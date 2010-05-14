@@ -1,0 +1,29 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MacroProject", "MacroProject\MacroProject.vcproj", "{F39C7417-770D-4635-8A47-77BD9CDDCD71}"
+	ProjectSection(ProjectDependencies) = postProject
+		{305604F2-9728-4D61-AC29-4658B31533DF} = {305604F2-9728-4D61-AC29-4658B31533DF}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MicroProject", "MicroProject\MicroProject.vcproj", "{305604F2-9728-4D61-AC29-4658B31533DF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F39C7417-770D-4635-8A47-77BD9CDDCD71}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F39C7417-770D-4635-8A47-77BD9CDDCD71}.Debug|Win32.Build.0 = Debug|Win32
+		{F39C7417-770D-4635-8A47-77BD9CDDCD71}.Release|Win32.ActiveCfg = Release|Win32
+		{F39C7417-770D-4635-8A47-77BD9CDDCD71}.Release|Win32.Build.0 = Release|Win32
+		{305604F2-9728-4D61-AC29-4658B31533DF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{305604F2-9728-4D61-AC29-4658B31533DF}.Debug|Win32.Build.0 = Debug|Win32
+		{305604F2-9728-4D61-AC29-4658B31533DF}.Release|Win32.ActiveCfg = Release|Win32
+		{305604F2-9728-4D61-AC29-4658B31533DF}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
