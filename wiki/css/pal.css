@@ -1,0 +1,75 @@
+/* Add the following line between <head> and </head> in your HTML
+   document to use this style sheet:
+
+<link rel="stylesheet" type="text/css" href="example.css" title="default" />
+*/
+
+
+.pal-cal     {
+	       width: 95%;              /* width of calendar on page */
+	       margin-left: auto;       /* center calendar */
+	       margin-right: auto;
+	       margin-bottom: 15px;     /* space below each calendar */
+	       border: 2px solid black; /* border around each calendar */
+             }
+
+
+/* formatting for the "Monday", "Tuesday", ... labels */
+.pal-dayname {
+                background-color: black;
+	        color: white;            /* font color */
+		width: 10%;              /* sets minimum width of columns in calendar */
+             }
+
+
+/* month name (on top of each calendar) */
+.pal-month   {
+               background-color: #cccccc;
+	       font-weight: bold;
+	       font-size: 150%;
+             }
+
+
+/* Formatting for individual days. If you wish, you can define these separately*/
+.pal-today, .pal-mon, .pal-tue, .pal-wed, .pal-thu, .pal-fri, .pal-sat, .pal-sun
+             {
+               border: 1px solid black;
+	       height: 100px;            /* minimum height of rows in calendar */
+             }
+
+
+/* additional formatting for Saturday and Sunday */
+.pal-sat, .pal-sun
+             {
+               background-color: #eeeeee;
+             }
+
+
+
+/* additional formatting for the current day */
+.pal-today   {
+	       border: 3px solid darkred;
+	       background-color: #cccccc;
+ 	     }
+
+
+/* formatting of blank days at beginning and end of calendar */
+.pal-blank   { border: 1px solid lightgray; }
+
+
+
+/* formatting of individual events.  For example, if a calendar file
+in pal.conf is set up to display as red, you can change the appearance
+of the events in that calendar file by changing .pal-event-red. */
+
+.pal-event-black    { background-color: #000000;
+                      color: #ffffff; }
+.pal-event-red      { background-color: #ff6666; }
+.pal-event-green    { background-color: #66ffcc; }
+.pal-event-yellow   { background-color: #ffff99; }
+.pal-event-blue     { background-color: #66ccff; }
+.pal-event-magenta  { background-color: #cc99ff; }
+.pal-event-cyan     { background-color: #ccffff; }
+.pal-event-white    { background-color: #cccccc; }
+
+.pal-tagline        { font-size: smaller; text-align: right; }

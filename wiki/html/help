@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title></title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="date" content="" />
+  <link rel="stylesheet" href="/Users/gabrielsynnaeve/labs/mkd-wiki/css/style.css" type="text/css" />
+<script language="javascript">
+  function toggleTOC() {
+    var toc = document.getElementById('TOC');
+    if (document.defaultView.getComputedStyle(toc, null).display == 'none') {
+      toc.style.display = 'inline';
+    } else {
+      toc.style.display = 'none';
+    }
+  }
+</script>
+</head>
+<body>
+<div id="header">
+  <a href="/Users/gabrielsynnaeve/labs/mkd-wiki/html/index">Index</a>
+  <a href="/Users/gabrielsynnaeve/labs/mkd-wiki/html/etapes_broodai">Etapes</a>
+  <a href="#" onclick="toggleTOC()">TOC</a>
+  <a href="/Users/gabrielsynnaeve/labs/mkd-wiki/html/help">Help</a>
+</div>
+<div id="TOC"
+><ul
+  ><li
+    ><a href="#this-is-an-empty-wiki"
+      >This is an empty wiki</a
+      ></li
+    ><li
+    ><a href="#typical-workflow"
+      >Typical workflow</a
+      ></li
+    ></ul
+  ></div
+>
+<div id="this-is-an-empty-wiki"
+><h1
+  ><a href="#TOC"
+    >This is an empty wiki</a
+    ></h1
+  ><p
+  >You can write it in <a href="http://daringfireball.net/projects/markdown/"
+    >Markdown</a
+    > syntax, with <a href="http://johnmacfarlane.net/pandoc/"
+    >Pandoc extensions</a
+    >.</p
+  ></div
+><div id="typical-workflow"
+><h1
+  ><a href="#TOC"
+    >Typical workflow</a
+    ></h1
+  ><ul
+  ><li
+    >edit files in your favorite editor</li
+    ><li
+    >mark links in markdown syntax, without <code
+      >.mkd</code
+      > extension (don't forget to create target files)</li
+    ><li
+    ><code
+      >:make</code
+      > will create a <code
+      >html</code
+      > directory you can browse to</li
+    ><li
+    >you can navigate links within vim too ! Just <code
+      >set suffixesadd=.mkd</code
+      > to add <code
+      >.mkd</code
+      > files to the list of files searched by the <code
+      >gf</code
+      > command.</li
+    ><li
+    >have fun</li
+    ></ul
+  ></div
+>
+
+</body>
+</html>
+
