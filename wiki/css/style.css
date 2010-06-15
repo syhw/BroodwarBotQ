@@ -1,0 +1,47 @@
+p                 {
+                    font-family: "Calibri", sans, palatino;
+                  }
+ul                {
+                    font-family: "Calibri", sans, palatino;
+                  }
+h1                {
+                    font-family: "Calibri", sans, palatino;
+                  }
+h2                {
+                    font-family: "Calibri", sans, palatino;
+                  }
+h3                {
+                    font-family: "Calibri", sans, palatino;
+                  }
+#header           { border: dashed 1px black
+                  ; margin-left: 30%
+                  ; margin-right: 30%
+                  ; text-align: center
+                  }
+#header a         { margin-left: 5px
+                  ; margin-right: 5px
+                  }
+a                 { text-decoration:none
+                  ; color:blue
+                  ; font-family: "Calibri", sans, palatino
+                  }
+a[href^=http]     { -moz-background-clip:border
+                  ; -moz-background-inline-policy:continuous
+                  ; -moz-background-origin:padding
+                  ; background:transparent url(../img/external.png) no-repeat scroll right center
+                  ; padding-right: 13px
+                  }
+a[href^=\#]       { color: black
+                  }
+a:hover           { text-decoration:underline
+                  }
+#TOC              { display: none }
+.email blockquote { border-left: double
+                  ; padding-left: 10px
+                  }
+dt                { font-style: italic
+                  }
+body              { width: 80%
+                  ; margin-left: auto
+                  ; margin-right: auto
+                  }

@@ -1,0 +1,508 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title></title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="date" content="" />
+  <link rel="stylesheet" href="/Users/gabrielsynnaeve/labs/mkd-wiki/css/style.css" type="text/css" />
+<script language="javascript">
+  function toggleTOC() {
+    var toc = document.getElementById('TOC');
+    if (document.defaultView.getComputedStyle(toc, null).display == 'none') {
+      toc.style.display = 'inline';
+    } else {
+      toc.style.display = 'none';
+    }
+  }
+</script>
+</head>
+<body>
+<div id="header">
+  <a href="/Users/gabrielsynnaeve/labs/mkd-wiki/html/index">Index</a>
+  <a href="/Users/gabrielsynnaeve/labs/mkd-wiki/html/etapes_broodai">Etapes</a>
+  <a href="#" onclick="toggleTOC()">TOC</a>
+  <a href="/Users/gabrielsynnaeve/labs/mkd-wiki/html/help">Help</a>
+</div>
+<div id="TOC"
+><ul
+  ><li
+    ><a href="#concours-et-notre-approche"
+      >Concours et notre approche</a
+      ><ul
+      ><li
+	><a href="#microgestion-mono-unit-type"
+	  >Microgestion mono unit type</a
+	  ></li
+	><li
+	><a href="#microgestion-groupes"
+	  >Microgestion groupes</a
+	  ></li
+	><li
+	><a href="#tech-limited-full-game"
+	  >Tech limited full game</a
+	  ></li
+	><li
+	><a href="#full-game"
+	  >Full game</a
+	  ></li
+	></ul
+      ></li
+    ><li
+    ><a href="#description-de-larchi-actuelle"
+      >Description de l'archi actuelle</a
+      ><ul
+      ><li
+	><a href="#macro"
+	  >Macro</a
+	  ></li
+	><li
+	><a href="#micro"
+	  >Micro</a
+	  ></li
+	></ul
+      ></li
+    ><li
+    ><a href="#les-questions-que-lon-se-pose"
+      >Les questions que l'on se pose</a
+      ><ul
+      ><li
+	><a href="#strategie"
+	  >Strategie</a
+	  ></li
+	><li
+	><a href="#tactique"
+	  >Tactique</a
+	  ></li
+	><li
+	><a href="#sens-du-jeu"
+	  >Sens du jeu</a
+	  ></li
+	><li
+	><a href="#microgestion"
+	  >Microgestion</a
+	  ></li
+	></ul
+      ></li
+    ><li
+    ><a href="#etape-1-:-sadapter-&#224;-ce-que-fait-lennemi"
+      >Etape 1 : S'adapter à ce que fait l'ennemi</a
+      ><ul
+      ><li
+	><a href="#estimer-son-eco-minerauxmin-et-gazmin"
+	  >1.0 Estimer son Eco (Mineraux/Min et Gaz/Min)</a
+	  ><ul
+	  ><li
+	    ><a href="#minerauxmin"
+	      >1.0.0 Mineraux/Min</a
+	      ></li
+	    ><li
+	    ><a href="#gazmin"
+	      >1.0.1 Gaz/Min</a
+	      ></li
+	    ><li
+	    ><a href="#sadapter"
+	      >1.0.2 S'adapter</a
+	      ></li
+	    ><li
+	    ><a href="#de-meilleures-interpolationsestimations"
+	      >1.0.3 De meilleures interpolations/estimations</a
+	      ></li
+	    ></ul
+	  ></li
+	><li
+	><a href="#estimer-sa-tech-techtree"
+	  >1.1 Estimer sa Tech (techtree)</a
+	  ><ul
+	  ><li
+	    ><a href="#tech-tree-possibles"
+	      >1.1.0 Tech tree possibles</a
+	      ></li
+	    ><li
+	    ><a href="#update-avec-le-scout"
+	      >1.1.1 Update avec le scout</a
+	      ></li
+	    ><li
+	    ><a href="#deduction-adaptation"
+	      >1.1.2 Deduction / Adaptation</a
+	      ></li
+	    ></ul
+	  ></li
+	><li
+	><a href="#estimer-sa-production-en-nombre-type-dunit"
+	  >1.2 Estimer sa Production en nombre / type d'unit</a
+	  ></li
+	></ul
+      ></li
+    ><li
+    ><a href="#etape-2"
+      >Etape 2</a
+      ><ul
+      ><li
+	><a href="#section"
+	  >2.0</a
+	  ></li
+	><li
+	><a href="#section-1"
+	  >2.1</a
+	  ></li
+	><li
+	><a href="#section-2"
+	  >2.2</a
+	  ></li
+	></ul
+      ></li
+    ></ul
+  ></div
+>
+<div id="concours-et-notre-approche"
+><h1
+  ><a href="#TOC"
+    >Concours et notre approche</a
+    ></h1
+  ><div id="microgestion-mono-unit-type"
+  ><h2
+    ><a href="#TOC"
+      >Microgestion mono unit type</a
+      ></h2
+    ><p
+    >Ici on ne se concentre que sur l'efficacité de la classe BayesianUnit.</p
+    ></div
+  ><div id="microgestion-groupes"
+  ><h2
+    ><a href="#TOC"
+      >Microgestion groupes</a
+      ></h2
+    ><p
+    >On se concentre sur l'efficacité de la classe BayesianUnit + cas particulier du médic qui doit être optimisé (communication ou non ?).</p
+    ></div
+  ><div id="tech-limited-full-game"
+  ><h2
+    ><a href="#TOC"
+      >Tech limited full game</a
+      ></h2
+    ><p
+    >On fait la Tech de Nony, Gate10 Gate15, goons le plus vite possible. Si pas de super résultats, on passe sur le même module que pour Full Game.</p
+    ></div
+  ><div id="full-game"
+  ><h2
+    ><a href="#TOC"
+      >Full game</a
+      ></h2
+    ><p
+    >Quelle race pick ? Un Zerg avec une macro de poulpe + tech switches ou un Terran / Protoss intelligent (prévoyant) avec une micro de poulpe ? Pour l'instant Protoss.</p
+    ></div
+  ></div
+><div id="description-de-larchi-actuelle"
+><h1
+  ><a href="#TOC"
+    >Description de l'archi actuelle</a
+    ></h1
+  ><p
+  >image</p
+  ><div id="macro"
+  ><h2
+    ><a href="#TOC"
+      >Macro</a
+      ></h2
+    ><p
+    >On fait simplement des workers en continu et on produit pour avoir les finances proches de 0/0. Avec la creation de supply quand on a besoin de la creation d'unites selon ce que l'on peut et ce que demande le &quot;WarManager&quot;. Quand on arrive a saturation, on expand.</p
+    ></div
+  ><div id="micro"
+  ><h2
+    ><a href="#TOC"
+      >Micro</a
+      ></h2
+    ><p
+    >Tout est gere par BayesianUnit qui ne fait pour l'instant pas grand chose (flocking + attack move).</p
+    ></div
+  ></div
+><div id="les-questions-que-lon-se-pose"
+><h1
+  ><a href="#TOC"
+    >Les questions que l'on se pose</a
+    ></h1
+  ><div id="strategie"
+  ><h2
+    ><a href="#TOC"
+      >Strategie</a
+      ></h2
+    ><p
+    >Quelle unit produire ? Quelle tech faire (== quelle unit produire dans longtemps) ?</p
+    ></div
+  ><div id="tactique"
+  ><h2
+    ><a href="#TOC"
+      >Tactique</a
+      ></h2
+    ><p
+    >Where fight? Where flee? Where to take positions?</p
+    ></div
+  ><div id="sens-du-jeu"
+  ><h2
+    ><a href="#TOC"
+      >Sens du jeu</a
+      ></h2
+    ><p
+    >Quand se battre ? Quand fuir ? Ratio eco/prod/tech ? (eco/war + prod/tech ?)</p
+    ></div
+  ><div id="microgestion"
+  ><h2
+    ><a href="#TOC"
+      >Microgestion</a
+      ></h2
+    ><p
+    >Who to target? When to move? Where?</p
+    ></div
+  ></div
+><div id="etape-1-:-sadapter-&#224;-ce-que-fait-lennemi"
+><h1
+  ><a href="#TOC"
+    >Etape 1 : S'adapter à ce que fait l'ennemi</a
+    ></h1
+  ><p
+  >image</p
+  ><div id="estimer-son-eco-minerauxmin-et-gazmin"
+  ><h2
+    ><a href="#TOC"
+      >1.0 Estimer son Eco (Mineraux/Min et Gaz/Min)</a
+      ></h2
+    ><p
+    >Zerg:<br
+       /><span class="math"
+      ><em
+	>Nworkers</em
+	>=<em
+	>Nworkers</em
+	><sub
+	><em
+	  >minerals</em
+	  ></sub
+	>+<em
+	>Nworkers</em
+	><sub
+	><em
+	  >gaz</em
+	  ></sub
+	>+1</span
+      ><br
+       />Protoss:<br
+       /><span class="math"
+      ><em
+	>Nworkers</em
+	>=<em
+	>Nworkers</em
+	><sub
+	><em
+	  >minerals</em
+	  ></sub
+	>+<em
+	>Nworkers</em
+	><sub
+	><em
+	  >gaz</em
+	  ></sub
+	></span
+      ><br
+       />Terran:<br
+       /><span class="math"
+      ><em
+	>Nworkers</em
+	>=<em
+	>Nworkers</em
+	><sub
+	><em
+	  >minerals</em
+	  ></sub
+	>+<em
+	>Nworkers</em
+	><sub
+	><em
+	  >gaz</em
+	  ></sub
+	>+<em
+	>Nworkers</em
+	><sub
+	><em
+	  >build</em
+	  ></sub
+	></span
+      ></p
+    ><div id="minerauxmin"
+    ><h3
+      ><a href="#TOC"
+	>1.0.0 Mineraux/Min</a
+	></h3
+      ><p
+      >Assumer que depuis la 1ère seconde, l'ennemi ne fait que produire des workers en continu =&gt; estimation de son nombre de workers. Sans plus d'information, estimer qu'il dispose d'autant de bases que nous et d'autant de geysers de gaz vespene. Faire <span class="math"
+	><em
+	  >Nworkers</em
+	  ><sub
+	  ><em
+	    >minerals</em
+	    ></sub
+	  >=<em
+	  >Nworkers</em
+	  >-<em
+	  >Nworkers</em
+	  ><sub
+	  ><em
+	    >gaz</em
+	    ></sub
+	  ></span
+	> (<span class="math"
+	>-<em
+	  >Nworkers</em
+	  ><sub
+	  ><em
+	    >build</em
+	    ></sub
+	  ></span
+	> pour Terran). Utiliser une courbe <span class="math"
+	><em
+	  >Nworkers</em
+	  ><sub
+	  ><em
+	    >minerals</em
+	    ></sub
+	  >/<em
+	  >Npatches</em
+	  ><sub
+	  ><em
+	    >owned</em
+	    ></sub
+	  >( ⇔ <em
+	  >Mbases</em
+	  >)</span
+	> pour avoir Min/M (saturation ~ 3 workers / patch). Ré-estimer <span class="math"
+	><em
+	  >Nworkers</em
+	  ></span
+	>, <span class="math"
+	><em
+	  >Nworkers</em
+	  ><sub
+	  ><em
+	    >minerals</em
+	    ></sub
+	  ></span
+	>, <span class="math"
+	><em
+	  >Nworkers</em
+	  ><sub
+	  ><em
+	    >gaz</em
+	    ></sub
+	  ></span
+	> quand on scout sa base (re-aligner sur ce que l'on voit).</p
+      ></div
+    ><div id="gazmin"
+    ><h3
+      ><a href="#TOC"
+	>1.0.1 Gaz/Min</a
+	></h3
+      ><p
+      >Estimer <span class="math"
+	><em
+	  >Nworkers</em
+	  ><sub
+	  ><em
+	    >gaz</em
+	    ></sub
+	  ></span
+	> et <span class="math"
+	><em
+	  >Ngeysers</em
+	  ></span
+	> et utiliser une formule. Ré-estimer <span class="math"
+	><em
+	  >Nworkers</em
+	  ><sub
+	  ><em
+	    >gaz</em
+	    ></sub
+	  ></span
+	> quand on scout sa base.</p
+      ></div
+    ><div id="sadapter"
+    ><h3
+      ><a href="#TOC"
+	>1.0.2 S'adapter</a
+	></h3
+      ><p
+      >Si on estime que son Min/M est supérieur au notre, dépenser plus en éco et essayer de harass (il a une meilleure macro et va nous écraser au nombre) et/ou techer.<br
+	 />Si on estime que son Gaz/M est supérieur au notre, essayer d'attaquer de suite et de techer (il tech et va faire plus d'unités gaz-heavy que nous).</p
+      ></div
+    ><div id="de-meilleures-interpolationsestimations"
+    ><h3
+      ><a href="#TOC"
+	>1.0.3 De meilleures interpolations/estimations</a
+	></h3
+      ></div
+    ></div
+  ><div id="estimer-sa-tech-techtree"
+  ><h2
+    ><a href="#TOC"
+      >1.1 Estimer sa Tech (techtree)</a
+      ></h2
+    ><div id="tech-tree-possibles"
+    ><h3
+      ><a href="#TOC"
+	>1.1.0 Tech tree possibles</a
+	></h3
+      ><p
+      >Generer les tech tree possibles et les ponderer des probas apprises (par EM ?) sur les replays selon le match-up.</p
+      ></div
+    ><div id="update-avec-le-scout"
+    ><h3
+      ><a href="#TOC"
+	>1.1.1 Update avec le scout</a
+	></h3
+      ><p
+      >Les upadater avec ce que l'on voit (en rend certain impossibles et augmente la probas de ceux qui ressemblent, au detriment des autres).</p
+      ></div
+    ><div id="deduction-adaptation"
+    ><h3
+      ><a href="#TOC"
+	>1.1.2 Deduction / Adaptation</a
+	></h3
+      ><p
+      >En deduire les unites possibles / techs possibles, et s'y adater en allant sur les contres.</p
+      ></div
+    ></div
+  ><div id="estimer-sa-production-en-nombre-type-dunit"
+  ><h2
+    ><a href="#TOC"
+      >1.2 Estimer sa Production en nombre / type d'unit</a
+      ></h2
+    ></div
+  ></div
+><div id="etape-2"
+><h1
+  ><a href="#TOC"
+    >Etape 2</a
+    ></h1
+  ><div id="section"
+  ><h2
+    ><a href="#TOC"
+      >2.0</a
+      ></h2
+    ></div
+  ><div id="section-1"
+  ><h2
+    ><a href="#TOC"
+      >2.1</a
+      ></h2
+    ></div
+  ><div id="section-2"
+  ><h2
+    ><a href="#TOC"
+      >2.2</a
+      ></h2
+    ></div
+  ></div
+>
+
+</body>
+</html>
+

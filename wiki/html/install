@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title></title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="date" content="" />
+  <link rel="stylesheet" href="/Users/gabrielsynnaeve/labs/mkd-wiki/css/style.css" type="text/css" />
+<script language="javascript">
+  function toggleTOC() {
+    var toc = document.getElementById('TOC');
+    if (document.defaultView.getComputedStyle(toc, null).display == 'none') {
+      toc.style.display = 'inline';
+    } else {
+      toc.style.display = 'none';
+    }
+  }
+</script>
+</head>
+<body>
+<div id="header">
+  <a href="/Users/gabrielsynnaeve/labs/mkd-wiki/html/index">Index</a>
+  <a href="/Users/gabrielsynnaeve/labs/mkd-wiki/html/etapes_broodai">Etapes</a>
+  <a href="#" onclick="toggleTOC()">TOC</a>
+  <a href="/Users/gabrielsynnaeve/labs/mkd-wiki/html/help">Help</a>
+</div>
+<div id="TOC"
+><ul
+  ><li
+    ><a href="#this-page-explains-the-full-setup-needed-to-work-on-broodai"
+      >This page explains the full setup needed to work on BroodAI</a
+      ><ul
+      ><li
+	><a href="#prerequisites"
+	  >Prerequisites</a
+	  ><ul
+	  ><li
+	    ><a href="#needed:"
+	      >Needed:</a
+	      ></li
+	    ><li
+	    ><a href="#optional:"
+	      >Optional:</a
+	      ></li
+	    ></ul
+	  ></li
+	><li
+	><a href="#walkthrough"
+	  >Walkthrough</a
+	  ></li
+	></ul
+      ></li
+    ></ul
+  ></div
+>
+<div id="this-page-explains-the-full-setup-needed-to-work-on-broodai"
+><h1
+  ><a href="#TOC"
+    >This page explains the full setup needed to work on BroodAI</a
+    ></h1
+  ><div id="prerequisites"
+  ><h2
+    ><a href="#TOC"
+      >Prerequisites</a
+      ></h2
+    ><div id="needed:"
+    ><h3
+      ><a href="#TOC"
+	>Needed:</a
+	></h3
+      ><ul
+      ><li
+	>Windows (XP or Vista)</li
+	><li
+	>Visual Studio (Express 2008 at least)</li
+	><li
+	>BWAPI library + Chaoslauncher</li
+	><li
+	>GIT (version control)</li
+	><li
+	>Starcraft: Broodwar (latest patch)</li
+	><li
+	>Boost Library (currently 1.42)</li
+	></ul
+      ></div
+    ><div id="optional:"
+    ><h3
+      ><a href="#TOC"
+	>Optional:</a
+	></h3
+      ><ul
+      ><li
+	>Your favorite editor</li
+	><li
+	>Python (for cpplint.py and scrapper scripts)</li
+	><li
+	>Qt SDK (for debugger output)</li
+	><li
+	>ProBT (not used right now but soon for strategies)</li
+	><li
+	>Cygwin</li
+	><li
+	>Perl+Pandoc+make (to edit this wiki)</li
+	></ul
+      ></div
+    ></div
+  ><div id="walkthrough"
+  ><h2
+    ><a href="#TOC"
+      >Walkthrough</a
+      ></h2
+    ><ol style="list-style-type: decimal;"
+    ><li
+      >Install VS (&gt;= Express 2008)</li
+      ><li
+      >Install Starcraft: Broodwar and patch</li
+      ><li
+      >Download BWAPI here: <a href="http://code.google.com/bwapi/"
+	><code
+	  >http://code.google.com/bwapi/</code
+	  ></a
+	> and install it all as said in the README (DLLs in /Windows/, injector DLL in chaoslauncher, bwapi-data in Starcraft/)</li
+      ><li
+      >In this folder (where BWAPI is, where you have include/ and lib/ for BWAPI), git clone git+ssh://inrialogin@scm.gforge.inria.fr//gitroot//broodai/broodai.git</li
+      ><li
+      >Open the .sln file of the cloned repository with VS</li
+      ><li
+      >Change the paths of include and linked library files in project properties for both Macro and Micro. If you have the right directory structure BWAPI/broodai/BroodAIProject.sln alongside BWAPI/include/ and BWAPI/lib/ you shouldn't have to change the paths for BWAPI lib.</li
+      ><li
+      >Build all in Release mode</li
+      ><li
+      >Launch chaosluncher and click &quot;Config&quot; for the injector, change the path for the one of the DLL you want to use (under broodai/Release/)</li
+      ><li
+      >Launch Starcraft and a corresponding map</li
+      ><li
+      >Profit</li
+      ></ol
+    ></div
+  ></div
+>
+
+</body>
+</html>
+
