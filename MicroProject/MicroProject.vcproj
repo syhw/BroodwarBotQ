@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../src;../src/Arbitrator;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Regions;../src/Utils;../../BWAPI_Beta_2.6.1/include;../../BWAPI_Beta_2.6.1/include/BWAPI;../../BWAPI_Beta_2.6.1/include/BWTA;&quot;C:\Program Files\boost\boost_1_42\&quot;;../../boost_1_42"
+				AdditionalIncludeDirectories="../src;../src/Arbitrator;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Regions;../src/Utils;../../BWAPI_Beta_2.8/include;../../BWAPI_Beta_2.8/include/BWAPI;../../BWAPI_Beta_2.8/include/BWTA;&quot;C:\Program Files\boost\boost_1_42\&quot;;../../boost_1_42"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -58,7 +58,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="../../BWAPI_Beta_2.6.1/lib/BWAPI.lib ../../BWAPI_Beta_2.6.1/lib/BWTA.lib ../../BWAPI_Beta_2.6.1/lib/CGAL-vc90-mt.lib ../../BWAPI_Beta_2.6.1/lib/gmp-vc90-mt.lib ../../BWAPI_Beta_2.6.1/lib/libboost_thread-vc90-mt-1_38.lib ../../BWAPI_Beta_2.6.1/lib/mpfr-vc90-mt.lib"
+				AdditionalDependencies="../../BWAPI_Beta_2.8/lib/BWAPI.lib ../../BWAPI_Beta_2.8/lib/BWTA.lib ../../BWAPI_Beta_2.8/lib/CGAL-vc90-mt.lib ../../BWAPI_Beta_2.8/lib/gmp-vc90-mt.lib ../../BWAPI_Beta_2.8/lib/libboost_thread-vc90-mt-1_40.lib ../../BWAPI_Beta_2.8/lib/mpfr-vc90-mt.lib"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
 			/>
@@ -111,7 +111,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../src;../src/Arbitrator;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Regions;../src/Utils;../../BWAPI_Beta_2.7.2/include;../../BWAPI_Beta_2.7.2/include/BWAPI;../../BWAPI_Beta_2.7.2/include/BWTA;&quot;C:\Program Files\boost\boost_1_42\&quot;;../../probt/include;../../boost_1_42"
+				AdditionalIncludeDirectories="../src;../src/Arbitrator;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Regions;../src/Utils;../../BWAPI_Beta_2.8/include;../../BWAPI_Beta_2.8/include/BWAPI;../../BWAPI_Beta_2.8/include/BWTA;&quot;C:\Program Files\boost\boost_1_42\&quot;;../../probt/include;../../boost_1_42"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
@@ -128,7 +128,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="../../BWAPI_Beta_2.7.2/lib/BWAPI.lib ../../BWAPI_Beta_2.7.2/lib/BWTA.lib ../../BWAPI_Beta_2.7.2/lib/CGAL-vc90-mt.lib ../../BWAPI_Beta_2.7.2/lib/gmp-vc90-mt.lib ../../BWAPI_Beta_2.7.2/lib/libboost_thread-vc90-mt-1_40.lib ../../BWAPI_Beta_2.7.2/lib/mpfr-vc90-mt.lib"
+				AdditionalDependencies="../../BWAPI_Beta_2.8/lib/BWAPI.lib ../../BWAPI_Beta_2.8/lib/BWTA.lib ../../BWAPI_Beta_2.8/lib/CGAL-vc90-mt.lib ../../BWAPI_Beta_2.8/lib/gmp-vc90-mt.lib ../../BWAPI_Beta_2.8/lib/libboost_thread-vc90-mt-1_40.lib ../../BWAPI_Beta_2.8/lib/mpfr-vc90-mt.lib"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
