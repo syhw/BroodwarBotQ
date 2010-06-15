@@ -85,6 +85,7 @@ strategies:
 - trouver un apercu de la minimap dans les map star pour l'affichage de la minimap qt (ou walkability pour l'instant)
 
 
+http://msdn.microsoft.com/en-us/library/kdxzbw9t%28v=VS.80%29.aspx
 
 
 
