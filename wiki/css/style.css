@@ -13,6 +13,9 @@ h2                {
 h3                {
                     font-family: "Calibri", sans, palatino;
                   }
+li                {
+                    font-family: "Calibri", sans, palatino;
+                  }
 #header           { border: dashed 1px black
                   ; margin-left: 30%
                   ; margin-right: 30%
