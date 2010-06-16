@@ -129,6 +129,12 @@
       ><li
       >Build all in Release mode</li
       ><li
+      >Change your Path variable in Windows (System Properties <span class="math"
+	> → </span
+	> Advanced) to contain Qt and stuff, example: <code
+	>C:\Python26;C:\nant-0.86-beta1\bin;C:\Program Files\Parallels\Parallels Tools\Applications;%SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;C:\Program Files\Mercurial;C:\Program Files\Lua\5.1;C:\Program Files\Lua\5.1\clibs;C:\Program Files\TortoiseHg;C:\Program Files\QuickTime\QTSystem\;C:\Program Files\GtkSharp\2.12\bin;C:\Program Files\CMake 2.8\bin;C:\Program Files\TortoiseSVN\bin;C:\Program Files\CGAL-3.6\auxiliary\gmp\lib;C:\CGAL\CGAL-3.6\auxiliary\gmp\lib;C:\Python26\Scripts;C:\Program Files\software.jessies.org\terminator\Resources\terminator\bin\;C:\Qt\4.6.2\bin;C:\Qt\4.6.2\lib</code
+	></li
+      ><li
       >Launch chaosluncher and click &quot;Config&quot; for the injector, change the path for the one of the DLL you want to use (under broodai/Release/)</li
       ><li
       >Launch Starcraft and a corresponding map</li
