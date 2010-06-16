@@ -245,7 +245,7 @@ double BayesianUnit::computeProb(unsigned int i)
         }
     }
     if (_occupation[i] == OCCUP_BUILDING) /// NON-WALKABLE (BUILDING) INFLUENCE
-    {
+    {	
         val *= 1.0-_PROB_NO_BUILDING_MOVE;
     }
     else if (_occupation[i] == OCCUP_BLOCKING) /// NON-WALKABLE INFLUENCE

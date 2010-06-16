@@ -14,10 +14,10 @@ ObjectManager::~ObjectManager()
 void ObjectManager::updateOM()
 {
 #ifndef CREATOR_COMPIL
-  BWAPI::Broodwar->setLocalSpeed( speed.getValue());
+  BWAPI::Broodwar->setLocalSpeed(99-speed.getValue());
 	(*speedChanged.beginEdit()) = false;
 	speedChanged.endEdit();
-  BWAPI::Broodwar->printf( "changement de la vitesse du jeu pour %i", speed.getValue());
+ // BWAPI::Broodwar->printf( "Changement de la vitesse du jeu pour %i", speed.getValue());
 #endif
 }
 
