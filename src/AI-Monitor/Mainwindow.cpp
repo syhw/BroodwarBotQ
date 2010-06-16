@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent, ObjectManager* objManager) :
     splitter->addWidget (miniMap);
     ui->horizontalLayout_main->addWidget (splitter);
 
-    connect( menuWidget->ui->hSlider_gameSpeed, SIGNAL(valueChanged(int)), this, SLOT(changeGameSpeed(int)));
+    connect(menuWidget->ui->hSlider_gameSpeed, SIGNAL(valueChanged(int)), this, SLOT(changeGameSpeed(int)));
 }
 
 MainWindow::~MainWindow()

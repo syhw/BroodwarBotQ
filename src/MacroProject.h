@@ -20,6 +20,7 @@
 #include "Regions.h"
 #include "MicroManager.h"
 #include "ObjectManager.h"
+#include "EUnitsFilter.h"
 
 static bool analyzed;
 static bool analysis_just_finished;
@@ -49,6 +50,7 @@ public:
 	UpgradeManager* upgradeManager;
 	WorkerManager* workerManager;
     MapManager* mapManager;
+    EUnitsFilter* eUnitsFilter;
 	bool showManagerAssignments;
 
 	BattleBroodAI();

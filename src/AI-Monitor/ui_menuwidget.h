@@ -35,6 +35,7 @@ public:
     QVBoxLayout *verticalLayout;
     QTreeView *treeView;
     QWidget *tab_2;
+    QWidget *tab_EUnitsFilter;
 
     void setupUi(QWidget *MenuWidget)
     {
@@ -68,7 +69,10 @@ public:
         tabWidget->addTab(tab, QString());
         tab_2 = new QWidget();
         tab_2->setObjectName(QString::fromUtf8("tab_2"));
-        tabWidget->addTab(tab_2, QString());
+        tabWidget->addTab(tab_2, QString());    
+        tab_EUnitsFilter = new QWidget();
+        tab_EUnitsFilter->setObjectName(QString::fromUtf8("tab_EUnitsFilter"));
+        tabWidget->addTab(tab_EUnitsFilter, QString());
 
         verticalLayout_2->addWidget(tabWidget);
 
@@ -87,6 +91,7 @@ public:
         label->setText(QApplication::translate("MenuWidget", "Game speed:", 0, QApplication::UnicodeUTF8));
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MenuWidget", "Composants", 0, QApplication::UnicodeUTF8));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("MenuWidget", "Visu", 0, QApplication::UnicodeUTF8));
+        tabWidget->setTabText(tabWidget->indexOf(tab_EUnitsFilter), QApplication::translate("MenuWidget", "EUFilter", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

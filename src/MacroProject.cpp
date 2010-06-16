@@ -57,6 +57,8 @@ BattleBroodAI::~BattleBroodAI()
 	MicroManager::Destroy();
 	Regions::Destroy();
     MapManager::Destroy();
+    EUnitsFilter::Destroy();
+
 
 	if( Broodwar->self()->getRace() == Races::Protoss)
 		ProtossStrat::Destroy();
@@ -100,7 +102,7 @@ void BattleBroodAI::onStart()
 	BWTA::analyze();
 	this->analyzed=true;
 	this->timeManager       = & TimeManager::Instance();
-	this->arbitrator		    = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
+	this->arbitrator		= & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
 	this->buildManager      = & BuildManager::Instance();
 	this->techManager       = & TechManager::Instance();
 	this->upgradeManager    = & UpgradeManager::Instance();
@@ -110,6 +112,7 @@ void BattleBroodAI::onStart()
 	this->baseManager       = & BaseManager::Instance();
 	this->supplyManager     = & SupplyManager::Instance();
     this->mapManager        = & MapManager::Instance();
+    this->eUnitsFilter      = & EUnitsFilter::Instance();
 
 	this->supplyManager->setBuildManager(this->buildManager);
 	this->supplyManager->setBuildOrderManager(this->buildOrderManager);
@@ -437,6 +440,7 @@ void BattleBroodAI::onUnitDestroy(BWAPI::Unit* unit)
 	this->upgradeManager->onUnitDestroy(unit);
 	this->workerManager->onUnitDestroy(unit);
     this->mapManager->onUnitDestroy(unit);
+    this->eUnitsFilter->onUnitDestroy(unit);
 }
 
 void BattleBroodAI::onUnitMorph(BWAPI::Unit* unit)
@@ -455,6 +459,7 @@ void BattleBroodAI::onUnitMorph(BWAPI::Unit* unit)
 			//Broodwar->sendText("%.2d:%.2d: %s morphs a %s",minutes,seconds,unit->getPlayer()->getName().c_str(),unit->getType().getName().c_str());
 		}
 	}
+    eUnitsFilter->update(unit);
 }
 
 void BattleBroodAI::onUnitShow(BWAPI::Unit* unit)
@@ -464,6 +469,7 @@ void BattleBroodAI::onUnitShow(BWAPI::Unit* unit)
 
 	regions->onUnitShow(unit);
     mapManager->onUnitShow(unit);
+    eUnitsFilter->update(unit);
 }
 
 void BattleBroodAI::onUnitHide(BWAPI::Unit* unit)
@@ -473,12 +479,14 @@ void BattleBroodAI::onUnitHide(BWAPI::Unit* unit)
 
 	regions->onUnitHide(unit);
     mapManager->onUnitHide(unit);
+    eUnitsFilter->update(unit);
 }
 
 void BattleBroodAI::onUnitRenegade(BWAPI::Unit* unit)
 {
 	//if (!Broodwar->isReplay())
 	//	Broodwar->sendText("A %s [%x] is now owned by %s",unit->getType().getName().c_str(),unit,unit->getPlayer()->getName().c_str());
+    eUnitsFilter->update(unit);
 }
 
 void BattleBroodAI::onPlayerLeft(BWAPI::Player* player)
