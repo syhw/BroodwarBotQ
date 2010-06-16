@@ -39,5 +39,5 @@ void MainWindow::changeEvent(QEvent *e)
 
 void MainWindow::changeGameSpeed( int value)
 {
-    objManager->setGameSpeed( value);
+    objManager->setGameSpeed(value);
 }

@@ -178,12 +178,12 @@ void UnitsGroup::attackMove(BWAPI::Position& p)
 void UnitsGroup::formation(Formation* f)
 {
 	std::vector<BWAPI::Position> from;
-	std::vector<Unit*> units;
+	std::vector<pBayesianUnit> units;
 	for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); it++)
 	{
 		from.push_back((*it)->unit->getPosition());
 	}
-
+	
 	f->computeToPositions(this->units);
 
 	const std::vector<BWAPI::Position>& to = f->end_positions;
@@ -197,6 +197,7 @@ void UnitsGroup::formation(Formation* f)
 		(this->units)[i]->target = to[alignment[i]];
 		//(this->units)[i]->attackMove(to[alignment[i]]);
 	}
+
 }
 
 void UnitsGroup::setGoals(std::list<Goal*>& goals)

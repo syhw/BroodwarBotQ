@@ -34,7 +34,7 @@ void BattleUnit::attackMove(const Position& p)
     if (path.size() == 0) 
         Broodwar->printf("Scandale path.size()==0");*/
     //unit->rightClick(path.pop....
-	unit->attackMove(p);
+		unit->attackMove(p);
 }
 
 bool BattleUnit::operator == (const BattleUnit& bu) const
