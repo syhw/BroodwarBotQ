@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="MacroProject"
 	ProjectGUID="{F39C7417-770D-4635-8A47-77BD9CDDCD71}"
 	RootNamespace="MacroProject"
@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Regions;../src/Utils;../src/Utils/Component;../../BWAPI_Beta_2.8/include;../../BWAPI_Beta_2.8/include/BWAPI;../../BWAPI_Beta_2.8/include/BWTA;&quot;C:\Program Files\boost\boost_1_42\&quot;;../../boost_1_42;C:\Qt\4.6.2\include;&quot;C:\dev\libQGLViewer-2.3.5\QGLViewer&quot;"
+				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Regions;../src/Utils;../src/Utils/Component;../../BWAPI_Beta_2.8/include;../../BWAPI_Beta_2.8/include/BWAPI;../../BWAPI_Beta_2.8/include/BWTA;&quot;C:\Program Files\boost\boost_1_42\&quot;;../../boost_1_42;C:\Qt\4.6.2\include;C:\Qt\4.6.3\include;&quot;C:\dev\libQGLViewer-2.3.5\QGLViewer&quot;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -59,7 +59,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="../../BWAPI_Beta_2.8/lib/BWAPI.lib ../../BWAPI_Beta_2.8/lib/BWTA.lib ../../BWAPI_Beta_2.8/lib/CGAL-vc90-mt.lib ../../BWAPI_Beta_2.8/lib/gmp-vc90-mt.lib ../../BWAPI_Beta_2.8/lib/libboost_thread-vc90-mt-1_40.lib ../../BWAPI_Beta_2.8/lib/mpfr-vc90-mt.lib QtCore4.lib QtGui4.lib QtOpenGL4.lib QtXml4.lib opengl32.lib glu32.lib"
-				AdditionalLibraryDirectories="C:\Qt\4.6.2\lib;C:\dev\libQGLViewer-2.3.5\QGLViewer\release"
+				AdditionalLibraryDirectories="C:\Qt\4.6.2\lib;C:\Qt\4.6.3\lib;&quot;C:\dev\libQGLViewer-2.3.5\QGLViewer\release&quot;"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				TargetMachine="1"
@@ -113,7 +113,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Regions;../src/Utils;../src/Utils/Component;../../BWAPI_Beta_2.8/include;../../BWAPI_Beta_2.8/include/BWAPI;../../BWAPI_Beta_2.8/include/BWTA;&quot;C:\Program Files\boost\boost_1_42\&quot;;../../boost_1_42;C:\Qt\4.6.2\include;&quot;C:\dev\libQGLViewer-2.3.5\QGLViewer&quot;"
+				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Regions;../src/Utils;../src/Utils/Component;../../BWAPI_Beta_2.8/include;../../BWAPI_Beta_2.8/include/BWAPI;../../BWAPI_Beta_2.8/include/BWTA;&quot;C:\Program Files\boost\boost_1_42\&quot;;../../boost_1_42;C:\Qt\4.6.2\include;C:\Qt\4.6.3\include;&quot;C:\dev\libQGLViewer-2.3.5\QGLViewer&quot;"
 				MinimalRebuild="false"
 				ExceptionHandling="1"
 				RuntimeLibrary="2"
@@ -133,8 +133,8 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="-GX /GX&#x0D;&#x0A;"
-				AdditionalDependencies="../../BWAPI_Beta_2.8/lib/BWAPI.lib ../../BWAPI_Beta_2.8/lib/BWTA.lib ../../BWAPI_Beta_2.8/lib/CGAL-vc90-mt.lib ../../BWAPI_Beta_2.8/lib/gmp-vc90-mt.lib ../../BWAPI_Beta_2.8/lib/libboost_thread-vc90-mt-1_40.lib ../../BWAPI_Beta_2.7.2/lib/mpfr-vc90-mt.lib C:\Qt\4.6.2\lib\QtCore4.lib C:\Qt\4.6.2\lib\QtGui4.lib C:\Qt\4.6.2\lib\QtOpenGL4.lib C:\Qt\4.6.2\lib\QtXml4.lib opengl32.lib glu32.lib"
-				AdditionalLibraryDirectories=""
+				AdditionalDependencies="../../BWAPI_Beta_2.8/lib/BWAPI.lib ../../BWAPI_Beta_2.8/lib/BWTA.lib ../../BWAPI_Beta_2.8/lib/CGAL-vc90-mt.lib ../../BWAPI_Beta_2.8/lib/gmp-vc90-mt.lib ../../BWAPI_Beta_2.8/lib/libboost_thread-vc90-mt-1_40.lib ../../BWAPI_Beta_2.8/lib/mpfr-vc90-mt.lib QtCore4.lib QtGui4.lib QtOpenGL4.lib QtXml4.lib opengl32.lib glu32.lib"
+				AdditionalLibraryDirectories="C:\Qt\4.6.2\lib;C:\Qt\4.6.3\lib;&quot;C:\dev\libQGLViewer-2.3.5\QGLViewer\release&quot;"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
