@@ -5,7 +5,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="date" content="" />
-  <link rel="stylesheet" href="/Users/gabrielsynnaeve/labs/mkd-wiki/css/style.css" type="text/css" />
+  <link rel="stylesheet" href="../css/style.css" type="text/css" />
 <script language="javascript">
   function toggleTOC() {
     var toc = document.getElementById('TOC');
@@ -19,10 +19,10 @@
 </head>
 <body>
 <div id="header">
-  <a href="/Users/gabrielsynnaeve/labs/mkd-wiki/html/index">Index</a>
-  <a href="/Users/gabrielsynnaeve/labs/mkd-wiki/html/etapes_broodai">Etapes</a>
+  <a href="../html/index">Index</a>
+  <a href="../html/etapes_broodai">Etapes</a>
   <a href="#" onclick="toggleTOC()">TOC</a>
-  <a href="/Users/gabrielsynnaeve/labs/mkd-wiki/html/help">Help</a>
+  <a href="../html/help">Help</a>
 </div>
 <div id="TOC"
 ><ul

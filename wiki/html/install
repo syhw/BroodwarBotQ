@@ -5,7 +5,7 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="generator" content="pandoc" />
   <meta name="date" content="" />
-  <link rel="stylesheet" href="/Users/gabrielsynnaeve/labs/mkd-wiki/css/style.css" type="text/css" />
+  <link rel="stylesheet" href="../css/style.css" type="text/css" />
 <script language="javascript">
   function toggleTOC() {
     var toc = document.getElementById('TOC');
@@ -19,10 +19,10 @@
 </head>
 <body>
 <div id="header">
-  <a href="/Users/gabrielsynnaeve/labs/mkd-wiki/html/index">Index</a>
-  <a href="/Users/gabrielsynnaeve/labs/mkd-wiki/html/etapes_broodai">Etapes</a>
+  <a href="../html/index">Index</a>
+  <a href="../html/etapes_broodai">Etapes</a>
   <a href="#" onclick="toggleTOC()">TOC</a>
-  <a href="/Users/gabrielsynnaeve/labs/mkd-wiki/html/help">Help</a>
+  <a href="../html/help">Help</a>
 </div>
 <div id="TOC"
 ><ul
@@ -47,6 +47,24 @@
 	><li
 	><a href="#walkthrough"
 	  >Walkthrough</a
+	  ></li
+	><li
+	><a href="#to-read"
+	  >To Read</a
+	  ><ul
+	  ><li
+	    ><a href="#beginning:"
+	      >Beginning:</a
+	      ></li
+	    ><li
+	    ><a href="#to-check-every-day:"
+	      >To Check Every Day:</a
+	      ></li
+	    ><li
+	    ><a href="#to-check-every-week:"
+	      >To Check Every Week:</a
+	      ></li
+	    ></ul
 	  ></li
 	></ul
       ></li
@@ -143,6 +161,78 @@
       ><li
       >Profit</li
       ></ol
+    ></div
+  ><div id="to-read"
+  ><h2
+    ><a href="#TOC"
+      >To Read</a
+      ></h2
+    ><div id="beginning:"
+    ><h3
+      ><a href="#TOC"
+	>Beginning:</a
+	></h3
+      ><ul
+      ><li
+	><a href="http://www.spheredev.org/wiki/Git_for_the_lazy"
+	  ><code
+	    >http://www.spheredev.org/wiki/Git_for_the_lazy</code
+	    ></a
+	  ></li
+	><li
+	><a href="http://bitbucket.org/bousket/battlebroodai/wiki/Home"
+	  ><code
+	    >http://bitbucket.org/bousket/battlebroodai/wiki/Home</code
+	    ></a
+	  ></li
+	></ul
+      ></div
+    ><div id="to-check-every-day:"
+    ><h3
+      ><a href="#TOC"
+	>To Check Every Day:</a
+	></h3
+      ><ul
+      ><li
+	><a href="http://eis.ucsc.edu/StarCraftAICompetition"
+	  ><code
+	    >http://eis.ucsc.edu/StarCraftAICompetition</code
+	    ></a
+	  ></li
+	><li
+	><a href="http://code.google.com/p/bwapi/"
+	  ><code
+	    >http://code.google.com/p/bwapi/</code
+	    ></a
+	  ></li
+	><li
+	><a href="http://www.broodwarai.com/forums/index.php?showtopic=659&amp;st=20&amp;start=20"
+	  ><code
+	    >http://www.broodwarai.com/forums/index.php?showtopic=659&amp;st=20&amp;start=20</code
+	    ></a
+	  ></li
+	></ul
+      ></div
+    ><div id="to-check-every-week:"
+    ><h3
+      ><a href="#TOC"
+	>To Check Every Week:</a
+	></h3
+      ><ul
+      ><li
+	><a href="http://starcraftai.rabbitx86.net/"
+	  ><code
+	    >http://starcraftai.rabbitx86.net/</code
+	    ></a
+	  ></li
+	><li
+	><a href="http://www.broodwarai.com/forums/index.php?showforum=46"
+	  ><code
+	    >http://www.broodwarai.com/forums/index.php?showforum=46</code
+	    ></a
+	  ></li
+	></ul
+      ></div
     ></div
   ></div
 >
