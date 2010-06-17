@@ -13,6 +13,9 @@ void EUnitsFilter::update(Unit* u)
     else 
         eViewedUnits[u] = EViewedUnit(u, timeManager->getElapsedTime());
         //eViewedUnits.insert(make_pair(u, EViewedUnit(u, timeManager->getElapsedTime())));
+#ifdef USE_MONITOR
+    // callback to Qt to modify EUFilter tab's QTableWidget with current values
+#endif
 }
 
 EUnitsFilter::EUnitsFilter()

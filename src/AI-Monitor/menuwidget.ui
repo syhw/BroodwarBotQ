@@ -67,6 +67,11 @@
          <height>0</height>
         </size>
        </property>
+       <row>
+        <property name="text">
+         <string>0</string>
+        </property>
+       </row>
        <column>
         <property name="text">
          <string>pointer</string>
@@ -92,6 +97,11 @@
          <string>HP</string>
         </property>
        </column>
+       <item row="0" column="0">
+        <property name="text">
+         <string/>
+        </property>
+       </item>
       </widget>
      </widget>
     </widget>

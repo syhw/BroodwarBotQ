@@ -82,7 +82,7 @@ DWORD WINAPI LaunchMonitor( LPVOID lpParam )
 { 
 #ifdef USE_MONITOR
 
-	while( !broodAI)
+	while(!broodAI)
 	{
 		Sleep( 50);
 	}

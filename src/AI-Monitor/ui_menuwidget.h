@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'menuwidget.ui'
 **
-** Created: Thu 17. Jun 16:08:16 2010
+** Created: Thu 17. Jun 16:57:09 2010
 **      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -87,6 +87,12 @@ public:
         EVUnits->setHorizontalHeaderItem(3, __qtablewidgetitem3);
         QTableWidgetItem *__qtablewidgetitem4 = new QTableWidgetItem();
         EVUnits->setHorizontalHeaderItem(4, __qtablewidgetitem4);
+        if (EVUnits->rowCount() < 1)
+            EVUnits->setRowCount(1);
+        QTableWidgetItem *__qtablewidgetitem5 = new QTableWidgetItem();
+        EVUnits->setVerticalHeaderItem(0, __qtablewidgetitem5);
+        QTableWidgetItem *__qtablewidgetitem6 = new QTableWidgetItem();
+        EVUnits->setItem(0, 0, __qtablewidgetitem6);
         EVUnits->setObjectName(QString::fromUtf8("EVUnits"));
         EVUnits->setGeometry(QRect(0, 0, 771, 411));
         EVUnits->setMinimumSize(QSize(381, 0));
@@ -119,6 +125,13 @@ public:
         ___qtablewidgetitem3->setText(QApplication::translate("MenuWidget", "last_seen", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem4 = EVUnits->horizontalHeaderItem(4);
         ___qtablewidgetitem4->setText(QApplication::translate("MenuWidget", "HP", 0, QApplication::UnicodeUTF8));
+        QTableWidgetItem *___qtablewidgetitem5 = EVUnits->verticalHeaderItem(0);
+        ___qtablewidgetitem5->setText(QApplication::translate("MenuWidget", "0", 0, QApplication::UnicodeUTF8));
+
+        const bool __sortingEnabled = EVUnits->isSortingEnabled();
+        EVUnits->setSortingEnabled(false);
+        EVUnits->setSortingEnabled(__sortingEnabled);
+
         tabWidget->setTabText(tabWidget->indexOf(tab_EUFilter), QApplication::translate("MenuWidget", "EUFilter", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
