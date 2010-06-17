@@ -6,6 +6,13 @@
 
 class UnitsGroup;
 
+#ifndef _SMART_POINTER_GOAL
+#define _SMART_POINTER_GOAL 1
+#include <boost/shared_ptr.hpp>
+class Goal;
+typedef boost::shared_ptr<Goal> pGoal;
+#endif
+
 typedef enum
 {
 	GT_DEFEND_BASE  = 0,

@@ -1,4 +1,7 @@
 #pragma once
+#define _CRTDBG_MAP_ALLOC       // anti-memory leaks
+#include <stdlib.h>             // anti-memory leaks
+#include <crtdbg.h>             // anti-memory leaks
 #include <BWAPI.h>
 #include <BWTA.h>
 #include <windows.h>
