@@ -58,11 +58,12 @@ void MicroAIModule::onStart()
 	std::list<Goal*> goals;
 	// goals.push_back(Formation(0,1,Position(1000,1000)); 
     /// TEST test_path with tanks & vultures: 
-    /// goals.push_back(Goal("direct line to 1120, 704", new Formation(Vec(1120, 704), Vec(-0.5, -0.5))));
+    /// goals.push_back(new Goal("direct line to 1120, 704", new Formation(Vec(1120, 704), Vec(-0.5, -0.5))));
     /// TEST test_square
     /// goals.push_back(Goal("direct square 480, 1600", new SquareFormation(Vec(480, 1600))));
     /// TEST test_pathfinding
-    goals.push_back(new Goal("direct square 1920, 1920", new SquareFormation(Vec(1920, 1920))));
+    // 12,24
+    goals.push_back(new Goal("direct square 1920, 1920", new SquareFormation(Vec(384, 768))));
 
 	BWAPI::TilePosition mp = Broodwar->self()->getStartLocation();
 	Position p;
@@ -72,7 +73,7 @@ void MicroAIModule::onStart()
 			p = BWAPI::Position(*l);
 	}
 
-	goals.push_back(new Goal("formation line x+400", new LineFormation(Vec(p.x(), p.y()), Vec(1, 0))));
+	//goals.push_back(new Goal("formation line x+400", new LineFormation(Vec(p.x(), p.y()), Vec(1, 0))));
 	//goals.push_back(Formation(0,1,Position(400,0)));
 	//goals.push_back(Goal("attack move right !!!!!!!", Position(1999,1000)));
 	//goals->push_back(new Goal("attack move just there", Position(500,1300)));

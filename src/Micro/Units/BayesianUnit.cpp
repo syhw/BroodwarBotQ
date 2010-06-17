@@ -169,7 +169,8 @@ void BayesianUnit::updateAttractors()
         Position tmp = _dirv[i].translate(up);
         if (mapManager->buildings[tmp.x()/32 + (tmp.y()/32)*width])
             _occupation.push_back(OCCUP_BUILDING);
-        else if (!mapManager->walkability[tmp.x()/8 + (tmp.y()/8)*4*width]) // tmp.x()/8 + (tmp.y()/2)*width
+        else if (!mapManager->walkability[tmp.x()/8 + (tmp.y()/8)*4*width]) 
+                                       // tmp.x()/8 + (tmp.y()/2)*width
             _occupation.push_back(OCCUP_BLOCKING);
         else // TODO UNIT/EUNIT
             _occupation.push_back(OCCUP_NO);
@@ -237,11 +238,8 @@ double BayesianUnit::computeProb(unsigned int i)
             dirvtmp.normalize();
             Vec objnorm = obj;
             objnorm.normalize();
-            double tmp = dirvtmp.dot(objnorm);
-            if (tmp > 0)
-                val *= prob_obj*tmp;
-            else
-                val *= 1.0 - prob_obj;
+            const double tmp = dirvtmp.dot(objnorm);
+            val *= tmp > 0 ? prob_obj*tmp : 1.0 - prob_obj;
         }
     }
     if (_occupation[i] == OCCUP_BUILDING) /// NON-WALKABLE (BUILDING) INFLUENCE
@@ -312,9 +310,7 @@ void BayesianUnit::updateObj()
     if (_ppath.size() > 1)   // path[0] is the current unit position
     {
         Position p;
-        if (_ppath.size() >= 3)
-            p = _ppath[1]; // TODO
-        else if (_path.size() >= 2) 
+        if (_path.size() >= 2) 
             p = _ppath[1];
         //Broodwar->printf("p.x: %d, p.y: %d, up.x: %d, up.y: %d\n", p.x(), p.y(), up.x(), up.y());
         obj = Vec(p.x() - up.x(), p.y() - up.y());
@@ -447,8 +443,15 @@ void BayesianUnit::drawDirV()
 void BayesianUnit::updateDir()
 {
     Position p = this->unit->getPosition();
+
     updateDirV();
+    //Affiche les différents axes de directions de l'unité
+    //drawDirV();
+
     updateAttractors();
+    //Affiche les différents objets et la probabilité de pouvoir y aller
+    //drawAttractors();
+    
     updateObj();
     //drawObj(_unitsGroup->size());
     //drawObj(0);
@@ -457,14 +460,16 @@ void BayesianUnit::updateDir()
     multimap<double, Vec> dirvProb;
     for (unsigned int i = 0; i < _dirv.size(); ++i)
         dirvProb.insert(make_pair(computeProb(i), _dirv[i]));
-    multimap<double, Vec>::const_iterator last = dirvProb.end(); // I want the right probas and not 1-prob in the multimap
+    multimap<double, Vec>::const_iterator last = dirvProb.end(); 
+    // I want the right probas and not 1-prob in the multimap
     --last;
-    if (dirvProb.count(dirvProb.begin()->first) == 1)
+    if (dirvProb.count(dirvProb.begin()->first) == 1) 
+    {
         dir = last->second;
+    }
     else
     {
-        pair<multimap<double, Vec>::const_iterator, multimap<double, Vec>::const_iterator> 
-            possible_dirs = dirvProb.equal_range(last->first);
+        pair<multimap<double, Vec>::const_iterator, multimap<double, Vec>::const_iterator> possible_dirs = dirvProb.equal_range(last->first);
         double max = -100000.0;
         for (multimap<double, Vec>::const_iterator it = possible_dirs.first; it != possible_dirs.second; ++it)
         {
@@ -604,8 +609,8 @@ void BayesianUnit::update()
     }*/
     // _path = BWTA::getShortestPath(unit->getTilePosition(), target);
     //if (tick()) 
-    //    pathFind(_path, unit->getPosition(), target);
-    ///// drawWalkability();
+    //      pathFind(_path, unit->getPosition(), target);
+    //      drawWalkability();
     //drawPath();
     // double velocity = sqrt(unit->getVelocityX()*unit->getVelocityX() + unit->getVelocityY()*unit->getVelocityY());
     // if (velocity > 0)
