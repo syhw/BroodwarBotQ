@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'menuwidget.ui'
 **
-** Created: Fri 28. May 19:21:05 2010
+** Created: Thu 17. Jun 16:08:16 2010
 **      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -18,6 +18,7 @@
 #include <QtGui/QLabel>
 #include <QtGui/QSlider>
 #include <QtGui/QTabWidget>
+#include <QtGui/QTableWidget>
 #include <QtGui/QTreeView>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QWidget>
@@ -35,13 +36,14 @@ public:
     QVBoxLayout *verticalLayout;
     QTreeView *treeView;
     QWidget *tab_2;
-    QWidget *tab_EUnitsFilter;
+    QWidget *tab_EUFilter;
+    QTableWidget *EVUnits;
 
     void setupUi(QWidget *MenuWidget)
     {
         if (MenuWidget->objectName().isEmpty())
             MenuWidget->setObjectName(QString::fromUtf8("MenuWidget"));
-        MenuWidget->resize(400, 300);
+        MenuWidget->resize(793, 505);
         verticalLayout_2 = new QVBoxLayout(MenuWidget);
         verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
         label = new QLabel(MenuWidget);
@@ -69,17 +71,33 @@ public:
         tabWidget->addTab(tab, QString());
         tab_2 = new QWidget();
         tab_2->setObjectName(QString::fromUtf8("tab_2"));
-        tabWidget->addTab(tab_2, QString());    
-        tab_EUnitsFilter = new QWidget();
-        tab_EUnitsFilter->setObjectName(QString::fromUtf8("tab_EUnitsFilter"));
-        tabWidget->addTab(tab_EUnitsFilter, QString());
+        tabWidget->addTab(tab_2, QString());
+        tab_EUFilter = new QWidget();
+        tab_EUFilter->setObjectName(QString::fromUtf8("tab_EUFilter"));
+        EVUnits = new QTableWidget(tab_EUFilter);
+        if (EVUnits->columnCount() < 5)
+            EVUnits->setColumnCount(5);
+        QTableWidgetItem *__qtablewidgetitem = new QTableWidgetItem();
+        EVUnits->setHorizontalHeaderItem(0, __qtablewidgetitem);
+        QTableWidgetItem *__qtablewidgetitem1 = new QTableWidgetItem();
+        EVUnits->setHorizontalHeaderItem(1, __qtablewidgetitem1);
+        QTableWidgetItem *__qtablewidgetitem2 = new QTableWidgetItem();
+        EVUnits->setHorizontalHeaderItem(2, __qtablewidgetitem2);
+        QTableWidgetItem *__qtablewidgetitem3 = new QTableWidgetItem();
+        EVUnits->setHorizontalHeaderItem(3, __qtablewidgetitem3);
+        QTableWidgetItem *__qtablewidgetitem4 = new QTableWidgetItem();
+        EVUnits->setHorizontalHeaderItem(4, __qtablewidgetitem4);
+        EVUnits->setObjectName(QString::fromUtf8("EVUnits"));
+        EVUnits->setGeometry(QRect(0, 0, 771, 411));
+        EVUnits->setMinimumSize(QSize(381, 0));
+        tabWidget->addTab(tab_EUFilter, QString());
 
         verticalLayout_2->addWidget(tabWidget);
 
 
         retranslateUi(MenuWidget);
 
-        tabWidget->setCurrentIndex(0);
+        tabWidget->setCurrentIndex(2);
 
 
         QMetaObject::connectSlotsByName(MenuWidget);
@@ -91,7 +109,17 @@ public:
         label->setText(QApplication::translate("MenuWidget", "Game speed:", 0, QApplication::UnicodeUTF8));
         tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MenuWidget", "Composants", 0, QApplication::UnicodeUTF8));
         tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("MenuWidget", "Visu", 0, QApplication::UnicodeUTF8));
-        tabWidget->setTabText(tabWidget->indexOf(tab_EUnitsFilter), QApplication::translate("MenuWidget", "EUFilter", 0, QApplication::UnicodeUTF8));
+        QTableWidgetItem *___qtablewidgetitem = EVUnits->horizontalHeaderItem(0);
+        ___qtablewidgetitem->setText(QApplication::translate("MenuWidget", "pointer", 0, QApplication::UnicodeUTF8));
+        QTableWidgetItem *___qtablewidgetitem1 = EVUnits->horizontalHeaderItem(1);
+        ___qtablewidgetitem1->setText(QApplication::translate("MenuWidget", "unittype", 0, QApplication::UnicodeUTF8));
+        QTableWidgetItem *___qtablewidgetitem2 = EVUnits->horizontalHeaderItem(2);
+        ___qtablewidgetitem2->setText(QApplication::translate("MenuWidget", "last_pos", 0, QApplication::UnicodeUTF8));
+        QTableWidgetItem *___qtablewidgetitem3 = EVUnits->horizontalHeaderItem(3);
+        ___qtablewidgetitem3->setText(QApplication::translate("MenuWidget", "last_seen", 0, QApplication::UnicodeUTF8));
+        QTableWidgetItem *___qtablewidgetitem4 = EVUnits->horizontalHeaderItem(4);
+        ___qtablewidgetitem4->setText(QApplication::translate("MenuWidget", "HP", 0, QApplication::UnicodeUTF8));
+        tabWidget->setTabText(tabWidget->indexOf(tab_EUFilter), QApplication::translate("MenuWidget", "EUFilter", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

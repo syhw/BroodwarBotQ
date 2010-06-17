@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>793</width>
+    <height>505</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -52,21 +52,46 @@
       <attribute name="title">
        <string>EUFilter</string>
       </attribute>
-      <widget class="QTableView" name="EVUnits">
+      <widget class="QTableWidget" name="EVUnits">
        <property name="geometry">
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>381</width>
-         <height>211</height>
+         <width>771</width>
+         <height>411</height>
         </rect>
        </property>
-       <property name="maximumSize">
+       <property name="minimumSize">
         <size>
          <width>381</width>
-         <height>16777215</height>
+         <height>0</height>
         </size>
        </property>
+       <column>
+        <property name="text">
+         <string>pointer</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>unittype</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>last_pos</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>last_seen</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string>HP</string>
+        </property>
+       </column>
       </widget>
      </widget>
     </widget>
