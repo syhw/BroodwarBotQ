@@ -45,7 +45,7 @@ public:
 	// Goals interface
 	virtual void attackMove(int x, int y);
 	virtual void attackMove(BWAPI::Position& p);
-	virtual void formation(Formation* f);
+	virtual void formation(pFormation f);
 	virtual void setGoals(std::list<pGoal>& goals);
 	virtual void addGoal(pGoal goal);
 	virtual const pGoal getLastGoal() const;

@@ -1,15 +1,15 @@
+#####  Plantage(s) #####
+Quand on ne ferme pas d'abord Qt avant SC. Voir autour de 
+case DLL_PROCESS_DETACH: dans MacroDll.cpp
+
 #####  En général  #####
 Micro:
-- Formation and Goal has to be instancied by smart pointer (memory leak for the moment)
+- Goal has to be instancied by smart pointer (memory leak for the moment)
 - commencer a gerer templars et medics
-
 
 Macro:
 - reponse a l'attaque (envoyer des troupes la ou on se fait attaquer).
 - attaque des drones qd ca devient trop tendu (rush...)
-
-
-Tools:
 
 
 

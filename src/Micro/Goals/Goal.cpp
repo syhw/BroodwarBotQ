@@ -20,7 +20,7 @@ Goal::Goal(const Goal& g)
 {
 }
 
-Goal::Goal(const char* text, Formation* f)
+Goal::Goal(const char* text, pFormation f)
 : type(GT_ND)
 , status(GS_IN_PROGRESS)
 , formation(f)

@@ -6,6 +6,12 @@
 #include <Vec.h>
 #include <BayesianUnit.h>
 
+#ifndef _SMART_POINTER_FORMATION_INCLUDED
+#define _SMART_POINTER_FORMATION_INCLUDED 1
+#include <boost/shared_ptr.hpp>
+class Formation;
+typedef boost::shared_ptr<Formation> pFormation;
+#endif
 
 class Formation 
 {

@@ -22,7 +22,7 @@ DefendGoal::DefendGoal(const DefendGoal& g)
 }
 */
 DefendGoal::DefendGoal(const Position& position)
-: Goal("Defend", new SquareFormation( position))
+: Goal("Defend", pFormation(new SquareFormation( position)))
 {
  type = GT_DEFEND_BASE;
  status = GS_ACHIEVED;

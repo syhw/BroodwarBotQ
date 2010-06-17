@@ -175,7 +175,7 @@ void UnitsGroup::attackMove(BWAPI::Position& p)
 	}
 }
 
-void UnitsGroup::formation(Formation* f)
+void UnitsGroup::formation(pFormation f)
 {
 	std::vector<BWAPI::Position> from;
 	std::vector<pBayesianUnit> units;
