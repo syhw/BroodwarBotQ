@@ -31,7 +31,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>2</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -47,6 +47,27 @@
       <attribute name="title">
        <string>Visu</string>
       </attribute>
+     </widget>
+     <widget class="QWidget" name="tab_EUFilter">
+      <attribute name="title">
+       <string>EUFilter</string>
+      </attribute>
+      <widget class="QTableView" name="EVUnits">
+       <property name="geometry">
+        <rect>
+         <x>0</x>
+         <y>0</y>
+         <width>381</width>
+         <height>211</height>
+        </rect>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>381</width>
+         <height>16777215</height>
+        </size>
+       </property>
+      </widget>
      </widget>
     </widget>
    </item>
