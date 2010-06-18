@@ -7,7 +7,7 @@
 using namespace BWAPI;
 
 UnitsGroup::UnitsGroup()
-:lastGoal(NULL)
+:lastGoal(boost::shared_ptr<Goal>())
 {
 }
 
@@ -176,7 +176,7 @@ void UnitsGroup::attackMove(BWAPI::Position& p)
 	}
 }
 
-void UnitsGroup::formation(Formation* f)
+void UnitsGroup::formation(pFormation f)
 {
 	std::vector<BWAPI::Position> from;
 	std::vector<pBayesianUnit> units;
@@ -201,22 +201,22 @@ void UnitsGroup::formation(Formation* f)
 
 }
 
-void UnitsGroup::setGoals(std::list<Goal*>& goals)
+void UnitsGroup::setGoals(std::list<pGoal>& goals)
 {
 	this->goals = goals;
-	if (!lastGoal) lastGoal = goals.front();
+	if (lastGoal == boost::shared_ptr<Goal>()) lastGoal = goals.front();
 	this->goals.front()->achieve(this);
 }
 
-void UnitsGroup::addGoal(Goal* goal)
+void UnitsGroup::addGoal(pGoal goal)
 {
 	this->goals.push_back(goal);
-	if (!lastGoal) lastGoal = goal;
+	if (lastGoal == boost::shared_ptr<Goal>()) lastGoal = goal;
 	if (goals.size() == 1 && !this->units.empty())
 		this->goals.front()->achieve(this);
 }
 
-const Goal* UnitsGroup::getLastGoal() const
+const pGoal UnitsGroup::getLastGoal() const
 {
 	return lastGoal;
 }
@@ -352,7 +352,7 @@ void UnitsGroup::display()
 			Broodwar->drawTextMap( unit->getPosition().x(), unit->getPosition().y(), "P");
 	}
 
-	for (std::list<Goal*>::iterator it = goals.begin(); it != goals.end(); it++)
+	for (std::list<pGoal>::iterator it = goals.begin(); it != goals.end(); it++)
 	{
 		Broodwar->drawCircle( CoordinateType::Map, (int)((*it)->formation->center.x), (int)((*it)->formation->center.y), 5, Colors::White, true);
 	}

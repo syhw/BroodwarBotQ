@@ -139,7 +139,7 @@ void MicroManager::sendGroupToAttack( UnitsGroup* ug)
 	}
 
 	if (!found) return;
-	ug->addGoal(new AttackGoal(nearestEnemyLocation, enemyUnit));
+	ug->addGoal(pGoal(new AttackGoal(nearestEnemyLocation, enemyUnit)));
 	Broodwar->printf( "Let's fight !!");
 }
 
@@ -168,5 +168,5 @@ void MicroManager::sendGroupToDefense( UnitsGroup* ug)
 	}
 
 	// Send the group defend the base
-	ug->addGoal(new DefendGoal(chokePoint));
+	ug->addGoal(pGoal(new DefendGoal(chokePoint)));
 }

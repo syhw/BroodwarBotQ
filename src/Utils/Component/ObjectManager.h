@@ -11,7 +11,7 @@ public:
 	~ObjectManager();
 
 	virtual void updateOM(); // call for bwapi
-	void setGameSpeed( int speed); // call for qt appli
+	void setGameSpeed(int speed); // call for qt appli
 
 protected:
 	Data<bool> speedChanged;

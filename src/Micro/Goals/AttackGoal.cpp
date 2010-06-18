@@ -16,7 +16,7 @@ AttackGoal::AttackGoal(const AttackGoal& g)
 }
 */
 AttackGoal::AttackGoal( const Position& position, Unit* unit)
-: Goal( "Attack", new Formation(position))
+: Goal( "Attack", pFormation(new Formation(position)))
 , unit (unit)
 {
 }

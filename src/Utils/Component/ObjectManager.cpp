@@ -21,7 +21,7 @@ void ObjectManager::updateOM()
 #endif
 }
 
-void ObjectManager::setGameSpeed( int speed)
+void ObjectManager::setGameSpeed(int speed)
 {
 	(*this->speed.beginEdit()) = speed;
 	this->speed.endEdit();

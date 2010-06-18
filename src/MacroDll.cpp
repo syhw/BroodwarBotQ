@@ -82,7 +82,7 @@ DWORD WINAPI LaunchMonitor( LPVOID lpParam )
 { 
 #ifdef USE_MONITOR
 
-	while( !broodAI)
+	while(!broodAI)
 	{
 		Sleep( 50);
 	}
@@ -91,7 +91,7 @@ DWORD WINAPI LaunchMonitor( LPVOID lpParam )
 	char* name = "AI-Monitor";
 	char** argv = &name;
 	application = new QApplication( argc, argv);
-	MainWindow w( 0, (BattleBroodAI*)broodAI);
+    MainWindow w(0, (BattleBroodAI*)broodAI);
 	w.show();
 	application->exec();
 #endif

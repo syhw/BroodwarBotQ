@@ -9,22 +9,21 @@ class BaseData;
 class BaseObject
 {
 public:
-	BaseObject();
-	~BaseObject();
+    BaseObject();
+    ~BaseObject();
 
-	std::string getClassName() const;
-	void processStream(std::ostream& out);
+    std::string getClassName() const;
+    void processStream(std::ostream& out);
 
-	// Serializer les data pour echanger entre threads.
+    // Serializer les data pour echanger entre threads.
 
-  mutable CustomOStream<BaseObject> sendl;
-  mutable std::ostringstream sout;
-  mutable std::ostringstream serr;
+    mutable CustomOStream<BaseObject> sendl;
+    mutable std::ostringstream sout;
+    mutable std::ostringstream serr;
 
 protected:
-	std::vector<BaseData*> vData;
-
-  std::string warnings;
-  std::string outputs;
-	std::string className;
+    std::vector<BaseData*> vData;
+    std::string warnings;
+    std::string outputs;
+    std::string className;
 };

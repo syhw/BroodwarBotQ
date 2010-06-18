@@ -25,14 +25,14 @@ struct i_dist {
 class UnitsGroup
 {
 private:
-	Goal* lastGoal; // the last goal is copied from the last executed goal in 'goals' and is keep to give order to new units added to a group (to avoid empty 'goals' for new units).
+	pGoal lastGoal; // the last goal is copied from the last executed goal in 'goals' and is keep to give order to new units added to a group (to avoid empty 'goals' for new units).
 	int totalHP;
 	int totalPower;
     BWAPI::Position center;
     std::vector<pBayesianUnit> units;
 
 public:
-	std::list<Goal*> goals; // list of goals to execute.
+	std::list<pGoal> goals; // list of goals to execute.
 
 	UnitsGroup();
 	~UnitsGroup();
@@ -45,10 +45,10 @@ public:
 	// Goals interface
 	virtual void attackMove(int x, int y);
 	virtual void attackMove(BWAPI::Position& p);
-	virtual void formation(Formation* f);
-	virtual void setGoals(std::list<Goal*>& goals);
-	virtual void addGoal(Goal* goal);
-	virtual const Goal* getLastGoal() const;
+	virtual void formation(pFormation f);
+	virtual void setGoals(std::list<pGoal>& goals);
+	virtual void addGoal(pGoal goal);
+	virtual const pGoal getLastGoal() const;
 	//virtual bool checkInFormation();
 	//virtual bool checkAtDestination();
 	virtual void updateCenter();

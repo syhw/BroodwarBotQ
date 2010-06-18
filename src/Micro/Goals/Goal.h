@@ -6,6 +6,13 @@
 
 class UnitsGroup;
 
+#ifndef _SMART_POINTER_GOAL_INCLUDED
+#define _SMART_POINTER_GOAL_INCLUDED 1
+#include <boost/shared_ptr.hpp>
+class Goal;
+typedef boost::shared_ptr<Goal> pGoal;
+#endif
+
 typedef enum
 {
 	GT_DEFEND_BASE  = 0,
@@ -36,12 +43,12 @@ protected:
 public:
 	GoalType type;          /**< type of the goal */
 	GoalStatus status;      /**< status of the goal */
-	Formation* formation;   /**< formation to adopt during the goal */
+	pFormation formation;   /**< formation to adopt during the goal */
 	std::string purpose;    /**< string describing the purpose of the goal */
 
 	//Goal();
 	Goal(const Goal& g);
-	Goal(const char* text, Formation* f);
+	Goal(const char* text, pFormation f);
 	virtual ~Goal();
 
 	virtual void achieve(UnitsGroup* ug);
