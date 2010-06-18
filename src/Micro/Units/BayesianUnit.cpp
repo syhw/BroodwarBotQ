@@ -239,7 +239,7 @@ double BayesianUnit::computeProb(unsigned int i)
             Vec objnorm = obj;
             objnorm.normalize();
             const double tmp = dirvtmp.dot(objnorm);
-            val *= tmp > 0 ? prob_obj*tmp : 1.0 - prob_obj;
+            val *= (tmp > 0 ? prob_obj*tmp : 1.0 - prob_obj);
         }
     }
     if (_occupation[i] == OCCUP_BUILDING) /// NON-WALKABLE (BUILDING) INFLUENCE
@@ -305,7 +305,8 @@ void BayesianUnit::drawProbs(multimap<double, Vec>& probs, int number)
 void BayesianUnit::updateObj()
 {
     Position up = unit->getPosition();
-    //pathFind(_path, unit->getPosition(), target); // TODO, too high cost for the moment
+    if (Broodwar->getFrameCount()%70 == 0) // hack to remove (?)
+        pathFind(_path, unit->getPosition(), target); // TODO, too high cost for the moment
     straightLine(_ppath, up, target, true);
     if (_ppath.size() > 1)   // path[0] is the current unit position
     {
@@ -453,8 +454,8 @@ void BayesianUnit::updateDir()
     //drawAttractors();
     
     updateObj();
+    //drawObj(2);
     //drawObj(_unitsGroup->size());
-    //drawObj(0);
     //drawOccupation(_unitsGroup->size());
     //drawPath();
     multimap<double, Vec> dirvProb;
@@ -474,7 +475,7 @@ void BayesianUnit::updateDir()
         for (multimap<double, Vec>::const_iterator it = possible_dirs.first; it != possible_dirs.second; ++it)
         {
             double tmp = obj.dot(it->second);
-            if (tmp > max)
+            if (tmp < max)
             {
                 max = tmp;
                 dir = it->second;
@@ -494,6 +495,13 @@ void BayesianUnit::clickDir()
 {
     dir += unit->getPosition();
     //if (unit->getPosition() != dir.toPosition()) TODO
+    if (Broodwar->getFrameCount()%70 == 0) 
+    {
+        Broodwar->printf("Position de l'unité = (%i, %i)", this->unit->getPosition().x(), this->unit->getPosition().y());
+        Broodwar->printf("Direction = (%i, %i)", dir.x, dir.y);
+        Broodwar->printf("Objectif = (%i, %i)", obj.x, obj.y);
+        Broodwar->printf("Target = (%i, %i)", target.x(), target.y());
+    }
     unit->rightClick(dir.toPosition());
 }
 
@@ -557,6 +565,7 @@ void BayesianUnit::onUnitHide(Unit* u)
 void BayesianUnit::update()
 {
     if (!unit->exists()) return;
+    this->drawTarget();
     if (_mode == MODE_FIGHT_G) {
         // TODO not every update()s, perhaps even asynchronously
         // TODO inline function!

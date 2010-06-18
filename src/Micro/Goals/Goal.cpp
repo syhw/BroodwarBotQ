@@ -56,3 +56,8 @@ void Goal::checkAchievement(UnitsGroup* ug)
 	if (allIdle) achiviedCpt++;
 	if (achiviedCpt > 2) status = GS_ACHIEVED;
 }
+
+std::string Goal::getPurpose() const
+{
+    return purpose;
+}

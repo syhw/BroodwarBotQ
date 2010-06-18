@@ -80,7 +80,7 @@ void BattleBroodAI::onStart()
 	//Broodwar->enableFlag(Flag::CompleteMapInformation);
 
 	// Speed up the game to the maximum
-  Broodwar->setLocalSpeed(0);
+    Broodwar->setLocalSpeed(0);
 
 	this->showManagerAssignments=false;
 
@@ -526,8 +526,17 @@ bool BattleBroodAI::onSendText(std::string text)
         }
         return false;
     }
-
-    if (text=="/target")
+    else if (text.substr(0,9) == "/setspeed")
+    {
+        int x = 0;
+        if (text[9] != ' ')
+            Broodwar->printf("Usage: /setspeed SPEEDVALUE");
+        std::string xx = text.substr(10);
+        x = atoi(xx.c_str());
+        Broodwar->printf("Set Speed %i", x);
+        Broodwar->setLocalSpeed(x);
+    }
+    else if (text=="/target")
     {
         set<pBayesianUnit> tmp;
         for (std::list<UnitsGroup*>::iterator it = this->microManager->unitsgroups.begin(); it != this->microManager->unitsgroups.end(); it++)
