@@ -53,4 +53,5 @@ public:
 
 	virtual void achieve(UnitsGroup* ug);
 	virtual void checkAchievement(UnitsGroup* ug);
+    virtual std::string getPurpose() const;
 };

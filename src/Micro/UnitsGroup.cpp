@@ -140,7 +140,7 @@ void UnitsGroup::update()
 		(*it)->update();
 		this->totalHP += (*it)->unit->getHitPoints();
 		this->totalPower += (*it)->unit->getType().groundWeapon().damageAmount();
-	}
+    }
 
 	updateCenter();
 
@@ -148,6 +148,7 @@ void UnitsGroup::update()
 
 	if (!goals.empty())
 	{
+        
 		if (goals.front()->status == GS_ACHIEVED) 
 		{
 			if (goals.size() == 1) lastGoal = goals.front();

@@ -20,51 +20,51 @@ DWORD WINAPI LaunchMonitor( LPVOID lpParam );
 
 
 namespace BWAPI { Game* Broodwar; }
-BOOL APIENTRY DllMain( HANDLE hModule, 
-											DWORD  ul_reason_for_call, 
-											LPVOID lpReserved
-											)
+BOOL APIENTRY DllMain(HANDLE hModule,
+                      DWORD  ul_reason_for_call,
+                      LPVOID lpReserved)
 {
 	DWORD   dwThreadIdArray;
 
 	switch (ul_reason_for_call)
 	{
-	case DLL_PROCESS_ATTACH:
-	BWAPI::BWAPI_init();
+	    case DLL_PROCESS_ATTACH:
+	        BWAPI::BWAPI_init();
 
-	// Create the thread to begin execution on its own.
+	        // Create the thread to begin execution on its own.
 
-	hThreadArrayMonitor = CreateThread( 
-	NULL,                   // default security attributes
-	0,                      // use default stack size  
-	LaunchMonitor,       // thread function name
-	NULL,          // argument to thread function 
-	0,                      // use default creation flags 
-	&dwThreadIdArray);   // returns the thread identifier 
+	        hThreadArrayMonitor = CreateThread( 
+	        NULL,                   // default security attributes
+	        0,                      // use default stack size  
+	        LaunchMonitor,       // thread function name
+	        NULL,          // argument to thread function 
+	        0,                      // use default creation flags 
+	        &dwThreadIdArray);   // returns the thread identifier 
 
 
-	// Check the return value for success.
-	// If CreateThread fails, terminate execution. 
-	// This will automatically clean up threads and memory. 
+	        // Check the return value for success.
+	        // If CreateThread fails, terminate execution. 
+	        // This will automatically clean up threads and memory. 
 
-	if (hThreadArrayMonitor == NULL) 
-	{
-	ExitProcess(3);
-	}
+	        if (hThreadArrayMonitor == NULL) 
+	        {
+	            ExitProcess(3);
+	        }
 
-		break;
-	case DLL_PROCESS_DETACH:
+		    break;
+	    
+        case DLL_PROCESS_DETACH:
 			// Wait until monitor thread have terminated.
 
-	application->quit();
-		
-	WaitForMultipleObjects(1, &hThreadArrayMonitor, TRUE, INFINITE);
+	        application->quit();
+        		
+	        WaitForMultipleObjects(1, &hThreadArrayMonitor, TRUE, INFINITE);
 
-	// Close all thread handles and free memory allocations.
+	        // Close all thread handles and free memory allocations.
+            
+	        CloseHandle(&hThreadArrayMonitor);
 
-		CloseHandle(&hThreadArrayMonitor);
-
-		break;
+	        break;
 	}
 
 	return TRUE;
@@ -94,7 +94,6 @@ DWORD WINAPI LaunchMonitor( LPVOID lpParam )
     MainWindow w(0, (BattleBroodAI*)broodAI);
 	w.show();
 	application->exec();
-
 #endif
 
 	return 0; 
