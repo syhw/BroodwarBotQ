@@ -90,7 +90,7 @@ DWORD WINAPI LaunchMonitor( LPVOID lpParam )
 	int argc = 1;
 	char* name = "AI-Monitor";
 	char** argv = &name;
-	application = new QApplication( argc, argv);
+	application = new QApplication(argc, argv);
     MainWindow w(0, (BattleBroodAI*)broodAI);
 	w.show();
 	application->exec();

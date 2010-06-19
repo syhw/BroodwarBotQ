@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'menuwidget.ui'
 **
-** Created: Thu 17. Jun 16:57:09 2010
+** Created: Sat 19. Jun 13:38:53 2010
 **      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -87,12 +87,20 @@ public:
         EVUnits->setHorizontalHeaderItem(3, __qtablewidgetitem3);
         QTableWidgetItem *__qtablewidgetitem4 = new QTableWidgetItem();
         EVUnits->setHorizontalHeaderItem(4, __qtablewidgetitem4);
-        if (EVUnits->rowCount() < 1)
-            EVUnits->setRowCount(1);
+        if (EVUnits->rowCount() < 5)
+            EVUnits->setRowCount(5);
         QTableWidgetItem *__qtablewidgetitem5 = new QTableWidgetItem();
         EVUnits->setVerticalHeaderItem(0, __qtablewidgetitem5);
         QTableWidgetItem *__qtablewidgetitem6 = new QTableWidgetItem();
-        EVUnits->setItem(0, 0, __qtablewidgetitem6);
+        EVUnits->setVerticalHeaderItem(1, __qtablewidgetitem6);
+        QTableWidgetItem *__qtablewidgetitem7 = new QTableWidgetItem();
+        EVUnits->setVerticalHeaderItem(2, __qtablewidgetitem7);
+        QTableWidgetItem *__qtablewidgetitem8 = new QTableWidgetItem();
+        EVUnits->setVerticalHeaderItem(3, __qtablewidgetitem8);
+        QTableWidgetItem *__qtablewidgetitem9 = new QTableWidgetItem();
+        EVUnits->setVerticalHeaderItem(4, __qtablewidgetitem9);
+        QTableWidgetItem *__qtablewidgetitem10 = new QTableWidgetItem();
+        EVUnits->setItem(0, 0, __qtablewidgetitem10);
         EVUnits->setObjectName(QString::fromUtf8("EVUnits"));
         EVUnits->setGeometry(QRect(0, 0, 771, 411));
         EVUnits->setMinimumSize(QSize(381, 0));
@@ -127,6 +135,14 @@ public:
         ___qtablewidgetitem4->setText(QApplication::translate("MenuWidget", "HP", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem5 = EVUnits->verticalHeaderItem(0);
         ___qtablewidgetitem5->setText(QApplication::translate("MenuWidget", "0", 0, QApplication::UnicodeUTF8));
+        QTableWidgetItem *___qtablewidgetitem6 = EVUnits->verticalHeaderItem(1);
+        ___qtablewidgetitem6->setText(QApplication::translate("MenuWidget", "New Row", 0, QApplication::UnicodeUTF8));
+        QTableWidgetItem *___qtablewidgetitem7 = EVUnits->verticalHeaderItem(2);
+        ___qtablewidgetitem7->setText(QApplication::translate("MenuWidget", "New Row", 0, QApplication::UnicodeUTF8));
+        QTableWidgetItem *___qtablewidgetitem8 = EVUnits->verticalHeaderItem(3);
+        ___qtablewidgetitem8->setText(QApplication::translate("MenuWidget", "New Row", 0, QApplication::UnicodeUTF8));
+        QTableWidgetItem *___qtablewidgetitem9 = EVUnits->verticalHeaderItem(4);
+        ___qtablewidgetitem9->setText(QApplication::translate("MenuWidget", "New Row", 0, QApplication::UnicodeUTF8));
 
         const bool __sortingEnabled = EVUnits->isSortingEnabled();
         EVUnits->setSortingEnabled(false);

@@ -7,7 +7,7 @@
 #include <map>
 #include <utility>
 
-class EUnitsFilter : public CSingleton<EUnitsFilter> 
+class EUnitsFilter : public CSingleton<EUnitsFilter>
 {
     TimeManager* timeManager;
     std::map<BWAPI::Unit*, EViewedUnit> eViewedUnits;
