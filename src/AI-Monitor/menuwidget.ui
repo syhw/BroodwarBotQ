@@ -22,48 +22,83 @@
     </widget>
    </item>
    <item>
-    <widget class="QSlider" name="hSlider_gameSpeed">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
       <number>2</number>
      </property>
-     <widget class="QWidget" name="tab">
+     <widget class="QWidget" name="tab_Goals">
       <attribute name="title">
        <string>Composants</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QTreeView" name="treeView"/>
+        <widget class="QTreeView" name="goalsTree"/>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_2">
+     <widget class="QWidget" name="tab_Strat">
       <attribute name="title">
        <string>Visu</string>
       </attribute>
-      <layout class="QHBoxLayout" name="horizontalLayout">
-       <item>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="2" column="1">
         <widget class="QPushButton" name="pushButton_2">
          <property name="text">
           <string>PushButton</string>
          </property>
         </widget>
        </item>
-       <item>
+       <item row="2" column="2">
+        <widget class="QPushButton" name="pushButton_3">
+         <property name="text">
+          <string>PushButton</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
         <widget class="QPushButton" name="pushButton">
          <property name="text">
           <string>PushButton</string>
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QPushButton" name="pushButton_3">
+       <item row="1" column="2">
+        <widget class="QPushButton" name="pushButton_4">
+         <property name="text">
+          <string>PushButton</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QPushButton" name="pushButton_5">
+         <property name="text">
+          <string>PushButton</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QPushButton" name="pushButton_6">
+         <property name="text">
+          <string>PushButton</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QPushButton" name="pushButton_7">
+         <property name="text">
+          <string>PushButton</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QPushButton" name="pushButton_8">
+         <property name="text">
+          <string>PushButton</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QPushButton" name="pushButton_9">
          <property name="text">
           <string>PushButton</string>
          </property>
@@ -91,22 +126,12 @@
          </row>
          <row>
           <property name="text">
-           <string>New Row</string>
+           <string>1</string>
           </property>
          </row>
          <row>
           <property name="text">
-           <string>New Row</string>
-          </property>
-         </row>
-         <row>
-          <property name="text">
-           <string>New Row</string>
-          </property>
-         </row>
-         <row>
-          <property name="text">
-           <string>New Row</string>
+           <string>2</string>
           </property>
          </row>
          <column>
@@ -141,29 +166,20 @@
          </item>
          <item row="1" column="1">
           <property name="text">
-           <string>LOL</string>
+           <string/>
           </property>
          </item>
         </widget>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_3">
-      <attribute name="title">
-       <string>Page</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <widget class="QTreeWidget" name="treeWidget">
-         <column>
-          <property name="text">
-           <string notr="true">1</string>
-          </property>
-         </column>
-        </widget>
-       </item>
-      </layout>
-     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QSlider" name="hSlider_gameSpeed">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
     </widget>
    </item>
   </layout>

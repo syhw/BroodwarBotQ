@@ -14,6 +14,10 @@ class WalkTilePosition
             //: _x((position.x() + 4)/ 8), _y((position.y()+4) / 8) // 8 pixels for a WalkTile
         {
         }
+        WalkTilePosition(const BWAPI::TilePosition& tile)
+            : _x(tile.x() * 4), _y(tile.y() * 4)
+        {
+        }
         WalkTilePosition(int x, int y) 
             : _x(x), _y(y)
         {

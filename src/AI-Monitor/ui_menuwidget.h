@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'menuwidget.ui'
 **
-** Created: Sun 20. Jun 01:07:03 2010
+** Created: Sun 20. Jun 23:25:24 2010
 **      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -14,6 +14,7 @@
 #include <QtGui/QAction>
 #include <QtGui/QApplication>
 #include <QtGui/QButtonGroup>
+#include <QtGui/QGridLayout>
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QHeaderView>
 #include <QtGui/QLabel>
@@ -22,7 +23,6 @@
 #include <QtGui/QTabWidget>
 #include <QtGui/QTableWidget>
 #include <QtGui/QTreeView>
-#include <QtGui/QTreeWidget>
 #include <QtGui/QVBoxLayout>
 #include <QtGui/QWidget>
 
@@ -33,22 +33,25 @@ class Ui_MenuWidget
 public:
     QVBoxLayout *verticalLayout_2;
     QLabel *label;
-    QSlider *hSlider_gameSpeed;
     QTabWidget *tabWidget;
-    QWidget *tab;
+    QWidget *tab_Goals;
     QVBoxLayout *verticalLayout;
-    QTreeView *treeView;
-    QWidget *tab_2;
-    QHBoxLayout *horizontalLayout;
+    QTreeView *goalsTree;
+    QWidget *tab_Strat;
+    QGridLayout *gridLayout;
     QPushButton *pushButton_2;
-    QPushButton *pushButton;
     QPushButton *pushButton_3;
+    QPushButton *pushButton;
+    QPushButton *pushButton_4;
+    QPushButton *pushButton_5;
+    QPushButton *pushButton_6;
+    QPushButton *pushButton_7;
+    QPushButton *pushButton_8;
+    QPushButton *pushButton_9;
     QWidget *tab_EUFilter;
     QHBoxLayout *horizontalLayout_2;
     QTableWidget *EVUnits;
-    QWidget *tab_3;
-    QVBoxLayout *verticalLayout_3;
-    QTreeWidget *treeWidget;
+    QSlider *hSlider_gameSpeed;
 
     void setupUi(QWidget *MenuWidget)
     {
@@ -62,44 +65,68 @@ public:
 
         verticalLayout_2->addWidget(label);
 
-        hSlider_gameSpeed = new QSlider(MenuWidget);
-        hSlider_gameSpeed->setObjectName(QString::fromUtf8("hSlider_gameSpeed"));
-        hSlider_gameSpeed->setOrientation(Qt::Horizontal);
-
-        verticalLayout_2->addWidget(hSlider_gameSpeed);
-
         tabWidget = new QTabWidget(MenuWidget);
         tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
-        tab = new QWidget();
-        tab->setObjectName(QString::fromUtf8("tab"));
-        verticalLayout = new QVBoxLayout(tab);
+        tab_Goals = new QWidget();
+        tab_Goals->setObjectName(QString::fromUtf8("tab_Goals"));
+        verticalLayout = new QVBoxLayout(tab_Goals);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-        treeView = new QTreeView(tab);
-        treeView->setObjectName(QString::fromUtf8("treeView"));
+        goalsTree = new QTreeView(tab_Goals);
+        goalsTree->setObjectName(QString::fromUtf8("goalsTree"));
 
-        verticalLayout->addWidget(treeView);
+        verticalLayout->addWidget(goalsTree);
 
-        tabWidget->addTab(tab, QString());
-        tab_2 = new QWidget();
-        tab_2->setObjectName(QString::fromUtf8("tab_2"));
-        horizontalLayout = new QHBoxLayout(tab_2);
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-        pushButton_2 = new QPushButton(tab_2);
+        tabWidget->addTab(tab_Goals, QString());
+        tab_Strat = new QWidget();
+        tab_Strat->setObjectName(QString::fromUtf8("tab_Strat"));
+        gridLayout = new QGridLayout(tab_Strat);
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
+        pushButton_2 = new QPushButton(tab_Strat);
         pushButton_2->setObjectName(QString::fromUtf8("pushButton_2"));
 
-        horizontalLayout->addWidget(pushButton_2);
+        gridLayout->addWidget(pushButton_2, 2, 1, 1, 1);
 
-        pushButton = new QPushButton(tab_2);
-        pushButton->setObjectName(QString::fromUtf8("pushButton"));
-
-        horizontalLayout->addWidget(pushButton);
-
-        pushButton_3 = new QPushButton(tab_2);
+        pushButton_3 = new QPushButton(tab_Strat);
         pushButton_3->setObjectName(QString::fromUtf8("pushButton_3"));
 
-        horizontalLayout->addWidget(pushButton_3);
+        gridLayout->addWidget(pushButton_3, 2, 2, 1, 1);
 
-        tabWidget->addTab(tab_2, QString());
+        pushButton = new QPushButton(tab_Strat);
+        pushButton->setObjectName(QString::fromUtf8("pushButton"));
+
+        gridLayout->addWidget(pushButton, 1, 1, 1, 1);
+
+        pushButton_4 = new QPushButton(tab_Strat);
+        pushButton_4->setObjectName(QString::fromUtf8("pushButton_4"));
+
+        gridLayout->addWidget(pushButton_4, 1, 2, 1, 1);
+
+        pushButton_5 = new QPushButton(tab_Strat);
+        pushButton_5->setObjectName(QString::fromUtf8("pushButton_5"));
+
+        gridLayout->addWidget(pushButton_5, 1, 0, 1, 1);
+
+        pushButton_6 = new QPushButton(tab_Strat);
+        pushButton_6->setObjectName(QString::fromUtf8("pushButton_6"));
+
+        gridLayout->addWidget(pushButton_6, 2, 0, 1, 1);
+
+        pushButton_7 = new QPushButton(tab_Strat);
+        pushButton_7->setObjectName(QString::fromUtf8("pushButton_7"));
+
+        gridLayout->addWidget(pushButton_7, 0, 0, 1, 1);
+
+        pushButton_8 = new QPushButton(tab_Strat);
+        pushButton_8->setObjectName(QString::fromUtf8("pushButton_8"));
+
+        gridLayout->addWidget(pushButton_8, 0, 1, 1, 1);
+
+        pushButton_9 = new QPushButton(tab_Strat);
+        pushButton_9->setObjectName(QString::fromUtf8("pushButton_9"));
+
+        gridLayout->addWidget(pushButton_9, 0, 2, 1, 1);
+
+        tabWidget->addTab(tab_Strat, QString());
         tab_EUFilter = new QWidget();
         tab_EUFilter->setObjectName(QString::fromUtf8("tab_EUFilter"));
         horizontalLayout_2 = new QHBoxLayout(tab_EUFilter);
@@ -117,8 +144,8 @@ public:
         EVUnits->setHorizontalHeaderItem(3, __qtablewidgetitem3);
         QTableWidgetItem *__qtablewidgetitem4 = new QTableWidgetItem();
         EVUnits->setHorizontalHeaderItem(4, __qtablewidgetitem4);
-        if (EVUnits->rowCount() < 5)
-            EVUnits->setRowCount(5);
+        if (EVUnits->rowCount() < 3)
+            EVUnits->setRowCount(3);
         QTableWidgetItem *__qtablewidgetitem5 = new QTableWidgetItem();
         EVUnits->setVerticalHeaderItem(0, __qtablewidgetitem5);
         QTableWidgetItem *__qtablewidgetitem6 = new QTableWidgetItem();
@@ -126,34 +153,23 @@ public:
         QTableWidgetItem *__qtablewidgetitem7 = new QTableWidgetItem();
         EVUnits->setVerticalHeaderItem(2, __qtablewidgetitem7);
         QTableWidgetItem *__qtablewidgetitem8 = new QTableWidgetItem();
-        EVUnits->setVerticalHeaderItem(3, __qtablewidgetitem8);
+        EVUnits->setItem(0, 0, __qtablewidgetitem8);
         QTableWidgetItem *__qtablewidgetitem9 = new QTableWidgetItem();
-        EVUnits->setVerticalHeaderItem(4, __qtablewidgetitem9);
-        QTableWidgetItem *__qtablewidgetitem10 = new QTableWidgetItem();
-        EVUnits->setItem(0, 0, __qtablewidgetitem10);
-        QTableWidgetItem *__qtablewidgetitem11 = new QTableWidgetItem();
-        EVUnits->setItem(1, 1, __qtablewidgetitem11);
+        EVUnits->setItem(1, 1, __qtablewidgetitem9);
         EVUnits->setObjectName(QString::fromUtf8("EVUnits"));
         EVUnits->setMinimumSize(QSize(381, 0));
 
         horizontalLayout_2->addWidget(EVUnits);
 
         tabWidget->addTab(tab_EUFilter, QString());
-        tab_3 = new QWidget();
-        tab_3->setObjectName(QString::fromUtf8("tab_3"));
-        verticalLayout_3 = new QVBoxLayout(tab_3);
-        verticalLayout_3->setObjectName(QString::fromUtf8("verticalLayout_3"));
-        treeWidget = new QTreeWidget(tab_3);
-        QTreeWidgetItem *__qtreewidgetitem = new QTreeWidgetItem();
-        __qtreewidgetitem->setText(0, QString::fromUtf8("1"));
-        treeWidget->setHeaderItem(__qtreewidgetitem);
-        treeWidget->setObjectName(QString::fromUtf8("treeWidget"));
-
-        verticalLayout_3->addWidget(treeWidget);
-
-        tabWidget->addTab(tab_3, QString());
 
         verticalLayout_2->addWidget(tabWidget);
+
+        hSlider_gameSpeed = new QSlider(MenuWidget);
+        hSlider_gameSpeed->setObjectName(QString::fromUtf8("hSlider_gameSpeed"));
+        hSlider_gameSpeed->setOrientation(Qt::Horizontal);
+
+        verticalLayout_2->addWidget(hSlider_gameSpeed);
 
 
         retranslateUi(MenuWidget);
@@ -168,11 +184,17 @@ public:
     {
         MenuWidget->setWindowTitle(QApplication::translate("MenuWidget", "Form", 0, QApplication::UnicodeUTF8));
         label->setText(QApplication::translate("MenuWidget", "Game speed:", 0, QApplication::UnicodeUTF8));
-        tabWidget->setTabText(tabWidget->indexOf(tab), QApplication::translate("MenuWidget", "Composants", 0, QApplication::UnicodeUTF8));
+        tabWidget->setTabText(tabWidget->indexOf(tab_Goals), QApplication::translate("MenuWidget", "Composants", 0, QApplication::UnicodeUTF8));
         pushButton_2->setText(QApplication::translate("MenuWidget", "PushButton", 0, QApplication::UnicodeUTF8));
-        pushButton->setText(QApplication::translate("MenuWidget", "PushButton", 0, QApplication::UnicodeUTF8));
         pushButton_3->setText(QApplication::translate("MenuWidget", "PushButton", 0, QApplication::UnicodeUTF8));
-        tabWidget->setTabText(tabWidget->indexOf(tab_2), QApplication::translate("MenuWidget", "Visu", 0, QApplication::UnicodeUTF8));
+        pushButton->setText(QApplication::translate("MenuWidget", "PushButton", 0, QApplication::UnicodeUTF8));
+        pushButton_4->setText(QApplication::translate("MenuWidget", "PushButton", 0, QApplication::UnicodeUTF8));
+        pushButton_5->setText(QApplication::translate("MenuWidget", "PushButton", 0, QApplication::UnicodeUTF8));
+        pushButton_6->setText(QApplication::translate("MenuWidget", "PushButton", 0, QApplication::UnicodeUTF8));
+        pushButton_7->setText(QApplication::translate("MenuWidget", "PushButton", 0, QApplication::UnicodeUTF8));
+        pushButton_8->setText(QApplication::translate("MenuWidget", "PushButton", 0, QApplication::UnicodeUTF8));
+        pushButton_9->setText(QApplication::translate("MenuWidget", "PushButton", 0, QApplication::UnicodeUTF8));
+        tabWidget->setTabText(tabWidget->indexOf(tab_Strat), QApplication::translate("MenuWidget", "Visu", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem = EVUnits->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QApplication::translate("MenuWidget", "pointer", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem1 = EVUnits->horizontalHeaderItem(1);
@@ -186,22 +208,15 @@ public:
         QTableWidgetItem *___qtablewidgetitem5 = EVUnits->verticalHeaderItem(0);
         ___qtablewidgetitem5->setText(QApplication::translate("MenuWidget", "0", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem6 = EVUnits->verticalHeaderItem(1);
-        ___qtablewidgetitem6->setText(QApplication::translate("MenuWidget", "New Row", 0, QApplication::UnicodeUTF8));
+        ___qtablewidgetitem6->setText(QApplication::translate("MenuWidget", "1", 0, QApplication::UnicodeUTF8));
         QTableWidgetItem *___qtablewidgetitem7 = EVUnits->verticalHeaderItem(2);
-        ___qtablewidgetitem7->setText(QApplication::translate("MenuWidget", "New Row", 0, QApplication::UnicodeUTF8));
-        QTableWidgetItem *___qtablewidgetitem8 = EVUnits->verticalHeaderItem(3);
-        ___qtablewidgetitem8->setText(QApplication::translate("MenuWidget", "New Row", 0, QApplication::UnicodeUTF8));
-        QTableWidgetItem *___qtablewidgetitem9 = EVUnits->verticalHeaderItem(4);
-        ___qtablewidgetitem9->setText(QApplication::translate("MenuWidget", "New Row", 0, QApplication::UnicodeUTF8));
+        ___qtablewidgetitem7->setText(QApplication::translate("MenuWidget", "2", 0, QApplication::UnicodeUTF8));
 
         const bool __sortingEnabled = EVUnits->isSortingEnabled();
         EVUnits->setSortingEnabled(false);
-        QTableWidgetItem *___qtablewidgetitem10 = EVUnits->item(1, 1);
-        ___qtablewidgetitem10->setText(QApplication::translate("MenuWidget", "LOL", 0, QApplication::UnicodeUTF8));
         EVUnits->setSortingEnabled(__sortingEnabled);
 
         tabWidget->setTabText(tabWidget->indexOf(tab_EUFilter), QApplication::translate("MenuWidget", "EUFilter", 0, QApplication::UnicodeUTF8));
-        tabWidget->setTabText(tabWidget->indexOf(tab_3), QApplication::translate("MenuWidget", "Page", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

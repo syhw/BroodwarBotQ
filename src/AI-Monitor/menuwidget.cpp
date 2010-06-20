@@ -7,11 +7,11 @@ MenuWidget::MenuWidget(QWidget *parent) :
     ui(new Ui::MenuWidget)
 {
     ui->setupUi(this);
-    QTableWidgetItem *newItem = new QTableWidgetItem(0);
-    QString str = "lol";
-    QTableWidgetItem *newItem2 = new QTableWidgetItem(str, 0);
-    ui->EVUnits->setItem(1, 1, newItem2);
-    ui->EVUnits->setItem(0, 0, newItem);
+    //QTableWidgetItem *newItem = new QTableWidgetItem(0);
+    //QString str = "lol";
+    //QTableWidgetItem *newItem2 = new QTableWidgetItem(str, 0);
+    //ui->EVUnits->setItem(1, 1, newItem2);
+    //ui->EVUnits->setItem(0, 0, newItem);
     BWAPI::Broodwar->printf("menuwidget initialised"); // doesnt work
 }
 

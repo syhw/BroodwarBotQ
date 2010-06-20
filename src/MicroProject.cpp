@@ -87,6 +87,7 @@ void MicroAIModule::onStart()
 
 void MicroAIModule::onFrame()
 {
+    ObjectManager::updateOM();
 	if (mm != NULL) mm->update();
     regions->update();
     regions->display();

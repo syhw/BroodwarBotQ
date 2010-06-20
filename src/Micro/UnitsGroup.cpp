@@ -159,6 +159,8 @@ void UnitsGroup::update()
 		{
 			goals.front()->checkAchievement(this);
 		}
+
+        //debug_goals(goals);
 	}
 }
 

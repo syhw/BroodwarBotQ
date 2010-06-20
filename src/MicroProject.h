@@ -6,6 +6,7 @@
 #include "MapManager.h"
 #include "Regions.h"
 #include "Formations.h"
+#include "ObjectManager.h"
 
 static bool analyzed;
 static bool analysis_just_finished;
@@ -13,7 +14,7 @@ static BWTA::Region* home;
 static BWTA::Region* enemy_base;
 DWORD WINAPI AnalyzeThread();
 
-class MicroAIModule : public BWAPI::AIModule
+class MicroAIModule : public BWAPI::AIModule, public ObjectManager
 {
 public:	    
     UnitsGroup* mm;

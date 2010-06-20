@@ -1,6 +1,7 @@
 #include "BayesianUnit.h"
 #include "Rainbow.h"
 #include <utility>
+#include <time.h>
 #ifdef PROBT
 #include <pl.h>
 #else
@@ -43,7 +44,6 @@ BayesianUnit::BayesianUnit(Unit* u, vector<pBayesianUnit> const * ug)
     updateDirV();
     mapManager = & MapManager::Instance();
     switchMode(_mode);
-    //updateProx();
     updateAttractors();
     initDefaultProb();
     if (_mode == MODE_FLOCK)
@@ -54,12 +54,6 @@ BayesianUnit::BayesianUnit(Unit* u, vector<pBayesianUnit> const * ug)
         _flockProb.push_back(0.38);                  //FLOCK_MEDIUM
         _flockProb.push_back(0.22);                 //FLOCK_FAR
     }
-
-    /// TEST test_sizes_tanks_marines 
-    /// Broodwar->printf("I'm a %s and I do h: %d, w: %d \n", 
-    ///     unit->getType().getName().c_str(), unit->getType().dimensionUp() - unit->getType().dimensionDown(), 
-    ///     unit->getType().dimensionRight() - unit->getType().dimensionLeft());
-    //unit->getType().size();
 }
 
 void BayesianUnit::initDefaultProb()
@@ -113,8 +107,7 @@ void BayesianUnit::straightLine(vector<Position>& ppath,
         const Position& p_start, const Position& p_end, bool quick)
 {
     ppath.clear();
-    //if (p_start == p_end) return;
-    if (p_start.getDistance(p_end) < 8) return;
+    if (p_start.getDistance(p_end) < 8) return; // <=> if (p_start == p_end) return;
     // not anti-aliased :)
     vector<Vec> dirvnorm;
     for (unsigned int i = 0; i < _dirv.size(); ++i)
@@ -147,8 +140,7 @@ void BayesianUnit::straightLine(vector<Position>& ppath,
     } 
     else 
     {
-        //while (current != end) 
-        // TODO correct that, current and end rarely match
+        //while (current != end) // TODO correct that, current and end rarely match
         //{
             //TODO
         //}
@@ -185,7 +177,6 @@ void BayesianUnit::drawAttractors()
         Position p = _dirv[i].translate(up);
         if (!_occupation[i])
         {
-            //Broodwar->drawBox(CoordinateType::Map, p.x() - 2, p.y() -2, p.x() + 2, p.y() + 2, Colors::White, true);
             continue;
         }
         if (_occupation[i] == OCCUP_BUILDING)
@@ -305,16 +296,27 @@ void BayesianUnit::drawProbs(multimap<double, Vec>& probs, int number)
 void BayesianUnit::updateObj()
 {
     Position up = unit->getPosition();
-    if (Broodwar->getFrameCount()%70 == 0) // hack to remove (?)
-        pathFind(_path, unit->getPosition(), target); // TODO, too high cost for the moment
-    straightLine(_ppath, up, target, true);
-    if (_ppath.size() > 1)   // path[0] is the current unit position
+    if (Broodwar->getFrameCount()%70 == 0) // hack to remove with the introduction of TimeManager
     {
-        Position p;
-        if (_path.size() >= 2) 
-            p = _ppath[1];
-        //Broodwar->printf("p.x: %d, p.y: %d, up.x: %d, up.y: %d\n", p.x(), p.y(), up.x(), up.y());
-        obj = Vec(p.x() - up.x(), p.y() - up.y());
+        clock_t start = clock();
+        std::vector<BWAPI::TilePosition> tmp;
+        tmp = BWTA::getShortestPath(TilePosition(unit->getPosition()), TilePosition(target));
+        _path.clear();
+        for (std::vector<TilePosition>::const_iterator it = tmp.begin(); it != tmp.end(); ++it)
+            _path.push_back(*it);
+        //pathFind(_path, unit->getPosition(), target); // TODO, too high cost for the moment
+        clock_t end = clock();
+        Broodwar->printf("Iterations took %f", (double)(end-start));
+    } else 
+    {
+        straightLine(_ppath, up, target, true);
+        if (_ppath.size() > 1)   // path[0] is the current unit position
+        {
+            Position p;
+            if (_path.size() >= 2) 
+                p = _ppath[1];
+            obj = Vec(p.x() - up.x(), p.y() - up.y());
+        }
     }
 }
 
@@ -482,7 +484,7 @@ void BayesianUnit::updateDir()
             }
         }
     }
-    drawProbs(dirvProb, _unitsGroup->size());
+    //drawProbs(dirvProb, _unitsGroup->size());
 }
 
 void BayesianUnit::drawDir()
@@ -604,7 +606,7 @@ void BayesianUnit::update()
             //drawAttractors();
             //drawTarget();
             updateDir();
-            //drawDir();
+            drawDir();
             clickDir();
             //drawFlockValues();
         }

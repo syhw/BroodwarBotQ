@@ -78,13 +78,13 @@ extern "C" __declspec(dllexport) BWAPI::AIModule* newAIModule(BWAPI::Game* game)
 }
 
 
-DWORD WINAPI LaunchMonitor( LPVOID lpParam ) 
+DWORD WINAPI LaunchMonitor(LPVOID lpParam ) 
 { 
 #ifdef USE_MONITOR
 
 	while(!broodAI)
 	{
-		Sleep( 50);
+		Sleep(50);
 	}
 
 	int argc = 1;
