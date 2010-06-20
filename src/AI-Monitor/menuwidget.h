@@ -13,6 +13,9 @@ public:
     MenuWidget(QWidget *parent = 0);
     ~MenuWidget();
 
+public slots:
+    void draw();
+
 protected:
     void changeEvent(QEvent *e);
 

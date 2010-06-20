@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'Mainwindow.h'
 **
-** Created: Fri 28. May 14:56:14 2010
+** Created: Sat 19. Jun 13:49:21 2010
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.6.2)
 **
 ** WARNING! All changes made in this file will be lost!

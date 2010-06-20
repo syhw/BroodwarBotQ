@@ -1,6 +1,7 @@
 #include "Mainwindow.h"
 #include "ui_Mainwindow.h"
 #include "ui_menuwidget.h"
+#include <BWAPI.h>
 
 MainWindow::MainWindow(QWidget *parent, ObjectManager* objManager) :
     QMainWindow(parent),
@@ -13,8 +14,8 @@ MainWindow::MainWindow(QWidget *parent, ObjectManager* objManager) :
     MiniMap* miniMap = new MiniMap (this);
 
     splitter = new QSplitter (this);
-    splitter->addWidget (menuWidget);
-    splitter->addWidget (miniMap);
+    splitter->addWidget(menuWidget);
+    splitter->addWidget(miniMap);
     ui->horizontalLayout_main->addWidget (splitter);
 
     connect(menuWidget->ui->hSlider_gameSpeed, SIGNAL(valueChanged(int)), this, SLOT(changeGameSpeed(int)));
