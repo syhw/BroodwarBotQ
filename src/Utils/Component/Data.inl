@@ -2,6 +2,7 @@
 
 template< class T>
 Data<T>::Data()
+:_synchronized(true)
 {
     /*
 ghMutex = CreateMutex( 
@@ -74,7 +75,7 @@ void Data<T>::endEdit()
 {
 	// lacher le mutex
         //ReleaseMutex(ghMutex);
-
+    _synchronized = false;
 }
 
 

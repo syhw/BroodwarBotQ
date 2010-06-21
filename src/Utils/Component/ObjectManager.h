@@ -1,5 +1,7 @@
 #pragma once
 #include <vector>
+#include <list>
+#include "Goals.h"
 #include "Data.inl"
 
 class BaseObject;
@@ -14,7 +16,6 @@ public:
 	void setGameSpeed(int speed); // call for qt appli
 
 protected:
-	Data<bool> speedChanged;
 	Data<int> speed; // temp var to do bwapi call in the good thread
 	std::vector<BaseObject*> vObject;
 };

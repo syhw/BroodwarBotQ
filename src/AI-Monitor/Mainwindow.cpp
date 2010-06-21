@@ -13,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent, ObjectManager* objManager) :
     MenuWidget* menuWidget = new MenuWidget (this);
     MiniMap* miniMap = new MiniMap (this);
 
-    splitter = new QSplitter (this);
+    splitter = new QSplitter(this);
     splitter->addWidget(menuWidget);
     splitter->addWidget(miniMap);
     ui->horizontalLayout_main->addWidget (splitter);

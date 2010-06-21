@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'menuwidget.ui'
 **
-** Created: Sun 20. Jun 23:25:24 2010
+** Created: Mon 21. Jun 23:33:18 2010
 **      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -33,6 +33,7 @@ class Ui_MenuWidget
 public:
     QVBoxLayout *verticalLayout_2;
     QLabel *label;
+    QSlider *hSlider_gameSpeed;
     QTabWidget *tabWidget;
     QWidget *tab_Goals;
     QVBoxLayout *verticalLayout;
@@ -51,7 +52,6 @@ public:
     QWidget *tab_EUFilter;
     QHBoxLayout *horizontalLayout_2;
     QTableWidget *EVUnits;
-    QSlider *hSlider_gameSpeed;
 
     void setupUi(QWidget *MenuWidget)
     {
@@ -64,6 +64,12 @@ public:
         label->setObjectName(QString::fromUtf8("label"));
 
         verticalLayout_2->addWidget(label);
+
+        hSlider_gameSpeed = new QSlider(MenuWidget);
+        hSlider_gameSpeed->setObjectName(QString::fromUtf8("hSlider_gameSpeed"));
+        hSlider_gameSpeed->setOrientation(Qt::Horizontal);
+
+        verticalLayout_2->addWidget(hSlider_gameSpeed);
 
         tabWidget = new QTabWidget(MenuWidget);
         tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
@@ -164,12 +170,6 @@ public:
         tabWidget->addTab(tab_EUFilter, QString());
 
         verticalLayout_2->addWidget(tabWidget);
-
-        hSlider_gameSpeed = new QSlider(MenuWidget);
-        hSlider_gameSpeed->setObjectName(QString::fromUtf8("hSlider_gameSpeed"));
-        hSlider_gameSpeed->setOrientation(Qt::Horizontal);
-
-        verticalLayout_2->addWidget(hSlider_gameSpeed);
 
 
         retranslateUi(MenuWidget);
