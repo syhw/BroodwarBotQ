@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 #include <list>
-#include "Goals.h"
 #include "Data.inl"
 
 class BaseObject;

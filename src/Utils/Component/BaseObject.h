@@ -9,10 +9,12 @@ class BaseData;
 class BaseObject
 {
 public:
-    BaseObject();
+    BaseObject(BaseObject* parent);
     ~BaseObject();
 
     std::string getClassName() const;
+    void addChild(BaseObject* p);
+    void removeChild(BaseObject* p);
     void processStream(std::ostream& out);
 
     // Serializer les data pour echanger entre threads.
@@ -22,6 +24,8 @@ public:
     mutable std::ostringstream serr;
 
 protected:
+    BaseObject* parent;
+    std::vector<BaseObject*> children;
     std::vector<BaseData*> vData;
     std::string warnings;
     std::string outputs;

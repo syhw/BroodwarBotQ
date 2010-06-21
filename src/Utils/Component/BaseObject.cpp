@@ -1,21 +1,38 @@
 #include "BaseObject.h"
+#include <algorithm>
 
-BaseObject::BaseObject()
-:	sout( )
+
+BaseObject::BaseObject(BaseObject* parent)
+:	parent(parent)
+,sout( )
 , serr( )
 {
-
+    parent->addChild(this);
 }
 
 BaseObject::~BaseObject()
 {
-
+    for (std::vector<BaseObject*>::iterator it = children.begin(); it != children.end(); ++it)
+    {
+        (*it)->parent = NULL;
+    }
+    parent->removeChild(this);
 }
 
 
 std::string BaseObject::getClassName() const
 {
 	return className;
+}
+
+void BaseObject::addChild(BaseObject* p)
+{
+    children.push_back(p);
+}
+
+void BaseObject::removeChild(BaseObject* p)
+{
+    children.erase(find(children.begin(), children.end(), p));
 }
 
 void BaseObject::processStream(std::ostream& out)

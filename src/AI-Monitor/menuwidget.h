@@ -15,7 +15,6 @@ public:
 
 public slots:
     void draw();
-    void debug_EUnitsFilter();
 
 protected:
     void changeEvent(QEvent *e);
