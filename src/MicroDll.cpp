@@ -5,7 +5,7 @@
 #include <tchar.h>
 #include <BWAPI.h>
 
-#define USE_MONITOR
+//#define USE_MONITOR
 #define BUF_SIZE 255
 
 #include <QtGui/QApplication>

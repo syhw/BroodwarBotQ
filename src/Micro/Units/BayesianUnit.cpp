@@ -96,10 +96,18 @@ void BayesianUnit::computeFlockValues()
 
 void BayesianUnit::switchMode(unit_mode um)
 {
-    if (MODE_FLOCK)
+    Broodwar->printf("appel");
+    switch (um) 
     {
-        _defaultProb[OCCUP_UNIT] = 0.6;
-        //_defaultProb[OCCUP_FLOCK] = 0.1;
+        case MODE_FLOCK:
+            _mode = um;
+            _defaultProb[OCCUP_UNIT] = 0.6;
+            //_defaultProb[OCCUP_FLOCK] = 0.1;
+            break;
+        case MODE_FIGHT_G:
+            _mode = um;
+            break;
+
     }
 }
 
@@ -223,7 +231,7 @@ double BayesianUnit::computeProb(unsigned int i)
         /// OBJECTIVE (pathfinder) INFLUENCE
         if (_dirv[i] == obj)
             val *= prob_obj;
-        else 
+        else
         {
             Vec dirvtmp = _dirv[i];
             dirvtmp.normalize();
@@ -304,9 +312,8 @@ void BayesianUnit::updateObj()
         _path.clear();
         for (std::vector<TilePosition>::const_iterator it = tmp.begin(); it != tmp.end(); ++it)
             _path.push_back(*it);
-        //pathFind(_path, unit->getPosition(), target); // TODO, too high cost for the moment
         clock_t end = clock();
-        Broodwar->printf("Iterations took %f", (double)(end-start));
+        //Broodwar->printf("Iterations took %f", (double)(end-start));
     } else 
     {
         straightLine(_ppath, up, target, true);
@@ -459,7 +466,7 @@ void BayesianUnit::updateDir()
     //drawObj(2);
     //drawObj(_unitsGroup->size());
     //drawOccupation(_unitsGroup->size());
-    //drawPath();
+
     multimap<double, Vec> dirvProb;
     for (unsigned int i = 0; i < _dirv.size(); ++i)
         dirvProb.insert(make_pair(computeProb(i), _dirv[i]));
@@ -497,13 +504,18 @@ void BayesianUnit::clickDir()
 {
     dir += unit->getPosition();
     //if (unit->getPosition() != dir.toPosition()) TODO
+
+
+    /*
+    //A VIRER
     if (Broodwar->getFrameCount()%70 == 0) 
     {
         Broodwar->printf("Position de l'unité = (%i, %i)", this->unit->getPosition().x(), this->unit->getPosition().y());
         Broodwar->printf("Direction = (%i, %i)", dir.x, dir.y);
         Broodwar->printf("Objectif = (%i, %i)", obj.x, obj.y);
         Broodwar->printf("Target = (%i, %i)", target.x(), target.y());
-    }
+    }*/
+
     unit->rightClick(dir.toPosition());
 }
 
@@ -606,7 +618,7 @@ void BayesianUnit::update()
             //drawAttractors();
             //drawTarget();
             updateDir();
-            drawDir();
+            //drawDir();
             clickDir();
             //drawFlockValues();
         }
@@ -631,4 +643,5 @@ void BayesianUnit::update()
     //drawArrow(obj);
     //drawArrow(dir);
     //drawEnclosingBox();
+    //drawPath();
 }
