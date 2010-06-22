@@ -96,7 +96,7 @@ void BayesianUnit::computeFlockValues()
 
 void BayesianUnit::switchMode(unit_mode um)
 {
-    Broodwar->printf("appel");
+    // Comportement attendu ?
     switch (um) 
     {
         case MODE_FLOCK:
@@ -107,7 +107,6 @@ void BayesianUnit::switchMode(unit_mode um)
         case MODE_FIGHT_G:
             _mode = um;
             break;
-
     }
 }
 

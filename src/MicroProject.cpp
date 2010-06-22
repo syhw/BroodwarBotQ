@@ -33,7 +33,7 @@ void MicroAIModule::onStart()
 		} 
 		else 
 		{
-            Broodwar->printf("Took control of: %s\n", (*i)->getType().getName().c_str() );
+            //Broodwar->printf("Took control of: %s\n", (*i)->getType().getName().c_str() );
 			mm->takeControl(*i);
 			// center += (*i)->getPosition();
 		}
