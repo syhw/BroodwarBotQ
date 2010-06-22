@@ -387,6 +387,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Intelligence\EStrat.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Intelligence\EUnitsFilter.cpp"
 					>
 				</File>
@@ -666,6 +670,10 @@
 				>
 				<File
 					RelativePath="..\src\Intelligence\EEcoEstimator.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Intelligence\EStrat.h"
 					>
 				</File>
 				<File
