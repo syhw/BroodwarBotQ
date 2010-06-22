@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="MacroProject"
 	ProjectGUID="{F39C7417-770D-4635-8A47-77BD9CDDCD71}"
 	RootNamespace="MacroProject"
@@ -383,6 +383,10 @@
 				Name="Intelligence"
 				>
 				<File
+					RelativePath="..\src\Intelligence\EEcoEstimator.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Intelligence\EUnitsFilter.cpp"
 					>
 				</File>
@@ -660,6 +664,10 @@
 			<Filter
 				Name="Intelligence"
 				>
+				<File
+					RelativePath="..\src\Intelligence\EEcoEstimator.h"
+					>
+				</File>
 				<File
 					RelativePath="..\src\Intelligence\EUnitsFilter.h"
 					>
