@@ -48,12 +48,13 @@ void Goal::checkAchievement(UnitsGroup* ug)
 		if (!(*ug)[i].unit->isIdle())
 			allIdle = false;
 	}
-	if( !allIdle)
+	if(!allIdle)
 	{
 		achiviedCpt = 0;
 		status = GS_IN_PROGRESS;
-	}
-	if (allIdle) achiviedCpt++;
+    } else { 
+        achiviedCpt++;
+    }
 	if (achiviedCpt > 2) status = GS_ACHIEVED;
 }
 

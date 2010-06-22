@@ -4,6 +4,8 @@
 #include <util.h>
 #include <cmath>
 #include <assert.h>
+#include <fstream>
+#include <iostream>
 using namespace BWAPI;
 
 UnitsGroup::UnitsGroup()
@@ -222,14 +224,36 @@ const pGoal UnitsGroup::getLastGoal() const
 	return lastGoal;
 }
 
+/*
+void trace(std::string message, int id)
+{
+    std::ofstream fichier("trace.txt", std::ios_base::out | std::ios_base::app);
+    if(fichier)
+    {
+        fichier << message << id << '\n';
+        fichier.close();
+    }
+}
+*/
+
 void UnitsGroup::onUnitDestroy(Unit* u)
 {
+    //trace("Destruction de l'unité ", u->getID());
+    std::vector<pBayesianUnit>::const_iterator uniteToDel;
+    bool test = false;
     for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
     {
-        if ((*it)->unit == u)
-            units.erase(it);
-        (*it)->onUnitDestroy(u);
+        //trace("Pour l'unité ", (*it)->unit->getID());
+        if ((*it)->unit->getID() == u->getID())
+        {
+            test = true;
+            uniteToDel = it;
+        }
+        else
+            (*it)->onUnitDestroy(u);
     }
+    if (test)
+        units.erase(uniteToDel);
 }
 
 void UnitsGroup::onUnitShow(Unit* u)

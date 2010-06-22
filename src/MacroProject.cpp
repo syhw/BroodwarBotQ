@@ -1,5 +1,6 @@
 #include "MacroProject.h"
 #include <Util.h>
+#include <time.h>
 
 #include <UnitsGroup.h>
 
@@ -150,6 +151,8 @@ void BattleBroodAI::onEnd(bool isWinner)
 
 void BattleBroodAI::onFrame()
 {
+    //clock_t start = clock();
+
     // log("IN BBAI::onFrame()");
     ObjectManager::updateOM();
     if (Broodwar->isReplay()) return;
@@ -374,6 +377,8 @@ void BattleBroodAI::onFrame()
     // log("OUT BBAI::onFrame()");
 
     display();
+    //clock_t end = clock();
+    //Broodwar->printf("Iterations took %f", (double)(end-start)/CLOCKS_PER_SEC);
 }
 
 void BattleBroodAI::onUnitCreate(BWAPI::Unit* unit)
