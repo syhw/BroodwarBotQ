@@ -2,8 +2,8 @@
 
 int EStrat::probability_of_rush(){
 	//To be computed on scout operation
-
-
+	
+	
 	//TODO determine whether rush is only showed by 
 	//the number of 'missing' worker
 	//compared to the theorical number
