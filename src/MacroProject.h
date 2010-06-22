@@ -24,6 +24,7 @@
 #include "MicroManager.h"
 #include "ObjectManager.h"
 #include "EUnitsFilter.h"
+#include "EEcoEstimator.h"
 
 static bool analyzed;
 static bool analysis_just_finished;
@@ -54,6 +55,7 @@ public:
 	WorkerManager* workerManager;
     MapManager* mapManager;
     EUnitsFilter* eUnitsFilter;
+	EEcoEstimator* eEcoEstimator;
 	bool showManagerAssignments;
 
 	BattleBroodAI();

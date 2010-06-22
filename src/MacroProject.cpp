@@ -116,6 +116,7 @@ void BattleBroodAI::onStart()
 	this->supplyManager     = & SupplyManager::Instance();
     this->mapManager        = & MapManager::Instance();
     this->eUnitsFilter      = & EUnitsFilter::Instance();
+	this->eEcoEstimator     = & EEcoEstimator::Instance();
 
     this->supplyManager->setBuildManager(this->buildManager);
     this->supplyManager->setBuildOrderManager(this->buildOrderManager);
@@ -171,10 +172,11 @@ void BattleBroodAI::onFrame()
     ////this->unitManager->update();
     this->microManager->update();
     this->regions->update();
+	this->eEcoEstimator->onFrame();
 
     // Scout example to remove TODO
-    if( (Broodwar->getFrameCount() % (100*24)) == 0)
-        scoutManager->checkEmptyXP();
+	//if( (Broodwar->getFrameCount() % (100*24)) == 0)
+      //scoutManager->checkEmptyXP();
 
     std::set<Unit*> units=Broodwar->self()->getUnits();
     if (this->showManagerAssignments)
