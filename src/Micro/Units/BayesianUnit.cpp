@@ -579,7 +579,7 @@ void BayesianUnit::update()
 {
     if (!unit->exists()) return;
     this->drawTarget();
-    if (_mode == MODE_FIGHT_G) {
+    if (true) {//(_mode == MODE_FIGHT_G) {
         // TODO not every update()s, perhaps even asynchronously
         // TODO inline function!
         if (!unit->getGroundWeaponCooldown()) {
@@ -587,7 +587,7 @@ void BayesianUnit::update()
             rangeEnemyUnit = _rangeEnemies.begin();
             unsigned int i = 0;
             unsigned int end = _rangeEnemies.size();
-            while (i < end) 
+            while (i < end)
             {
                 double enemyDistance = rangeEnemyUnit->second->getDistance(unit->getPosition());
                 if (enemyDistance < unit->getType().groundWeapon().maxRange()) { // attack former closer if in range
