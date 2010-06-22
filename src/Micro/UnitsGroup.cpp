@@ -136,12 +136,36 @@ void align(std::vector<Position>& from, std::vector<Position>& to, std::vector<u
 void UnitsGroup::update()
 {
 	this->totalHP = 0;
+
+  //  Unit* parcoursEnemy;
+
 	for(std::vector<pBayesianUnit>::iterator it = this->units.begin();
 		it != this->units.end(); ++it)
 	{
 		(*it)->update();
 		this->totalHP += (*it)->unit->getHitPoints();
 		this->totalPower += (*it)->unit->getType().groundWeapon().damageAmount();
+    
+
+        /* ALGO ciblage ...
+        if (oldTarget != newTarget)
+        {
+            unitsGroup.e_t[oldTarget].remove(this);
+            unitsGroup.e_t[newTarget].append(this); ATTENTION : SI CEST LE PREMIER A TIRER SUR CET ENNEMI, IL FAUT CREER LA LISTE
+            oldTarget = newTarget;
+        }  */
+
+      /* 
+        A FINIR 
+      if (parcoursEnemy == NULL)
+            parcoursEnemy = (*it)->_rangeEnemies;
+
+        if ((*it)->oldTarget != eTargets)
+        {
+            
+            eTargets[(*it)->oldTarget].
+                
+        }*/
     }
 
 	updateCenter();
@@ -160,7 +184,6 @@ void UnitsGroup::update()
 		{
 			goals.front()->checkAchievement(this);
 		}
-
         //debug_goals(goals);
 	}
 }
@@ -226,13 +249,9 @@ const pGoal UnitsGroup::getLastGoal() const
 
 void UnitsGroup::onUnitDestroy(Unit* u)
 {
-    log("Unité détruite : %i", u->getID());
     if (u->getPlayer() != Broodwar->self())
         for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
-        {
-            log("Pour l'unité : %i", (*it)->unit->getID());
             (*it)->onUnitDestroy(u);
-        }
     else
     {
         for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
@@ -258,7 +277,7 @@ void UnitsGroup::onUnitHide(Unit* u)
 
 void UnitsGroup::takeControl(Unit* u)
 {
-    pBayesianUnit tmp(new BayesianUnit(u, &units));
+    pBayesianUnit tmp(new BayesianUnit(u, this));
 	this->units.push_back(tmp);
 	if (this->goals.empty()) goals.push_back(lastGoal);
     if (this->goals.front() != NULL) this->goals.front()->achieve(this);
@@ -332,6 +351,16 @@ bool UnitsGroup::empty()
 unsigned int UnitsGroup::getNbUnits() const
 {
 	return units.size();
+}
+
+std::vector<pBayesianUnit>* UnitsGroup::getUnits()
+{
+    return &units;
+}
+
+std::map<BWAPI::Unit*, std::list<pBayesianUnit> >& UnitsGroup::getAttackersEnemy()
+{
+    return attackersEnemy;
 }
 
 const BayesianUnit& UnitsGroup::operator[](int i)
