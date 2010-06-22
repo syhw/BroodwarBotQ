@@ -336,7 +336,7 @@ void UnitsGroup::display()
 		Position target = (*it)->target;
 
 		// Attack range
-		Broodwar->drawCircle( CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), unit->getType().groundWeapon()->maxRange(), Colors::Red);
+		//Broodwar->drawCircle( CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), unit->getType().groundWeapon()->maxRange(), Colors::Red);
 
 		// Target
 		if( true)//unit->getPosition().getDistance( target) < 200)
