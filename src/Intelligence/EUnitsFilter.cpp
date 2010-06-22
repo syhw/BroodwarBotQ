@@ -3,6 +3,12 @@
 using namespace BWAPI;
 using namespace std;
 
+EUnitsFilter::EUnitsFilter()
+: BaseObject(std::string("EUnitsFilter"))
+{
+    timeManager = & TimeManager::Instance();
+}
+
 void EUnitsFilter::update(Unit* u)
 {
     if (u->getPlayer() == Broodwar->self()) return;
@@ -16,11 +22,6 @@ void EUnitsFilter::update(Unit* u)
 #ifdef USE_MONITOR
     // callback to Qt to modify EUFilter tab's QTableWidget with current values
 #endif
-}
-
-EUnitsFilter::EUnitsFilter()
-{
-    timeManager = & TimeManager::Instance();
 }
 
 void EUnitsFilter::onUnitDestroy(Unit* u)

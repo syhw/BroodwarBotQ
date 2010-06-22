@@ -1,38 +1,24 @@
 #include "BaseObject.h"
+#include "ObjectManager.h"
+#include "MacroProject.h"
 #include <algorithm>
+#include "MacroDll.h"
 
-
-BaseObject::BaseObject(BaseObject* parent)
-:	parent(parent)
-,sout( )
+BaseObject::BaseObject(std::string name)
+: sout( )
 , serr( )
+, className(name)
 {
-    parent->addChild(this);
+    ObjectManager::Instance().addObject(this);
 }
 
 BaseObject::~BaseObject()
 {
-    for (std::vector<BaseObject*>::iterator it = children.begin(); it != children.end(); ++it)
-    {
-        (*it)->parent = NULL;
-    }
-    parent->removeChild(this);
 }
-
 
 std::string BaseObject::getClassName() const
 {
 	return className;
-}
-
-void BaseObject::addChild(BaseObject* p)
-{
-    children.push_back(p);
-}
-
-void BaseObject::removeChild(BaseObject* p)
-{
-    children.erase(find(children.begin(), children.end(), p));
 }
 
 void BaseObject::processStream(std::ostream& out)
@@ -50,4 +36,9 @@ void BaseObject::processStream(std::ostream& out)
 		outputs += sout.str();
 		sout.str("");
 	}
+}
+
+void BaseObject::addData(BaseData* data)
+{
+    vData.push_back(data);
 }

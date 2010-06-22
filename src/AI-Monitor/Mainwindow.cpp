@@ -6,7 +6,8 @@
 MainWindow::MainWindow(QWidget *parent, ObjectManager* objManager) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    objManager(objManager)
+    objManager(&ObjectManager::Instance())
+    //objManager(objManager)
 {
     ui->setupUi(this);
 

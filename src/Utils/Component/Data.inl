@@ -1,9 +1,14 @@
 #include "Data.h"
+#include "BaseObject.h"
 
 template< class T>
-Data<T>::Data()
-:_synchronized(true)
+Data<T>::Data(T defaultValue, std::string name, BaseObject* parent)
+: _synchronized(true)
+, value(defaultValue)
+, data_name(name)
 {
+    if (parent)
+        parent->addData(this);
     /*
 ghMutex = CreateMutex( 
         NULL,              // default security attributes

@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <string>
 #include <iostream>
 #include "CustomOStream.h"
 
@@ -9,13 +10,12 @@ class BaseData;
 class BaseObject
 {
 public:
-    BaseObject(BaseObject* parent);
+    BaseObject(std::string name);
     ~BaseObject();
 
     std::string getClassName() const;
-    void addChild(BaseObject* p);
-    void removeChild(BaseObject* p);
     void processStream(std::ostream& out);
+    void addData(BaseData* data);
 
     // Serializer les data pour echanger entre threads.
 
@@ -24,8 +24,6 @@ public:
     mutable std::ostringstream serr;
 
 protected:
-    BaseObject* parent;
-    std::vector<BaseObject*> children;
     std::vector<BaseData*> vData;
     std::string warnings;
     std::string outputs;

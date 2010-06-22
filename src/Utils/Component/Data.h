@@ -4,12 +4,13 @@
 #include <iostream>
 #include <string>
 
+class BaseObject;
 
-template< class T>
+template<class T>
 class Data: public BaseData
 {
 public:
-	Data();
+    Data(T defaultValue, std::string name, BaseObject* parent);
 	~Data();
 
 	const T& getValue() const;
@@ -31,9 +32,16 @@ public:
         _synchronized = true;
     }
 
+
 private:
     bool _synchronized;
 	T value;
 //	HANDLE ghMutex;
 	std::string data_name;
 };
+
+// cadeau Bousket
+//static Data<T>& initData(T* defaultValue, std::string name, BaseObject* parent)
+//{
+//    return Data<T>(defaultValue, name, parent);
+//}

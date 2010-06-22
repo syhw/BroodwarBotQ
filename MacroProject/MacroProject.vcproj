@@ -577,6 +577,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\MacroDll.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Utils\TimeManager.h"
 					>
 				</File>

@@ -11,10 +11,9 @@
 #define USE_MONITOR
 #define BUF_SIZE 255
 
-volatile static BattleBroodAI* broodAI = NULL;
+static BattleBroodAI* broodAI = NULL;
 static QApplication* application = NULL;
 static HANDLE  hThreadArrayMonitor;
-
 
 DWORD WINAPI LaunchMonitor( LPVOID lpParam );
 
@@ -72,7 +71,7 @@ BOOL APIENTRY DllMain(HANDLE hModule,
 
 extern "C" __declspec(dllexport) BWAPI::AIModule* newAIModule(BWAPI::Game* game)
 {
-	BWAPI::Broodwar=game;
+	BWAPI::Broodwar = game;
 	broodAI = new BattleBroodAI();
 	return (BattleBroodAI*)broodAI;
 }
@@ -91,7 +90,7 @@ DWORD WINAPI LaunchMonitor(LPVOID lpParam )
 	char* name = "AI-Monitor";
 	char** argv = &name;
 	application = new QApplication(argc, argv);
-    MainWindow w(0, (BattleBroodAI*)broodAI);
+    MainWindow w;//0, (BattleBroodAI*)broodAI);
 	w.show();
 	application->exec();
 #endif

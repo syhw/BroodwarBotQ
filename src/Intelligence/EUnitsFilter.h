@@ -1,5 +1,6 @@
 #pragma once
 #include "CSingleton.h"
+#include "BaseObject.h"
 #include "TimeManager.h"
 #include "EViewedUnit.h"
 #include <BWTA.h>
@@ -7,7 +8,7 @@
 #include <map>
 #include <utility>
 
-class EUnitsFilter : public CSingleton<EUnitsFilter>
+class EUnitsFilter : public CSingleton<EUnitsFilter>, public BaseObject
 {
     TimeManager* timeManager;
     std::map<BWAPI::Unit*, EViewedUnit> eViewedUnits;
