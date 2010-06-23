@@ -398,6 +398,10 @@
 					RelativePath="..\src\Intelligence\EViewedUnit.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\src\Intelligence\ScoutObjectives.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -682,6 +686,10 @@
 				</File>
 				<File
 					RelativePath="..\src\Intelligence\EViewedUnit.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Intelligence\ScoutObjectives.h"
 					>
 				</File>
 			</Filter>

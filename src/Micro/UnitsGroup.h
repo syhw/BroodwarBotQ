@@ -30,6 +30,8 @@ private:
 	int totalPower;
     BWAPI::Position center;
     std::vector<pBayesianUnit> units;
+    std::map<BWAPI::Unit*, std::list<pBayesianUnit> > attackersEnemy;
+
 
 public:
 	std::list<pGoal> goals; // list of goals to execute.
@@ -65,8 +67,11 @@ public:
     virtual void giveUpControl(BWAPI::Unit* u);
 	bool empty();
 	unsigned int getNbUnits() const;
+    std::vector<pBayesianUnit>* getUnits();
+    std::map<BWAPI::Unit*, std::list<pBayesianUnit> >& getAttackersEnemy();
 #ifdef _UNITS_DEBUG
     void selectedUnits(std::set<pBayesianUnit>& u);
 #endif
 	const BayesianUnit& operator[](int i);
 };
+

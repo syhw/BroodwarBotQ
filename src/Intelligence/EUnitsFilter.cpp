@@ -7,7 +7,7 @@ void EUnitsFilter::update(Unit* u)
 {
     if (u->getPlayer() == Broodwar->self()) return;
     if (u->getPlayer()->isNeutral()) return;
-    Broodwar->printf("eViedUnits.size() : %d", eViewedUnits.size());
+    Broodwar->printf("eViewedUnits.size() : %d", eViewedUnits.size());
     if (eViewedUnits.count(u))
         eViewedUnits[u].update(timeManager->getElapsedTime());
     else 

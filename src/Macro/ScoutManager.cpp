@@ -3,14 +3,11 @@
 
 ScoutManager::ScoutManager( )
 {
+	scoutObjectives = & ScoutObjectives::Instance();
 	arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
 	regions = & Regions::Instance();
 	desiredScoutCount = 0;
-
-	myStartLocation = BWTA::getStartLocation(BWAPI::Broodwar->self());
-	std::list<BWTA::BaseLocation*> path = getBestPath( BWTA::getStartLocations(), myStartLocation);
-	for(std::list<BWTA::BaseLocation*>::iterator p=path.begin();p!=path.end();p++)
-		positionsToScout.push_back((*p)->getPosition());
+	this->positionsToScout = scoutObjectives->get_Objectives();
 	showPath();
 }
 
@@ -39,8 +36,17 @@ void ScoutManager::onRevoke(BWAPI::Unit *unit, double bid)
 
 void ScoutManager::update()
 {
-	if (!(Broodwar->getFrameCount() % (24*50)))
-		checkEmptyXP();
+	//if (!(Broodwar->getFrameCount() % (24*50)))
+		//checkEmptyXP();
+
+	//TODO find a way to remove these test in mid game
+	if(!desiredScoutCount)
+		setScoutCount(1);
+	
+	if(Broodwar->getFrameCount() > 24 && scoutObjectives->got_objectives()){
+		this->positionsToScout = this->scoutObjectives->get_Objectives();
+		Broodwar->printf("Objectives acquired");
+	}
 
 	if (needMoreScouts())
 	{
@@ -177,32 +183,7 @@ void ScoutManager::updateScoutAssignments()
 
 }
 
-std::list<BWTA::BaseLocation*> ScoutManager::getBestPath( std::set<BWTA::BaseLocation* > baseLocations, BWTA::BaseLocation* myStartLocation) const
-{
-	std::list<BWTA::BaseLocation*> res;
-	baseLocations.erase( myStartLocation);
-	BWTA::BaseLocation* baseFrom = myStartLocation;
-	while( !baseLocations.empty())
-	{
-		BWTA::BaseLocation* nearestBase = NULL;
-		double dist = 0xFFFF;
-		for( std::set<BWTA::BaseLocation* >::iterator b = baseLocations.begin(); b != baseLocations.end(); b++)
-		{
-			double dist2 = baseFrom->getGroundDistance( *b);
-			if( dist2 <= 0) // Unreachable by walk.
-				baseLocations.erase( nearestBase);
-			if( dist2 < dist)
-			{
-				nearestBase = *b;
-				dist = dist2;
-			}
-		}
-		baseLocations.erase( nearestBase);
-		res.push_back( nearestBase);
-		baseFrom = nearestBase;
-	}
-	return res;
-}
+
 
 void ScoutManager::scoutAllEnemies()
 {
@@ -232,10 +213,10 @@ void ScoutManager::harassWorkers()
 void ScoutManager::checkEmptyXP()
 {
 	// Be sure we have at least a scout
-	if( !desiredScoutCount)
+	if(!desiredScoutCount)
 		setScoutCount(1);
 
-	Broodwar->printf( "########  checkEmptyXP  !!");
+	//Broodwar->printf( "########  checkEmptyXP  !!");
 	// Get the base set still not occupied.
 	std::set<BWTA::BaseLocation* > baseLocToVisit;
 	const std::set<BWTA::BaseLocation*>& allBaseLoc = BWTA::getBaseLocations();
@@ -249,7 +230,7 @@ void ScoutManager::checkEmptyXP()
 
 	// Add it to the position to scout
 	BWTA::BaseLocation* myStartLocation = BWTA::getStartLocation(BWAPI::Broodwar->self());
-	std::list<BWTA::BaseLocation*> orderedBaseLoc = getBestPath(baseLocToVisit, myStartLocation);
+	std::list<BWTA::BaseLocation*> orderedBaseLoc = scoutObjectives->getBestPath(baseLocToVisit, myStartLocation);
 	for(std::list<BWTA::BaseLocation*>::iterator it = orderedBaseLoc.begin(); it != orderedBaseLoc.end(); ++it)
 		positionsToScout.push_back((*it)->getPosition());
 }

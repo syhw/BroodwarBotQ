@@ -25,7 +25,7 @@
 #include "ObjectManager.h"
 #include "EUnitsFilter.h"
 #include "EEcoEstimator.h"
-
+#include "ScoutObjectives.h"
 static bool analyzed;
 static bool analysis_just_finished;
 static BWTA::Region* home;
@@ -56,6 +56,7 @@ public:
     MapManager* mapManager;
     EUnitsFilter* eUnitsFilter;
 	EEcoEstimator* eEcoEstimator;
+	ScoutObjectives* scoutObjectives;
 	bool showManagerAssignments;
 
 	BattleBroodAI();

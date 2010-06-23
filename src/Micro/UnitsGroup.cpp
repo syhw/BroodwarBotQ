@@ -1,3 +1,4 @@
+
 #include <UnitsGroup.h>
 #include <Position.h>
 #include <algorithm>
@@ -136,12 +137,36 @@ void align(std::vector<Position>& from, std::vector<Position>& to, std::vector<u
 void UnitsGroup::update()
 {
 	this->totalHP = 0;
+
+  //  Unit* parcoursEnemy;
+
 	for(std::vector<pBayesianUnit>::iterator it = this->units.begin();
 		it != this->units.end(); ++it)
 	{
 		(*it)->update();
 		this->totalHP += (*it)->unit->getHitPoints();
 		this->totalPower += (*it)->unit->getType().groundWeapon().damageAmount();
+    
+
+        /* ALGO ciblage ...
+        if (oldTarget != newTarget)
+        {
+            unitsGroup.e_t[oldTarget].remove(this);
+            unitsGroup.e_t[newTarget].append(this); ATTENTION : SI CEST LE PREMIER A TIRER SUR CET ENNEMI, IL FAUT CREER LA LISTE
+            oldTarget = newTarget;
+        }  */
+
+      /* 
+        A FINIR 
+      if (parcoursEnemy == NULL)
+            parcoursEnemy = (*it)->_rangeEnemies;
+
+        if ((*it)->oldTarget != eTargets)
+        {
+            
+            eTargets[(*it)->oldTarget].
+                
+        }*/
     }
 
 	updateCenter();
@@ -160,7 +185,6 @@ void UnitsGroup::update()
 		{
 			goals.front()->checkAchievement(this);
 		}
-
         //debug_goals(goals);
 	}
 }
@@ -224,36 +248,20 @@ const pGoal UnitsGroup::getLastGoal() const
 	return lastGoal;
 }
 
-/*
-void trace(std::string message, int id)
-{
-    std::ofstream fichier("trace.txt", std::ios_base::out | std::ios_base::app);
-    if(fichier)
-    {
-        fichier << message << id << '\n';
-        fichier.close();
-    }
-}
-*/
-
 void UnitsGroup::onUnitDestroy(Unit* u)
 {
-    //trace("Destruction de l'unité ", u->getID());
-    std::vector<pBayesianUnit>::const_iterator uniteToDel;
-    bool test = false;
-    for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
-    {
-        //trace("Pour l'unité ", (*it)->unit->getID());
-        if ((*it)->unit->getID() == u->getID())
-        {
-            test = true;
-            uniteToDel = it;
-        }
-        else
+    if (u->getPlayer() != Broodwar->self())
+        for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
             (*it)->onUnitDestroy(u);
+    else
+    {
+        for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
+            if ( (*it)->unit == u ) 
+            {
+                units.erase(it);
+                return;
+            }
     }
-    if (test)
-        units.erase(uniteToDel);
 }
 
 void UnitsGroup::onUnitShow(Unit* u)
@@ -270,7 +278,7 @@ void UnitsGroup::onUnitHide(Unit* u)
 
 void UnitsGroup::takeControl(Unit* u)
 {
-    pBayesianUnit tmp(new BayesianUnit(u, &units));
+    pBayesianUnit tmp(new BayesianUnit(u, this));
 	this->units.push_back(tmp);
 	if (this->goals.empty()) goals.push_back(lastGoal);
     if (this->goals.front() != NULL) this->goals.front()->achieve(this);
@@ -344,6 +352,16 @@ bool UnitsGroup::empty()
 unsigned int UnitsGroup::getNbUnits() const
 {
 	return units.size();
+}
+
+std::vector<pBayesianUnit>* UnitsGroup::getUnits()
+{
+    return &units;
+}
+
+std::map<BWAPI::Unit*, std::list<pBayesianUnit> >& UnitsGroup::getAttackersEnemy()
+{
+    return attackersEnemy;
 }
 
 const BayesianUnit& UnitsGroup::operator[](int i)
