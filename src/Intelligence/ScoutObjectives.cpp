@@ -141,5 +141,7 @@ void ScoutObjectives::explore_region(BWTA::Region* region){
 
 
 void ScoutObjectives::accomplished(BWAPI::Position p){
+
+
 this->assigned_objectives.remove(p);
 }
