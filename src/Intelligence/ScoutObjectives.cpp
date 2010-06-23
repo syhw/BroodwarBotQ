@@ -22,7 +22,11 @@ void ScoutObjectives::set_ennemy_found(bool b){
 
 std::list<Position> ScoutObjectives::get_Objectives(){
 std::list<Position> temp;
-this->objectives.swap(temp);
+	for each (Position pos in objectives){
+		temp.push_back(pos);
+		assigned_objectives.push_back(pos);
+	}
+	objectives.clear();
 return temp;
 }
 
@@ -69,45 +73,68 @@ std::list<BWTA::BaseLocation*> ScoutObjectives::getBestPath( std::set<BWTA::Base
 void ScoutObjectives::onUnitShow(BWAPI::Unit* unit){
 
 	if(unit->getType().isResourceDepot() && ! this->ennemy_found()){
-		Broodwar->printf("Test 1");
 		this->set_ennemy_found(true);
 		//Find the right base location
-		std::list<BWTA::BaseLocation*> res;
-		Broodwar->printf("Test 2");
-		for(std::list<BWTA::BaseLocation* >::iterator b = res.begin(); b!= res.end(); b++){
-			//Maybe try not to run all the BaseLocation possible
-			if( (*b)->getTilePosition() == unit->getTilePosition() )
+		std::set<BWTA::BaseLocation*> res = BWTA::getStartLocations();
+		for(std::set<BWTA::BaseLocation* >::iterator b = res.begin(); b!= res.end(); ++b){
+			if( (*b)->getTilePosition() == unit->getTilePosition() ){
 				eStartLocation = (*b);
+				break;
+			}
 		}
-		Broodwar->printf("Test 3");
+		
 		if(eStartLocation == NULL)
 			Broodwar -> printf("eStartLocation is NULL, problem...");
 		Broodwar->printf("Ennemy main base found, waiting for objectives");
-		Broodwar->printf("Test 4");
-		//scout_all_EBase();
+		BWTA::Region* region = eStartLocation->getRegion();
+		//explore_region(region);
+		
 	}
 		//We assume that if the ennemy was not spotted and we find a ResourceDepot, then it is the main base : requires fast scout
-}
-
-void ScoutObjectives::scout_all_EBase(){
-	Broodwar->printf("Test 5");
-	Broodwar->printf("Must explore the base");
-	//Go to minerals
-	Broodwar->printf("Test 6");
-
-	std::set<BWAPI::Unit*> minerals = eStartLocation->getMinerals();
-	for(std::set<BWAPI::Unit*>::const_iterator it=minerals.begin(); it!=minerals.end(); it++){
-		objectives.push_back((*it)->getPosition());
-	}
-	Broodwar->printf("Test 7");
-	Broodwar->printf("Got %d new objectives", objectives.size());
 }
 
 
 bool ScoutObjectives::got_objectives(){
 
-	if(objectives.size() > 0)
-		return true;
+	return objectives.size() > 0;
+}
 
-	return false;
+void ScoutObjectives::explore_region(BWTA::Region* region){
+
+	BWTA::Polygon polygon = (*region).getPolygon();
+	std::list<Position> to_see;
+	for(std::vector<Position>::iterator it = polygon.begin(); it != polygon.end(); ++it)
+		to_see.push_back((*it));
+	
+	//Select a first position added to the objectives
+	//TODO select a not yet seen position
+	Position current_pos= polygon.getNearestPoint(eStartLocation->getPosition());
+	objectives.push_back(current_pos);
+	to_see.remove(current_pos);
+
+	double max_dist=0;
+	double test_dist=0;
+	Position current_target;
+
+	while(to_see.size() >0){
+		
+		//Find the farthest point of current_pos
+		for(std::list<Position>::iterator pos = to_see.begin(); pos != to_see.end(); ++pos){
+			test_dist=(*pos).getApproxDistance(current_pos);
+			if(test_dist > max_dist){
+				max_dist=test_dist;
+				current_target = (*pos);
+			}
+		}
+		
+		objectives.push_back(current_target);
+		current_pos=current_target;
+		to_see.remove(current_pos);
+	}
+
+}
+
+
+void ScoutObjectives::accomplished(BWAPI::Position p){
+this->assigned_objectives.remove(p);
 }

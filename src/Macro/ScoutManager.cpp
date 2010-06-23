@@ -43,7 +43,7 @@ void ScoutManager::update()
 	if(!desiredScoutCount)
 		setScoutCount(1);
 	
-	if(Broodwar->getFrameCount() > 24 && scoutObjectives->got_objectives()){
+	if(scoutObjectives->got_objectives() && this->positionsToScout.size()==0){
 		this->positionsToScout = this->scoutObjectives->get_Objectives();
 		Broodwar->printf("Objectives acquired");
 	}
