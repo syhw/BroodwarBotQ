@@ -129,6 +129,8 @@ void ScoutObjectives::explore_region(BWTA::Region* region){
 			}
 		}
 		Broodwar->printf("ou ? x %d  y %d", current_target.x(), current_target.y());
+		add(current_target);
+		Broodwar->drawCircleMap(current_target.x(),current_target.y(),200,Colors::Blue);
 		Broodwar->drawCircle(CoordinateType::Screen,current_target.x(), current_target.y(),200,Colors::Yellow, true);
 	//	void drawCircleMap(int x, int y, int radius, Color color = Color(BWAPI::Colors::Green), bool isSolid = false); 
 		objectives.push_back(current_target);
@@ -144,4 +146,14 @@ void ScoutObjectives::accomplished(BWAPI::Position p){
 
 
 this->assigned_objectives.remove(p);
+}
+
+void ScoutObjectives::add(Position p){
+	to_display.push_back(p);
+}
+
+void ScoutObjectives::show(){
+	for each (Position pos in to_display){
+		Broodwar->drawCircleMap(pos.x(),pos.y(),20,Colors::Blue);
+	}
 }

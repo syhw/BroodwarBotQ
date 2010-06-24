@@ -19,6 +19,7 @@ public:
 	bool got_objectives();
 	void explore_region(BWTA::Region* region);//add to the objectives the exploration of the region
 	void accomplished(BWAPI::Position p);
+	void show();
 private:
 	ScoutObjectives();
 	~ScoutObjectives();
@@ -27,5 +28,6 @@ private:
 	std::list<BWAPI::Position> assigned_objectives;
 	BWTA::BaseLocation* myStartLocation;
 	BWTA::BaseLocation* eStartLocation;
-	
+	std::list<BWAPI::Position> to_display;
+	void add(BWAPI::Position p);
 };

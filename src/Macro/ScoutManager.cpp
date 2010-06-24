@@ -36,6 +36,7 @@ void ScoutManager::onRevoke(BWAPI::Unit *unit, double bid)
 
 void ScoutManager::update()
 {
+	scoutObjectives->show();
 	//if (!(Broodwar->getFrameCount() % (24*50)))
 		//checkEmptyXP();
 
