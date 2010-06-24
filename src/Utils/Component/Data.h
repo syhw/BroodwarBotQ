@@ -26,11 +26,13 @@ public:
 	std::ostream& operator <<(std::ostream& os) const;
 	std::istream& operator >>(const std::istream& is) const;
 
-    T& operator*();
+    //T& operator*();
 
     T* operator->();
     
-    const T& operator*() const;
+    //const T& operator*() const;
+
+    T& operator*();
 
     const T* operator->() const;
 
@@ -42,7 +44,8 @@ public:
 protected:
     bool _synchronized;
 	T value;
-//	HANDLE ghMutex;
+    T value_ro;
+    HANDLE ghMutex;
 	std::string data_name;
 };
 /*

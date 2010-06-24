@@ -12,29 +12,29 @@ Data<T>::Data(T defaultValue, std::string name, BaseObject* parent)
 {
     if (parent)
         parent->addData(this);
-    /*
-ghMutex = CreateMutex( 
+
+    ghMutex = CreateMutex( 
         NULL,              // default security attributes
         FALSE,             // initially not owned
         NULL);             // unnamed mutex
 
-// if (ghMutex == NULL) 
-//	 Broodwar->printf("bad mutex creation");
-        */
+    if (ghMutex == NULL) 
+        BWAPI::Broodwar->printf("bad mutex creation");
+
 }
  
 
 template< typename T>
 Data<T>::~Data()
 {
-    //CloseHandle(ghMutex);
+    CloseHandle(ghMutex);
 }
 
-template< typename T>
+/*template< typename T>
 T& Data<T>::operator*()
 {
     return value;
-}
+}*/
 
 template< typename T>
 T* Data<T>::operator->()
@@ -43,9 +43,35 @@ T* Data<T>::operator->()
 }
 
 template< typename T>
-const T& Data<T>::operator*() const
+T& Data<T>::operator*()
 {
-    return value;
+	DWORD dwWaitResult = WaitForSingleObject( 
+            ghMutex,    // handle to mutex
+            INFINITE);  // no time-out interval
+ 
+        switch (dwWaitResult) 
+        {
+            // The thread got ownership of the mutex
+            case WAIT_OBJECT_0: 
+                __try { 
+                    value_ro = value;
+                } 
+
+                __finally { 
+                    // Release ownership of the mutex object
+                    if (!ReleaseMutex(ghMutex)) 
+                    { 
+                        // Handle error.
+                    } 
+                } 
+                break; 
+
+            // The thread got ownership of an abandoned mutex
+            // The database is in an indeterminate state
+            case WAIT_ABANDONED:
+                return value_ro; 
+        }
+    return value_ro;
 }
 
 template< typename T>
@@ -71,38 +97,9 @@ void Data<T>::synchronized()
 template< typename T>
 T* Data<T>::beginEdit()
 {
-    /*
-	DWORD dwCount = 0;
 	DWORD dwWaitResult = WaitForSingleObject( 
             ghMutex,    // handle to mutex
             INFINITE);  // no time-out interval
- 
-        switch (dwWaitResult) 
-        {
-            // The thread got ownership of the mutex
-            case WAIT_OBJECT_0: 
-                __try { 
-                    // TODO: Write to the database
-                    printf("Thread %d writing to database...\n", 
-                            GetCurrentThreadId());
-                    dwCount++;
-                } 
-
-                __finally { 
-                    // Release ownership of the mutex object
-                    if (! ReleaseMutex(ghMutex)) 
-                    { 
-                        // Handle error.
-                    } 
-                } 
-                break; 
-
-            // The thread got ownership of an abandoned mutex
-            // The database is in an indeterminate state
-            case WAIT_ABANDONED: 
-                return FALSE; 
-        }
-*/
 	return &value;
 }
 
@@ -111,7 +108,7 @@ template< typename T>
 void Data<T>::endEdit()
 {
 	// lacher le mutex
-        //ReleaseMutex(ghMutex);
+    ReleaseMutex(ghMutex);
     _synchronized = false;
 }
 

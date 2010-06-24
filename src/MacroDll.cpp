@@ -8,29 +8,6 @@
 #include "MainWindow.h"
 #include "MacroProject.h"
 
-
-
-
-
-
-
-
-
-
-
-
-#include "Util.h"
-
-
-
-
-
-
-
-
-
-
-
 #define USE_MONITOR
 #define BUF_SIZE 255
 
@@ -96,7 +73,6 @@ extern "C" __declspec(dllexport) BWAPI::AIModule* newAIModule(BWAPI::Game* game)
 {
 	BWAPI::Broodwar = game;
 	broodAI = new BattleBroodAI();
-    log( "putain de pointeur: %i", (long)broodAI);
 	return (BattleBroodAI*)broodAI;
 }
 
