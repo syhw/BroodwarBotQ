@@ -25,6 +25,8 @@
 #include "MicroManager.h"
 #include "ObjectManager.h"
 #include "EUnitsFilter.h"
+#include "EEcoEstimator.h"
+#include "ScoutObjectives.h"
 
 #ifdef BW_QT_DEBUG
 #include <QtGui/QApplication>
@@ -34,7 +36,6 @@ static MainWindow* qmainwindow = NULL;
 #endif
 class BattleBroodAI;
 static BattleBroodAI* broodAI = NULL;
-
 
 static bool analyzed;
 static bool analysis_just_finished;
@@ -65,6 +66,8 @@ public:
 	WorkerManager* workerManager;
     MapManager* mapManager;
     EUnitsFilter* eUnitsFilter;
+	EEcoEstimator* eEcoEstimator;
+	ScoutObjectives* scoutObjectives;
 	bool showManagerAssignments;
     ObjectManager* objManager;
 

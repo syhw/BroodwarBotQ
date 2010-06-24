@@ -3,7 +3,8 @@
 #include <BWTA.h>
 #include <windows.h>
 #include "Formations.h"
-
+#include "Subgoal.h"
+//#include "UnitsGroup.h"
 class UnitsGroup;
 
 #ifndef _SMART_POINTER_GOAL_INCLUDED
@@ -39,6 +40,7 @@ class Goal
 {
 protected:
 	unsigned int achiviedCpt;
+	std::list<Subgoal> subgoals;
 
 public:
 	GoalType type;          /**< type of the goal */
@@ -54,4 +56,5 @@ public:
 	virtual void achieve(UnitsGroup* ug);
 	virtual void checkAchievement(UnitsGroup* ug);
     virtual std::string getPurpose() const;
+
 };

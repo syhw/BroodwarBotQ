@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="MacroProject"
 	ProjectGUID="{F39C7417-770D-4635-8A47-77BD9CDDCD71}"
 	RootNamespace="MacroProject"
@@ -241,6 +241,10 @@
 						RelativePath="..\src\Micro\Goals\Goal.cpp"
 						>
 					</File>
+					<File
+						RelativePath="..\src\Micro\Goals\Subgoal.cpp"
+						>
+					</File>
 				</Filter>
 			</Filter>
 			<Filter
@@ -387,11 +391,23 @@
 				Name="Intelligence"
 				>
 				<File
+					RelativePath="..\src\Intelligence\EEcoEstimator.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Intelligence\EStrat.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Intelligence\EUnitsFilter.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\src\Intelligence\EViewedUnit.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Intelligence\ScoutObjectives.cpp"
 					>
 				</File>
 			</Filter>
@@ -485,6 +501,10 @@
 					</File>
 					<File
 						RelativePath="..\src\Micro\Goals\Goal.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Goals\Subgoal.h"
 						>
 					</File>
 				</Filter>
@@ -681,11 +701,23 @@
 				Name="Intelligence"
 				>
 				<File
+					RelativePath="..\src\Intelligence\EEcoEstimator.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Intelligence\EStrat.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Intelligence\EUnitsFilter.h"
 					>
 				</File>
 				<File
 					RelativePath="..\src\Intelligence\EViewedUnit.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Intelligence\ScoutObjectives.h"
 					>
 				</File>
 			</Filter>

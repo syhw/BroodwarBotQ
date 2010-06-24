@@ -73,3 +73,4 @@ public:
 #endif
 	const BayesianUnit& operator[](int i);
 };
+

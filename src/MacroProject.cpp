@@ -135,7 +135,8 @@ void BattleBroodAI::onStart()
 	this->supplyManager     = & SupplyManager::Instance();
     this->mapManager        = & MapManager::Instance();
     this->eUnitsFilter      = & EUnitsFilter::Instance();
-
+	this->eEcoEstimator     = & EEcoEstimator::Instance();
+	this->scoutObjectives   = & ScoutObjectives::Instance();
     this->supplyManager->setBuildManager(this->buildManager);
     this->supplyManager->setBuildOrderManager(this->buildOrderManager);
     this->techManager->setBuildingPlacer(this->buildManager->getBuildingPlacer());
@@ -155,9 +156,10 @@ void BattleBroodAI::onStart()
     this->microManager = & MicroManager::Instance();
     this->regions = & Regions::Instance();
 
-    Broodwar->printf("The match up is %s v %s",
-        Broodwar->self()->getRace().getName().c_str(),
-        Broodwar->enemy()->getRace().getName().c_str());
+    //Broodwar->printf("The match up is %s v %s",
+        Broodwar->self()->getRace().getName().c_str();
+        Broodwar->enemy()->getRace().getName().c_str();
+	scoutObjectives->find_ennemy();
 }
 
 void BattleBroodAI::onEnd(bool isWinner)
@@ -194,10 +196,11 @@ void BattleBroodAI::onFrame()
     ////this->unitManager->update();
     this->microManager->update();
     this->regions->update();
+	this->eEcoEstimator->onFrame();
 
     // Scout example to remove TODO
-    if( (Broodwar->getFrameCount() % (100*24)) == 0)
-        scoutManager->checkEmptyXP();
+	//if( (Broodwar->getFrameCount() % (100*24)) == 0)
+      //scoutManager->checkEmptyXP();
 
     std::set<Unit*> units=Broodwar->self()->getUnits();
     if (this->showManagerAssignments)
@@ -500,6 +503,7 @@ void BattleBroodAI::onUnitShow(BWAPI::Unit* unit)
     regions->onUnitShow(unit);
     mapManager->onUnitShow(unit);
     eUnitsFilter->update(unit);
+	this->scoutObjectives->onUnitShow(unit);
 }
 
 void BattleBroodAI::onUnitHide(BWAPI::Unit* unit)
@@ -549,7 +553,7 @@ bool BattleBroodAI::onSendText(std::string text)
     {
         if (analyzed == false)
         {
-            Broodwar->printf("Analyzing map... this may take a minute");
+           // Broodwar->printf("Analyzing map... this may take a minute");
             CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)AnalyzeThread, NULL, 0, NULL);
         }
         return false;
@@ -558,10 +562,10 @@ bool BattleBroodAI::onSendText(std::string text)
     {
         int x = 0;
         if (text[9] != ' ')
-            Broodwar->printf("Usage: /setspeed SPEEDVALUE");
+           Broodwar->printf("Usage: /setspeed SPEEDVALUE");
         std::string xx = text.substr(10);
         x = atoi(xx.c_str());
-        Broodwar->printf("Set Speed %i", x);
+      //  Broodwar->printf("Set Speed %i", x);
         Broodwar->setLocalSpeed(x);
     }
     else if (text=="/target")
@@ -572,12 +576,12 @@ bool BattleBroodAI::onSendText(std::string text)
             set<pBayesianUnit> tmp;
             (*it)->selectedUnits(tmp);
             if (tmp.size() == 0)
-                Broodwar->printf("No selected units");
+            //    Broodwar->printf("No selected units");
             for (std::set<pBayesianUnit>::const_iterator i = tmp.begin(); i != tmp.end(); ++i)
             {
-                Broodwar->printf("Target de l'unité : (%i, %i)", (*i)->target.x(), (*i)->target.y());
+              //  Broodwar->printf("Target de l'unité : (%i, %i)", (*i)->target.x(), (*i)->target.y());
                 Position pos(Broodwar->getScreenPosition() + Broodwar->getMousePosition());
-                Broodwar->printf("Curseur : (%i, %i)", pos.x(), pos.y());
+               // Broodwar->printf("Curseur : (%i, %i)", pos.x(), pos.y());
             }
         }
     }
@@ -658,7 +662,7 @@ void BattleBroodAI::showPlayers()
     std::set<Player*> players=Broodwar->getPlayers();
     for(std::set<Player*>::iterator i=players.begin();i!=players.end();i++)
     {
-        Broodwar->printf("Player [%d]: %s is in force: %s",(*i)->getID(),(*i)->getName().c_str(), (*i)->getForce()->getName().c_str());
+     //   Broodwar->printf("Player [%d]: %s is in force: %s",(*i)->getID(),(*i)->getName().c_str(), (*i)->getForce()->getName().c_str());
     }
 }
 void BattleBroodAI::showForces()
@@ -667,10 +671,10 @@ void BattleBroodAI::showForces()
     for(std::set<Force*>::iterator i=forces.begin();i!=forces.end();i++)
     {
         std::set<Player*> players=(*i)->getPlayers();
-        Broodwar->printf("Force %s has the following players:",(*i)->getName().c_str());
+      //  Broodwar->printf("Force %s has the following players:",(*i)->getName().c_str());
         for(std::set<Player*>::iterator j=players.begin();j!=players.end();j++)
         {
-            Broodwar->printf("  - Player [%d]: %s",(*j)->getID(),(*j)->getName().c_str());
+      //      Broodwar->printf("  - Player [%d]: %s",(*j)->getID(),(*j)->getName().c_str());
         }
     }
 }
