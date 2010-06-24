@@ -32,7 +32,6 @@ private:
     std::vector<pBayesianUnit> units;
     std::map<BWAPI::Unit*, std::list<pBayesianUnit> > attackersEnemy;
 
-
 public:
 	std::list<pGoal> goals; // list of goals to execute.
 

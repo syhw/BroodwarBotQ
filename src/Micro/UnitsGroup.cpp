@@ -138,35 +138,11 @@ void UnitsGroup::update()
 {
 	this->totalHP = 0;
 
-  //  Unit* parcoursEnemy;
-
-	for(std::vector<pBayesianUnit>::iterator it = this->units.begin();
-		it != this->units.end(); ++it)
-	{
-		(*it)->update();
-		this->totalHP += (*it)->unit->getHitPoints();
-		this->totalPower += (*it)->unit->getType().groundWeapon().damageAmount();
-    
-
-        /* ALGO ciblage ...
-        if (oldTarget != newTarget)
-        {
-            unitsGroup.e_t[oldTarget].remove(this);
-            unitsGroup.e_t[newTarget].append(this); ATTENTION : SI CEST LE PREMIER A TIRER SUR CET ENNEMI, IL FAUT CREER LA LISTE
-            oldTarget = newTarget;
-        }  */
-
-      /* 
-        A FINIR 
-      if (parcoursEnemy == NULL)
-            parcoursEnemy = (*it)->_rangeEnemies;
-
-        if ((*it)->oldTarget != eTargets)
-        {
-            
-            eTargets[(*it)->oldTarget].
-                
-        }*/
+    for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+    {
+        (*it)->update();
+        this->totalHP += (*it)->unit->getHitPoints();
+        this->totalPower += (*it)->unit->getType().groundWeapon().damageAmount();
     }
 
 	updateCenter();
@@ -186,7 +162,154 @@ void UnitsGroup::update()
 			goals.front()->checkAchievement(this);
 		}
         //debug_goals(goals);
+	}    
+
+	std::set<Unit*> enemies;
+	std::set<Unit*> enemies_in_range;
+
+	for each(Unit* u in Broodwar->getAllUnits())
+	{
+		if ( (u->getPlayer() != Broodwar->self()) )
+		{
+			enemies.insert(u);
+		}
 	}
+
+    double maxRangeGoon = 0.0;
+    double maxRangeGoonEnemy = 0.0;
+	for each(pBayesianUnit u in units)
+	{
+		// find enemies in range of our current dragoon
+		for each(Unit* enemy in enemies)
+		{
+            if (maxRangeGoon == 0.0) 
+            {
+                maxRangeGoon = u->unit->getType().groundWeapon().maxRange();
+                for each (UpgradeType upgrade in u->unit->getType().upgrades()) 
+                {
+                    if (upgrade == BWAPI::UpgradeTypes::Singularity_Charge)
+                    {
+                        maxRangeGoon *= 1.5;
+                        break;
+                    }
+                }
+            }
+            if (maxRangeGoonEnemy == 0.0)
+            {
+                maxRangeGoonEnemy = enemy->getType().groundWeapon().maxRange();
+                for each (UpgradeType upgrade in enemy->getType().upgrades()) 
+                {
+                    if (upgrade == BWAPI::UpgradeTypes::Singularity_Charge)
+                    {
+                        maxRangeGoonEnemy *= 1.5;
+                        break;
+                    }
+                }
+            }
+           
+			if (u->unit->getDistance(enemy) < maxRangeGoon) 
+			{
+				enemies_in_range.insert(enemy);
+			}
+		}
+		// find weakest
+		Unit* weakestenemy = NULL;
+		for each(Unit* enemy in enemies_in_range)
+		{
+			if (weakestenemy)
+			{
+				int weakesthp = weakestenemy->getHitPoints() + weakestenemy->getShields();
+				int enemyhp = enemy->getHitPoints() + enemy->getShields();
+				if (weakesthp > enemyhp)
+				{
+					weakestenemy = enemy;
+				}
+			}
+			else
+			{
+				weakestenemy = enemy;
+			}
+		}
+		// Enemy found
+		if (weakestenemy)
+		{
+			int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
+			int ex = weakestenemy->getPosition().x(); int ey = weakestenemy->getPosition().y();
+			
+			Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Red);
+			if (u->unit->getOrderTarget() != weakestenemy && !u->unit->isMoving())
+			{
+				u->unit->rightClick(weakestenemy);
+			}
+		}
+		// Enemy not found
+		else
+		{
+			// Find the closest enemy
+			Unit* closest_enemy = NULL;
+			for each(Unit* enemy in enemies)
+			{
+				if (closest_enemy)
+				{
+					if (u->unit->getDistance(closest_enemy) > u->unit->getDistance(enemy))
+					{
+						closest_enemy = enemy;
+					}
+				}
+				else
+				{
+					closest_enemy = enemy;
+				}
+			}
+			// Enemy found
+			if (closest_enemy)
+			{
+				int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
+				int ex = closest_enemy->getPosition().x(); int ey = closest_enemy->getPosition().y();
+				
+				Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Yellow);
+
+                if (u->unit->getOrderTarget() != closest_enemy && !u->unit->isMoving())
+				{
+					u->unit->rightClick(closest_enemy);
+				}
+			}
+			// No enemy
+			else
+			{
+				int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
+				int ex = u->unit->getTargetPosition().x(); int ey = u->unit->getTargetPosition().y();
+				
+				Broodwar->drawLineMap(ux,uy,ex,ey,Colors::White);
+                
+                if (static_cast<Goal>(*lastGoal).status == GS_ACHIEVED) 
+                    u->unit->rightClick(Position(u->unit->getPosition().x()+10, u->unit->getPosition().y()));
+			}
+		}
+		enemies_in_range.clear();
+	}  
+    // Some IA problems here ..
+    for each(Unit* enemy in enemies)
+    {
+        if (enemy->getOrderTarget() != NULL && enemy->isAttacking()) 
+        {
+            Unit* myUnit = enemy->getOrderTarget();
+            if (myUnit->getPlayer() == Broodwar->self() && !myUnit->isMoving()) 
+            {
+                Vec dep(enemy->getPosition() - myUnit->getPosition()); 
+                dep = dep.normalize();
+                Position newPos = Position(myUnit->getPosition().x(), myUnit->getPosition().y());;
+                
+                double calc = (maxRangeGoonEnemy - enemy->getDistance(newPos))/dep.norm();
+                newPos += Position(static_cast<int>(dep.x * calc), static_cast<int>(dep.y * calc));
+
+                myUnit->rightClick(newPos);
+				int ux = myUnit->getPosition().x(); int uy = myUnit->getPosition().y();
+				int ex = myUnit->getTargetPosition().x(); int ey = myUnit->getTargetPosition().y();
+                Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Blue);
+            }
+        }
+    }
 }
 
 void UnitsGroup::attackMove(int x, int y)
@@ -316,11 +439,13 @@ void UnitsGroup::keepDistance()
 	for (std::vector<pBayesianUnit>::iterator itUnit = units.begin(); itUnit != units.end(); itUnit++)
 	{
 		Unit* unit = (*itUnit)->unit;
-		if ((*itUnit)->timeIdle >= 0) (*itUnit)->timeIdle++;
+		if ((*itUnit)->timeIdle >= 0) 
+            (*itUnit)->timeIdle++;
 		if ((*itUnit)->timeIdle > 75)
 		{
 			(*itUnit)->timeIdle = -1;
-			if (!goals.empty()) (*itUnit)->attackMove(goals.front()->formation->center.toPosition());
+			//if (!goals.empty()) 
+             //   (*itUnit)->attackMove(goals.front()->formation->center.toPosition());
 		}
 
 		if (enemies.empty()) continue;
@@ -338,7 +463,7 @@ void UnitsGroup::keepDistance()
 		if (closestUnit->getType().groundWeapon().maxRange() < attackRange &&
 			closestUnit->getDistance(unit) < closestUnit->getType().groundWeapon().maxRange())
 		{
-			(unit)->rightClick( Broodwar->self()->getStartLocation());
+			//(unit)->rightClick( Broodwar->self()->getStartLocation());
 			(*itUnit)->timeIdle = 0;
 		}
 	}

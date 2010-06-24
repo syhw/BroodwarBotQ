@@ -5,6 +5,7 @@
 #include <BWAPI.h>
 
 struct Vec {
+    friend std::ostream& operator <<(std::ostream& os, const Vec& v);
     double x, y;
     Vec(double x_=0.0, double y_=0.0){ x=x_; y=y_; }
     Vec(const Vec& v){ x=v.x; y=v.y; }
@@ -26,4 +27,7 @@ struct Vec {
     BWAPI::Position toPosition() const { return BWAPI::Position( (int)x, (int)y);};
     Vec operator%(Vec&b){return Vec(-y*b.x-x*b.y, x*b.y-y*b.x);}
     BWAPI::Position translate(const BWAPI::Position& p) const { return BWAPI::Position(p.x() + (int)x, p.y() + (int)y); }
+    std::ostream& operator <<(std::ostream& os) const { os << x << " " << y; return os; }
 };
+
+inline std::ostream& operator <<(std::ostream& os, const Vec& v) { os << v.x << " " << v.y; return os; }

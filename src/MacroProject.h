@@ -24,15 +24,26 @@
 #include "MicroManager.h"
 #include "ObjectManager.h"
 #include "EUnitsFilter.h"
+
 #include "EEcoEstimator.h"
 #include "ScoutObjectives.h"
+#define BW_QT_DEBUG 1
+#ifdef BW_QT_DEBUG
+#include <QtGui/QApplication>
+static QApplication* qapplication = NULL;
+#endif
+class BattleBroodAI;
+static BattleBroodAI* broodAI = NULL;
+
+
+>>>>>>> 050253a32fe42efcb6115a06992d5ba4c07b8947:src/MacroProject.h
 static bool analyzed;
 static bool analysis_just_finished;
 static BWTA::Region* home;
 static BWTA::Region* enemy_base;
 DWORD WINAPI AnalyzeThread();
 
-class BattleBroodAI : public BWAPI::AIModule, public ObjectManager
+class BattleBroodAI : public BWAPI::AIModule//, public ObjectManager
 {
 public:
 	bool show_visibility_data;
@@ -58,9 +69,15 @@ public:
 	EEcoEstimator* eEcoEstimator;
 	ScoutObjectives* scoutObjectives;
 	bool showManagerAssignments;
+    ObjectManager* objManager;
 
-	BattleBroodAI();
-	~BattleBroodAI();
+#ifdef BW_QT_DEBUG
+	BattleBroodAI(QApplication** qapplication);
+    QApplication** qapp;
+#else
+    BattleBroodAI()
+#endif
+    ~BattleBroodAI();
 	virtual void onStart();
 	virtual void onEnd(bool isWinner);
 	virtual void onFrame();

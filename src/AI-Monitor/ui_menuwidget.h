@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'menuwidget.ui'
 **
-** Created: Sun 20. Jun 23:25:24 2010
+** Created: Tue 22. Jun 14:34:55 2010
 **      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -33,10 +33,11 @@ class Ui_MenuWidget
 public:
     QVBoxLayout *verticalLayout_2;
     QLabel *label;
+    QSlider *hSlider_gameSpeed;
     QTabWidget *tabWidget;
     QWidget *tab_Goals;
     QVBoxLayout *verticalLayout;
-    QTreeView *goalsTree;
+    QTreeView *componentTree;
     QWidget *tab_Strat;
     QGridLayout *gridLayout;
     QPushButton *pushButton_2;
@@ -51,7 +52,6 @@ public:
     QWidget *tab_EUFilter;
     QHBoxLayout *horizontalLayout_2;
     QTableWidget *EVUnits;
-    QSlider *hSlider_gameSpeed;
 
     void setupUi(QWidget *MenuWidget)
     {
@@ -65,16 +65,22 @@ public:
 
         verticalLayout_2->addWidget(label);
 
+        hSlider_gameSpeed = new QSlider(MenuWidget);
+        hSlider_gameSpeed->setObjectName(QString::fromUtf8("hSlider_gameSpeed"));
+        hSlider_gameSpeed->setOrientation(Qt::Horizontal);
+
+        verticalLayout_2->addWidget(hSlider_gameSpeed);
+
         tabWidget = new QTabWidget(MenuWidget);
         tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
         tab_Goals = new QWidget();
         tab_Goals->setObjectName(QString::fromUtf8("tab_Goals"));
         verticalLayout = new QVBoxLayout(tab_Goals);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-        goalsTree = new QTreeView(tab_Goals);
-        goalsTree->setObjectName(QString::fromUtf8("goalsTree"));
+        componentTree = new QTreeView(tab_Goals);
+        componentTree->setObjectName(QString::fromUtf8("componentTree"));
 
-        verticalLayout->addWidget(goalsTree);
+        verticalLayout->addWidget(componentTree);
 
         tabWidget->addTab(tab_Goals, QString());
         tab_Strat = new QWidget();
@@ -165,16 +171,10 @@ public:
 
         verticalLayout_2->addWidget(tabWidget);
 
-        hSlider_gameSpeed = new QSlider(MenuWidget);
-        hSlider_gameSpeed->setObjectName(QString::fromUtf8("hSlider_gameSpeed"));
-        hSlider_gameSpeed->setOrientation(Qt::Horizontal);
-
-        verticalLayout_2->addWidget(hSlider_gameSpeed);
-
 
         retranslateUi(MenuWidget);
 
-        tabWidget->setCurrentIndex(2);
+        tabWidget->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(MenuWidget);

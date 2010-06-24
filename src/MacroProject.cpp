@@ -2,12 +2,20 @@
 #include <Util.h>
 #include <time.h>
 
+
 #include <UnitsGroup.h>
+
 
 using namespace BWAPI;
 
+#ifdef BW_QT_DEBUG
+BattleBroodAI::BattleBroodAI(QApplication** qapplication)
+{
+    qapp = qapplication;
+#else
 BattleBroodAI::BattleBroodAI()
 {
+#endif
     clearLog();
 
     std::set<UnitType>& aut = BWAPI::UnitTypes::allUnitTypes();
@@ -43,10 +51,15 @@ BattleBroodAI::BattleBroodAI()
     for (std::set<UnitType>::iterator wu = aut.begin(); wu != aut.end(); wu++)
         if( !wu->isBuilding() && !wu->isWorker())
             log( "%s has a range of %i.", wu->getName().c_str(), wu->seekRange());
+
 }
 
 BattleBroodAI::~BattleBroodAI()
 {
+#ifdef BW_QT_DEBUG
+    (*qapp)->quit();
+#endif
+
     TimeManager::Destroy();
     Arbitrator::Arbitrator<BWAPI::Unit*,double>::Destroy();
     BuildManager::Destroy();
@@ -61,6 +74,7 @@ BattleBroodAI::~BattleBroodAI()
     Regions::Destroy();
     MapManager::Destroy();
     EUnitsFilter::Destroy();
+    ObjectManager::Destroy();
 
 
     if( Broodwar->self()->getRace() == Races::Protoss)
@@ -74,7 +88,7 @@ BattleBroodAI::~BattleBroodAI()
 void BattleBroodAI::onStart()
 {
     _CrtDumpMemoryLeaks();      // anti-memory leaks
-	//Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
+    Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
 	// Enable some cheat flags
 	Broodwar->enableFlag(Flag::UserInput);
 	// Uncomment to enable complete map information
@@ -104,6 +118,9 @@ void BattleBroodAI::onStart()
 	BWTA::readMap();
 	BWTA::analyze();
 	this->analyzed=true;
+
+    this->objManager = & ObjectManager::Instance();
+
 	this->timeManager       = & TimeManager::Instance();
 	this->arbitrator		= & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
 	this->buildManager      = & BuildManager::Instance();
@@ -153,10 +170,14 @@ void BattleBroodAI::onEnd(bool isWinner)
 
 void BattleBroodAI::onFrame()
 {
+#ifdef BW_QT_DEBUG
+    if (!*qapp)
+        Broodwar->printf("Qt not connected\n");
+#endif
     //clock_t start = clock();
 
     // log("IN BBAI::onFrame()");
-    ObjectManager::updateOM();
+    objManager->updateOM();
     if (Broodwar->isReplay()) return;
     if (!this->analyzed) return;
     this->timeManager->update();
