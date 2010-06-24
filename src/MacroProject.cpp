@@ -9,9 +9,11 @@
 using namespace BWAPI;
 
 #ifdef BW_QT_DEBUG
-BattleBroodAI::BattleBroodAI(QApplication** qapplication)
+BattleBroodAI::BattleBroodAI(QApplication** qappli, MainWindow** qmain)
 {
-    qapp = qapplication;
+    qapp = qappli;
+    qapplication = *qappli;
+    qmainwindow = *qmain;
 #else
 BattleBroodAI::BattleBroodAI()
 {

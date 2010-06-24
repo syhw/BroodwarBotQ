@@ -1,4 +1,5 @@
 #pragma once
+#include "Defines.h"
 #include "CSingleton.h"
 #include "BaseObject.h"
 #include "TimeManager.h"

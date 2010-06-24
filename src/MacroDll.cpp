@@ -5,7 +5,6 @@
 #include <tchar.h>
 #include <BWAPI.h>
 #include <QtGui/QApplication>
-#include "MainWindow.h"
 #include "MacroProject.h"
 
 #define USE_MONITOR
@@ -68,7 +67,7 @@ extern "C" __declspec(dllexport) BWAPI::AIModule* newAIModule(BWAPI::Game* game)
 {
 	BWAPI::Broodwar = game;
 #ifdef BW_QT_DEBUG
-	broodAI = new BattleBroodAI(&qapplication);
+	broodAI = new BattleBroodAI(&qapplication, &qmainwindow);
 #else
     broodAI = new BattleBroodAI();
 #endif
@@ -90,8 +89,8 @@ DWORD WINAPI LaunchMonitor(LPVOID lpParam )
 	char* name = "AI-Monitor";
 	char** argv = &name;
 	qapplication = new QApplication(argc, argv);
-    MainWindow w;//0, (BattleBroodAI*)broodAI);
-	w.show();
+    qmainwindow = new MainWindow();//0, (BattleBroodAI*)broodAI);
+	qmainwindow->show();
 	qapplication->exec();
 #endif
 	return 0; 

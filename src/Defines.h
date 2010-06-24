@@ -1,0 +1,1 @@
+#define BW_QT_DEBUG 1

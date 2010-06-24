@@ -5,6 +5,7 @@
 #include <BWAPI.h>
 #include <BWTA.h>
 #include <windows.h>
+#include "Defines.h"
 #include "Arbitrator.h"
 #include "WorkerManager.h"
 #include "SupplyManager.h"
@@ -25,10 +26,11 @@
 #include "ObjectManager.h"
 #include "EUnitsFilter.h"
 
-#define BW_QT_DEBUG 1
 #ifdef BW_QT_DEBUG
 #include <QtGui/QApplication>
+#include "MainWindow.h"
 static QApplication* qapplication = NULL;
+static MainWindow* qmainwindow = NULL;
 #endif
 class BattleBroodAI;
 static BattleBroodAI* broodAI = NULL;
@@ -67,7 +69,7 @@ public:
     ObjectManager* objManager;
 
 #ifdef BW_QT_DEBUG
-	BattleBroodAI(QApplication** qapplication);
+	BattleBroodAI(QApplication** qappli, MainWindow** qmain);
     QApplication** qapp;
 #else
     BattleBroodAI()

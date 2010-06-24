@@ -84,7 +84,7 @@ void MainWindow::componentDoubleClicked(QModelIndex index)
         {
             unsigned int dataIndex = i*5+j;
             if (dataIndex >= data.size()) continue;
-            layout->addWidget( data[dataIndex]->createWidget(tab));
+            layout->addWidget(data[dataIndex]->createWidget(tab));
         }
         tabWidget->addTab(tab, QString("Data"));
     }

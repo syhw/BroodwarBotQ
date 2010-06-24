@@ -291,6 +291,10 @@
 					RelativePath="..\src\AI-Monitor\release\moc_MiniMap.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\src\Regions\WalkTilePosition.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -298,6 +302,10 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath="..\src\Defines.h"
+				>
+			</File>
 			<File
 				RelativePath="..\src\Micro\Formations.h"
 				>
@@ -328,10 +336,6 @@
 			</File>
 			<File
 				RelativePath="..\src\Micro\UnitsGroup.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\Regions\WalkTilePosition.h"
 				>
 			</File>
 			<Filter
