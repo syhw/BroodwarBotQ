@@ -1,6 +1,7 @@
 #include "MicroProject.h"
 #include "Goal.h"
 #include "DefendGoal.h"
+#include <stdio.h>
 using namespace BWAPI;
 using namespace std;
 
@@ -62,7 +63,7 @@ void MicroAIModule::onStart()
     /// TEST test_square
     /// goals.push_back(Goal("direct square 480, 1600", new SquareFormation(Vec(480, 1600))));
     /// TEST test_pathfinding
-    goals.push_back(pGoal(new Goal("direct square 384, 768", pFormation(new SquareFormation(Vec(60*32, 61*32))))));
+    /// goals.push_back(pGoal(new Goal("direct square 384, 768", pFormation(new SquareFormation(Vec(60*32, 61*32))))));
 
 	BWAPI::TilePosition mp = Broodwar->self()->getStartLocation();
 	Position p;
@@ -72,7 +73,7 @@ void MicroAIModule::onStart()
 			p = BWAPI::Position(*l);
 	}
 
-	//goals.push_back(pGoal(new Goal("formation line x+400", pFormation(new LineFormation(Vec(p.x(), p.y()), Vec(1, 0))))));
+	goals.push_back(pGoal(new Goal("formation line x+400", pFormation(new LineFormation(Vec(20*32, 36*32), Vec(1, 0))))));
 	//goals.push_back(Formation(0,1,Position(400,0)));
 	//goals.push_back(Goal("attack move right !!!!!!!", Position(1999,1000)));
 	//goals->push_back(new Goal("attack move just there", Position(500,1300)));

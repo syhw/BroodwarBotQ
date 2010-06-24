@@ -109,6 +109,7 @@ public:
     virtual void onUnitShow(BWAPI::Unit* u);
     virtual void onUnitHide(BWAPI::Unit* u);
     void update();
+    virtual void attackMove(const BWAPI::Position& p);
 
     std::multimap<double, BWAPI::Unit*>& getRangeEnemies();
     BWAPI::Unit* getOldTarget();

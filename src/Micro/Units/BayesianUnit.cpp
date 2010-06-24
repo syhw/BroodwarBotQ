@@ -464,6 +464,20 @@ void BayesianUnit::drawDirV()
             Broodwar->drawLine(CoordinateType::Map, up.x(), up.y(), _dirv[i].translate(up).x(), _dirv[i].translate(up).y(), Colors::Black);
 }
 
+void BayesianUnit::attackMove(const Position& p)
+{
+    target = p;
+    //pathFind(_path, unit->getPosition(), target);
+    /*std::vector<TilePosition> path;
+    pathFind(path, unit->getPosition(), target);
+    path = std::vector<TilePosition>(getShortestPath(
+        unit->getTilePosition(), target));
+    if (path.size() == 0) 
+        Broodwar->printf("Scandale path.size()==0");*/
+    //unit->rightClick(path.pop....
+	unit->attackMove(p);
+}
+
 void BayesianUnit::updateDir()
 {
     Position p = this->unit->getPosition();
@@ -517,20 +531,11 @@ void BayesianUnit::drawDir()
 void BayesianUnit::clickDir()
 {
     dir += unit->getPosition();
+   
     //if (unit->getPosition() != dir.toPosition()) TODO
 
-
-    /*
-    //A VIRER
-    if (Broodwar->getFrameCount()%70 == 0) 
-    {
-        Broodwar->printf("Position de l'unité = (%i, %i)", this->unit->getPosition().x(), this->unit->getPosition().y());
-        Broodwar->printf("Direction = (%i, %i)", dir.x, dir.y);
-        Broodwar->printf("Objectif = (%i, %i)", obj.x, obj.y);
-        Broodwar->printf("Target = (%i, %i)", target.x(), target.y());
-    }*/
-
-    unit->rightClick(dir.toPosition());
+    //unit->rightClick(dir.toPosition());
+    unit->rightClick(target);
 }
 
 void BayesianUnit::drawArrow(Vec& v)
@@ -592,10 +597,12 @@ void BayesianUnit::onUnitHide(Unit* u)
 
 void BayesianUnit::update()
 {
+    static int test = 0;
+
     if (!unit->exists()) return;
     this->drawTarget();
-    if (true) {
     //if (_mode == MODE_FIGHT_G) {
+    if (test > 12) {
         // TODO not every update()s, perhaps even asynchronously
         // TODO inline function!
        if (!unit->getGroundWeaponCooldown()) {
@@ -607,7 +614,7 @@ void BayesianUnit::update()
             {
                 double enemyDistance = rangeEnemyUnit->second->getDistance(unit->getPosition());
                 if (enemyDistance < unit->getType().groundWeapon().maxRange()) { // attack former closer if in range
-                   // unit->rightClick(rangeEnemyUnit->second->getPosition());
+                    // unit->rightClick(rangeEnemyUnit->second->getPosition());
                     break;
                 } else { // replace former close that is now out of range in the right position
                     if (enemyDistance > unit->getType().groundWeapon().maxRange() + rangeEnemyUnit->second->getType().groundWeapon().maxRange()) {
@@ -628,7 +635,8 @@ void BayesianUnit::update()
             }
         }
 
-    } else if (_mode == MODE_FLOCK) {
+    } //else if (_mode == MODE_FLOCK) {
+    else {
         //if (tick())
         {
             //drawAttractors();
@@ -636,6 +644,7 @@ void BayesianUnit::update()
             updateDir();
             //drawDir();
             clickDir();
+            test++;
             //drawFlockValues();
         }
         //Broodwar->drawLine(CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), target.x(), target.y(), BWAPI::Color(92, 92, 92));
