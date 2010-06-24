@@ -52,6 +52,11 @@ public:
 	Goal(const Goal& g);
 	Goal(const char* text, pFormation f);
 	virtual ~Goal();
+	
+	//Manage subgoals
+	void add_subgoal(Subgoal s);
+
+
 
 	virtual void achieve(UnitsGroup* ug);
 	virtual void checkAchievement(UnitsGroup* ug);

@@ -62,3 +62,7 @@ std::string Goal::getPurpose() const
 {
     return purpose;
 }
+
+void Goal::add_subgoal(Subgoal s){
+	subgoals.push_back(s);
+}
