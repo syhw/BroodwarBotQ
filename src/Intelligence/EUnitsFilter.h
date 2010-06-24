@@ -17,9 +17,12 @@ public:
     EUnitsFilter();
     ~EUnitsFilter() { }
     void update(BWAPI::Unit* u);
-	virtual void onUnitDestroy(BWAPI::Unit* u);
-	virtual void onUnitMorph(BWAPI::Unit* u);
-	virtual void onUnitShow(BWAPI::Unit* u);
-	virtual void onUnitHide(BWAPI::Unit* u);
-	virtual void onUnitRenegade(BWAPI::Unit* u);
+	void onUnitDestroy(BWAPI::Unit* u);
+	void onUnitMorph(BWAPI::Unit* u);
+	void onUnitShow(BWAPI::Unit* u);
+	void onUnitHide(BWAPI::Unit* u);
+	void onUnitRenegade(BWAPI::Unit* u);
+#ifdef BW_QT_DEBUG
+    void outputQt();
+#endif
 };

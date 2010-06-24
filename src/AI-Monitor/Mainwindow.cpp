@@ -68,8 +68,8 @@ void MainWindow::componentDoubleClicked(QModelIndex index)
     const BaseObject* baseObj = objManager->getObjects()[index.row()];
     QDialog* window = new QDialog(0);
     window->setWindowTitle (QString (baseObj->getClassName().c_str()));
-    QVBoxLayout* mainLayout = new QVBoxLayout( window);
-    window->setLayout( mainLayout);
+    QVBoxLayout* mainLayout = new QVBoxLayout(window);
+    window->setLayout(mainLayout);
     QTabWidget* tabWidget = new QTabWidget();
     mainLayout->addWidget(tabWidget);
 
@@ -86,17 +86,17 @@ void MainWindow::componentDoubleClicked(QModelIndex index)
             if (dataIndex >= data.size()) continue;
             layout->addWidget( data[dataIndex]->createWidget(tab));
         }
-        tabWidget->addTab( tab, QString("Data"));
+        tabWidget->addTab(tab, QString("Data"));
     }
 
     // Create warnings text area
     QTextEdit* textEdit_sout = new QTextEdit(tabWidget);
-    textEdit_sout->setText( QString( baseObj->getWarnings().c_str()));
-    tabWidget->addTab( textEdit_sout, QString( "Warnings"));
+    textEdit_sout->setText(QString(baseObj->getWarnings().c_str()));
+    tabWidget->addTab(textEdit_sout, QString( "Warnings"));
 
     // Create errors text area
     QTextEdit* textEdit_serr = new QTextEdit(tabWidget);
-    textEdit_serr->setText( QString( baseObj->getErrors().c_str()));
+    textEdit_serr->setText(QString(baseObj->getErrors().c_str()));
     tabWidget->addTab( textEdit_serr, QString( "Errors"));
     
     window->exec();

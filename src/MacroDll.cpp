@@ -11,8 +11,6 @@
 #define USE_MONITOR
 #define BUF_SIZE 255
 
-static BattleBroodAI* broodAI = NULL;
-static QApplication* application = NULL;
 static HANDLE  hThreadArrayMonitor;
 
 DWORD WINAPI LaunchMonitor( LPVOID lpParam );
@@ -28,9 +26,7 @@ BOOL APIENTRY DllMain(HANDLE hModule,
 	switch (ul_reason_for_call)
 	{
 	    case DLL_PROCESS_ATTACH:
-	        BWAPI::BWAPI_init();
-
-	        // Create the thread to begin execution on its own.
+            BWAPI::BWAPI_init();
 
 	        hThreadArrayMonitor = CreateThread( 
 	        NULL,                   // default security attributes
@@ -41,10 +37,9 @@ BOOL APIENTRY DllMain(HANDLE hModule,
 	        &dwThreadIdArray);   // returns the thread identifier 
 
 
-	        // Check the return value for success.
+            // Check the return value for success.
 	        // If CreateThread fails, terminate execution. 
 	        // This will automatically clean up threads and memory. 
-
 	        if (hThreadArrayMonitor == NULL) 
 	        {
 	            ExitProcess(3);
@@ -55,7 +50,7 @@ BOOL APIENTRY DllMain(HANDLE hModule,
         case DLL_PROCESS_DETACH:
 			// Wait until monitor thread have terminated.
 
-	        application->quit();
+	        qapplication->quit();
         		
 	        WaitForMultipleObjects(1, &hThreadArrayMonitor, TRUE, INFINITE);
 
@@ -72,7 +67,11 @@ BOOL APIENTRY DllMain(HANDLE hModule,
 extern "C" __declspec(dllexport) BWAPI::AIModule* newAIModule(BWAPI::Game* game)
 {
 	BWAPI::Broodwar = game;
-	broodAI = new BattleBroodAI();
+#ifdef BW_QT_DEBUG
+	broodAI = new BattleBroodAI(&qapplication);
+#else
+    broodAI = new BattleBroodAI();
+#endif
 	return (BattleBroodAI*)broodAI;
 }
 
@@ -85,16 +84,15 @@ DWORD WINAPI LaunchMonitor(LPVOID lpParam )
 	{
 		Sleep(50);
 	}
-    Sleep(100);
+    Sleep(50);
 
 	int argc = 1;
 	char* name = "AI-Monitor";
 	char** argv = &name;
-	application = new QApplication(argc, argv);
+	qapplication = new QApplication(argc, argv);
     MainWindow w;//0, (BattleBroodAI*)broodAI);
 	w.show();
-	application->exec();
+	qapplication->exec();
 #endif
-
 	return 0; 
 }

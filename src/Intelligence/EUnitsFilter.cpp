@@ -13,10 +13,10 @@ EUnitsFilter::EUnitsFilter()
 
 void EUnitsFilter::update(Unit* u)
 {
-    sout << "plop, j update" << sendl;
+    serr << "plop, j update" << sendl;
     if (u->getPlayer() == Broodwar->self()) return;
     if (u->getPlayer()->isNeutral()) return;
-    Broodwar->printf("eViedUnits.size() : %d", eViewedUnits->size());
+    serr << "eViedUnits.size() : " << eViewedUnits->size() << sendl;
     if (eViewedUnits->count(u))
         (*eViewedUnits)[u].update(timeManager->getElapsedTime());
     else 
@@ -55,3 +55,8 @@ void EUnitsFilter::onUnitRenegade(Unit* u)
     update(u);
 }
 
+#ifdef BW_QT_DEBUG
+void EUnitsFilter::outputQt()
+{
+}
+#endif
