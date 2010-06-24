@@ -60,6 +60,7 @@ BattleBroodAI::~BattleBroodAI()
     Regions::Destroy();
     MapManager::Destroy();
     EUnitsFilter::Destroy();
+    ObjectManager::Destroy();
 
 
     if( Broodwar->self()->getRace() == Races::Protoss)
@@ -103,6 +104,9 @@ void BattleBroodAI::onStart()
 	BWTA::readMap();
 	BWTA::analyze();
 	this->analyzed=true;
+
+    this->objManager = & ObjectManager::Instance();
+
 	this->timeManager       = & TimeManager::Instance();
 	this->arbitrator		= & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
 	this->buildManager      = & BuildManager::Instance();
@@ -151,7 +155,7 @@ void BattleBroodAI::onEnd(bool isWinner)
 void BattleBroodAI::onFrame()
 {
     // log("IN BBAI::onFrame()");
-    ObjectManager::updateOM();
+    objManager->updateOM();
     if (Broodwar->isReplay()) return;
     if (!this->analyzed) return;
     this->timeManager->update();

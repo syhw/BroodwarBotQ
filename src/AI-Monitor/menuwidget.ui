@@ -31,7 +31,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_Goals">
       <attribute name="title">
@@ -39,7 +39,7 @@
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QTreeView" name="goalsTree"/>
+        <widget class="QTreeView" name="componentTree"/>
        </item>
       </layout>
      </widget>

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'menuwidget.ui'
 **
-** Created: Mon 21. Jun 23:33:18 2010
+** Created: Tue 22. Jun 14:34:55 2010
 **      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -37,7 +37,7 @@ public:
     QTabWidget *tabWidget;
     QWidget *tab_Goals;
     QVBoxLayout *verticalLayout;
-    QTreeView *goalsTree;
+    QTreeView *componentTree;
     QWidget *tab_Strat;
     QGridLayout *gridLayout;
     QPushButton *pushButton_2;
@@ -77,10 +77,10 @@ public:
         tab_Goals->setObjectName(QString::fromUtf8("tab_Goals"));
         verticalLayout = new QVBoxLayout(tab_Goals);
         verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
-        goalsTree = new QTreeView(tab_Goals);
-        goalsTree->setObjectName(QString::fromUtf8("goalsTree"));
+        componentTree = new QTreeView(tab_Goals);
+        componentTree->setObjectName(QString::fromUtf8("componentTree"));
 
-        verticalLayout->addWidget(goalsTree);
+        verticalLayout->addWidget(componentTree);
 
         tabWidget->addTab(tab_Goals, QString());
         tab_Strat = new QWidget();
@@ -174,7 +174,7 @@ public:
 
         retranslateUi(MenuWidget);
 
-        tabWidget->setCurrentIndex(2);
+        tabWidget->setCurrentIndex(0);
 
 
         QMetaObject::connectSlotsByName(MenuWidget);

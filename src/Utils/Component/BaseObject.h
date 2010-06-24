@@ -16,6 +16,10 @@ public:
     std::string getClassName() const;
     void processStream(std::ostream& out);
     void addData(BaseData* data);
+    const std::vector<BaseData*>& getData() const;
+    const std::string& getWarnings() const;
+    const std::string& getErrors() const;
+
 
     // Serializer les data pour echanger entre threads.
 

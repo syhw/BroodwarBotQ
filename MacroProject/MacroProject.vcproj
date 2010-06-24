@@ -346,6 +346,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\src\Utils\Component\Data.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\src\Utils\Component\ObjectManager.cpp"
 						>
 					</File>
@@ -658,6 +662,14 @@
 				</File>
 				<File
 					RelativePath="..\src\AI-Monitor\ui_menuwidget.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\AI-Monitor\WidgetCreator.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\AI-Monitor\WidgetCreator.inl"
 					>
 				</File>
 			</Filter>

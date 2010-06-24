@@ -1,7 +1,10 @@
+#include <map>
+#include "WidgetCreator.h"
 #include "Data.h"
 #include "BaseObject.h"
+#include "WidgetCreator.inl"
 
-template< class T>
+template<typename T>
 Data<T>::Data(T defaultValue, std::string name, BaseObject* parent)
 : _synchronized(true)
 , value(defaultValue)
@@ -21,22 +24,51 @@ ghMutex = CreateMutex(
 }
  
 
-template< class T>
+template< typename T>
 Data<T>::~Data()
 {
     //CloseHandle(ghMutex);
 }
 
-
-template< class T>
-const T& Data<T>::getValue() const
+template< typename T>
+T& Data<T>::operator*()
 {
-	// verifier que personne n'ecrit en ce moment ?
-	return value;
+    return value;
+}
+
+template< typename T>
+T* Data<T>::operator->()
+{
+    return &value;
+}
+
+template< typename T>
+const T& Data<T>::operator*() const
+{
+    return value;
+}
+
+template< typename T>
+const T* Data<T>::operator->() const
+{
+    return &value;
 }
 
 
-template< class T>
+template< typename T>
+bool Data<T>::is_sychronized()
+{
+    return _synchronized;
+}
+
+template< typename T>
+void Data<T>::synchronized()
+{
+    _synchronized = true;
+}
+
+
+template< typename T>
 T* Data<T>::beginEdit()
 {
     /*
@@ -75,7 +107,7 @@ T* Data<T>::beginEdit()
 }
 
 
-template< class T>
+template< typename T>
 void Data<T>::endEdit()
 {
 	// lacher le mutex
@@ -84,24 +116,30 @@ void Data<T>::endEdit()
 }
 
 
-template< class T>
+template< typename T>
 const std::string& Data<T>::getName() const
 {
 	return data_name;
 }
 
 
-template< class T>
-std::ostream& Data<T>::operator <<(const std::ostream& os) const
+template< typename T>
+std::ostream& Data<T>::operator <<(std::ostream& os) const
 {
-	//os << value;
+	os << value;
 	return os;
 }
 
 
-template< class T>
+template< typename T>
 std::istream& Data<T>::operator >>(const std::istream& is) const
 {
-	//is >> value;
+	is >> value;
 	return is;
+}
+
+template< typename T>
+QWidget* Data<T>::createWidget(QWidget* parent)
+{
+    return WidgetCreator<T>::create(this, parent);
 }

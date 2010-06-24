@@ -6,6 +6,8 @@
 
 struct EViewedUnit
 {
+    friend std::ostream& operator <<(std::ostream&, const EViewedUnit&);
+
     BWAPI::Unit* unit;
     int HP;
     BWAPI::Position position;
@@ -14,6 +16,11 @@ struct EViewedUnit
     Vec velocity;
     EViewedUnit() { }
     EViewedUnit(BWAPI::Unit* u, unsigned long time);
+    EViewedUnit(const EViewedUnit& evu);
     void update(unsigned long time);
     ~EViewedUnit() { }
+    //std::ostream& operator <<(std::ostream& os) const;
+	const std::istream& operator >>(const std::istream& is) const;
 };
+
+std::ostream& operator <<(std::ostream& os, const EViewedUnit& evu);

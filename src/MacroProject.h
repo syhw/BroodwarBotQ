@@ -31,7 +31,7 @@ static BWTA::Region* home;
 static BWTA::Region* enemy_base;
 DWORD WINAPI AnalyzeThread();
 
-class BattleBroodAI : public BWAPI::AIModule, public ObjectManager
+class BattleBroodAI : public BWAPI::AIModule//, public ObjectManager
 {
 public:
 	bool show_visibility_data;
@@ -55,6 +55,7 @@ public:
     MapManager* mapManager;
     EUnitsFilter* eUnitsFilter;
 	bool showManagerAssignments;
+    ObjectManager* objManager;
 
 	BattleBroodAI();
 	~BattleBroodAI();

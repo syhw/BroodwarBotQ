@@ -1,8 +1,6 @@
 #include "BaseObject.h"
 #include "ObjectManager.h"
-#include "MacroProject.h"
 #include <algorithm>
-#include "MacroDll.h"
 
 BaseObject::BaseObject(std::string name)
 : sout( )
@@ -41,4 +39,19 @@ void BaseObject::processStream(std::ostream& out)
 void BaseObject::addData(BaseData* data)
 {
     vData.push_back(data);
+}
+
+const std::vector<BaseData*>& BaseObject::getData() const
+{
+    return vData;
+}
+
+const std::string& BaseObject::getWarnings() const
+{
+    return outputs;
+}
+
+const std::string& BaseObject::getErrors() const
+{
+    return warnings;
 }

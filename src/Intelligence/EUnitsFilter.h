@@ -7,11 +7,12 @@
 #include <BWAPI.h>
 #include <map>
 #include <utility>
+#include "Data.h"
 
 class EUnitsFilter : public CSingleton<EUnitsFilter>, public BaseObject
 {
     TimeManager* timeManager;
-    std::map<BWAPI::Unit*, EViewedUnit> eViewedUnits;
+    Data<std::map<BWAPI::Unit*, EViewedUnit> > eViewedUnits;
 public:
     EUnitsFilter();
     ~EUnitsFilter() { }
