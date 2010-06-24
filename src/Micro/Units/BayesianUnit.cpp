@@ -612,6 +612,12 @@ void BayesianUnit::update()
             unsigned int end = _rangeEnemies.size();
             while (i < end)
             {
+                if (!rangeEnemyUnit->second->exists()) {
+                    _rangeEnemies.erase(rangeEnemyUnit);
+                    rangeEnemyUnit = _rangeEnemies.begin();
+                    --end;
+                    continue;
+                }
                 double enemyDistance = rangeEnemyUnit->second->getDistance(unit->getPosition());
                 if (enemyDistance < unit->getType().groundWeapon().maxRange()) { // attack former closer if in range
                     // unit->rightClick(rangeEnemyUnit->second->getPosition());

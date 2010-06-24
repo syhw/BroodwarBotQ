@@ -22,6 +22,7 @@ protected:
 
 public slots:
     void changeGameSpeed( int value);
+    void componentDoubleClicked(QModelIndex index);
 
 private:
     Ui::MainWindow *ui;

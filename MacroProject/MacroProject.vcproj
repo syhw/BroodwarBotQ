@@ -132,7 +132,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalOptions="-GX /GX&#x0D;&#x0A;"
+				AdditionalOptions="&#x0D;&#x0A;"
 				AdditionalDependencies="../../BWAPI_Beta_2.8/lib/BWAPI.lib ../../BWAPI_Beta_2.8/lib/BWTA.lib ../../BWAPI_Beta_2.8/lib/CGAL-vc90-mt.lib ../../BWAPI_Beta_2.8/lib/gmp-vc90-mt.lib ../../BWAPI_Beta_2.8/lib/libboost_thread-vc90-mt-1_40.lib ../../BWAPI_Beta_2.8/lib/mpfr-vc90-mt.lib QtCore4.lib QtGui4.lib QtOpenGL4.lib QtXml4.lib opengl32.lib glu32.lib"
 				AdditionalLibraryDirectories="C:\Qt\4.6.2\lib;C:\Qt\4.6.3\lib;&quot;C:\dev\libQGLViewer-2.3.5\QGLViewer\release&quot;"
 				GenerateDebugInformation="true"
@@ -343,6 +343,10 @@
 					</File>
 					<File
 						RelativePath="..\src\Utils\Component\BaseObject.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Utils\Component\Data.cpp"
 						>
 					</File>
 					<File
@@ -577,6 +581,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\MacroDll.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Utils\TimeManager.h"
 					>
 				</File>
@@ -654,6 +662,14 @@
 				</File>
 				<File
 					RelativePath="..\src\AI-Monitor\ui_menuwidget.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\AI-Monitor\WidgetCreator.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\AI-Monitor\WidgetCreator.inl"
 					>
 				</File>
 			</Filter>

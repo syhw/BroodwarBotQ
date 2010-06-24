@@ -88,6 +88,10 @@ void MicroAIModule::onStart()
 
 void MicroAIModule::onFrame()
 {
+#ifdef BW_QT_DEBUG
+    if (!*qapp)
+        Broodwar->printf("Qt not connected\n");
+#endif
     ObjectManager::updateOM();
 	if (mm != NULL) mm->update();
     regions->update();
@@ -128,10 +132,24 @@ void MicroAIModule::onFrame()
 
 MicroAIModule::~MicroAIModule()
 {
+#ifdef BW_QT_DEBUG
+    (*qapp)->quit();
+#endif
     MapManager::Destroy();
     Regions::Destroy();
     mm->~UnitsGroup();
 }
+
+#ifdef BW_QT_DEBUG
+MicroAIModule::MicroAIModule(QApplication** qapplication)
+{
+    qapp = qapplication;
+}
+#else
+MicroAIModule::MicroAIModule()
+{
+}
+#endif
 
 /* void MicroAIModule::onRemove(BWAPI::Unit* unit)
 {

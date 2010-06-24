@@ -449,6 +449,10 @@
 					RelativePath="..\src\AI-Monitor\ui_menuwidget.h"
 					>
 				</File>
+				<File
+					RelativePath="..\src\AI-Monitor\WidgetCreator.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
