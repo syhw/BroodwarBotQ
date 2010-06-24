@@ -1,8 +1,8 @@
 #include "MicroProject.h"
 #include "Goal.h"
+#include "DefendGoal.h"
 using namespace BWAPI;
 using namespace std;
-
 
 void MicroAIModule::onStart()
 {
@@ -33,7 +33,7 @@ void MicroAIModule::onStart()
 		} 
 		else 
 		{
-            Broodwar->printf("Took control of: %s\n", (*i)->getType().getName().c_str() );
+            //Broodwar->printf("Took control of: %s\n", (*i)->getType().getName().c_str() );
 			mm->takeControl(*i);
 			// center += (*i)->getPosition();
 		}
@@ -62,7 +62,7 @@ void MicroAIModule::onStart()
     /// TEST test_square
     /// goals.push_back(Goal("direct square 480, 1600", new SquareFormation(Vec(480, 1600))));
     /// TEST test_pathfinding
-    goals.push_back(pGoal(new Goal("direct square 384, 768", pFormation(new SquareFormation(Vec(384, 768))))));
+    goals.push_back(pGoal(new Goal("direct square 384, 768", pFormation(new SquareFormation(Vec(60*32, 61*32))))));
 
 	BWAPI::TilePosition mp = Broodwar->self()->getStartLocation();
 	Position p;

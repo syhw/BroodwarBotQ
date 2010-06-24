@@ -2,6 +2,7 @@
 #include "Rainbow.h"
 #include <utility>
 #include <time.h>
+#include <UnitsGroup.h>
 #ifdef PROBT
 #include <pl.h>
 #else
@@ -32,7 +33,7 @@ using namespace BWAPI;
 
 // TODO optimize by removing the dirv inside the unit (but one, the center, when it's better not to move at all)
 
-BayesianUnit::BayesianUnit(Unit* u, vector<pBayesianUnit> const * ug)
+BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 : BattleUnit(u)
 , dir(Vec(unit->getVelocityX(), unit->getVelocityY()))
 , _mode(MODE_FLOCK)
@@ -40,6 +41,7 @@ BayesianUnit::BayesianUnit(Unit* u, vector<pBayesianUnit> const * ug)
 , _unitsGroup(ug)
 , _sheight(unit->getType().dimensionUp() + unit->getType().dimensionDown())
 , _slarge(unit->getType().dimensionRight() + unit->getType().dimensionLeft())
+, oldTarget(NULL)
 {
     updateDirV();
     mapManager = & MapManager::Instance();
@@ -53,6 +55,19 @@ BayesianUnit::BayesianUnit(Unit* u, vector<pBayesianUnit> const * ug)
         _flockProb.push_back(0.25);                 //FLOCK_CLOSE
         _flockProb.push_back(0.38);                  //FLOCK_MEDIUM
         _flockProb.push_back(0.22);                 //FLOCK_FAR
+    }
+}
+
+BayesianUnit::~BayesianUnit()
+{
+    // TODO O(n) -> O(1) ?
+    for (std::list<pBayesianUnit>::iterator it =_unitsGroup->getAttackersEnemy()[oldTarget].begin() ; it != _unitsGroup->getAttackersEnemy()[oldTarget].end(); it++)
+    {
+        if ( *(*it) == *this )
+        {
+            _unitsGroup->getAttackersEnemy()[oldTarget].remove(*it);
+            return;
+        }
     }
 }
 
@@ -71,8 +86,8 @@ void BayesianUnit::computeFlockValues()
     for (unsigned int i = 0; i < _dirv.size(); ++i)
     {
         vector<flock_value> tmpv;
-        for (vector<pBayesianUnit>::const_iterator it = _unitsGroup->begin(); 
-            it != _unitsGroup->end(); ++it)
+        for (vector<pBayesianUnit>::const_iterator it = _unitsGroup->getUnits()->begin(); 
+            it != _unitsGroup->getUnits()->end(); ++it)
         {
             if ((*it)->unit == this->unit) continue; // we don't flock with ourselves!
             flock_value value = (flock_value)(1 + (int)((*it)->unit->getDistance(_dirv[i].translate(this->unit->getPosition()))/32));
@@ -96,10 +111,17 @@ void BayesianUnit::computeFlockValues()
 
 void BayesianUnit::switchMode(unit_mode um)
 {
-    if (MODE_FLOCK)
+    // Comportement attendu ?
+    switch (um) 
     {
-        _defaultProb[OCCUP_UNIT] = 0.6;
-        //_defaultProb[OCCUP_FLOCK] = 0.1;
+        case MODE_FLOCK:
+            _mode = um;
+            _defaultProb[OCCUP_UNIT] = 0.6;
+            //_defaultProb[OCCUP_FLOCK] = 0.1;
+            break;
+        case MODE_FIGHT_G:
+            _mode = um;
+            break;
     }
 }
 
@@ -216,14 +238,14 @@ double BayesianUnit::computeProb(unsigned int i)
     if (_mode == MODE_FLOCK)
     {
         /// FLOCKING INFLUENCE
-        double prob_obj = _PROB_GO_OBJ / _unitsGroup->size();
+        double prob_obj = _PROB_GO_OBJ / _unitsGroup->getUnits()->size();
         //for (unsigned int j = 0; j < _flockValues[i].size(); ++j) // one j for each attractor
         //    val *= _flockProb[_flockValues[i][j]];
 
         /// OBJECTIVE (pathfinder) INFLUENCE
         if (_dirv[i] == obj)
             val *= prob_obj;
-        else 
+        else
         {
             Vec dirvtmp = _dirv[i];
             dirvtmp.normalize();
@@ -304,9 +326,8 @@ void BayesianUnit::updateObj()
         _path.clear();
         for (std::vector<TilePosition>::const_iterator it = tmp.begin(); it != tmp.end(); ++it)
             _path.push_back(*it);
-        //pathFind(_path, unit->getPosition(), target); // TODO, too high cost for the moment
         clock_t end = clock();
-        Broodwar->printf("Iterations took %f", (double)(end-start));
+        //Broodwar->printf("Iterations took %f", (double)(end-start));
     } else 
     {
         straightLine(_ppath, up, target, true);
@@ -459,7 +480,7 @@ void BayesianUnit::updateDir()
     //drawObj(2);
     //drawObj(_unitsGroup->size());
     //drawOccupation(_unitsGroup->size());
-    //drawPath();
+
     multimap<double, Vec> dirvProb;
     for (unsigned int i = 0; i < _dirv.size(); ++i)
         dirvProb.insert(make_pair(computeProb(i), _dirv[i]));
@@ -497,13 +518,18 @@ void BayesianUnit::clickDir()
 {
     dir += unit->getPosition();
     //if (unit->getPosition() != dir.toPosition()) TODO
+
+
+    /*
+    //A VIRER
     if (Broodwar->getFrameCount()%70 == 0) 
     {
         Broodwar->printf("Position de l'unité = (%i, %i)", this->unit->getPosition().x(), this->unit->getPosition().y());
         Broodwar->printf("Direction = (%i, %i)", dir.x, dir.y);
         Broodwar->printf("Objectif = (%i, %i)", obj.x, obj.y);
         Broodwar->printf("Target = (%i, %i)", target.x(), target.y());
-    }
+    }*/
+
     unit->rightClick(dir.toPosition());
 }
 
@@ -568,19 +594,20 @@ void BayesianUnit::update()
 {
     if (!unit->exists()) return;
     this->drawTarget();
-    if (_mode == MODE_FIGHT_G) {
+    if (true) {
+    //if (_mode == MODE_FIGHT_G) {
         // TODO not every update()s, perhaps even asynchronously
         // TODO inline function!
-        if (!unit->getGroundWeaponCooldown()) {
+       if (!unit->getGroundWeaponCooldown()) {
             std::multimap<double, Unit*>::const_iterator rangeEnemyUnit;
             rangeEnemyUnit = _rangeEnemies.begin();
             unsigned int i = 0;
             unsigned int end = _rangeEnemies.size();
-            while (i < end) 
+            while (i < end)
             {
                 double enemyDistance = rangeEnemyUnit->second->getDistance(unit->getPosition());
                 if (enemyDistance < unit->getType().groundWeapon().maxRange()) { // attack former closer if in range
-                    unit->rightClick(rangeEnemyUnit->second->getPosition());
+                   // unit->rightClick(rangeEnemyUnit->second->getPosition());
                     break;
                 } else { // replace former close that is now out of range in the right position
                     if (enemyDistance > unit->getType().groundWeapon().maxRange() + rangeEnemyUnit->second->getType().groundWeapon().maxRange()) {
@@ -600,13 +627,14 @@ void BayesianUnit::update()
                 Broodwar->printf("me think I have no enemy unit in range, me perhaps stoodpid!\n");
             }
         }
+
     } else if (_mode == MODE_FLOCK) {
         //if (tick())
         {
             //drawAttractors();
             //drawTarget();
             updateDir();
-            drawDir();
+            //drawDir();
             clickDir();
             //drawFlockValues();
         }
@@ -631,4 +659,20 @@ void BayesianUnit::update()
     //drawArrow(obj);
     //drawArrow(dir);
     //drawEnclosingBox();
+    //drawPath();
+}
+
+std::multimap<double, BWAPI::Unit*>& BayesianUnit::getRangeEnemies()
+{
+    return _rangeEnemies;
+}
+
+BWAPI::Unit* BayesianUnit::getOldTarget()
+{
+    return oldTarget;
+}
+
+void BayesianUnit::setOldTarget(Unit* newTarget)
+{
+    oldTarget = newTarget;
 }

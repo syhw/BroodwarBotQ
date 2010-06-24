@@ -4,6 +4,8 @@
 #include <util.h>
 #include <cmath>
 #include <assert.h>
+#include <fstream>
+#include <iostream>
 using namespace BWAPI;
 
 UnitsGroup::UnitsGroup()
@@ -134,12 +136,12 @@ void align(std::vector<Position>& from, std::vector<Position>& to, std::vector<u
 void UnitsGroup::update()
 {
 	this->totalHP = 0;
-	for(std::vector<pBayesianUnit>::iterator it = this->units.begin();
-		it != this->units.end(); ++it)
-	{
-		(*it)->update();
-		this->totalHP += (*it)->unit->getHitPoints();
-		this->totalPower += (*it)->unit->getType().groundWeapon().damageAmount();
+
+    for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+    {
+        (*it)->update();
+        this->totalHP += (*it)->unit->getHitPoints();
+        this->totalPower += (*it)->unit->getType().groundWeapon().damageAmount();
     }
 
 	updateCenter();
@@ -148,7 +150,6 @@ void UnitsGroup::update()
 
 	if (!goals.empty())
 	{
-        
 		if (goals.front()->status == GS_ACHIEVED) 
 		{
 			if (goals.size() == 1) lastGoal = goals.front();
@@ -160,6 +161,183 @@ void UnitsGroup::update()
 			goals.front()->checkAchievement(this);
 		}
 	}
+
+    
+  /*  if (this->units.size() != 0 && (*(this->units.begin()))->getRangeEnemies().size() != 0) 
+    {
+        BWAPI::Unit* enemy = NULL;
+        for(std::multimap<double, BWAPI::Unit*>::iterator it = (*(this->units.begin()))->getRangeEnemies().begin(); it != (*(this->units.begin()))->getRangeEnemies().end(); it++)
+        {
+            if ( it->second->getPlayer() != Broodwar->self() )
+            {
+                enemy = it->second;
+                break;
+            }
+        }
+
+        if (enemy != NULL)
+        {
+            log("Enemy spotted : %i\n", enemy->getID());
+            for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+            {
+                if((*it)->unit->attackUnit(enemy))
+                    log("%i : Target Acquired !\n", (*it)->unit->getID());
+                (*it)->setOldTarget(enemy);
+                /* bool test = false;
+                if ((*it)->getOldTarget() != enemy)
+                {
+                int nbDegats = (*it)->unit->getType().groundWeapon().damageAmount();
+                //bool empty = true;
+
+                for(std::list<pBayesianUnit>::iterator it3 = attackersEnemy[enemy].begin(); it3 != attackersEnemy[enemy].end(); it3++)
+                {
+                nbDegats += (*it3)->unit->getType().groundWeapon().damageAmount();
+                //empty = false;
+                }
+
+                int nbPv = enemy->getHitPoints();
+                if (nbDegats < nbPv)
+                {
+                attackersEnemy[(*it)->getOldTarget()].remove(*it);
+                // if (empty)
+                //   eTargets[(*it2)]  //Utile ?
+                attackersEnemy[enemy].push_front(*it);
+                (*it)->unit->rightClick(enemy->getPosition());
+                (*it)->setOldTarget(enemy);
+                test = true;
+                }
+                }*/
+   //         }
+   //     }
+    //}
+	std::set<Unit*> enemies;
+	std::set<Unit*> enemies_in_range;
+
+	for each(Unit* u in Broodwar->getAllUnits())
+	{
+		if ( (u->getPlayer() != Broodwar->self()) )
+		{
+			enemies.insert(u);
+		}
+	}
+
+	for each(pBayesianUnit u in units)
+	{
+		// find enemies in range of our current dragoon
+		for each(Unit* enemy in enemies)
+		{
+            int maxRange = u->unit->getType().groundWeapon().maxRange();
+            for each (UpgradeType upgrade in enemy->getType().upgrades()) 
+            {
+                if (upgrade == BWAPI::UpgradeTypes::Singularity_Charge)
+                {
+                    maxRange *= 1.5;
+                    break;
+                }
+            }
+           
+			if (u->unit->getDistance(enemy) < maxRange) 
+			{
+				enemies_in_range.insert(enemy);
+			}
+		}
+		// find weakest
+		Unit* weakestenemy = NULL;
+		for each(Unit* enemy in enemies_in_range)
+		{
+			if (weakestenemy)
+			{
+				int weakesthp = weakestenemy->getHitPoints() + weakestenemy->getShields();
+				int enemyhp = enemy->getHitPoints() + enemy->getShields();
+				if (weakesthp > enemyhp)
+				{
+					weakestenemy = enemy;
+				}
+			}
+			else
+			{
+				weakestenemy = enemy;
+			}
+		}
+		// Enemy found
+		if (weakestenemy)
+		{
+			int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
+			int ex = weakestenemy->getPosition().x(); int ey = weakestenemy->getPosition().y();
+			
+			Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Red);
+			if (u->unit->getOrderTarget() != weakestenemy && !u->unit->isMoving())
+			{
+				u->unit->rightClick(weakestenemy);
+			}
+		}
+		// Enemy not found
+		else
+		{
+			// find the closest enemy
+			Unit* closest_enemy = NULL;
+			for each(Unit* enemy in enemies)
+			{
+				if (closest_enemy)
+				{
+					if (u->unit->getDistance(closest_enemy) > u->unit->getDistance(enemy))
+					{
+						closest_enemy = enemy;
+					}
+				}
+				else
+				{
+					closest_enemy = enemy;
+				}
+			}
+			// Enemy found
+			if (closest_enemy)
+			{
+				int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
+				int ex = closest_enemy->getPosition().x(); int ey = closest_enemy->getPosition().y();
+				
+				Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Yellow);
+				
+				if (u->unit->getTarget())
+					{
+						Broodwar->drawTextMap(ux,uy,"%s",u->unit->getTarget()->getType().getName().c_str());
+					}
+
+                if (u->unit->getOrderTarget() != closest_enemy && !u->unit->isMoving())
+				{
+					u->unit->rightClick(closest_enemy);
+				}
+			}
+			// No enemy
+			else
+			{
+				int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
+				int ex = u->unit->getTargetPosition().x(); int ey = u->unit->getTargetPosition().y();
+				
+				Broodwar->drawLineMap(ux,uy,ex,ey,Colors::White);
+			}
+		}
+		enemies_in_range.clear();
+	}
+    /*
+    for each(Unit* enemy in enemies)
+    {
+        if (enemy->isAttacking() && enemy->getTarget() != NULL)
+        {
+            Unit* target = enemy->getTarget();
+            log("L'ennemi %i attaque mon unité %i", enemy->getID(), target->getID());
+            log("Il est positionné en (%i, %i)", enemy->getPosition().x(), enemy->getPosition().y());
+            int maxrange = enemy->getType().groundWeapon().maxRange()+32;
+            log("Sa portée est de %i", maxrange);
+            Vec dep(enemy->getPosition() - target->getPosition());
+            dep = dep.normalize();
+            Position newPos = Position(target->getPosition().x(), target->getPosition().y());;
+            log("Nous sommes à %f de distance", enemy->getDistance(newPos));
+            newPos += Position(dep.toPosition().x() * (maxrange - enemy->getDistance(newPos))/dep.norm(), dep.toPosition().y() * (maxrange - enemy->getDistance(newPos))/dep.norm());
+            target->rightClick(newPos);
+            log("J'étais en (%i, %i) et je me dirige vers (%i, %i) pour échapper à ses tirs !", target->getPosition().x(), target->getPosition().y(), newPos.x(), newPos.y());
+        }
+    }*/
 }
 
 void UnitsGroup::attackMove(int x, int y)
@@ -223,11 +401,17 @@ const pGoal UnitsGroup::getLastGoal() const
 
 void UnitsGroup::onUnitDestroy(Unit* u)
 {
-    for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
+    if (u->getPlayer() != Broodwar->self())
+        for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
+            (*it)->onUnitDestroy(u);
+    else
     {
-        if ((*it)->unit == u)
-            units.erase(it);
-        (*it)->onUnitDestroy(u);
+        for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
+            if ( (*it)->unit == u ) 
+            {
+                units.erase(it);
+                return;
+            }
     }
 }
 
@@ -245,7 +429,7 @@ void UnitsGroup::onUnitHide(Unit* u)
 
 void UnitsGroup::takeControl(Unit* u)
 {
-    pBayesianUnit tmp(new BayesianUnit(u, &units));
+    pBayesianUnit tmp(new BayesianUnit(u, this));
 	this->units.push_back(tmp);
 	if (this->goals.empty()) goals.push_back(lastGoal);
     if (this->goals.front() != NULL) this->goals.front()->achieve(this);
@@ -319,6 +503,16 @@ bool UnitsGroup::empty()
 unsigned int UnitsGroup::getNbUnits() const
 {
 	return units.size();
+}
+
+std::vector<pBayesianUnit>* UnitsGroup::getUnits()
+{
+    return &units;
+}
+
+std::map<BWAPI::Unit*, std::list<pBayesianUnit> >& UnitsGroup::getAttackersEnemy()
+{
+    return attackersEnemy;
 }
 
 const BayesianUnit& UnitsGroup::operator[](int i)

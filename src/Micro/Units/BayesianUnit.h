@@ -20,6 +20,8 @@ typedef boost::shared_ptr<BayesianUnit> pBayesianUnit;
 // TODO, this class has to be derived to take Flying/Ground/Special Units 
 // (templars, tanks, lurkers, etc.) into account
 
+class UnitsGroup;
+
 enum occupation_type {
     OCCUP_NO,
     OCCUP_EUNIT,
@@ -66,9 +68,10 @@ protected:
     MapManager* mapManager;
     std::vector<std::vector<flock_value> > _flockValues; // one vector<flock_value> per unit with which we flock
     std::vector<double> _flockProb; // TODO decide if static, perhaps unit dependant
-    std::vector<pBayesianUnit> const * _unitsGroup;
+    UnitsGroup* _unitsGroup;
     std::multimap<double, BWAPI::Unit*> _rangeEnemies;
     std::map<occupation_type, double> _defaultProb;
+    BWAPI::Unit* oldTarget;
 
     inline void initDefaultProb();
     inline void computeFlockValues();
@@ -100,9 +103,14 @@ protected:
 public:
     Vec dir, obj; // dir=current direction, obj=pathfinder's direction
     // std::map<attractor_type, std::vector<BWAPI::Position>> prox; 
-    BayesianUnit(BWAPI::Unit* u, std::vector<pBayesianUnit> const * ug);
+    BayesianUnit(BWAPI::Unit* u, UnitsGroup* ug);
+    ~BayesianUnit();
     virtual void onUnitDestroy(BWAPI::Unit* u);
     virtual void onUnitShow(BWAPI::Unit* u);
     virtual void onUnitHide(BWAPI::Unit* u);
     void update();
+
+    std::multimap<double, BWAPI::Unit*>& getRangeEnemies();
+    BWAPI::Unit* getOldTarget();
+    void setOldTarget(BWAPI::Unit* newTarget);
 };
