@@ -241,6 +241,10 @@
 						RelativePath="..\src\Micro\Goals\Goal.cpp"
 						>
 					</File>
+					<File
+						RelativePath="..\src\Micro\Goals\Subgoal.cpp"
+						>
+					</File>
 				</Filter>
 			</Filter>
 			<Filter
@@ -489,6 +493,10 @@
 					</File>
 					<File
 						RelativePath="..\src\Micro\Goals\Goal.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Goals\Subgoal.h"
 						>
 					</File>
 				</Filter>
