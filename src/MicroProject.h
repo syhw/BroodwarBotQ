@@ -8,6 +8,14 @@
 #include "Formations.h"
 #include "ObjectManager.h"
 
+#define BW_QT_DEBUG 1
+#ifdef BW_QT_DEBUG
+#include <QtGui/QApplication>
+static QApplication* qapplication = NULL;
+#endif
+class MicroAIModule;
+static MicroAIModule* broodAI = NULL;
+
 static bool analyzed;
 static bool analysis_just_finished;
 static BWTA::Region* home;
@@ -21,6 +29,12 @@ public:
     MapManager* mapManager;
     Regions* regions;
 	virtual void onStart();
+#ifdef BW_QT_DEBUG
+	MicroAIModule(QApplication** qapplication);
+    QApplication** qapp;
+#else
+    MicroAIModule()
+#endif
     ~MicroAIModule();
 	virtual void onEnd(bool isWinner);
 	virtual void onFrame();
