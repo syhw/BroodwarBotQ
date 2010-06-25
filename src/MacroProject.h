@@ -27,6 +27,7 @@
 #include "EUnitsFilter.h"
 #include "EEcoEstimator.h"
 #include "ScoutObjectives.h"
+#include "GoalManager.h"
 
 #ifdef BW_QT_DEBUG
 #include <QtGui/QApplication>
@@ -67,8 +68,11 @@ public:
     MapManager* mapManager;
     EUnitsFilter* eUnitsFilter;
 	EEcoEstimator* eEcoEstimator;
+	GoalManager* goalManager;
+
 	bool showManagerAssignments;
     ObjectManager* objManager;
+
 
 #ifdef BW_QT_DEBUG
 	BattleBroodAI(QApplication** qappli, MainWindow** qmain);

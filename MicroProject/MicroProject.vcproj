@@ -307,10 +307,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\Micro\Goals.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\Regions\MapManager.h"
 				>
 			</File>

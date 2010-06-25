@@ -11,6 +11,9 @@ Goal::Goal()
 {
 }*/
 
+Goal::Goal(){
+}
+
 Goal::Goal(const Goal& g)
 : type(g.type)
 , status(g.status)

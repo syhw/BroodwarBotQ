@@ -406,10 +406,6 @@
 					RelativePath="..\src\Macro\ScoutManager.cpp"
 					>
 				</File>
-				<File
-					RelativePath="..\src\Intelligence\ScoutObjectives.cpp"
-					>
-				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -442,10 +438,6 @@
 				>
 				<File
 					RelativePath="..\src\Micro\Formations.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Micro\Goals.h"
 					>
 				</File>
 				<File
@@ -714,10 +706,6 @@
 				</File>
 				<File
 					RelativePath="..\src\Macro\ScoutManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Intelligence\ScoutObjectives.h"
 					>
 				</File>
 			</Filter>

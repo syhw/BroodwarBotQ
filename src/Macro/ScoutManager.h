@@ -58,16 +58,23 @@ class ScoutManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public 
 		//TODO positionsToSurvey; // to refresh infos about enemy bases: lord(zerg), scan/vessel?(terran), obs(toss)
     std::list<BWAPI::Position> positionsToScout;    
 
-
-	void onUnitCreate();//New 
+	void onUnitShow(BWAPI::Unit* unit);//New
+	void onUnitCreate(BWAPI::Unit* unit);//New 
 	void findEnnemy();//New
+	bool ennemyFound() const;//New
+	void setEnnemyFound(bool b);//New
 	std::list<BWTA::BaseLocation*> getBestPath( std::set<BWTA::BaseLocation* > baseLocations, BWTA::BaseLocation* myStartLocation) const;//New
+	void exploreRegion(BWTA::Region* region);//New
+	int newGoal() const ;//New
 private:
 	
-	std::list<Goal> scoutGoals; //New
-	std::list<Goal> assignedScoutGoals; //New
+	std::list<pGoal> scoutGoals; //New
+	std::list<pGoal> assignedScoutGoals; //New
 	BWTA::BaseLocation* myStartLocation;//New
 	BWTA::BaseLocation* eStartLocation;//New
+	bool bEnnemyFound;//New
+	
+
 
     bool needMoreScouts() const;
     void requestScout(double bid);

@@ -22,6 +22,7 @@ std::string MacroManager::getName() const
 
 void MacroManager::onUnitCreate(BWAPI::Unit* unit)
 {
+
 	// ***********   Expand   *********** //
 	if( unit->getType().isResourceDepot())
 		expanding = false;

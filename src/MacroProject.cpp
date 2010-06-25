@@ -77,7 +77,9 @@ BattleBroodAI::~BattleBroodAI()
     MapManager::Destroy();
     EUnitsFilter::Destroy();
     ObjectManager::Destroy();
-
+	EEcoEstimator::Destroy();
+	GoalManager::Destroy();
+	
 
     if( Broodwar->self()->getRace() == Races::Protoss)
         ProtossStrat::Destroy();
@@ -136,6 +138,7 @@ void BattleBroodAI::onStart()
     this->mapManager        = & MapManager::Instance();
     this->eUnitsFilter      = & EUnitsFilter::Instance();
 	this->eEcoEstimator     = & EEcoEstimator::Instance();
+	this->goalManager       = & GoalManager::Instance();
     this->supplyManager->setBuildManager(this->buildManager);
     this->supplyManager->setBuildOrderManager(this->buildOrderManager);
     this->techManager->setBuildingPlacer(this->buildManager->getBuildingPlacer());
@@ -196,7 +199,7 @@ void BattleBroodAI::onFrame()
     this->microManager->update();
     this->regions->update();
 	this->eEcoEstimator->onFrame();
-
+	this->goalManager->onFrame();
     // Scout example to remove TODO
 	//if( (Broodwar->getFrameCount() % (100*24)) == 0)
       //scoutManager->checkEmptyXP();
@@ -408,6 +411,7 @@ void BattleBroodAI::onFrame()
 
 void BattleBroodAI::onUnitCreate(BWAPI::Unit* unit)
 {
+	this->scoutManager->onUnitCreate(unit);
     this->regions->onUnitCreate(unit);
     this->mapManager->onUnitCreate(unit);
     //Broodwar->printf("BBAI::onUnitCreate() %s", unit->getType().getName().c_str());
