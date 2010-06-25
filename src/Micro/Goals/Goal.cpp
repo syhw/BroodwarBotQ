@@ -19,7 +19,9 @@ Goal::Goal(const Goal& g)
 , achiviedCpt(0)
 {
 }
+Goal::Goal(const char* text, pFormation f){
 
+}
 
 Goal::~Goal()
 {

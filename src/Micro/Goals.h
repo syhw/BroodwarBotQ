@@ -5,5 +5,3 @@ class Goal;
 typedef boost::shared_ptr<Goal> pGoal;
 #endif
 #include "Goals/Goal.h"
-#include "Goals/DefendGoal.h"
-#include "Goals/AttackGoal.h"
