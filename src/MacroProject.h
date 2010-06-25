@@ -67,7 +67,6 @@ public:
     MapManager* mapManager;
     EUnitsFilter* eUnitsFilter;
 	EEcoEstimator* eEcoEstimator;
-	ScoutObjectives* scoutObjectives;
 	bool showManagerAssignments;
     ObjectManager* objManager;
 

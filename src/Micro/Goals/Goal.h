@@ -4,25 +4,19 @@
 #include <windows.h>
 #include "Formations.h"
 #include "Subgoal.h"
-//#include "UnitsGroup.h"
-class UnitsGroup;
-
 #ifndef _SMART_POINTER_GOAL_INCLUDED
-#define _SMART_POINTER_GOAL_INCLUDED 1
+#define _SMART_POINTER_GOAL_INCLUDED
 #include <boost/shared_ptr.hpp>
 class Goal;
 typedef boost::shared_ptr<Goal> pGoal;
 #endif
 
+class UnitsGroup;
 typedef enum
 {
-	GT_DEFEND_BASE  = 0,
-	GT_ATTACK_BASE  = 1,
-	GT_EXPLORE      = 2,
-	GT_DROP         = 3,
-	GT_PATROL       = 4,
-	GT_BLOCK_SLOPE  = 5,
-	GT_ND           = 0
+	SCOUT = 0,
+	ATTACK = 1,
+	DEFEND = 2
 } GoalType;
 
 typedef enum
@@ -35,21 +29,20 @@ typedef enum
 } GoalStatus;
 
 
-
 class Goal
 {
 protected:
 	unsigned int achiviedCpt;
-	std::list<Subgoal> subgoals;
+	std::list<pSubgoal> subgoals;
 
 public:
+	Goal();
+	Goal(const Goal& g);
 	GoalType type;          /**< type of the goal */
 	GoalStatus status;      /**< status of the goal */
 	pFormation formation;   /**< formation to adopt during the goal */
 	std::string purpose;    /**< string describing the purpose of the goal */
 
-	//Goal();
-	Goal(const Goal& g);
 	Goal(const char* text, pFormation f);
 	virtual ~Goal();
 
@@ -57,4 +50,5 @@ public:
 	virtual void checkAchievement(UnitsGroup* ug);
     virtual std::string getPurpose() const;
 
+	void addSubgoal(pSubgoal s);
 };

@@ -3,14 +3,14 @@
 #include "UnitsGroup.h"
 /*
 Goal::Goal()
-: type(GT_ND)
+: type(SCOUT)
 , status(GS_IN_PROGRESS)
 , formation(NULL)
 , purpose("Default Goal") 
 , achiviedCpt(0)
 {
-}
-*/
+}*/
+
 Goal::Goal(const Goal& g)
 : type(g.type)
 , status(g.status)
@@ -20,14 +20,6 @@ Goal::Goal(const Goal& g)
 {
 }
 
-Goal::Goal(const char* text, pFormation f)
-: type(GT_ND)
-, status(GS_IN_PROGRESS)
-, formation(f)
-, purpose(text) 
-, achiviedCpt(0)
-{
-}
 
 Goal::~Goal()
 {
@@ -61,4 +53,8 @@ void Goal::checkAchievement(UnitsGroup* ug)
 std::string Goal::getPurpose() const
 {
     return purpose;
+}
+
+void Goal::addSubgoal(pSubgoal s){
+	this->subgoals.push_back(s);
 }

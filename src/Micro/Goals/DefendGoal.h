@@ -7,8 +7,8 @@
 class DefendGoal: public Goal
 {
 public:
-	//DefendGoal();
-	//DefendGoal( const DefendGoal& g);
+	DefendGoal();
+	DefendGoal( const DefendGoal& g);
     DefendGoal(const BWAPI::Position& position);
 	virtual ~DefendGoal();
 

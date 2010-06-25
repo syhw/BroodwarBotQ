@@ -32,17 +32,17 @@ void MicroManager::update()
 
 		if (ug->goals.empty())
 		{
-			if (ug->getLastGoal()->type == GT_ATTACK_BASE)
-				sendGroupToAttack( ug);
+		//	if (ug->getLastGoal()->type == GT_ATTACK_BASE)
+		//		sendGroupToAttack( ug);
 
-			if (ug->getLastGoal()->type == GT_DEFEND_BASE && ug->getNbUnits() > 9)
-			{
-				sendGroupToAttack (ug);
+		//	if (ug->getLastGoal()->type == GT_DEFEND_BASE && ug->getNbUnits() > 9)
+		//	{
+		//		sendGroupToAttack (ug);
 				// Create a new defense group.
 				UnitsGroup* ug2 = new UnitsGroup();
 				unitsgroups.push_back( ug2);
-				sendGroupToDefense (ug2);
-			}
+		//		sendGroupToDefense (ug2);
+		//	}
 		}
 	}
 }

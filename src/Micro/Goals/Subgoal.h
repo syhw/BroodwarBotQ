@@ -1,6 +1,11 @@
 #pragma once
 #include <BWAPI.h>
-
+#include <boost/shared_ptr.hpp>
+#ifndef SUBGOAL_SMART_POINTER
+#define SUBGOAL_SMART_POINTER
+class Subgoal;
+typedef boost::shared_ptr<Subgoal> pSubgoal;
+#endif
 
 typedef enum  
 {
@@ -21,11 +26,13 @@ class Subgoal
 {
 public:
 	Subgoal();
+	Subgoal(SubgoalType t, SubgoalCondition c, BWAPI::Position pos);
 	~Subgoal();
+
 	BWAPI::Position subgoalPosition() const;
 	SubgoalType subgoalType() const;
 	SubgoalCondition subgoalCondition() const;
-	bool isValid();//Depends on the condition
+	bool isRealized();//Depends on the condition
 	//if SC_ACTIVE return if subgoal still valid
 	//if SC_ONCE return if already accomplished
 

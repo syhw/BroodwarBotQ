@@ -10,8 +10,8 @@ protected:
     BWAPI::Unit* unit;
 
 public:
-	//AttackGoal();
-	//AttackGoal( const AttackGoal& g);
+	AttackGoal();
+	AttackGoal( const AttackGoal& g);
     AttackGoal(const BWAPI::Position& position, BWAPI::Unit* unit);
 	virtual ~AttackGoal();
 

@@ -136,7 +136,6 @@ void BattleBroodAI::onStart()
     this->mapManager        = & MapManager::Instance();
     this->eUnitsFilter      = & EUnitsFilter::Instance();
 	this->eEcoEstimator     = & EEcoEstimator::Instance();
-	this->scoutObjectives   = & ScoutObjectives::Instance();
     this->supplyManager->setBuildManager(this->buildManager);
     this->supplyManager->setBuildOrderManager(this->buildOrderManager);
     this->techManager->setBuildingPlacer(this->buildManager->getBuildingPlacer());
@@ -159,7 +158,7 @@ void BattleBroodAI::onStart()
     //Broodwar->printf("The match up is %s v %s",
         Broodwar->self()->getRace().getName().c_str();
         Broodwar->enemy()->getRace().getName().c_str();
-	scoutObjectives->find_ennemy();
+	
 }
 
 void BattleBroodAI::onEnd(bool isWinner)
@@ -503,7 +502,6 @@ void BattleBroodAI::onUnitShow(BWAPI::Unit* unit)
     regions->onUnitShow(unit);
     mapManager->onUnitShow(unit);
     eUnitsFilter->update(unit);
-	this->scoutObjectives->onUnitShow(unit);
 }
 
 void BattleBroodAI::onUnitHide(BWAPI::Unit* unit)

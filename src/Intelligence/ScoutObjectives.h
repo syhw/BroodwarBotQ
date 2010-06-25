@@ -12,7 +12,7 @@ class ScoutObjectives : public CSingleton<ScoutObjectives>
 public:
 	std::list<BWAPI::Position> get_Objectives();
 	void find_ennemy();
-	std::list<BWTA::BaseLocation*> getBestPath( std::set<BWTA::BaseLocation* > baseLocations, BWTA::BaseLocation* myStartLocation) const;
+	
 	bool ennemy_found() const;
 	void set_ennemy_found(bool b);
 	void onUnitShow(BWAPI::Unit* unit);

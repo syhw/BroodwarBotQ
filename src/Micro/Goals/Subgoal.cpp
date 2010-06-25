@@ -2,7 +2,11 @@
 using namespace BWAPI;
 
 
-Subgoal::Subgoal():validated(false){
+Subgoal::Subgoal() : validated(false){
+
+}
+
+Subgoal::Subgoal(SubgoalType t, SubgoalCondition c, BWAPI::Position pos) : validated(false),type(t),cond(c),pos(pos){
 
 }
 
@@ -21,7 +25,7 @@ SubgoalCondition Subgoal::subgoalCondition() const {
 	return this->cond;
 }
 
-bool Subgoal::isValid() {
+bool Subgoal::isRealized() {
 
 	if(this->cond==SC_ONCE){
 

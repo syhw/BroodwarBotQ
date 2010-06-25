@@ -30,45 +30,9 @@ std::list<Position> temp;
 return temp;
 }
 
-void ScoutObjectives::find_ennemy(){
-
-	//Scout the different possible bases
-	myStartLocation = BWTA::getStartLocation(BWAPI::Broodwar->self());
-	std::list<BWTA::BaseLocation*> path = getBestPath( BWTA::getStartLocations(), myStartLocation);
-	Broodwar->printf("Number of bases : %d",path.size());
-
-	for(std::list<BWTA::BaseLocation*>::iterator p=path.begin();p!=path.end();p++){
-		objectives.push_back((*p)->getPosition());
-	}
-}
 
 
-std::list<BWTA::BaseLocation*> ScoutObjectives::getBestPath( std::set<BWTA::BaseLocation* > baseLocations, BWTA::BaseLocation* myStartLocation) const
-{
-	std::list<BWTA::BaseLocation*> res;
-	baseLocations.erase( myStartLocation);
-	BWTA::BaseLocation* baseFrom = myStartLocation;
-	while( !baseLocations.empty())
-	{
-		BWTA::BaseLocation* nearestBase = NULL;
-		double dist = 0xFFFF;
-		for( std::set<BWTA::BaseLocation* >::iterator b = baseLocations.begin(); b != baseLocations.end(); b++)
-		{
-			double dist2 = baseFrom->getGroundDistance( *b);
-			if( dist2 <= 0) // Unreachable by walk.
-				baseLocations.erase( nearestBase);
-			if( dist2 < dist)
-			{
-				nearestBase = *b;
-				dist = dist2;
-			}
-		}
-		baseLocations.erase( nearestBase);
-		res.push_back( nearestBase);
-		baseFrom = nearestBase;
-	}
-	return res;
-}
+
 
 void ScoutObjectives::onUnitShow(BWAPI::Unit* unit){
 
