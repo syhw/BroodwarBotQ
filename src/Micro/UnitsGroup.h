@@ -31,6 +31,8 @@ private:
     BWAPI::Position center;
     std::vector<pBayesianUnit> units;
     std::map<BWAPI::Unit*, std::list<pBayesianUnit> > attackersEnemy;
+    void goonMicro(pBayesianUnit u);
+    void zealotMicro(pBayesianUnit u);
 
 public:
 	std::list<pGoal> goals; // list of goals to execute.

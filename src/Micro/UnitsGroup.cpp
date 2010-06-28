@@ -134,6 +134,284 @@ void align(std::vector<Position>& from, std::vector<Position>& to, std::vector<u
     }
 }
 
+void UnitsGroup::zealotMicro(pBayesianUnit u)
+{
+    std::set<Unit*> enemies;
+    std::set<Unit*> enemies_in_range;
+    int damagesTaken = 0;
+
+    for each(Unit* v in Broodwar->getAllUnits())
+    {
+        if (Broodwar->self()->isEnemy(v->getPlayer()))
+        {
+            enemies.insert(v);
+            if (v->getOrderTarget() == u->unit)// && v->getDistance(u->unit) < 10.0)
+                damagesTaken += v->getType().groundWeapon().damageAmount();
+        }
+    }
+
+    double maxRangeZealot = u->unit->getType().groundWeapon().maxRange();
+    double maxRangeZealotEnemy = 0.0;
+    // find enemies in range of our current dragoon
+    for each(Unit* enemy in enemies)
+    {
+        if (maxRangeZealotEnemy == 0.0)
+            maxRangeZealotEnemy = enemy->getType().groundWeapon().maxRange();
+
+        if (u->unit->getDistance(enemy) < maxRangeZealot) 
+            enemies_in_range.insert(enemy);
+    }
+    // find weakest
+    Unit* weakestenemy = NULL;
+    for each(Unit* enemy in enemies_in_range)
+    {
+        if (weakestenemy)
+        {
+            int weakesthp = weakestenemy->getHitPoints() + weakestenemy->getShields();
+            int enemyhp = enemy->getHitPoints() + enemy->getShields();
+            if (weakesthp > enemyhp)
+            {
+                weakestenemy = enemy;
+            }
+        }
+        else
+        {
+            weakestenemy = enemy;
+        }
+    }
+    // Enemy found
+    if (weakestenemy)
+    {
+        int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
+        int ex = weakestenemy->getPosition().x(); int ey = weakestenemy->getPosition().y();
+
+        Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Red);
+        if (u->unit->getOrderTarget() != weakestenemy && !u->unit->isMoving())
+        {
+            u->unit->rightClick(weakestenemy);
+        }
+    }
+    // Enemy not found
+    else
+    {
+        // Find the closest enemy
+        Unit* closest_enemy = NULL;
+        for each(Unit* enemy in enemies)
+        {
+            if (closest_enemy)
+            {
+                if (u->unit->getDistance(closest_enemy) > u->unit->getDistance(enemy))
+                {
+                    closest_enemy = enemy;
+                }
+            }
+            else
+            {
+                closest_enemy = enemy;
+            }
+        }
+        // Enemy found
+        if (closest_enemy)
+        {
+            int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
+            int ex = closest_enemy->getPosition().x(); int ey = closest_enemy->getPosition().y();
+
+            Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Yellow);
+
+            if (u->unit->getOrderTarget() != closest_enemy && !u->unit->isMoving())
+            {
+                u->unit->rightClick(closest_enemy);
+            }
+        }
+        // No enemy
+        else
+        {
+            int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
+            int ex = u->unit->getTargetPosition().x(); int ey = u->unit->getTargetPosition().y();
+
+            Broodwar->drawLineMap(ux,uy,ex,ey,Colors::White);
+
+            if (static_cast<Goal>(*lastGoal).status == GS_ACHIEVED) 
+                u->unit->rightClick(Position(u->unit->getPosition().x()+10, u->unit->getPosition().y()));
+        }
+    }
+    enemies_in_range.clear();
+
+    if (damagesTaken >= 32) // More than 2 zealots on him
+    {
+        Broodwar->printf("FUITE");
+        std::vector<BWAPI::TilePosition> tmp;
+        tmp = BWTA::getShortestPath(TilePosition(u->unit->getPosition()), Position(u->unit->getPosition().x()-40, u->unit->getPosition().y()));
+        u->unit->rightClick(Position(tmp[1].x(), tmp[1].y()));
+        //u->Back();
+    }
+}
+
+//Need some improvements, but it works.
+void UnitsGroup::goonMicro(pBayesianUnit u)
+{
+    std::set<Unit*> enemies;
+    std::set<Unit*> enemies_in_range;
+
+    int damagesTaken = 0;
+
+    for each(Unit* v in Broodwar->getAllUnits())
+    {
+        if (Broodwar->self()->isEnemy(v->getPlayer()))
+        {
+            enemies.insert(v);
+            if (v->getOrderTarget() == u->unit)
+                damagesTaken += v->getType().groundWeapon().damageAmount();
+        }
+    }
+
+    double maxRangeGoon = 0.0;
+    double maxRangeGoonEnemy = 0.0;
+    // find enemies in range of our current dragoon
+    for each(Unit* enemy in enemies)
+    {
+        if (maxRangeGoon == 0.0) 
+        {
+            maxRangeGoon = u->unit->getType().groundWeapon().maxRange();
+            for each (UpgradeType upgrade in u->unit->getType().upgrades()) 
+            {
+                if (upgrade == BWAPI::UpgradeTypes::Singularity_Charge)
+                {
+                    maxRangeGoon *= 1.5;
+                    break;
+                }
+            }
+        }
+        if (maxRangeGoonEnemy == 0.0)
+        {
+            maxRangeGoonEnemy = enemy->getType().groundWeapon().maxRange();
+            for each (UpgradeType upgrade in enemy->getType().upgrades()) 
+            {
+                if (upgrade == BWAPI::UpgradeTypes::Singularity_Charge)
+                {
+                    maxRangeGoonEnemy *= 1.5;
+                    break;
+                }
+            }
+        }
+
+        if (u->unit->getDistance(enemy) < maxRangeGoon) 
+        {
+            enemies_in_range.insert(enemy);
+        }
+    }
+    // find weakest
+    Unit* weakestenemy = NULL;
+    for each(Unit* enemy in enemies_in_range)
+    {
+        if (weakestenemy)
+        {
+            int weakesthp = weakestenemy->getHitPoints() + weakestenemy->getShields();
+            int enemyhp = enemy->getHitPoints() + enemy->getShields();
+            if (weakesthp > enemyhp)
+            {
+                weakestenemy = enemy;
+            }
+        }
+        else
+        {
+            weakestenemy = enemy;
+        }
+    }
+    // Enemy found
+    if (weakestenemy)
+    {
+        int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
+        int ex = weakestenemy->getPosition().x(); int ey = weakestenemy->getPosition().y();
+
+        Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Red);
+        if (u->unit->getOrderTarget() != weakestenemy && !u->unit->isMoving())
+        {
+            u->unit->rightClick(weakestenemy);
+        }
+    }
+    // Enemy not found
+    else
+    {
+        // Find the closest enemy
+        Unit* closest_enemy = NULL;
+        for each(Unit* enemy in enemies)
+        {
+            if (closest_enemy)
+            {
+                if (u->unit->getDistance(closest_enemy) > u->unit->getDistance(enemy))
+                {
+                    closest_enemy = enemy;
+                }
+            }
+            else
+            {
+                closest_enemy = enemy;
+            }
+        }
+        // Enemy found
+        if (closest_enemy)
+        {
+            int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
+            int ex = closest_enemy->getPosition().x(); int ey = closest_enemy->getPosition().y();
+
+            Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Yellow);
+
+            if (u->unit->getOrderTarget() != closest_enemy && !u->unit->isMoving())
+            {
+                u->unit->rightClick(closest_enemy);
+            }
+        }
+        // No enemy
+        else
+        {
+            int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
+            int ex = u->unit->getTargetPosition().x(); int ey = u->unit->getTargetPosition().y();
+
+            Broodwar->drawLineMap(ux,uy,ex,ey,Colors::White);
+
+           /* if (static_cast<Goal>(*lastGoal).status == GS_ACHIEVED) 
+                u->unit->rightClick(Position(u->unit->getPosition().x()+10, u->unit->getPosition().y()));*/
+        }
+    }
+    enemies_in_range.clear();
+    // IA improve
+    for each(Unit* enemy in enemies)
+    {
+        if (enemy->getOrderTarget() != NULL && (enemy->isStartingAttack() || enemy->isAttacking()) ) 
+        {
+            Unit* myUnit = enemy->getOrderTarget();
+            if (myUnit->getPlayer() == Broodwar->self() && !myUnit->isMoving()) 
+            {
+                Vec dep(myUnit->getPosition().x() - enemy->getPosition().x(), myUnit->getPosition().y() - enemy->getPosition().y()); 
+                dep = dep.normalize();
+                Position newPos = Position(myUnit->getPosition().x(), myUnit->getPosition().y());;
+                double distanceFromEnemy = dep.norm();
+                double calc = (maxRangeGoonEnemy + 30 - enemy->getDistance(newPos))/distanceFromEnemy;
+                newPos += Position(static_cast<int>(dep.x * calc), static_cast<int>(dep.y * calc));
+                bool test = true;
+                for each (Unit* uunit in Broodwar->unitsOnTile(newPos.x(), newPos.y()))
+                    if (uunit != myUnit)
+                    {
+                        test = false;
+                        break;
+                    }
+                    double actualLife = myUnit->getHitPoints() + myUnit->getShields();
+                    double totalLife = myUnit->getType().maxHitPoints() + myUnit->getType().maxShields();
+                    double probaFuite = 0.2 + 0.8*(1-(distanceFromEnemy/maxRangeGoonEnemy));
+                    probaFuite = (actualLife/totalHP < 0.1 ? 0 : probaFuite);
+                    if (test && (actualLife/totalLife) < probaFuite) 
+                    {
+                        myUnit->rightClick(newPos);
+                        int ux = myUnit->getPosition().x(); int uy = myUnit->getPosition().y();
+                        int ex = myUnit->getTargetPosition().x(); int ey = myUnit->getTargetPosition().y();
+                        Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Blue);
+                        break;
+                    }
+            }
+        }
+    }
+}
 void UnitsGroup::update()
 {
     this->totalHP = 0;
@@ -164,164 +442,15 @@ void UnitsGroup::update()
         //debug_goals(goals);
     }    
 
-    std::set<Unit*> enemies;
-    std::set<Unit*> enemies_in_range;
-
-    for each(Unit* u in Broodwar->getAllUnits())
-    {
-        if ( (u->getPlayer() != Broodwar->self()) )
-        {
-            enemies.insert(u);
-        }
-    }
-
-    double maxRangeGoon = 0.0;
-    double maxRangeGoonEnemy = 0.0;
     for each(pBayesianUnit u in units)
     {
-        // find enemies in range of our current dragoon
-        for each(Unit* enemy in enemies)
+        if (u->unit->getType() == BWAPI::UnitTypes::Protoss_Dragoon)
         {
-            if (maxRangeGoon == 0.0) 
-            {
-                maxRangeGoon = u->unit->getType().groundWeapon().maxRange();
-                for each (UpgradeType upgrade in u->unit->getType().upgrades()) 
-                {
-                    if (upgrade == BWAPI::UpgradeTypes::Singularity_Charge)
-                    {
-                        maxRangeGoon *= 1.5;
-                        break;
-                    }
-                }
-            }
-            if (maxRangeGoonEnemy == 0.0)
-            {
-                maxRangeGoonEnemy = enemy->getType().groundWeapon().maxRange();
-                for each (UpgradeType upgrade in enemy->getType().upgrades()) 
-                {
-                    if (upgrade == BWAPI::UpgradeTypes::Singularity_Charge)
-                    {
-                        maxRangeGoonEnemy *= 1.5;
-                        break;
-                    }
-                }
-            }
-
-            if (u->unit->getDistance(enemy) < maxRangeGoon) 
-            {
-                enemies_in_range.insert(enemy);
-            }
+            goonMicro(u);
         }
-        // find weakest
-        Unit* weakestenemy = NULL;
-        for each(Unit* enemy in enemies_in_range)
+        else if (u->unit->getType() == BWAPI::UnitTypes::Protoss_Zealot)
         {
-            if (weakestenemy)
-            {
-                int weakesthp = weakestenemy->getHitPoints() + weakestenemy->getShields();
-                int enemyhp = enemy->getHitPoints() + enemy->getShields();
-                if (weakesthp > enemyhp)
-                {
-                    weakestenemy = enemy;
-                }
-            }
-            else
-            {
-                weakestenemy = enemy;
-            }
-        }
-        // Enemy found
-        if (weakestenemy)
-        {
-            int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
-            int ex = weakestenemy->getPosition().x(); int ey = weakestenemy->getPosition().y();
-
-            Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Red);
-            if (u->unit->getOrderTarget() != weakestenemy && !u->unit->isMoving())
-            {
-                u->unit->rightClick(weakestenemy);
-            }
-        }
-        // Enemy not found
-        else
-        {
-            // Find the closest enemy
-            Unit* closest_enemy = NULL;
-            for each(Unit* enemy in enemies)
-            {
-                if (closest_enemy)
-                {
-                    if (u->unit->getDistance(closest_enemy) > u->unit->getDistance(enemy))
-                    {
-                        closest_enemy = enemy;
-                    }
-                }
-                else
-                {
-                    closest_enemy = enemy;
-                }
-            }
-            // Enemy found
-            if (closest_enemy)
-            {
-                int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
-                int ex = closest_enemy->getPosition().x(); int ey = closest_enemy->getPosition().y();
-
-                Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Yellow);
-
-                if (u->unit->getOrderTarget() != closest_enemy && !u->unit->isMoving())
-                {
-                    u->unit->rightClick(closest_enemy);
-                }
-            }
-            // No enemy
-            else
-            {
-                int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
-                int ex = u->unit->getTargetPosition().x(); int ey = u->unit->getTargetPosition().y();
-
-                Broodwar->drawLineMap(ux,uy,ex,ey,Colors::White);
-
-                if (static_cast<Goal>(*lastGoal).status == GS_ACHIEVED) 
-                    u->unit->rightClick(Position(u->unit->getPosition().x()+10, u->unit->getPosition().y()));
-            }
-        }
-        enemies_in_range.clear();
-    }  
-    // IA improve
-    for each(Unit* enemy in enemies)
-    {
-        if (enemy->getOrderTarget() != NULL && enemy->isAttacking()) 
-        {
-            Unit* myUnit = enemy->getOrderTarget();
-            if (myUnit->getPlayer() == Broodwar->self() && !myUnit->isMoving()) 
-            {
-                Vec dep(myUnit->getPosition().x() - enemy->getPosition().x(), myUnit->getPosition().y() - enemy->getPosition().y()); 
-                dep = dep.normalize();
-                Position newPos = Position(myUnit->getPosition().x(), myUnit->getPosition().y());;
-                double distanceFromEnemy = dep.norm();
-                double calc = (maxRangeGoonEnemy + 25 - enemy->getDistance(newPos))/distanceFromEnemy;
-                newPos += Position(static_cast<int>(dep.x * calc), static_cast<int>(dep.y * calc));
-                bool test = true;
-                for each (Unit* uunit in Broodwar->unitsOnTile(newPos.x(), newPos.y()))
-                {
-                    if (uunit != myUnit){
-                        test = false;
-                        break;
-                    }
-                }
-                double actualLife = myUnit->getHitPoints() + myUnit->getShields();
-                double totalLife = myUnit->getType().maxHitPoints() + myUnit->getType().maxShields();
-                double probaFuite = 0.2 + 0.8*(1-(distanceFromEnemy/maxRangeGoonEnemy));
-                probaFuite = (actualLife/totalHP < 0.1 ? 0 : probaFuite);
-                if (test && (actualLife/totalLife) < probaFuite) 
-                {
-                    myUnit->rightClick(newPos);
-                    int ux = myUnit->getPosition().x(); int uy = myUnit->getPosition().y();
-                    int ex = myUnit->getTargetPosition().x(); int ey = myUnit->getTargetPosition().y();
-                    Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Blue);
-                }
-            }
+            zealotMicro(u);
         }
     }
 }

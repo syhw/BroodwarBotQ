@@ -602,8 +602,7 @@ void BayesianUnit::update()
 
     if (!unit->exists()) return;
     this->drawTarget();
-    //if (_mode == MODE_FIGHT_G) {
-    if (test > 12) {
+    if (_mode == MODE_FIGHT_G || 1) {
         // TODO not every update()s, perhaps even asynchronously
         // TODO inline function!
        if (!unit->getGroundWeaponCooldown()) {
