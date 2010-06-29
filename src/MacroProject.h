@@ -35,8 +35,6 @@ static QApplication* qapplication = NULL;
 static MainWindow* qmainwindow = NULL;
 #endif
 
-class BattleBroodAI;
-BattleBroodAI* broodAI = NULL;
 
 static bool analyzed;
 static bool analysis_just_finished;

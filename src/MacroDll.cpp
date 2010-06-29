@@ -7,6 +7,8 @@
 #include <QtGui/QApplication>
 #include "MacroProject.h"
 
+BattleBroodAI* broodAI = NULL;
+
 #define BUF_SIZE 255
 
 static HANDLE  hThreadArrayMonitor;
