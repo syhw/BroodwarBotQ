@@ -33,6 +33,7 @@ private:
     std::map<BWAPI::Unit*, std::list<pBayesianUnit> > attackersEnemy;
     void goonMicro(pBayesianUnit u);
     void zealotMicro(pBayesianUnit u);
+    void dragoonIA(std::set<BWAPI::Unit*> enemies, double maxRangeGoonEnemy);
 
 public:
 	std::list<pGoal> goals; // list of goals to execute.
