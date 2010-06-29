@@ -62,14 +62,14 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 BayesianUnit::~BayesianUnit()
 {
     // TODO O(n) -> O(1) ?
-    for (std::list<pBayesianUnit>::iterator it =_unitsGroup->getAttackersEnemy()[oldTarget].begin() ; it != _unitsGroup->getAttackersEnemy()[oldTarget].end(); it++)
+  /*  for each (pBayesianUnit it in _unitsGroup->getAttackersEnemy()[oldTarget])
     {
-        if ( *(*it) == *this )
+        if ( (*it) == *this )
         {
-            _unitsGroup->getAttackersEnemy()[oldTarget].remove(*it);
+           _unitsGroup->getAttackersEnemy()[oldTarget].remove(it);
             return;
         }
-    }
+    }*/
 }
 
 void BayesianUnit::initDefaultProb()
@@ -598,12 +598,11 @@ void BayesianUnit::onUnitHide(Unit* u)
 
 void BayesianUnit::update()
 {
-    static int test = 0;
+   static int test = 0;
 
     if (!unit->exists()) return;
     this->drawTarget();
-    //if (_mode == MODE_FIGHT_G) {
-    if (test > 12) {
+    if (_mode == MODE_FIGHT_G || 1) {
         // TODO not every update()s, perhaps even asynchronously
         // TODO inline function!
        if (!unit->getGroundWeaponCooldown()) {
@@ -611,7 +610,7 @@ void BayesianUnit::update()
             rangeEnemyUnit = _rangeEnemies.begin();
             unsigned int i = 0;
             unsigned int end = _rangeEnemies.size();
-            while (i < end)
+            while (i < end && rangeEnemyUnit != _rangeEnemies.end())
             {
                 if (!rangeEnemyUnit->second->exists()) {
                     _rangeEnemies.erase(rangeEnemyUnit);
@@ -638,7 +637,7 @@ void BayesianUnit::update()
             if (++i == end) {
                 // NOT IMPL TODO
                 // perhaps fill _rangeEnemies in the UnitsGroup (higher level)
-                Broodwar->printf("me think I have no enemy unit in range, me perhaps stoodpid!\n");
+                //Broodwar->printf("me think I have no enemy unit in range, me perhaps stoodpid!\n");
             }
         }
 
