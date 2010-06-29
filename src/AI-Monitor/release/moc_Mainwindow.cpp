@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'Mainwindow.h'
 **
-** Created: Tue 22. Jun 14:41:35 2010
+** Created: Tue 29. Jun 14:29:03 2010
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.6.2)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -32,14 +32,14 @@ static const uint qt_meta_data_MainWindow[] = {
 
  // slots: signature, parameters, type, tag, flags
       18,   12,   11,   11, 0x0a,
-      39,   11,   11,   11, 0x0a,
+      45,   39,   11,   11, 0x0a,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_MainWindow[] = {
     "MainWindow\0\0value\0changeGameSpeed(int)\0"
-    "componentDoubleClicked(QModelIndex)\0"
+    "index\0componentDoubleClicked(QModelIndex)\0"
 };
 
 const QMetaObject MainWindow::staticMetaObject = {

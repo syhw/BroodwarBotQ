@@ -31,10 +31,12 @@
 #ifdef BW_QT_DEBUG
 #include <QtGui/QApplication>
 #include "MainWindow.h"
-static QApplication* qapplication = NULL;
-static MainWindow* qmainwindow = NULL;
-#endif
 
+class BattleBroodAI;
+extern BattleBroodAI* broodAI;
+extern QApplication* qapplication;
+extern MainWindow* qmainwindow;
+#endif
 
 static bool analyzed;
 static bool analysis_just_finished;
