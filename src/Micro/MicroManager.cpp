@@ -30,7 +30,7 @@ void MicroManager::update()
 		UnitsGroup* ug = *it;
 		ug->update();
 
-		if (ug->goals.empty())
+		if (ug->emptyGoals())
 		{
 		//	if (ug->getLastGoal()->type == GT_ATTACK_BASE)
 		//		sendGroupToAttack( ug);
@@ -93,7 +93,7 @@ void MicroManager::onUnitDestroy(BWAPI::Unit* unit)
 	for (std::list<UnitsGroup*>::iterator it = unitsgroups.begin(); it != unitsgroups.end();)
 	{
 		(*it)->giveUpControl(unit);
-		if( (*it)->empty())
+		if( (*it)->emptyUnits())
 		{
 			UnitsGroup* ug = *it;
 			it = unitsgroups.erase( it);

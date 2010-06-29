@@ -33,9 +33,9 @@ private:
     std::map<BWAPI::Unit*, std::list<pBayesianUnit> > attackersEnemy;
     void goonMicro(pBayesianUnit u);
     void zealotMicro(pBayesianUnit u);
-
-public:
 	std::list<pGoal> goals; // list of goals to execute.
+public:
+	
 
 	UnitsGroup();
 	~UnitsGroup();
@@ -66,7 +66,8 @@ public:
     virtual void onUnitHide(BWAPI::Unit* u);
     virtual void takeControl(BWAPI::Unit* u);
     virtual void giveUpControl(BWAPI::Unit* u);
-	bool empty();
+	bool emptyUnits();
+	bool emptyGoals();
 	unsigned int getNbUnits() const;
     std::vector<pBayesianUnit>* getUnits();
     std::map<BWAPI::Unit*, std::list<pBayesianUnit> >& getAttackersEnemy();

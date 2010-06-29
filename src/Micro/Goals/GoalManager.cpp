@@ -36,16 +36,7 @@ void GoalManager::findUnit(pGoal goal){
 	//Check if the unitsGroup is not empty else Segfault ?
 		if (ug->getUnits()->size() != 0) {
 			goal->status = GS_MOVE_TO;
-			
-			//goal->formation = static_cast<pFormation>(new formation());
-			if(ug->goals.size()==0){
-				Broodwar->printf("il y en a pas");
-			}
 			ug->addGoal(goal);
-			//if(ug->goals.front()->type == SCOUT){
-			//	Broodwar->printf("ok");
-			//}
-
 			microManager->unitsgroups.push_back(ug);
 			Broodwar->printf("Unit found, goal attributed");
 		}else{
