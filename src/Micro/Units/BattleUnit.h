@@ -39,4 +39,10 @@ public:
     virtual void onUnitDestroy(BWAPI::Unit* u);
     virtual void onUnitShow(BWAPI::Unit* u);
     virtual void onUnitHide(BWAPI::Unit* u);
+
+
+    void attackEnemy(BWAPI::Unit* u, BWAPI::Color col);
+    BWAPI::Unit* findClosestEnemy(std::set<BWAPI::Unit*> &enemies);
+    void fillEnemies(std::set<BWAPI::Unit*> &enemies, int &damagesTaken);
+    void fillEnemiesInRangeForDragoon(std::set<BWAPI::Unit*> &enemies, std::set<BWAPI::Unit*> &enemies_in_range, double &maxRangeGoon, double &maxRangeGoonEnemy);
 };

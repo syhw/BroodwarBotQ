@@ -2,13 +2,13 @@
 #include <BWAPI.h>
 #include <BWTA.h>
 #include <windows.h>
-#include "UnitsGroup.h"
-#include "MapManager.h"
-#include "Regions.h"
+#include "Defines.h"
 #include "Formations.h"
+#include "MapManager.h"
 #include "ObjectManager.h"
+#include "Regions.h"
+#include "UnitsGroup.h"
 
-#define BW_QT_DEBUG 1
 #ifdef BW_QT_DEBUG
 #include <QtGui/QApplication>
 static QApplication* qapplication = NULL;
@@ -33,7 +33,7 @@ public:
 	MicroAIModule(QApplication** qapplication);
     QApplication** qapp;
 #else
-    MicroAIModule()
+    MicroAIModule();
 #endif
     ~MicroAIModule();
 	virtual void onEnd(bool isWinner);
