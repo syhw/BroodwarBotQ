@@ -7,7 +7,6 @@
 #include <QtGui/QApplication>
 #include "MacroProject.h"
 
-#define USE_MONITOR
 #define BUF_SIZE 255
 
 static HANDLE  hThreadArrayMonitor;
@@ -25,7 +24,7 @@ BOOL APIENTRY DllMain(HANDLE hModule,
 	switch (ul_reason_for_call)
 	{
 	    case DLL_PROCESS_ATTACH:
-            BWAPI::BWAPI_init();
+          BWAPI::BWAPI_init();
 
 	        hThreadArrayMonitor = CreateThread( 
 	        NULL,                   // default security attributes
@@ -47,16 +46,15 @@ BOOL APIENTRY DllMain(HANDLE hModule,
 		    break;
 	    
         case DLL_PROCESS_DETACH:
-			// Wait until monitor thread have terminated.
-
+#ifdef BW_QT_DEBUG
 	        qapplication->quit();
-        		
+#endif
+					
+			    // Wait until monitor thread have terminated.
 	        WaitForMultipleObjects(1, &hThreadArrayMonitor, TRUE, INFINITE);
-
 	        // Close all thread handles and free memory allocations.
-            
 	        CloseHandle(&hThreadArrayMonitor);
-
+					
 	        break;
 	}
 
@@ -69,15 +67,15 @@ extern "C" __declspec(dllexport) BWAPI::AIModule* newAIModule(BWAPI::Game* game)
 #ifdef BW_QT_DEBUG
 	broodAI = new BattleBroodAI(&qapplication, &qmainwindow);
 #else
-    broodAI = new BattleBroodAI();
+  broodAI = new BattleBroodAI();
 #endif
-	return (BattleBroodAI*)broodAI;
+	return broodAI;
 }
 
 
 DWORD WINAPI LaunchMonitor(LPVOID lpParam ) 
 { 
-#ifdef USE_MONITOR
+#ifdef BW_QT_DEBUG
 
 	while(!broodAI)
 	{
@@ -89,7 +87,7 @@ DWORD WINAPI LaunchMonitor(LPVOID lpParam )
 	char* name = "AI-Monitor";
 	char** argv = &name;
 	qapplication = new QApplication(argc, argv);
-    qmainwindow = new MainWindow();//0, (BattleBroodAI*)broodAI);
+    qmainwindow = new MainWindow();
 	qmainwindow->show();
 	qapplication->exec();
 #endif

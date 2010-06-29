@@ -8,7 +8,6 @@
 #include "MainWindow.h"
 #include "MicroProject.h"
 
-#define USE_MONITOR
 #define BUF_SIZE 255
 
 static HANDLE hThreadArrayMonitor;
@@ -36,7 +35,7 @@ BOOL APIENTRY DllMain(HANDLE hModule,
             0,                      // use default creation flags 
             &dwThreadIdArray);   // returns the thread identifier 
         // Check the return value for success.
-        // If CreateThread fails, terminate execution. 
+        // If CreateThread fails, terminate execution.
         // This will automatically clean up threads and memory. 
         if (hThreadArrayMonitor == NULL) 
         {
@@ -45,13 +44,13 @@ BOOL APIENTRY DllMain(HANDLE hModule,
 
         break;
     case DLL_PROCESS_DETACH:
-
-        // Wait until monitor thread have terminated.
+#ifdef BW_QT_DEBUG
         qapplication->quit();        		
+#endif
+        // Wait until monitor thread have terminated.
         WaitForMultipleObjects(1, &hThreadArrayMonitor, TRUE, INFINITE);
         // Close all thread handles and free memory allocations.
         CloseHandle(&hThreadArrayMonitor);
-
         break;
     }
 
@@ -72,7 +71,7 @@ extern "C" __declspec(dllexport) BWAPI::AIModule* newAIModule(BWAPI::Game* game)
 
 DWORD WINAPI LaunchMonitor(LPVOID lpParam)
 {
-#ifdef USE_MONITOR
+#ifdef BW_QT_DEBUG
     while(!broodAI)
     {
         Sleep(50);
@@ -82,7 +81,7 @@ DWORD WINAPI LaunchMonitor(LPVOID lpParam)
     char* name = "AI-Monitor";
     char** argv = &name;
     qapplication = new QApplication(argc, argv);
-    MainWindow w(0, (MicroAIModule*)broodAI);
+    MainWindow w;//(0, (MicroAIModule*)broodAI);
     w.show();
     qapplication->exec();
 #endif

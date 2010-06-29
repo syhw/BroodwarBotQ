@@ -1,1 +1,3 @@
-#define BW_QT_DEBUG 1
+#pragma once
+
+#define BW_QT_DEBUG
