@@ -260,7 +260,7 @@ void ScoutManager::showPath()
 ////////////////////////////NEW SECTION
 
 void ScoutManager::onUnitCreate(BWAPI::Unit* unit){
-	if(BWAPI::Broodwar->self()->supplyUsed() == 18 && !this->ennemyFound()){
+	if(BWAPI::Broodwar->self()->supplyUsed() == 18 && unit->getType().isWorker() && !this->ennemyFound()){
 		BWAPI::Broodwar->printf("gotta find the ennemy, ScoutManager created the objective");
 		findEnnemy();
 	}
@@ -269,7 +269,8 @@ void ScoutManager::onUnitCreate(BWAPI::Unit* unit){
 
 void ScoutManager::findEnnemy(){
 	//Create a new scoutGoal 
-	ScoutGoal sc;
+	pGoal g = pGoal(new Goal(SCOUT));
+	g->purpose = "My purpose is to find the ennemy";
 	pSubgoal sb;
 
 	//Scout the different possible bases
@@ -279,8 +280,9 @@ void ScoutManager::findEnnemy(){
 		
 	for(std::list<BWTA::BaseLocation*>::iterator p=path.begin();p!=path.end();p++){
 		sb=static_cast<pSubgoal>(new Subgoal(ST_VIEW,SC_ONCE,(*p)->getPosition()));
-		sc.addSubgoal(sb);
+		g->addSubgoal(sb);
 	}
+	scoutGoals.push_back(g);
 }
 
 std::list<BWTA::BaseLocation*> ScoutManager::getBestPath( std::set<BWTA::BaseLocation* > baseLocations, BWTA::BaseLocation* myStartLocation) const
@@ -327,6 +329,7 @@ void ScoutManager::onUnitShow(BWAPI::Unit* unit){
 		
 		if(eStartLocation == NULL)
 			Broodwar -> printf("eStartLocation is NULL, problem...");
+
 		Broodwar->printf("Ennemy main base found, waiting for objectives");
 		BWTA::Region* region = eStartLocation->getRegion();
 
@@ -389,4 +392,11 @@ void ScoutManager::setEnnemyFound(bool b){
 
 int ScoutManager::newGoal() const {
 	return scoutGoals.size();
+}
+
+
+pGoal ScoutManager::getGoal(){
+	pGoal p=scoutGoals.front();
+	scoutGoals.pop_front();
+	return p;
 }

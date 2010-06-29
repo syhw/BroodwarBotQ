@@ -29,6 +29,9 @@ Goal::Goal(const char* text, pFormation f){
 Goal::~Goal()
 {
 }
+Goal::Goal(GoalType t):type(t),status(GS_NOT_ATTRIBUTED){
+
+}
 
 void Goal::achieve(UnitsGroup* ug)
 {

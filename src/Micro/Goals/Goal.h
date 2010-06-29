@@ -21,11 +21,13 @@ typedef enum
 
 typedef enum
 {
+
 	GS_ND_STATUS           = 0,
 	GS_ACHIEVED            = 0,
 	GS_IN_PROGRESS         = 1,
 	GS_MOVE_TO             = 2,
-	GS_FLEE                = 3
+	GS_FLEE                = 3,
+	GS_NOT_ATTRIBUTED      = 4
 } GoalStatus;
 
 
@@ -36,7 +38,8 @@ protected:
 	std::list<pSubgoal> subgoals;
 
 public:
-	Goal();
+	Goal(); 
+	Goal(GoalType t); //Always create a goal with status GS_NOT_ATTRIBUTED
 	Goal(const Goal& g);
 	GoalType type;          /**< type of the goal */
 	GoalStatus status;      /**< status of the goal */
@@ -49,6 +52,5 @@ public:
 	virtual void achieve(UnitsGroup* ug);
 	virtual void checkAchievement(UnitsGroup* ug);
     virtual std::string getPurpose() const;
-
 	void addSubgoal(pSubgoal s);
 };

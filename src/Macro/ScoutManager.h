@@ -6,7 +6,7 @@
 #include <BWTA.h>
 #include "Goal.h"
 #include "Subgoal.h"
-#include "ScoutGoal.h"
+
 class ScoutManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public CSingleton<ScoutManager>
 {
 	friend class CSingleton<ScoutManager>;
@@ -65,7 +65,8 @@ class ScoutManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public 
 	void setEnnemyFound(bool b);//New
 	std::list<BWTA::BaseLocation*> getBestPath( std::set<BWTA::BaseLocation* > baseLocations, BWTA::BaseLocation* myStartLocation) const;//New
 	void exploreRegion(BWTA::Region* region);//New
-	int newGoal() const ;//New
+	int newGoal() const ;//New   Return the number of new goals
+	pGoal getGoal();//New Return the first element in the goal list
 private:
 	
 	std::list<pGoal> scoutGoals; //New

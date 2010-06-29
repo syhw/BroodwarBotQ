@@ -149,27 +149,17 @@ void UnitsGroup::update()
 
 	keepDistance(); // Temporary call to test micro tech
 
-	if (!goals.empty())
-	{
-		if (goals.front()->status == GS_ACHIEVED) 
-		{
-			if (goals.size() == 1) lastGoal = goals.front();
-			goals.pop_front();
-			if (!goals.empty()) goals.front()->achieve(this);
-		}
-		else
-		{
-			goals.front()->checkAchievement(this);
-		}
-        //debug_goals(goals);
-	}    
+	if(!goals.empty()){
+		
+		accomplishGoal();
+	}
 
 	std::set<Unit*> enemies;
 	std::set<Unit*> enemies_in_range;
 
 	for each(Unit* u in Broodwar->getAllUnits())
 	{
-		if ( (u->getPlayer() != Broodwar->self()) )
+		if ( u->getPlayer()->isEnemy())
 		{
 			enemies.insert(u);
 		}
@@ -496,6 +486,7 @@ const BayesianUnit& UnitsGroup::operator[](int i)
 
 void UnitsGroup::display()
 {
+	/*
 	Broodwar->drawCircle(CoordinateType::Map, center.x(), center.y(), 8, Colors::Green);
     for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); it++)
 	{
@@ -523,7 +514,7 @@ void UnitsGroup::display()
 	for (std::list<pGoal>::iterator it = goals.begin(); it != goals.end(); it++)
 	{
 		Broodwar->drawCircle( CoordinateType::Map, (int)((*it)->formation->center.x), (int)((*it)->formation->center.y), 5, Colors::White, true);
-	}
+	}*/
 }
 
 void UnitsGroup::updateCenter()
@@ -555,3 +546,21 @@ void UnitsGroup::selectedUnits(std::set<pBayesianUnit>& u)
     }
 }
 #endif
+
+
+void UnitsGroup::accomplishGoal(){
+	/*
+		if (goals.front()->status == GS_ACHIEVED) 
+		{
+			if (goals.size() == 1) lastGoal = goals.front();
+			goals.pop_front();
+			if (!goals.empty()) goals.front()->achieve(this);
+		}
+		else
+		{
+			goals.front()->checkAchievement(this);
+		}
+        //debug_goals(goals);
+		*/
+	//Broodwar->printf("%s",goals.front()->purpose);
+}

@@ -238,10 +238,6 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\Micro\Goals\ScoutGoal.cpp"
-						>
-					</File>
-					<File
 						RelativePath="..\src\Micro\Goals\Subgoal.cpp"
 						>
 					</File>
@@ -489,10 +485,6 @@
 					</File>
 					<File
 						RelativePath="..\src\Micro\Goals\GoalManager.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\ScoutGoal.h"
 						>
 					</File>
 					<File

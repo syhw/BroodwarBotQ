@@ -72,5 +72,6 @@ public:
     void selectedUnits(std::set<pBayesianUnit>& u);
 #endif
 	const BayesianUnit& operator[](int i);
+	void accomplishGoal();
 };
 
