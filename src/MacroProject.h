@@ -34,8 +34,7 @@
 static QApplication* qapplication = NULL;
 static MainWindow* qmainwindow = NULL;
 #endif
-class BattleBroodAI;
-static BattleBroodAI* broodAI = NULL;
+
 
 static bool analyzed;
 static bool analysis_just_finished;
@@ -43,7 +42,7 @@ static BWTA::Region* home;
 static BWTA::Region* enemy_base;
 DWORD WINAPI AnalyzeThread();
 
-class BattleBroodAI : public BWAPI::AIModule//, public ObjectManager
+class BattleBroodAI : public BWAPI::AIModule
 {
 public:
 	bool show_visibility_data;
@@ -75,7 +74,7 @@ public:
 	BattleBroodAI(QApplication** qappli, MainWindow** qmain);
     QApplication** qapp;
 #else
-    BattleBroodAI()
+    BattleBroodAI();
 #endif
     ~BattleBroodAI();
 	virtual void onStart();

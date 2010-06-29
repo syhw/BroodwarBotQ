@@ -6,7 +6,7 @@
 #include <QtGui/QDialogButtonBox>
 
 
-MainWindow::MainWindow(QWidget *parent, ObjectManager* objManager) :
+MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
