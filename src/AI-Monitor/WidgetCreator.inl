@@ -25,7 +25,7 @@ QWidget* WidgetCreator<std::map<Key, Value> >::create(
     layout->addWidget(table);
     QStandardItemModel* mapModel = new QStandardItemModel((*data)->size(), 2);
     QStandardItem *parentItem = mapModel->invisibleRootItem();
-    for (std::map<Key, Value>::const_iterator it = (*data)->begin(); it != (*data)->end(); ++it)
+    for (typename std::map<Key, Value>::const_iterator it = (*data)->begin(); it != (*data)->end(); ++it)
     {
         std::ostringstream stream1, stream2;
         stream1 << it->first;

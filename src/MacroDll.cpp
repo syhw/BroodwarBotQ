@@ -8,6 +8,8 @@
 #include "MacroProject.h"
 
 BattleBroodAI* broodAI = NULL;
+QApplication* qapplication = NULL;
+MainWindow* qmainwindow = NULL;
 
 #define BUF_SIZE 255
 
