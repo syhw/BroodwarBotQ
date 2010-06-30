@@ -549,7 +549,7 @@ void UnitsGroup::selectedUnits(std::set<pBayesianUnit>& u)
 
 
 void UnitsGroup::accomplishGoal(){
-	
+	    
 		if (goals.front()->status == GS_ACHIEVED) 
 		{
 			if (goals.size() == 1) lastGoal = goals.front();
