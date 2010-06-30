@@ -99,7 +99,7 @@ protected:
     void drawProbs(std::multimap<double, Vec>& probs, int number=0);
     inline void deleteRangeEnemiesElem(BWAPI::Unit* u);
     inline void updateRangeEnemiesWith(BWAPI::Unit* u);
-
+    void dragoonIA(std::set<BWAPI::Unit*> enemies, double maxRangeGoonEnemy);
 public:
     Vec dir, obj; // dir=current direction, obj=pathfinder's direction
     // std::map<attractor_type, std::vector<BWAPI::Position>> prox; 
@@ -110,8 +110,12 @@ public:
     virtual void onUnitHide(BWAPI::Unit* u);
     void update();
     virtual void attackMove(const BWAPI::Position& p);
-
     std::multimap<double, BWAPI::Unit*>& getRangeEnemies();
     BWAPI::Unit* getOldTarget();
     void setOldTarget(BWAPI::Unit* newTarget);
+    void baseMicro();
+    void zealotMicro();
+    void dragoonMicro();
+    virtual void micro() = 0;
+   // void (BayesianUnit::*micro)();
 };

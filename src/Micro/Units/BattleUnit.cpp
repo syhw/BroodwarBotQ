@@ -243,12 +243,12 @@ BWAPI::Unit* BattleUnit::findClosestEnemy(std::set<Unit*> &enemies)
     {
         if (closest_enemy)
         {
-            if (unit->getDistance(closest_enemy) > unit->getDistance(enemy))
+            if (unit->getDistance(closest_enemy) > unit->getDistance(enemy) && enemy->isVisible())
             {
                 closest_enemy = enemy;
             }
         }
-        else
+        else if (enemy->isVisible())
         {
             closest_enemy = enemy;
         }

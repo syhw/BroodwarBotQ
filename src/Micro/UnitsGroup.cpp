@@ -7,6 +7,21 @@
 #include <assert.h>
 #include <fstream>
 #include <iostream>
+#include <ArbiterUnit.h>
+#include <ArchonUnit.h>
+#include <CarrierUnit.h>
+#include <ObserverUnit.h>
+#include <CorsairUnit.h>
+#include <ZealotUnit.h>
+#include <ShuttleUnit.h>
+#include <ScoutUnit.h>
+#include <ReaverUnit.h>
+#include <ProbeUnit.h>
+#include <HighTemplarUnit.h>
+#include <DragoonUnit.h>
+#include <DarkTemplarUnit.h>
+#include <DarkArchonUnit.h>
+
 using namespace BWAPI;
 
 UnitsGroup::UnitsGroup()
@@ -134,7 +149,7 @@ void align(std::vector<Position>& from, std::vector<Position>& to, std::vector<u
     }
 }
 
-Unit* findWeakestEnemy(std::set<Unit*> enemies_in_range)
+Unit* UnitsGroup::findWeakestEnemy(std::set<Unit*> enemies_in_range)
 {
     Unit* weakestenemy(NULL);
     for each(Unit* enemy in enemies_in_range)
@@ -143,124 +158,18 @@ Unit* findWeakestEnemy(std::set<Unit*> enemies_in_range)
         {
             int weakesthp = weakestenemy->getHitPoints() + weakestenemy->getShields();
             int enemyhp = enemy->getHitPoints() + enemy->getShields();
-            if (weakesthp > enemyhp)
+            if (weakesthp > enemyhp && enemy->isVisible())
             {
                 weakestenemy = enemy;
             }
         }
-        else
+        else if (enemy->isVisible())
         {
             weakestenemy = enemy;
         }
     }
 
     return weakestenemy;
-}
-
-void UnitsGroup::zealotMicro(pBayesianUnit u)
-{
-    std::set<Unit*> enemies;
-    std::set<Unit*> enemies_in_range;
-    int damagesTaken = 0;
-
-    u->fillEnemies(enemies, damagesTaken);
-
-    double maxRangeZealot = u->unit->getType().groundWeapon().maxRange();
-    double maxRangeZealotEnemy = 0.0;
-    for each(Unit* enemy in enemies)
-    {
-        if (maxRangeZealotEnemy == 0.0)
-            maxRangeZealotEnemy = enemy->getType().groundWeapon().maxRange();
-
-        if (u->unit->getDistance(enemy) < maxRangeZealot) 
-            enemies_in_range.insert(enemy);
-    }
-    Unit* weakestenemy = findWeakestEnemy(enemies_in_range);
-
-    if (weakestenemy)
-        u->attackEnemy(weakestenemy, Colors::Red);
-    else
-    {
-        Unit* closest_enemy = u->findClosestEnemy(enemies);
-        if (closest_enemy)
-            u->attackEnemy(closest_enemy, Colors::Yellow);
-        else
-            Broodwar->drawLineMap(u->unit->getPosition().x(),      u->unit->getPosition().y(),
-                                  u->unit->getTargetPosition().x(),u->unit->getTargetPosition().y(),
-                                  Colors::White);
-    }
-    enemies_in_range.clear();
-}
-
-void UnitsGroup::dragoonIA(std::set<Unit*> enemies, double maxRangeGoonEnemy)
-{
-    for each(Unit* enemy in enemies)
-    {
-        if (enemy->getOrderTarget() != NULL && (enemy->isStartingAttack() || enemy->isAttacking()) ) 
-        {
-            Unit* myUnit = enemy->getOrderTarget();
-            if (myUnit->getPlayer() == Broodwar->self() && !myUnit->isMoving()) 
-            {
-                Vec dep(myUnit->getPosition().x() - enemy->getPosition().x(), myUnit->getPosition().y() - enemy->getPosition().y()); 
-                dep = dep.normalize();
-                Position newPos = Position(myUnit->getPosition().x(), myUnit->getPosition().y());;
-                double distanceFromEnemy = dep.norm();
-                double calc = (maxRangeGoonEnemy + 30 - enemy->getDistance(newPos))/distanceFromEnemy;
-                newPos += Position(static_cast<int>(dep.x * calc), static_cast<int>(dep.y * calc));
-                bool test = true;
-                for each (Unit* uunit in Broodwar->unitsOnTile(newPos.x(), newPos.y()))
-                {
-                    if (uunit != myUnit)
-                    {
-                        test = false;
-                        break;
-                    }
-                    double actualLife = myUnit->getHitPoints() + myUnit->getShields();
-                    double totalLife = myUnit->getType().maxHitPoints() + myUnit->getType().maxShields();
-                    double probaFuite = 0.2 + 0.8*(1-(distanceFromEnemy/maxRangeGoonEnemy));
-                    probaFuite = (actualLife/totalHP < 0.1 ? 0 : probaFuite);
-                    if (test && (actualLife/totalLife) < probaFuite) 
-                    {
-                        myUnit->rightClick(newPos);
-                        int ux = myUnit->getPosition().x(); int uy = myUnit->getPosition().y();
-                        int ex = myUnit->getTargetPosition().x(); int ey = myUnit->getTargetPosition().y();
-                        Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Blue);
-                        break;
-                    }
-                }
-            }
-        }
-    }
-}
-
-//Need some improvements, but it works.
-void UnitsGroup::goonMicro(pBayesianUnit u)
-{
-    std::set<Unit*> enemies;
-    int damagesTaken = 0;
-    u->fillEnemies(enemies, damagesTaken);
-
-    std::set<Unit*> enemies_in_range;
-    double maxRangeGoon = 0.0;
-    double maxRangeGoonEnemy = 0.0;
-    u->fillEnemiesInRangeForDragoon(enemies, enemies_in_range, maxRangeGoon, maxRangeGoonEnemy);
-
-    Unit* weakestenemy = findWeakestEnemy(enemies_in_range);
-  
-    if (weakestenemy)
-        u->attackEnemy(weakestenemy, Colors::Red);
-    else
-    {
-        Unit* closest_enemy = u->findClosestEnemy(enemies);
-        if (closest_enemy)
-            u->attackEnemy(closest_enemy, Colors::Yellow);
-        else
-            Broodwar->drawLineMap(u->unit->getPosition().x(),      u->unit->getPosition().y(),
-                                  u->unit->getTargetPosition().x(),u->unit->getTargetPosition().y(),
-                                  Colors::White);
-    }
-    enemies_in_range.clear();
-    dragoonIA(enemies, maxRangeGoonEnemy);
 }
 
 void UnitsGroup::update()
@@ -294,16 +203,7 @@ void UnitsGroup::update()
     }    
 
     for each(pBayesianUnit u in units)
-    {
-        if (u->unit->getType() == BWAPI::UnitTypes::Protoss_Dragoon)
-        {
-            goonMicro(u);
-        }
-        else if (u->unit->getType() == BWAPI::UnitTypes::Protoss_Zealot)
-        {
-            zealotMicro(u);
-        }
-    }
+        (u->micro)();
 }
 
 void UnitsGroup::attackMove(int x, int y)
@@ -395,8 +295,38 @@ void UnitsGroup::onUnitHide(Unit* u)
 
 void UnitsGroup::takeControl(Unit* u)
 {
-    pBayesianUnit tmp(new BayesianUnit(u, this));
-    this->units.push_back(tmp);
+    pBayesianUnit tmp;
+    if (u->getType() == BWAPI::UnitTypes::Protoss_Arbiter)
+        tmp = pBayesianUnit(new ArbiterUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Protoss_Archon)
+        tmp = pBayesianUnit(new ArchonUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Protoss_Carrier)
+        tmp = pBayesianUnit(new CarrierUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Protoss_Corsair)
+        tmp = pBayesianUnit(new CorsairUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Protoss_Dark_Archon)
+        tmp = pBayesianUnit(new DarkArchonUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Protoss_Dark_Templar)
+        tmp = pBayesianUnit(new DarkTemplarUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Protoss_Dragoon)
+        tmp = pBayesianUnit(new DragoonUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Protoss_High_Templar)
+        tmp = pBayesianUnit(new HighTemplarUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Protoss_Observer)
+        tmp = pBayesianUnit(new ObserverUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Protoss_Probe)
+        tmp = pBayesianUnit(new ProbeUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Protoss_Reaver)
+        tmp = pBayesianUnit(new ReaverUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Protoss_Scout)
+        tmp = pBayesianUnit(new ScoutUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Protoss_Shuttle)
+        tmp = pBayesianUnit(new ShuttleUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Protoss_Zealot)
+        tmp = pBayesianUnit(new ZealotUnit(u, this));
+
+    if (tmp != NULL)
+        this->units.push_back(tmp);
     if (this->goals.empty()) goals.push_back(lastGoal);
     if (this->goals.front() != NULL) this->goals.front()->achieve(this);
 }
@@ -471,6 +401,11 @@ bool UnitsGroup::empty()
 unsigned int UnitsGroup::getNbUnits() const
 {
     return units.size();
+}
+
+int UnitsGroup::getTotalHP() const
+{
+    return totalHP;
 }
 
 std::vector<pBayesianUnit>* UnitsGroup::getUnits()
