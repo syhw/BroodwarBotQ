@@ -12,3 +12,8 @@ void DarkTemplarUnit::micro()
 {
 
 }
+
+const std::list<BWAPI::UnitType> DarkTemplarUnit::getListePrio() const
+{
+    return listPriorite;
+}

@@ -12,3 +12,8 @@ void ProbeUnit::micro()
 {
 
 }
+
+const std::list<BWAPI::UnitType> ProbeUnit::getListePrio() const
+{
+    return listPriorite;
+}

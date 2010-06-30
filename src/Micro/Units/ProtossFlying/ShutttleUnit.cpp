@@ -12,3 +12,8 @@ void ShuttleUnit::micro()
 {
 
 }
+
+const std::list<BWAPI::UnitType> ShuttleUnit::getListePrio() const
+{
+    return listPriorite;
+}

@@ -12,3 +12,8 @@ void ScoutUnit::micro()
 {
 
 }
+
+const std::list<BWAPI::UnitType> ScoutUnit::getListePrio() const
+{
+    return listPriorite;
+}

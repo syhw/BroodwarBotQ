@@ -12,3 +12,8 @@ void CorsairUnit::micro()
 {
 
 }
+
+const std::list<BWAPI::UnitType> CorsairUnit::getListePrio() const
+{
+    return listPriorite;
+}

@@ -12,3 +12,8 @@ void ArchonUnit::micro()
 {
 
 }
+
+const std::list<BWAPI::UnitType> ArchonUnit::getListePrio() const
+{
+    return listPriorite;
+}

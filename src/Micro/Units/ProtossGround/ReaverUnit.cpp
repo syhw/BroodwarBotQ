@@ -12,3 +12,8 @@ void ReaverUnit::micro()
 {
 
 }
+
+const std::list<BWAPI::UnitType> ReaverUnit::getListePrio() const
+{
+    return listPriorite;
+}

@@ -12,3 +12,8 @@ void CarrierUnit::micro()
 {
 
 }
+
+const std::list<BWAPI::UnitType> CarrierUnit::getListePrio() const
+{
+    return listPriorite;
+}

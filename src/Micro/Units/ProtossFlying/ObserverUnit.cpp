@@ -12,3 +12,8 @@ void ObserverUnit::micro()
 {
 
 }
+
+const std::list<BWAPI::UnitType> ObserverUnit::getListePrio() const
+{
+    return listPriorite;
+}

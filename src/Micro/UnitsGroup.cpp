@@ -203,7 +203,7 @@ void UnitsGroup::update()
     }    
 
     for each(pBayesianUnit u in units)
-        (u->micro)();
+        u->micro();
 }
 
 void UnitsGroup::attackMove(int x, int y)
