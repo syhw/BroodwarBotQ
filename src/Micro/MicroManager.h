@@ -5,6 +5,7 @@
 //#include "Goals.h"
 #include <CSingleton.h>
 #include <Arbitrator.h>
+#include <stdlib.h>
 
 class UnitsGroup;
 class Regions;
@@ -17,6 +18,7 @@ class MicroManager: public CSingleton<MicroManager>, public Arbitrator::Controll
 private:
 	MicroManager();
 	~MicroManager();
+	std::list<UnitsGroup *> promptedRemove;
 
 public:
 	std::list<UnitsGroup*> unitsgroups;
@@ -33,4 +35,6 @@ public:
 
 	void sendGroupToAttack( UnitsGroup* ug);
 	void sendGroupToDefense( UnitsGroup* ug);
+	bool remove(UnitsGroup* u);
+	void promptRemove(UnitsGroup* ug);
 };

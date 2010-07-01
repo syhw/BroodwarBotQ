@@ -8,11 +8,14 @@
 #include "Formations.h"
 #include <Vec.h>
 #include <set>
+#include "MicroManager.h"
+#include "GoalManager.h"
 
 #define _UNITS_DEBUG 1
 
 //class Goal;
 class Formation;
+class GoalManager;
 
 struct i_dist {
 	unsigned int ind;
@@ -34,10 +37,10 @@ private:
     void goonMicro(pBayesianUnit u);
     void zealotMicro(pBayesianUnit u);
     void dragoonIA(std::set<BWAPI::Unit*> enemies, double maxRangeGoonEnemy);
-	std::list<pGoal> goals; // list of goals to execute.
+	std::list<pGoal> goals; // list of goals to accomplish
+	GoalManager* goalManager;
 public:
 	
-
 	UnitsGroup();
 	~UnitsGroup();
 
@@ -49,6 +52,8 @@ public:
 	// Goals interface
 	virtual void attackMove(int x, int y);
 	virtual void attackMove(BWAPI::Position& p);
+	virtual void move(BWAPI::Position& p);
+
 	virtual void formation(pFormation f);
 	virtual void setGoals(std::list<pGoal>& goals);
 	virtual void addGoal(pGoal goal);

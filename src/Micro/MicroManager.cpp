@@ -23,15 +23,22 @@ MicroManager::~MicroManager()
 
 void MicroManager::update()
 {
-	if (unitsgroups.empty()) return;
+	//Suppress the list prompted to suppress 
+	for each (UnitsGroup * ug in this->promptedRemove){
+		this->remove(ug);
+	}
+	promptedRemove.clear();
 
+
+	if (unitsgroups.empty()) return;
+	UnitsGroup* ug;
 	for (std::list<UnitsGroup*>::iterator it = unitsgroups.begin(); it != unitsgroups.end(); it++)
 	{
-		UnitsGroup* ug = *it;
-		ug->update();
+		 ug = *it;
+		 ug->update();
 
-		if (ug->emptyGoals())
-		{
+		//if (ug->emptyGoals())
+		//{
 		//	if (ug->getLastGoal()->type == GT_ATTACK_BASE)
 		//		sendGroupToAttack( ug);
 
@@ -39,11 +46,11 @@ void MicroManager::update()
 		//	{
 		//		sendGroupToAttack (ug);
 				// Create a new defense group.
-				UnitsGroup* ug2 = new UnitsGroup();
-				unitsgroups.push_back( ug2);
+		//		UnitsGroup* ug2 = new UnitsGroup();
+		//		unitsgroups.push_back( ug2);
 		//		sendGroupToDefense (ug2);
 		//	}
-		}
+		//}
 	}
 }
 
@@ -62,7 +69,7 @@ void MicroManager::onOffer(std::set<BWAPI::Unit*> units)
 				sendGroupToDefense (ug);
 			}
 
-			unitsgroups.back()->takeControl(*u);
+			//unitsgroups.back()->takeControl(*u);
 			//Broodwar->printf("New %s added to the micro manager", (*u)->getType().getName().c_str());
 		}
 		else
@@ -170,3 +177,18 @@ void MicroManager::sendGroupToDefense( UnitsGroup* ug)
 	// Send the group defend the base
 	//ug->addGoal(pGoal(new DefendGoal(chokePoint)));
 }
+
+bool MicroManager::remove(UnitsGroup* u){
+	for(std::list<UnitsGroup *>::iterator it = unitsgroups.begin(); it != unitsgroups.end(); it ++){
+		if( (*it) == u){
+			unitsgroups.erase(it);
+			return true;
+		}
+	}
+	return false;
+}
+
+void MicroManager::promptRemove(UnitsGroup* ug){
+	this->promptedRemove.push_back(ug);
+}
+

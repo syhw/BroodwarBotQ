@@ -199,7 +199,7 @@ void BattleBroodAI::onFrame()
     this->microManager->update();
     this->regions->update();
 	this->eEcoEstimator->onFrame();
-	this->goalManager->onFrame();
+
     // Scout example to remove TODO
 	//if( (Broodwar->getFrameCount() % (100*24)) == 0)
       //scoutManager->checkEmptyXP();

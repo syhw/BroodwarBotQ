@@ -1,3 +1,6 @@
+#ifndef SCOUTMANAGER__H
+#define SCOUTMANAGER__H
+
 #pragma once
 #include <CSingleton.h>
 #include <Arbitrator.h>
@@ -6,6 +9,11 @@
 #include <BWTA.h>
 #include "Goal.h"
 #include "Subgoal.h"
+#include "GoalManager.h"
+
+class GoalManager;
+
+
 
 class ScoutManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public CSingleton<ScoutManager>
 {
@@ -60,9 +68,9 @@ class ScoutManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public 
 
 	void onUnitShow(BWAPI::Unit* unit);//New
 	void onUnitCreate(BWAPI::Unit* unit);//New 
-	void findEnnemy();//New
-	bool ennemyFound() const;//New
-	void setEnnemyFound(bool b);//New
+	void findEnemy();//New
+	bool enemyFound() const;//New
+	void setEnemyFound(bool b);//New
 	std::list<BWTA::BaseLocation*> getBestPath( std::set<BWTA::BaseLocation* > baseLocations, BWTA::BaseLocation* myStartLocation) const;//New
 	void exploreRegion(BWTA::Region* region);//New
 	int newGoal() const ;//New   Return the number of new goals
@@ -73,8 +81,8 @@ private:
 	std::list<pGoal> assignedScoutGoals; //New
 	BWTA::BaseLocation* myStartLocation;//New
 	BWTA::BaseLocation* eStartLocation;//New
-	bool bEnnemyFound;//New
-	
+	bool bEnemyFound;//New
+	GoalManager* goalManager;
 
 
     bool needMoreScouts() const;
@@ -90,3 +98,4 @@ private:
 		//std::pair<std::list<BWTA::BaseLocation*>, double> getBestPath( std::set<BWTA::BaseLocation* > baseLocations) const; //old getBestPath
 		void showPath();
 };
+#endif 

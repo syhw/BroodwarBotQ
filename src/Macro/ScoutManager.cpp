@@ -3,12 +3,13 @@
 
 
 using namespace BWAPI;
-ScoutManager::ScoutManager( ):bEnnemyFound(false)
+ScoutManager::ScoutManager( ):bEnemyFound(false)
 {
 	arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
 	regions = & Regions::Instance();
 	desiredScoutCount = 0;
 	showPath();
+	goalManager = & GoalManager::Instance();
 }
 
 ScoutManager::~ScoutManager( )
@@ -61,6 +62,14 @@ void ScoutManager::update()
 		}
 	}
 	updateScoutAssignments();
+
+
+	if(this->newGoal()){
+		pGoal p = getGoal();
+		goalManager->newGoal(p);
+	}
+
+
 
 	//TODO Once all enemies found, stop scouting & Remove positions scouted by allies
 //	const map<Region*, RegionData>& regionsData = regions->regionsData;
@@ -260,17 +269,16 @@ void ScoutManager::showPath()
 ////////////////////////////NEW SECTION
 
 void ScoutManager::onUnitCreate(BWAPI::Unit* unit){
-	if(BWAPI::Broodwar->self()->supplyUsed() == 18 && unit->getType().isWorker() && !this->ennemyFound()){
-		BWAPI::Broodwar->printf("gotta find the ennemy, ScoutManager created the objective");
-		findEnnemy();
+	if(BWAPI::Broodwar->self()->supplyUsed() == 18 && unit->getType().isWorker() && !this->enemyFound()){
+		BWAPI::Broodwar->printf("gotta find the enemy, ScoutManager created the objective");
+		findEnemy();
 	}
 }
 
 
-void ScoutManager::findEnnemy(){
+void ScoutManager::findEnemy(){
 	//Create a new scoutGoal 
-	pGoal g = pGoal(new Goal(SCOUT));
-	g->purpose = "My purpose is to find the ennemy";
+	pGoal g = pGoal(new Goal(SCOUT, GP_FINDENEMY));
 	pSubgoal sb;
 
 	//Scout the different possible bases
@@ -314,10 +322,10 @@ std::list<BWTA::BaseLocation*> ScoutManager::getBestPath( std::set<BWTA::BaseLoc
 
 void ScoutManager::onUnitShow(BWAPI::Unit* unit){
 
-//We assume that if the ennemy was not spotted and we find a ResourceDepot, then it is the main base : requires fast scout
+//We assume that if the enemy was not spotted and we find a ResourceDepot, then it is the main base : requires fast scout
 
-	if(unit->getType().isResourceDepot() && ! this->ennemyFound()){
-		this->setEnnemyFound(true);
+	if(unit->getType().isResourceDepot() && ! this->enemyFound()){
+		this->setEnemyFound(true);
 		//Find the right base location
 		std::set<BWTA::BaseLocation*> res = BWTA::getStartLocations();
 		for(std::set<BWTA::BaseLocation* >::iterator b = res.begin(); b!= res.end(); ++b){
@@ -330,7 +338,7 @@ void ScoutManager::onUnitShow(BWAPI::Unit* unit){
 		if(eStartLocation == NULL)
 			Broodwar -> printf("eStartLocation is NULL, problem...");
 
-		Broodwar->printf("Ennemy main base found, waiting for objectives");
+		Broodwar->printf("Enemy main base found, waiting for objectives");
 		BWTA::Region* region = eStartLocation->getRegion();
 
 		exploreRegion(region);
@@ -382,12 +390,12 @@ void ScoutManager::exploreRegion(BWTA::Region* region){
 }
 
 //Accesseurs
-bool ScoutManager::ennemyFound() const {
-	return bEnnemyFound;
+bool ScoutManager::enemyFound() const {
+	return bEnemyFound;
 }
 
-void ScoutManager::setEnnemyFound(bool b){
-	bEnnemyFound = b;
+void ScoutManager::setEnemyFound(bool b){
+	bEnemyFound = b;
 }
 
 int ScoutManager::newGoal() const {
@@ -400,3 +408,4 @@ pGoal ScoutManager::getGoal(){
 	scoutGoals.pop_front();
 	return p;
 }
+

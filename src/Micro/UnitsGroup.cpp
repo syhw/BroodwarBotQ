@@ -12,6 +12,7 @@ using namespace BWAPI;
 UnitsGroup::UnitsGroup()
 :lastGoal(boost::shared_ptr<Goal>())
 {
+	goalManager = & GoalManager::Instance();
 }
 
 UnitsGroup::~UnitsGroup()
@@ -277,11 +278,9 @@ void UnitsGroup::update()
 
     keepDistance(); // Temporary call to test micro tech
 
-    if (!goals.empty())
-    {
-       accomplishGoal();
+    accomplishGoal();
         //debug_goals(goals);
-    }    
+
 
     for each(pBayesianUnit u in units)
     {
@@ -309,6 +308,16 @@ void UnitsGroup::attackMove(BWAPI::Position& p)
         (*it)->attackMove(p); // TODO, for the moment, each unit keeps a path, needs to be 1 unit per UnitsGroup + flocking
     }
 }
+
+void UnitsGroup::move(BWAPI::Position& p){
+ for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); it++)
+    {
+        (*it)->target = p;
+		(*it)->unit->rightClick(p);
+    }
+
+}
+
 
 void UnitsGroup::formation(pFormation f)
 {
@@ -345,9 +354,9 @@ void UnitsGroup::setGoals(std::list<pGoal>& goals)
 void UnitsGroup::addGoal(pGoal goal)
 {
     this->goals.push_back(goal);
-   // if (lastGoal == boost::shared_ptr<Goal>()) lastGoal = goal;
-  //  if (goals.size() == 1 && !this->units.empty())
-    //    this->goals.front()->achieve(this);
+    if (lastGoal == boost::shared_ptr<Goal>()) lastGoal = goal;
+    if (goals.size() == 1 && !this->units.empty())
+    this->goals.front()->achieve(this);
 }
 
 const pGoal UnitsGroup::getLastGoal() const
@@ -385,10 +394,12 @@ void UnitsGroup::onUnitHide(Unit* u)
 
 void UnitsGroup::takeControl(Unit* u)
 {
+	//TOCHECK : insert the unitgroup in the unit properties?
     pBayesianUnit tmp(new BayesianUnit(u, this));
     this->units.push_back(tmp);
-   // if (this->goals.empty()) goals.push_back(lastGoal);
-   // if (this->goals.front() != NULL) this->goals.front()->achieve(this);
+	if(this->lastGoal != boost::shared_ptr<Goal>()){
+		lastGoal->achieve(this);
+	}
 }
 
 void UnitsGroup::giveUpControl(Unit* u)
@@ -428,8 +439,11 @@ void UnitsGroup::keepDistance()
         if (itUnit->timeIdle > 75)
         {
             itUnit->timeIdle = -1;
-            //if (!goals.empty()) 
-            //   itUnit->attackMove(goals.front()->formation->center.toPosition());
+			if (!goals.empty()){
+				if(goals.front()->getType()!=SCOUT){
+				  itUnit->attackMove(goals.front()->getFormation()->center.toPosition());
+				}
+			}
         }
 
         if (enemies.empty()) continue;
@@ -485,7 +499,7 @@ const BayesianUnit& UnitsGroup::operator[](int i)
 
 void UnitsGroup::display()
 {
-	/*
+	
     Broodwar->drawCircle(CoordinateType::Map, center.x(), center.y(), 8, Colors::Green);
     for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); it++)
     {
@@ -504,17 +518,18 @@ void UnitsGroup::display()
         }
 
         // Goal status
-        if( goals.empty() || goals.front()->status == GS_ACHIEVED)
+        if( goals.empty() || goals.front()->getStatus() == GS_ACHIEVED)
             Broodwar->drawTextMap( unit->getPosition().x(), unit->getPosition().y(), "W");
-        if( !goals.empty() && goals.front()->status == GS_IN_PROGRESS)
+        if( !goals.empty() && goals.front()->getStatus() == GS_IN_PROGRESS)
             Broodwar->drawTextMap( unit->getPosition().x(), unit->getPosition().y(), "P");
     }
 
-    for (std::list<pGoal>::iterator it = goals.begin(); it != goals.end(); it++)
-    {
-        Broodwar->drawCircle( CoordinateType::Map, (int)((*it)->formation->center.x), (int)((*it)->formation->center.y), 5, Colors::White, true);
-    }
-	*/
+	//TOUNCOMMENT when formation for all units group accomplished
+//    for (std::list<pGoal>::iterator it = goals.begin(); it != goals.end(); it++)
+//    {
+//        Broodwar->drawCircle( CoordinateType::Map, (int)((*it)->formation->center.x), (int)((*it)->formation->center.y), 5, Colors::White, true);
+//    }
+	
 }
 
 void UnitsGroup::updateCenter()
@@ -549,18 +564,48 @@ void UnitsGroup::selectedUnits(std::set<pBayesianUnit>& u)
 
 
 void UnitsGroup::accomplishGoal(){
-	    
-		if (goals.front()->status == GS_ACHIEVED) 
-		{
-			if (goals.size() == 1) lastGoal = goals.front();
-			goals.pop_front();
-			if (!goals.empty()) goals.front()->achieve(this);
+	
+	//TOCHECK Potential Memory Leak with accomplished goals => no thanks to smart pointers
+	
+	if(goals.size() > 0){
+		if (!goals.front()->getStatus() == GS_ACHIEVED) {
+			goals.front()->achieve(this);
+		} else {
+			goalManager->goalDone(this, goals.front());
+			if(goals.size() > 1 ){
+				goals.pop_front();
+			}
 		}
-		else
-		{
-			goals.front()->checkAchievement(this);
+	}
+
+
+		/*
+		
+		if (goals.front()->getStatus() == GS_ACHIEVED) {
+			//The first goal of the list is accomplished
+			lastGoal = goals.front();
+			
+			goalManager->goalDone(this, goals.front());
+
+			goals.pop_front();
+			
+			if (!goals.empty()){
+				lastGoal=goals.front();
+				goals.front()->achieve(this);
+			} else{
+				//The unitsgroup has no more goals
+				//must idle
+				for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); it++)
+					(*it)->unit->stop();
+
+			}
+			
+		} else {
+			goals.front()->achieve(this);
 		}
         //debug_goals(goals);
 		
 	//Broodwar->printf("%s",goals.front()->purpose);
+	
+	}*/
 }
