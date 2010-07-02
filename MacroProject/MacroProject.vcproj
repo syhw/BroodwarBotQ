@@ -322,6 +322,14 @@
 						>
 					</File>
 					<File
+						RelativePath="..\src\Micro\Goals\GoalManager.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Goals\ScoutGoal.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\src\Micro\Goals\Subgoal.cpp"
 						>
 					</File>
@@ -336,10 +344,6 @@
 				</File>
 				<File
 					RelativePath="..\src\Macro\ProtossStrat.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\ScoutManager.cpp"
 					>
 				</File>
 				<File
@@ -487,7 +491,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Intelligence\ScoutObjectives.cpp"
+					RelativePath="..\src\Macro\ScoutManager.cpp"
 					>
 				</File>
 			</Filter>
@@ -522,10 +526,6 @@
 				>
 				<File
 					RelativePath="..\src\Micro\Formations.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Micro\Goals.h"
 					>
 				</File>
 				<File
@@ -664,6 +664,14 @@
 						>
 					</File>
 					<File
+						RelativePath="..\src\Micro\Goals\GoalManager.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Goals\ScoutGoal.h"
+						>
+					</File>
+					<File
 						RelativePath="..\src\Micro\Goals\Subgoal.h"
 						>
 					</File>
@@ -682,10 +690,6 @@
 				</File>
 				<File
 					RelativePath="..\src\Macro\ProtossStrat.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\ScoutManager.h"
 					>
 				</File>
 				<File
@@ -877,7 +881,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Intelligence\ScoutObjectives.h"
+					RelativePath="..\src\Macro\ScoutManager.h"
 					>
 				</File>
 			</Filter>

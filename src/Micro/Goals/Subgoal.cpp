@@ -2,7 +2,11 @@
 using namespace BWAPI;
 
 
-Subgoal::Subgoal():validated(false){
+Subgoal::Subgoal() : validated(false){
+
+}
+
+Subgoal::Subgoal(SubgoalType t, SubgoalCondition c, BWAPI::Position pos) : validated(false),type(t),cond(c),pos(pos){
 
 }
 
@@ -21,20 +25,21 @@ SubgoalCondition Subgoal::subgoalCondition() const {
 	return this->cond;
 }
 
-bool Subgoal::isValid() {
-
+bool Subgoal::isRealized() {
+//TOCHECK
 	if(this->cond==SC_ONCE){
 
-		if(!validated)
+		if(!validated){
 			this->validated=check();
-
+		}
 		return validated;
 
 	}else if (this->cond==SC_ACTIVE) {
 		return check();
 		
-	}
-		
+	}else 
+		return check();
+
 }
 
 bool Subgoal::check(){
@@ -45,7 +50,7 @@ bool Subgoal::check(){
 		//TODO	
 		return false;
 	}else if (type==ST_VIEW){
-		return Broodwar->isVisible(pos.x(),pos.y());
+		return Broodwar->isVisible(pos.x()/32,pos.y()/32);
 	}
-	
+	return true;
 }

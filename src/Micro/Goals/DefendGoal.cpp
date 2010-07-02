@@ -22,10 +22,10 @@ DefendGoal::DefendGoal(const DefendGoal& g)
 }
 */
 DefendGoal::DefendGoal(const Position& position)
-: Goal("Defend", pFormation(new SquareFormation( position)))
+//: Goal("Defend", pFormation(new SquareFormation( position)))
 {
- type = GT_DEFEND_BASE;
- status = GS_ACHIEVED;
+ //type = GT_DEFEND_BASE;
+ //status = GS_ACHIEVED;
 }
 
 DefendGoal::~DefendGoal()
@@ -34,7 +34,7 @@ DefendGoal::~DefendGoal()
 
 void DefendGoal::achieve(UnitsGroup* ug)
 {
-	ug->formation( this->formation);
+
 }
 
 void DefendGoal::checkAchievement(UnitsGroup* ug)

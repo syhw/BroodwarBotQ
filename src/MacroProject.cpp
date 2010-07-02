@@ -70,7 +70,9 @@ BattleBroodAI::~BattleBroodAI()
     MapManager::Destroy();
     EUnitsFilter::Destroy();
     ObjectManager::Destroy();
-
+	EEcoEstimator::Destroy();
+	GoalManager::Destroy();
+	
 
     if( Broodwar->self()->getRace() == Races::Protoss)
         ProtossStrat::Destroy();
@@ -83,7 +85,7 @@ BattleBroodAI::~BattleBroodAI()
 void BattleBroodAI::onStart()
 {
   _CrtDumpMemoryLeaks();      // anti-memory leaks
-  Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
+  //Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
 	// Enable some cheat flags
 	Broodwar->enableFlag(Flag::UserInput);
 	// Uncomment to enable complete map information
@@ -96,12 +98,12 @@ void BattleBroodAI::onStart()
 
 	if (Broodwar->isReplay())
 	{
-		Broodwar->printf("The following players are in this replay:");
+	//	Broodwar->printf("The following players are in this replay:");
 		for(std::set<Player*>::iterator p=Broodwar->getPlayers().begin();p!=Broodwar->getPlayers().end();p++)
 		{
 			if (!(*p)->getUnits().empty() && !(*p)->isNeutral())
 			{
-				Broodwar->printf("%s, playing as a %s",(*p)->getName().c_str(),(*p)->getRace().getName().c_str());
+			//	Broodwar->printf("%s, playing as a %s",(*p)->getName().c_str(),(*p)->getRace().getName().c_str());
 			}
 		}
 		return;
@@ -129,7 +131,7 @@ void BattleBroodAI::onStart()
     this->mapManager        = & MapManager::Instance();
     this->eUnitsFilter      = & EUnitsFilter::Instance();
 	this->eEcoEstimator     = & EEcoEstimator::Instance();
-	this->scoutObjectives   = & ScoutObjectives::Instance();
+	this->goalManager       = & GoalManager::Instance();
     this->supplyManager->setBuildManager(this->buildManager);
     this->supplyManager->setBuildOrderManager(this->buildOrderManager);
     this->techManager->setBuildingPlacer(this->buildManager->getBuildingPlacer());
@@ -152,7 +154,7 @@ void BattleBroodAI::onStart()
     //Broodwar->printf("The match up is %s v %s",
         Broodwar->self()->getRace().getName().c_str();
         Broodwar->enemy()->getRace().getName().c_str();
-	scoutObjectives->find_ennemy();
+	
 }
 
 void BattleBroodAI::onEnd(bool isWinner)
@@ -166,8 +168,10 @@ void BattleBroodAI::onEnd(bool isWinner)
 void BattleBroodAI::onFrame()
 {
 #ifdef BW_QT_DEBUG
+
     if (!qapplication)
         Broodwar->printf("Qt not connected\n");
+
 #endif
     //clock_t start = clock();
 
@@ -402,6 +406,7 @@ void BattleBroodAI::onFrame()
 
 void BattleBroodAI::onUnitCreate(BWAPI::Unit* unit)
 {
+	this->scoutManager->onUnitCreate(unit);
     this->regions->onUnitCreate(unit);
     this->mapManager->onUnitCreate(unit);
     //Broodwar->printf("BBAI::onUnitCreate() %s", unit->getType().getName().c_str());
@@ -496,7 +501,6 @@ void BattleBroodAI::onUnitShow(BWAPI::Unit* unit)
     regions->onUnitShow(unit);
     mapManager->onUnitShow(unit);
     eUnitsFilter->update(unit);
-	this->scoutObjectives->onUnitShow(unit);
 }
 
 void BattleBroodAI::onUnitHide(BWAPI::Unit* unit)

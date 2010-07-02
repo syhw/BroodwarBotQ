@@ -1,9 +1,20 @@
+#ifndef SCOUTMANAGER__H
+#define SCOUTMANAGER__H
+
 #pragma once
 #include <CSingleton.h>
 #include <Arbitrator.h>
 #include <BWAPI.h>
 #include <Regions.h>
-#include "ScoutObjectives.h"
+#include <BWTA.h>
+#include "Goal.h"
+#include "Subgoal.h"
+#include "ScoutGoal.h"
+#include "GoalManager.h"
+class GoalManager;
+
+
+
 class ScoutManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public CSingleton<ScoutManager>
 {
 	friend class CSingleton<ScoutManager>;
@@ -11,7 +22,6 @@ class ScoutManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public 
 	private:
 		ScoutManager();
 		~ScoutManager();
-
   public:
     class ScoutData
     {
@@ -28,6 +38,8 @@ class ScoutManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public 
         BWAPI::Position target;
         ScoutMode mode;
     };
+
+
     virtual void onOffer(std::set<BWAPI::Unit*> units);
     virtual void onRevoke(BWAPI::Unit* unit, double bid);
     virtual void update();
@@ -47,14 +59,28 @@ class ScoutManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public 
 		void checkEmptyXP();
 
     Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
-		Regions* regions;
+	Regions* regions;
    
     std::map<BWAPI::Unit*, ScoutData> scouts;
-    std::list<BWAPI::Position> positionsToScout;
 		//TODO positionsToSurvey; // to refresh infos about enemy bases: lord(zerg), scan/vessel?(terran), obs(toss)
-        
-  private:
-    ScoutObjectives* scoutObjectives;
+    std::list<BWAPI::Position> positionsToScout;    
+
+	void onUnitShow(BWAPI::Unit* unit);//New
+	void onUnitCreate(BWAPI::Unit* unit);//New 
+	void findEnemy();//New
+	std::list<BWTA::BaseLocation*> getBestPath( std::set<BWTA::BaseLocation* > baseLocations, BWTA::BaseLocation* myStartLocation) const;//New
+	void exploreRegion(BWTA::Region* region);//New
+	int newGoal() const ;//New   Return the number of new goals
+	pGoal getGoal();//New Return the first element in the goal list
+private:
+	
+	std::list<pGoal> scoutGoals; //New
+	std::list<pGoal> assignedScoutGoals; //New
+	BWTA::BaseLocation* myStartLocation;//New
+	BWTA::BaseLocation* eStartLocation;//New
+	GoalManager* goalManager;
+
+
     bool needMoreScouts() const;
     void requestScout(double bid);
     void addScout(BWAPI::Unit* unit);
@@ -68,3 +94,4 @@ class ScoutManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public 
 		//std::pair<std::list<BWTA::BaseLocation*>, double> getBestPath( std::set<BWTA::BaseLocation* > baseLocations) const; //old getBestPath
 		void showPath();
 };
+#endif 

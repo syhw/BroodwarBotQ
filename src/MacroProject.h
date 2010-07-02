@@ -27,6 +27,8 @@
 #include "EUnitsFilter.h"
 #include "EEcoEstimator.h"
 #include "ScoutObjectives.h"
+#include "GoalManager.h"
+
 
 class BattleBroodAI;
 extern BattleBroodAI* broodAI;
@@ -61,7 +63,8 @@ public:
     MapManager* mapManager;
     EUnitsFilter* eUnitsFilter;
 	EEcoEstimator* eEcoEstimator;
-	ScoutObjectives* scoutObjectives;
+	GoalManager* goalManager;
+
 	bool showManagerAssignments;
     ObjectManager* objManager;
 

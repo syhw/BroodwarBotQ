@@ -1,28 +1,25 @@
+#ifndef GOAL__H
+#define GOAL__H
 #pragma once
 #include <BWAPI.h>
 #include <BWTA.h>
 #include <windows.h>
 #include "Formations.h"
 #include "Subgoal.h"
-//#include "UnitsGroup.h"
-class UnitsGroup;
-
-#ifndef _SMART_POINTER_GOAL_INCLUDED
-#define _SMART_POINTER_GOAL_INCLUDED 1
 #include <boost/shared_ptr.hpp>
+
 class Goal;
 typedef boost::shared_ptr<Goal> pGoal;
-#endif
 
+
+class UnitsGroup;
 typedef enum
 {
-	GT_DEFEND_BASE  = 0,
-	GT_ATTACK_BASE  = 1,
-	GT_EXPLORE      = 2,
-	GT_DROP         = 3,
-	GT_PATROL       = 4,
-	GT_BLOCK_SLOPE  = 5,
-	GT_ND           = 0
+	GT_UNDEFINED           = 0,
+	GT_SCOUT               = 1,
+	GT_ATTACK              = 2,
+	GT_DEFEND              = 3
+
 } GoalType;
 
 typedef enum
@@ -31,30 +28,42 @@ typedef enum
 	GS_ACHIEVED            = 0,
 	GS_IN_PROGRESS         = 1,
 	GS_MOVE_TO             = 2,
-	GS_FLEE                = 3
+	GS_FLEE                = 3,
+	GS_NOT_STARTED         = 4
 } GoalStatus;
-
-
 
 class Goal
 {
+	//A goal contain a list of subgoals
+	//Some subgoals must be validated only once (SC_ACTIVE),
+	//other must be validated all along the accomplishment (SC_ONCE).
 protected:
-	unsigned int achiviedCpt;
-	std::list<Subgoal> subgoals;
-
-public:
-	GoalType type;          /**< type of the goal */
+	std::list<pSubgoal> subgoals; //The subgoals cannot be shared
 	GoalStatus status;      /**< status of the goal */
-	pFormation formation;   /**< formation to adopt during the goal */
-	std::string purpose;    /**< string describing the purpose of the goal */
+	pFormation formation;    /**< formation to accomplish the goal */
+	GoalType type;
+public:
 
-	//Goal();
-	Goal(const Goal& g);
-	Goal(const char* text, pFormation f);
+	//Constructors
+	Goal(); //Don't forgot to set a formation and movement if wanted
+	//Else avoid enemy and void formation is used
+	Goal(GoalType t);
 	virtual ~Goal();
+	
+	virtual void achieve(UnitsGroup* ug);//Start the goal
 
-	virtual void achieve(UnitsGroup* ug);
-	virtual void checkAchievement(UnitsGroup* ug);
-    virtual std::string getPurpose() const;
+	virtual void checkAchievement(UnitsGroup* ug);//Check if accomplished
+	//(Check if all subgoals are accomplished)
 
+	//Mutators
+	void addSubgoal(pSubgoal s);
+	void setFormation(pFormation f); //Warning, the formation is not duplicated.
+
+	//Accessors
+	pFormation getFormation() const;
+	GoalStatus getStatus() const;
+	void setStatus(GoalStatus s);
+	GoalType getType() const;
 };
+
+#endif 

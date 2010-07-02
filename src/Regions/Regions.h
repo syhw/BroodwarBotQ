@@ -45,7 +45,6 @@ private:
 	~Regions();
     MapManager* mapManager;
     inline BWTA::Region* findRegion(BWAPI::Position p);
-
 public:
     inline void addUnit(BWAPI::Unit* unit); // Add to the corresponding map (building/unit) in regionData. Refresh it if already present.
     void removeUnits();
@@ -58,6 +57,7 @@ public:
     void onUnitShow(BWAPI::Unit* unit);
     void onUnitHide(BWAPI::Unit* unit);
 	void display() const;
+	bool EnemyFound() const;
 
     std::map<BWTA::Region*, RegionData> regionsData;
 	TimeManager* timeManager;
