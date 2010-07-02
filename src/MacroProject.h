@@ -28,6 +28,7 @@
 #include "EEcoEstimator.h"
 #include "ScoutObjectives.h"
 #include "GoalManager.h"
+#include "TimeManaged.h"
 
 
 class BattleBroodAI;

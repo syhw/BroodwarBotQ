@@ -51,47 +51,66 @@ void TechManager::onRevoke(BWAPI::Unit* unit, double bid)
 
 void TechManager::update()
 {
-  std::set<BWAPI::Unit*> myPlayerUnits=BWAPI::Broodwar->self()->getUnits();
-  for(std::set<BWAPI::Unit*>::iterator u = myPlayerUnits.begin(); u != myPlayerUnits.end(); u++)
-  {
-    std::map<BWAPI::UnitType,std::list<BWAPI::TechType> >::iterator r=researchQueues.find((*u)->getType());
-    if (r!=researchQueues.end() && !r->second.empty())
-      arbitrator->setBid(this, *u, 50);
-  }
-  std::map<BWAPI::Unit*,BWAPI::TechType>::iterator i_next;
-  for(std::map<BWAPI::Unit*,BWAPI::TechType>::iterator i=researchingUnits.begin();i!=researchingUnits.end();i=i_next)
-  {
-    i_next=i;
-    i_next++;
-    if (i->first->isResearching())
+    try 
     {
-      if (i->first->getTech()!=i->second)
-      {
-        i->first->cancelResearch();
-      }
-    }
-    else
+#ifdef TEST_TIME_MANAGER_CUT_TOO_LONG
+        TimeManager* tm = & TimeManager::Instance();
+        if (tm->getElapsedTime() > 200)
+        {
+            volatile int i = 0;
+            while (!i) 
+                i = 0;
+        }
+#endif
+
+        std::set<BWAPI::Unit*> myPlayerUnits=BWAPI::Broodwar->self()->getUnits();
+        for(std::set<BWAPI::Unit*>::iterator u = myPlayerUnits.begin(); u != myPlayerUnits.end(); u++)
+        {
+            std::map<BWAPI::UnitType,std::list<BWAPI::TechType> >::iterator r=researchQueues.find((*u)->getType());
+            if (r!=researchQueues.end() && !r->second.empty())
+                arbitrator->setBid(this, *u, 50);
+        }
+        std::map<BWAPI::Unit*,BWAPI::TechType>::iterator i_next;
+        for(std::map<BWAPI::Unit*,BWAPI::TechType>::iterator i=researchingUnits.begin();i!=researchingUnits.end();i=i_next)
+        {
+            i_next=i;
+            i_next++;
+            if (i->first->isResearching())
+            {
+                if (i->first->getTech()!=i->second)
+                {
+                    i->first->cancelResearch();
+                }
+            }
+            else
+            {
+                if (BWAPI::Broodwar->self()->hasResearched(i->second))
+                {
+                    researchingUnits.erase(i);
+                    arbitrator->removeBid(this, i->first);
+                }
+                else
+                {
+                    if (i->first->isLifted())
+                    {
+                        if (i->first->isIdle())
+                            i->first->land(placer->getBuildLocationNear(i->first->getTilePosition()+BWAPI::TilePosition(0,1),i->first->getType()));
+                    }
+                    else
+                    {
+                        if (BWAPI::Broodwar->canResearch(i->first,i->second))
+                            i->first->research(i->second);
+                    }
+                }
+            }
+        }
+    } 
+    catch (std::exception* e)
     {
-      if (BWAPI::Broodwar->self()->hasResearched(i->second))
-      {
-        researchingUnits.erase(i);
-        arbitrator->removeBid(this, i->first);
-      }
-      else
-      {
-        if (i->first->isLifted())
-        {
-          if (i->first->isIdle())
-            i->first->land(placer->getBuildLocationNear(i->first->getTilePosition()+BWAPI::TilePosition(0,1),i->first->getType()));
-        }
-        else
-        {
-          if (BWAPI::Broodwar->canResearch(i->first,i->second))
-            i->first->research(i->second);
-        }
-      }
+        // TODO used exception, bufferize in str and printf str
+        BWAPI::Broodwar->printf("Too long I think");
+        return;
     }
-  }
 }
 
 std::string TechManager::getName() const

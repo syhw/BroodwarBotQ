@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="MacroProject"
 	ProjectGUID="{F39C7417-770D-4635-8A47-77BD9CDDCD71}"
 	RootNamespace="MacroProject"
@@ -40,8 +40,9 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Regions;../src/Utils;../src/Utils/Component;../src/Intelligence;../../BWAPI_Beta_2.8/include;../../BWAPI_Beta_2.8/include/BWAPI;../../BWAPI_Beta_2.8/include/BWTA;&quot;C:\Program Files\boost\boost_1_42\&quot;;../../boost_1_42;C:\Qt\4.6.2\include;C:\Qt\4.6.3\include;&quot;C:\dev\libQGLViewer-2.3.5\QGLViewer&quot;"
+				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Regions;../src/Utils;../src/Utils/Component;../src/Intelligence;../../BWAPI_Beta_2.8/include;../../BWAPI_Beta_2.8/include/BWAPI;../../BWAPI_Beta_2.8/include/BWTA;../../boost_1_43_0;&quot;C:\Program Files\boost\boost_1_42\&quot;;../../boost_1_42;C:\Qt\4.6.2\include;C:\Qt\4.6.3\include;&quot;C:\dev\libQGLViewer-2.3.5\QGLViewer&quot;"
 				MinimalRebuild="true"
+				ExceptionHandling="2"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				WarningLevel="3"
@@ -113,9 +114,9 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Utils/Component;../src/Intelligence;../../BWAPI_Beta_2.8/include;../../BWAPI_Beta_2.8/include/BWAPI;../../BWAPI_Beta_2.8/include/BWTA;&quot;C:\Program Files\boost\boost_1_42\&quot;;../../boost_1_42;C:\Qt\4.6.2\include;C:\Qt\4.6.3\include;&quot;C:\dev\libQGLViewer-2.3.5\QGLViewer&quot;"
-				MinimalRebuild="false"
-				ExceptionHandling="1"
+				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Utils/Component;../src/Intelligence;../../BWAPI_Beta_2.8/include;../../BWAPI_Beta_2.8/include/BWAPI;../../BWAPI_Beta_2.8/include/BWTA;../../boost_1_43_0;&quot;C:\Program Files\boost\boost_1_42\&quot;;../../boost_1_42;C:\Qt\4.6.2\include;C:\Qt\4.6.3\include;&quot;C:\dev\libQGLViewer-2.3.5\QGLViewer&quot;"
+				MinimalRebuild="true"
+				ExceptionHandling="2"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"

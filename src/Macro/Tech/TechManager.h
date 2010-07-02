@@ -3,9 +3,11 @@
 #include <Arbitrator.h>
 #include <BWAPI.h>
 #include <BuildingPlacer.h>
+#include "TimeManaged.h"
 
 
-class TechManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public CSingleton<TechManager>
+class TechManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public CSingleton<TechManager>,
+    public TimeManaged
 {
 	friend class CSingleton<TechManager>;
 	private:
