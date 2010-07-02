@@ -15,21 +15,19 @@ AttackGoal::AttackGoal(const AttackGoal& g)
 {
 }
 */
-AttackGoal::AttackGoal( const Position& position, Unit* unit)
-: Goal( "Attack", pFormation(new Formation(position)))
-, unit (unit)
-{
-}
 
 AttackGoal::~AttackGoal()
 {
 }
 
+AttackGoal::AttackGoal(BWAPI::Position p){
+	this->addSubgoal(pSubgoal(new Subgoal(ST_ATTACK,SC_ONCE, p)));
+
+}
+
 void AttackGoal::achieve(UnitsGroup* ug)
 {
 	status = GS_IN_PROGRESS;
-	achiviedCpt = 0;
-	ug->formation( this->formation);
 }
 
 void AttackGoal::checkAchievement(UnitsGroup* ug)
@@ -40,3 +38,4 @@ void AttackGoal::checkAchievement(UnitsGroup* ug)
 		status = GS_ACHIEVED;
 	}
 }
+

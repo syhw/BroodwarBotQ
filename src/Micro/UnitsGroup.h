@@ -29,6 +29,9 @@ class UnitsGroup
 {
 private:
 	pGoal lastGoal; // the last goal is copied from the last executed goal in 'goals' and is keep to give order to new units added to a group (to avoid empty 'goals' for new units).
+	//No longer used theorically
+
+
 	int totalHP;
 	int totalPower;
     BWAPI::Position center;

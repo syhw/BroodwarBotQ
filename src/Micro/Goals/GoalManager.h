@@ -7,12 +7,14 @@
 #include "MicroManager.h"
 #include "../Formations/Formation.h"
 
+
 class GoalManager : public CSingleton<GoalManager>
 {
 	friend class CSingleton<GoalManager>;
 private:
 	MicroManager * microManager;
 	std::map<UnitsGroup *, std::list<pGoal>> attributedGoals;
+	Regions * regions;
 
 public:
 	GoalManager();

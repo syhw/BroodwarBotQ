@@ -9,23 +9,21 @@ Goal::~Goal()
 }
 
 Goal::Goal(GoalType t):
-type(t),
 status(GS_NOT_STARTED),
-purpose(GP_UNDEFINED),
-formation(pFormation(boost::shared_ptr<Formation>()))
+formation(pFormation(boost::shared_ptr<Formation>())),
+type(t)
 {
-	scoutManager = & ScoutManager::Instance();
+	
+
 }
 
-Goal::Goal(GoalType t, GoalPurpose p):
-type(t),
-status(GS_NOT_STARTED),
-purpose(p),
-formation(pFormation(boost::shared_ptr<Formation>()))
-{
-	scoutManager = & ScoutManager::Instance();
-}
 
+Goal::Goal():
+status(GS_NOT_STARTED),
+formation(pFormation(boost::shared_ptr<Formation>())),
+type(GT_UNDEFINED)
+{
+}
 
 void Goal::achieve(UnitsGroup* ug)
 {
@@ -38,8 +36,8 @@ void Goal::achieve(UnitsGroup* ug)
 		for(std::list<pSubgoal>::iterator p = subgoals.begin(); p != subgoals.end(); p++){
 			if((*p)->subgoalCondition()==SC_ONCE && !(*p)->isRealized()){
 				sub=(*p);
-				if(this->getType()==SCOUT)
-					ug->move(sub->subgoalPosition());
+				
+				ug->attackMove(sub->subgoalPosition());//TOCHANGE ACCORDING TO SUBGOAL TYPE
 				
 				break;
 			}
@@ -52,11 +50,6 @@ void Goal::achieve(UnitsGroup* ug)
 
 void Goal::checkAchievement(UnitsGroup* ug)
 {
-	if (this->purpose == GP_FINDENEMY){
-		if(scoutManager->enemyFound())
-			this->status = GS_ACHIEVED;
-
-	} else {
 		bool ach=true;
 		for each (pSubgoal p in subgoals){
 			
@@ -67,14 +60,9 @@ void Goal::checkAchievement(UnitsGroup* ug)
 		}
 		if (ach==true){
 			this->status = GS_ACHIEVED;
-			BWAPI::Broodwar->printf("Goal achieved");
+			//BWAPI::Broodwar->printf("Goal achieved");
 		}
-	}
-}
-
-GoalPurpose Goal::getPurpose() const
-{
-    return purpose;
+	
 }
 
 void Goal::addSubgoal(pSubgoal s){
@@ -92,7 +80,12 @@ pFormation Goal::getFormation() const{
 GoalStatus Goal::getStatus() const{
 	return status;
 }
+void Goal::setStatus(GoalStatus s) {
+	status = s;
+}
 
 GoalType Goal::getType() const{
-	return type;
+return type;
+
 }
+

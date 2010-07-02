@@ -34,7 +34,7 @@ DefendGoal::~DefendGoal()
 
 void DefendGoal::achieve(UnitsGroup* ug)
 {
-	ug->formation( this->formation);
+
 }
 
 void DefendGoal::checkAchievement(UnitsGroup* ug)

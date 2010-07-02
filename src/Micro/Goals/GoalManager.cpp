@@ -18,7 +18,7 @@ void GoalManager::findUnitsGroup(pGoal goal){
 	//And create the units group
 
 
-	if(goal->getType()==SCOUT){
+	if(goal->getType()==GT_SCOUT){
 		//Select a worker
 		UnitsGroup* ug;	
 		
@@ -36,9 +36,9 @@ void GoalManager::findUnitsGroup(pGoal goal){
 				ug->addGoal(goal);
 				insert(ug, goal);
 				microManager->unitsgroups.push_back(ug);
-				Broodwar->printf("Unit found, goal attributed");
+			//	Broodwar->printf("Unit found, goal attributed");
 			}else{
-				Broodwar->printf("Could not find an appropriate unit for this scout goal");
+				//Broodwar->printf("Could not find an appropriate unit for this scout goal");
 			}
 
 		}
@@ -93,8 +93,8 @@ bool GoalManager::clean(UnitsGroup * ug){
 
 void GoalManager::goalDone(UnitsGroup * ug, pGoal p){
 
-	if (p->getType() == SCOUT){
-		BWAPI::Broodwar->printf("Receive the order to destroy the group");
+	if (p->getType() == GT_SCOUT){
+	//	BWAPI::Broodwar->printf("Receive the order to destroy the group");
 		//Destroy the units group : remove units
 		microManager->promptRemove(ug);
 		ug->~UnitsGroup();

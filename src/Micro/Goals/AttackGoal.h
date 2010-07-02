@@ -2,7 +2,7 @@
 #include <BWAPI.h>
 #include <BWTA.h>
 #include "Goal.h"
-
+#include "Subgoal.h"
 
 class AttackGoal: public Goal
 {
@@ -11,8 +11,9 @@ protected:
 
 public:
 	AttackGoal();
+	AttackGoal(BWAPI::Position p);
 	AttackGoal( const AttackGoal& g);
-    AttackGoal(const BWAPI::Position& position, BWAPI::Unit* unit);
+
 	virtual ~AttackGoal();
 
 	virtual void achieve(UnitsGroup* ug);

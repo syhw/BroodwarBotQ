@@ -3,7 +3,7 @@
 
 
 using namespace BWAPI;
-ScoutManager::ScoutManager( ):bEnemyFound(false)
+ScoutManager::ScoutManager( )
 {
 	arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
 	regions = & Regions::Instance();
@@ -269,7 +269,7 @@ void ScoutManager::showPath()
 ////////////////////////////NEW SECTION
 
 void ScoutManager::onUnitCreate(BWAPI::Unit* unit){
-	if(BWAPI::Broodwar->self()->supplyUsed() == 18 && unit->getType().isWorker() && !this->enemyFound()){
+	if(BWAPI::Broodwar->self()->supplyUsed() == 18 && unit->getType().isWorker() && !regions->EnemyFound()){
 		BWAPI::Broodwar->printf("gotta find the enemy, ScoutManager created the objective");
 		findEnemy();
 	}
@@ -278,7 +278,7 @@ void ScoutManager::onUnitCreate(BWAPI::Unit* unit){
 
 void ScoutManager::findEnemy(){
 	//Create a new scoutGoal 
-	pGoal g = pGoal(new Goal(SCOUT, GP_FINDENEMY));
+	pGoal g = pGoal(new ScoutGoal());
 	pSubgoal sb;
 
 	//Scout the different possible bases
@@ -321,11 +321,13 @@ std::list<BWTA::BaseLocation*> ScoutManager::getBestPath( std::set<BWTA::BaseLoc
 }
 
 void ScoutManager::onUnitShow(BWAPI::Unit* unit){
+//TO REMOVE FROM THIS FILE
 
 //We assume that if the enemy was not spotted and we find a ResourceDepot, then it is the main base : requires fast scout
 
-	if(unit->getType().isResourceDepot() && ! this->enemyFound()){
-		this->setEnemyFound(true);
+	/*
+	if(unit->getType().isResourceDepot()){
+	
 		//Find the right base location
 		std::set<BWTA::BaseLocation*> res = BWTA::getStartLocations();
 		for(std::set<BWTA::BaseLocation* >::iterator b = res.begin(); b!= res.end(); ++b){
@@ -344,6 +346,7 @@ void ScoutManager::onUnitShow(BWAPI::Unit* unit){
 		exploreRegion(region);
 		
 	}
+	*/
 }
 
 void ScoutManager::exploreRegion(BWTA::Region* region){
@@ -387,15 +390,6 @@ void ScoutManager::exploreRegion(BWTA::Region* region){
 	}
 	Broodwar->printf("Nombre d'objectifs : %d", objectives.size());
 	*/
-}
-
-//Accesseurs
-bool ScoutManager::enemyFound() const {
-	return bEnemyFound;
-}
-
-void ScoutManager::setEnemyFound(bool b){
-	bEnemyFound = b;
 }
 
 int ScoutManager::newGoal() const {

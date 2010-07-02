@@ -19,7 +19,7 @@ private:
 	MicroManager();
 	~MicroManager();
 	std::list<UnitsGroup *> promptedRemove;
-
+	bool remove(UnitsGroup* u);
 public:
 	std::list<UnitsGroup*> unitsgroups;
 	Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
@@ -35,6 +35,5 @@ public:
 
 	void sendGroupToAttack( UnitsGroup* ug);
 	void sendGroupToDefense( UnitsGroup* ug);
-	bool remove(UnitsGroup* u);
 	void promptRemove(UnitsGroup* ug);
 };

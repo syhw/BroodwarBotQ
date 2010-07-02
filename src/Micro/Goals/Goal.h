@@ -7,8 +7,7 @@
 #include "Formations.h"
 #include "Subgoal.h"
 #include <boost/shared_ptr.hpp>
-#include "ScoutManager.h"
-class ScoutManager;
+
 class Goal;
 typedef boost::shared_ptr<Goal> pGoal;
 
@@ -16,10 +15,11 @@ typedef boost::shared_ptr<Goal> pGoal;
 class UnitsGroup;
 typedef enum
 {
-	UNDEFINED = 0,
-	SCOUT = 1,
-	ATTACK = 2,
-	DEFEND = 3
+	GT_UNDEFINED           = 0,
+	GT_SCOUT               = 1,
+	GT_ATTACK              = 2,
+	GT_DEFEND              = 3
+
 } GoalType;
 
 typedef enum
@@ -32,41 +32,28 @@ typedef enum
 	GS_NOT_STARTED         = 4
 } GoalStatus;
 
-typedef enum
-{	
-	GP_UNDEFINED  = 0,
-	GP_FINDENEMY = 1,
-	GP_CHECK_XP = 2
-
-}GoalPurpose;
-
 class Goal
 {
 	//A goal contain a list of subgoals
 	//Some subgoals must be validated only once (SC_ACTIVE),
 	//other must be validated all along the accomplishment (SC_ONCE).
 protected:
-	ScoutManager * scoutManager;
 	std::list<pSubgoal> subgoals; //The subgoals cannot be shared
-	GoalType type;          /**< type of the goal */
 	GoalStatus status;      /**< status of the goal */
 	pFormation formation;    /**< formation to accomplish the goal */
-	GoalPurpose purpose;    /**< The purpose is an alternative way to accomplish the goal */
-
+	GoalType type;
 public:
 
 	//Constructors
-	Goal(GoalType t); //Don't forgot to set a formation and movement if wanted
+	Goal(); //Don't forgot to set a formation and movement if wanted
 	//Else avoid enemy and void formation is used
-	Goal(GoalType t, GoalPurpose p);
+	Goal(GoalType t);
 	virtual ~Goal();
 	
 	virtual void achieve(UnitsGroup* ug);//Start the goal
 
 	virtual void checkAchievement(UnitsGroup* ug);//Check if accomplished
 	//(Check if all subgoals are accomplished)
-
-    virtual GoalPurpose getPurpose() const;
 
 	//Mutators
 	void addSubgoal(pSubgoal s);
@@ -75,6 +62,7 @@ public:
 	//Accessors
 	pFormation getFormation() const;
 	GoalStatus getStatus() const;
+	void setStatus(GoalStatus s);
 	GoalType getType() const;
 };
 

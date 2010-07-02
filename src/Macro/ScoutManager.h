@@ -9,8 +9,8 @@
 #include <BWTA.h>
 #include "Goal.h"
 #include "Subgoal.h"
+#include "ScoutGoal.h"
 #include "GoalManager.h"
-
 class GoalManager;
 
 
@@ -22,7 +22,6 @@ class ScoutManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public 
 	private:
 		ScoutManager();
 		~ScoutManager();
-
   public:
     class ScoutData
     {
@@ -60,7 +59,7 @@ class ScoutManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public 
 		void checkEmptyXP();
 
     Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
-		Regions* regions;
+	Regions* regions;
    
     std::map<BWAPI::Unit*, ScoutData> scouts;
 		//TODO positionsToSurvey; // to refresh infos about enemy bases: lord(zerg), scan/vessel?(terran), obs(toss)
@@ -69,8 +68,6 @@ class ScoutManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public 
 	void onUnitShow(BWAPI::Unit* unit);//New
 	void onUnitCreate(BWAPI::Unit* unit);//New 
 	void findEnemy();//New
-	bool enemyFound() const;//New
-	void setEnemyFound(bool b);//New
 	std::list<BWTA::BaseLocation*> getBestPath( std::set<BWTA::BaseLocation* > baseLocations, BWTA::BaseLocation* myStartLocation) const;//New
 	void exploreRegion(BWTA::Region* region);//New
 	int newGoal() const ;//New   Return the number of new goals
@@ -81,7 +78,6 @@ private:
 	std::list<pGoal> assignedScoutGoals; //New
 	BWTA::BaseLocation* myStartLocation;//New
 	BWTA::BaseLocation* eStartLocation;//New
-	bool bEnemyFound;//New
 	GoalManager* goalManager;
 
 

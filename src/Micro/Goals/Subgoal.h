@@ -11,7 +11,8 @@ typedef enum
 {
 	ST_REACH_BY_UG = 0, //UG==UnitGroup
 	ST_REACH = 1,//By anybody
-	ST_VIEW  = 2
+	ST_VIEW  = 2,
+	ST_ATTACK = 3
 
 } SubgoalType;
 

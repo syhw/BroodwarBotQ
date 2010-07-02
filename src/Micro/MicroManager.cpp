@@ -2,6 +2,7 @@
 #include <Regions.h>
 #include <util.h>
 #include <UnitsGroup.h>
+#include "AttackGoal.h"
 
 using std::map;
 using std::set;
@@ -18,7 +19,7 @@ MicroManager::MicroManager()
 
 MicroManager::~MicroManager() 
 {
-	Broodwar->printf("INOUT MicroManager::~MicroManager()");
+	//Broodwar->printf("INOUT MicroManager::~MicroManager()");
 }
 
 void MicroManager::update()
@@ -146,8 +147,8 @@ void MicroManager::sendGroupToAttack( UnitsGroup* ug)
 	}
 
 	if (!found) return;
-	//ug->addGoal(pGoal(new AttackGoal(nearestEnemyLocation, enemyUnit)));
-	Broodwar->printf( "Let's fight !!");
+	ug->addGoal(pGoal(new AttackGoal(nearestEnemyLocation)));
+	//Broodwar->printf( "Let's fight !!");
 }
 
 void MicroManager::sendGroupToDefense( UnitsGroup* ug)

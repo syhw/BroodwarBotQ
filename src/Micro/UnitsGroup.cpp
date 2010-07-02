@@ -440,7 +440,7 @@ void UnitsGroup::keepDistance()
         {
             itUnit->timeIdle = -1;
 			if (!goals.empty()){
-				if(goals.front()->getType()!=SCOUT){
+				if(goals.front()->getType()!=GT_SCOUT){
 				  itUnit->attackMove(goals.front()->getFormation()->center.toPosition());
 				}
 			}
