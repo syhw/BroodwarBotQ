@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'menuwidget.ui'
 **
-** Created: Tue 29. Jun 14:33:35 2010
+** Created: Tue 29. Jun 17:20:26 2010
 **      by: Qt User Interface Compiler version 4.6.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -67,7 +67,6 @@ public:
 
         hSlider_gameSpeed = new QSlider(MenuWidget);
         hSlider_gameSpeed->setObjectName(QString::fromUtf8("hSlider_gameSpeed"));
-        hSlider_gameSpeed->setMaximum(40);
         hSlider_gameSpeed->setOrientation(Qt::Horizontal);
 
         verticalLayout_2->addWidget(hSlider_gameSpeed);

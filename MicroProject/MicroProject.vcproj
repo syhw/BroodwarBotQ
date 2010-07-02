@@ -113,7 +113,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Regions;../src/Utils;../src/Intelligence;../src/Utils/Component;../../BWAPI_Beta_2.8/include;../../BWAPI_Beta_2.8/include/BWAPI;../../BWAPI_Beta_2.8/include/BWTA;&quot;C:\Program Files\boost\boost_1_42\&quot;;../../probt/include;../../boost_1_42;C:\Qt\4.6.2\include;C:\Qt\4.6.3\include"
+				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Intelligence;../src/Utils/Component;../../BWAPI_Beta_2.8/include;../../BWAPI_Beta_2.8/include/BWAPI;../../BWAPI_Beta_2.8/include/BWTA;&quot;C:\Program Files\boost\boost_1_42\&quot;;../../probt/include;../../boost_1_42;C:\Qt\4.6.2\include;C:\Qt\4.6.3\include"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
@@ -219,6 +219,86 @@
 					RelativePath="..\src\Micro\Units\BayesianUnit.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\src\Micro\Units\FlyingUnit.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Units\GrountUnit.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Units\SpecialUnit.cpp"
+					>
+				</File>
+				<Filter
+					Name="ProtossFlying"
+					>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossFlying\CarrierUnit.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossFlying\CorsairUnit.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossFlying\ObserverUnit.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossFlying\ScoutUnit.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossFlying\ShutttleUnit.cpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="ProtossGround"
+					>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossGround\ArchonUnit.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossGround\DarkTemplarUnit.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossGround\DragoonUnit.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossGround\ProbeUnit.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossGround\ReaverUnit.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossGround\ZealotUnit.cpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="ProtossSpecial"
+					>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossSpecial\ArbiterUnit.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossSpecial\DarkArchonUnit.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossSpecial\HighTemplarUnit.cpp"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="Goals"
@@ -373,6 +453,86 @@
 					RelativePath="..\src\Micro\Units\BayesianUnit.h"
 					>
 				</File>
+				<File
+					RelativePath="..\src\Micro\Units\FlyingUnit.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Units\GroundUnit.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Units\SpecialUnit.h"
+					>
+				</File>
+				<Filter
+					Name="ProtossFlying"
+					>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossFlying\CarrierUnit.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossFlying\CorsairUnit.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossFlying\ObserverUnit.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossFlying\ScoutUnit.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossFlying\ShuttleUnit.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="ProtossGround"
+					>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossGround\ArchonUnit.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossGround\DarkTemplarUnit.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossGround\DragoonUnit.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossGround\ProbeUnit.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossGround\ReaverUnit.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossGround\ZealotUnit.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="ProtossSpecial"
+					>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossSpecial\ArbiterUnit.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossSpecial\DarkArchonUnit.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossSpecial\HighTemplarUnit.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="Goals"

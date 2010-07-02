@@ -10,6 +10,8 @@
 
 class BattleUnit
 {
+    friend void baseMicro();
+    friend void zealotMicro();
 protected:
 #ifdef UNIT_DEBUG
     std::string _unitType;
@@ -24,6 +26,7 @@ protected:
     static void pathFind(std::vector<WalkTilePosition>& path, const BWAPI::Position& p_start, const BWAPI::Position& p_end);
     unsigned int _tick;
     bool inline tick();
+
 public:
 	BWAPI::Unit* unit;
 	BWAPI::Position target; // display debug purpose

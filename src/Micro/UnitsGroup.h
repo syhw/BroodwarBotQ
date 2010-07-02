@@ -78,8 +78,12 @@ public:
 	bool emptyUnits();
 	bool emptyGoals();
 	unsigned int getNbUnits() const;
+    int getTotalHP() const;
     std::vector<pBayesianUnit>* getUnits();
     std::map<BWAPI::Unit*, std::list<pBayesianUnit> >& getAttackersEnemy();
+
+    static BWAPI::Unit* findWeakestEnemy(std::set<BWAPI::Unit*> enemies_in_range);
+
 #ifdef _UNITS_DEBUG
     void selectedUnits(std::set<pBayesianUnit>& u);
 #endif

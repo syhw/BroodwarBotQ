@@ -9,13 +9,6 @@
 #include "Regions.h"
 #include "UnitsGroup.h"
 
-#ifdef BW_QT_DEBUG
-#include <QtGui/QApplication>
-static QApplication* qapplication = NULL;
-#endif
-class MicroAIModule;
-static MicroAIModule* broodAI = NULL;
-
 static bool analyzed;
 static bool analysis_just_finished;
 static BWTA::Region* home;

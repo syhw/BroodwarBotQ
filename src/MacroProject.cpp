@@ -8,16 +8,8 @@
 
 using namespace BWAPI;
 
-#ifdef BW_QT_DEBUG
-BattleBroodAI::BattleBroodAI(QApplication** qappli, MainWindow** qmain)
-{
-    qapp = qappli;
-    qapplication = *qappli;
-    qmainwindow = *qmain;
-#else
 BattleBroodAI::BattleBroodAI()
 {
-#endif
     clearLog();
 
     std::set<UnitType>& aut = BWAPI::UnitTypes::allUnitTypes();
@@ -59,7 +51,8 @@ BattleBroodAI::BattleBroodAI()
 BattleBroodAI::~BattleBroodAI()
 {
 #ifdef BW_QT_DEBUG
-    (*qapp)->quit();
+    if (qapplication)
+        qapplication->quit();
 #endif
 
     TimeManager::Destroy();
@@ -175,8 +168,10 @@ void BattleBroodAI::onEnd(bool isWinner)
 void BattleBroodAI::onFrame()
 {
 #ifdef BW_QT_DEBUG
-    if (!*qapp)
-       // Broodwar->printf("Qt not connected\n");
+
+    if (!qapplication)
+        Broodwar->printf("Qt not connected\n");
+
 #endif
     //clock_t start = clock();
 

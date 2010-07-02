@@ -99,7 +99,6 @@ protected:
     void drawProbs(std::multimap<double, Vec>& probs, int number=0);
     inline void deleteRangeEnemiesElem(BWAPI::Unit* u);
     inline void updateRangeEnemiesWith(BWAPI::Unit* u);
-
 public:
     Vec dir, obj; // dir=current direction, obj=pathfinder's direction
     // std::map<attractor_type, std::vector<BWAPI::Position>> prox; 
@@ -113,4 +112,5 @@ public:
     std::multimap<double, BWAPI::Unit*>& getRangeEnemies();
     BWAPI::Unit* getOldTarget();
     void setOldTarget(BWAPI::Unit* newTarget);
+    virtual void micro() = 0;
 };
