@@ -7,6 +7,12 @@ using namespace BWAPI;
 
 DragoonUnit::DragoonUnit(BWAPI::Unit* u, UnitsGroup* ug):GroundUnit(u, ug)
 {
+    BWAPI::UnitType myPrio[] = {BWAPI::UnitTypes::Protoss_High_Templar,
+                                BWAPI::UnitTypes::Protoss_Dragoon,
+                                BWAPI::UnitTypes::Protoss_Reaver,
+                                BWAPI::UnitTypes::Protoss_Zealot,
+                                BWAPI::UnitTypes::Protoss_Probe};
+    listPriorite = list<BWAPI::UnitType>(myPrio, myPrio + sizeof(myPrio) / sizeof(BWAPI::UnitType) );
 }
 
 DragoonUnit::~DragoonUnit()
@@ -35,7 +41,7 @@ void DragoonUnit::micro()
         if (closest_enemy)
             attackEnemy(closest_enemy, Colors::Yellow);
         else
-            Broodwar->drawLineMap(unit->getPosition().x(),      unit->getPosition().y(),
+            BWAPI::Broodwar->drawLineMap(unit->getPosition().x(),      unit->getPosition().y(),
                                   unit->getTargetPosition().x(),unit->getTargetPosition().y(),
                                   Colors::White);
     }
@@ -50,7 +56,7 @@ void DragoonUnit::dragoonIA(std::set<Unit*> enemies, double maxRangeGoonEnemy)
         if (enemy->getOrderTarget() != NULL && (enemy->isStartingAttack() || enemy->isAttacking()) ) 
         {
             Unit* myUnit = enemy->getOrderTarget();
-            if (myUnit->getPlayer() == Broodwar->self() && !myUnit->isMoving()) 
+            if (myUnit->getPlayer() == BWAPI::Broodwar->self() && !myUnit->isMoving()) 
             {
                 Vec dep(myUnit->getPosition().x() - enemy->getPosition().x(), myUnit->getPosition().y() - enemy->getPosition().y()); 
                 dep = dep.normalize();
@@ -59,7 +65,7 @@ void DragoonUnit::dragoonIA(std::set<Unit*> enemies, double maxRangeGoonEnemy)
                 double calc = (maxRangeGoonEnemy + 30 - enemy->getDistance(newPos))/distanceFromEnemy;
                 newPos += Position(static_cast<int>(dep.x * calc), static_cast<int>(dep.y * calc));
                 bool test = true;
-                for each (Unit* uunit in Broodwar->unitsOnTile(newPos.x(), newPos.y()))
+                for each (Unit* uunit in BWAPI::Broodwar->unitsOnTile(newPos.x(), newPos.y()))
                 {
                     if (uunit != myUnit)
                     {
@@ -76,7 +82,7 @@ void DragoonUnit::dragoonIA(std::set<Unit*> enemies, double maxRangeGoonEnemy)
                         myUnit->rightClick(newPos);
                         int ux = myUnit->getPosition().x(); int uy = myUnit->getPosition().y();
                         int ex = myUnit->getTargetPosition().x(); int ey = myUnit->getTargetPosition().y();
-                        Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Blue);
+                        BWAPI::Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Blue);
                         break;
                     }
                 }
@@ -88,4 +94,14 @@ void DragoonUnit::dragoonIA(std::set<Unit*> enemies, double maxRangeGoonEnemy)
 const std::list<BWAPI::UnitType> DragoonUnit::getListePrio() const
 {
     return listPriorite;
+}
+
+bool DragoonUnit::canHit(Unit* enemy)
+{
+    return enemy->isVisible() && DragoonUnit::getMaxRange() > enemy->getDistance(unit)-enemy->getType().dimensionRight() ;
+}
+
+double DragoonUnit::getMaxRange()
+{
+    return BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Singularity_Charge) == 1 ? 192.0 : 128.0;
 }

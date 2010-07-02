@@ -225,10 +225,12 @@ void BattleUnit::onUnitHide(Unit* u)
 
 void BattleUnit::attackEnemy(BWAPI::Unit* u, BWAPI::Color col)
 {
+#ifdef __DEBUG_MICRO__
     int ux = unit->getPosition().x(); int uy = unit->getPosition().y();
     int ex = u->getPosition().x(); int ey = u->getPosition().y();
 
     Broodwar->drawLineMap(ux, uy, ex, ey, col);
+#endif
     
     if (unit->getOrderTarget() != u && !unit->isMoving())
     {

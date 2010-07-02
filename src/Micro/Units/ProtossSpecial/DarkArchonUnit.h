@@ -9,4 +9,5 @@ public:
     DarkArchonUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~DarkArchonUnit();
     virtual void micro();
+    virtual bool canHit(BWAPI::Unit* enemy);
 };

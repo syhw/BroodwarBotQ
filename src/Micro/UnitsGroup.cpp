@@ -21,6 +21,8 @@
 #include <DragoonUnit.h>
 #include <DarkTemplarUnit.h>
 #include <DarkArchonUnit.h>
+#include <stack>
+#include <typeinfo>
 
 using namespace BWAPI;
 
@@ -187,12 +189,115 @@ void UnitsGroup::update()
 
     keepDistance(); // Temporary call to test micro tech
 
-    accomplishGoal();
-        //debug_goals(goals);
+    if (!goals.empty())
+    {
+        if (goals.front()->status == GS_ACHIEVED) 
+        {
+            if (goals.size() == 1) lastGoal = goals.front();
+            goals.pop_front();
+            if (!goals.empty()) goals.front()->achieve(this);
+        }
+        else
+        {
+            goals.front()->checkAchievement(this);
+        }
+    }
+//////////////// TEST
+/*
+    // On récupère tous les ennemis.
+    std::set<Unit*> allies;
+    std::set<Unit*> enemies;
+    for each(Unit* v in Broodwar->getAllUnits())
+    {
+        if (Broodwar->self()->isEnemy(v->getPlayer()))
+            enemies.insert(v);
+        else if (!Broodwar->self()->isEnemy(v->getPlayer()))
+            allies.insert(v);
+    }
+    static int test = 0;
+    for each(Unit* v in allies)
+    {
+        if(test < 40)
+        {
+            if (v->getOrderTarget() == NULL)
+                v->rightClick(*(enemies.begin()));
+            test++;
+        }
+        else if (v->getGroundWeaponCooldown() == 0 && !enemies.empty())
+        {
+            v->rightClick(*(enemies.begin()));
+        }
+    }*/
+    //////////////// END TEST 
 
+
+    // On récupère tous les ennemis.
+    std::set<Unit*> enemies;
+    for each(Unit* v in Broodwar->getAllUnits())
+        if (Broodwar->self()->isEnemy(v->getPlayer()))
+            enemies.insert(v);
+
+    // On récupère toutes les unités qui sont en capacités de sélectionner une nouvelle cible
+    std::list<pBayesianUnit> unitsAvailables;
+    for each(pBayesianUnit u in units)
+        if(u->unit->getGroundWeaponCooldown() == 0)
+            unitsAvailables.push_back(u);
+    //accomplishGoal();
+
+
+    // On récupère tous les ennemis à portée de l'unitsGroup
+    std::map<BWAPI::Unit*, int> enemiesInRange;
+    for each(pBayesianUnit u in units)
+    {
+        for each(Unit* v in enemies)
+        {
+            if (u->canHit(v))
+            {
+                if (enemiesInRange.count(v) == 0) 
+                {
+                    enemiesInRange.insert(std::pair<Unit*, int>(v, (u->unit->getOrderTarget() == v && (u->unit->isStartingAttack() || u->unit->isAttacking()) ? u->damagesOn(v) : 0)));
+                }
+                else
+                {
+
+                    enemiesInRange[v] += (u->unit->getOrderTarget() == v && (u->unit->isStartingAttack() || u->unit->isAttacking()) ? u->damagesOn(v) : 0);
+                }
+            }
+        }
+    }
+
+    for each(std::pair<Unit*, int> eUnit in enemiesInRange)
+    {
+        for (std::list<pBayesianUnit>::iterator iter = unitsAvailables.begin(); iter != unitsAvailables.end();)
+        {
+            if (eUnit.second < (eUnit.first->getHitPoints() + eUnit.first->getShields()) && (*iter)->canHit(eUnit.first))
+            {
+                (*iter)->attackEnemy(eUnit.first, Colors::Red);
+                eUnit.second += (*iter)->damagesOn(eUnit.first);
+                std::list<pBayesianUnit>::iterator tmp = iter;
+                ++iter;
+                unitsAvailables.erase(tmp);
+            }
+            else
+            {
+                ++iter;
+            }
+
+        }
+    }
 
     for each(pBayesianUnit u in units)
-        u->micro();
+    {
+        if (u->unit->getOrderTarget())
+        {
+            int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
+            int ex = u->unit->getOrderTarget()->getTargetPosition().x(); int ey = u->unit->getOrderTarget()->getTargetPosition().y();
+            BWAPI::Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Orange);
+        }
+    }
+    
+    // for each(pBayesianUnit u in units)
+    //     u->micro();
 }
 
 void UnitsGroup::attackMove(int x, int y)
@@ -323,6 +428,8 @@ void UnitsGroup::takeControl(Unit* u)
         tmp = pBayesianUnit(new ShuttleUnit(u, this));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Zealot)
         tmp = pBayesianUnit(new ZealotUnit(u, this));
+    else
+        Broodwar->printf("Cette race n'est pas correctement gérée par l'IA pour le moment !");
 
     if (tmp != NULL)
         this->units.push_back(tmp);

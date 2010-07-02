@@ -12,4 +12,5 @@ public:
     ~ReaverUnit();
     virtual void micro();
     virtual const std::list<BWAPI::UnitType> getListePrio() const;
+    virtual bool canHit(BWAPI::Unit* enemy);
 };

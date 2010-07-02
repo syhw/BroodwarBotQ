@@ -9,4 +9,5 @@ public:
     ArbiterUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~ArbiterUnit();
     virtual void micro();
+    virtual bool canHit(BWAPI::Unit* enemy);
 };

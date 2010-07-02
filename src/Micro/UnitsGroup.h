@@ -17,13 +17,13 @@
 class Formation;
 class GoalManager;
 
-struct i_dist {
+struct i_dist 
+{
 	unsigned int ind;
 	double dist;
 	i_dist(unsigned int i, double d): ind(i), dist(d) {}
 	//bool operator<(i_dist& ext) { return (ext.dist < dist); }
 };
-
 
 class UnitsGroup
 {

@@ -1,4 +1,5 @@
 #pragma once
+#define __DEBUG_MICRO__
 #include <BWAPI.h>
 #include <BWTA.h>
 #include <windows.h>
