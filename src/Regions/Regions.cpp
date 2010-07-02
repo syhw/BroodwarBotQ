@@ -79,7 +79,7 @@ Region* Regions::findRegion(BWAPI::Position p)
     const std::set<Region*>& regions = getRegions();
 	for( std::set<Region*>::const_iterator itRegion = regions.begin(); itRegion != regions.end(); ++itRegion)
 	{
-		const Polygon& poly = (*itRegion)->getPolygon();
+        const BWTA::Polygon& poly = (*itRegion)->getPolygon();
 		if (poly.isInside(p))
 		    return *itRegion;
     }
