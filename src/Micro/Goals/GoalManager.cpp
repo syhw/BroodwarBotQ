@@ -42,7 +42,9 @@ void GoalManager::findUnitsGroup(pGoal goal){
 			}
 
 		}
-	}
+	}else if(goal->getType()==GT_ATTACK){
+
+		}
 
 	
 }

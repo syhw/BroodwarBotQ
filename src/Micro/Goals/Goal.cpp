@@ -36,8 +36,13 @@ void Goal::achieve(UnitsGroup* ug)
 		for(std::list<pSubgoal>::iterator p = subgoals.begin(); p != subgoals.end(); p++){
 			if((*p)->subgoalCondition()==SC_ONCE && !(*p)->isRealized()){
 				sub=(*p);
-				
-				ug->attackMove(sub->subgoalPosition());//TOCHANGE ACCORDING TO SUBGOAL TYPE
+				if(this->type==GT_SCOUT){
+					ug->move(sub->subgoalPosition());//TOCHANGE ACCORDING TO SUBGOAL TYPE
+				}else{
+					ug->attackMove(sub->subgoalPosition());
+				}
+
+
 				
 				break;
 			}
