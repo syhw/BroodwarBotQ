@@ -774,6 +774,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Utils\TimeManaged.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Utils\TimeManager.h"
 					>
 				</File>
