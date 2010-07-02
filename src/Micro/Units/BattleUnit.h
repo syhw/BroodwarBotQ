@@ -48,4 +48,5 @@ public:
     BWAPI::Unit* findClosestEnemy(std::set<BWAPI::Unit*> &enemies);
     void fillEnemies(std::set<BWAPI::Unit*> &enemies, int &damagesTaken);
     void fillEnemiesInRangeForDragoon(std::set<BWAPI::Unit*> &enemies, std::set<BWAPI::Unit*> &enemies_in_range, double &maxRangeGoon, double &maxRangeGoonEnemy);
+    virtual int damagesOn(BWAPI::Unit* enemy) = 0;
 };

@@ -10,5 +10,11 @@ HighTemplarUnit::~HighTemplarUnit()
 
 void HighTemplarUnit::micro()
 {
+    BWAPI::Broodwar->printf("HighTemplarUnit::micro non implémenté !");
+}
 
+bool HighTemplarUnit::canHit(BWAPI::Unit* enemy)
+{
+    BWAPI::Broodwar->printf("HighTemplarUnit::canHit non implémenté !");
+    return false;
 }

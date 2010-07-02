@@ -95,7 +95,7 @@ void BayesianUnit::computeFlockValues()
             ///Position tmp = _dirv[i].translate(this->unit->getPosition());
             ///Vec tmpvit((*it)->unit->getVelocityX(), (*it)->unit->getVelocityY()); // we flock with the interpolated next position of other units
             ///tmpvit *= 8;
-            //Broodwar->printf("X: %f, Y: %f \n", (*it)->unit->getVelocityX(), (*it)->unit->getVelocityY());
+            //BWAPI::Broodwar->printf("X: %f, Y: %f \n", (*it)->unit->getVelocityX(), (*it)->unit->getVelocityY());
             ///flock_value value = (flock_value)(1 + (int)tmp.getDistance(tmpvit.translate((*it)->unit->getPosition())) / 32);
             // if (value == FLOCK_FAR + 1) --value; // some kind of hysteresis for FAR
             if (value <= FLOCK_FAR)
@@ -598,8 +598,6 @@ void BayesianUnit::onUnitHide(Unit* u)
 
 void BayesianUnit::update()
 {
-   static int test = 0;
-
     if (!unit->exists()) return;
     this->drawTarget();
     if (_mode == MODE_FIGHT_G || 1) {
@@ -650,7 +648,6 @@ void BayesianUnit::update()
             updateDir();
             //drawDir();
             clickDir();
-            test++;
             //drawFlockValues();
         }
         //Broodwar->drawLine(CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), target.x(), target.y(), BWAPI::Color(92, 92, 92));

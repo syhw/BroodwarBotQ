@@ -10,5 +10,11 @@ ArbiterUnit::~ArbiterUnit()
 
 void ArbiterUnit::micro()
 {
+    BWAPI::Broodwar->printf("ArbiterUnit::micro non implémenté !");
+}
 
+bool ArbiterUnit::canHit(BWAPI::Unit* enemy)
+{
+    BWAPI::Broodwar->printf("ArbiterUnit::canHit non implémenté !");
+    return false;
 }

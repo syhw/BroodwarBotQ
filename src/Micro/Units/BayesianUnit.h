@@ -112,5 +112,8 @@ public:
     std::multimap<double, BWAPI::Unit*>& getRangeEnemies();
     BWAPI::Unit* getOldTarget();
     void setOldTarget(BWAPI::Unit* newTarget);
+
     virtual void micro() = 0;
+    virtual bool canHit(BWAPI::Unit* enemy) = 0;
+    virtual int damagesOn(BWAPI::Unit* enemy) = 0;
 };

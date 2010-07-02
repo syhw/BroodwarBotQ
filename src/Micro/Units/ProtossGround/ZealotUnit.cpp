@@ -7,6 +7,12 @@ using namespace BWAPI;
 
 ZealotUnit::ZealotUnit(BWAPI::Unit* u, UnitsGroup* ug):GroundUnit(u, ug)
 {
+    BWAPI::UnitType myPrio[] = {BWAPI::UnitTypes::Protoss_High_Templar,
+                                BWAPI::UnitTypes::Protoss_Zealot,
+                                BWAPI::UnitTypes::Protoss_Dragoon,
+                                BWAPI::UnitTypes::Protoss_Reaver,
+                                BWAPI::UnitTypes::Protoss_Probe};
+    listPriorite = list<BWAPI::UnitType>(myPrio, myPrio + sizeof(myPrio) / sizeof(BWAPI::UnitType) );
 }
 
 ZealotUnit::~ZealotUnit()
@@ -42,7 +48,7 @@ void ZealotUnit::micro()
         if (closest_enemy)
             attackEnemy(closest_enemy, Colors::Yellow);
         else
-            Broodwar->drawLineMap(unit->getPosition().x(),      unit->getPosition().y(),
+            BWAPI::Broodwar->drawLineMap(unit->getPosition().x(),      unit->getPosition().y(),
                                   unit->getTargetPosition().x(),unit->getTargetPosition().y(),
                                   Colors::White);
     }
@@ -52,4 +58,9 @@ void ZealotUnit::micro()
 const std::list<BWAPI::UnitType> ZealotUnit::getListePrio() const
 {
     return listPriorite;
+}
+
+bool ZealotUnit::canHit(BWAPI::Unit* enemy)
+{
+    return enemy->isVisible() && !enemy->getType().isFlyer() && (enemy->getDistance(unit) > 0);
 }
