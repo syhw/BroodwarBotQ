@@ -12,6 +12,7 @@ class MenuWidget : public QWidget {
 public:
     MenuWidget(QWidget *parent = 0);
     ~MenuWidget();
+    void addTabWidget(QWidget* qw);
 
 public slots:
     void draw();

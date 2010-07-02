@@ -23,9 +23,6 @@
    </item>
    <item>
     <widget class="QSlider" name="hSlider_gameSpeed">
-     <property name="maximum">
-      <number>40</number>
-     </property>
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>

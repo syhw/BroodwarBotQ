@@ -25,5 +25,6 @@ public:
 	void onUnitRenegade(BWAPI::Unit* u);
 #ifdef BW_QT_DEBUG
     void outputQt();
+    bool qt_initialized;
 #endif
 };

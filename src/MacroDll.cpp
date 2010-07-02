@@ -51,10 +51,11 @@ BOOL APIENTRY DllMain(HANDLE hModule,
 	    
         case DLL_PROCESS_DETACH:
 #ifdef BW_QT_DEBUG
-	        qapplication->quit();
+            if (qapplication)
+                qapplication->quit();
 #endif
 					
-			    // Wait until monitor thread have terminated.
+            // Wait until monitor thread have terminated.
 	        WaitForMultipleObjects(1, &hThreadArrayMonitor, TRUE, INFINITE);
 	        // Close all thread handles and free memory allocations.
 	        CloseHandle(&hThreadArrayMonitor);
@@ -68,11 +69,7 @@ BOOL APIENTRY DllMain(HANDLE hModule,
 extern "C" __declspec(dllexport) BWAPI::AIModule* newAIModule(BWAPI::Game* game)
 {
 	BWAPI::Broodwar = game;
-#ifdef BW_QT_DEBUG
-	broodAI = new BattleBroodAI(&qapplication, &qmainwindow);
-#else
-  broodAI = new BattleBroodAI();
-#endif
+    broodAI = new BattleBroodAI();
 	return broodAI;
 }
 

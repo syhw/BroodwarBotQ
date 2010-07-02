@@ -8,6 +8,10 @@
 #include "MainWindow.h"
 #include "MicroProject.h"
 
+MicroAIModule* broodAI = NULL;
+QApplication* qapplication = NULL;
+MainWindow* qmainwindow = NULL;
+
 #define BUF_SIZE 255
 
 static HANDLE hThreadArrayMonitor;

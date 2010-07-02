@@ -19,6 +19,14 @@ MenuWidget::~MenuWidget()
     delete ui;
 }
 
+void MenuWidget::addTabWidget(QWidget* qw)
+{
+#define BW_DO_NOT_RUN
+#ifndef BW_DO_NOT_RUN
+    this->ui->tabWidget->addTab(qw, QString()); //QString("Data")
+#endif
+}
+
 void MenuWidget::changeEvent(QEvent *e)
 {
     QWidget::changeEvent(e);

@@ -44,6 +44,11 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::addTabWidget(QWidget* qw)
+{
+    menuWidget->addTabWidget(qw);
+}
+
 void MainWindow::changeEvent(QEvent *e)
 {
     QMainWindow::changeEvent(e);

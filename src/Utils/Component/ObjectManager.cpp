@@ -20,7 +20,7 @@ void ObjectManager::updateOM()
 void ObjectManager::setGameSpeed(int speed)
 {
 #ifndef CREATOR_COMPIL
-    BWAPI::Broodwar->setLocalSpeed(99 - speed);
+    BWAPI::Broodwar->setLocalSpeed(speed);
 #endif
 }
 

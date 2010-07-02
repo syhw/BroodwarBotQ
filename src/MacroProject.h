@@ -28,15 +28,8 @@
 #include "EEcoEstimator.h"
 #include "ScoutObjectives.h"
 
-#ifdef BW_QT_DEBUG
-#include <QtGui/QApplication>
-#include "MainWindow.h"
-
 class BattleBroodAI;
 extern BattleBroodAI* broodAI;
-extern QApplication* qapplication;
-extern MainWindow* qmainwindow;
-#endif
 
 static bool analyzed;
 static bool analysis_just_finished;
@@ -72,12 +65,7 @@ public:
 	bool showManagerAssignments;
     ObjectManager* objManager;
 
-#ifdef BW_QT_DEBUG
-	BattleBroodAI(QApplication** qappli, MainWindow** qmain);
-    QApplication** qapp;
-#else
     BattleBroodAI();
-#endif
     ~BattleBroodAI();
 	virtual void onStart();
 	virtual void onEnd(bool isWinner);
