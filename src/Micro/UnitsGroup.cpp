@@ -191,7 +191,7 @@ void UnitsGroup::update()
 
     if (!goals.empty())
     {
-        if (goals.front()->status == GS_ACHIEVED) 
+        if (goals.front()->getStatus() == GS_ACHIEVED) 
         {
             if (goals.size() == 1) lastGoal = goals.front();
             goals.pop_front();
