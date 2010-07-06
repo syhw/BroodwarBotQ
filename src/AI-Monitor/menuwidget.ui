@@ -31,7 +31,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_Goals">
       <attribute name="title">
@@ -109,73 +109,6 @@
          <property name="text">
           <string>PushButton</string>
          </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="tab_EUFilter">
-      <attribute name="title">
-       <string>EUFilter</string>
-      </attribute>
-      <layout class="QHBoxLayout" name="horizontalLayout_2">
-       <item>
-        <widget class="QTableWidget" name="EVUnits">
-         <property name="minimumSize">
-          <size>
-           <width>381</width>
-           <height>0</height>
-          </size>
-         </property>
-         <row>
-          <property name="text">
-           <string>0</string>
-          </property>
-         </row>
-         <row>
-          <property name="text">
-           <string>1</string>
-          </property>
-         </row>
-         <row>
-          <property name="text">
-           <string>2</string>
-          </property>
-         </row>
-         <column>
-          <property name="text">
-           <string>pointer</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>unittype</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>last_pos</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>last_seen</string>
-          </property>
-         </column>
-         <column>
-          <property name="text">
-           <string>HP</string>
-          </property>
-         </column>
-         <item row="0" column="0">
-          <property name="text">
-           <string/>
-          </property>
-         </item>
-         <item row="1" column="1">
-          <property name="text">
-           <string/>
-          </property>
-         </item>
         </widget>
        </item>
       </layout>

@@ -483,6 +483,14 @@
 					RelativePath="..\src\AI-Monitor\release\moc_MiniMap.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\src\AI-Monitor\release\moc_QtOutputer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\AI-Monitor\QtOutputer.cpp"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="Intelligence"
@@ -871,6 +879,10 @@
 				</File>
 				<File
 					RelativePath="..\src\AI-Monitor\MiniMap.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\AI-Monitor\QtOutputer.h"
 					>
 				</File>
 				<File
