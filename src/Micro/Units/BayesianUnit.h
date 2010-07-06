@@ -13,6 +13,8 @@
 
 // #define PROBT 1
 
+#define NUMBER_OF_PRIORITY 5
+
 class BayesianUnit;
 typedef boost::shared_ptr<BayesianUnit> pBayesianUnit;
 

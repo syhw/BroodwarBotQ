@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="MicroProject"
 	ProjectGUID="{305604F2-9728-4D61-AC29-4658B31533DF}"
 	RootNamespace="MicroProject"
@@ -114,7 +114,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Intelligence;../src/Utils/Component;../../BWAPI_Beta_2.8/include;../../BWAPI_Beta_2.8/include/BWAPI;../../BWAPI_Beta_2.8/include/BWTA;../../boost_1_43_0;&quot;C:\Program Files\boost\boost_1_42\&quot;;../../probt/include;../../boost_1_42;C:\Qt\4.6.2\include;C:\Qt\4.6.3\include"
+				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ZergFlying;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Intelligence;../src/Utils/Component;../../BWAPI_Beta_2.8/include;../../BWAPI_Beta_2.8/include/BWAPI;../../BWAPI_Beta_2.8/include/BWTA;../../boost_1_43_0;&quot;C:\Program Files\boost\boost_1_42\&quot;;../../probt/include;../../boost_1_42;C:\Qt\4.6.2\include;C:\Qt\4.6.3\include"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
 				RuntimeLibrary="2"
@@ -299,6 +299,18 @@
 					</File>
 					<File
 						RelativePath="..\src\Micro\Units\ProtossSpecial\HighTemplarUnit.cpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="ZergFlying"
+					>
+					<File
+						RelativePath="..\src\Micro\Units\ZergFlying\MutaliskUnit.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ZergFlying\ScourgeUnit.cpp"
 						>
 					</File>
 				</Filter>
@@ -533,6 +545,18 @@
 					</File>
 					<File
 						RelativePath="..\src\Micro\Units\ProtossSpecial\HighTemplarUnit.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="ZergFlying"
+					>
+					<File
+						RelativePath="..\src\Micro\Units\ZergFlying\MutaliskUnit.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ZergFlying\ScourgeUnit.h"
 						>
 					</File>
 				</Filter>

@@ -1,15 +1,15 @@
 #pragma once
 
-#include <GroundUnit.h>
 #include <BWAPI.h>
+#include <FlyingUnit.h>
 
-class ArchonUnit : public GroundUnit
+class ScourgeUnit : public FlyingUnit
 {
 protected:
     static std::list<BWAPI::UnitType> listPriorite;
 public:
-    ArchonUnit(BWAPI::Unit* u, UnitsGroup* ug);
-    ~ArchonUnit();
+    ScourgeUnit(BWAPI::Unit* u, UnitsGroup* ug);
+    ~ScourgeUnit();
     virtual void micro();
     virtual bool canHit(BWAPI::Unit* enemy);
 };
