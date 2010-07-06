@@ -46,10 +46,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::addTabWidget(QWidget* qw)
 {
-            QPushButton hello("Hello world!");
-        hello.resize(100, 30);
-
-        hello.show();
+    QPushButton hello("SIGNAL RECU!");
+    hello.resize(100, 30);
+    hello.show();
 
     menuWidget->ui->tabWidget->addTab(qw, QString("plop"));
     // OR 

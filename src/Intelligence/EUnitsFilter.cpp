@@ -51,8 +51,9 @@ void EUnitsFilter::update(Unit* u)
         eViewedUnits[u] = EViewedUnit(u, timeManager->getElapsedTime());
         //eViewedUnits.insert(make_pair(u, EViewedUnit(u, timeManager->getElapsedTime())));
 #ifdef BW_QT_DEBUG
-    qtOutputer.init();
-    //qtOutputer.output(qw);
+    //qtOutputer.init();
+    QWidget* qw;
+    qtOutputer.output(qw);
 #endif
 }
 
