@@ -92,3 +92,12 @@ return type;
 
 }
 
+BWAPI::Position Goal::firstPosition() const{
+	if(!this->subgoals.empty())
+		return this->subgoals.front()->subgoalPosition();
+	
+	else
+		return BWAPI::Position(0,0);
+
+}
+

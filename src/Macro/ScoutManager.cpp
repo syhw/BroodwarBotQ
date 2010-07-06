@@ -112,37 +112,11 @@ std::list<BWTA::BaseLocation*> ScoutManager::getBestPath( std::set<BWTA::BaseLoc
 	return res;
 }
 
-void ScoutManager::onUnitShow(BWAPI::Unit* unit){
-//TO REMOVE FROM THIS FILE
+pGoal ScoutManager::exploreRegion(BWTA::Region* region){
+/*
 
-//We assume that if the enemy was not spotted and we find a ResourceDepot, then it is the main base : requires fast scout
 
-	/*
-	if(unit->getType().isResourceDepot()){
 	
-		//Find the right base location
-		std::set<BWTA::BaseLocation*> res = BWTA::getStartLocations();
-		for(std::set<BWTA::BaseLocation* >::iterator b = res.begin(); b!= res.end(); ++b){
-			if( (*b)->getTilePosition() == unit->getTilePosition() ){
-				eStartLocation = (*b);
-				break;
-			}
-		}
-		
-		if(eStartLocation == NULL)
-			Broodwar -> printf("eStartLocation is NULL, problem...");
-
-		Broodwar->printf("Enemy main base found, waiting for objectives");
-		BWTA::Region* region = eStartLocation->getRegion();
-
-		exploreRegion(region);
-		
-	}
-	*/
-}
-
-void ScoutManager::exploreRegion(BWTA::Region* region){
-	/*
 	std::list<Position>::iterator pos;
 	BWTA::Polygon polygon = (*region).getPolygon();
 	std::list<Position> to_see;

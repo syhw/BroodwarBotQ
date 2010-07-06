@@ -19,12 +19,11 @@ class ScoutManager :  public CSingleton<ScoutManager>
 {
 	friend class CSingleton<ScoutManager>;
 
-	private:
+private:
 		ScoutManager();
 		~ScoutManager();
-  public:
+ public:
     virtual void update();
-
     virtual std::string getName() const;
 		// Goals // Just ideas, not yet implemented
 		void scoutAllEnemies();
@@ -34,13 +33,11 @@ class ScoutManager :  public CSingleton<ScoutManager>
 		void checkEmptyXP();
 
 	Regions* regions;
-   
 	//TODO positionsToSurvey; // to refresh infos about enemy bases: lord(zerg), scan/vessel?(terran), obs(toss)
-	void onUnitShow(BWAPI::Unit* unit);//New
 	void onUnitCreate(BWAPI::Unit* unit);//New 
 	void findEnemy();//New
 	std::list<BWTA::BaseLocation*> getBestPath( std::set<BWTA::BaseLocation* > baseLocations, BWTA::BaseLocation* myStartLocation) const;//New
-	void exploreRegion(BWTA::Region* region);//New
+	pGoal exploreRegion(BWTA::Region* region);//New
 	int newGoal() const ;//New   Return the number of new goals
 	pGoal getGoal();//New Return the first element in the goal list
 private:

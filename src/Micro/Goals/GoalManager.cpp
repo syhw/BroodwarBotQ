@@ -13,22 +13,47 @@ void GoalManager::newGoal(pGoal p){
 }
 
 void GoalManager::findUnitsGroup(pGoal goal){
-	//TODO
-	//For the moment take a worker for scout goals
-	//And create the units group
-
-
 	if(goal->getType()==GT_SCOUT){
 		//Select a worker
 		UnitsGroup* ug;	
 		
-		for each(Unit* u in Broodwar->getAllUnits()){
-			if (u->getPlayer()==Broodwar->self()&&u->getType().isWorker()&& !(u->isConstructing())){
-			ug = new UnitsGroup();
-			ug->takeControl(u);
-			break;
+		for(std::map<UnitsGroup *, std::list<pGoal>>::iterator it_ug = this->attributedGoals.begin(); it_ug != attributedGoals.end(); ++it_ug){
+			//Check over all the already created unitsGroup which one is near the first subgoal to accomplish
+			//TODO
+		}
+
+		/*if (ug ==NULL){
+			//NO unitsgroup already found, must create a new one
+			BWAPI::Position p = goal->firstPosition();
+			Unit * unitToTake;
+			double minDist=9999;
+			double curDist=0;
+			for each(Unit* u in Broodwar->getAllUnits()){
+				if (u->getPlayer()==Broodwar->self()&&u->getType().isWorker()&& !(u->isConstructing())){
+					curDist=p.getDistance(u->getPosition());
+					if(curDist<minDist){
+						unitToTake = u;
+						minDist=curDist;
+					}
+				}
+
+			}
+			//if(unitToTake != NULL){ // TOCHECK (DEF PROG)
+				ug = new UnitsGroup();
+			
+				ug->takeControl(unitToTake);
+			//}
+		}*/
+		if (ug ==NULL){
+			for each(Unit* u in Broodwar->getAllUnits()){
+				if (u->getPlayer()==Broodwar->self()&&u->getType().isWorker()&& !(u->isConstructing())){
+					ug = new UnitsGroup();
+					ug->takeControl(u);
+					break;
+				}
 			}
 		}
+
 		if (ug != NULL){
 			//Check if the unitsGroup is not empty else Segfault ?
 			if (ug->getUnits()->size() != 0) {
@@ -38,7 +63,8 @@ void GoalManager::findUnitsGroup(pGoal goal){
 				microManager->unitsgroups.push_back(ug);
 			//	Broodwar->printf("Unit found, goal attributed");
 			}else{
-				//Broodwar->printf("Could not find an appropriate unit for this scout goal");
+				Broodwar->printf("Could not find an appropriate unit for this scout goal");
+				Broodwar->printf("Problem...");
 			}
 
 		}

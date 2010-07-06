@@ -27,7 +27,6 @@
 using namespace BWAPI;
 
 UnitsGroup::UnitsGroup()
-:lastGoal(boost::shared_ptr<Goal>())
 {
 	goalManager = & GoalManager::Instance();
 }
@@ -341,22 +340,17 @@ void UnitsGroup::formation(pFormation f)
 void UnitsGroup::setGoals(std::list<pGoal>& goals)
 {
     this->goals = goals;
-    if (lastGoal == boost::shared_ptr<Goal>()) lastGoal = goals.front();
-    this->goals.front()->achieve(this);
+	if(!this->goals.empty())
+		this->goals.front()->achieve(this);
 }
 
 void UnitsGroup::addGoal(pGoal goal)
 {
     this->goals.push_back(goal);
-    if (lastGoal == boost::shared_ptr<Goal>()) lastGoal = goal;
     if (goals.size() == 1 && !this->units.empty())
     this->goals.front()->achieve(this);
 }
 
-const pGoal UnitsGroup::getLastGoal() const
-{
-    return lastGoal;
-}
 
 void UnitsGroup::onUnitDestroy(Unit* u)
 {
@@ -422,8 +416,10 @@ void UnitsGroup::takeControl(Unit* u)
 
     if (tmp != NULL)
         this->units.push_back(tmp);
-	if(this->lastGoal != boost::shared_ptr<Goal>()){
-		lastGoal->achieve(this);
+	if(this->goals.size()==1){
+		if(this->goals.front()->getStatus()==GS_ACHIEVED){
+			goals.front()->achieve(this);
+		}
 	}
 }
 
@@ -607,35 +603,4 @@ void UnitsGroup::accomplishGoal(){
 			}
 		}
 	}
-
-
-		/*
-		
-		if (goals.front()->getStatus() == GS_ACHIEVED) {
-			//The first goal of the list is accomplished
-			lastGoal = goals.front();
-			
-			goalManager->goalDone(this, goals.front());
-
-			goals.pop_front();
-			
-			if (!goals.empty()){
-				lastGoal=goals.front();
-				goals.front()->achieve(this);
-			} else{
-				//The unitsgroup has no more goals
-				//must idle
-				for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); it++)
-					(*it)->unit->stop();
-
-			}
-			
-		} else {
-			goals.front()->achieve(this);
-		}
-        //debug_goals(goals);
-		
-	//Broodwar->printf("%s",goals.front()->purpose);
-	
-	}*/
 }
