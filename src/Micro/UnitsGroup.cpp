@@ -188,20 +188,6 @@ void UnitsGroup::update()
     updateCenter();
 
     keepDistance(); // Temporary call to test micro tech
-
-    if (!goals.empty())
-    {
-        if (goals.front()->status == GS_ACHIEVED) 
-        {
-            if (goals.size() == 1) lastGoal = goals.front();
-            goals.pop_front();
-            if (!goals.empty()) goals.front()->achieve(this);
-        }
-        else
-        {
-            goals.front()->checkAchievement(this);
-        }
-    }
 //////////////// TEST
 /*
     // On récupère tous les ennemis.
@@ -229,7 +215,7 @@ void UnitsGroup::update()
         }
     }*/
     //////////////// END TEST 
-
+/*
 
     // On récupère tous les ennemis.
     std::set<Unit*> enemies;
@@ -242,7 +228,7 @@ void UnitsGroup::update()
     for each(pBayesianUnit u in units)
         if(u->unit->getGroundWeaponCooldown() == 0)
             unitsAvailables.push_back(u);
-    //accomplishGoal();
+    accomplishGoal();
 
 
     // On récupère tous les ennemis à portée de l'unitsGroup
@@ -295,7 +281,7 @@ void UnitsGroup::update()
             BWAPI::Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Orange);
         }
     }
-    
+    */
     // for each(pBayesianUnit u in units)
     //     u->micro();
 }
@@ -475,11 +461,6 @@ void UnitsGroup::keepDistance()
         if (itUnit->timeIdle > 75)
         {
             itUnit->timeIdle = -1;
-			if (!goals.empty()){
-				if(goals.front()->getType()!=GT_SCOUT){
-				  itUnit->attackMove(goals.front()->getFormation()->center.toPosition());
-				}
-			}
         }
 
         if (enemies.empty()) continue;

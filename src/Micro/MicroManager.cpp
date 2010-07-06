@@ -57,7 +57,7 @@ void MicroManager::update()
 
 
 void MicroManager::onOffer(std::set<BWAPI::Unit*> units)
-{/* //TOREMOVE
+{ //TOREMOVE
 	for(std::set<BWAPI::Unit*>::iterator u = units.begin(); u != units.end(); u++)
 	{
 		if (!(*u)->getType().isWorker() && !(*u)->getType().isBuilding())
@@ -70,7 +70,7 @@ void MicroManager::onOffer(std::set<BWAPI::Unit*> units)
 				sendGroupToDefense (ug);
 			}
 			
-			//unitsgroups.back()->takeControl(*u);
+			unitsgroups.back()->takeControl(*u);
 			//Broodwar->printf("New %s added to the micro manager", (*u)->getType().getName().c_str());
 		}
 		else
@@ -78,7 +78,7 @@ void MicroManager::onOffer(std::set<BWAPI::Unit*> units)
 			arbitrator->decline(this, *u, 0);
 		}
 	}
-	*/
+	
 }
 
 void MicroManager::onRevoke(BWAPI::Unit* unit, double bid)
