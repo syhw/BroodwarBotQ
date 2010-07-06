@@ -28,8 +28,9 @@ type(GT_UNDEFINED)
 void Goal::achieve(UnitsGroup* ug)
 {
 	checkAchievement(ug);
+			//TOIMPROVE
 	if(this->status!=GS_ACHIEVED){
-		//TOIMPROVE
+
 		pSubgoal sub;
 
 		//Select first subgoal not accomplished
@@ -40,14 +41,10 @@ void Goal::achieve(UnitsGroup* ug)
 					ug->move(sub->subgoalPosition());//TOCHANGE ACCORDING TO SUBGOAL TYPE
 				}else{
 					ug->attackMove(sub->subgoalPosition());
-				}
-
-
-				
+				}				
 				break;
 			}
 		}
-
 
 	}
 
@@ -56,6 +53,7 @@ void Goal::achieve(UnitsGroup* ug)
 void Goal::checkAchievement(UnitsGroup* ug)
 {
 		bool ach=true;
+		
 		for each (pSubgoal p in subgoals){
 			
 			if(!p->isRealized()){
@@ -65,7 +63,7 @@ void Goal::checkAchievement(UnitsGroup* ug)
 		}
 		if (ach==true){
 			this->status = GS_ACHIEVED;
-			//BWAPI::Broodwar->printf("Goal achieved");
+			
 		}
 	
 }
@@ -91,6 +89,15 @@ void Goal::setStatus(GoalStatus s) {
 
 GoalType Goal::getType() const{
 return type;
+
+}
+
+BWAPI::Position Goal::firstPosition() const{
+	if(!this->subgoals.empty())
+		return this->subgoals.front()->subgoalPosition();
+	
+	else
+		return BWAPI::Position(0,0);
 
 }
 

@@ -25,13 +25,16 @@ struct i_dist
 	//bool operator<(i_dist& ext) { return (ext.dist < dist); }
 };
 
+typedef struct __enemy
+{
+    BWAPI::Unit* self;
+    int damageTaken;
+} cEnemy;
+
+
 class UnitsGroup
 {
 private:
-	pGoal lastGoal; // the last goal is copied from the last executed goal in 'goals' and is keep to give order to new units added to a group (to avoid empty 'goals' for new units).
-	//No longer used theorically
-
-
 	int totalHP;
 	int totalPower;
     BWAPI::Position center;
@@ -60,7 +63,7 @@ public:
 	virtual void formation(pFormation f);
 	virtual void setGoals(std::list<pGoal>& goals);
 	virtual void addGoal(pGoal goal);
-	virtual const pGoal getLastGoal() const;
+	
 	//virtual bool checkInFormation();
 	//virtual bool checkAtDestination();
 	virtual void updateCenter();

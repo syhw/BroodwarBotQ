@@ -1,5 +1,6 @@
 #include "MicroProject.h"
 #include "Goal.h"
+#include <AttackGoal.h>
 #include "DefendGoal.h"
 #include <stdio.h>
 using namespace BWAPI;
@@ -72,8 +73,11 @@ void MicroAIModule::onStart()
 		if (!((*l) == mp))
 			p = BWAPI::Position(*l);
 	}
+    pFormation form = pFormation(new LineFormation(Position(22*32,37*32), Vec(1,0)));
+    pGoal gl = pGoal(new Goal(GT_ATTACK));
+    gl->setFormation(form);
+	goals.push_back(gl);
 
-	//goals.push_back(pGoal(new Goal("formation line x+400", pFormation(new LineFormation(Vec(20*32, 36*32), Vec(1, 0))))));
 	//goals.push_back(Formation(0,1,Position(400,0)));
 	//goals.push_back(Goal("attack move right !!!!!!!", Position(1999,1000)));
 	//goals->push_back(new Goal("attack move just there", Position(500,1300)));
@@ -93,7 +97,8 @@ void MicroAIModule::onFrame()
         Broodwar->printf("Qt not connected\n");
 #endif
     ObjectManager::updateOM();
-	if (mm != NULL) mm->update();
+	if (mm != NULL) 
+        mm->update();
     regions->update();
     regions->display();
 	/*if (Broodwar->getFrameCount()%300==0)

@@ -64,6 +64,9 @@ public:
 	GoalStatus getStatus() const;
 	void setStatus(GoalStatus s);
 	GoalType getType() const;
+
+	//Special function
+	BWAPI::Position firstPosition() const; //Return the position of its first subgoal
 };
 
 #endif 

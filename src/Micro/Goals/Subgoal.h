@@ -18,8 +18,9 @@ typedef enum
 
 typedef enum
 {
-	SC_ACTIVE = 0,//The subgoal must be valid all along the accomplishment
-	SC_ONCE   = 1 //The subgoal must ve validated once to accomplish the goal
+	SC_ONCE   = 0, //The subgoal must ve validated once to accomplish the goal
+	SC_ACTIVE = 1//The subgoal must be valid all along the accomplishment
+	
  	
 } SubgoalCondition;
 

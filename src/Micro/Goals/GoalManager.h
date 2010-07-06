@@ -19,7 +19,7 @@ private:
 public:
 	GoalManager();
 	~GoalManager();
-	void newGoal(pGoal p);
+	void newGoal(pGoal p); //To call when new goal to attribute
 	void insert(UnitsGroup * ug, pGoal g);
 	bool remove(UnitsGroup * ug, pGoal g);//Return true if the deletion is accomplished, false in the other case
 	bool clean(UnitsGroup * ug); //Remove the pair that uses this ug as key in attributedGoals

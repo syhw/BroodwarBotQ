@@ -466,7 +466,6 @@ void BattleBroodAI::onUnitDestroy(BWAPI::Unit* unit)
     this->macroManager->onUnitDestroy( unit);
     this->microManager->onUnitDestroy(unit);
     this->regions->onUnitDestroy(unit);
-    this->scoutManager->onUnitDestroy(unit);
     this->techManager->onUnitDestroy(unit);
     this->upgradeManager->onUnitDestroy(unit);
     this->workerManager->onUnitDestroy(unit);

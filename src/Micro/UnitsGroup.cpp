@@ -27,7 +27,6 @@
 using namespace BWAPI;
 
 UnitsGroup::UnitsGroup()
-:lastGoal(boost::shared_ptr<Goal>())
 {
 	goalManager = & GoalManager::Instance();
 }
@@ -176,104 +175,65 @@ Unit* UnitsGroup::findWeakestEnemy(std::set<Unit*> enemies_in_range)
 
 void UnitsGroup::update()
 {
+    std::list<pBayesianUnit> unitsAvailables;
+    std::map<int, cEnemy> enemiesInRange;
     this->totalHP = 0;
+
+    // On récupère tous les ennemis.
+    std::set<Unit*> enemies;
+    {
+        std::set<BWAPI::Player*>::iterator iter = Broodwar->getPlayers().begin();
+        for(;iter != Broodwar->getPlayers().end() && !(*iter)->isEnemy(Broodwar->self());iter++);
+        enemies = (*iter)->getUnits();
+    }
 
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     {
         (*it)->update();
         this->totalHP += (*it)->unit->getHitPoints();
         this->totalPower += (*it)->unit->getType().groundWeapon().damageAmount();
+
+        // On récupère toutes les unités qui sont en capacités de sélectionner une nouvelle cible
+        if((*it)->unit->getGroundWeaponCooldown() == 8)
+            unitsAvailables.push_back(*it);
+
+        // On récupère tous les ennemis à portée de l'UnitsGroup, et ils sont triés par ordre croissant de HP/SP
+        for each(Unit* v in enemies)
+        {
+            if ((*it)->canHit(v))
+            {
+                // Si l'unité u est en train d'attaquer l'unité v, alors damageTaken = u->damagesOn(v), sinon 0
+                int damageDoneByUnit =  (*it)->unit->getOrderTarget() == v && ((*it)->unit->isStartingAttack() || (*it)->unit->isAttacking())  ? (*it)->damagesOn(v) : 0;
+
+                // Si l'unité v n'existe pas dans enemiesInRange, alors je la crée et je la rajoute
+                if (enemiesInRange.count(v->getHitPoints()+v->getShields()) == 0) 
+                {                                     
+                    cEnemy temp = {v, damageDoneByUnit};                    
+                    enemiesInRange.insert(std::pair<int, cEnemy>(v->getHitPoints()+v->getShields(), temp));
+                }
+                else // Sinon je rajoute les dégâts à ses damageTaken
+                {
+                    enemiesInRange[v->getHitPoints()+v->getShields()].damageTaken += damageDoneByUnit;
+                }
+            }
+        }
     }
 
     updateCenter();
 
     keepDistance(); // Temporary call to test micro tech
 
-    if (!goals.empty())
-    {
-        if (goals.front()->getStatus() == GS_ACHIEVED) 
-        {
-            if (goals.size() == 1) lastGoal = goals.front();
-            goals.pop_front();
-            if (!goals.empty()) goals.front()->achieve(this);
-        }
-        else
-        {
-            goals.front()->checkAchievement(this);
-        }
-    }
-//////////////// TEST
-/*
-    // On récupère tous les ennemis.
-    std::set<Unit*> allies;
-    std::set<Unit*> enemies;
-    for each(Unit* v in Broodwar->getAllUnits())
-    {
-        if (Broodwar->self()->isEnemy(v->getPlayer()))
-            enemies.insert(v);
-        else if (!Broodwar->self()->isEnemy(v->getPlayer()))
-            allies.insert(v);
-    }
-    static int test = 0;
-    for each(Unit* v in allies)
-    {
-        if(test < 40)
-        {
-            if (v->getOrderTarget() == NULL)
-                v->rightClick(*(enemies.begin()));
-            test++;
-        }
-        else if (v->getGroundWeaponCooldown() == 0 && !enemies.empty())
-        {
-            v->rightClick(*(enemies.begin()));
-        }
-    }*/
-    //////////////// END TEST 
+	this->accomplishGoal();
 
-
-    // On récupère tous les ennemis.
-    std::set<Unit*> enemies;
-    for each(Unit* v in Broodwar->getAllUnits())
-        if (Broodwar->self()->isEnemy(v->getPlayer()))
-            enemies.insert(v);
-
-    // On récupère toutes les unités qui sont en capacités de sélectionner une nouvelle cible
-    std::list<pBayesianUnit> unitsAvailables;
-    for each(pBayesianUnit u in units)
-        if(u->unit->getGroundWeaponCooldown() == 0)
-            unitsAvailables.push_back(u);
-    //accomplishGoal();
-
-
-    // On récupère tous les ennemis à portée de l'unitsGroup
-    std::map<BWAPI::Unit*, int> enemiesInRange;
-    for each(pBayesianUnit u in units)
-    {
-        for each(Unit* v in enemies)
-        {
-            if (u->canHit(v))
-            {
-                if (enemiesInRange.count(v) == 0) 
-                {
-                    enemiesInRange.insert(std::pair<Unit*, int>(v, (u->unit->getOrderTarget() == v && (u->unit->isStartingAttack() || u->unit->isAttacking()) ? u->damagesOn(v) : 0)));
-                }
-                else
-                {
-
-                    enemiesInRange[v] += (u->unit->getOrderTarget() == v && (u->unit->isStartingAttack() || u->unit->isAttacking()) ? u->damagesOn(v) : 0);
-                }
-            }
-        }
-    }
-
-    for each(std::pair<Unit*, int> eUnit in enemiesInRange)
+    // On assigne des cibles aux unités du UnitsGroup qui sont en capacités de sélectionner une nouvelle cible
+    for each(std::pair<int, cEnemy> eUnit in enemiesInRange)
     {
         for (std::list<pBayesianUnit>::iterator iter = unitsAvailables.begin(); iter != unitsAvailables.end();)
         {
-            if (eUnit.second < (eUnit.first->getHitPoints() + eUnit.first->getShields()) && (*iter)->canHit(eUnit.first))
+            if (eUnit.second.damageTaken < eUnit.first && (*iter)->canHit(eUnit.second.self))
             {
-                (*iter)->attackEnemy(eUnit.first, Colors::Red);
-                eUnit.second += (*iter)->damagesOn(eUnit.first);
+                (*iter)->attackEnemy(eUnit.second.self, Colors::Red);
+                eUnit.second.damageTaken += (*iter)->damagesOn(eUnit.second.self);
                 std::list<pBayesianUnit>::iterator tmp = iter;
                 ++iter;
                 unitsAvailables.erase(tmp);
@@ -282,10 +242,10 @@ void UnitsGroup::update()
             {
                 ++iter;
             }
-
         }
     }
 
+    // On affiche les cibles des unités du UnitsGroup
     for each(pBayesianUnit u in units)
     {
         if (u->unit->getOrderTarget())
@@ -352,22 +312,17 @@ void UnitsGroup::formation(pFormation f)
 void UnitsGroup::setGoals(std::list<pGoal>& goals)
 {
     this->goals = goals;
-    if (lastGoal == boost::shared_ptr<Goal>()) lastGoal = goals.front();
-    this->goals.front()->achieve(this);
+	if(!this->goals.empty())
+		this->goals.front()->achieve(this);
 }
 
 void UnitsGroup::addGoal(pGoal goal)
 {
     this->goals.push_back(goal);
-    if (lastGoal == boost::shared_ptr<Goal>()) lastGoal = goal;
     if (goals.size() == 1 && !this->units.empty())
     this->goals.front()->achieve(this);
 }
 
-const pGoal UnitsGroup::getLastGoal() const
-{
-    return lastGoal;
-}
 
 void UnitsGroup::onUnitDestroy(Unit* u)
 {
@@ -433,8 +388,10 @@ void UnitsGroup::takeControl(Unit* u)
 
     if (tmp != NULL)
         this->units.push_back(tmp);
-	if(this->lastGoal != boost::shared_ptr<Goal>()){
-		lastGoal->achieve(this);
+	if(this->goals.size()==1){
+		if(this->goals.front()->getStatus()==GS_ACHIEVED){
+			goals.front()->achieve(this);
+		}
 	}
 }
 
@@ -475,11 +432,6 @@ void UnitsGroup::keepDistance()
         if (itUnit->timeIdle > 75)
         {
             itUnit->timeIdle = -1;
-			if (!goals.empty()){
-				if(goals.front()->getType()!=GT_SCOUT){
-				  itUnit->attackMove(goals.front()->getFormation()->center.toPosition());
-				}
-			}
         }
 
         if (enemies.empty()) continue;
@@ -618,35 +570,4 @@ void UnitsGroup::accomplishGoal(){
 			}
 		}
 	}
-
-
-		/*
-		
-		if (goals.front()->getStatus() == GS_ACHIEVED) {
-			//The first goal of the list is accomplished
-			lastGoal = goals.front();
-			
-			goalManager->goalDone(this, goals.front());
-
-			goals.pop_front();
-			
-			if (!goals.empty()){
-				lastGoal=goals.front();
-				goals.front()->achieve(this);
-			} else{
-				//The unitsgroup has no more goals
-				//must idle
-				for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); it++)
-					(*it)->unit->stop();
-
-			}
-			
-		} else {
-			goals.front()->achieve(this);
-		}
-        //debug_goals(goals);
-		
-	//Broodwar->printf("%s",goals.front()->purpose);
-	
-	}*/
 }

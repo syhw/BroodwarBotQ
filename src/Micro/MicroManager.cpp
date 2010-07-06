@@ -37,27 +37,12 @@ void MicroManager::update()
 	{
 		 ug = *it;
 		 ug->update();
-
-		//if (ug->emptyGoals())
-		//{
-		//	if (ug->getLastGoal()->type == GT_ATTACK_BASE)
-		//		sendGroupToAttack( ug);
-
-		//	if (ug->getLastGoal()->type == GT_DEFEND_BASE && ug->getNbUnits() > 9)
-		//	{
-		//		sendGroupToAttack (ug);
-				// Create a new defense group.
-		//		UnitsGroup* ug2 = new UnitsGroup();
-		//		unitsgroups.push_back( ug2);
-		//		sendGroupToDefense (ug2);
-		//	}
-		//}
 	}
 }
 
 
 void MicroManager::onOffer(std::set<BWAPI::Unit*> units)
-{/* //TOREMOVE
+{ //TOREMOVE
 	for(std::set<BWAPI::Unit*>::iterator u = units.begin(); u != units.end(); u++)
 	{
 		if (!(*u)->getType().isWorker() && !(*u)->getType().isBuilding())
@@ -70,7 +55,7 @@ void MicroManager::onOffer(std::set<BWAPI::Unit*> units)
 				sendGroupToDefense (ug);
 			}
 			
-			//unitsgroups.back()->takeControl(*u);
+			unitsgroups.back()->takeControl(*u);
 			//Broodwar->printf("New %s added to the micro manager", (*u)->getType().getName().c_str());
 		}
 		else
@@ -78,7 +63,7 @@ void MicroManager::onOffer(std::set<BWAPI::Unit*> units)
 			arbitrator->decline(this, *u, 0);
 		}
 	}
-	*/
+	
 }
 
 void MicroManager::onRevoke(BWAPI::Unit* unit, double bid)
