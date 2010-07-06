@@ -189,19 +189,8 @@ void UnitsGroup::update()
 
     keepDistance(); // Temporary call to test micro tech
 
-    if (!goals.empty())
-    {
-        if (goals.front()->getStatus() == GS_ACHIEVED) 
-        {
-            if (goals.size() == 1) lastGoal = goals.front();
-            goals.pop_front();
-            if (!goals.empty()) goals.front()->achieve(this);
-        }
-        else
-        {
-            goals.front()->checkAchievement(this);
-        }
-    }
+	this->accomplishGoal();
+   
 //////////////// TEST
 /*
     // On récupère tous les ennemis.

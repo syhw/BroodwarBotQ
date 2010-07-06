@@ -3,7 +3,7 @@
 
 class EStrat : public CSingleton<EStrat>
 {
-	friend class CSingleton<EEcoEstimator>;
+	friend class CSingleton<EStrat>;
 
 public :
 	int probability_of_rush();

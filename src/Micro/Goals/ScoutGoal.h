@@ -11,6 +11,6 @@ public:
 	ScoutGoal();
 	virtual ~ScoutGoal();
 
-//	virtual void achieve(UnitsGroup* ug);
+
 	virtual void checkAchievement(UnitsGroup* ug);
 };

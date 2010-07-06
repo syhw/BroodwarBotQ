@@ -28,8 +28,9 @@ type(GT_UNDEFINED)
 void Goal::achieve(UnitsGroup* ug)
 {
 	checkAchievement(ug);
+			//TOIMPROVE
 	if(this->status!=GS_ACHIEVED){
-		//TOIMPROVE
+
 		pSubgoal sub;
 
 		//Select first subgoal not accomplished
@@ -40,10 +41,7 @@ void Goal::achieve(UnitsGroup* ug)
 					ug->move(sub->subgoalPosition());//TOCHANGE ACCORDING TO SUBGOAL TYPE
 				}else{
 					ug->attackMove(sub->subgoalPosition());
-				}
-
-
-				
+				}				
 				break;
 			}
 		}

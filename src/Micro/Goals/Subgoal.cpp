@@ -50,6 +50,7 @@ bool Subgoal::check(){
 		//TODO	
 		return false;
 	}else if (type==ST_VIEW){
+		
 		return Broodwar->isVisible(pos.x()/32,pos.y()/32);
 	}
 	return true;
