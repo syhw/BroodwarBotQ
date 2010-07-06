@@ -25,6 +25,13 @@ struct i_dist
 	//bool operator<(i_dist& ext) { return (ext.dist < dist); }
 };
 
+typedef struct __enemy
+{
+    BWAPI::Unit* self;
+    int damageTaken;
+} cEnemy;
+
+
 class UnitsGroup
 {
 private:

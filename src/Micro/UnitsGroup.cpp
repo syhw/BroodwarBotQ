@@ -200,22 +200,17 @@ void UnitsGroup::update()
         else if (!Broodwar->self()->isEnemy(v->getPlayer()))
             allies.insert(v);
     }
-    static int test = 0;
     for each(Unit* v in allies)
     {
-        if(test < 40)
+        if (!v->isStartingAttack() == 0 && !enemies.empty() && v->getOrderTarget() == NULL)
         {
-            if (v->getOrderTarget() == NULL)
-                v->rightClick(*(enemies.begin()));
-            test++;
-        }
-        else if (v->getGroundWeaponCooldown() == 0 && !enemies.empty())
-        {
-            v->rightClick(*(enemies.begin()));
+            Broodwar->printf("TEST");
+            v->attackUnit(*(enemies.begin()));
+           // v->attackUnit
         }
     }*/
     //////////////// END TEST 
-/*
+
 
     // On récupère tous les ennemis.
     std::set<Unit*> enemies;
@@ -226,40 +221,42 @@ void UnitsGroup::update()
     // On récupère toutes les unités qui sont en capacités de sélectionner une nouvelle cible
     std::list<pBayesianUnit> unitsAvailables;
     for each(pBayesianUnit u in units)
-        if(u->unit->getGroundWeaponCooldown() == 0)
+        if(u->unit->getGroundWeaponCooldown() == 10)
             unitsAvailables.push_back(u);
+
     accomplishGoal();
 
-
-    // On récupère tous les ennemis à portée de l'unitsGroup
-    std::map<BWAPI::Unit*, int> enemiesInRange;
+    // On récupère tous les ennemis à portée de l'UnitsGroup, et ils sont triés par ordre croissant de HP/SP
+    std::map<int, cEnemy> enemiesInRange;
     for each(pBayesianUnit u in units)
     {
         for each(Unit* v in enemies)
         {
             if (u->canHit(v))
             {
-                if (enemiesInRange.count(v) == 0) 
+                if (enemiesInRange.count(v->getHitPoints()+v->getShields()) == 0) 
                 {
-                    enemiesInRange.insert(std::pair<Unit*, int>(v, (u->unit->getOrderTarget() == v && (u->unit->isStartingAttack() || u->unit->isAttacking()) ? u->damagesOn(v) : 0)));
+                    cEnemy temp = {v, (u->unit->getOrderTarget() == v && (u->unit->isStartingAttack() || u->unit->isAttacking()) 
+                                        ? u->damagesOn(v) : 0 )};
+                    
+                    enemiesInRange.insert(std::pair<int, cEnemy>(v->getHitPoints()+v->getShields(), temp));
                 }
                 else
                 {
-
-                    enemiesInRange[v] += (u->unit->getOrderTarget() == v && (u->unit->isStartingAttack() || u->unit->isAttacking()) ? u->damagesOn(v) : 0);
+                    enemiesInRange[v->getHitPoints()+v->getShields()].damageTaken += (u->unit->getOrderTarget() == v && (u->unit->isStartingAttack() || u->unit->isAttacking()) ? u->damagesOn(v) : 0);
                 }
             }
         }
     }
 
-    for each(std::pair<Unit*, int> eUnit in enemiesInRange)
+    for each(std::pair<int, cEnemy> eUnit in enemiesInRange)
     {
         for (std::list<pBayesianUnit>::iterator iter = unitsAvailables.begin(); iter != unitsAvailables.end();)
         {
-            if (eUnit.second < (eUnit.first->getHitPoints() + eUnit.first->getShields()) && (*iter)->canHit(eUnit.first))
+            if (eUnit.second.damageTaken < eUnit.first && (*iter)->canHit(eUnit.second.self))
             {
-                (*iter)->attackEnemy(eUnit.first, Colors::Red);
-                eUnit.second += (*iter)->damagesOn(eUnit.first);
+                (*iter)->attackEnemy(eUnit.second.self, Colors::Red);
+                eUnit.second.damageTaken += (*iter)->damagesOn(eUnit.second.self);
                 std::list<pBayesianUnit>::iterator tmp = iter;
                 ++iter;
                 unitsAvailables.erase(tmp);
@@ -281,7 +278,7 @@ void UnitsGroup::update()
             BWAPI::Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Orange);
         }
     }
-    */
+    
     // for each(pBayesianUnit u in units)
     //     u->micro();
 }
