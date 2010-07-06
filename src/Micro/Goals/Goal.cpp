@@ -48,7 +48,6 @@ void Goal::achieve(UnitsGroup* ug)
 			}
 		}
 
-
 	}
 
 }
@@ -56,6 +55,7 @@ void Goal::achieve(UnitsGroup* ug)
 void Goal::checkAchievement(UnitsGroup* ug)
 {
 		bool ach=true;
+		
 		for each (pSubgoal p in subgoals){
 			
 			if(!p->isRealized()){
@@ -65,7 +65,7 @@ void Goal::checkAchievement(UnitsGroup* ug)
 		}
 		if (ach==true){
 			this->status = GS_ACHIEVED;
-			//BWAPI::Broodwar->printf("Goal achieved");
+			
 		}
 	
 }
