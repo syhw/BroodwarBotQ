@@ -20,13 +20,13 @@ void GoalManager::findUnitsGroup(pGoal goal){
 		for(std::map<UnitsGroup *, std::list<pGoal>>::iterator it_ug = this->attributedGoals.begin(); it_ug != attributedGoals.end(); ++it_ug){
 			//Check over all the already created unitsGroup which one is near the first subgoal to accomplish
 			//TODO
-		}
+		} 
 
-		/*if (ug ==NULL){
+		
 			//NO unitsgroup already found, must create a new one
 			BWAPI::Position p = goal->firstPosition();
 			Unit * unitToTake;
-			double minDist=9999;
+			double minDist=999999;
 			double curDist=0;
 			for each(Unit* u in Broodwar->getAllUnits()){
 				if (u->getPlayer()==Broodwar->self()&&u->getType().isWorker()&& !(u->isConstructing())){
@@ -43,16 +43,8 @@ void GoalManager::findUnitsGroup(pGoal goal){
 			
 				ug->takeControl(unitToTake);
 			//}
-		}*/
-		if (ug ==NULL){
-			for each(Unit* u in Broodwar->getAllUnits()){
-				if (u->getPlayer()==Broodwar->self()&&u->getType().isWorker()&& !(u->isConstructing())){
-					ug = new UnitsGroup();
-					ug->takeControl(u);
-					break;
-				}
-			}
-		}
+		//}
+
 
 		if (ug != NULL){
 			//Check if the unitsGroup is not empty else Segfault ?
