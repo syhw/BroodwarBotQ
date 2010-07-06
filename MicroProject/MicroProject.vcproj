@@ -387,6 +387,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\AI-Monitor\release\moc_QtOutputer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\AI-Monitor\QtOutputer.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Regions\WalkTilePosition.h"
 					>
 				</File>
@@ -630,6 +638,10 @@
 				</File>
 				<File
 					RelativePath="..\src\AI-Monitor\MiniMap.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\AI-Monitor\QtOutputer.h"
 					>
 				</File>
 				<File
