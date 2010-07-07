@@ -3,4 +3,6 @@
   * [Etapes BroodAI](etapes_broodai)
   * [Install](install)
   * [Strategy Manager](stratmanager)
+  * [Goals for unitsgroup](goal)
   * [Wiki Help](help)
+  
