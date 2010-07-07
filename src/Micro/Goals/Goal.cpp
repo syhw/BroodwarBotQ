@@ -10,7 +10,6 @@ Goal::~Goal()
 
 Goal::Goal(GoalType t):
 status(GS_NOT_STARTED),
-formation(pFormation(boost::shared_ptr<Formation>())),
 type(t)
 {
 	
@@ -20,7 +19,6 @@ type(t)
 
 Goal::Goal():
 status(GS_NOT_STARTED),
-formation(pFormation(boost::shared_ptr<Formation>())),
 type(GT_UNDEFINED)
 {
 }
@@ -70,14 +68,6 @@ void Goal::checkAchievement(UnitsGroup* ug)
 
 void Goal::addSubgoal(pSubgoal s){
 	this->subgoals.push_back(s);
-}
-
-void Goal::setFormation(pFormation f){
-formation = f;
-}
-
-pFormation Goal::getFormation() const{
-	return formation;
 }
 
 GoalStatus Goal::getStatus() const{
