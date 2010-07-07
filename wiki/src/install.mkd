@@ -1,0 +1,53 @@
+# This page explains the full setup needed to work on BroodAI
+
+## Prerequisites
+
+### Needed:
+
+ * Windows (XP or Vista)
+ * Visual Studio (Express 2008 at least)
+ * BWAPI library + Chaoslauncher
+ * GIT (version control)
+ * Starcraft: Broodwar (latest patch)
+ * Boost Library (currently 1.42)
+
+### Optional:
+ 
+ * Your favorite editor
+ * Python (for cpplint.py and scrapper scripts)
+ * Qt SDK (for debugger output)
+ * ProBT (not used right now but soon for strategies)
+ * Cygwin
+ * Perl+Pandoc+make (to edit this wiki)
+
+## Walkthrough
+
+ 1. Install VS (>= Express 2008)
+ 2. Install Starcraft: Broodwar and patch
+ 3. Download BWAPI here: <http://code.google.com/bwapi/> and install it all as said in the README (DLLs in /Windows/, injector DLL in chaoslauncher, bwapi-data in Starcraft/)
+ 4. In this folder (where BWAPI is, where you have include/ and lib/ for BWAPI), git clone git+ssh://inrialogin@scm.gforge.inria.fr//gitroot//broodai/broodai.git
+ 5. Open the .sln file of the cloned repository with VS
+ 6. Change the paths of include and linked library files in project properties for both Macro and Micro. If you have the right directory structure BWAPI/broodai/BroodAIProject.sln alongside BWAPI/include/ and BWAPI/lib/ you shouldn't have to change the paths for BWAPI lib.
+ 7. Build all in Release mode 
+ 8. Change your _System_ Path variable in Windows (System Properties $\rightarrow$ Advanced) to contain Qt and stuff, example: `` C:\Python26;C:\nant-0.86-beta1\bin;C:\Program Files\Parallels\Parallels Tools\Applications;%SystemRoot%\system32;%SystemRoot%;%SystemRoot%\System32\Wbem;C:\Program Files\Mercurial;C:\Program Files\Lua\5.1;C:\Program Files\Lua\5.1\clibs;C:\Program Files\TortoiseHg;C:\Program Files\QuickTime\QTSystem\;C:\Program Files\GtkSharp\2.12\bin;C:\Program Files\CMake 2.8\bin;C:\Program Files\TortoiseSVN\bin;C:\Program Files\CGAL-3.6\auxiliary\gmp\lib;C:\CGAL\CGAL-3.6\auxiliary\gmp\lib;C:\Python26\Scripts;C:\Program Files\software.jessies.org\terminator\Resources\terminator\bin\;C:\Qt\4.6.2\bin;C:\Qt\4.6.2\lib ``
+ 9. Launch chaosluncher and click "Config" for the injector, change the path for the one of the DLL you want to use (under broodai/Release/)
+ 10. Launch Starcraft and a corresponding map
+ 11. Profit
+ 
+## To Read
+
+### Beginning:
+
+ * <http://www.spheredev.org/wiki/Git_for_the_lazy>
+ * <http://bitbucket.org/bousket/battlebroodai/wiki/Home>
+
+### To Check Every Day:
+ * <http://eis.ucsc.edu/StarCraftAICompetition>
+ * <http://code.google.com/p/bwapi/>
+ * <http://www.broodwarai.com/forums/index.php?showtopic=659&st=20&start=20>
+
+### To Check Every Week:
+
+ * <http://starcraftai.rabbitx86.net/>
+ * <http://www.broodwarai.com/forums/index.php?showforum=46>
+ 

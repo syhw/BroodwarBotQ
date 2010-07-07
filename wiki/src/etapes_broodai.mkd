@@ -1,0 +1,110 @@
+# Concours et notre approche
+
+## Microgestion mono unit type
+Ici on ne se concentre que sur l'efficacité de la classe BayesianUnit.
+
+## Microgestion groupes
+On se concentre sur l'efficacité de la classe BayesianUnit + cas particulier du médic qui doit être optimisé (communication ou non ?).
+
+## Tech limited full game
+On fait la Tech de Nony, Gate10 Gate15, goons le plus vite possible. Si pas de super résultats, on passe sur le même module que pour Full Game. Attention, dans ce mode on a le "maphack" (full information).
+
+## Full game
+Quelle race pick ? Un Zerg avec une macro de poulpe + tech switches ou un Terran / Protoss intelligent (prévoyant) avec une micro de poulpe ? Pour l'instant Protoss.
+
+# Description de l'archi actuelle
+
+image
+
+## Macro
+On fait simplement des workers en continu et on produit pour avoir les finances proches de 0/0. Avec la creation de supply quand on a besoin de la creation d'unites selon ce que l'on peut et ce que demande le "WarManager". Quand on arrive a saturation, on expand.
+
+## Micro
+Tout est gere par BayesianUnit qui ne fait pour l'instant pas grand chose (flocking + attack move).
+
+# Les questions que l'on se pose
+
+## Strategie
+
+Quelle unit produire ? Quelle tech faire (== quelle unit produire dans longtemps) ?
+
+## Tactique 
+
+Where fight? Where flee? Where to take positions? 
+
+## Sens du jeu
+
+Quand se battre ? Quand fuir ? Ratio eco/prod/tech ? (eco/war + prod/tech ?)
+
+## Microgestion
+
+Who to target? When to move? Where?
+
+# Etape 1 : S'adapter à ce que fait l'ennemi
+
+image
+
+## 1.0 Estimer son Eco (Mineraux/Min et Gaz/Min)
+Zerg:  
+$Nworkers = Nworkers_{minerals} + Nworkers_{gaz} + 1$  
+Protoss:  
+$Nworkers = Nworkers_{minerals} + Nworkers_{gaz}$  
+Terran:  
+$Nworkers = Nworkers_{minerals} + Nworkers_{gaz} + Nworkers_{build}$  
+
+### 1.0.0 Mineraux/Min
+
+Assumer que depuis la 1ère seconde, l'ennemi ne fait que produire des workers en continu => estimation de son nombre de workers. Sans plus d'information, estimer qu'il dispose d'autant de bases que nous et d'autant de geysers de gaz vespene. Faire $Nworkers_{minerals} = Nworkers - Nworkers_{gaz}$ ($- Nworkers_{build}$ pour Terran). Utiliser une courbe $Nworkers_{minerals} / Npatches_{owned} (\Leftrightarrow Mbases)$ pour avoir Min/M (saturation ~ 3 workers / patch). Ré-estimer $Nworkers$, $Nworkers_{minerals}$, $Nworkers_{gaz}$ quand on scout sa base (re-aligner sur ce que l'on voit).
+
+### 1.0.1 Gaz/Min
+Estimer $Nworkers_{gaz}$ et $Ngeysers$ et utiliser une formule. Ré-estimer $Nworkers_{gaz}$ quand on scout sa base.
+
+### 1.0.2 S'adapter
+Si on estime que son Min/M est supérieur au notre, dépenser plus en éco et essayer de harass (il a une meilleure macro et va nous écraser au nombre) et/ou techer.  
+Si on estime que son Gaz/M est supérieur au notre, essayer d'attaquer de suite et de techer (il tech et va faire plus d'unités gaz-heavy que nous).
+
+### 1.0.3 De meilleures interpolations/estimations
+## 1.1 Estimer sa Tech (techtree)
+
+### 1.1.0 Tech tree possibles
+
+Generer les tech tree possibles et les ponderer des probas apprises (par EM ?) sur les replays selon le match-up. Avec ça on doit générer un ordre de priorité de production des unités par tech.
+
+### 1.1.1 Update avec le scout
+
+Les upadater avec ce que l'on voit (en rend certain impossibles et augmente la probas de ceux qui ressemblent, au detriment des autres).  
+Une manière facile: mesurer une distance entre ce qu'il fait et une tech canonique (moyenne extraite des replays). Tech canonique = gaussiennes avec mean/std dev. de ce que l'on a apprit, tech qu'il fait = on y ajoute au fur et à mesure les batiments que l'on voit en les inscrivant à $T<t_{present}$ (moyenne avec estimation ?).
+
+### 1.1.2 Deduction / Adaptation
+
+En deduire les unites possibles / techs possibles, et s'y adater en allant sur les contres. Straight-forward une fois que l'on a ses tech tree les plus probables, on pondère les $CanProduce_{i \in \{unittype\}}$ par les probas des techtree à l'instant présent et on produit les contres (soit en proportion des probas, soit on draw le top3 ou le plus probable).
+
+## 1.2 Estimer son nombre / type d'unit
+
+### 1.2.1 Approche simple de l'estimation de production, par priorité par tech
+
+Soit on choisit un pas de temps différent pour chaque type d'unité, correspondant à la durée de construction, soit on fait plus simple et on prend qqch comme 20 ou 30 sec de pas de temps.  
+Possible manière de traiter le calcul :  
+$i = UnitPriority.pop()$  
+if $CanProduce_i > seuil$:  
+	$Prod_i^{t\rightarrow t+1} = ProdRate_i * NbBatProd_i$  
+	if $Prod_i > CanBuy_i$:  
+		$Prod_i = CanBuy_i$  
+
+### 1.2.2 Réestimer le nombre d'unité qu'il a
+
+La vraie équation:  
+$NbUnit_i^{t+1} = NbUnit_i^{t} + Prod_i^{t \rightarrow t+1} - Lost_i^{t \rightarrow t+1}$  
+Celle que l'on va utiliser:  
+$NbUnit_i^{t+1} = NbUnit_i^{t} + Prod_i^{t \rightarrow t+1}$  
+donc avec $Lost_i^{t \rightarrow t+1}$ compris dans $NbViewedUnit$:  
+$NbUnit_i^{t+1} = NbViewedUnit_i^t + NbHiddenUnit_i^t + Prod_i^{t \rightarrow t+1}$  
+Niveau implémentation, on prend $NbViewedUnit$ dans $EUnitFilter$, qui se charge de garder en tête les unités que l'on a vues, les associer avec celles que l'on revoit, et celles qui meurent. $NbHiddenUnit$ s'estime de moultes manières. La plus simple utilisant $MapViewed_{t-T} =$ "pourcentage pondéré (par sa densité) de la carte vue depuis un certain $T$" et faisant $NbHiddenUnit = NbViewedUnit * (1-MapViewed_{t-T})/{MapViewed_{t-T}$. Attention à ne pas compter $Prod$ quand on est dans la base ennemie (ou même que l'on voit les batiments de prod).
+
+### 1.2.3 Adaptation: calculer le rapport de force et produire en conséquence
+
+
+# Etape 2
+## 2.0
+## 2.1
+## 2.2

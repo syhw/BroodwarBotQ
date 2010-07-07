@@ -1,0 +1,17 @@
+# StratManager
+
+## Needs
+
+* Intelligence
+	+ EUnitsFilter
+	+ ETechEstimator
+	+ EProdEstimator
+* Inference
+	+ FightsSimulator
+
+## Outputs
+
+* WantedUnits
+* ExpandGoal
+* DefendGoal
+* AttackGoal
