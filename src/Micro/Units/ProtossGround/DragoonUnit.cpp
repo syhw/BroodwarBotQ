@@ -5,14 +5,14 @@
 using namespace std;
 using namespace BWAPI;
 
+BWAPI::UnitType DragoonUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes::Protoss_High_Templar,
+                                                                BWAPI::UnitTypes::Protoss_Dragoon,
+                                                                BWAPI::UnitTypes::Protoss_Reaver,
+                                                                BWAPI::UnitTypes::Protoss_Zealot,
+                                                                BWAPI::UnitTypes::Protoss_Probe};
+
 DragoonUnit::DragoonUnit(BWAPI::Unit* u, UnitsGroup* ug):GroundUnit(u, ug)
 {
-    BWAPI::UnitType myPrio[] = {BWAPI::UnitTypes::Protoss_High_Templar,
-                                BWAPI::UnitTypes::Protoss_Dragoon,
-                                BWAPI::UnitTypes::Protoss_Reaver,
-                                BWAPI::UnitTypes::Protoss_Zealot,
-                                BWAPI::UnitTypes::Protoss_Probe};
-    listPriorite = list<BWAPI::UnitType>(myPrio, myPrio + sizeof(myPrio) / sizeof(BWAPI::UnitType) );
 }
 
 DragoonUnit::~DragoonUnit()
@@ -89,11 +89,6 @@ void DragoonUnit::dragoonIA(std::set<Unit*> enemies, double maxRangeGoonEnemy)
             }
         }
     }
-}
-
-const std::list<BWAPI::UnitType> DragoonUnit::getListePrio() const
-{
-    return listPriorite;
 }
 
 bool DragoonUnit::canHit(Unit* enemy)

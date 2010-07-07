@@ -6,11 +6,10 @@
 class CorsairUnit : public FlyingUnit
 {
 protected:
-    std::list<BWAPI::UnitType> listPriorite;
+    static std::list<BWAPI::UnitType> listPriorite;
 public:
     CorsairUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~CorsairUnit();
     virtual void micro();
-    virtual const std::list<BWAPI::UnitType> getListePrio() const;
     virtual bool canHit(BWAPI::Unit* enemy);
 };

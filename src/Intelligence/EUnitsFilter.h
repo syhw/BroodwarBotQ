@@ -10,10 +10,14 @@
 #include <utility>
 #include "Data.h"
 
-class EUnitsFilter : public CSingleton<EUnitsFilter>, public BaseObject
+#ifdef BW_QT_DEBUG
+#include "QtOutputer.h"
+#endif
+
+class EUnitsFilter : public CSingleton<EUnitsFilter> 
 {
     TimeManager* timeManager;
-    Data<std::map<BWAPI::Unit*, EViewedUnit> > eViewedUnits;
+    std::map<BWAPI::Unit*, EViewedUnit> eViewedUnits;
 public:
     EUnitsFilter();
     ~EUnitsFilter() { }
@@ -24,7 +28,6 @@ public:
 	void onUnitHide(BWAPI::Unit* u);
 	void onUnitRenegade(BWAPI::Unit* u);
 #ifdef BW_QT_DEBUG
-    void outputQt();
-    bool qt_initialized;
+    QtOutputer qtOutputer;
 #endif
 };

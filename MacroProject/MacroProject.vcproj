@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="MacroProject"
 	ProjectGUID="{F39C7417-770D-4635-8A47-77BD9CDDCD71}"
 	RootNamespace="MacroProject"
@@ -114,7 +114,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Utils/Component;../src/Intelligence;../../BWAPI_Beta_2.8/include;../../BWAPI_Beta_2.8/include/BWAPI;../../BWAPI_Beta_2.8/include/BWTA;../../boost_1_43_0;&quot;C:\Program Files\boost\boost_1_42\&quot;;../../boost_1_42;C:\Qt\4.6.2\include;C:\Qt\4.6.3\include;&quot;C:\dev\libQGLViewer-2.3.5\QGLViewer&quot;"
+				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ZergFlying;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Utils/Component;../src/Intelligence;../../BWAPI_Beta_2.8/include;../../BWAPI_Beta_2.8/include/BWAPI;../../BWAPI_Beta_2.8/include/BWTA;../../boost_1_43_0;&quot;C:\Program Files\boost\boost_1_42\&quot;;../../boost_1_42;C:\Qt\4.6.2\include;C:\Qt\4.6.3\include;&quot;C:\dev\libQGLViewer-2.3.5\QGLViewer&quot;"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
 				RuntimeLibrary="2"
@@ -306,6 +306,18 @@
 							>
 						</File>
 					</Filter>
+					<Filter
+						Name="ZergFlying"
+						>
+						<File
+							RelativePath="..\src\Micro\Units\ZergFlying\MutaliskUnit.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\src\Micro\Units\ZergFlying\ScourgeUnit.cpp"
+							>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="Goals"
@@ -469,6 +481,14 @@
 				</File>
 				<File
 					RelativePath="..\src\AI-Monitor\release\moc_MiniMap.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\AI-Monitor\release\moc_QtOutputer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\AI-Monitor\QtOutputer.cpp"
 					>
 				</File>
 			</Filter>
@@ -645,6 +665,18 @@
 						</File>
 						<File
 							RelativePath="..\src\Micro\Units\ProtossFlying\ShuttleUnit.h"
+							>
+						</File>
+					</Filter>
+					<Filter
+						Name="ZergFlying"
+						>
+						<File
+							RelativePath="..\src\Micro\Units\ZergFlying\MutaliskUnit.h"
+							>
+						</File>
+						<File
+							RelativePath="..\src\Micro\Units\ZergFlying\ScourgeUnit.h"
 							>
 						</File>
 					</Filter>
@@ -847,6 +879,10 @@
 				</File>
 				<File
 					RelativePath="..\src\AI-Monitor\MiniMap.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\AI-Monitor\QtOutputer.h"
 					>
 				</File>
 				<File

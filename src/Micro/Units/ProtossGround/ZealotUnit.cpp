@@ -5,14 +5,13 @@
 using namespace std;
 using namespace BWAPI;
 
+BWAPI::UnitType ZealotUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes::Protoss_High_Templar,
+                                                                BWAPI::UnitTypes::Protoss_Zealot,
+                                                                BWAPI::UnitTypes::Protoss_Dragoon,
+                                                                BWAPI::UnitTypes::Protoss_Reaver,
+                                                                BWAPI::UnitTypes::Protoss_Probe};
 ZealotUnit::ZealotUnit(BWAPI::Unit* u, UnitsGroup* ug):GroundUnit(u, ug)
 {
-    BWAPI::UnitType myPrio[] = {BWAPI::UnitTypes::Protoss_High_Templar,
-                                BWAPI::UnitTypes::Protoss_Zealot,
-                                BWAPI::UnitTypes::Protoss_Dragoon,
-                                BWAPI::UnitTypes::Protoss_Reaver,
-                                BWAPI::UnitTypes::Protoss_Probe};
-    listPriorite = list<BWAPI::UnitType>(myPrio, myPrio + sizeof(myPrio) / sizeof(BWAPI::UnitType) );
 }
 
 ZealotUnit::~ZealotUnit()
@@ -53,11 +52,6 @@ void ZealotUnit::micro()
                                   Colors::White);
     }
     enemies_in_range.clear();
-}
-
-const std::list<BWAPI::UnitType> ZealotUnit::getListePrio() const
-{
-    return listPriorite;
 }
 
 bool ZealotUnit::canHit(BWAPI::Unit* enemy)

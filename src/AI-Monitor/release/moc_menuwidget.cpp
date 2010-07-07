@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'menuwidget.h'
 **
-** Created: Tue 22. Jun 14:41:40 2010
+** Created: Tue 6. Jul 17:20:56 2010
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.6.2)
 **
 ** WARNING! All changes made in this file will be lost!

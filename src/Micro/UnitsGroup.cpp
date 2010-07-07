@@ -21,6 +21,8 @@
 #include <DragoonUnit.h>
 #include <DarkTemplarUnit.h>
 #include <DarkArchonUnit.h>
+#include <ScourgeUnit.h>
+#include <MutaliskUnit.h>
 #include <stack>
 #include <typeinfo>
 
@@ -383,6 +385,10 @@ void UnitsGroup::takeControl(Unit* u)
         tmp = pBayesianUnit(new ShuttleUnit(u, this));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Zealot)
         tmp = pBayesianUnit(new ZealotUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Zerg_Mutalisk)
+        tmp = pBayesianUnit(new MutaliskUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Zerg_Scourge)
+        tmp = pBayesianUnit(new ScourgeUnit(u, this));
     else
         Broodwar->printf("Cette race n'est pas correctement gérée par l'IA pour le moment !");
 

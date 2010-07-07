@@ -1,0 +1,14 @@
+# This is an empty wiki
+
+You can write it in [Markdown](http://daringfireball.net/projects/markdown/) syntax,
+with [Pandoc extensions](http://johnmacfarlane.net/pandoc/).
+
+# Typical workflow
+
+  * edit files in your favorite editor
+  * mark links in markdown syntax, without `.mkd` extension (don't forget to
+    create target files)
+  * `:make` will create a `html` directory you can browse to
+  * you can navigate links within vim too ! Just `set suffixesadd=.mkd` to add
+    `.mkd` files to the list of files searched by the `gf` command.
+  * have fun

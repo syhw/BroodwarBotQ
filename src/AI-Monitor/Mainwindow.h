@@ -16,14 +16,14 @@ class MainWindow : public QMainWindow {
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
-    void addTabWidget(QWidget* qw);
 
 protected:
     void changeEvent(QEvent *e);
 
 public slots:
-    void changeGameSpeed( int value);
+    void changeGameSpeed(int value);
     void componentDoubleClicked(QModelIndex index);
+    void addTabWidget(QWidget* qw);
 
 private:
     Ui::MainWindow *ui;

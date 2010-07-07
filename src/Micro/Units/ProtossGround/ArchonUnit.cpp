@@ -13,12 +13,6 @@ void ArchonUnit::micro()
     BWAPI::Broodwar->printf("ArchonUnit::micro non implémenté !");
 }
 
-const std::list<BWAPI::UnitType> ArchonUnit::getListePrio() const
-{
-    return listPriorite;
-}
-
-
 bool ArchonUnit::canHit(BWAPI::Unit* enemy)
 {
     BWAPI::Broodwar->printf("ArchonUnit::canHit non implémenté !");
