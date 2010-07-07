@@ -1,0 +1,85 @@
+
+#Goals in broodai
+
+
+##News
+WARNING : DO NOT CALL the getFormation() function of the goal class.
+The formation attribute of a goal is not used for the moment. We will see later how to take it into account. For the moment the behavior of this function
+is undefined.
+
+##Files
+The concerned files are, for the moment, Goal.* , Subgoal.* , AttackGoal.* , DefendGoal.* , ScoutGoal.*
+
+##Generalities
+###Goal
+A goal has a type (GoalType type), a status (GoalStatus status), a list of subgoals (std::list\<pSubgoal\> subgoals) and a formation (pFormation formation).
+
+possible types : (new types can be added)
+
+	-GT_UNDEFINED
+	
+	-GT_SCOUT 
+	
+	-GT_ATTACK
+	
+	-GT_DEFEND
+	
+
+possible status : (no new status should be required)
+
+	-GS_ND_STATUS
+	
+	-GS_ACHIEVED
+	
+	-GS_IN_PROGRESS
+	
+	-GS_MOVE_TO
+	
+	-GS_FLEE
+	
+	-GS_NOT_STARTED
+###Subgoal
+ A subgoal has a type (SubgoalType type), a condition (SubgoalCondition cond) and a Position (BWAPI::Position pos)
+ 
+possible types : (new types can be added)
+
+	-ST_REACH_BY_UG  means the units group must reach pos
+	
+	-ST_REACH  means any unit must reach pos
+	
+	-ST_VIEW means pos must be viewable
+	
+	-ST_ATTACK means the unitsgroup will attack toward pos
+	
+possible conditions : 
+
+	-SC_ONCE means that if the subgoal is validated once, it will remain validated
+	
+	-SC_ACTIVE means that this subgoal can be validated or not at any moment (whatever was its previous status)
+	
+##Default behavior
+
+When creating a Goal, by default, the type is GT_UNDEFINED and status is GS_NOT_STARTED. 
+To have a unitsGroup accomplishing a goal, the unitsgroup must call the achieve function. By default, it will check if the goal is achieved, and if not, have the unitsGroup trying to
+comply the first subgoal of the list that is not validated. The test to know whether the goal is finished or not is done by the function checkAchievement.
+This function MUST set the goal status to GS_ACHIEVED if the goal is finished. By default, this function check if all the subgoals are done, and if so, change the status of the goal to GS_ACHIEVED.
+A unitsGroup without goal does nothing. If a unitsGroup has only 1 goal in its list, this goal will be kept even if accomplished, so that units
+joining the group after the accomplishment will have the unitsGroup accomplishing once again the goal (useful for defendGoal for instance).
+Yet a unitsGroup with only 1 goal achieved in its list does nothing. By default, a goal without any subgoal will be marked as achieved.
+
+N.B. : By default, i mean using the Goal class without extending it, or without overloading the achieve and checkAchievement function
+
+##Creating new goals
+###New subgoals
+It is possible to create new subgoal by adding types or conditions. Creating a new type requires to handle it in the check function of the class Subgoal
+The same goes for the condition.
+
+###New goals
+It is possible to create new classes that extend Goal (like AttackGoal, DefendGoal and ScoutGoal).
+These classes can overload, on need, the achieve and checkAchievement functions.
+It is not compulsory to overload both functions. The achieve function by default, will call checkAchievement (the overloaded one if it exists).
+Extending the Goal class, requires to create at least one new type of goal, and all goals of this new class will have these types. 
+It is also possible to create only a new type of a previously created class that extends Goal. For instance, it is possible to create the type GT_HITANDRUN and to create AttackGoal 
+of that type. The checkAchievement or achieve functions of the AttackGoal class must thus be modified to take into account this new type of AttackGoal.
+ 
+
