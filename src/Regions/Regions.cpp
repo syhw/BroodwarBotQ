@@ -32,6 +32,7 @@ bool UnitData::operator == ( const UnitData& ud) const
 
 RegionData::RegionData()
 : lastSeen(BWAPI::Broodwar->getFrameCount())
+, visited(0)
 {
 }
 

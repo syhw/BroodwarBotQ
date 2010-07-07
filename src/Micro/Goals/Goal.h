@@ -40,7 +40,6 @@ class Goal
 protected:
 	std::list<pSubgoal> subgoals; //The subgoals cannot be shared
 	GoalStatus status;      /**< status of the goal */
-	pFormation formation;    /**< formation to accomplish the goal */
 	GoalType type;
 public:
 
@@ -57,10 +56,8 @@ public:
 
 	//Mutators
 	void addSubgoal(pSubgoal s);
-	void setFormation(pFormation f); //Warning, the formation is not duplicated.
 
 	//Accessors
-	pFormation getFormation() const;
 	GoalStatus getStatus() const;
 	void setStatus(GoalStatus s);
 	GoalType getType() const;

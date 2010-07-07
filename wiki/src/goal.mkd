@@ -3,9 +3,8 @@
 
 
 ##News
-WARNING : DO NOT CALL the getFormation() function of the goal class.
-The formation attribute of a goal is not used for the moment. We will see later how to take it into account. For the moment the behavior of this function
-is undefined.
+07/07 Formation are now part of some subgoals. The subgoals with the identificator _F in their type use a formation to accomplish the subgoal
+
 
 ##Files
 The concerned files are, for the moment, Goal.* , Subgoal.* , AttackGoal.* , DefendGoal.* , ScoutGoal.*
@@ -51,11 +50,19 @@ possible types : (new types can be added)
 	
 	-ST_ATTACK means the unitsgroup will attack toward pos
 	
+	-ST_REACH_F 
+	
+	-ST_ATTACK_F 
+	
+	The types with the identificator _F means they use formation instead of position
+	
 possible conditions : 
 
 	-SC_ONCE means that if the subgoal is validated once, it will remain validated
 	
 	-SC_ACTIVE means that this subgoal can be validated or not at any moment (whatever was its previous status)
+	
+	A subgoal which uses a formation is valid if all its unit have reached the mode IN_POS.
 	
 ##Default behavior
 
