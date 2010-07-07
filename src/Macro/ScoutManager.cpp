@@ -70,7 +70,7 @@ void ScoutManager::onUnitCreate(BWAPI::Unit* unit){
 
 void ScoutManager::findEnemy(){
 	//Create a new scoutGoal 
-	pGoal g = pGoal(new ScoutGoal());
+	pGoal g = pGoal(new ScoutGoal(SP_FINDENEMY));
 	pSubgoal sb;
 
 	//Scout the different possible bases
@@ -112,11 +112,58 @@ std::list<BWTA::BaseLocation*> ScoutManager::getBestPath( std::set<BWTA::BaseLoc
 	return res;
 }
 
-pGoal ScoutManager::exploreRegion(BWTA::Region* region){
-/*
+void ScoutManager::exploreRegion(BWTA::Region* region){
 
+	BWTA::Polygon polygon = region->getPolygon();
+	std::list<Position> to_see;
+	bool insert=true;
+	for(std::vector<Position>::iterator it = polygon.begin(); it != polygon.end(); ++it){
+		for(std::list<Position>::iterator it_to_see = to_see.begin(); it_to_see != to_see.end(); ++it_to_see){
+			if((*it_to_see).getDistance( (*it) ) <= BWAPI::UnitTypes::Protoss_Probe.sightRange())
+				insert=false;
+		}
+		if (insert) {
+			to_see.push_back(*it);
+		}
+		insert=true;
+	}
 
+	if(to_see.size() > 0){
+		//Create the goal !
+		pGoal goal = pGoal(new ScoutGoal(SP_EXPLOREREGION));
+		double curDist;
+		double maxDist=0;
+		BWAPI::Position precPos=to_see.front();
+		BWAPI::Position chosePos;
+		goal->addSubgoal(pSubgoal(new Subgoal(ST_VIEW,SC_ONCE,to_see.front())));
+		to_see.pop_front();
+		int size = to_see.size();
+		while(size > 0){
+			
+			for(std::list<Position>::iterator it = to_see.begin(); it != to_see.end(); ++it){
+				curDist = it->getDistance(precPos);
+				if(curDist > maxDist){
+					maxDist=curDist;
+					chosePos = (*it);
+				}
+			}
+		precPos = chosePos;
+		goal->addSubgoal(pSubgoal(new Subgoal(ST_VIEW,SC_ONCE,chosePos)));
+		to_see.remove(chosePos);
+		size --;
+		maxDist=0;
+		}
+		
+		this->scoutGoals.push_back(goal);
+		BWAPI::Broodwar->printf("Goal to explore the base created");
+	}
 	
+
+}
+				//TOCHECK : I use a protoss_probe vision to explore the region
+	
+
+/*	
 	std::list<Position>::iterator pos;
 	BWTA::Polygon polygon = (*region).getPolygon();
 	std::list<Position> to_see;
@@ -156,7 +203,7 @@ pGoal ScoutManager::exploreRegion(BWTA::Region* region){
 	}
 	Broodwar->printf("Nombre d'objectifs : %d", objectives.size());
 	*/
-}
+
 
 int ScoutManager::newGoal() const {
 	return scoutGoals.size();
@@ -169,3 +216,9 @@ pGoal ScoutManager::getGoal(){
 	return p;
 }
 
+void ScoutManager::onUnitShow(BWAPI::Unit* unit){
+	if(unit->getPlayer()->isEnemy(BWAPI::Broodwar->self())){
+		//enemy found, must explore his base
+		this->exploreRegion(BWTA::getRegion(unit->getTilePosition()));
+	}
+}

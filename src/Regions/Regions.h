@@ -29,6 +29,8 @@ public:
     std::map<Player*, std::vector<UnitData> > buildings;	// list of enemy building seen in this region for each player.
     std::map<Player*, std::vector<UnitData> > units;      // list of enemy units seen in this region for each player.
     int lastSeen; // Last seen frame.
+	int visited; //Number of the frame when a scout goal to explore was accomplished.
+	// 0 means never
 
 	RegionData();
 	bool isOccupied() const;

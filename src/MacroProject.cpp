@@ -500,6 +500,7 @@ void BattleBroodAI::onUnitShow(BWAPI::Unit* unit)
     regions->onUnitShow(unit);
     mapManager->onUnitShow(unit);
     eUnitsFilter->update(unit);
+	scoutManager->onUnitShow(unit);
 }
 
 void BattleBroodAI::onUnitHide(BWAPI::Unit* unit)

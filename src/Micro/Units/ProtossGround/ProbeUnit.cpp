@@ -20,6 +20,6 @@ const std::list<BWAPI::UnitType> ProbeUnit::getListePrio() const
 
 bool ProbeUnit::canHit(BWAPI::Unit* enemy)
 {
-    BWAPI::Broodwar->printf("ProbeUnit::canHit non implémenté !");
+   // BWAPI::Broodwar->printf("ProbeUnit::canHit non implémenté !");
     return false;
 }
