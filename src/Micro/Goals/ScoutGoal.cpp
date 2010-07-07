@@ -1,7 +1,7 @@
 #include "ScoutGoal.h"
 
 
-ScoutGoal::ScoutGoal():Goal(GT_SCOUT){
+ScoutGoal::ScoutGoal(ScoutPurpose sp):Goal(GT_SCOUT),purpose(sp){
 	regions = & Regions::Instance();
 }
 

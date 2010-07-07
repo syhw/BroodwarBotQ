@@ -9,6 +9,7 @@ GoalManager::~GoalManager(){
 }
 
 void GoalManager::newGoal(pGoal p){
+	BWAPI::Broodwar->printf("Received 1 new objective, got to find the unitsgroup");
 	findUnitsGroup(p);
 }
 
@@ -44,8 +45,6 @@ void GoalManager::findUnitsGroup(pGoal goal){
 				ug->takeControl(unitToTake);
 			//}
 		//}
-
-
 		if (ug != NULL){
 			//Check if the unitsGroup is not empty else Segfault ?
 			if (ug->getUnits()->size() != 0) {
