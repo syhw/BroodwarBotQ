@@ -225,7 +225,7 @@ void BattleUnit::onUnitHide(Unit* u)
 
 void BattleUnit::attackEnemy(BWAPI::Unit* u, BWAPI::Color col)
 {
-#ifdef __DEBUG_MICRO__
+#ifdef __DEBUG_NICOLAS__
     int ux = unit->getPosition().x(); int uy = unit->getPosition().y();
     int ex = u->getPosition().x(); int ey = u->getPosition().y();
 

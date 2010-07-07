@@ -17,22 +17,22 @@ int FlyingUnit::damagesOn(BWAPI::Unit* enemy)
     {
         if (enemy->getType().size() == BWAPI::UnitSizeTypes::Medium)
         {
-            damages *= 0.5;
+            damages = static_cast<int>(damages * 0.5);
         }
         else if (enemy->getType().size() == BWAPI::UnitSizeTypes::Large)
         {
-            damages *= 0.25;
+            damages = static_cast<int>(damages * 0.25);
         }
     }
     else if (airW.damageType() == BWAPI::DamageTypes::Explosive)
     {
         if (enemy->getType().size() == BWAPI::UnitSizeTypes::Medium)
         {
-            damages *= 0.75;
+            damages = static_cast<int>(damages * 0.75);
         }
         else if (enemy->getType().size() == BWAPI::UnitSizeTypes::Small)
         {
-            damages *= 0.5;
+            damages = static_cast<int>(damages * 0.5);
         }
     }
     return damages;

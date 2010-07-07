@@ -1,5 +1,5 @@
 #pragma once
-#define __DEBUG_MICRO__
+#define __DEBUG_NICOLAS__
 #include <BWAPI.h>
 #include <BWTA.h>
 #include <windows.h>

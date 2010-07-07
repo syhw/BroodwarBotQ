@@ -45,8 +45,8 @@ public:
 
 
     void attackEnemy(BWAPI::Unit* u, BWAPI::Color col);
-    BWAPI::Unit* findClosestEnemy(std::set<BWAPI::Unit*> &enemies);
-    void fillEnemies(std::set<BWAPI::Unit*> &enemies, int &damagesTaken);
-    void fillEnemiesInRangeForDragoon(std::set<BWAPI::Unit*> &enemies, std::set<BWAPI::Unit*> &enemies_in_range, double &maxRangeGoon, double &maxRangeGoonEnemy);
+    BWAPI::Unit* findClosestEnemy(std::set<BWAPI::Unit*> &enemies); // Function to remove
+    void fillEnemies(std::set<BWAPI::Unit*> &enemies, int &damagesTaken); // Function to remove
+    void fillEnemiesInRangeForDragoon(std::set<BWAPI::Unit*> &enemies, std::set<BWAPI::Unit*> &enemies_in_range, double &maxRangeGoon, double &maxRangeGoonEnemy); // Function to remove
     virtual int damagesOn(BWAPI::Unit* enemy) = 0;
 };

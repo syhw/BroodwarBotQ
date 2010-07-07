@@ -247,6 +247,7 @@ void UnitsGroup::update()
         }
     }
 
+#ifdef __DEBUG_NICOLAS__
     // On affiche les cibles des unités du UnitsGroup
     for each(pBayesianUnit u in units)
     {
@@ -257,6 +258,7 @@ void UnitsGroup::update()
             BWAPI::Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Orange);
         }
     }
+#endif
     
     // for each(pBayesianUnit u in units)
     //     u->micro();
