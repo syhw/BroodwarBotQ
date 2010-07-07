@@ -599,7 +599,9 @@ void BayesianUnit::onUnitHide(Unit* u)
 void BayesianUnit::update()
 {
     if (!unit->exists()) return;
+#ifdef __DEBUG_NICOLAS__
     this->drawTarget();
+#endif
     if (_mode == MODE_FIGHT_G || 1) {
         // TODO not every update()s, perhaps even asynchronously
         // TODO inline function!

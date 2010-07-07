@@ -3,7 +3,7 @@
 PAGES=index
 -include .depend
 
-PANDOC=pandoc -s --template template -V wikiroot=$(ROOT)/html/ -c $(ROOT)/css/style.css --toc
+PANDOC=pandoc -s --template template -V wikiroot="../html/" -c "../css/style.css" --toc
 PERL=perl
 RM=rm -f
 

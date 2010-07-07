@@ -73,7 +73,7 @@ void MicroManager::onRevoke(BWAPI::Unit* unit, double bid)
 
 std::string MicroManager::getName() const
 {
-	return "micro Manager";
+	return "Micro Manager";
 }
 
 void MicroManager::onUnitCreate(BWAPI::Unit* unit)
