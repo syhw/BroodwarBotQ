@@ -25,7 +25,7 @@ public slots:
     void componentDoubleClicked(QModelIndex index);
     void addTabWidget(QWidget* qw);
 
-private:
+public:
     Ui::MainWindow *ui;
     QSplitter* splitter;
     MenuWidget* menuWidget;

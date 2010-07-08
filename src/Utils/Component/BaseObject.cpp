@@ -7,11 +7,15 @@ BaseObject::BaseObject(std::string name)
 , serr( )
 , className(name)
 {
-    ObjectManager::Instance().addObject(this);
 }
 
 BaseObject::~BaseObject()
 {
+}
+
+void BaseObject::registerToObjManager()
+{
+    ObjectManager::Instance().addObject(this);
 }
 
 std::string BaseObject::getClassName() const

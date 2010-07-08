@@ -4,10 +4,12 @@ using namespace BWAPI;
 using namespace std;
 
 EUnitsFilter::EUnitsFilter()
+:BaseObject( "EUnitsFilter")
 {
     timeManager = & TimeManager::Instance();
 #ifdef BW_QT_DEBUG
-    QWidget* qw = new QWidget();
+		/*
+    QWidget* qw = new QWidget(qmainwindow->menuWidget->ui->tabWidget);
     qw->setObjectName(QString::fromUtf8("tab_EUFilter_test"));
     QHBoxLayout* horizontalLayout = new QHBoxLayout(qw);
     horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout_EUFilter"));
@@ -38,6 +40,7 @@ EUnitsFilter::EUnitsFilter()
     horizontalLayout->addWidget(EVUnits);
 
     qtOutputer.init(qw);
+		*/
 #endif
 }
 
@@ -52,8 +55,8 @@ void EUnitsFilter::update(Unit* u)
         //eViewedUnits.insert(make_pair(u, EViewedUnit(u, timeManager->getElapsedTime())));
 #ifdef BW_QT_DEBUG
     //qtOutputer.init();
-    QWidget* qw;
-    qtOutputer.output(qw);
+    //QWidget* qw;
+    //qtOutputer.output(qw);
 #endif
 }
 

@@ -10,7 +10,7 @@ class QtOutputer : public QObject
     QWidget* _qwidget;
 
 public:
-    QtOutputer();
+    QtOutputer(/*QWidget* parent = NULL*/);
     bool init();
     bool init(QWidget* qw);
     void output(QWidget* qw);

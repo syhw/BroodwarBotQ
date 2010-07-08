@@ -802,10 +802,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\MacroDll.h"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Utils\TimeManaged.h"
 					>
 				</File>

@@ -154,7 +154,6 @@ void BattleBroodAI::onStart()
     //Broodwar->printf("The match up is %s v %s",
         Broodwar->self()->getRace().getName().c_str();
         Broodwar->enemy()->getRace().getName().c_str();
-	
 }
 
 void BattleBroodAI::onEnd(bool isWinner)

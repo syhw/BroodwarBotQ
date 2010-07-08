@@ -4,7 +4,9 @@
 
 using namespace std;
 
-QtOutputer::QtOutputer(): qt_initialized(false) 
+QtOutputer::QtOutputer(/*QWidget* parent*/)
+: qt_initialized(false)
+, QObject(/*parent*/)
 { 
 }
 
@@ -38,6 +40,7 @@ bool QtOutputer::init(QWidget* qw)
     }
     // add tab by signaling the qwidget to main window
     emit addTabToWidget(qw);
+
     return true;
 }
 

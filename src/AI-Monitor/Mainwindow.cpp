@@ -36,7 +36,6 @@ MainWindow::MainWindow(QWidget *parent) :
     }
     menuWidget->ui->componentTree->setModel( componentModel);
     connect(menuWidget->ui->componentTree, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(componentDoubleClicked(QModelIndex)));
-
 }
 
 MainWindow::~MainWindow()
@@ -46,13 +45,12 @@ MainWindow::~MainWindow()
 
 void MainWindow::addTabWidget(QWidget* qw)
 {
-    QPushButton hello("SIGNAL RECU!");
-    hello.resize(100, 30);
-    hello.show();
+	// Check if the signal is well received
+	QMessageBox::critical( qw, "plop", "signal recu");
 
-    menuWidget->ui->tabWidget->addTab(qw, QString("plop"));
-    // OR 
-    // menuWidget->addTabWidget(qw);
+	menuWidget->ui->tabWidget->addTab(qw, QString("plop"));
+	// OR 
+	// menuWidget->addTabWidget(qw);
 }
 
 void MainWindow::changeEvent(QEvent *e)
@@ -84,8 +82,12 @@ void MainWindow::componentDoubleClicked(QModelIndex index)
     QTabWidget* tabWidget = new QTabWidget();
     mainLayout->addWidget(tabWidget);
 
+		// Display the component output.
+//TODO add the component output.
+
+		// Display the Data<>
     const std::vector<BaseData*>& data = baseObj->getData();
-    for (unsigned int i = 0; i < data.size()/5+1; ++i)
+    for (unsigned int i = 0; i < (data.size()+4)/5; ++i)
     {
         // create a tab
         QWidget* tab = new QWidget( tabWidget);
