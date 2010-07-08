@@ -17,3 +17,9 @@ bool ShuttleUnit::canHit(BWAPI::Unit* enemy)
 {
     return false;
 }
+
+int ShuttleUnit::getTimeToAttack()
+{
+    BWAPI::Broodwar->printf("ShuttleUnit::getTimeToAttack non implémenté !");
+    return 0;
+}

@@ -18,3 +18,9 @@ bool HighTemplarUnit::canHit(BWAPI::Unit* enemy)
     BWAPI::Broodwar->printf("HighTemplarUnit::canHit non implémenté !");
     return false;
 }
+
+int HighTemplarUnit::getTimeToAttack()
+{
+    BWAPI::Broodwar->printf("HighTemplarUnit::getTimeToAttack non implémenté !");
+    return 0;
+}

@@ -2,6 +2,7 @@
 #include "BayesianUnit.h"
 #include "Rainbow.h"
 #include <utility>
+#include <Defines.h>
 #include <time.h>
 #include <UnitsGroup.h>
 #ifdef PROBT
@@ -602,10 +603,12 @@ void BayesianUnit::update()
 #ifdef __DEBUG_NICOLAS__
     this->drawTarget();
 #endif
+    
     if (_mode == MODE_FIGHT_G || 1) {
         // TODO not every update()s, perhaps even asynchronously
         // TODO inline function!
-       if (!unit->getGroundWeaponCooldown()) {
+      /*
+      if (!unit->getGroundWeaponCooldown()) {
             std::multimap<double, Unit*>::const_iterator rangeEnemyUnit;
             rangeEnemyUnit = _rangeEnemies.begin();
             unsigned int i = 0;
@@ -634,13 +637,16 @@ void BayesianUnit::update()
                     ++i;
                 }
             }
-            if (++i == end) {
+            if (++i == end) 
+            {
                 // NOT IMPL TODO
                 // perhaps fill _rangeEnemies in the UnitsGroup (higher level)
                 //Broodwar->printf("me think I have no enemy unit in range, me perhaps stoodpid!\n");
             }
         }
-
+        */
+        if (targetEnemy != NULL)
+            attackEnemy(targetEnemy, BWAPI::Colors::Red);
     } //else if (_mode == MODE_FLOCK) {
     else {
         //if (tick())
@@ -689,4 +695,19 @@ BWAPI::Unit* BayesianUnit::getOldTarget()
 void BayesianUnit::setOldTarget(Unit* newTarget)
 {
     oldTarget = newTarget;
+}
+
+void BayesianUnit::attackEnemy(BWAPI::Unit* u, BWAPI::Color col)
+{
+#ifdef __DEBUG_NICOLAS__
+    int ux = unit->getPosition().x(); int uy = unit->getPosition().y();
+    int ex = u->getPosition().x(); int ey = u->getPosition().y();
+
+    Broodwar->drawLineMap(ux, uy, ex, ey, col);
+#endif
+    
+    if (unit->getOrderTarget() != u)
+    {
+        unit->rightClick(u);
+    }
 }

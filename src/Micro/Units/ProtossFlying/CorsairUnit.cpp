@@ -18,3 +18,9 @@ bool CorsairUnit::canHit(BWAPI::Unit* enemy)
     BWAPI::Broodwar->printf("CorsairUnit::canHit non implémenté !");
     return false;
 }
+
+int CorsairUnit::getTimeToAttack()
+{
+    BWAPI::Broodwar->printf("CorsairUnit::getTimeToAttack non implémenté !");
+    return 0;
+}

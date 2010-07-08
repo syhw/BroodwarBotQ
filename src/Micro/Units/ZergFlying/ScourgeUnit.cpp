@@ -18,3 +18,8 @@ bool ScourgeUnit::canHit(BWAPI::Unit* enemy)
     BWAPI::Broodwar->printf("ScourgeUnit::canHit non implémenté !");
     return false;
 }
+
+int ScourgeUnit::getTimeToAttack()
+{
+    return 0;
+}

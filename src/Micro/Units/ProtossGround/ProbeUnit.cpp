@@ -18,3 +18,9 @@ bool ProbeUnit::canHit(BWAPI::Unit* enemy)
     //BWAPI::Broodwar->printf("ProbeUnit::canHit non implémenté !");
     return false;
 }
+
+int ProbeUnit::getTimeToAttack()
+{
+    //BWAPI::Broodwar->printf("ProbeUnit::getTimeToAttack non implémenté !");
+    return 0;
+}

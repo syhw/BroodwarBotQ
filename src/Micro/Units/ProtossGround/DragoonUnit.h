@@ -14,4 +14,5 @@ public:
     virtual void micro();
     virtual bool canHit(BWAPI::Unit* enemy);
     static double getMaxRange();
+    virtual int getTimeToAttack();
 };

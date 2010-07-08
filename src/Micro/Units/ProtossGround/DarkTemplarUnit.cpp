@@ -18,3 +18,9 @@ bool DarkTemplarUnit::canHit(BWAPI::Unit* enemy)
     BWAPI::Broodwar->printf("DarkTemplarUnit::canHit non implémenté !");
     return false;
 }
+
+int DarkTemplarUnit::getTimeToAttack()
+{
+    BWAPI::Broodwar->printf("DarkTemplarUnit::getTimeToAttack non implémenté !");
+    return 0;
+}

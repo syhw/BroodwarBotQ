@@ -18,3 +18,9 @@ bool CarrierUnit::canHit(BWAPI::Unit* enemy)
     BWAPI::Broodwar->printf("CarrierUnit::canHit non implémenté !");
     return false;
 }
+
+int CarrierUnit::getTimeToAttack()
+{
+    BWAPI::Broodwar->printf("CarrierUnit::getTimeToAttack non implémenté !");
+    return 0;
+}
