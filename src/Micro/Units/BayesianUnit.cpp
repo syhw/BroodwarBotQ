@@ -124,6 +124,9 @@ void BayesianUnit::switchMode(unit_mode um)
         case MODE_FIGHT_G:
             _mode = um;
             break;
+        default:
+            _mode = um;
+            break;
     }
 }
 
@@ -600,6 +603,11 @@ void BayesianUnit::onUnitHide(Unit* u)
 void BayesianUnit::update()
 {
     if (!unit->exists()) return;
+    Position p = unit->getPosition();
+    if ((_mode == MODE_FLOCK && _mode == MODE_FLOCKFORM)
+        && (p.getDistance(target) < 4 
+            || (_ground_unit && BWTA::isConnected(TilePosition(p), TilePosition(target)))))
+        switchMode(MODE_INPOS);
 #ifdef __DEBUG_NICOLAS__
     this->drawTarget();
 #endif

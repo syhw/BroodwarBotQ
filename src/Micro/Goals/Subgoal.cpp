@@ -10,6 +10,19 @@ Subgoal::Subgoal(SubgoalType t, SubgoalCondition c, BWAPI::Position pos) : valid
 
 }
 
+Subgoal::Subgoal(SubgoalType t, SubgoalCondition c, pFormation formation) :
+validated(false),
+type(t),
+cond(c),
+formation(formation)
+{
+	if(t==	ST_REACH_BY_UG || t == ST_REACH || t == ST_VIEW || t == ST_ATTACK){
+		BWAPI::Broodwar->printf("ERROR, the subgoal created has a type that does not use formation");
+		//TODO : create the position using the formation goal
+	}
+
+}
+
 Subgoal::~Subgoal(){
 }
 
@@ -27,31 +40,66 @@ SubgoalCondition Subgoal::subgoalCondition() const {
 
 bool Subgoal::isRealized() {
 //TOCHECK
-	if(this->cond==SC_ONCE){
 
-		if(!validated){
-			this->validated=check();
-		}
-		return validated;
+	switch(this->cond){
 
-	}else if (this->cond==SC_ACTIVE) {
-		return check();
-		
-	}else 
-		return check();
+		case SC_ONCE : {
+			if(!validated)
+				this->validated=check();
+			return validated;
+			break;
+					  }
+		case SC_ACTIVE : {
 
+			return check();
+			break;	
+						 }
+
+		default : {
+			return check();
+				  }
+	}
 }
 
 bool Subgoal::check(){
-	if (type==ST_REACH) {
-		//TODO
-		return false;
-	}else if (type==ST_REACH_BY_UG) {
-		//TODO	
-		return false;
-	}else if (type==ST_VIEW){
-		
-		return Broodwar->isVisible(pos.x()/32,pos.y()/32);
+
+	switch(this->type){
+
+		case ST_REACH : {
+			//TODO
+			break;
+						}
+
+		case ST_REACH_BY_UG : {
+
+			//TODO
+			break;	
+							  }
+
+		case ST_VIEW : {
+
+			return Broodwar->isVisible(pos.x()/32,pos.y()/32);
+			break;	
+					   }
+		case ST_ATTACK :{
+
+			//TODO
+			break;
+						}
+		case ST_REACH_F : {
+			
+			//TODO
+			break;
+						  }
+		case ST_ATTACK_F : {
+
+			//TODO
+			break;
+						   }
+							  
+		default : {
+			return true;
+				  }
 	}
 	return true;
 }

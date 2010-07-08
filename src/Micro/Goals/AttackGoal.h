@@ -15,5 +15,4 @@ public:
 	AttackGoal( const AttackGoal& g);
 
 	virtual ~AttackGoal();
-	virtual void checkAchievement(UnitsGroup* ug);
 };

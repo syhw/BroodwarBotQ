@@ -31,7 +31,6 @@ public:
     int lastSeen; // Last seen frame.
 	int visited; //Number of the frame when a scout goal to explore was accomplished.
 	// 0 means never
-
 	RegionData();
 	bool isOccupied() const;
 	bool contain(Unit* unit) const;
