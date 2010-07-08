@@ -11,6 +11,8 @@
 #include "Subgoal.h"
 #include "ScoutGoal.h"
 #include "GoalManager.h"
+#include "SeeSubgoal.h"
+#include "FindSubgoal.h"
 class GoalManager;
 
 
@@ -46,7 +48,7 @@ private:
 	std::list<pGoal> scoutGoals; //New
 	BWTA::BaseLocation* myStartLocation;//New
 	GoalManager* goalManager;//New
-
+	bool to_remove;
     void updateScoutAssignments();
 };
 #endif 

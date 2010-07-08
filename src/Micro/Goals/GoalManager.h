@@ -1,7 +1,7 @@
 #pragma once
+#include "Goal.h"
 #include "CSingleton.h"
 #include <stdlib.h>
-#include "Goal.h"
 #include "UnitsGroup.h"
 #include <BWAPI.h>
 #include "MicroManager.h"
@@ -13,7 +13,7 @@ class GoalManager : public CSingleton<GoalManager>
 	friend class CSingleton<GoalManager>;
 private:
 	MicroManager * microManager;
-	std::map<UnitsGroup *, std::list<pGoal>> attributedGoals;
+	std::map<UnitsGroup *, std::list<pGoal> > attributedGoals;
 	Regions * regions;
 
 public:

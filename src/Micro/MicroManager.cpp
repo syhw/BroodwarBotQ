@@ -133,7 +133,7 @@ void MicroManager::sendGroupToAttack( UnitsGroup* ug)
 	}
 
 	if (!found) return;
-	ug->addGoal(pGoal(new AttackGoal(nearestEnemyLocation)));
+	//	ug->addGoal(pGoal(new AttackGoal(nearestEnemyLocation)));
 	//Broodwar->printf( "Let's fight !!");
 }
 

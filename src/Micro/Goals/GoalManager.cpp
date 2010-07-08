@@ -14,11 +14,15 @@ void GoalManager::newGoal(pGoal p){
 }
 
 void GoalManager::findUnitsGroup(pGoal goal){
+	/*
 	if(goal->getType()==GT_SCOUT){
 		//Select a worker
 		UnitsGroup* ug;	
-		
+		double minDist=999999;
+		double curDist=0;
 		for(std::map<UnitsGroup *, std::list<pGoal>>::iterator it_ug = this->attributedGoals.begin(); it_ug != attributedGoals.end(); ++it_ug){
+			
+			
 			//Check over all the already created unitsGroup which one is near the first subgoal to accomplish
 			//TODO
 		} 
@@ -27,8 +31,8 @@ void GoalManager::findUnitsGroup(pGoal goal){
 			//NO unitsgroup already found, must create a new one
 			BWAPI::Position p = goal->firstPosition();
 			Unit * unitToTake;
-			double minDist=999999;
-			double curDist=0;
+			minDist=999999;
+			curDist=0;
 			for each(Unit* u in Broodwar->getAllUnits()){
 				if (u->getPlayer()==Broodwar->self()&&u->getType().isWorker()&& !(u->isConstructing())){
 					curDist=p.getDistance(u->getPosition());
@@ -49,6 +53,7 @@ void GoalManager::findUnitsGroup(pGoal goal){
 			//Check if the unitsGroup is not empty else Segfault ?
 			if (ug->getUnits()->size() != 0) {
 			//TOCHECK
+				BWAPI::Broodwar->printf("ok goal pushed in the unitsgroup");
 				ug->addGoal(goal);
 				insert(ug, goal);
 				microManager->unitsgroups.push_back(ug);
@@ -63,7 +68,7 @@ void GoalManager::findUnitsGroup(pGoal goal){
 
 		}
 
-	
+	*/
 }
 
 
@@ -112,15 +117,15 @@ bool GoalManager::clean(UnitsGroup * ug){
 
 void GoalManager::goalDone(UnitsGroup * ug, pGoal p){
 
-	if (p->getType() == GT_SCOUT){
+	//if (p->getType() == GT_SCOUT){
 	//	BWAPI::Broodwar->printf("Receive the order to destroy the group");
 		//Destroy the units group : remove units
-		microManager->promptRemove(ug);
-		ug->~UnitsGroup();
+		// microManager->promptRemove(ug);
+		//	ug->~UnitsGroup();
 	//	if(!this->microManager->remove(ug)){
 	//		BWAPI::Broodwar->printf("Could not find the group");
 	//	}
 		//ug->~UnitsGroup();
-	}
+	//}
 
 }

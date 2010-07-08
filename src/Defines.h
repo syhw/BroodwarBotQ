@@ -1,5 +1,6 @@
 #pragma once
 
+#define __DEBUG__LOUIS
 #define BW_QT_DEBUG
 
 #ifdef BW_QT_DEBUG
