@@ -582,7 +582,6 @@ void UnitsGroup::accomplishGoal(){
 		if (!goals.front()->getStatus() == GS_ACHIEVED) {
 			goals.front()->achieve(this);
 		} else {
-			goalManager->goalDone(this, goals.front());
 			if(goals.size() > 1 ){
 				goals.pop_front();
 			}

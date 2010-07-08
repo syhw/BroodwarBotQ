@@ -2,6 +2,7 @@
 #include "Goal.h"
 #include "UnitsGroup.h"
 #include "float.h"
+#include "Defines.h"
 
 Goal::~Goal()
 {
@@ -45,31 +46,36 @@ void Goal::achieve(UnitsGroup* ug)
 
 void Goal::checkAchievement(UnitsGroup* ug)
 {
-	//All the subgoals are tested because the check function might validate
-	//some subgoals
-		bool res_and=true;
-		bool res_or=false;
-		
-		for each (pSubgoal p in subgoals){
-			
-			if(p->getLogic() == SL_AND){
-				//AND case 
-				if(!p->isRealized()){
-					res_and=false;
-				}
 
-			} else {
-				//OR case
-				if(p->isRealized()){
-				res_or = true;
+	if(this->status!=GS_ACHIEVED){
+		//All the subgoals are tested because the check function might validate
+		//some subgoals
+			bool res_and=true;
+			bool res_or=false;
+			
+			for each (pSubgoal p in subgoals){
+				
+				if(p->getLogic() == SL_AND){
+					//AND case 
+					if(!p->isRealized()){
+						res_and=false;
+					}
+
+				} else {
+					//OR case
+					if(p->isRealized()){
+					res_or = true;
+					}
 				}
 			}
-		}
-			
-		if(res_and || res_or){
-			this->status= GS_ACHIEVED;
-		}
-	
+				
+			if(res_and || res_or){
+	#ifdef __DEBUG__LOUIS
+				BWAPI::Broodwar->printf("Goal done");
+	#endif
+				this->status= GS_ACHIEVED;
+			}
+	}
 }
 
 void Goal::addSubgoal(pSubgoal s){

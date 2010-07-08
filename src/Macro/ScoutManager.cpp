@@ -6,7 +6,7 @@ using namespace BWAPI;
 ScoutManager::ScoutManager( )
 {
 	regions = & Regions::Instance();
-	goalManager = & GoalManager::Instance();
+	microManager = & MicroManager::Instance();
 	to_remove = false;
 }
 
@@ -16,10 +16,6 @@ ScoutManager::~ScoutManager( )
 
 void ScoutManager::update()
 {
-	if(this->newGoal()){
-		pGoal p = getGoal();
-		goalManager->newGoal(p);
-	}
 }
 
 std::string ScoutManager::getName() const
@@ -73,49 +69,53 @@ void ScoutManager::onUnitCreate(BWAPI::Unit* unit){
 
 void ScoutManager::findEnemy(){
 	//Create a new scoutGoal 
-	pGoal g = pGoal(new ScoutGoal());
+	pGoal goal = pGoal(new ScoutGoal());
 	pSubgoal sb;
 
 	//Scout the different possible bases
-	myStartLocation = BWTA::getStartLocation(BWAPI::Broodwar->self());
+	BWTA::BaseLocation * myStartLocation = BWTA::getStartLocation(BWAPI::Broodwar->self());
 	std::set<BWTA::BaseLocation*> path = BWTA::getStartLocations();
 		
 	for(std::set<BWTA::BaseLocation*>::iterator p=path.begin();p!=path.end();p++){
+		if( (*p) != myStartLocation){
 		sb=pSubgoal(new SeeSubgoal(SL_AND, (*p)->getPosition()));
-		g->addSubgoal(sb);
+		goal->addSubgoal(sb);
+		}
 	}
 	sb=pSubgoal(new FindSubgoal(SL_OR));
-	g->addSubgoal(sb);
+	goal->addSubgoal(sb);
 
-	scoutGoals.push_back(g);
-}
+	//Find the appropriate UnitsGroup
+	
+	//Select a worker
+	UnitsGroup* ug;	
+	double minDist=999999;
+	double curDist=0;
+	
+		//Check over all the already created unitsGroup which one is near the first subgoal to accomplish
+		//TODO
 
-std::list<BWTA::BaseLocation*> ScoutManager::getBestPath( std::set<BWTA::BaseLocation* > baseLocations, BWTA::BaseLocation* myStartLocation) const
-{
-	//TOREMOVE ?
-	std::list<BWTA::BaseLocation*> res;
-	baseLocations.erase( myStartLocation);
-	BWTA::BaseLocation* baseFrom = myStartLocation;
-	while( !baseLocations.empty())
-	{
-		BWTA::BaseLocation* nearestBase = NULL;
-		double dist = 0xFFFF;
-		for( std::set<BWTA::BaseLocation* >::iterator b = baseLocations.begin(); b != baseLocations.end(); b++)
-		{
-			double dist2 = baseFrom->getGroundDistance( *b);
-			if( dist2 <= 0) // Unreachable by walk.
-				baseLocations.erase( nearestBase);
-			if( dist2 < dist)
-			{
-				nearestBase = *b;
-				dist = dist2;
-			}
+		
+	//NO unitsgroup already found, must create a new one
+	ug = new UnitsGroup();	
+	for each(Unit* u in Broodwar->getAllUnits()){
+		if (u->getPlayer()==Broodwar->self()&&u->getType().isWorker()&& !(u->isConstructing())){
+			ug->takeControl(u);
+			break;
 		}
-		baseLocations.erase( nearestBase);
-		res.push_back( nearestBase);
-		baseFrom = nearestBase;
 	}
-	return res;
+
+	//Check if the unitsGroup is not empty else Segfault ?
+	if (ug->getUnits()->size() != 0) {
+	//TOCHECK
+		ug->addGoal(goal);
+		microManager->unitsgroups.push_back(ug);
+		//	Broodwar->printf("Unit found, goal attributed");
+	}else{
+		Broodwar->printf("Could not find an appropriate unit for this scout goal");
+		Broodwar->printf("Problem...");
+	}
+
 }
 
 void ScoutManager::exploreRegion(BWTA::Region* region){
@@ -211,18 +211,6 @@ void ScoutManager::exploreRegion(BWTA::Region* region){
 	}
 	Broodwar->printf("Nombre d'objectifs : %d", objectives.size());
 	*/
-
-
-int ScoutManager::newGoal() const {
-	return scoutGoals.size();
-}
-
-
-pGoal ScoutManager::getGoal(){
-	pGoal p=scoutGoals.front();
-	scoutGoals.pop_front();
-	return p;
-}
 
 void ScoutManager::onUnitShow(BWAPI::Unit* unit){
 	if(unit->getPlayer()->isEnemy(BWAPI::Broodwar->self()) && to_remove == false){

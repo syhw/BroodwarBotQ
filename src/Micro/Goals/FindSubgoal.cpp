@@ -1,5 +1,5 @@
 #include "FindSubgoal.h"
-	
+#include "Defines.h"
 FindSubgoal::FindSubgoal(SubgoalLogic l) :
 Subgoal(l),
 achieved(false)
@@ -17,7 +17,14 @@ bool FindSubgoal::isRealized(){
 }
 
 bool FindSubgoal::check(){
-	return regions->EnemyFound();	
+	if (regions->EnemyFound()){
+#ifdef __DEBUG__LOUIS
+		BWAPI::Broodwar->printf("findSubgoal done");
+#endif
+		return true;
+	}
+	return false;
+//	return regions->EnemyFound();
 }
 
 void FindSubgoal::tryToRealize(UnitsGroup * ug){

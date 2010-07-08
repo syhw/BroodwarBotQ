@@ -65,6 +65,8 @@ bool ZealotUnit::canHit(BWAPI::Unit* enemy)
 
 int ZealotUnit::getTimeToAttack()
 {
+#ifdef __DEBUG_NICOLAS__
     BWAPI::Broodwar->printf("ZealotUnit::getTimeToAttack non implémenté !");
+#endif 
     return 0;
 }
