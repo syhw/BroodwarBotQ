@@ -15,6 +15,7 @@ BattleUnit::BattleUnit(BWAPI::Unit* unit)
 , timeIdle(0)
 , _tick(0)
 , targetEnemy(NULL)
+, targetEnemyInRange(NULL)
 #ifdef UNIT_DEBUG
 , _unitType(unit->getType().getName())
 #endif

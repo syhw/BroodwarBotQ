@@ -43,7 +43,6 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 , _unitsGroup(ug)
 , _sheight(unit->getType().dimensionUp() + unit->getType().dimensionDown())
 , _slarge(unit->getType().dimensionRight() + unit->getType().dimensionLeft())
-, oldTarget(NULL)
 {
     updateDirV();
     mapManager = & MapManager::Instance();
@@ -62,15 +61,6 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 
 BayesianUnit::~BayesianUnit()
 {
-    // TODO O(n) -> O(1) ?
-  /*  for each (pBayesianUnit it in _unitsGroup->getAttackersEnemy()[oldTarget])
-    {
-        if ( (*it) == *this )
-        {
-           _unitsGroup->getAttackersEnemy()[oldTarget].remove(it);
-            return;
-        }
-    }*/
 }
 
 void BayesianUnit::initDefaultProb()
@@ -608,6 +598,7 @@ void BayesianUnit::update()
         && (p.getDistance(target) < 4 
             || (_ground_unit && BWTA::isConnected(TilePosition(p), TilePosition(target)))))
         switchMode(MODE_INPOS);
+
 #ifdef __DEBUG_NICOLAS__
     this->drawTarget();
 #endif
@@ -653,10 +644,9 @@ void BayesianUnit::update()
             }
         }
         */
-        if (targetEnemy != NULL)
+        if (targetEnemy != NULL && withinRange(targetEnemy))
             attackEnemy(targetEnemy, BWAPI::Colors::Red);
-    } //else if (_mode == MODE_FLOCK) {
-    else {
+    } else if (_mode == MODE_FLOCK) {
         //if (tick())
         {
             //drawAttractors();

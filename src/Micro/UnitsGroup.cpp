@@ -200,22 +200,31 @@ void UnitsGroup::updateUnitsAvaibles(std::vector<pBayesianUnit>::iterator it)
 
 void UnitsGroup::updateTargetOfUnitsAvailables()
 {
-    for each(std::pair<int, cEnemy> eUnit in enemiesInRange)
+    for (unsigned int i = 0; i < NUMBER_OF_PRIORITY; i++)
     {
-        for (std::list<pBayesianUnit>::iterator iter = unitsAvailables.begin(); iter != unitsAvailables.end();)
+        for each(std::pair<int, cEnemy> eUnit in enemiesInRange)
         {
-            if (eUnit.second.damageTaken < eUnit.first && (*iter)->canHit(eUnit.second.self))
+            for (std::list<pBayesianUnit>::iterator iter = unitsAvailables.begin(); iter != unitsAvailables.end();)
             {
-                (*iter)->targetEnemy = eUnit.second.self;
-                //(*iter)->attackEnemy(eUnit.second.self, BWAPI::Colors::Red);
-                eUnit.second.damageTaken += (*iter)->damagesOn(eUnit.second.self);
-                std::list<pBayesianUnit>::iterator tmp = iter;
-                ++iter;
-                unitsAvailables.erase(tmp);
-            }
-            else
-            {
-                ++iter;
+                if ((*iter)->getListPriorite()[i] == eUnit.second.self->getType())
+                {
+                    if (eUnit.second.damageTaken < eUnit.first && (*iter)->canHit(eUnit.second.self))
+                    {
+                        (*iter)->targetEnemy = eUnit.second.self;
+                        eUnit.second.damageTaken += (*iter)->damagesOn(eUnit.second.self);
+                        std::list<pBayesianUnit>::iterator tmp = iter;
+                        ++iter;
+                        unitsAvailables.erase(tmp);
+                    }
+                    else
+                    {
+                        ++iter;
+                    }
+                }
+                else
+                {
+                    ++iter;
+                }
             }
         }
     }
@@ -228,15 +237,15 @@ void UnitsGroup::displayTargets()
         if (u->unit->getOrderTarget())
         {
             int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
-            int ex = u->unit->getOrderTarget()->getTargetPosition().x(); int ey = u->unit->getOrderTarget()->getTargetPosition().y();
+            int ex = u->unit->getOrderTarget()->getPosition().x(); int ey = u->unit->getOrderTarget()->getPosition().y();
             BWAPI::Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Orange);
-        }
         
-        if (u->targetEnemy)
-        {
-            int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
-            int ex = u->targetEnemy->getPosition().x(); int ey = u->targetEnemy->getPosition().y();
-            BWAPI::Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Blue);
+            if (u->targetEnemy && u->unit->getOrderTarget() != u->targetEnemy)
+            {
+                int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
+                int ex = u->targetEnemy->getPosition().x(); int ey = u->targetEnemy->getPosition().y();
+                BWAPI::Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Blue);
+            }
         }
     }
 }
@@ -253,6 +262,7 @@ void UnitsGroup::update()
         updateUnitsAvaibles(it);
         updateEnemiesInRange(it);
     }
+
     updateTargetOfUnitsAvailables();
 
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
@@ -288,15 +298,14 @@ void UnitsGroup::attackMove(BWAPI::Position& p)
     }
 }
 
-void UnitsGroup::move(BWAPI::Position& p){
- for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); it++)
+void UnitsGroup::move(BWAPI::Position& p)
+{
+    for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); it++)
     {
         (*it)->target = p;
-		(*it)->unit->rightClick(p);
+        (*it)->unit->rightClick(p);
     }
-
 }
-
 
 void UnitsGroup::formation(pFormation f)
 {

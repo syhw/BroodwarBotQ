@@ -10,6 +10,7 @@ BWAPI::UnitType ZealotUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes
                                                                 BWAPI::UnitTypes::Protoss_Dragoon,
                                                                 BWAPI::UnitTypes::Protoss_Reaver,
                                                                 BWAPI::UnitTypes::Protoss_Probe};
+
 ZealotUnit::ZealotUnit(BWAPI::Unit* u, UnitsGroup* ug):GroundUnit(u, ug)
 {
 }
@@ -69,4 +70,9 @@ int ZealotUnit::getTimeToAttack()
     BWAPI::Broodwar->printf("ZealotUnit::getTimeToAttack non implémenté !");
 #endif 
     return 0;
+}
+
+BWAPI::UnitType* ZealotUnit::getListPriorite()
+{
+    return ZealotUnit::listPriorite;
 }
