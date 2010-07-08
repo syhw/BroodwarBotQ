@@ -35,6 +35,9 @@ typedef struct __enemy
 class UnitsGroup
 {
 private:
+    std::list<pBayesianUnit> unitsAvailables;
+    std::map<int, cEnemy> enemiesInRange;
+    std::set<BWAPI::Unit*> enemies;
 	int totalHP;
 	int totalPower;
     BWAPI::Position center;
@@ -43,8 +46,17 @@ private:
     void goonMicro(pBayesianUnit u);
     void zealotMicro(pBayesianUnit u);
     void dragoonIA(std::set<BWAPI::Unit*> enemies, double maxRangeGoonEnemy);
+    
 	std::list<pGoal> goals; // list of goals to accomplish
 	GoalManager* goalManager;
+    /// Mets à jour la liste des ennemis à portée de l'UnitsGroup, et ces derniers sont triés par ordre croissant de HP/SP
+    void updateEnemiesInRange(std::vector<pBayesianUnit>::iterator it);
+    /// Mets à jour la liste des unités capables de sélectionner une nouvelle cible
+    void updateUnitsAvaibles(std::vector<pBayesianUnit>::iterator it);
+    /// Assignation des cibles aux unités du UnitsGroup qui sont disponible pour sélectionner une nouvelle cible
+    void updateTargetOfUnitsAvailables();
+    /// Affiche les cibles des unités du UnitsGroup
+    void displayTargets();
 public:
 	
 	UnitsGroup();

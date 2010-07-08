@@ -12,4 +12,5 @@ public:
     ~ReaverUnit();
     virtual void micro();
     virtual bool canHit(BWAPI::Unit* enemy);
+    virtual int getTimeToAttack();
 };

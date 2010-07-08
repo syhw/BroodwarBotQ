@@ -22,14 +22,13 @@ DragoonUnit::~DragoonUnit()
 //Need some improvements, but it works.
 void DragoonUnit::micro()
 {
+    /*
     std::set<Unit*> enemies;
     int damagesTaken = 0;
-    fillEnemies(enemies, damagesTaken);
 
     std::set<Unit*> enemies_in_range;
     double maxRangeGoon = 0.0;
     double maxRangeGoonEnemy = 0.0;
-    fillEnemiesInRangeForDragoon(enemies, enemies_in_range, maxRangeGoon, maxRangeGoonEnemy);
 
     Unit* weakestenemy = UnitsGroup::findWeakestEnemy(enemies_in_range);
   
@@ -40,13 +39,16 @@ void DragoonUnit::micro()
         Unit* closest_enemy = findClosestEnemy(enemies);
         if (closest_enemy)
             attackEnemy(closest_enemy, Colors::Yellow);
+#ifdef __DEBUG_NICOLAS__
         else
             BWAPI::Broodwar->drawLineMap(unit->getPosition().x(),      unit->getPosition().y(),
                                   unit->getTargetPosition().x(),unit->getTargetPosition().y(),
                                   Colors::White);
+#endif
     }
     enemies_in_range.clear();
     dragoonIA(enemies, maxRangeGoonEnemy);
+    */
 }
 
 void DragoonUnit::dragoonIA(std::set<Unit*> enemies, double maxRangeGoonEnemy)
@@ -80,9 +82,11 @@ void DragoonUnit::dragoonIA(std::set<Unit*> enemies, double maxRangeGoonEnemy)
                     if (test && (actualLife/totalLife) < probaFuite) 
                     {
                         myUnit->rightClick(newPos);
+#ifdef __DEBUG_NICOLAS__
                         int ux = myUnit->getPosition().x(); int uy = myUnit->getPosition().y();
                         int ex = myUnit->getTargetPosition().x(); int ey = myUnit->getTargetPosition().y();
                         BWAPI::Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Blue);
+#endif
                         break;
                     }
                 }
@@ -99,4 +103,9 @@ bool DragoonUnit::canHit(Unit* enemy)
 double DragoonUnit::getMaxRange()
 {
     return BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Singularity_Charge) == 1 ? 192.0 : 128.0;
+}
+
+int DragoonUnit::getTimeToAttack()
+{
+    return 8;
 }

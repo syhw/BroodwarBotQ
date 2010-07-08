@@ -18,3 +18,9 @@ bool ArchonUnit::canHit(BWAPI::Unit* enemy)
     BWAPI::Broodwar->printf("ArchonUnit::canHit non implémenté !");
     return false;
 }
+
+int ArchonUnit::getTimeToAttack()
+{
+    BWAPI::Broodwar->printf("ArchonUnit::getTimeToAttack non implémenté !");
+    return 0;
+}

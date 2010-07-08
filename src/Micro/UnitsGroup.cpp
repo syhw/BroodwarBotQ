@@ -1,4 +1,4 @@
-
+#include <Defines.h>
 #include <UnitsGroup.h>
 #include <Position.h>
 #include <algorithm>
@@ -155,19 +155,12 @@ void align(std::vector<Position>& from, std::vector<Position>& to, std::vector<u
 
 Unit* UnitsGroup::findWeakestEnemy(std::set<Unit*> enemies_in_range)
 {
-    Unit* weakestenemy(NULL);
+    Unit* weakestenemy( enemies_in_range.empty() ? NULL : *enemies_in_range.begin() );
     for each(Unit* enemy in enemies_in_range)
     {
-        if (weakestenemy)
-        {
-            int weakesthp = weakestenemy->getHitPoints() + weakestenemy->getShields();
-            int enemyhp = enemy->getHitPoints() + enemy->getShields();
-            if (weakesthp > enemyhp && enemy->isVisible())
-            {
-                weakestenemy = enemy;
-            }
-        }
-        else if (enemy->isVisible())
+        int weakesthp = weakestenemy->getHitPoints() + weakestenemy->getShields();
+        int enemyhp = enemy->getHitPoints() + enemy->getShields();
+        if (weakesthp > enemyhp && enemy->isVisible())
         {
             weakestenemy = enemy;
         }
@@ -175,66 +168,46 @@ Unit* UnitsGroup::findWeakestEnemy(std::set<Unit*> enemies_in_range)
     return weakestenemy;
 }
 
-void UnitsGroup::update()
+void UnitsGroup::updateEnemiesInRange(std::vector<pBayesianUnit>::iterator it)
 {
-    std::list<pBayesianUnit> unitsAvailables;
-    std::map<int, cEnemy> enemiesInRange;
-    this->totalHP = 0;
-
-    // On récupère tous les ennemis.
-    std::set<Unit*> enemies;
+    for each(Unit* v in enemies)
     {
-        std::set<BWAPI::Player*>::iterator iter = Broodwar->getPlayers().begin();
-        for(;iter != Broodwar->getPlayers().end() && !(*iter)->isEnemy(Broodwar->self());iter++);
-        enemies = (*iter)->getUnits();
-    }
-
-    for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
-    {
-        (*it)->update();
-        this->totalHP += (*it)->unit->getHitPoints();
-        this->totalPower += (*it)->unit->getType().groundWeapon().damageAmount();
-
-        // On récupère toutes les unités qui sont en capacités de sélectionner une nouvelle cible
-        if((*it)->unit->getGroundWeaponCooldown() == 8)
-            unitsAvailables.push_back(*it);
-
-        // On récupère tous les ennemis à portée de l'UnitsGroup, et ils sont triés par ordre croissant de HP/SP
-        for each(Unit* v in enemies)
+        if ((*it)->canHit(v))
         {
-            if ((*it)->canHit(v))
-            {
-                // Si l'unité u est en train d'attaquer l'unité v, alors damageTaken = u->damagesOn(v), sinon 0
-                int damageDoneByUnit =  (*it)->unit->getOrderTarget() == v && ((*it)->unit->isStartingAttack() || (*it)->unit->isAttacking())  ? (*it)->damagesOn(v) : 0;
+            // Si l'unité u est en train d'attaquer l'unité v, alors damageTaken = u->damagesOn(v), sinon 0
+            int damageDoneByUnit =  (*it)->targetEnemy == v && (*it)->unit->getGroundWeaponCooldown() != (*it)->getTimeToAttack() && ((*it)->unit->isStartingAttack() || (*it)->unit->isAttacking()) ? (*it)->damagesOn(v) : 0;
 
-                // Si l'unité v n'existe pas dans enemiesInRange, alors je la crée et je la rajoute
-                if (enemiesInRange.count(v->getHitPoints()+v->getShields()) == 0) 
-                {                                     
-                    cEnemy temp = {v, damageDoneByUnit};                    
-                    enemiesInRange.insert(std::pair<int, cEnemy>(v->getHitPoints()+v->getShields(), temp));
-                }
-                else // Sinon je rajoute les dégâts à ses damageTaken
-                {
-                    enemiesInRange[v->getHitPoints()+v->getShields()].damageTaken += damageDoneByUnit;
-                }
+            // Si l'unité v n'existe pas dans enemiesInRange, alors je la crée et je la rajoute
+            if (enemiesInRange.count(v->getHitPoints()+v->getShields()) == 0)
+            {
+                cEnemy temp = {v, damageDoneByUnit};
+                enemiesInRange.insert(std::pair<int, cEnemy>(v->getHitPoints()+v->getShields(), temp));
+            }
+            // Sinon je rajoute les dégâts à ses damageTaken
+            else
+            {
+                enemiesInRange[v->getHitPoints()+v->getShields()].damageTaken += damageDoneByUnit;
             }
         }
     }
+}
 
-    updateCenter();
+void UnitsGroup::updateUnitsAvaibles(std::vector<pBayesianUnit>::iterator it)
+{
+    if((*it)->unit->getGroundWeaponCooldown() == (*it)->getTimeToAttack())
+        unitsAvailables.push_back(*it);
+}
 
-    keepDistance(); // Temporary call to test micro tech
-
-	this->accomplishGoal();
-
-    // On assigne des cibles aux unités du UnitsGroup qui sont en capacités de sélectionner une nouvelle cible
+void UnitsGroup::updateTargetOfUnitsAvailables()
+{
     for each(std::pair<int, cEnemy> eUnit in enemiesInRange)
     {
         for (std::list<pBayesianUnit>::iterator iter = unitsAvailables.begin(); iter != unitsAvailables.end();)
         {
             if (eUnit.second.damageTaken < eUnit.first && (*iter)->canHit(eUnit.second.self))
             {
-                (*iter)->attackEnemy(eUnit.second.self, Colors::Red);
+                (*iter)->targetEnemy = eUnit.second.self;
+                //(*iter)->attackEnemy(eUnit.second.self, BWAPI::Colors::Red);
                 eUnit.second.damageTaken += (*iter)->damagesOn(eUnit.second.self);
                 std::list<pBayesianUnit>::iterator tmp = iter;
                 ++iter;
@@ -246,9 +219,10 @@ void UnitsGroup::update()
             }
         }
     }
+}
 
-#ifdef __DEBUG_NICOLAS__
-    // On affiche les cibles des unités du UnitsGroup
+void UnitsGroup::displayTargets()
+{
     for each(pBayesianUnit u in units)
     {
         if (u->unit->getOrderTarget())
@@ -257,9 +231,45 @@ void UnitsGroup::update()
             int ex = u->unit->getOrderTarget()->getTargetPosition().x(); int ey = u->unit->getOrderTarget()->getTargetPosition().y();
             BWAPI::Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Orange);
         }
+        
+        if (u->targetEnemy)
+        {
+            int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
+            int ex = u->targetEnemy->getPosition().x(); int ey = u->targetEnemy->getPosition().y();
+            BWAPI::Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Blue);
+        }
     }
+}
+
+void UnitsGroup::update()
+{
+    this->totalHP = 0;
+    unitsAvailables.clear();
+    enemiesInRange.clear();
+    enemies = MicroManager::getEnemies();
+
+    for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+    { 
+        updateUnitsAvaibles(it);
+        updateEnemiesInRange(it);
+    }
+    updateTargetOfUnitsAvailables();
+
+    for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+    {
+        (*it)->update();
+        this->totalHP += (*it)->unit->getHitPoints();
+        this->totalPower += (*it)->unit->getType().groundWeapon().damageAmount();
+    }
+
+    updateCenter();
+    keepDistance(); // Temporary call to test micro tech
+	accomplishGoal();
+
+#ifdef __DEBUG_NICOLAS__
+    displayTargets();
 #endif
-    
+
     // for each(pBayesianUnit u in units)
     //     u->micro();
 }

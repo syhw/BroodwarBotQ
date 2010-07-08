@@ -18,3 +18,9 @@ bool MutaliskUnit::canHit(BWAPI::Unit* enemy)
     BWAPI::Broodwar->printf("MutaliskUnit::canHit non implémenté !");
     return false;
 }
+
+int MutaliskUnit::getTimeToAttack()
+{
+    BWAPI::Broodwar->printf("MutaliskUnit::getTimeToAttack non implémenté !");
+    return 0;
+}

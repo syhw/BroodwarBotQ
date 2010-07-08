@@ -1,5 +1,6 @@
 #include "BattleUnit.h"
 #include "Vec.h"
+#include "Defines.h"
 #include "MapManager.h"
 #include <map>
 #include <stdio.h>
@@ -13,6 +14,7 @@ BattleUnit::BattleUnit(BWAPI::Unit* unit)
 : unit(unit)
 , timeIdle(0)
 , _tick(0)
+, targetEnemy(NULL)
 #ifdef UNIT_DEBUG
 , _unitType(unit->getType().getName())
 #endif
@@ -223,21 +225,6 @@ void BattleUnit::onUnitHide(Unit* u)
 {
 }
 
-void BattleUnit::attackEnemy(BWAPI::Unit* u, BWAPI::Color col)
-{
-#ifdef __DEBUG_NICOLAS__
-    int ux = unit->getPosition().x(); int uy = unit->getPosition().y();
-    int ex = u->getPosition().x(); int ey = u->getPosition().y();
-
-    Broodwar->drawLineMap(ux, uy, ex, ey, col);
-#endif
-    
-    if (unit->getOrderTarget() != u && !unit->isMoving())
-    {
-        unit->rightClick(u);
-    }
-}
-
 BWAPI::Unit* BattleUnit::findClosestEnemy(std::set<Unit*> &enemies)
 {
     Unit* closest_enemy = NULL;
@@ -256,54 +243,4 @@ BWAPI::Unit* BattleUnit::findClosestEnemy(std::set<Unit*> &enemies)
         }
     }
     return closest_enemy;
-}
-
-void BattleUnit::fillEnemies(std::set<Unit*> &enemies, int &damagesTaken)
-{
-    for each(Unit* v in Broodwar->getAllUnits())
-    {
-        if (Broodwar->self()->isEnemy(v->getPlayer()))
-        {
-            enemies.insert(v);
-            if (v->getOrderTarget() == unit)// && v->getDistance(u->unit) < 10.0)
-                damagesTaken += v->getType().groundWeapon().damageAmount();
-        }
-    }
-}
-
-void BattleUnit::fillEnemiesInRangeForDragoon(std::set<Unit*> &enemies, std::set<Unit*> &enemies_in_range, double &maxRangeGoon, double &maxRangeGoonEnemy)
-{
-    for each(Unit* enemy in enemies)
-    {
-        if (maxRangeGoon == 0.0) 
-        {
-            maxRangeGoon = unit->getType().groundWeapon().maxRange();
-            for each (UpgradeType upgrade in unit->getType().upgrades()) 
-            {
-                if (upgrade == BWAPI::UpgradeTypes::Singularity_Charge)
-                {
-                    maxRangeGoon *= 1.5;
-                    break;
-                }
-            }
-        }
-
-        if (maxRangeGoonEnemy == 0.0)
-        {
-            maxRangeGoonEnemy = enemy->getType().groundWeapon().maxRange();
-            for each (UpgradeType upgrade in enemy->getType().upgrades()) 
-            {
-                if (upgrade == BWAPI::UpgradeTypes::Singularity_Charge)
-                {
-                    maxRangeGoonEnemy *= 1.5;
-                    break;
-                }
-            }
-        }
-
-        if (unit->getDistance(enemy) < maxRangeGoon) 
-        {
-            enemies_in_range.insert(enemy);
-        }
-    }
 }
