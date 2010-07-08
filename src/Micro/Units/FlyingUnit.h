@@ -11,4 +11,6 @@ class FlyingUnit : public BayesianUnit
         virtual bool canHit(BWAPI::Unit* enemy) = 0;
         virtual int damagesOn(BWAPI::Unit* enemy);
         virtual int getTimeToAttack() = 0;
+        virtual bool withinRange(BWAPI::Unit* enemy);
+        virtual BWAPI::UnitType* getListPriorite() = 0;
 };

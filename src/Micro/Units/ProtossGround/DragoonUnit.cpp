@@ -97,7 +97,12 @@ void DragoonUnit::dragoonIA(std::set<Unit*> enemies, double maxRangeGoonEnemy)
 
 bool DragoonUnit::canHit(Unit* enemy)
 {
-    return enemy->isVisible() && DragoonUnit::getMaxRange() > enemy->getDistance(unit)-enemy->getType().dimensionRight() ;
+    return enemy->isVisible();
+}
+
+bool DragoonUnit::withinRange(Unit* enemy)
+{
+    return DragoonUnit::getMaxRange() > enemy->getDistance(unit)-enemy->getType().dimensionRight();
 }
 
 double DragoonUnit::getMaxRange()
@@ -108,4 +113,9 @@ double DragoonUnit::getMaxRange()
 int DragoonUnit::getTimeToAttack()
 {
     return 8;
+}
+
+BWAPI::UnitType* DragoonUnit::getListPriorite()
+{
+    return DragoonUnit::listPriorite;
 }

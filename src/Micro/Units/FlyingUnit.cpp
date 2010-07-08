@@ -38,3 +38,8 @@ int FlyingUnit::damagesOn(BWAPI::Unit* enemy)
     // L'unité fait au minimum 1 dégât
     return damages < 1 ? 1 : damages;
 }
+
+bool FlyingUnit::withinRange(BWAPI::Unit* enemy)
+{
+    return unit->getDistance(enemy) < 1.0; // to be confirmed
+}

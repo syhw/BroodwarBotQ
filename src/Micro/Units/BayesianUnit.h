@@ -120,4 +120,6 @@ public:
     virtual bool canHit(BWAPI::Unit* enemy) = 0;
     virtual int damagesOn(BWAPI::Unit* enemy) = 0;
     virtual int getTimeToAttack() = 0;
+    virtual bool withinRange(BWAPI::Unit* enemy) = 0;
+    virtual BWAPI::UnitType* getListPriorite() = 0;
 };

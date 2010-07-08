@@ -5,12 +5,12 @@
 
 class ShuttleUnit : public FlyingUnit
 {
-protected:
-    static std::list<BWAPI::UnitType> listPriorite;
 public:
+    static BWAPI::UnitType listPriorite[NUMBER_OF_PRIORITY];
     ShuttleUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~ShuttleUnit();
     virtual void micro();
     virtual bool canHit(BWAPI::Unit* enemy);
     virtual int getTimeToAttack();
+    virtual BWAPI::UnitType* getListPriorite();
 };

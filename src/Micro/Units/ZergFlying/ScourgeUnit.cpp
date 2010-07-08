@@ -1,5 +1,11 @@
 #include "ScourgeUnit.h"
 
+BWAPI::UnitType ScourgeUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes::Zerg_Mutalisk,
+                                                                BWAPI::UnitTypes::Zerg_Scourge,
+                                                                BWAPI::UnitTypes::Protoss_Reaver,
+                                                                BWAPI::UnitTypes::Protoss_Zealot,
+                                                                BWAPI::UnitTypes::Protoss_Probe};
+
 ScourgeUnit::ScourgeUnit(BWAPI::Unit* u, UnitsGroup* ug):FlyingUnit(u, ug)
 {
 }
@@ -22,4 +28,9 @@ bool ScourgeUnit::canHit(BWAPI::Unit* enemy)
 int ScourgeUnit::getTimeToAttack()
 {
     return 0;
+}
+
+BWAPI::UnitType* ScourgeUnit::getListPriorite()
+{
+    return ScourgeUnit::listPriorite;
 }
