@@ -245,8 +245,9 @@ double BayesianUnit::computeProb(unsigned int i)
     if (_mode == MODE_FLOCK)
     {
         /// FLOCKING INFLUENCE
-        //for (unsigned int j = 0; j < _flockValues[i].size(); ++j) // one j for each attractor
-        //    val *= _flockProb[_flockValues[i][j]];
+        // one j for each attractor
+        for (unsigned int j = 0; j < _flockValues[i].size(); ++j)
+            val *= _flockProb[_flockValues[i][j]];
 
         /// OBJECTIVE (pathfinder) INFLUENCE
         double prob_obj = _PROB_GO_OBJ / _unitsGroup->getUnits()->size();
@@ -259,7 +260,7 @@ double BayesianUnit::computeProb(unsigned int i)
             Vec objnorm = obj;
             objnorm.normalize();
             const double tmp = dirvtmp.dot(objnorm);
-            val *= (tmp > 0 ? prob_obj*tmp : 1.0 - prob_obj);
+            val *= (tmp > 0 ? prob_obj*tmp : (1.0 - prob_obj)*tmp);
         }
     }
     return val; // TODO remove
@@ -281,42 +282,45 @@ void BayesianUnit::drawProbs(multimap<double, Vec>& probs, int number)
     //Broodwar->printf("Size: %d\n", probs.size());
     Position up = unit->getPosition();
     Rainbow colors = Rainbow(Color(12, 12, 255), 51); // 5 colors
+    multimap<double, Vec>::const_iterator itmax = probs.end();
+    --itmax;
+    double max = itmax->first;
     for (multimap<double, Vec>::const_iterator it = probs.begin(); it != probs.end(); ++it)
     {
         //Broodwar->printf("proba: %f, Vec: %f, %f\n", it->first, it->second.x, it->second.y);
         if (number == 1)
         {
             const int middle = 64;
-            if (it->first < 0.2)
+            if (it->first < 0.2*max)
                 Broodwar->drawBoxScreen(middle - 4 + (int)it->second.x, middle - 4 + (int)it->second.y,
                 middle + 4 + (int)it->second.x, middle + 4 + (int)it->second.y, colors.rainbow[0], true);
-            else if (it->first >= 0.2 && it->first < 0.4)
+            else if (it->first >= 0.2*max && it->first < 0.4*max)
                 Broodwar->drawBoxScreen(middle - 4 + (int)it->second.x, middle - 4 + (int)it->second.y,
                 middle + 4 + (int)it->second.x, middle + 4 + (int)it->second.y, colors.rainbow[1], true);
-            else if (it->first >= 0.4 && it->first < 0.6)
+            else if (it->first >= 0.4*max && it->first < 0.6*max)
                 Broodwar->drawBoxScreen(middle - 4 + (int)it->second.x, middle - 4 + (int)it->second.y,
                 middle + 4 + (int)it->second.x, middle + 4 + (int)it->second.y, colors.rainbow[2], true);
-            else if (it->first >= 0.6 && it->first < 0.8)
+            else if (it->first >= 0.6*max && it->first < 0.8*max)
                 Broodwar->drawBoxScreen(middle - 4 + (int)it->second.x, middle - 4 + (int)it->second.y,
                 middle + 4 + (int)it->second.x, middle + 4 + (int)it->second.y, colors.rainbow[3], true);
-            else if (it->first >= 0.8)
+            else if (it->first >= 0.8*max)
                 Broodwar->drawBoxScreen(middle - 4 + (int)it->second.x, middle - 4 + (int)it->second.y,
                 middle + 4 + (int)it->second.x, middle + 4 + (int)it->second.y, colors.rainbow[4], true);
         } else
         {
-            if (it->first < 0.2)
+            if (it->first < 0.2*max)
                 Broodwar->drawBoxMap(up.x() - 4 + (int)it->second.x, up.y() - 4 + (int)it->second.y,
                 up.x() + 4 + (int)it->second.x, up.y() + 4 + (int)it->second.y, colors.rainbow[0], true);
-            else if (it->first >= 0.2 && it->first < 0.4)
+            else if (it->first >= 0.2*max && it->first < 0.4*max)
                 Broodwar->drawBoxMap(up.x() - 4 + (int)it->second.x, up.y() - 4 + (int)it->second.y,
                 up.x() + 4 + (int)it->second.x, up.y() + 4 + (int)it->second.y, colors.rainbow[1], true);
-            else if (it->first >= 0.4 && it->first < 0.6)
+            else if (it->first >= 0.4*max && it->first < 0.6*max)
                 Broodwar->drawBoxMap(up.x() - 4 + (int)it->second.x, up.y() - 4 + (int)it->second.y,
                 up.x() + 4 + (int)it->second.x, up.y() + 4 + (int)it->second.y, colors.rainbow[2], true);
-            else if (it->first >= 0.6 && it->first < 0.8)
+            else if (it->first >= 0.6*max && it->first < 0.8*max)
                 Broodwar->drawBoxMap(up.x() - 4 + (int)it->second.x, up.y() - 4 + (int)it->second.y,
                 up.x() + 4 + (int)it->second.x, up.y() + 4 + (int)it->second.y, colors.rainbow[3], true);
-            else if (it->first >= 0.8)
+            else if (it->first >= 0.8*max)
                 Broodwar->drawBoxMap(up.x() - 4 + (int)it->second.x, up.y() - 4 + (int)it->second.y,
                 up.x() + 4 + (int)it->second.x, up.y() + 4 + (int)it->second.y, colors.rainbow[4], true);
         }
