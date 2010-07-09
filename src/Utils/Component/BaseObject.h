@@ -28,8 +28,10 @@ public:
 		// Qt widget interface
 		virtual QWidget* createWidget(QWidget* parent) const; // must return the new widget with given parent
 		virtual void refreshWidget(QWidget* widget) const = 0; // update the given widget wich was returned by createWidget(QWidget* parent)
+#ifdef BW_QT_DEBUG
 signals:
 	void refreshWidget();
+#endif
 
 public:
 		std::string getClassName() const;

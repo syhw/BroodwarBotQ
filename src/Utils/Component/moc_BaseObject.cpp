@@ -7,6 +7,7 @@
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
+#ifdef BW_QT_DEBUG
 #include "BaseObject.h"
 #if !defined(Q_MOC_OUTPUT_REVISION)
 #error "The header file 'BaseObject.h' doesn't include <QObject>."
@@ -83,3 +84,4 @@ void BaseObject::refreshWidget()
     QMetaObject::activate(this, &staticMetaObject, 0, 0);
 }
 QT_END_MOC_NAMESPACE
+#endif

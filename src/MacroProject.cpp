@@ -153,7 +153,9 @@ void BattleBroodAI::onStart()
     Broodwar->self()->getRace().getName().c_str();
     Broodwar->enemy()->getRace().getName().c_str();
 
+#ifdef BW_QT_DEBUG
 		g_onStartDone = true;
+#endif
 }
 
 void BattleBroodAI::onEnd(bool isWinner)

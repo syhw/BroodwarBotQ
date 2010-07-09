@@ -11,6 +11,7 @@
 MicroAIModule* broodAI = NULL;
 QApplication* qapplication = NULL;
 MainWindow* qmainwindow = NULL;
+bool g_onStartDone = false;
 
 #define BUF_SIZE 255
 
@@ -85,8 +86,15 @@ DWORD WINAPI LaunchMonitor(LPVOID lpParam)
     char* name = "AI-Monitor";
     char** argv = &name;
     qapplication = new QApplication(argc, argv);
-    MainWindow w;//(0, (MicroAIModule*)broodAI);
-    w.show();
+    qmainwindow = new MainWindow;
+
+		while(!g_onStartDone)
+		{
+			Sleep(50);
+		}
+
+		qmainwindow->show();
+		qmainwindow->initComponentsTree();
     qapplication->exec();
 #endif
 
