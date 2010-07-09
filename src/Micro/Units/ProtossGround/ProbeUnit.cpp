@@ -16,18 +16,24 @@ ProbeUnit::~ProbeUnit()
 
 void ProbeUnit::micro()
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("ProbeUnit::micro non implémenté !");
+#endif
 }
 
 bool ProbeUnit::canHit(BWAPI::Unit* enemy)
 {
-    //BWAPI::Broodwar->printf("ProbeUnit::canHit non implémenté !");
+#ifdef __NON_IMPLEMENTE__
+    BWAPI::Broodwar->printf("ProbeUnit::canHit non implémenté !");
+#endif
     return false;
 }
 
 int ProbeUnit::getTimeToAttack()
 {
-    //BWAPI::Broodwar->printf("ProbeUnit::getTimeToAttack non implémenté !");
+#ifdef __NON_IMPLEMENTE__
+    BWAPI::Broodwar->printf("ProbeUnit::getTimeToAttack non implémenté !");
+#endif
     return 0;
 }
 

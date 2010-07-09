@@ -16,12 +16,16 @@ ObserverUnit::~ObserverUnit()
 
 void ObserverUnit::micro()
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("ObserverUnit::micro non implémenté !");
+#endif
 }
 
 bool ObserverUnit::canHit(BWAPI::Unit* enemy)
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("ObserverUnit::canHit non implémenté !");
+#endif
     return false;
 }
 

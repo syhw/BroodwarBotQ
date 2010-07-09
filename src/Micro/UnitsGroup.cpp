@@ -168,7 +168,7 @@ Unit* UnitsGroup::findWeakestEnemy(std::set<Unit*> enemies_in_range)
     return weakestenemy;
 }
 
-void UnitsGroup::updateEnemiesInRange(std::vector<pBayesianUnit>::iterator it)
+void UnitsGroup::updateEnemiesInSight(std::vector<pBayesianUnit>::iterator it)
 {
     for each(Unit* v in enemies)
     {
@@ -177,16 +177,16 @@ void UnitsGroup::updateEnemiesInRange(std::vector<pBayesianUnit>::iterator it)
             // Si l'unité u est en train d'attaquer l'unité v, alors damageTaken = u->damagesOn(v), sinon 0
             int damageDoneByUnit =  (*it)->targetEnemy == v && (*it)->unit->getGroundWeaponCooldown() != (*it)->getTimeToAttack() && ((*it)->unit->isStartingAttack() || (*it)->unit->isAttacking()) ? (*it)->damagesOn(v) : 0;
 
-            // Si l'unité v n'existe pas dans enemiesInRange, alors je la crée et je la rajoute
-            if (enemiesInRange.count(v->getHitPoints()+v->getShields()) == 0)
+            // Si l'unité v n'existe pas dans enemiesInSight, alors je la crée et je la rajoute
+            if (enemiesInSight.count(v->getHitPoints()+v->getShields()) == 0)
             {
                 cEnemy temp = {v, damageDoneByUnit};
-                enemiesInRange.insert(std::pair<int, cEnemy>(v->getHitPoints()+v->getShields(), temp));
+                enemiesInSight.insert(std::pair<int, cEnemy>(v->getHitPoints()+v->getShields(), temp));
             }
             // Sinon je rajoute les dégâts à ses damageTaken
             else
             {
-                enemiesInRange[v->getHitPoints()+v->getShields()].damageTaken += damageDoneByUnit;
+                enemiesInSight[v->getHitPoints()+v->getShields()].damageTaken += damageDoneByUnit;
             }
         }
     }
@@ -202,24 +202,23 @@ void UnitsGroup::updateTargetOfUnitsAvailables()
 {
     for (unsigned int i = 0; i < NUMBER_OF_PRIORITY; i++)
     {
-        for each(std::pair<int, cEnemy> eUnit in enemiesInRange)
+        for each(std::pair<int, cEnemy> eUnit in enemiesInSight)
         {
             for (std::list<pBayesianUnit>::iterator iter = unitsAvailables.begin(); iter != unitsAvailables.end();)
             {
-                if ((*iter)->getListPriorite()[i] == eUnit.second.self->getType())
+                if ((*iter)->getListPriorite()[i] == eUnit.second.self->getType() && eUnit.second.damageTaken < eUnit.first && (*iter)->canHit(eUnit.second.self))
                 {
-                    if (eUnit.second.damageTaken < eUnit.first && (*iter)->canHit(eUnit.second.self))
+                    (*iter)->targetEnemy = eUnit.second.self;
+                    eUnit.second.damageTaken += (*iter)->damagesOn(eUnit.second.self);
+
+                    std::list<pBayesianUnit>::iterator tmp = iter;
+                    ++iter;/*
+                    if (!(*tmp)->withinRange(eUnit.second.self))
                     {
-                        (*iter)->targetEnemy = eUnit.second.self;
-                        eUnit.second.damageTaken += (*iter)->damagesOn(eUnit.second.self);
-                        std::list<pBayesianUnit>::iterator tmp = iter;
-                        ++iter;
-                        unitsAvailables.erase(tmp);
-                    }
-                    else
-                    {
-                        ++iter;
-                    }
+                        copy.push_front(pBayesianUnit(*tmp));
+                    }*/
+                    
+                    unitsAvailables.erase(tmp);
                 }
                 else
                 {
@@ -227,7 +226,36 @@ void UnitsGroup::updateTargetOfUnitsAvailables()
                 }
             }
         }
-    }
+    }/*
+    if (!copy.empty())
+    {
+        for (unsigned int i = 0; i < NUMBER_OF_PRIORITY; i++)
+        {
+            for each(std::pair<int, cEnemy> eUnit in enemiesInSight)
+            {
+                for (std::list<pBayesianUnit>::iterator iter = copy.begin(); iter != copy.end();)
+                {
+                    if ((*iter)->getListPriorite()[i] == eUnit.second.self->getType() && eUnit.second.damageTaken < eUnit.first && (*iter)->canHit(eUnit.second.self) && (*iter)->withinRange(eUnit.second.self))
+                    {
+                        (*iter)->targetEnemyInRange = eUnit.second.self;
+                        eUnit.second.damageTaken += (*iter)->damagesOn(eUnit.second.self);
+                        std::list<pBayesianUnit>::iterator tmp = iter;
+                        ++iter;
+                        if (!(*tmp)->withinRange(eUnit.second.self))
+                        {
+                            copy.push_front(*tmp);
+                        }
+                        
+                        copy.erase(tmp);
+                    }
+                    else
+                    {
+                        ++iter;
+                    }
+                }
+            }
+        }
+    }*/
 }
 
 void UnitsGroup::displayTargets()
@@ -254,13 +282,13 @@ void UnitsGroup::update()
 {
     this->totalHP = 0;
     unitsAvailables.clear();
-    enemiesInRange.clear();
+    enemiesInSight.clear();
     enemies = MicroManager::getEnemies();
 
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     { 
         updateUnitsAvaibles(it);
-        updateEnemiesInRange(it);
+        updateEnemiesInSight(it);
     }
 
     updateTargetOfUnitsAvailables();

@@ -16,18 +16,24 @@ HighTemplarUnit::~HighTemplarUnit()
 
 void HighTemplarUnit::micro()
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("HighTemplarUnit::micro non implémenté !");
+#endif
 }
 
 bool HighTemplarUnit::canHit(BWAPI::Unit* enemy)
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("HighTemplarUnit::canHit non implémenté !");
+#endif
     return false;
 }
 
 int HighTemplarUnit::getTimeToAttack()
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("HighTemplarUnit::getTimeToAttack non implémenté !");
+#endif
     return 0;
 }
 
