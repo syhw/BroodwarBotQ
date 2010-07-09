@@ -17,6 +17,7 @@ class EUnitsFilter : public CSingleton<EUnitsFilter>, public BaseObject
 public:
     EUnitsFilter();
     ~EUnitsFilter() { }
+		void update();
     void update(BWAPI::Unit* u);
 	void onUnitDestroy(BWAPI::Unit* u);
 	void onUnitMorph(BWAPI::Unit* u);

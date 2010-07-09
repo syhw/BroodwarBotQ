@@ -11,8 +11,15 @@ EUnitsFilter::EUnitsFilter()
     timeManager = & TimeManager::Instance();
 }
 
+void EUnitsFilter::update()
+{
+	BaseObject::update();
+}
+
 void EUnitsFilter::update(Unit* u)
 {
+	sout << "allez, un petit test." << sendl;
+	serr << "et maintenant en tant qu'erreur" << sendl;
     if (u->getPlayer() == Broodwar->self()) return;
     if (u->getPlayer()->isNeutral()) return;
     if (eViewedUnits.count(u))

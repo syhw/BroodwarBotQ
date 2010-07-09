@@ -366,6 +366,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\src\Utils\Component\moc_BaseObject.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\src\Utils\Component\ObjectManager.cpp"
 						>
 					</File>
