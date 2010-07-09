@@ -2,6 +2,8 @@
 #include "Defines.h"
 #include <BWAPI.h>
 
+#ifdef BW_QT_DEBUG
+
 using namespace std;
 
 QtOutputer::QtOutputer(/*QWidget* parent*/)
@@ -86,3 +88,4 @@ void QtOutputer::output(QWidget* qw)
     }
     widget;*/
 }
+#endif

@@ -40,7 +40,6 @@ private:
     std::set<BWAPI::Unit*> enemies;
 	int totalHP;
 	int totalPower;
-    BWAPI::Position center;
     std::vector<pBayesianUnit> units;
     std::map<BWAPI::Unit*, std::list<pBayesianUnit> > attackersEnemy;
     void goonMicro(pBayesianUnit u);
@@ -62,6 +61,7 @@ public:
 	UnitsGroup();
 	~UnitsGroup();
 
+    BWAPI::Position center;
 	std::map<BWAPI::UnitSizeType, int> sizes;
 
 	virtual void update();
@@ -78,6 +78,7 @@ public:
 	
 	//virtual bool checkInFormation();
 	//virtual bool checkAtDestination();
+    int size();
 	virtual void updateCenter();
     virtual BWAPI::Position getCenter() const;
 
@@ -96,6 +97,7 @@ public:
     int getTotalHP() const;
     std::vector<pBayesianUnit>* getUnits();
     std::map<BWAPI::Unit*, std::list<pBayesianUnit> >& getAttackersEnemy();
+    
 
     static BWAPI::Unit* findWeakestEnemy(std::set<BWAPI::Unit*> enemies_in_range);
 

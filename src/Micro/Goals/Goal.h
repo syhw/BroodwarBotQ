@@ -7,7 +7,7 @@ typedef boost::shared_ptr<Goal> pGoal;
 #include <BWTA.h>
 #include <windows.h>
 #include "Formations.h"
-
+#include <list>
 
 class UnitsGroup;
 
@@ -32,6 +32,7 @@ public:
 
 	//Constructors
 	Goal();
+    Goal(pSubgoal s);
 	virtual ~Goal();
 	
 	virtual void achieve(UnitsGroup* ug);//Start the goal

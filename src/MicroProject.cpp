@@ -2,6 +2,7 @@
 #include "Goal.h"
 #include <AttackGoal.h>
 #include "DefendGoal.h"
+#include "FormationSubgoal.h"
 #include <stdio.h>
 using namespace BWAPI;
 using namespace std;
@@ -73,7 +74,14 @@ void MicroAIModule::onStart()
 		if (!((*l) == mp))
 			p = BWAPI::Position(*l);
 	}
-    pFormation form = pFormation(new LineFormation(Position(22*32,37*32), Vec(1,0)));
+
+    /// EXEMPLE FOR THE FLOCK_2 and FLOCK_8 MAPS
+    pFormation tmp_form = pFormation(new SquareFormation(Position(56*32,56*32), Vec(1,0)));
+	pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(
+        SL_AND, tmp_form, mm)
+    );
+    pGoal tmp_goal = pGoal(new Goal(tmp_subgoal));
+    goals.push_back(tmp_goal);
 	 
     //gl->setFormation(form);
 

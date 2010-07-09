@@ -552,6 +552,11 @@ void UnitsGroup::display()
 	
 }
 
+int UnitsGroup::size()
+{
+    return units.size();
+}
+
 void UnitsGroup::updateCenter()
 {
     center = Position(0, 0);

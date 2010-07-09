@@ -6,6 +6,11 @@ logic(l)
 {
 }
 
+Subgoal::Subgoal(const Subgoal& s) :
+logic(s.getLogic())
+{
+}
+
 Subgoal::~Subgoal(){
 }
 

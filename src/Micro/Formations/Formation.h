@@ -26,5 +26,6 @@ public:
 	Formation(const BWAPI::Position& p, const Vec& direction = Vec(0,0));
 	~Formation();
 
+    // TODO should be called on onUnitDestroy for us
 	virtual void computeToPositions(const std::vector<pBayesianUnit>& vUnit);
 };

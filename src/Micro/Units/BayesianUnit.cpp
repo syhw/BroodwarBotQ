@@ -593,11 +593,25 @@ void BayesianUnit::onUnitHide(Unit* u)
 void BayesianUnit::update()
 {
     if (!unit->exists()) return;
+    if (targetEnemy != NULL && withinRange(targetEnemy))
+    {
+        attackEnemy(targetEnemy, BWAPI::Colors::Red);
+        return;
+    }
+    drawAttractors();
+    drawTarget();
+    updateDir();
+    drawDir();
+    clickDir();
+    drawFlockValues();
+    return;
+
     Position p = unit->getPosition();
     if ((_mode == MODE_FLOCK && _mode == MODE_FLOCKFORM)
         && (p.getDistance(target) < 4 
             || (_ground_unit && BWTA::isConnected(TilePosition(p), TilePosition(target)))))
         switchMode(MODE_INPOS);
+    _mode = MODE_FLOCK;
 
 #ifdef __DEBUG_NICOLAS__
     this->drawTarget();
