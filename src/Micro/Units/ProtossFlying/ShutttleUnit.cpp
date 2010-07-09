@@ -16,7 +16,9 @@ ShuttleUnit::~ShuttleUnit()
 
 void ShuttleUnit::micro()
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("ShuttleUnit::micro non implémenté !");
+#endif
 }
 
 bool ShuttleUnit::canHit(BWAPI::Unit* enemy)
@@ -26,7 +28,9 @@ bool ShuttleUnit::canHit(BWAPI::Unit* enemy)
 
 int ShuttleUnit::getTimeToAttack()
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("ShuttleUnit::getTimeToAttack non implémenté !");
+#endif
     return 0;
 }
 

@@ -16,18 +16,24 @@ ArchonUnit::~ArchonUnit()
 
 void ArchonUnit::micro()
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("ArchonUnit::micro non implémenté !");
+#endif
 }
 
 bool ArchonUnit::canHit(BWAPI::Unit* enemy)
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("ArchonUnit::canHit non implémenté !");
+#endif
     return false;
 }
 
 int ArchonUnit::getTimeToAttack()
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("ArchonUnit::getTimeToAttack non implémenté !");
+#endif
     return 0;
 }
 
