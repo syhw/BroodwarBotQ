@@ -1,8 +1,10 @@
 #pragma once
 
+//our defines
 #define __DEBUG__LOUIS
-#define BW_QT_DEBUG
+#define __DEBUG_GABRIEL__
 
+#define BW_QT_DEBUG
 #ifdef BW_QT_DEBUG
 #include <QtGui/QApplication>
 #include "MainWindow.h"

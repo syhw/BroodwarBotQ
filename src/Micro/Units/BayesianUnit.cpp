@@ -649,12 +649,12 @@ void BayesianUnit::update()
     } else if (_mode == MODE_FLOCK) {
         //if (tick())
         {
-            //drawAttractors();
-            //drawTarget();
+            drawAttractors();
+            drawTarget();
             updateDir();
-            //drawDir();
+            drawDir();
             clickDir();
-            //drawFlockValues();
+            drawFlockValues();
         }
         //Broodwar->drawLine(CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), target.x(), target.y(), BWAPI::Color(92, 92, 92));
     }
