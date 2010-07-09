@@ -12,8 +12,7 @@ public:
 		BaseObject(std::string name);
     ~BaseObject();
 
-		void registerToObjManager();
-    std::string getClassName() const;
+		std::string getClassName() const;
     void processStream(std::ostream& out);
     void addData(BaseData* data);
     const std::vector<BaseData*>& getData() const;

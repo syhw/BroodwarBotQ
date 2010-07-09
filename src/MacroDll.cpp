@@ -97,7 +97,14 @@ DWORD WINAPI LaunchMonitor(LPVOID lpParam )
 	char** argv = &name;
 	qapplication = new QApplication(argc, argv);
     qmainwindow = new MainWindow();
+
+	while(!g_onStartDone)
+	{
+		Sleep(50);
+	}
+
 	qmainwindow->show();
+	qmainwindow->initComponentsTree();
 	qapplication->exec();
 #endif
 	return 0; 

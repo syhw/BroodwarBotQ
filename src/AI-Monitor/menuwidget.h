@@ -2,7 +2,10 @@
 #define MENUWIDGET_H
 
 #include <QtGui/QWidget>
-#include "ui_menuwidget.h"
+
+namespace Ui {
+	class MenuWidget;
+}
 
 class MenuWidget : public QWidget {
     Q_OBJECT
