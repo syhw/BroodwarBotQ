@@ -49,13 +49,13 @@ void MicroManager::onOffer(std::set<BWAPI::Unit*> units)
 		{
 			arbitrator->accept(this, *u);
 			if (unitsgroups.empty())
-			{
+		{	
 				UnitsGroup* ug = new UnitsGroup();
 				unitsgroups.push_back( ug);
 				sendGroupToDefense (ug);
 			}
 			
-			unitsgroups.back()->takeControl(*u);
+			//unitsgroups.back()->takeControl(*u);
 			//Broodwar->printf("New %s added to the micro manager", (*u)->getType().getName().c_str());
 		}
 		else

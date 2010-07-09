@@ -12,7 +12,7 @@ bool FindSubgoal::isRealized(){
 	if(achieved)
 		return true;
 	else
-		check();
+		achieved=check();
 		return achieved;
 }
 

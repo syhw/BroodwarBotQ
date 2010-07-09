@@ -3,28 +3,19 @@
 
 
 ##News
+07/09 Please read again this wiki, a lot of things have changed.
+
 07/07 Formation are now part of some subgoals. The subgoals with the identificator _F in their type use a formation to accomplish the subgoal
 
 
 ##Files
-The concerned files are, for the moment, Goal.* , Subgoal.* , AttackGoal.* , DefendGoal.* , ScoutGoal.*
+The concerned files are, for the moment, *Goal.* , *Subgoal.* 
 
 ##Generalities
 ###Goal
-A goal has a type (GoalType type), a status (GoalStatus status), a list of subgoals (std::list\<pSubgoal\> subgoals) and a formation (pFormation formation).
+A goal has a status (GoalStatus status) and a list of subgoals (std::list\<pSubgoal\> subgoals).
 
-possible types : (new types can be added)
-
-	-GT_UNDEFINED
-	
-	-GT_SCOUT 
-	
-	-GT_ATTACK
-	
-	-GT_DEFEND
-	
-
-possible status : (no new status should be required)
+possible status : (new status can be created if you ask gently)
 
 	-GS_ND_STATUS
 	
@@ -37,56 +28,50 @@ possible status : (no new status should be required)
 	-GS_FLEE
 	
 	-GS_NOT_STARTED
+	
+	
 ###Subgoal
- A subgoal has a type (SubgoalType type), a condition (SubgoalCondition cond) and a Position (BWAPI::Position pos)
+ A subgoal has a logic (SubgoalLogic logic)
  
-possible types : (new types can be added)
+possible logic : 
+	-SL_AND
+	
+	-SL_OR
+	
+The subgoal class is abstract, and thus must be extended.
+The functions to overload are :
 
-	-ST_REACH_BY_UG  means the units group must reach pos
-	
-	-ST_REACH  means any unit must reach pos
-	
-	-ST_VIEW means pos must be viewable
-	
-	-ST_ATTACK means the unitsgroup will attack toward pos
-	
-	-ST_REACH_F 
-	
-	-ST_ATTACK_F 
-	
-	The types with the identificator _F means they use formation instead of position
-	
-possible conditions : 
+- check : returns if the condition of validation of the subgoal is true or false.
 
-	-SC_ONCE means that if the subgoal is validated once, it will remain validated
-	
-	-SC_ACTIVE means that this subgoal can be validated or not at any moment (whatever was its previous status)
-	
-	A subgoal which uses a formation is valid if all its unit have reached the mode IN_POS.
-	
+- isRealized : returns if the subgoal is accomplished or not.
+In some cases this function can return only check. But you might need to have the subgoal noted as accomplished when check returned true once in the past.
+It is up to you to use both functions to have the behavior you want.
+
+- tryToRealize : this functions should give orders to a unitsgroup to accomplish this subgoal.
+
+- distanceToRealize : returns a double value which represents an approximate distance for a given UnitsGroup to accomplish the subgoal.
+It is important to notice that some subgoals cannot be achieved by giving orders.
+This is represented by the fact that their distanceToRealize function returns a negative value.
+ 	
 ##Default behavior
 
-When creating a Goal, by default, the type is GT_UNDEFINED and status is GS_NOT_STARTED. 
-To have a unitsGroup accomplishing a goal, the unitsgroup must call the achieve function. By default, it will check if the goal is achieved, and if not, have the unitsGroup trying to
-comply the first subgoal of the list that is not validated. The test to know whether the goal is finished or not is done by the function checkAchievement.
-This function MUST set the goal status to GS_ACHIEVED if the goal is finished. By default, this function check if all the subgoals are done, and if so, change the status of the goal to GS_ACHIEVED.
-A unitsGroup without goal does nothing. If a unitsGroup has only 1 goal in its list, this goal will be kept even if accomplished, so that units
-joining the group after the accomplishment will have the unitsGroup accomplishing once again the goal (useful for defendGoal for instance).
-Yet a unitsGroup with only 1 goal achieved in its list does nothing. By default, a goal without any subgoal will be marked as achieved.
+When creating a Goal, by default, its status is GS_NOT_STARTED. 
+The checkAchievement function tests whether the goal is done and if so, set its status
+to GS_ACHIEVED. The goal is done when :
 
-N.B. : By default, i mean using the Goal class without extending it, or without overloading the achieve and checkAchievement function
+	- One of its subgoal of logic SL_OR is accomplished. In this case, goal stop checking the other subgoals.
+	
+	- All of its subgoal of logic SL_AND are accomplished.
+
+
+The Achieve function gives directions to the unitsGroup to accomplish the Goal. The principle is to ask all its subgoal an estimation of the distance
+to achieve the subgoal. The goal will evaluate the smaller positive distance of all its subgoal and then call its tryToRealize function. 
+
 
 ##Creating new goals
-###New subgoals
-It is possible to create new subgoal by adding types or conditions. Creating a new type requires to handle it in the check function of the class Subgoal
-The same goes for the condition.
 
 ###New goals
 It is possible to create new classes that extend Goal (like AttackGoal, DefendGoal and ScoutGoal).
 These classes can overload, on need, the achieve and checkAchievement functions.
-It is not compulsory to overload both functions. The achieve function by default, will call checkAchievement (the overloaded one if it exists).
-Extending the Goal class, requires to create at least one new type of goal, and all goals of this new class will have these types. 
-It is also possible to create only a new type of a previously created class that extends Goal. For instance, it is possible to create the type GT_HITANDRUN and to create AttackGoal 
-of that type. The checkAchievement or achieve functions of the AttackGoal class must thus be modified to take into account this new type of AttackGoal.
- 
+It is not compulsory to overload both functions. The achieve function by default, will call checkAchievement (the overloaded one if it exists). 
 

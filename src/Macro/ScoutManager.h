@@ -41,6 +41,7 @@ public:
 	void exploreRegion(BWTA::Region* region);//New
 
 private:
+	UnitsGroup* findUnitsGroup(pGoal goal);
 	bool to_remove;
     void updateScoutAssignments();
 	MicroManager * microManager;

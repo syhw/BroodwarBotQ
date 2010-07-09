@@ -16,6 +16,11 @@ ScoutManager::~ScoutManager( )
 
 void ScoutManager::update()
 {
+	//if(regions->EnemyFound() && !to_remove ){
+	//	to_remove = true;
+		//TOCHANGE add a condition of the last time seen of the region of the ennemy
+		//this->exploreRegion();
+	//}
 }
 
 std::string ScoutManager::getName() const
@@ -58,7 +63,7 @@ void ScoutManager::checkEmptyXP()
 ////////////////////////////NEW SECTION
 
 void ScoutManager::onUnitCreate(BWAPI::Unit* unit){
-	if(BWAPI::Broodwar->self()->supplyUsed() == 18 && unit->getType().isWorker() && !regions->EnemyFound()){
+	if(BWAPI::Broodwar->self()->supplyUsed() == 10 && unit->getType().isWorker() && !regions->EnemyFound()){
 #ifdef __DEBUG__LOUIS
 		BWAPI::Broodwar->printf("gotta find the enemy, ScoutManager created the objective");
 #endif
@@ -68,6 +73,7 @@ void ScoutManager::onUnitCreate(BWAPI::Unit* unit){
 
 
 void ScoutManager::findEnemy(){
+
 	//Create a new scoutGoal 
 	pGoal goal = pGoal(new ScoutGoal());
 	pSubgoal sb;
@@ -85,26 +91,7 @@ void ScoutManager::findEnemy(){
 	sb=pSubgoal(new FindSubgoal(SL_OR));
 	goal->addSubgoal(sb);
 
-	//Find the appropriate UnitsGroup
-	
-	//Select a worker
-	UnitsGroup* ug;	
-	double minDist=999999;
-	double curDist=0;
-	
-		//Check over all the already created unitsGroup which one is near the first subgoal to accomplish
-		//TODO
-
-		
-	//NO unitsgroup already found, must create a new one
-	ug = new UnitsGroup();	
-	for each(Unit* u in Broodwar->getAllUnits()){
-		if (u->getPlayer()==Broodwar->self()&&u->getType().isWorker()&& !(u->isConstructing())){
-			ug->takeControl(u);
-			break;
-		}
-	}
-
+	UnitsGroup* ug = this->findUnitsGroup(goal);
 	//Check if the unitsGroup is not empty else Segfault ?
 	if (ug->getUnits()->size() != 0) {
 	//TOCHECK
@@ -115,10 +102,20 @@ void ScoutManager::findEnemy(){
 		Broodwar->printf("Could not find an appropriate unit for this scout goal");
 		Broodwar->printf("Problem...");
 	}
-
 }
 
 void ScoutManager::exploreRegion(BWTA::Region* region){
+
+	//Create a goal
+	pGoal goal = pGoal(new ScoutGoal());
+	
+	//Add each point of the Polygon that defines the area as a seesubgoal
+	BWTA::Polygon polygon = region->getPolygon();
+	for(std::vector<Position>::iterator it = polygon.begin(); it != polygon.end(); ++it){
+		goal->addSubgoal(pSubgoal(new SeeSubgoal(SL_AND,(*it))));
+	}
+	
+
 }
 /*
 	BWTA::Polygon polygon = region->getPolygon();
@@ -218,4 +215,29 @@ void ScoutManager::onUnitShow(BWAPI::Unit* unit){
 		//enemy found, must explore his base
 		this->exploreRegion(BWTA::getRegion(unit->getTilePosition()));
 	}
+}
+
+
+UnitsGroup* ScoutManager::findUnitsGroup(pGoal goal){
+
+		//Find the appropriate UnitsGroup
+	
+	//Select a worker
+	UnitsGroup* ug;	
+	double minDist=999999;
+	double curDist=0;
+	
+		//Check over all the already created unitsGroup which one is near the first subgoal to accomplish
+		//TODO
+
+		
+	//NO unitsgroup already found, must create a new one
+	ug = new UnitsGroup();	
+	for each(Unit* u in Broodwar->getAllUnits()){
+		if (u->getPlayer()==Broodwar->self()&&u->getType().isWorker()&& !(u->isConstructing())){
+			ug->takeControl(u);
+			break;
+		}
+	}
+	return ug;
 }
