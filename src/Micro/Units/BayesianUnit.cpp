@@ -78,23 +78,32 @@ void BayesianUnit::computeFlockValues()
     for (unsigned int i = 0; i < _dirv.size(); ++i)
     {
         vector<flock_value> tmpv;
-        for (vector<pBayesianUnit>::const_iterator it = _unitsGroup->getUnits()->begin(); 
+        for (vector<pBayesianUnit>::const_iterator it = 
+                _unitsGroup->getUnits()->begin(); 
             it != _unitsGroup->getUnits()->end(); ++it)
         {
-            if ((*it)->unit == this->unit) continue; // we don't flock with ourselves!
-            flock_value value = (flock_value)(1 + (int)((*it)->unit->getDistance(_dirv[i].translate(this->unit->getPosition()))/32));
-            ///Position tmp = _dirv[i].translate(this->unit->getPosition());
-            ///Vec tmpvit((*it)->unit->getVelocityX(), (*it)->unit->getVelocityY()); // we flock with the interpolated next position of other units
-            ///tmpvit *= 8;
-            //BWAPI::Broodwar->printf("X: %f, Y: %f \n", (*it)->unit->getVelocityX(), (*it)->unit->getVelocityY());
-            ///flock_value value = (flock_value)(1 + (int)tmp.getDistance(tmpvit.translate((*it)->unit->getPosition())) / 32);
-            // if (value == FLOCK_FAR + 1) --value; // some kind of hysteresis for FAR
+            if ((*it)->unit == this->unit) continue; 
+            // we don't flock with ourselves!
+            
+            //CODE flock_value value = (flock_value)
+            //CODE (1 + (int)((*it)->unit->getDistance(
+            //CODE      _dirv[i].translate(this->unit->getPosition()))/32));
+            Position tmp = _dirv[i].translate(this->unit->getPosition());
+            Vec tmpvit((*it)->unit->getVelocityX(), 
+                    (*it)->unit->getVelocityY()); 
+            // we flock with the interpolated next position of other units
+            tmpvit *= 8;
+            //TEST BWAPI::Broodwar->printf("X: %f, Y: %f \n", (*it)->unit->getVelocityX(), (*it)->unit->getVelocityY());
+            flock_value value = (flock_value)(1 + (int)tmp.getDistance(
+                        tmpvit.translate((*it)->unit->getPosition())) / 32);
+            //CODE if (value == FLOCK_FAR + 1) --value; 
+            // some kind of hysteresis for FAR
             if (value <= FLOCK_FAR)
                 tmpv.push_back(value);
             else
                 tmpv.push_back(FLOCK_NO);
-            //Broodwar->printf("distance int: %d, double %f\n", (int)(*it)->unit->getDistance(this->unit), (*it)->unit->getDistance(this->unit));
-            //Broodwar->printf("Flock value %d\n", value);
+            //TEST Broodwar->printf("distance int: %d, double %f\n", (int)(*it)->unit->getDistance(this->unit), (*it)->unit->getDistance(this->unit));
+            //TEST Broodwar->printf("Flock value %d\n", value);
         }
         _flockValues.push_back(tmpv);
     }
@@ -167,10 +176,13 @@ void BayesianUnit::straightLine(vector<Position>& ppath,
 void BayesianUnit::updateAttractors()
 {
     _occupation.clear();
+    // flocking attractions
     if (_mode == MODE_FLOCK)
     {
         computeFlockValues();
     }
+
+    // building and blocking attraction (repulsion)
     const int width = Broodwar->mapWidth();
     Position up = unit->getPosition();
     for (unsigned int i = 0; i < _dirv.size(); ++i)
@@ -233,11 +245,11 @@ double BayesianUnit::computeProb(unsigned int i)
     if (_mode == MODE_FLOCK)
     {
         /// FLOCKING INFLUENCE
-        double prob_obj = _PROB_GO_OBJ / _unitsGroup->getUnits()->size();
         //for (unsigned int j = 0; j < _flockValues[i].size(); ++j) // one j for each attractor
         //    val *= _flockProb[_flockValues[i][j]];
 
         /// OBJECTIVE (pathfinder) INFLUENCE
+        double prob_obj = _PROB_GO_OBJ / _unitsGroup->getUnits()->size();
         if (_dirv[i] == obj)
             val *= prob_obj;
         else
@@ -250,6 +262,7 @@ double BayesianUnit::computeProb(unsigned int i)
             val *= (tmp > 0 ? prob_obj*tmp : 1.0 - prob_obj);
         }
     }
+    return val; // TODO remove
     if (_occupation[i] == OCCUP_BUILDING) /// NON-WALKABLE (BUILDING) INFLUENCE
     {	
         val *= 1.0-_PROB_NO_BUILDING_MOVE;
@@ -477,29 +490,35 @@ void BayesianUnit::updateDir()
 {
     Position p = this->unit->getPosition();
 
+    // update possible directions vector
     updateDirV();
     //Affiche les différents axes de directions de l'unité
     //drawDirV();
 
+    // update attractions
     updateAttractors();
     //Affiche les différents objets et la probabilité de pouvoir y aller
     //drawAttractors();
     
+    // update objectives
     updateObj();
     //drawObj(2);
     //drawObj(_unitsGroup->size());
     //drawOccupation(_unitsGroup->size());
 
+    // compute the probability to go in each dirv(ector)
     multimap<double, Vec> dirvProb;
     for (unsigned int i = 0; i < _dirv.size(); ++i)
         dirvProb.insert(make_pair(computeProb(i), _dirv[i]));
     multimap<double, Vec>::const_iterator last = dirvProb.end(); 
-    // I want the right probas and not 1-prob in the multimap
+    // I want the right probabilities and not 1-prob in the multimap
     --last;
+    // select the most probable
     if (dirvProb.count(dirvProb.begin()->first) == 1) 
     {
         dir = last->second;
     }
+    // or the equally most probable and most in the direction of obj
     else
     {
         pair<multimap<double, Vec>::const_iterator, multimap<double, Vec>::const_iterator> possible_dirs = dirvProb.equal_range(last->first);
@@ -514,7 +533,7 @@ void BayesianUnit::updateDir()
             }
         }
     }
-    //drawProbs(dirvProb, _unitsGroup->size());
+    drawProbs(dirvProb, _unitsGroup->size());
 }
 
 void BayesianUnit::drawDir()
@@ -525,12 +544,10 @@ void BayesianUnit::drawDir()
 
 void BayesianUnit::clickDir()
 {
-    dir += unit->getPosition();
-   
-    //if (unit->getPosition() != dir.toPosition()) TODO
-
-    //unit->rightClick(dir.toPosition());
-    unit->rightClick(target);
+    ///dir += unit->getPosition();
+    if (unit->getPosition().getDistance(dir.toPosition()) > 3.0) 
+        unit->rightClick(dir.toPosition());
+    ///unit->rightClick(target);
 }
 
 void BayesianUnit::drawArrow(Vec& v)
@@ -598,12 +615,11 @@ void BayesianUnit::update()
         attackEnemy(targetEnemy, BWAPI::Colors::Red);
         return;
     }
-    drawAttractors();
-    drawTarget();
     updateDir();
-    drawDir();
+    //drawObj(0); // green
+    drawDir(); // red
     clickDir();
-    drawFlockValues();
+    //drawFlockValues();
     return;
 
     Position p = unit->getPosition();
