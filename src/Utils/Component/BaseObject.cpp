@@ -16,12 +16,16 @@ BaseObject::~BaseObject()
 
 void BaseObject::update()
 {
+#ifdef BW_QT_DEBUG
 	// profiler
 	onFrame();
 	// et afficher les resultats ici
 		QMessageBox::critical(0, "plop", "signal emis");
 
 	emit refreshWidget();
+#else
+	onFrame();
+#endif
 }
 
 QWidget* BaseObject::createWidget(QWidget* parent) const

@@ -96,6 +96,10 @@ void MicroAIModule::onStart()
 	Broodwar->printf( "size: %i", mm->goals.size());
 	Broodwar->printf( "center: %f, %f", mm->goals.front().formation->center.x, mm->goals.front().formation->center.y);
 	//*/
+
+#ifdef BW_QT_DEBUG
+	g_onStartDone = true;
+#endif
 }
 
 void MicroAIModule::onFrame()
