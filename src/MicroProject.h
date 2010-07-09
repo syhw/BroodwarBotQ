@@ -15,11 +15,12 @@ static BWTA::Region* home;
 static BWTA::Region* enemy_base;
 DWORD WINAPI AnalyzeThread();
 
-class MicroAIModule : public BWAPI::AIModule, public ObjectManager
+class MicroAIModule : public BWAPI::AIModule
 {
 public:	    
     UnitsGroup* mm;
     MapManager* mapManager;
+		ObjectManager* objectManager;
     Regions* regions;
 	virtual void onStart();
 #ifdef BW_QT_DEBUG

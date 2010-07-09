@@ -116,15 +116,15 @@ void BattleBroodAI::onStart()
 
     this->objManager = & ObjectManager::Instance();
 
-	this->timeManager       = & TimeManager::Instance();
+		this->timeManager = & TimeManager::Instance();
 	this->arbitrator		= & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
 	this->buildManager      = & BuildManager::Instance();
+	this->buildOrderManager = & BuildOrderManager::Instance();
+	this->baseManager       = & BaseManager::Instance();
 	this->techManager       = & TechManager::Instance();
 	this->upgradeManager    = & UpgradeManager::Instance();
-	this->buildOrderManager = & BuildOrderManager::Instance();
 	this->scoutManager      = & ScoutManager::Instance();
 	this->workerManager     = & WorkerManager::Instance();
-	this->baseManager       = & BaseManager::Instance();
 	this->supplyManager     = & SupplyManager::Instance();
     this->mapManager        = & MapManager::Instance();
     this->eUnitsFilter      = & EUnitsFilter::Instance();
@@ -168,38 +168,11 @@ void BattleBroodAI::onEnd(bool isWinner)
 
 void BattleBroodAI::onFrame()
 {
-#ifdef BW_QT_DEBUG
-
-    if (!qapplication)
-        Broodwar->printf("Qt not connected\n");
-
-#endif
-    //clock_t start = clock();
-
-    // log("IN BBAI::onFrame()");
-    objManager->updateOM();
-    if (Broodwar->isReplay()) return;
+		if (Broodwar->isReplay()) return;
     if (!this->analyzed) return;
-    this->timeManager->update();
-    this->buildManager->update();
-    this->buildOrderManager->update();
-    this->baseManager->update();
-    this->workerManager->update();
-    this->techManager->update();
-    this->upgradeManager->update();
-    this->macroManager->update();
-    this->supplyManager->update();
-    this->scoutManager->update();
-    this->arbitrator->update();
-    ////this->unitManager->update();
-    this->microManager->update();
-    this->regions->update();
-	this->eEcoEstimator->onFrame();
-	this->eUnitsFilter->update(); // hack for this component to call its BaseObject::update() method
 
-    // Scout example to remove TODO
-	//if( (Broodwar->getFrameCount() % (100*24)) == 0)
-      //scoutManager->checkEmptyXP();
+		objManager->onFrame();
+    this->arbitrator->update();
 
     std::set<Unit*> units=Broodwar->self()->getUnits();
     if (this->showManagerAssignments)

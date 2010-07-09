@@ -18,6 +18,7 @@ void MicroAIModule::onStart()
 	BWTA::readMap();
 	BWTA::analyze();
     this->mapManager = & MapManager::Instance();
+		this->objectManager = & ObjectManager::Instance();
     this->regions = & Regions::Instance();
 
 	mm = new UnitsGroup();
@@ -100,10 +101,9 @@ void MicroAIModule::onFrame()
     if (!*qapp)
         Broodwar->printf("Qt not connected\n");
 #endif
-    ObjectManager::updateOM();
+    objectManager->onFrame();
 	if (mm != NULL) 
         mm->update();
-    regions->update();
     regions->display();
 	/*if (Broodwar->getFrameCount()%300==0)
 	{
@@ -145,6 +145,7 @@ MicroAIModule::~MicroAIModule()
     (*qapp)->quit();
 #endif
     MapManager::Destroy();
+		ObjectManager::Destroy();
     Regions::Destroy();
     mm->~UnitsGroup();
 }

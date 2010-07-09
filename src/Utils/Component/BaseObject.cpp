@@ -13,13 +13,13 @@ BaseObject::~BaseObject()
 {
 }
 
-void BaseObject::update()
+void BaseObject::onFrame()
 {
 #ifdef BW_QT_DEBUG
 	// Profile onFrame of the component
 	beginTime = clock();
 
-	onFrame();
+	update();
 
 	endTime = clock();
 	timeEllapsed = (endTime - beginTime) / CLOCKS_PER_SEC;
@@ -31,13 +31,17 @@ void BaseObject::update()
 	if( !sout.str().empty()) processStream( sout);
 	if( !serr.str().empty()) processStream( serr);
 #else
-	onFrame();
+	update();
 #endif
 }
 
 QWidget* BaseObject::createWidget(QWidget* parent) const
 {
 	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
+}
+
+void BaseObject::display() const
+{
 }
 
 std::string BaseObject::getClassName() const

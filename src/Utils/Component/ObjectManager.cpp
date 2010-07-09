@@ -13,8 +13,10 @@ ObjectManager::~ObjectManager()
 
 }
 
-void ObjectManager::updateOM()
+void ObjectManager::onFrame()
 {
+	for(std::vector<BaseObject*>::const_iterator it = vObject.begin(); it != vObject.end(); ++it)
+		(*it)->onFrame();
 }
 
 void ObjectManager::setGameSpeed(int speed)

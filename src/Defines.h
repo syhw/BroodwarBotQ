@@ -8,6 +8,8 @@
 
 #define BW_QT_DEBUG
 #ifdef BW_QT_DEBUG
+// We can add here common Qt includes but NONE of our headers !!!
+#include <QtGui/QLabel>
 class QApplication;
 class MainWindow;
 

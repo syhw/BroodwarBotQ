@@ -17,7 +17,6 @@ class EUnitsFilter : public CSingleton<EUnitsFilter>, public BaseObject
 public:
     EUnitsFilter();
     ~EUnitsFilter() { }
-		void update();
     void update(BWAPI::Unit* u);
 	void onUnitDestroy(BWAPI::Unit* u);
 	void onUnitMorph(BWAPI::Unit* u);
@@ -25,7 +24,7 @@ public:
 	void onUnitHide(BWAPI::Unit* u);
 	void onUnitRenegade(BWAPI::Unit* u);
 
-	virtual void onFrame();
+	virtual void update();
 	virtual QWidget* createWidget(QWidget* parent) const;
 	virtual void refreshWidget(QWidget* widget) const;
 };

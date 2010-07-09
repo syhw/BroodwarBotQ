@@ -2,16 +2,17 @@
 #include <BWAPI.h>
 #include <BWTA.h>
 #include <windows.h>
-//#include "Goals.h"
 #include <CSingleton.h>
 #include <Arbitrator.h>
 #include <stdlib.h>
+#include "BaseObject.h"
+
 
 class UnitsGroup;
 class Regions;
 class ScoutManager;
 
-class MicroManager: public CSingleton<MicroManager>, public Arbitrator::Controller<BWAPI::Unit*,double>
+class MicroManager: public CSingleton<MicroManager>, public Arbitrator::Controller<BWAPI::Unit*,double>, public BaseObject
 {
 	friend class CSingleton<MicroManager>;
 
@@ -36,5 +37,10 @@ public:
 	void sendGroupToAttack( UnitsGroup* ug);
 	void sendGroupToDefense( UnitsGroup* ug);
 	void promptRemove(UnitsGroup* ug);
-    static std::set<BWAPI::Unit*> getEnemies();
+
+	// Qt interface
+	virtual QWidget* createWidget(QWidget* parent) const;
+	virtual void refreshWidget(QWidget* widget) const;
+
+	static std::set<BWAPI::Unit*> getEnemies();
 };

@@ -4,7 +4,7 @@
 #include <BWAPI.h>
 #include <string>
 #include <exception>
-
+#include "BaseObject.h"
 
 using namespace BWAPI;
 
@@ -36,7 +36,7 @@ public:
 * All classes running an update/onFrame() in BWAPI's thread should register here
 * To be terminated if they take more than 1/25 sec (40ms) to run (and so slow down the game).
 */
-class TimeManager : public CSingleton<TimeManager> 
+class TimeManager : public CSingleton<TimeManager>, public BaseObject
 {
 	friend class CSingleton<TimeManager>;
 
@@ -61,6 +61,10 @@ public:
         UINT idTimer,     // timer identifier 
         DWORD dwTime      // current system time 
         );
+
+		// Qt interface
+		virtual QWidget* createWidget(QWidget* parent) const;
+		virtual void refreshWidget(QWidget* widget) const;
 
 private:
 	unsigned long frameCount; // frame count since the begining

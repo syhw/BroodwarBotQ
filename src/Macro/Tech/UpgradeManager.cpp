@@ -1,6 +1,7 @@
 #include <UpgradeManager.h>
 
 UpgradeManager::UpgradeManager()
+: BaseObject("UpgradeManager")
 {
 	arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
   this->placer = NULL;
@@ -146,4 +147,14 @@ int UpgradeManager::getStartedLevel(BWAPI::UpgradeType type) const
 int UpgradeManager::getCompletedLevel(BWAPI::UpgradeType type) const
 {
   return BWAPI::Broodwar->self()->getUpgradeLevel(type);
+}
+
+QWidget* UpgradeManager::createWidget(QWidget* parent) const
+{
+	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
+}
+
+void UpgradeManager::refreshWidget(QWidget* widget) const
+{
+// TODO update your widget after having defined it in the previous method :)
 }

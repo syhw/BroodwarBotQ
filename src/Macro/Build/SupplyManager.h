@@ -4,7 +4,10 @@
 #include <BWAPI.h>
 #include <BuildManager.h>
 #include <BuildOrderManager.h>
-class SupplyManager : public CSingleton<SupplyManager>
+#include "BaseObject.h"
+
+
+class SupplyManager : public CSingleton<SupplyManager>, public BaseObject
 {
 	friend class CSingleton<SupplyManager>;
 
@@ -18,7 +21,12 @@ class SupplyManager : public CSingleton<SupplyManager>
     void update();
     std::string getName() const;
     int getPlannedSupply() const;
-    BuildManager* buildManager;
+
+		// Qt interface
+		virtual QWidget* createWidget(QWidget* parent) const;
+		virtual void refreshWidget(QWidget* widget) const;
+
+		BuildManager* buildManager;
     BuildOrderManager* buildOrderManager;
     int lastFrameCheck;
 };

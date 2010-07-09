@@ -11,11 +11,6 @@ EUnitsFilter::EUnitsFilter()
     timeManager = & TimeManager::Instance();
 }
 
-void EUnitsFilter::update()
-{
-	BaseObject::update();
-}
-
 void EUnitsFilter::update(Unit* u)
 {
     if (u->getPlayer() == Broodwar->self()) return;
@@ -89,12 +84,10 @@ QWidget* EUnitsFilter::createWidget(QWidget* parent) const
 		return qw;
 }
 
-void EUnitsFilter::onFrame()
+void EUnitsFilter::update()
 {
-// euh, c bizarre, il avait pas de onFrame ce composant ?
 }
 
 void EUnitsFilter::refreshWidget(QWidget* /*widget*/) const
 {
-
 }

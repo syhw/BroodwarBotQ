@@ -3,7 +3,9 @@
 #include <Arbitrator.h>
 #include <BWAPI.h>
 #include <BaseManager.h>
-class WorkerManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public CSingleton<WorkerManager>
+#include "BaseObject.h"
+
+class WorkerManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public CSingleton<WorkerManager>, public BaseObject
 {
 	friend class CSingleton<WorkerManager>;
 
@@ -25,6 +27,9 @@ class WorkerManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public
     virtual void onRevoke(BWAPI::Unit* unit, double bid);
     virtual void update();
     virtual std::string getName() const;
+
+		virtual QWidget* createWidget(QWidget* parent) const;
+		virtual void refreshWidget(QWidget* widget) const;
 
     void onUnitDestroy(BWAPI::Unit* unit);
     void setWorkersPerGas(int count);

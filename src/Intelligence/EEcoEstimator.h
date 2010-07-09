@@ -3,11 +3,14 @@
 #include "TimeManager.h"
 #include <BWAPI.h>
 #include <BWTA.h>
-class EEcoEstimator : public CSingleton<EEcoEstimator>
+#include "BaseObject.h"
+
+
+class EEcoEstimator : public CSingleton<EEcoEstimator>, public BaseObject
 {
 	friend class CSingleton<EEcoEstimator>;
 public:
-	virtual void onFrame();//Necessary to compute every frame?
+	virtual void update();
 	int m_per_mn() const;//Requires a first call to update workers else uses theorical number of workers
 	int g_per_mn() const;//Requires a first call to update workers else uses theorical number of workers
 	void update_workers(int mworkers, int gworkers);
@@ -21,6 +24,10 @@ public:
 	//gworkers correspond to the number of workers on the refinery
 	//Take care, gworkers is added directly to the number of workers on gaz
 	//And the number of gaz_exploited is increased
+
+	// Qt interface
+	virtual QWidget* createWidget(QWidget* parent) const;
+	virtual void refreshWidget(QWidget* widget) const;
 
 private:
 	EEcoEstimator();

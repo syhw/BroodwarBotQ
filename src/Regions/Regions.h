@@ -9,57 +9,62 @@
 #include <set>
 #include <list>
 #include <vector>
+#include "BaseObject.h"
 
 
 class UnitData
 {
 public:
-    Unit* unit;
-    UnitType unitType;
-    Position position;
-    int lastSeen;
-    UnitData(Unit* unit);
-    bool operator == (const UnitData& ud) const;
+	Unit* unit;
+	UnitType unitType;
+	Position position;
+	int lastSeen;
+	UnitData(Unit* unit);
+	bool operator == (const UnitData& ud) const;
 };
 
 class RegionData
 {
 public:
-    // TODO perhaps change vectors by sets (we need a quick find and don't care about the order)
-    std::map<Player*, std::vector<UnitData> > buildings;	// list of enemy building seen in this region for each player.
-    std::map<Player*, std::vector<UnitData> > units;      // list of enemy units seen in this region for each player.
-    int lastSeen; // Last seen frame.
+	// TODO perhaps change vectors by sets (we need a quick find and don't care about the order)
+	std::map<Player*, std::vector<UnitData> > buildings;	// list of enemy building seen in this region for each player.
+	std::map<Player*, std::vector<UnitData> > units;      // list of enemy units seen in this region for each player.
+	int lastSeen; // Last seen frame.
 	int visited; //Number of the frame when a scout goal to explore was accomplished.
 	// 0 means never
 	RegionData();
 	bool isOccupied() const;
 	bool contain(Unit* unit) const;
-    inline void add(Unit* unit);
+	inline void add(Unit* unit);
 };
 
-class Regions : public CSingleton<Regions> 
+class Regions : public CSingleton<Regions>, public BaseObject
 {
 	friend class CSingleton<Regions>;
 
 private:
 	Regions();
 	~Regions();
-    MapManager* mapManager;
-    inline BWTA::Region* findRegion(BWAPI::Position p);
+	MapManager* mapManager;
+	inline BWTA::Region* findRegion(BWAPI::Position p);
 public:
-    inline void addUnit(BWAPI::Unit* unit); // Add to the corresponding map (building/unit) in regionData. Refresh it if already present.
-    void removeUnits();
-    void addUnits();
-    inline void removeUnit( Unit* unit);
+	inline void addUnit(BWAPI::Unit* unit); // Add to the corresponding map (building/unit) in regionData. Refresh it if already present.
+	void removeUnits();
+	void addUnits();
+	inline void removeUnit( Unit* unit);
 	virtual void update();
 	virtual std::string getName() const;
-    void onUnitCreate(BWAPI::Unit* unit);
-    void onUnitDestroy(BWAPI::Unit* unit);
-    void onUnitShow(BWAPI::Unit* unit);
-    void onUnitHide(BWAPI::Unit* unit);
+	void onUnitCreate(BWAPI::Unit* unit);
+	void onUnitDestroy(BWAPI::Unit* unit);
+	void onUnitShow(BWAPI::Unit* unit);
+	void onUnitHide(BWAPI::Unit* unit);
 	void display() const;
 	bool EnemyFound() const;
 
-    std::map<BWTA::Region*, RegionData> regionsData;
+	// Qt interface
+	virtual QWidget* createWidget(QWidget* parent) const;
+	virtual void refreshWidget(QWidget* widget) const;
+
+	std::map<BWTA::Region*, RegionData> regionsData;
 	TimeManager* timeManager;
 };
