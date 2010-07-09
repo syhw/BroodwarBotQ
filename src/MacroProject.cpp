@@ -1,10 +1,8 @@
 #include "MacroProject.h"
 #include <Util.h>
 #include <time.h>
-
-
 #include <UnitsGroup.h>
-
+#include <QtGui/QApplication.h>
 
 using namespace BWAPI;
 
@@ -152,9 +150,10 @@ void BattleBroodAI::onStart()
     this->regions = & Regions::Instance();
 
     //Broodwar->printf("The match up is %s v %s",
-        Broodwar->self()->getRace().getName().c_str();
-        Broodwar->enemy()->getRace().getName().c_str();
-	
+    Broodwar->self()->getRace().getName().c_str();
+    Broodwar->enemy()->getRace().getName().c_str();
+
+		g_onStartDone = true;
 }
 
 void BattleBroodAI::onEnd(bool isWinner)

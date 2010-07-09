@@ -1,6 +1,4 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
-
+#pragma once
 #include <QtGui/QMainWindow>
 #include <QtGui/QSplitter>
 #include "MiniMap.h"
@@ -24,13 +22,12 @@ public slots:
     void changeGameSpeed(int value);
     void componentDoubleClicked(QModelIndex index);
     void addTabWidget(QWidget* qw);
+		void initComponentsTree();
 
-private:
+public:
     Ui::MainWindow *ui;
     QSplitter* splitter;
     MenuWidget* menuWidget;
     MiniMap* miniMap;
     ObjectManager* objManager;
 };
-
-#endif // MAINWINDOW_H

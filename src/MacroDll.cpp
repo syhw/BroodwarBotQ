@@ -6,10 +6,12 @@
 #include <BWAPI.h>
 #include <QtGui/QApplication>
 #include "MacroProject.h"
+#include "Mainwindow.h"
 
 BattleBroodAI* broodAI = NULL;
 QApplication* qapplication = NULL;
 MainWindow* qmainwindow = NULL;
+bool g_onStartDone = false;
 
 #define BUF_SIZE 255
 
@@ -69,7 +71,15 @@ BOOL APIENTRY DllMain(HANDLE hModule,
 extern "C" __declspec(dllexport) BWAPI::AIModule* newAIModule(BWAPI::Game* game)
 {
 	BWAPI::Broodwar = game;
-    broodAI = new BattleBroodAI();
+  broodAI = new BattleBroodAI();
+
+#ifdef BW_QT_DEBUG
+	while(!qmainwindow)
+	{
+		Sleep(50);
+	}
+#endif
+
 	return broodAI;
 }
 
@@ -82,14 +92,20 @@ DWORD WINAPI LaunchMonitor(LPVOID lpParam )
 	{
 		Sleep(50);
 	}
-    Sleep(50);
 
 	int argc = 1;
 	char* name = "AI-Monitor";
 	char** argv = &name;
 	qapplication = new QApplication(argc, argv);
     qmainwindow = new MainWindow();
+
+	while(!g_onStartDone)
+	{
+		Sleep(50);
+	}
+
 	qmainwindow->show();
+	qmainwindow->initComponentsTree();
 	qapplication->exec();
 #endif
 	return 0; 
