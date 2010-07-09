@@ -9,12 +9,12 @@
 #include <map>
 #include <utility>
 #include "Data.h"
-
 #ifdef BW_QT_DEBUG
 #include "QtOutputer.h"
+#include <QtGui/QWidget.h>
 #endif
 
-class EUnitsFilter : public CSingleton<EUnitsFilter> 
+class EUnitsFilter : public CSingleton<EUnitsFilter>, public BaseObject
 {
     TimeManager* timeManager;
     std::map<BWAPI::Unit*, EViewedUnit> eViewedUnits;
@@ -27,6 +27,7 @@ public:
 	void onUnitShow(BWAPI::Unit* u);
 	void onUnitHide(BWAPI::Unit* u);
 	void onUnitRenegade(BWAPI::Unit* u);
+
 #ifdef BW_QT_DEBUG
     QtOutputer qtOutputer;
 #endif

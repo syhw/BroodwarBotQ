@@ -13,7 +13,8 @@ DEFINES += CREATOR_COMPIL
 
 INCLUDEPATH += ../../../BWAPI_Beta_2.7.2/include \
         ../Utils/Component \
-        ../Utils
+        ../Utils \
+        ../
 LIBS += -L"../../../BWAPI_Beta_2.8/lib" \
     -L"../Utils/Component" \
     -lBWAPI
@@ -38,6 +39,7 @@ HEADERS += Mainwindow.h \
     ../Utils/Component/Data.h \
     ../Utils/Component/ObjectManager.h \
     ../Utils/CSingleton.h \
+    ../Defines.h
 
 FORMS += Mainwindow.ui \
     menuwidget.ui

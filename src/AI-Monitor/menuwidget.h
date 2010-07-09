@@ -4,7 +4,7 @@
 #include <QtGui/QWidget>
 
 namespace Ui {
-    class MenuWidget;
+	class MenuWidget;
 }
 
 class MenuWidget : public QWidget {
