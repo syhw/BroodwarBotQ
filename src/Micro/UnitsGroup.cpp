@@ -177,6 +177,14 @@ Unit* UnitsGroup::findWeakestEnemy(std::set<Unit*> enemies_in_range)
 
 void UnitsGroup::update()
 {
+    for each(pBayesianUnit it in this->units)
+    {
+        it->update();
+    }
+}
+
+/*void UnitsGroup::update()
+{
     std::list<pBayesianUnit> unitsAvailables;
     std::map<int, cEnemy> enemiesInRange;
     this->totalHP = 0;
@@ -263,6 +271,7 @@ void UnitsGroup::update()
     // for each(pBayesianUnit u in units)
     //     u->micro();
 }
+*/
 
 void UnitsGroup::attackMove(int x, int y)
 {
