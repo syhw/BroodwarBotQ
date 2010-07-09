@@ -1,5 +1,4 @@
 #pragma once
-#define __DEBUG_NICOLAS__
 #include <BWAPI.h>
 #include <BWTA.h>
 #include <windows.h>
@@ -37,4 +36,5 @@ public:
 	void sendGroupToAttack( UnitsGroup* ug);
 	void sendGroupToDefense( UnitsGroup* ug);
 	void promptRemove(UnitsGroup* ug);
+    static std::set<BWAPI::Unit*> getEnemies();
 };

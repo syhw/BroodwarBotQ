@@ -1,69 +1,81 @@
 #include <algorithm>
 #include "Goal.h"
 #include "UnitsGroup.h"
-
-
+#include "float.h"
+#include "Defines.h"
 
 Goal::~Goal()
 {
 }
 
-Goal::Goal(GoalType t):
-status(GS_NOT_STARTED),
-type(t)
-{
-	
-
-}
-
-
 Goal::Goal():
-status(GS_NOT_STARTED),
-type(GT_UNDEFINED)
+status(GS_NOT_STARTED)
 {
 }
 
 void Goal::achieve(UnitsGroup* ug)
 {
 	checkAchievement(ug);
-			//TOIMPROVE
+			
 	if(this->status!=GS_ACHIEVED){
-
-		pSubgoal sub;
-
-		//Select first subgoal not accomplished
-		for(std::list<pSubgoal>::iterator p = subgoals.begin(); p != subgoals.end(); p++){
-			if((*p)->subgoalCondition()==SC_ONCE && !(*p)->isRealized()){
-				sub=(*p);
-				if(this->type==GT_SCOUT){
-					ug->move(sub->subgoalPosition());//TOCHANGE ACCORDING TO SUBGOAL TYPE
-				}else{
-					ug->attackMove(sub->subgoalPosition());
-				}				
-				break;
+		double test;
+		pSubgoal selected;
+		double min = DBL_MAX;
+		
+		for(std::list<pSubgoal>::iterator it = subgoals.begin(); it != subgoals.end(); ++it){
+			if (!(*it)->isRealized()){
+				test = (*it)->distanceToRealize(ug);
+				if ( test >= 0 && test < min ){
+					min = test;
+					selected = (*it);
+				}
 			}
+		}
+		if(min > 0 && min < DBL_MAX){
+			selected->tryToRealize(ug);
+
+		}else{
+			//TODO
+			BWAPI::Broodwar->printf("Tell Louis this situation happened");
 		}
 
 	}
+
 
 }
 
 void Goal::checkAchievement(UnitsGroup* ug)
 {
-		bool ach=true;
-		
-		for each (pSubgoal p in subgoals){
+
+	if(this->status!=GS_ACHIEVED){
+		//All the subgoals are tested because the check function might validate
+		//some subgoals
+			bool res_and=true;
+			bool res_or=false;
 			
-			if(!p->isRealized()){
-				ach=false;
-				break;
+			for each (pSubgoal p in subgoals){
+				
+				if(p->getLogic() == SL_AND){
+					//AND case 
+					if(!p->isRealized()){
+						res_and=false;
+					}
+
+				} else {
+					//OR case
+					if(p->isRealized()){
+					res_or = true;
+					}
+				}
 			}
-		}
-		if (ach==true){
-			this->status = GS_ACHIEVED;
-			
-		}
-	
+				
+			if(res_and || res_or){
+	#ifdef __DEBUG__LOUIS
+				BWAPI::Broodwar->printf("Goal done");
+	#endif
+				this->status= GS_ACHIEVED;
+			}
+	}
 }
 
 void Goal::addSubgoal(pSubgoal s){
@@ -76,18 +88,3 @@ GoalStatus Goal::getStatus() const{
 void Goal::setStatus(GoalStatus s) {
 	status = s;
 }
-
-GoalType Goal::getType() const{
-return type;
-
-}
-
-BWAPI::Position Goal::firstPosition() const{
-	if(!this->subgoals.empty())
-		return this->subgoals.front()->subgoalPosition();
-	
-	else
-		return BWAPI::Position(0,0);
-
-}
-

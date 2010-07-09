@@ -11,8 +11,8 @@ GroundUnit::~GroundUnit()
 int GroundUnit::damagesOn(BWAPI::Unit* enemy)
 {
     BWAPI::WeaponType groundW = unit->getType().groundWeapon();
-    int damages = groundW.damageAmount();
-    damages += BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Protoss_Ground_Weapons);
+    int damages = groundW.damageAmount() + BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Protoss_Ground_Weapons)*groundW.damageFactor();
+    damages -= (enemy->getType().armor() + enemy->getPlayer()->getUpgradeLevel(enemy->getType().armorUpgrade()));
     if (groundW.damageType() == BWAPI::DamageTypes::Concussive)
     {
         if (enemy->getType().size() == BWAPI::UnitSizeTypes::Medium)
@@ -35,5 +35,12 @@ int GroundUnit::damagesOn(BWAPI::Unit* enemy)
             damages = static_cast<int>(damages * 0.5);
         }
     }
-    return damages;
+    // L'unité fait au minimum 1 dégât
+    return damages < 1 ? 1 : damages;
+}
+
+
+bool GroundUnit::withinRange(BWAPI::Unit* enemy)
+{
+    return unit->getDistance(enemy) < 1.0; // to be confirmed
 }

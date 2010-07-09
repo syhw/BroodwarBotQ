@@ -74,9 +74,8 @@ void MicroAIModule::onStart()
 			p = BWAPI::Position(*l);
 	}
     pFormation form = pFormation(new LineFormation(Position(22*32,37*32), Vec(1,0)));
-    pGoal gl = pGoal(new Goal(GT_ATTACK));
+	 
     //gl->setFormation(form);
-	goals.push_back(gl);
 
 	//goals.push_back(Formation(0,1,Position(400,0)));
 	//goals.push_back(Goal("attack move right !!!!!!!", Position(1999,1000)));
