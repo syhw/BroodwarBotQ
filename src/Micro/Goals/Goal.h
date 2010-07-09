@@ -1,35 +1,23 @@
-#ifndef GOAL__H
-#define GOAL__H
 #pragma once
+#include <boost/shared_ptr.hpp>
+class Goal;
+typedef boost::shared_ptr<Goal> pGoal;
+#include "Subgoal.h"
 #include <BWAPI.h>
 #include <BWTA.h>
 #include <windows.h>
 #include "Formations.h"
-#include "Subgoal.h"
-#include <boost/shared_ptr.hpp>
-
-class Goal;
-typedef boost::shared_ptr<Goal> pGoal;
 
 
 class UnitsGroup;
-typedef enum
-{
-	GT_UNDEFINED           = 0,
-	GT_SCOUT               = 1,
-	GT_ATTACK              = 2,
-	GT_DEFEND              = 3
-
-} GoalType;
 
 typedef enum
 {
 	GS_ND_STATUS           = 0,
 	GS_ACHIEVED            = 0,
 	GS_IN_PROGRESS         = 1,
-	GS_MOVE_TO             = 2,
-	GS_FLEE                = 3,
-	GS_NOT_STARTED         = 4
+	GS_FLEE                = 2,
+	GS_NOT_STARTED         = 3
 } GoalStatus;
 
 class Goal
@@ -40,13 +28,10 @@ class Goal
 protected:
 	std::list<pSubgoal> subgoals; //The subgoals cannot be shared
 	GoalStatus status;      /**< status of the goal */
-	GoalType type;
 public:
 
 	//Constructors
-	Goal(); //Don't forgot to set a formation and movement if wanted
-	//Else avoid enemy and void formation is used
-	Goal(GoalType t);
+	Goal();
 	virtual ~Goal();
 	
 	virtual void achieve(UnitsGroup* ug);//Start the goal
@@ -56,14 +41,8 @@ public:
 
 	//Mutators
 	void addSubgoal(pSubgoal s);
+	void setStatus(GoalStatus s);
 
 	//Accessors
 	GoalStatus getStatus() const;
-	void setStatus(GoalStatus s);
-	GoalType getType() const;
-
-	//Special function
-	BWAPI::Position firstPosition() const; //Return the position of its first subgoal
 };
-
-#endif 

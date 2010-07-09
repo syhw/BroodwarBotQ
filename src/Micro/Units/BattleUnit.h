@@ -29,6 +29,8 @@ protected:
 
 public:
 	BWAPI::Unit* unit;
+    BWAPI::Unit* targetEnemy;
+    BWAPI::Unit* targetEnemyInRange;
 	BWAPI::Position target; // display debug purpose
 	int timeIdle; // hack to remove soon... evite le conflit avec la reussite d'objectif dans le test UnitsGroup::keepDistance().
 	              // Cette variable sera inutile avec le flocking.
@@ -43,10 +45,7 @@ public:
     virtual void onUnitShow(BWAPI::Unit* u);
     virtual void onUnitHide(BWAPI::Unit* u);
 
-
-    void attackEnemy(BWAPI::Unit* u, BWAPI::Color col);
-    BWAPI::Unit* findClosestEnemy(std::set<BWAPI::Unit*> &enemies); // Function to remove
-    void fillEnemies(std::set<BWAPI::Unit*> &enemies, int &damagesTaken); // Function to remove
-    void fillEnemiesInRangeForDragoon(std::set<BWAPI::Unit*> &enemies, std::set<BWAPI::Unit*> &enemies_in_range, double &maxRangeGoon, double &maxRangeGoonEnemy); // Function to remove
+    BWAPI::Unit* findClosestEnemy(std::set<BWAPI::Unit*> &enemies); // Function to remove ?
     virtual int damagesOn(BWAPI::Unit* enemy) = 0;
+    virtual bool withinRange(BWAPI::Unit* enemy) = 0;
 };

@@ -8,68 +8,6 @@ GoalManager::GoalManager(){
 GoalManager::~GoalManager(){
 }
 
-void GoalManager::newGoal(pGoal p){
-	BWAPI::Broodwar->printf("Received 1 new objective, got to find the unitsgroup");
-	findUnitsGroup(p);
-}
-
-void GoalManager::findUnitsGroup(pGoal goal){
-	if(goal->getType()==GT_SCOUT){
-		//Select a worker
-		UnitsGroup* ug;	
-		
-		for(std::map<UnitsGroup *, std::list<pGoal>>::iterator it_ug = this->attributedGoals.begin(); it_ug != attributedGoals.end(); ++it_ug){
-			//Check over all the already created unitsGroup which one is near the first subgoal to accomplish
-			//TODO
-		} 
-
-		
-			//NO unitsgroup already found, must create a new one
-			BWAPI::Position p = goal->firstPosition();
-			Unit * unitToTake;
-			double minDist=999999;
-			double curDist=0;
-			for each(Unit* u in Broodwar->getAllUnits()){
-				if (u->getPlayer()==Broodwar->self()&&u->getType().isWorker()&& !(u->isConstructing())){
-					curDist=p.getDistance(u->getPosition());
-					if(curDist<minDist){
-						unitToTake = u;
-						minDist=curDist;
-					}
-				}
-
-			}
-			//if(unitToTake != NULL){ // TOCHECK (DEF PROG)
-				ug = new UnitsGroup();
-			
-				ug->takeControl(unitToTake);
-			//}
-		//}
-		if (ug != NULL){
-			//Check if the unitsGroup is not empty else Segfault ?
-			if (ug->getUnits()->size() != 0) {
-			//TOCHECK
-				ug->addGoal(goal);
-				insert(ug, goal);
-				microManager->unitsgroups.push_back(ug);
-			//	Broodwar->printf("Unit found, goal attributed");
-			}else{
-				Broodwar->printf("Could not find an appropriate unit for this scout goal");
-				Broodwar->printf("Problem...");
-			}
-
-		}
-	}else if(goal->getType()==GT_ATTACK){
-
-		}
-
-	
-}
-
-
-
-
-
 void GoalManager::insert(UnitsGroup * ug, pGoal g){
 	//Search if the ug is already in
 	std::map<UnitsGroup *, std::list<pGoal> >::iterator it = this->attributedGoals.find(ug);
@@ -108,19 +46,4 @@ bool GoalManager::clean(UnitsGroup * ug){
 		return true;
 	}
 	return false;
-}
-
-void GoalManager::goalDone(UnitsGroup * ug, pGoal p){
-
-	if (p->getType() == GT_SCOUT){
-	//	BWAPI::Broodwar->printf("Receive the order to destroy the group");
-		//Destroy the units group : remove units
-		microManager->promptRemove(ug);
-		ug->~UnitsGroup();
-	//	if(!this->microManager->remove(ug)){
-	//		BWAPI::Broodwar->printf("Could not find the group");
-	//	}
-		//ug->~UnitsGroup();
-	}
-
 }

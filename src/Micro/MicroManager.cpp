@@ -133,7 +133,7 @@ void MicroManager::sendGroupToAttack( UnitsGroup* ug)
 	}
 
 	if (!found) return;
-	ug->addGoal(pGoal(new AttackGoal(nearestEnemyLocation)));
+	//	ug->addGoal(pGoal(new AttackGoal(nearestEnemyLocation)));
 	//Broodwar->printf( "Let's fight !!");
 }
 
@@ -179,3 +179,9 @@ void MicroManager::promptRemove(UnitsGroup* ug){
 	this->promptedRemove.push_back(ug);
 }
 
+std::set<Unit*> MicroManager::getEnemies()
+{
+    std::set<BWAPI::Player*>::iterator iter = Broodwar->getPlayers().begin();
+    for(;iter != Broodwar->getPlayers().end() && !(*iter)->isEnemy(Broodwar->self());iter++);
+    return (*iter)->getUnits();
+}

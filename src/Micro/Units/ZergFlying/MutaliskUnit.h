@@ -5,11 +5,12 @@
 
 class MutaliskUnit : public FlyingUnit
 {
-protected:
-    static std::list<BWAPI::UnitType> listPriorite;
 public:
+    static BWAPI::UnitType listPriorite[NUMBER_OF_PRIORITY];
     MutaliskUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~MutaliskUnit();
     virtual void micro();
     virtual bool canHit(BWAPI::Unit* enemy);
+    virtual int getTimeToAttack();
+    virtual BWAPI::UnitType* getListPriorite();
 };

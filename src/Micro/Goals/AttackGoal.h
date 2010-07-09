@@ -11,7 +11,6 @@ protected:
 
 public:
 	AttackGoal();
-	AttackGoal(BWAPI::Position p);
 	AttackGoal( const AttackGoal& g);
 
 	virtual ~AttackGoal();

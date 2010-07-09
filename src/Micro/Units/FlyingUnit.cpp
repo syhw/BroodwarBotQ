@@ -11,8 +11,8 @@ FlyingUnit::~FlyingUnit()
 int FlyingUnit::damagesOn(BWAPI::Unit* enemy)
 {
     BWAPI::WeaponType airW = unit->getType().airWeapon();
-    int damages = airW.damageAmount();
-    damages += BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Protoss_Air_Weapons);
+    int damages = airW.damageAmount() + BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Protoss_Air_Weapons)*airW.damageFactor();
+    damages -= (enemy->getType().armor() + enemy->getPlayer()->getUpgradeLevel(enemy->getType().armorUpgrade()));
     if (airW.damageType() == BWAPI::DamageTypes::Concussive)
     {
         if (enemy->getType().size() == BWAPI::UnitSizeTypes::Medium)
@@ -35,5 +35,11 @@ int FlyingUnit::damagesOn(BWAPI::Unit* enemy)
             damages = static_cast<int>(damages * 0.5);
         }
     }
-    return damages;
+    // L'unité fait au minimum 1 dégât
+    return damages < 1 ? 1 : damages;
+}
+
+bool FlyingUnit::withinRange(BWAPI::Unit* enemy)
+{
+    return unit->getDistance(enemy) < 1.0; // to be confirmed
 }

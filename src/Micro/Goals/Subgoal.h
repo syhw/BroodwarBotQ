@@ -1,6 +1,4 @@
 #pragma once
-#include <BWAPI.h>
-#include "Formations.h"
 #include <boost/shared_ptr.hpp>
 #ifndef SUBGOAL_SMART_POINTER
 #define SUBGOAL_SMART_POINTER
@@ -8,49 +6,39 @@ class Subgoal;
 typedef boost::shared_ptr<Subgoal> pSubgoal;
 #endif
 
-typedef enum  
-{
-	ST_REACH_BY_UG = 0, //UG==UnitGroup
-	ST_REACH = 1,//By anybody
-	ST_VIEW  = 2,
-	ST_ATTACK = 3,
-	ST_REACH_F = 4, //In formation
-	ST_ATTACK_F = 5, //In formation
 
-} SubgoalType;
+#include <BWAPI.h>
+#include "Formations.h"
+#include "UnitsGroup.h"
+
 
 typedef enum
 {
-	SC_ONCE   = 0, //The subgoal must ve validated once to accomplish the goal
-	SC_ACTIVE = 1//The subgoal must be valid all along the accomplishment
- 	
-} SubgoalCondition;
+	SL_AND    = 0,
+	SL_OR     = 1
 
+} SubgoalLogic;
+	
 class Subgoal
 {
 public:
 	//Constructors
-	Subgoal(SubgoalType t, SubgoalCondition c, BWAPI::Position pos);
-	Subgoal(SubgoalType t, SubgoalCondition c, pFormation formation);
 	~Subgoal();
-
 	//Accessors
-	BWAPI::Position subgoalPosition() const;
-	SubgoalType subgoalType() const;
-	SubgoalCondition subgoalCondition() const;
+	SubgoalLogic getLogic() const;
 	//Check accomplishment
-	bool isRealized();//Depends on the condition
-	//if SC_ACTIVE return if subgoal still valid
-	//if SC_ONCE return if already accomplished
+	virtual bool isRealized() = 0;//Return if the subgoal is accomplished
+	//isRealized can return check(), but some subgoals will need to 
+	//be accomplished only once to complete the goal, others must be valid
+	//all along the goal accomplishment
 
-		
+	virtual void tryToRealize(UnitsGroup * ug) = 0;//Give suggestions to the UnitsGroup
+	virtual double distanceToRealize(UnitsGroup *ug) = 0;//Return an estimated distance to accomplish the Subgoal
+	//if the return value is negative, it means that the subgoal cannot give suggestions to the UnitsGroup
+protected:
+	Subgoal(SubgoalLogic l);
+	virtual bool check() = 0;//Function that defines the condition of the subgoal
 private:
-	Subgoal();
-	bool check();
-	BWAPI::Position pos;
-	SubgoalType type;
-	SubgoalCondition cond;
-	pFormation formation;    /**< formation to accomplish the subgoal if F in the type*/
-	bool validated;
+	SubgoalLogic logic;
 
 };

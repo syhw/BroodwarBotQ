@@ -10,6 +10,7 @@ BWAPI::UnitType ZealotUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes
                                                                 BWAPI::UnitTypes::Protoss_Dragoon,
                                                                 BWAPI::UnitTypes::Protoss_Reaver,
                                                                 BWAPI::UnitTypes::Protoss_Probe};
+
 ZealotUnit::ZealotUnit(BWAPI::Unit* u, UnitsGroup* ug):GroundUnit(u, ug)
 {
 }
@@ -20,6 +21,7 @@ ZealotUnit::~ZealotUnit()
 
 void ZealotUnit::micro()
 {
+   /* 
     std::set<Unit*> enemies;
     std::set<Unit*> enemies_in_range;
     int damagesTaken = 0;
@@ -46,15 +48,31 @@ void ZealotUnit::micro()
         Unit* closest_enemy = findClosestEnemy(enemies);
         if (closest_enemy)
             attackEnemy(closest_enemy, Colors::Yellow);
+#ifdef __DEBUG_NICOLAS__
         else
             BWAPI::Broodwar->drawLineMap(unit->getPosition().x(),      unit->getPosition().y(),
                                   unit->getTargetPosition().x(),unit->getTargetPosition().y(),
                                   Colors::White);
+#endif
     }
     enemies_in_range.clear();
+    */
 }
 
 bool ZealotUnit::canHit(BWAPI::Unit* enemy)
 {
     return enemy->isVisible() && !enemy->getType().isFlyer() && (enemy->getDistance(unit) > 0);
+}
+
+int ZealotUnit::getTimeToAttack()
+{
+#ifdef __DEBUG_NICOLAS__
+    BWAPI::Broodwar->printf("ZealotUnit::getTimeToAttack non implémenté !");
+#endif 
+    return 0;
+}
+
+BWAPI::UnitType* ZealotUnit::getListPriorite()
+{
+    return ZealotUnit::listPriorite;
 }
