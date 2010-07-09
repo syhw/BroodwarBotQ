@@ -13,8 +13,8 @@ MainWindow::MainWindow(QWidget *parent) :
     objManager = &ObjectManager::Instance();
     ui->setupUi(this);
 
-    MenuWidget* menuWidget = new MenuWidget (this);
-    MiniMap* miniMap = new MiniMap (this);
+    menuWidget = new MenuWidget (this);
+    miniMap = new MiniMap (this);
 
     // Add splitter
     splitter = new QSplitter(this);
@@ -24,8 +24,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //connect slider
     connect(menuWidget->ui->hSlider_gameSpeed, SIGNAL(valueChanged(int)), this, SLOT(changeGameSpeed(int)));
-		//QMessageBox::critical( this, "mainWindow", QString::number( (unsigned long)this).toStdString().c_str());
-		//QMessageBox::critical( this, "menuWidget", QString::number( (unsigned long)menuWidget).toStdString().c_str());
 }
 
 MainWindow::~MainWindow()
@@ -54,18 +52,8 @@ void MainWindow::initComponentsTree()
         item->setEditable(false);
         parentItem->appendRow(item);
     }
-		/*
-		la valeur de menuWidget est differente dans le constructeur et ici alors que mainWindow est identique. Verifier pkoi et par qui menuWidget est modifie...
-		QMessageBox::critical( this, "mainWindow", QString::number( (unsigned long)this).toStdString().c_str());
-		QMessageBox::critical( this, "menuWidget", QString::number( (unsigned long)menuWidget).toStdString().c_str());
-		Ui::MenuWidget* ui2 = menuWidget->ui;
-		QTreeView* componentTree2 = ui2->componentTree;
-		QMessageBox::critical( this, "componentTree2", QString::number( (unsigned long)componentTree2).toStdString().c_str());
-		QAbstractItemModel* componentModel2 = componentTree2->model();
-
     menuWidget->ui->componentTree->setModel( componentModel);
     connect(menuWidget->ui->componentTree, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(componentDoubleClicked(QModelIndex)));
-		*/
 }
 
 void MainWindow::changeEvent(QEvent *e)
