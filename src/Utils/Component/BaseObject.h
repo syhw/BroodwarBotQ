@@ -6,18 +6,14 @@
 #include "Defines.h"
 #include <QtGui/QWidget>
 #include <QtGui/QMessageBox>
+#include "RefreshWidgetEmiter.h"
+#include "time.h"
+#include "BWAPI.h"
 
 class BaseData;
 
 class BaseObject
-#ifdef BW_QT_DEBUG
-	: public QObject
 {
-	Q_OBJECT
-#else
-{
-#endif
-
 public:
 		BaseObject(std::string name);
     ~BaseObject();
@@ -28,10 +24,6 @@ public:
 		// Qt widget interface
 		virtual QWidget* createWidget(QWidget* parent) const; // must return the new widget with given parent
 		virtual void refreshWidget(QWidget* widget) const = 0; // update the given widget wich was returned by createWidget(QWidget* parent)
-#ifdef BW_QT_DEBUG
-signals:
-	void refreshWidget();
-#endif
 
 public:
 		std::string getClassName() const;
@@ -44,6 +36,13 @@ public:
     mutable CustomOStream<BaseObject> sendl;
     mutable std::ostringstream sout;
     mutable std::ostringstream serr;
+
+		// Profiling
+		clock_t beginTime, endTime, timeEllapsed;
+
+#ifdef BW_QT_DEBUG
+		RefreshWidgetEmiter* refreshWidgetEmiter;
+#endif
 
 protected:
     std::vector<BaseData*> vData;

@@ -366,7 +366,7 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\Utils\Component\moc_BaseObject.cpp"
+						RelativePath="..\src\Utils\Component\moc_RefreshWidgetEmiter.cpp"
 						>
 					</File>
 					<File
@@ -645,6 +645,10 @@
 					</File>
 					<File
 						RelativePath="..\src\Utils\Component\ObjectManager.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Utils\Component\RefreshWidgetEmiter.h"
 						>
 					</File>
 				</Filter>

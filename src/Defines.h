@@ -6,7 +6,7 @@
 //#define __NON_IMPLEMENTE__
 #define __DEBUG_GABRIEL__
 
-//#define BW_QT_DEBUG
+#define BW_QT_DEBUG
 #ifdef BW_QT_DEBUG
 class QApplication;
 class MainWindow;
