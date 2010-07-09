@@ -24,19 +24,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     //connect slider
     connect(menuWidget->ui->hSlider_gameSpeed, SIGNAL(valueChanged(int)), this, SLOT(changeGameSpeed(int)));
-
-    // Generate component tree
-    QStandardItemModel* componentModel = new QStandardItemModel();
-    QStandardItem *parentItem = componentModel->invisibleRootItem();
-    const std::vector<BaseObject*>& objects = objManager->getObjects();
-    for (std::vector<BaseObject*>::const_iterator it = objects.begin(); it != objects.end(); ++it) {
-        QStandardItem *item = new QStandardItem(QString((*it)->getClassName().c_str()));
-        item->setEditable(false);
-        parentItem->appendRow(item);
-    }
-    menuWidget->ui->componentTree->setModel( componentModel);
-    connect(menuWidget->ui->componentTree, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(componentDoubleClicked(QModelIndex)));
-
+		//QMessageBox::critical( this, "mainWindow", QString::number( (unsigned long)this).toStdString().c_str());
+		//QMessageBox::critical( this, "menuWidget", QString::number( (unsigned long)menuWidget).toStdString().c_str());
 }
 
 MainWindow::~MainWindow()
@@ -46,13 +35,37 @@ MainWindow::~MainWindow()
 
 void MainWindow::addTabWidget(QWidget* qw)
 {
-    QPushButton hello("SIGNAL RECU!");
-    hello.resize(100, 30);
-    hello.show();
+	// Check if the signal is well received
+	QMessageBox::critical( qw, "plop", "signal recu");
 
-    menuWidget->ui->tabWidget->addTab(qw, QString("plop"));
-    // OR 
-    // menuWidget->addTabWidget(qw);
+	menuWidget->ui->tabWidget->addTab(qw, QString("plop"));
+	// OR 
+	// menuWidget->addTabWidget(qw);
+}
+
+void MainWindow::initComponentsTree()
+{
+    // Generate component tree
+    QStandardItemModel* componentModel = new QStandardItemModel();
+    QStandardItem *parentItem = componentModel->invisibleRootItem();
+    const std::vector<BaseObject*>& objects = objManager->getObjects();
+    for (std::vector<BaseObject*>::const_iterator it = objects.begin(); it != objects.end(); ++it) {
+        QStandardItem *item = new QStandardItem(QString((*it)->getClassName().c_str()));
+        item->setEditable(false);
+        parentItem->appendRow(item);
+    }
+		/*
+		la valeur de menuWidget est differente dans le constructeur et ici alors que mainWindow est identique. Verifier pkoi et par qui menuWidget est modifie...
+		QMessageBox::critical( this, "mainWindow", QString::number( (unsigned long)this).toStdString().c_str());
+		QMessageBox::critical( this, "menuWidget", QString::number( (unsigned long)menuWidget).toStdString().c_str());
+		Ui::MenuWidget* ui2 = menuWidget->ui;
+		QTreeView* componentTree2 = ui2->componentTree;
+		QMessageBox::critical( this, "componentTree2", QString::number( (unsigned long)componentTree2).toStdString().c_str());
+		QAbstractItemModel* componentModel2 = componentTree2->model();
+
+    menuWidget->ui->componentTree->setModel( componentModel);
+    connect(menuWidget->ui->componentTree, SIGNAL(doubleClicked(QModelIndex)), this, SLOT(componentDoubleClicked(QModelIndex)));
+		*/
 }
 
 void MainWindow::changeEvent(QEvent *e)
@@ -84,8 +97,12 @@ void MainWindow::componentDoubleClicked(QModelIndex index)
     QTabWidget* tabWidget = new QTabWidget();
     mainLayout->addWidget(tabWidget);
 
+		// Display the component output.
+//TODO add the component output.
+
+		// Display the Data<>
     const std::vector<BaseData*>& data = baseObj->getData();
-    for (unsigned int i = 0; i < data.size()/5+1; ++i)
+    for (unsigned int i = 0; i < (data.size()+4)/5; ++i)
     {
         // create a tab
         QWidget* tab = new QWidget( tabWidget);

@@ -818,10 +818,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\MacroDll.h"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Utils\TimeManaged.h"
 					>
 				</File>
@@ -881,6 +877,10 @@
 					RelativePath="..\src\Arbitrator\Heap.h"
 					>
 				</File>
+				<File
+					RelativePath="..\src\AI-Monitor\WidgetCreator.inl"
+					>
+				</File>
 			</Filter>
 			<Filter
 				Name="AI_Monitor"
@@ -911,10 +911,6 @@
 				</File>
 				<File
 					RelativePath="..\src\AI-Monitor\WidgetCreator.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\AI-Monitor\WidgetCreator.inl"
 					>
 				</File>
 			</Filter>

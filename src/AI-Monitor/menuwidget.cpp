@@ -16,6 +16,7 @@ MenuWidget::MenuWidget(QWidget *parent) :
     //ui->EVUnits->setItem(1, 1, newItem2);
     //ui->EVUnits->setItem(0, 0, newItem);
 
+		/*
     // create and define your widget
     QWidget* qw = new QWidget();
     qw->setObjectName(QString::fromUtf8("tab_EUFilter_test"));
@@ -47,6 +48,7 @@ MenuWidget::MenuWidget(QWidget *parent) :
     ___qtablewidgetitem4->setText(QApplication::translate("MenuWidget", "HP", 0, QApplication::UnicodeUTF8));
     horizontalLayout->addWidget(EVUnits);
     //ui->tabWidget->addTab(qw, QString());
+		*/
 }
 
 MenuWidget::~MenuWidget()

@@ -11,4 +11,5 @@
 
 extern QApplication* qapplication;
 extern MainWindow* qmainwindow;
+extern bool g_onStartDone;
 #endif

@@ -24,8 +24,9 @@ public slots:
     void changeGameSpeed(int value);
     void componentDoubleClicked(QModelIndex index);
     void addTabWidget(QWidget* qw);
+		void initComponentsTree();
 
-private:
+public:
     Ui::MainWindow *ui;
     QSplitter* splitter;
     MenuWidget* menuWidget;
