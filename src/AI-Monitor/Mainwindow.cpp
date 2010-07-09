@@ -86,7 +86,7 @@ void MainWindow::componentDoubleClicked(QModelIndex index)
     mainLayout->addWidget(tabWidget);
 
 		// Display the component output.
-//TODO add the component output.
+		tabWidget->addTab(baseObj->createWidget(tabWidget), QString("Option"));
 
 		// Display the Data<>
     const std::vector<BaseData*>& data = baseObj->getData();

@@ -6,6 +6,7 @@
 #include <BWAPI.h>
 #include <QtGui/QApplication>
 #include "MacroProject.h"
+#include "Mainwindow.h"
 
 BattleBroodAI* broodAI = NULL;
 QApplication* qapplication = NULL;

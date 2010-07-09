@@ -114,7 +114,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ZergFlying;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Utils/Component;../src/Intelligence;../../BWAPI_Beta_2.8/include;../../BWAPI_Beta_2.8/include/BWAPI;../../BWAPI_Beta_2.8/include/BWTA;../../boost_1_43_0;&quot;C:\Program Files\boost\boost_1_42\&quot;;../../boost_1_42;C:\Qt\4.6.2\include;C:\Qt\4.6.3\include;&quot;C:\dev\libQGLViewer-2.3.5\QGLViewer&quot;"
+				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Intelligence;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ZergFlying;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Utils/Component;../../BWAPI_Beta_2.8/include;../../BWAPI_Beta_2.8/include/BWAPI;../../BWAPI_Beta_2.8/include/BWTA;../../boost_1_43_0;&quot;C:\Program Files\boost\boost_1_42\&quot;;../../boost_1_42;C:\Qt\4.6.2\include;C:\Qt\4.6.3\include;&quot;C:\dev\libQGLViewer-2.3.5\QGLViewer&quot;"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
 				RuntimeLibrary="2"
@@ -496,11 +496,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\AI-Monitor\release\moc_QtOutputer.cpp"
+					RelativePath="..\src\AI-Monitor\release\moc_QComponentWidget.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\AI-Monitor\QtOutputer.cpp"
+					RelativePath="..\src\AI-Monitor\QComponentWidget.cpp"
 					>
 				</File>
 			</Filter>
@@ -906,7 +906,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\AI-Monitor\QtOutputer.h"
+					RelativePath="..\src\AI-Monitor\QComponentWidget.h"
 					>
 				</File>
 				<File

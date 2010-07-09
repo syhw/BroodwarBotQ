@@ -26,6 +26,7 @@ protected:
     static void pathFind(std::vector<WalkTilePosition>& path, const BWAPI::Position& p_start, const BWAPI::Position& p_end);
     unsigned int _tick;
     bool inline tick();
+    BWAPI::Unit* oldTarget;
 
 public:
 	BWAPI::Unit* unit;

@@ -16,18 +16,24 @@ CorsairUnit::~CorsairUnit()
 
 void CorsairUnit::micro()
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("CorsairUnit::micro non implémenté !");
+#endif
 }
 
 bool CorsairUnit::canHit(BWAPI::Unit* enemy)
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("CorsairUnit::canHit non implémenté !");
+#endif
     return false;
 }
 
 int CorsairUnit::getTimeToAttack()
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("CorsairUnit::getTimeToAttack non implémenté !");
+#endif
     return 0;
 }
 

@@ -16,12 +16,16 @@ ScourgeUnit::~ScourgeUnit()
 
 void ScourgeUnit::micro()
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("ScourgeUnit::micro non implémenté !");
+#endif
 }
 
 bool ScourgeUnit::canHit(BWAPI::Unit* enemy)
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("ScourgeUnit::canHit non implémenté !");
+#endif
     return false;
 }
 

@@ -16,18 +16,24 @@ DarkTemplarUnit::~DarkTemplarUnit()
 
 void DarkTemplarUnit::micro()
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("DarkTemplarUnit::micro non implémenté !");
+#endif
 }
 
 bool DarkTemplarUnit::canHit(BWAPI::Unit* enemy)
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("DarkTemplarUnit::canHit non implémenté !");
+#endif
     return false;
 }
 
 int DarkTemplarUnit::getTimeToAttack()
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("DarkTemplarUnit::getTimeToAttack non implémenté !");
+#endif
     return 0;
 }
 

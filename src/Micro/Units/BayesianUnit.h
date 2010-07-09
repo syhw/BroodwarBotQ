@@ -73,7 +73,6 @@ protected:
     UnitsGroup* _unitsGroup;
     std::multimap<double, BWAPI::Unit*> _rangeEnemies;
     std::map<occupation_type, double> _defaultProb;
-    BWAPI::Unit* oldTarget;
 
     inline void initDefaultProb();
     inline void computeFlockValues();
@@ -112,8 +111,6 @@ public:
     void update();
     virtual void attackMove(const BWAPI::Position& p);
     std::multimap<double, BWAPI::Unit*>& getRangeEnemies();
-    BWAPI::Unit* getOldTarget();
-    void setOldTarget(BWAPI::Unit* newTarget);
 
     void attackEnemy(BWAPI::Unit* u, BWAPI::Color col);
     virtual void micro() = 0;

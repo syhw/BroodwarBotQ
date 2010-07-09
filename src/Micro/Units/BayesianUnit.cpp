@@ -39,8 +39,8 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 : BattleUnit(u)
 , dir(Vec(unit->getVelocityX(), unit->getVelocityY()))
 , _mode(MODE_FLOCK)
-, _ground_unit(!u->getType().isFlyer())
 , _unitsGroup(ug)
+, _ground_unit(!unit->getType().isFlyer())
 , _sheight(unit->getType().dimensionUp() + unit->getType().dimensionDown())
 , _slarge(unit->getType().dimensionRight() + unit->getType().dimensionLeft())
 {
@@ -657,9 +657,18 @@ void BayesianUnit::update()
                 //Broodwar->printf("me think I have no enemy unit in range, me perhaps stoodpid!\n");
             }
         }
+
         */
-        if (targetEnemy != NULL && withinRange(targetEnemy))
+        if (targetEnemy != NULL && unit->getGroundWeaponCooldown() == getTimeToAttack())//getTimeToAttack())
             attackEnemy(targetEnemy, BWAPI::Colors::Red);
+        else if ( unit->isAttacking() && unit->getGroundWeaponCooldown() < 20)
+            unit->rightClick(Position(unit->getPosition().x()-100, unit->getPosition().y()));
+        /*else if (targetEnemy != NULL && unit->getGroundWeaponCooldown() > getTimeToAttack())
+            unit->rightClick(targetEnemy);
+        else if (targetEnemyInRange != NULL && unit->getGroundWeaponCooldown() <= getTimeToAttack())*/
+        /*if (targetEnemyInRange != NULL && targetEnemyInRange->exists())
+            attackEnemy(targetEnemyInRange, BWAPI::Colors::Red);*/
+
     } else if (_mode == MODE_FLOCK) {
         //if (tick())
         {
@@ -697,16 +706,6 @@ void BayesianUnit::update()
 std::multimap<double, BWAPI::Unit*>& BayesianUnit::getRangeEnemies()
 {
     return _rangeEnemies;
-}
-
-BWAPI::Unit* BayesianUnit::getOldTarget()
-{
-    return oldTarget;
-}
-
-void BayesianUnit::setOldTarget(Unit* newTarget)
-{
-    oldTarget = newTarget;
 }
 
 void BayesianUnit::attackEnemy(BWAPI::Unit* u, BWAPI::Color col)

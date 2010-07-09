@@ -4,6 +4,7 @@
 #include "DefendGoal.h"
 #include "FormationSubgoal.h"
 #include <stdio.h>
+#include <QtGui/QApplication.h>
 using namespace BWAPI;
 using namespace std;
 

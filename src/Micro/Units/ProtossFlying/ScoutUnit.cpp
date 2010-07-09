@@ -16,18 +16,24 @@ ScoutUnit::~ScoutUnit()
 
 void ScoutUnit::micro()
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("ScoutUnit::micro non implémenté !");
+#endif
 }
 
 bool ScoutUnit::canHit(BWAPI::Unit* enemy)
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("ScoutUnit::canHit non implémenté !");
+#endif
     return false;
 }
 
 int ScoutUnit::getTimeToAttack()
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("ScoutUnit::getTimeToAttack non implémenté !");
+#endif
     return 0;
 }
 

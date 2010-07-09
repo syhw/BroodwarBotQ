@@ -1,6 +1,4 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
-
+#pragma once
 #include <QtGui/QMainWindow>
 #include <QtGui/QSplitter>
 #include "MiniMap.h"
@@ -33,5 +31,3 @@ public:
     MiniMap* miniMap;
     ObjectManager* objManager;
 };
-
-#endif // MAINWINDOW_H

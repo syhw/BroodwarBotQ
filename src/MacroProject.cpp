@@ -1,10 +1,8 @@
 #include "MacroProject.h"
 #include <Util.h>
 #include <time.h>
-
-
 #include <UnitsGroup.h>
-
+#include <QtGui/QApplication.h>
 
 using namespace BWAPI;
 
