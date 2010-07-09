@@ -1,12 +1,11 @@
 #include "QtOutputer.h"
-#include "Defines.h"
+#include "MainWindow.h"
 #include <BWAPI.h>
 
 using namespace std;
 
-QtOutputer::QtOutputer(/*QWidget* parent*/)
+QtOutputer::QtOutputer()
 : qt_initialized(false)
-, QObject(/*parent*/)
 { 
 }
 

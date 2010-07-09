@@ -14,6 +14,22 @@ BaseObject::~BaseObject()
 {
 }
 
+void BaseObject::update()
+{
+/* TODO
+calculer le temps de depart
+appeller onFrame() du composant (anciennement l'update)
+calculer le temps de fin pour le profiling
+emit refhreshWidget.
+*/
+	onFrame();
+}
+
+QWidget* BaseObject::createWidget(QWidget* parent) const
+{
+	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
+}
+
 std::string BaseObject::getClassName() const
 {
 	return className;

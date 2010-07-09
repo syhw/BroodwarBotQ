@@ -5,7 +5,7 @@
 #include "Data.h"
 #include "BaseObject.h"
 
-class ObjectManager : public CSingleton<ObjectManager> // : public BaseData
+class ObjectManager : public CSingleton<ObjectManager>
 {
     friend class CSingleton<ObjectManager>;
 

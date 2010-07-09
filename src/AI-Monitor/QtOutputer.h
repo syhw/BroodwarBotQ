@@ -1,6 +1,7 @@
 #pragma once
 #include <QtCore/QObject>
 #include <QtGui/QWidget>
+#include "Defines.h"
 
 class QtOutputer : public QObject
 {
@@ -10,7 +11,7 @@ class QtOutputer : public QObject
     QWidget* _qwidget;
 
 public:
-    QtOutputer(/*QWidget* parent = NULL*/);
+    QtOutputer();
     bool init();
     bool init(QWidget* qw);
     void output(QWidget* qw);
