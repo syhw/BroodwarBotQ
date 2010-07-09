@@ -5,14 +5,19 @@
 #include "CustomOStream.h"
 #include "Defines.h"
 #include <QtGui/QWidget>
+#include <QtGui/QMessageBox>
 
 class BaseData;
 
 class BaseObject
-#ifndef BW_QT_DEBUG
+#ifdef BW_QT_DEBUG
 	: public QObject
-#endif
 {
+	Q_OBJECT
+#else
+{
+#endif
+
 public:
 		BaseObject(std::string name);
     ~BaseObject();
@@ -24,7 +29,7 @@ public:
 		virtual QWidget* createWidget(QWidget* parent) const; // must return the new widget with given parent
 		virtual void refreshWidget(QWidget* widget) const = 0; // update the given widget wich was returned by createWidget(QWidget* parent)
 signals:
-	void refreshWidget(BaseObject*);
+	void refreshWidget();
 
 public:
 		std::string getClassName() const;

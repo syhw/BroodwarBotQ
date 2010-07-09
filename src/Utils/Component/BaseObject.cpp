@@ -16,13 +16,12 @@ BaseObject::~BaseObject()
 
 void BaseObject::update()
 {
-/* TODO
-calculer le temps de depart
-appeller onFrame() du composant (anciennement l'update)
-calculer le temps de fin pour le profiling
-emit refhreshWidget.
-*/
+	// profiler
 	onFrame();
+	// et afficher les resultats ici
+		QMessageBox::critical(0, "plop", "signal emis");
+
+	emit refreshWidget();
 }
 
 QWidget* BaseObject::createWidget(QWidget* parent) const

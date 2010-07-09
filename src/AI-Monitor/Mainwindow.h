@@ -4,6 +4,7 @@
 #include "MiniMap.h"
 #include "MenuWidget.h"
 #include "ObjectManager.h"
+#include "QComponentWidget.h"
 
 namespace Ui {
     class MainWindow;

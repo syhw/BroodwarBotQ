@@ -193,6 +193,7 @@ void BattleBroodAI::onFrame()
     this->microManager->update();
     this->regions->update();
 	this->eEcoEstimator->onFrame();
+	this->eUnitsFilter->update(); // hack for this component to call its BaseObject::update() method
 
     // Scout example to remove TODO
 	//if( (Broodwar->getFrameCount() % (100*24)) == 0)
