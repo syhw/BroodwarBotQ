@@ -6,8 +6,9 @@
 #include <TechManager.h>
 #include <UpgradeManager.h>
 #include <ProductionManager.h>
+#include "BaseObject.h"
 
-class BuildOrderManager : public CSingleton<BuildOrderManager>
+class BuildOrderManager : public CSingleton<BuildOrderManager>, public BaseObject
 {
 	friend class CSingleton<BuildOrderManager>;
 
@@ -42,6 +43,10 @@ class BuildOrderManager : public CSingleton<BuildOrderManager>
 	int getUnusedMinerals() {return BWAPI::Broodwar->self()->cumulativeMinerals()-this->usedMinerals;};
 	int getUnusedGas() {return BWAPI::Broodwar->self()->cumulativeGas()-this->usedGas;};
 	int getPlannedCount( BWAPI::UnitType unitType);
+
+		// Qt interface
+		virtual QWidget* createWidget(QWidget* parent) const;
+		virtual void refreshWidget(QWidget* widget) const;
 
   private:
     BuildManager* buildManager;

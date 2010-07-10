@@ -5,6 +5,7 @@ QComponentWidget::QComponentWidget(const BaseObject* obj)
 : QDialog(0)
 , baseObj( obj)
 {
+		setWindowModality(Qt::NonModal);
 	  setWindowTitle (QString (baseObj->getClassName().c_str()));
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     setLayout(mainLayout);
@@ -41,8 +42,7 @@ QComponentWidget::QComponentWidget(const BaseObject* obj)
     textEdit_serr->setText(QString(baseObj->getErrors().c_str()));
     tabWidget->addTab( textEdit_serr, QString( "Errors"));
 
-		connect( reinterpret_cast<const QObject*>(baseObj), SIGNAL(refreshWidget()), this, SLOT(refreshWidget()), Qt::QueuedConnection);
-	QMessageBox::critical(this, "plop", "connection faite");
+		connect( reinterpret_cast<const QObject*>(baseObj->refreshWidgetEmiter), SIGNAL(refreshWidget()), this, SLOT(refreshWidget()), Qt::QueuedConnection);
 }
 
 QComponentWidget::~QComponentWidget()
@@ -52,7 +52,6 @@ QComponentWidget::~QComponentWidget()
 
 void QComponentWidget::refreshWidget()
 {
-	QMessageBox::critical(this, "plop", "signal recu");
 	baseObj->refreshWidget(tabWidget->widget (0));
   textEdit_sout->setText(QString(baseObj->getWarnings().c_str()));
   textEdit_serr->setText(QString(baseObj->getErrors().c_str()));

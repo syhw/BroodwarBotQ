@@ -1,6 +1,7 @@
 #include <TechManager.h>
 
 TechManager::TechManager()
+: BaseObject("TechManager")
 {
 	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
   this->placer = NULL;
@@ -105,7 +106,7 @@ void TechManager::update()
             }
         }
     } 
-    catch (std::exception* e)
+    catch (std::exception* /*e*/)
     {
         // TODO used exception, bufferize in str and printf str
         BWAPI::Broodwar->printf("Too long I think");
@@ -141,4 +142,14 @@ bool TechManager::planned(BWAPI::TechType type) const
 {
   std::set<BWAPI::TechType>::const_iterator i=plannedTech.find(type);
   return (i!=plannedTech.end());
+}
+
+QWidget* TechManager::createWidget(QWidget* parent) const
+{
+	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
+}
+
+void TechManager::refreshWidget(QWidget* widget) const
+{
+// TODO update your widget after having defined it in the previous method :)
 }

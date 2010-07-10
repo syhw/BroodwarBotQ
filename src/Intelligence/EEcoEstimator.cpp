@@ -2,7 +2,14 @@
 
 using namespace BWAPI;
 
-EEcoEstimator::EEcoEstimator():mWorkers(4),gWorkers(0),totWorkers(4),gaz_exploited(0),seconds(0),theo_workers(0)
+EEcoEstimator::EEcoEstimator()
+: BaseObject("EEcoEstimator")
+, mWorkers(4)
+, gWorkers(0)
+, totWorkers(4)
+, gaz_exploited(0)
+, seconds(0)
+, theo_workers(0)
 {
 	BWTA::BaseLocation * our_base = BWTA::getNearestBaseLocation(Broodwar->self()->getStartLocation());
 	
@@ -28,7 +35,7 @@ EEcoEstimator::~EEcoEstimator(){
 }
 
 
-void EEcoEstimator::onFrame()
+void EEcoEstimator::update()
 {
 	//uses 300 as build time for worker
 	if ((timeManager->getElapsedTime()%300)==299) {
@@ -78,7 +85,18 @@ void EEcoEstimator::add_workers(int mworkers, int gworkers){
 this->mWorkers += mworkers;
 this->gWorkers += gworkers;
 }
+
 void EEcoEstimator::rm_workers(int mworkers, int gworkers){
 this->mWorkers -= mworkers;
 this->gWorkers -= gworkers;
+}
+
+QWidget* EEcoEstimator::createWidget(QWidget* parent) const
+{
+	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
+}
+
+void EEcoEstimator::refreshWidget(QWidget* widget) const
+{
+// TODO update your widget after having defined it in the previous method :)
 }

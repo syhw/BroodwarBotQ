@@ -1,5 +1,7 @@
 #include <BaseManager.h>
+
 BaseManager::BaseManager()
+: BaseObject("BaseManager")
 {
   this->builder = NULL;
 }
@@ -89,4 +91,14 @@ void BaseManager::onUnitDestroy(BWAPI::Unit* unit)
 				location2base.erase( it);
 				break;
 			}
+}
+
+QWidget* BaseManager::createWidget(QWidget* parent) const
+{
+	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
+}
+
+void BaseManager::refreshWidget(QWidget* widget) const
+{
+// TODO update your widget after having defined it in the previous method :)
 }

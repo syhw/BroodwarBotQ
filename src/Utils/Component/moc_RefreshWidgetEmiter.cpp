@@ -1,16 +1,15 @@
 /****************************************************************************
-** Meta object code from reading C++ file 'BaseObject.h'
+** Meta object code from reading C++ file 'RefreshWidgetEmiter.h'
 **
-** Created: Fri 9. Jul 17:12:04 2010
+** Created: Fri 9. Jul 18:25:11 2010
 **      by: The Qt Meta Object Compiler version 62 (Qt 4.6.2)
 **
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#ifdef BW_QT_DEBUG
-#include "BaseObject.h"
+#include "RefreshWidgetEmiter.h"
 #if !defined(Q_MOC_OUTPUT_REVISION)
-#error "The header file 'BaseObject.h' doesn't include <QObject>."
+#error "The header file 'RefreshWidgetEmiter.h' doesn't include <QObject>."
 #elif Q_MOC_OUTPUT_REVISION != 62
 #error "This file was generated using the moc from 4.6.2. It"
 #error "cannot be used with the include files from this version of Qt."
@@ -18,7 +17,7 @@
 #endif
 
 QT_BEGIN_MOC_NAMESPACE
-static const uint qt_meta_data_BaseObject[] = {
+static const uint qt_meta_data_RefreshWidgetEmiter[] = {
 
  // content:
        4,       // revision
@@ -32,38 +31,38 @@ static const uint qt_meta_data_BaseObject[] = {
        1,       // signalCount
 
  // signals: signature, parameters, type, tag, flags
-      12,   11,   11,   11, 0x05,
+      21,   20,   20,   20, 0x05,
 
        0        // eod
 };
 
-static const char qt_meta_stringdata_BaseObject[] = {
-    "BaseObject\0\0refreshWidget()\0"
+static const char qt_meta_stringdata_RefreshWidgetEmiter[] = {
+    "RefreshWidgetEmiter\0\0refreshWidget()\0"
 };
 
-const QMetaObject BaseObject::staticMetaObject = {
-    { &QObject::staticMetaObject, qt_meta_stringdata_BaseObject,
-      qt_meta_data_BaseObject, 0 }
+const QMetaObject RefreshWidgetEmiter::staticMetaObject = {
+    { &QObject::staticMetaObject, qt_meta_stringdata_RefreshWidgetEmiter,
+      qt_meta_data_RefreshWidgetEmiter, 0 }
 };
 
 #ifdef Q_NO_DATA_RELOCATION
-const QMetaObject &BaseObject::getStaticMetaObject() { return staticMetaObject; }
+const QMetaObject &RefreshWidgetEmiter::getStaticMetaObject() { return staticMetaObject; }
 #endif //Q_NO_DATA_RELOCATION
 
-const QMetaObject *BaseObject::metaObject() const
+const QMetaObject *RefreshWidgetEmiter::metaObject() const
 {
     return QObject::d_ptr->metaObject ? QObject::d_ptr->metaObject : &staticMetaObject;
 }
 
-void *BaseObject::qt_metacast(const char *_clname)
+void *RefreshWidgetEmiter::qt_metacast(const char *_clname)
 {
     if (!_clname) return 0;
-    if (!strcmp(_clname, qt_meta_stringdata_BaseObject))
-        return static_cast<void*>(const_cast< BaseObject*>(this));
+    if (!strcmp(_clname, qt_meta_stringdata_RefreshWidgetEmiter))
+        return static_cast<void*>(const_cast< RefreshWidgetEmiter*>(this));
     return QObject::qt_metacast(_clname);
 }
 
-int BaseObject::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+int RefreshWidgetEmiter::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
     _id = QObject::qt_metacall(_c, _id, _a);
     if (_id < 0)
@@ -79,9 +78,8 @@ int BaseObject::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void BaseObject::refreshWidget()
+void RefreshWidgetEmiter::refreshWidget()
 {
     QMetaObject::activate(this, &staticMetaObject, 0, 0);
 }
 QT_END_MOC_NAMESPACE
-#endif

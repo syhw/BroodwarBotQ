@@ -3,34 +3,45 @@
 #include <algorithm>
 
 BaseObject::BaseObject(std::string name)
-: sout( )
-, serr( )
-, className(name)
+: className(name)
 {
     ObjectManager::Instance().addObject(this);
+		refreshWidgetEmiter = new RefreshWidgetEmiter();
 }
 
 BaseObject::~BaseObject()
 {
 }
 
-void BaseObject::update()
+void BaseObject::onFrame()
 {
 #ifdef BW_QT_DEBUG
-	// profiler
-	onFrame();
-	// et afficher les resultats ici
-		QMessageBox::critical(0, "plop", "signal emis");
+	// Profile onFrame of the component
+	beginTime = clock();
 
-	emit refreshWidget();
+	update();
+
+	endTime = clock();
+	timeEllapsed = (endTime - beginTime) / CLOCKS_PER_SEC;
+
+	// refresh QtWidget all half seconds
+	if(!(clock()%12))
+		refreshWidgetEmiter->refresh(); // maybe replace this call by a timer should be better ?
+
+	if( !sout.str().empty()) processStream( sout);
+	if( !serr.str().empty()) processStream( serr);
 #else
-	onFrame();
+	update();
 #endif
 }
 
 QWidget* BaseObject::createWidget(QWidget* parent) const
 {
 	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
+}
+
+void BaseObject::display() const
+{
 }
 
 std::string BaseObject::getClassName() const
@@ -43,7 +54,8 @@ void BaseObject::processStream(std::ostream& out)
 	if (&out == &serr)
 	{	    
 		serr << "\n";
-		std::cerr<< "WARNING[" << getClassName() << "]: "<<serr.str();
+		std::cerr<< "ERROR[" << getClassName() << "]: "<<serr.str();
+		BWAPI::Broodwar->printf( "[%s]: %s", getClassName().c_str(), serr.str().c_str());
 		warnings += serr.str();
 		serr.str("");
 	}

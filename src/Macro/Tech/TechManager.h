@@ -4,10 +4,11 @@
 #include <BWAPI.h>
 #include <BuildingPlacer.h>
 #include "TimeManaged.h"
+#include "BaseObject.h"
 
 
 class TechManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public CSingleton<TechManager>,
-    public TimeManaged
+    public TimeManaged, public BaseObject
 {
 	friend class CSingleton<TechManager>;
 	private:
@@ -24,6 +25,11 @@ class TechManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public C
     void onUnitDestroy(BWAPI::Unit* unit);
     bool research(BWAPI::TechType type);
     bool planned(BWAPI::TechType type) const;
+
+		// Qt interface
+		virtual QWidget* createWidget(QWidget* parent) const;
+		virtual void refreshWidget(QWidget* widget) const;
+
     Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
     BuildingPlacer* placer;
     std::map<BWAPI::UnitType,std::list<BWAPI::TechType> > researchQueues;

@@ -4,6 +4,7 @@
 
 using namespace BWAPI;
 ScoutManager::ScoutManager( )
+: BaseObject("ScoutManager")
 {
 	regions = & Regions::Instance();
 	microManager = & MicroManager::Instance();
@@ -218,4 +219,14 @@ void ScoutManager::onUnitShow(BWAPI::Unit* unit){
 		//enemy found, must explore his base
 		this->exploreRegion(BWTA::getRegion(unit->getTilePosition()));
 	}
+}
+
+QWidget* ScoutManager::createWidget(QWidget* parent) const
+{
+	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
+}
+
+void ScoutManager::refreshWidget(QWidget* widget) const
+{
+// TODO update your widget after having defined it in the previous method :)
 }
