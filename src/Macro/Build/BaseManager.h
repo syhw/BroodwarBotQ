@@ -28,9 +28,11 @@ class BaseManager: public CSingleton<BaseManager>, public BaseObject
   std::string getName();
   void onUnitDestroy(BWAPI::Unit* unit);
 
-	// Qt interface
-	virtual QWidget* createWidget(QWidget* parent) const;
-	virtual void refreshWidget(QWidget* widget) const;
+#ifdef BW_QT_DEBUG
+  // Qt interface
+  virtual QWidget* createWidget(QWidget* parent) const;
+  virtual void refreshWidget(QWidget* widget) const;
+#endif
 
   BuildOrderManager* builder;
   std::map<BWTA::BaseLocation*,Base*> location2base;

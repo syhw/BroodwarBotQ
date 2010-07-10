@@ -144,6 +144,7 @@ bool TechManager::planned(BWAPI::TechType type) const
   return (i!=plannedTech.end());
 }
 
+#ifdef BW_QT_DEBUG
 QWidget* TechManager::createWidget(QWidget* parent) const
 {
 	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
@@ -153,3 +154,4 @@ void TechManager::refreshWidget(QWidget* widget) const
 {
 // TODO update your widget after having defined it in the previous method :)
 }
+#endif

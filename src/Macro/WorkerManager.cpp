@@ -212,6 +212,7 @@ void WorkerManager::setWorkersPerGas(int count)
   this->WorkersPerGas=count;
 }
 
+#ifdef BW_QT_DEBUG
 QWidget* WorkerManager::createWidget(QWidget* parent) const
 {
 //TODO what do you want to display ?
@@ -222,3 +223,4 @@ void WorkerManager::refreshWidget(QWidget* widget) const
 {
 //TODO update your widget !!
 }
+#endif

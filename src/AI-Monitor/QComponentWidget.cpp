@@ -3,17 +3,18 @@
 
 QComponentWidget::QComponentWidget(const BaseObject* obj)
 : QDialog(0)
-, baseObj( obj)
+, baseObj(obj)
 {
-		setWindowModality(Qt::NonModal);
-	  setWindowTitle (QString (baseObj->getClassName().c_str()));
+#ifdef BW_QT_DEBUG
+    setWindowModality(Qt::NonModal);
+    setWindowTitle (QString (baseObj->getClassName().c_str()));
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     setLayout(mainLayout);
     tabWidget = new QTabWidget();
     mainLayout->addWidget(tabWidget);
 
-		// Display the component output.
-		tabWidget->addTab(baseObj->createWidget(tabWidget), QString("Option"));
+    // Display the component output.
+    tabWidget->addTab(baseObj->createWidget(tabWidget), QString("Option"));
 
 		// Display the Data<>
     const std::vector<BaseData*>& data = baseObj->getData();
@@ -42,7 +43,8 @@ QComponentWidget::QComponentWidget(const BaseObject* obj)
     textEdit_serr->setText(QString(baseObj->getErrors().c_str()));
     tabWidget->addTab( textEdit_serr, QString( "Errors"));
 
-		connect( reinterpret_cast<const QObject*>(baseObj->refreshWidgetEmiter), SIGNAL(refreshWidget()), this, SLOT(refreshWidget()), Qt::QueuedConnection);
+    connect(reinterpret_cast<const QObject*>(baseObj->refreshWidgetEmiter), SIGNAL(refreshWidget()), this, SLOT(refreshWidget()), Qt::QueuedConnection);
+#endif
 }
 
 QComponentWidget::~QComponentWidget()
@@ -52,7 +54,9 @@ QComponentWidget::~QComponentWidget()
 
 void QComponentWidget::refreshWidget()
 {
-	baseObj->refreshWidget(tabWidget->widget (0));
-  textEdit_sout->setText(QString(baseObj->getWarnings().c_str()));
-  textEdit_serr->setText(QString(baseObj->getErrors().c_str()));
+#ifdef BW_QT_DEBUG
+    baseObj->refreshWidget(tabWidget->widget (0));
+    textEdit_sout->sestText(QString(baseObj->getWarnings().c_str()));
+    textEdit_serr->setText(QString(baseObj->getErrors().c_str()));
+#endif
 }

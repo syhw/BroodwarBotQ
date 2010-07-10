@@ -7,11 +7,15 @@
 #include <QtGui/QApplication>
 #include "MacroProject.h"
 #include "Mainwindow.h"
+#include "Defines.h"
 
 BattleBroodAI* broodAI = NULL;
+
+#ifdef BW_QT_DEBUG
 QApplication* qapplication = NULL;
 MainWindow* qmainwindow = NULL;
 bool g_onStartDone = false;
+#endif
 
 #define BUF_SIZE 255
 

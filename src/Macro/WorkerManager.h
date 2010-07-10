@@ -28,8 +28,11 @@ class WorkerManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public
     virtual void update();
     virtual std::string getName() const;
 
-		virtual QWidget* createWidget(QWidget* parent) const;
-		virtual void refreshWidget(QWidget* widget) const;
+#ifdef BW_QT_DEBUG
+    // Qt interface
+    virtual QWidget* createWidget(QWidget* parent) const;
+    virtual void refreshWidget(QWidget* widget) const;
+#endif
 
     void onUnitDestroy(BWAPI::Unit* unit);
     void setWorkersPerGas(int count);

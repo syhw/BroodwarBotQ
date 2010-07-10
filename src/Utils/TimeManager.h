@@ -62,10 +62,12 @@ public:
         DWORD dwTime      // current system time 
         );
 
-		// Qt interface
-		virtual QWidget* createWidget(QWidget* parent) const;
-		virtual void refreshWidget(QWidget* widget) const;
+#ifdef BW_QT_DEBUG
+    // Qt interface
+    virtual QWidget* createWidget(QWidget* parent) const;
+    virtual void refreshWidget(QWidget* widget) const;
+#endif
 
 private:
-	unsigned long frameCount; // frame count since the begining
+    unsigned long frameCount; // frame count since the begining
 };

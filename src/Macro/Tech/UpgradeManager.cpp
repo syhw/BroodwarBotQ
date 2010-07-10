@@ -149,6 +149,7 @@ int UpgradeManager::getCompletedLevel(BWAPI::UpgradeType type) const
   return BWAPI::Broodwar->self()->getUpgradeLevel(type);
 }
 
+#ifdef BW_QT_DEBUG
 QWidget* UpgradeManager::createWidget(QWidget* parent) const
 {
 	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
@@ -158,3 +159,4 @@ void UpgradeManager::refreshWidget(QWidget* widget) const
 {
 // TODO update your widget after having defined it in the previous method :)
 }
+#endif

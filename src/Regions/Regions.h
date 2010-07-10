@@ -38,6 +38,7 @@ public:
 	inline void add(Unit* unit);
 };
 
+
 class Regions : public CSingleton<Regions>, public BaseObject
 {
 	friend class CSingleton<Regions>;
@@ -61,9 +62,11 @@ public:
 	void display() const;
 	bool EnemyFound() const;
 
+#ifdef BW_QT_DEBUG
 	// Qt interface
 	virtual QWidget* createWidget(QWidget* parent) const;
 	virtual void refreshWidget(QWidget* widget) const;
+#endif
 
 	std::map<BWTA::Region*, RegionData> regionsData;
 	TimeManager* timeManager;

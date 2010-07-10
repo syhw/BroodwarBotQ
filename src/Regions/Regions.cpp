@@ -262,6 +262,7 @@ bool Regions::EnemyFound() const{
 
 }
 
+#ifdef BW_QT_DEBUG
 QWidget* Regions::createWidget(QWidget* parent) const
 {
 	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
@@ -271,3 +272,4 @@ void Regions::refreshWidget(QWidget* widget) const
 {
 // TODO update your widget after having defined it in the previous method :)
 }
+#endif

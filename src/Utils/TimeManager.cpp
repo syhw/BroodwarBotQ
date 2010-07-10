@@ -72,6 +72,7 @@ VOID CALLBACK TimeManager::suspendAll(
     Broodwar->printf("timer: %d, %d", message, idTimer); 
 }
 
+#ifdef BW_QT_DEBUG
 QWidget* TimeManager::createWidget(QWidget* parent) const
 {
 	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
@@ -81,3 +82,4 @@ void TimeManager::refreshWidget(QWidget* widget) const
 {
 // TODO update your widget after having defined it in the previous method :)
 }
+#endif

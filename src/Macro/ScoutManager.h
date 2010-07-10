@@ -18,7 +18,7 @@
 
 class GoalManager;
 
-class ScoutManager :  public CSingleton<ScoutManager>, public BaseObject
+class ScoutManager : public CSingleton<ScoutManager>, public BaseObject
 {
 	friend class CSingleton<ScoutManager>;
 
@@ -41,9 +41,11 @@ public:
 	void findEnemy();//New
 	void exploreRegion(BWTA::Region* region);//New
 
+#ifdef BW_QT_DEBUG
 	// Qt interface
 	virtual QWidget* createWidget(QWidget* parent) const;
 	virtual void refreshWidget(QWidget* widget) const;
+#endif
 
 private:
 	bool to_remove;

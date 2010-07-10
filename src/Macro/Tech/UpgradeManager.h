@@ -29,9 +29,11 @@ class UpgradeManager : public Arbitrator::Controller<BWAPI::Unit*,double>, publi
     int getStartedLevel(BWAPI::UpgradeType type) const;
     int getCompletedLevel(BWAPI::UpgradeType type) const;
 
-		// Qt interface
-		virtual QWidget* createWidget(QWidget* parent) const;
-		virtual void refreshWidget(QWidget* widget) const;
+#ifdef BW_QT_DEBUG
+    // Qt interface
+    virtual QWidget* createWidget(QWidget* parent) const;
+    virtual void refreshWidget(QWidget* widget) const;
+#endif
 
   private:
     Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;

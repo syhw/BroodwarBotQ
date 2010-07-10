@@ -44,9 +44,11 @@ class BuildOrderManager : public CSingleton<BuildOrderManager>, public BaseObjec
 	int getUnusedGas() {return BWAPI::Broodwar->self()->cumulativeGas()-this->usedGas;};
 	int getPlannedCount( BWAPI::UnitType unitType);
 
-		// Qt interface
-		virtual QWidget* createWidget(QWidget* parent) const;
-		virtual void refreshWidget(QWidget* widget) const;
+#ifdef BW_QT_DEBUG
+    // Qt interface
+    virtual QWidget* createWidget(QWidget* parent) const;
+    virtual void refreshWidget(QWidget* widget) const;
+#endif
 
   private:
     BuildManager* buildManager;

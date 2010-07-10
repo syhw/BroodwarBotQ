@@ -28,9 +28,11 @@ class BuildManager : public CSingleton<BuildManager>, public BaseObject
     int getCompletedCount(BWAPI::UnitType type) const;
     void setBuildDistance(int distance);
 
-		// Qt interface
-		virtual QWidget* createWidget(QWidget* parent) const;
-		virtual void refreshWidget(QWidget* widget) const;
+#ifdef BW_QT_DEBUG
+    // Qt interface
+    virtual QWidget* createWidget(QWidget* parent) const;
+    virtual void refreshWidget(QWidget* widget) const;
+#endif
 
   private:
 		Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;

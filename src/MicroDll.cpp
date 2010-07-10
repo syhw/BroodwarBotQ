@@ -9,9 +9,11 @@
 #include "MicroProject.h"
 
 MicroAIModule* broodAI = NULL;
+#ifdef BW_QT_DEBUG
 QApplication* qapplication = NULL;
 MainWindow* qmainwindow = NULL;
 bool g_onStartDone = false;
+#endif
 
 #define BUF_SIZE 255
 

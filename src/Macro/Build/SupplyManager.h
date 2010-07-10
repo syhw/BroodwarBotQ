@@ -22,11 +22,13 @@ class SupplyManager : public CSingleton<SupplyManager>, public BaseObject
     std::string getName() const;
     int getPlannedSupply() const;
 
-		// Qt interface
-		virtual QWidget* createWidget(QWidget* parent) const;
-		virtual void refreshWidget(QWidget* widget) const;
+#ifdef BW_QT_DEBUG
+    // Qt interface
+    virtual QWidget* createWidget(QWidget* parent) const;
+    virtual void refreshWidget(QWidget* widget) const;
+#endif
 
-		BuildManager* buildManager;
+    BuildManager* buildManager;
     BuildOrderManager* buildOrderManager;
     int lastFrameCheck;
 };

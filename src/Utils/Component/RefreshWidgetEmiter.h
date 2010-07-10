@@ -4,7 +4,6 @@
 #include <QtGui/QMessageBox>
 
 //Useless class to avoid pb with BW_QT_DEBUG flag
-#ifdef BW_QT_DEBUG
 class RefreshWidgetEmiter: public QObject 
 {
 	Q_OBJECT
@@ -18,4 +17,3 @@ public:
 signals:
 	void refreshWidget();
 };
-#endif

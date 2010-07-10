@@ -6,7 +6,9 @@ BaseObject::BaseObject(std::string name)
 : className(name)
 {
     ObjectManager::Instance().addObject(this);
-		refreshWidgetEmiter = new RefreshWidgetEmiter();
+#ifdef BW_QT_DEBUG
+    refreshWidgetEmiter = new RefreshWidgetEmiter();
+#endif
 }
 
 BaseObject::~BaseObject()
@@ -35,10 +37,12 @@ void BaseObject::onFrame()
 #endif
 }
 
+#ifdef BW_QT_DEBUG
 QWidget* BaseObject::createWidget(QWidget* parent) const
 {
 	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
 }
+#endif
 
 void BaseObject::display() const
 {

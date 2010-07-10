@@ -26,9 +26,11 @@ class TechManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public C
     bool research(BWAPI::TechType type);
     bool planned(BWAPI::TechType type) const;
 
-		// Qt interface
-		virtual QWidget* createWidget(QWidget* parent) const;
-		virtual void refreshWidget(QWidget* widget) const;
+#ifdef BW_QT_DEBUG
+    // Qt interface
+    virtual QWidget* createWidget(QWidget* parent) const;
+    virtual void refreshWidget(QWidget* widget) const;
+#endif
 
     Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
     BuildingPlacer* placer;

@@ -52,10 +52,15 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
     if (_mode == MODE_FLOCK)
     {
         _flockProb.push_back(_PROB_NO_FLOCK_MOVE);  //FLOCK_NO
-        _flockProb.push_back(0.05);                  //FLOCK_CONTACT
-        _flockProb.push_back(0.25);                 //FLOCK_CLOSE
-        _flockProb.push_back(0.38);                  //FLOCK_MEDIUM
-        _flockProb.push_back(0.22);                 //FLOCK_FAR
+        _flockProb.push_back(0.01);                  //FLOCK_CONTACT
+        _flockProb.push_back(0.29);                 //FLOCK_CLOSE
+        _flockProb.push_back(0.30);                  //FLOCK_MEDIUM
+        _flockProb.push_back(0.30);                 //FLOCK_FAR
+        // old (~~safe) params
+//        _flockProb.push_back(0.05);                  //FLOCK_CONTACT
+//        _flockProb.push_back(0.25);                 //FLOCK_CLOSE
+//        _flockProb.push_back(0.38);                  //FLOCK_MEDIUM
+//        _flockProb.push_back(0.22);                 //FLOCK_FAR
     }
 }
 
@@ -422,12 +427,19 @@ void BayesianUnit::drawOccupation(int number)
 void BayesianUnit::updateDirV()
 {
     _dirv.clear();
+    int accel = unit->getType().acceleration();
+    double speed = unit->getType().topSpeed();
+    //Broodwar->printf("unittype: %s, accel: %d, top speed: %f", unit->getType(). , accel, speed);
     Position p = unit->getPosition();
     WalkTilePosition wtp(p);
-    const int minx = max(p.x() - _slarge, 0);
-    const int maxx = min(p.x() + _slarge, 32*Broodwar->mapWidth());
-    const int miny = max(p.y() - _sheight, 0);
-    const int maxy = min(p.y() + _sheight, 32*Broodwar->mapHeight());
+//    const int minx = 0;
+//    const int maxx = 32*Broodwar->mapWidth();
+//    const int miny = 0;
+//    const int maxy = 32*Broodwar->mapHeight();
+    const int minx = max(p.x() - 1.5*_slarge, 0);
+    const int maxx = min(p.x() + 1.5*_slarge, 32*Broodwar->mapWidth());
+    const int miny = max(p.y() - 1.5*_sheight, 0);
+    const int maxy = min(p.y() + 1.5*_sheight, 32*Broodwar->mapHeight());
     for (int x = -4; x <= 4; ++x)
         for (int y = -4; y <= 4; ++y)
         {
