@@ -31,6 +31,6 @@ bool FormationSubgoal::check()
 {
     if (distanceToRealize(unitsgroup) <= unitsgroup->size()*_OK_DISTANCE_) 
         return true;
-    Broodwar->printf("dist: %f", distanceToRealize(unitsgroup));
+    //Broodwar->printf("dist: %f", distanceToRealize(unitsgroup));
     return false;
 }

@@ -548,8 +548,8 @@ void BayesianUnit::drawDir()
 
 void BayesianUnit::clickDir()
 {
-    ///dir += unit->getPosition();
-    if (unit->getPosition().getDistance(dir.toPosition()) > 3.0) 
+    dir += unit->getPosition();
+    if (unit->getPosition().getDistance(dir.toPosition()) >= 1.0) 
         unit->rightClick(dir.toPosition());
     ///unit->rightClick(target);
 }
