@@ -331,7 +331,7 @@ void UnitsGroup::move(BWAPI::Position& p)
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); it++)
     {
         (*it)->target = p;
-        (*it)->unit->rightClick(p);
+        // (*it)->unit->rightClick(p); // we don't want rightClicks bypassing BayesianUnit!!!
     }
 }
 
