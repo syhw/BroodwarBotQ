@@ -77,11 +77,17 @@ void MicroAIModule::onStart()
 			p = BWAPI::Position(*l);
 	}
 
-    /// EXEMPLE FOR THE FLOCK_2 and FLOCK_8 MAPS
+   /* /// EXEMPLE FOR THE FLOCK_2 and FLOCK_8 MAPS
     pFormation tmp_form = pFormation(new SquareFormation(Position(56*32,56*32), Vec(1,0)));
 	pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(
         SL_AND, tmp_form, mm)
     );
+    pGoal tmp_goal = pGoal(new Goal(tmp_subgoal));
+    goals.push_back(tmp_goal);*/
+
+    /// EXEMPLE FOR THE INPOS MAP
+    pFormation tmp_form = pFormation(new LineFormation(Position(25*32,9*32), Vec(1,0)));
+    pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form, mm));
     pGoal tmp_goal = pGoal(new Goal(tmp_subgoal));
     goals.push_back(tmp_goal);
 	 

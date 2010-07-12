@@ -118,18 +118,16 @@ void BayesianUnit::computeFlockValues()
 void BayesianUnit::switchMode(unit_mode um)
 {
     // Comportement attendu ?
+    _mode = um;
     switch (um) 
     {
         case MODE_FLOCK:
-            _mode = um;
             _defaultProb[OCCUP_UNIT] = 0.6;
             //_defaultProb[OCCUP_FLOCK] = 0.1;
             break;
         case MODE_FIGHT_G:
-            _mode = um;
             break;
         default:
-            _mode = um;
             break;
     }
 }
@@ -556,7 +554,8 @@ void BayesianUnit::updateDir()
 void BayesianUnit::drawDir()
 {
     Position up = unit->getPosition();
-    Broodwar->drawLineMap(up.x(), up.y(), dir.translate(up).x(), dir.translate(up).y(), Colors::Red);
+    if (dir.translate(up).y() <= Broodwar->mapHeight()*BWAPI::TILE_SIZE && dir.translate(up).x() <= Broodwar->mapWidth()*BWAPI::TILE_SIZE)
+        Broodwar->drawLineMap(up.x(), up.y(), dir.translate(up).x(), dir.translate(up).y(), Colors::Red);
 }
 
 void BayesianUnit::clickDir()
@@ -632,12 +631,23 @@ void BayesianUnit::update()
         attackEnemy(targetEnemy, BWAPI::Colors::Red);
         return;
     }
-    updateDir();
-    //drawObj(0); // green
-    drawDir(); // red
-    clickDir();
-    //drawFlockValues();
-    return;
+
+    if (_mode == MODE_FLOCK) 
+    {
+        updateDir();
+        //drawObj(0); // green
+        drawDir(); // red
+        clickDir();
+        if (unit->getDistance(obj.toPosition()) < 30)
+            switchMode(MODE_INPOS);
+        // test distance obj < 8pixels => INPOS ?"
+        //drawFlockValues();
+        return;
+    }
+    else if (_mode == MODE_INPOS)
+    {
+        this->dir = Vec(0,0);
+    }
 
     Position p = unit->getPosition();
     if ((_mode == MODE_FLOCK && _mode == MODE_FLOCKFORM)
