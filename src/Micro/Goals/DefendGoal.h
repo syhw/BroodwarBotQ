@@ -11,7 +11,6 @@ public:
 	DefendGoal( const DefendGoal& g);
     DefendGoal(const BWAPI::Position& position);
 	virtual ~DefendGoal();
-
 	virtual void achieve(UnitsGroup* ug);
 	virtual void checkAchievement(UnitsGroup* ug);
 };

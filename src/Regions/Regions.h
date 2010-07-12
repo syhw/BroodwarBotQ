@@ -58,7 +58,7 @@ public:
     void onUnitShow(BWAPI::Unit* unit);
     void onUnitHide(BWAPI::Unit* unit);
 	void display() const;
-	bool EnemyFound() const;
+	bool enemyFound() const;
 
     std::map<BWTA::Region*, RegionData> regionsData;
 	TimeManager* timeManager;

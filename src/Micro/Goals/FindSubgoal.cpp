@@ -17,14 +17,14 @@ bool FindSubgoal::isRealized(){
 }
 
 bool FindSubgoal::check(){
-	if (regions->EnemyFound()){
-#ifdef __DEBUG__LOUIS
+	if (regions->enemyFound()){
+#ifdef __DEBUG_LOUIS__
 		BWAPI::Broodwar->printf("findSubgoal done");
 #endif
 		return true;
 	}
 	return false;
-//	return regions->EnemyFound();
+//	return regions->enemyFound();
 }
 
 void FindSubgoal::tryToRealize(UnitsGroup * ug){

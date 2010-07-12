@@ -70,7 +70,7 @@ void Goal::checkAchievement(UnitsGroup* ug)
 			}
 				
 			if(res_and || res_or){
-	#ifdef __DEBUG__LOUIS
+	#ifdef __DEBUG_LOUIS__
 				BWAPI::Broodwar->printf("Goal done");
 	#endif
 				this->status= GS_ACHIEVED;

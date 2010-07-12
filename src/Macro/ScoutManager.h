@@ -13,6 +13,7 @@
 #include "SeeSubgoal.h"
 #include "FindSubgoal.h"
 #include "MicroManager.h"
+#include "ExploreGoal.h"
 class GoalManager;
 
 
@@ -38,8 +39,6 @@ public:
 	void onUnitCreate(BWAPI::Unit* unit);//New 
 	void onUnitShow(BWAPI::Unit* unit);
 	void findEnemy();//New
-	void exploreRegion(BWTA::Region* region);//New
-
 private:
 	UnitsGroup* findUnitsGroup(pGoal goal);
 	bool to_remove;

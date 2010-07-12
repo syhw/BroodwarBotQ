@@ -331,6 +331,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\src\Micro\Goals\ExploreGoal.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\src\Micro\Goals\FindSubgoal.cpp"
 						>
 					</File>
@@ -698,6 +702,10 @@
 					</File>
 					<File
 						RelativePath="..\src\Micro\Goals\DefendGoal.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Goals\ExploreGoal.h"
 						>
 					</File>
 					<File

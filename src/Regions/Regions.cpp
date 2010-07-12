@@ -249,7 +249,7 @@ void Regions::display() const
 }
 
 
-bool Regions::EnemyFound() const{
+bool Regions::enemyFound() const{
 	for(std::map<BWTA::Region*, RegionData>::const_iterator it = this->regionsData.begin(); it != regionsData.end(); ++it){
 	
 		for(std::map<Player*, std::vector<UnitData> >::const_iterator it_b = it->second.buildings.begin(); it_b != it->second.buildings.end(); ++it_b){
