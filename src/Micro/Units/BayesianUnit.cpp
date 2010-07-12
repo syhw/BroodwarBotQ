@@ -635,19 +635,18 @@ void BayesianUnit::update()
     if (_mode == MODE_FLOCK) 
     {
         updateDir();
-        //drawObj(0); // green
+        drawObj(0); // green
         drawDir(); // red
         clickDir();
         if (unit->getDistance(obj.toPosition()) < 30)
             switchMode(MODE_INPOS);
-        // test distance obj < 8pixels => INPOS ?"
         //drawFlockValues();
-        return;
     }
     else if (_mode == MODE_INPOS)
     {
         this->dir = Vec(0,0);
     }
+    return;
 
     Position p = unit->getPosition();
     if ((_mode == MODE_FLOCK && _mode == MODE_FLOCKFORM)
