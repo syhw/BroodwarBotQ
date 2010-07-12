@@ -247,7 +247,7 @@ double BayesianUnit::computeProb(unsigned int i)
     double val = 1.;
     //for (multimap<Position, attractor_type>::const_iterator it = _prox.begin(); it != _prox.end(); ++it)
 
-    if (_mode == MODE_FLOCK)
+    if (_unitsGroup->getUnits()->size() > 1 && _mode == MODE_FLOCK)
     {
         /// FLOCKING INFLUENCE
         // one j for each attractor
@@ -255,7 +255,7 @@ double BayesianUnit::computeProb(unsigned int i)
             val *= _flockProb[_flockValues[i][j]];
 
         /// OBJECTIVE (pathfinder) INFLUENCE
-        double prob_obj = _PROB_GO_OBJ / _unitsGroup->getUnits()->size();
+        double prob_obj = _PROB_GO_OBJ / (_unitsGroup->getUnits()->size() - 1);
         if (_dirv[i] == obj)
             val *= prob_obj;
         else
@@ -265,7 +265,8 @@ double BayesianUnit::computeProb(unsigned int i)
             Vec objnorm = obj;
             objnorm.normalize();
             const double tmp = dirvtmp.dot(objnorm);
-            val *= (tmp > 0 ? prob_obj*tmp : (1.0 - prob_obj)*tmp);
+            val *= (tmp > 0 ? prob_obj*tmp : 0.01); 
+            // TODO 0.01 magic number (uniform prob to go in the half-quadrant opposite to obj)
         }
     }
     return val; // TODO remove
@@ -436,10 +437,10 @@ void BayesianUnit::updateDirV()
 //    const int maxx = 32*Broodwar->mapWidth();
 //    const int miny = 0;
 //    const int maxy = 32*Broodwar->mapHeight();
-    const int minx = max(p.x() - 1.5*_slarge, 0);
-    const int maxx = min(p.x() + 1.5*_slarge, 32*Broodwar->mapWidth());
-    const int miny = max(p.y() - 1.5*_sheight, 0);
-    const int maxy = min(p.y() + 1.5*_sheight, 32*Broodwar->mapHeight());
+    const int minx = max(p.x() - _slarge, 0);
+    const int maxx = min(p.x() + _slarge, 32*Broodwar->mapWidth());
+    const int miny = max(p.y() - _sheight, 0);
+    const int maxy = min(p.y() + _sheight, 32*Broodwar->mapHeight());
     for (int x = -4; x <= 4; ++x)
         for (int y = -4; y <= 4; ++y)
         {
