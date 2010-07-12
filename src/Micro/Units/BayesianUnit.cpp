@@ -97,7 +97,7 @@ void BayesianUnit::computeFlockValues()
             Vec tmpvit((*it)->unit->getVelocityX(), 
                     (*it)->unit->getVelocityY()); 
             // we flock with the interpolated next position of other units
-            tmpvit *= 8;
+            //tmpvit *= 8;
             //TEST BWAPI::Broodwar->printf("X: %f, Y: %f \n", (*it)->unit->getVelocityX(), (*it)->unit->getVelocityY());
             flock_value value = (flock_value)(1 + (int)tmp.getDistance(
                         tmpvit.translate((*it)->unit->getPosition())) / 32);
@@ -517,7 +517,6 @@ void BayesianUnit::updateDir()
     
     // update objectives
     updateObj();
-    //drawObj(2);
     //drawObj(_unitsGroup->size());
     //drawOccupation(_unitsGroup->size());
 
@@ -541,14 +540,15 @@ void BayesianUnit::updateDir()
         for (multimap<double, Vec>::const_iterator it = possible_dirs.first; it != possible_dirs.second; ++it)
         {
             double tmp = obj.dot(it->second);
-            if (tmp < max)
+            if (tmp > max)
             {
                 max = tmp;
                 dir = it->second;
             }
         }
     }
-    drawProbs(dirvProb, _unitsGroup->size());
+
+    //drawProbs(dirvProb, _unitsGroup->size());
 }
 
 void BayesianUnit::drawDir()
@@ -638,7 +638,7 @@ void BayesianUnit::update()
         drawObj(0); // green
         drawDir(); // red
         clickDir();
-        if (unit->getDistance(obj.toPosition()) < 30)
+        if (unit->getDistance(obj.toPosition()) < 8.0)
             switchMode(MODE_INPOS);
         //drawFlockValues();
     }
