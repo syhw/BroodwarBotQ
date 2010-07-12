@@ -97,7 +97,7 @@ void BayesianUnit::computeFlockValues()
             Vec tmpvit((*it)->unit->getVelocityX(), 
                     (*it)->unit->getVelocityY()); 
             // we flock with the interpolated next position of other units
-            tmpvit *= 8;
+            //tmpvit *= 8;
             //TEST BWAPI::Broodwar->printf("X: %f, Y: %f \n", (*it)->unit->getVelocityX(), (*it)->unit->getVelocityY());
             flock_value value = (flock_value)(1 + (int)tmp.getDistance(
                         tmpvit.translate((*it)->unit->getPosition())) / 32);
