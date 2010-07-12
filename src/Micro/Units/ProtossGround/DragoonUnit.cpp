@@ -81,7 +81,7 @@ void DragoonUnit::dragoonIA(std::set<Unit*> enemies, double maxRangeGoonEnemy)
                     probaFuite = (actualLife/_unitsGroup->getTotalHP() < 0.1 ? 0 : probaFuite);
                     if (test && (actualLife/totalLife) < probaFuite) 
                     {
-                        myUnit->rightClick(newPos);
+                        myUnit->rightClick(newPos); // à changer
 #ifdef __DEBUG_NICOLAS__
                         int ux = myUnit->getPosition().x(); int uy = myUnit->getPosition().y();
                         int ex = myUnit->getTargetPosition().x(); int ey = myUnit->getTargetPosition().y();

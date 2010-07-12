@@ -19,6 +19,7 @@ class MicroAIModule : public BWAPI::AIModule
 {
 public:	    
     UnitsGroup* mm;
+    UnitsGroup* mD;
     MapManager* mapManager;
 		ObjectManager* objectManager;
     Regions* regions;

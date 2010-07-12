@@ -43,6 +43,7 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 , _ground_unit(!unit->getType().isFlyer())
 , _sheight(unit->getType().dimensionUp() + unit->getType().dimensionDown())
 , _slarge(unit->getType().dimensionRight() + unit->getType().dimensionLeft())
+, _unitIncoming(false)
 {
     updateDirV();
     mapManager = & MapManager::Instance();
@@ -56,6 +57,9 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
         _flockProb.push_back(0.29);                 //FLOCK_CLOSE
         _flockProb.push_back(0.30);                  //FLOCK_MEDIUM
         _flockProb.push_back(0.30);                 //FLOCK_FAR
+
+        _inPosProb.push_back(0.999); // INPOS_OK
+        _inPosProb.push_back(0.001); // INPOS_CONTACT
         // old (~~safe) params
 //        _flockProb.push_back(0.05);                  //FLOCK_CONTACT
 //        _flockProb.push_back(0.25);                 //FLOCK_CLOSE
@@ -75,6 +79,46 @@ void BayesianUnit::initDefaultProb()
     _defaultProb.insert(make_pair(OCCUP_BLOCKING, _PROB_NO_WALL_MOVE));       // P(this_case_is_blocking=false | we_go_in_this_case=true)
     _defaultProb.insert(make_pair(OCCUP_BUILDING, _PROB_NO_BUILDING_MOVE));   // P(there_is_a_building_in_this_case=false | we_go_in_this_case=true)
     //_defaultProb.insert(make_pair(OCCUP_FLOCK, _PROB_NO_FLOCK_MOVE));       // P(there_is_flocking_attraction=false | we_go_in_this_case=true)
+}
+
+void BayesianUnit::computeInPosValues()
+{
+    _inPosValues.clear();
+    _unitIncoming = false;
+    for (unsigned int i = 0; i < _dirv.size(); ++i)
+    {
+        vector<inPos_value> tmpv;
+        for (std::set<Unit*>::const_iterator it = 
+                Broodwar->self()->getUnits().begin(); 
+            it != Broodwar->self()->getUnits().end(); ++it)
+        {
+            if ( (*it) == this->unit) continue; 
+
+            bool appartient = false;
+            for (vector<pBayesianUnit>::const_iterator it2 = 
+                _unitsGroup->getUnits()->begin(); 
+            it2 != _unitsGroup->getUnits()->end() && !appartient; ++it2)
+                    appartient = (*it2)->unit == (*it);
+
+            if (appartient) continue;
+
+            Position tmp = _dirv[i].translate(this->unit->getPosition());
+            Vec tmpvit((*it)->getVelocityX(), 
+                    (*it)->getVelocityY());
+
+            inPos_value value = (inPos_value)(1 + (int)tmp.getDistance(
+                tmpvit.translate((*it)->getPosition())) / 32);
+
+            if (value <= INPOS_CONTACT)
+            {
+                tmpv.push_back(INPOS_CONTACT);
+                _unitIncoming = true;
+            }
+            else
+                tmpv.push_back(INPOS_OK);
+        }
+        _inPosValues.push_back(tmpv);
+    }
 }
 
 void BayesianUnit::computeFlockValues()
@@ -184,6 +228,10 @@ void BayesianUnit::updateAttractors()
     {
         computeFlockValues();
     }
+    else if (_mode == MODE_INPOS)
+    {
+        computeInPosValues();
+    }
 
     // building and blocking attraction (repulsion)
     const int width = Broodwar->mapWidth();
@@ -254,6 +302,29 @@ double BayesianUnit::computeProb(unsigned int i)
 
         /// OBJECTIVE (pathfinder) INFLUENCE
         double prob_obj = _PROB_GO_OBJ / (_unitsGroup->getUnits()->size() - 1);
+        if (_dirv[i] == obj)
+            val *= prob_obj;
+        else
+        {
+            Vec dirvtmp = _dirv[i];
+            dirvtmp.normalize();
+            Vec objnorm = obj;
+            objnorm.normalize();
+            const double tmp = dirvtmp.dot(objnorm);
+            val *= (tmp > 0 ? prob_obj*tmp : 0.01); 
+            // TODO 0.01 magic number (uniform prob to go in the half-quadrant opposite to obj)
+        }
+    }
+    else if (_mode == MODE_INPOS)
+    {
+        /// INPOS INFLUENCE
+        // one j for each attractor
+        for (unsigned int j = 0; j < _inPosValues[i].size(); ++j)
+            val *= _inPosProb[_inPosValues[i][j]];
+
+        /// OBJECTIVE (pathfinder) INFLUENCE
+        double prob_obj = _PROB_GO_OBJ / (_unitsGroup->getUnits()->size() - 1);
+
         if (_dirv[i] == obj)
             val *= prob_obj;
         else
@@ -560,6 +631,8 @@ void BayesianUnit::drawDir()
 
 void BayesianUnit::clickDir()
 {
+    if (!_unitIncoming && _mode == MODE_INPOS && unit->getDistance(this->target) < 16.0)
+        return;
     dir += unit->getPosition();
     if (unit->getPosition().getDistance(dir.toPosition()) >= 1.0) 
         unit->rightClick(dir.toPosition());
@@ -626,28 +699,41 @@ void BayesianUnit::onUnitHide(Unit* u)
 void BayesianUnit::update()
 {
     if (!unit->exists()) return;
+
     if (targetEnemy != NULL && withinRange(targetEnemy))
     {
         attackEnemy(targetEnemy, BWAPI::Colors::Red);
         return;
     }
 
-    if (_mode == MODE_FLOCK) 
+
+
+    if (_mode == MODE_FLOCK || _mode == MODE_INPOS) 
     {
         updateDir();
-        //drawObj(0); // green
+        drawObj(0); // green
         drawDir(); // red
         clickDir();
-        if (unit->getDistance(obj.toPosition()) < 8.0)
+        if (unit->getDistance(this->target) < 8.0)
             switchMode(MODE_INPOS);
-        // test distance obj < 8pixels => INPOS ?"
         //drawFlockValues();
-        return;
     }
-    else if (_mode == MODE_INPOS)
-    {
-        this->dir = Vec(0,0);
-    }
+    return;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     Position p = unit->getPosition();
     if ((_mode == MODE_FLOCK && _mode == MODE_FLOCKFORM)
