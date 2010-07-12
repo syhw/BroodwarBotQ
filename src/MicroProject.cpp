@@ -19,7 +19,7 @@ void MicroAIModule::onStart()
 	BWTA::readMap();
 	BWTA::analyze();
     this->mapManager = & MapManager::Instance();
-		this->objectManager = & ObjectManager::Instance();
+    this->objectManager = & ObjectManager::Instance();
     this->regions = & Regions::Instance();
 
 	mm = new UnitsGroup();

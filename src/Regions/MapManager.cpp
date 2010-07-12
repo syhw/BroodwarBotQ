@@ -31,6 +31,7 @@ MapManager::MapManager()
             buildings[x + y*width/4] = false; // initialized with manual call to onUnitCreate() in onStart()
         }
     }
+    eUnitsFilter = & EUnitsFilter::Instance();
 }
 
 MapManager::~MapManager()
@@ -77,6 +78,11 @@ void MapManager::onUnitShow(Unit* u)
 void MapManager::onUnitHide(Unit* u)
 {
     addBuilding(u);
+}
+
+void MapManager::onFrame()
+{
+
 }
 
 void MapManager::drawBuildings()
