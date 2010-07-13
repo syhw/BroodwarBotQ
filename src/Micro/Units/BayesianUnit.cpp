@@ -700,7 +700,6 @@ void BayesianUnit::onUnitHide(Unit* u)
 void BayesianUnit::update()
 {
     if (!unit->exists()) return;
-    mapManager->drawBuildings();
 
     if (targetEnemy != NULL && withinRange(targetEnemy))
     {
