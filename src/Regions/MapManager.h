@@ -1,6 +1,7 @@
 #pragma once
 #include <BWAPI.h>
 #include "CSingleton.h"
+#include "EUnitsFilter.h"
 
 /** From BWAPI's doc:
 * Positions are measured in pixels and are the highest resolution
@@ -14,7 +15,7 @@ class MapManager: public CSingleton<MapManager>
     friend class CSingleton<MapManager>;
 
 private:
-    EUnitsFilter* eUnitsFilter;
+    //EUnitsFilter* eUnitsFilter;
     MapManager();
     ~MapManager();
     inline void modifyBuildings(BWAPI::Unit* u, bool b);
@@ -24,6 +25,7 @@ public:
     bool* walkability;          // walk tiles
     bool* lowResWalkability;    // low res => building tiles
     bool* buildings;            // low res => building tiles
+    bool* buildings_wt;
     int   damages;              // walktiles, -1 for unknown
     void onUnitCreate(BWAPI::Unit* u);
     void onUnitDestroy(BWAPI::Unit* u);

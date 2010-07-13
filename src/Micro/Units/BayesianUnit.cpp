@@ -239,7 +239,9 @@ void BayesianUnit::updateAttractors()
     for (unsigned int i = 0; i < _dirv.size(); ++i)
     {
         Position tmp = _dirv[i].translate(up);
-        if (mapManager->buildings[tmp.x()/32 + (tmp.y()/32)*width])
+        //if (mapManager->buildings[tmp.x()/32 + (tmp.y()/32)*width])
+        //    _occupation.push_back(OCCUP_BUILDING);
+        if (mapManager->buildings_wt[tmp.x()/8 + (tmp.y()/8)*4*width])
             _occupation.push_back(OCCUP_BUILDING);
         else if (!mapManager->walkability[tmp.x()/8 + (tmp.y()/8)*4*width]) 
                                        // tmp.x()/8 + (tmp.y()/2)*width
@@ -338,7 +340,6 @@ double BayesianUnit::computeProb(unsigned int i)
             // TODO 0.01 magic number (uniform prob to go in the half-quadrant opposite to obj)
         }
     }
-    return val; // TODO remove
     if (_occupation[i] == OCCUP_BUILDING) /// NON-WALKABLE (BUILDING) INFLUENCE
     {	
         val *= 1.0-_PROB_NO_BUILDING_MOVE;
@@ -619,7 +620,7 @@ void BayesianUnit::updateDir()
         }
     }
 
-    //drawProbs(dirvProb, _unitsGroup->size());
+    drawProbs(dirvProb, _unitsGroup->size());
 }
 
 void BayesianUnit::drawDir()
@@ -699,14 +700,13 @@ void BayesianUnit::onUnitHide(Unit* u)
 void BayesianUnit::update()
 {
     if (!unit->exists()) return;
+    mapManager->drawBuildings();
 
     if (targetEnemy != NULL && withinRange(targetEnemy))
     {
         attackEnemy(targetEnemy, BWAPI::Colors::Red);
         return;
     }
-
-
 
     if (_mode == MODE_FLOCK || _mode == MODE_INPOS) 
     {
@@ -719,21 +719,6 @@ void BayesianUnit::update()
         //drawFlockValues();
     }
     return;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     Position p = unit->getPosition();
     if ((_mode == MODE_FLOCK && _mode == MODE_FLOCKFORM)
