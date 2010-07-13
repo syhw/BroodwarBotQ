@@ -106,14 +106,14 @@ void BayesianUnit::computeInPosValues()
             inPos_value value = (inPos_value)(1 + (int)tmp.getDistance(
                 tmpvit.translate((*it)->getPosition())) / 32);
 
-            if (value <= INPOS_CONTACT)
+            if (value <= INPOS_CONTACT*2)
                 tmpv.push_back(INPOS_CONTACT);
             else
             {
                 value = (inPos_value)(1 + (int)tmp.getDistance(
                     tmpvit.translate((*it)->getTargetPosition())) / 32);
 
-                if (value <= INPOS_CONTACT)
+                if (value <= INPOS_CONTACT*2)
                     tmpv.push_back(INPOS_CONTACT);
                 else
                     tmpv.push_back(INPOS_OK);
@@ -422,14 +422,13 @@ void BayesianUnit::updateObj()
         straightLine(_ppath, up, target, true);
         if (_ppath.size() > 1)   // path[0] is the current unit position
         {
-            Position p;
-            if (_path.size() > 2) 
-                p = _ppath[1];
-            else if (_path.size() == 1 || _path.size() == 2)
-                p = _ppath[0];
+            if (_path.size() >= 2) 
+            {
+                Position p = _ppath[1];
+                obj = Vec(p.x() - up.x(), p.y() - up.y());
+            }
             else
-                p = unit->getPosition();
-            obj = Vec(p.x() - up.x(), p.y() - up.y());
+                obj = Vec(0,0);
         }
     }
 }
@@ -721,18 +720,6 @@ void BayesianUnit::update()
         //drawFlockValues();
     }
     return;
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
