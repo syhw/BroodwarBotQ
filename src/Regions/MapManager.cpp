@@ -35,7 +35,7 @@ MapManager::MapManager()
             buildings[x + y*width/4] = false; // initialized with manual call to onUnitCreate() in onStart()
         }
     }
-    //eUnitsFilter = & EUnitsFilter::Instance();
+    _eUnitsFilter = & EUnitsFilter::Instance();
 }
 
 MapManager::~MapManager()

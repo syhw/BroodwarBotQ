@@ -415,6 +415,18 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="Intelligence"
+				>
+				<File
+					RelativePath="..\src\Intelligence\EUnitsFilter.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Intelligence\EViewedUnit.cpp"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -690,6 +702,18 @@
 				</File>
 				<File
 					RelativePath="..\src\AI-Monitor\WidgetCreator.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Intelligence"
+				>
+				<File
+					RelativePath="..\src\Intelligence\EUnitsFilter.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Intelligence\EViewedUnit.h"
 					>
 				</File>
 			</Filter>

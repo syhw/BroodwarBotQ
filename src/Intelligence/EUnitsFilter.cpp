@@ -15,18 +15,18 @@ void EUnitsFilter::update(Unit* u)
 {
     if (u->getPlayer() == Broodwar->self()) return;
     if (u->getPlayer()->isNeutral()) return;
-    if (eViewedUnits.count(u))
-        eViewedUnits[u].update(timeManager->getElapsedTime());
+    if (_eViewedUnits.count(u))
+        _eViewedUnits[u].update(timeManager->getElapsedTime());
     else 
-        eViewedUnits[u] = EViewedUnit(u, timeManager->getElapsedTime());
-        //eViewedUnits.insert(make_pair(u, EViewedUnit(u, timeManager->getElapsedTime())));
+        _eViewedUnits[u] = EViewedUnit(u, timeManager->getElapsedTime());
+        //_eViewedUnits.insert(make_pair(u, EViewedUnit(u, timeManager->getElapsedTime())));
 }
 
 void EUnitsFilter::onUnitDestroy(Unit* u)
 {
     if (u->getPlayer() == Broodwar->self()) return;
     if (u->getPlayer()->isNeutral()) return;
-    eViewedUnits.erase(u);
+    _eViewedUnits.erase(u);
 }
 
 void EUnitsFilter::onUnitMorph(Unit* u)
@@ -88,6 +88,14 @@ void EUnitsFilter::update()
 {
 }
 
+void EUnitsFilter::bwOutput()
+{
+    for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = _eViewedUnits.begin(); 
+        it != _eViewedUnits.end(); ++it)
+        Broodwar->printf("Unit: %i", it->first);
+}
+
 void EUnitsFilter::refreshWidget(QWidget* /*widget*/) const
 {
 }
+

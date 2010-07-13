@@ -73,6 +73,25 @@ void BattleUnit::drawPath()
     }
 }
 
+void BattleUnit::drawBTPath()
+{
+    for (std::vector<TilePosition>::const_iterator it = _btpath.begin(); 
+        it != _btpath.end(); ++it)
+    {
+        Broodwar->drawBox(CoordinateType::Map, it->x()*32 - 14, it->y()*32 - 14, 
+            it->x()*32 + 14, it->y()*32 + 14, Colors::Yellow);
+    }
+}
+
+void BattleUnit::drawPPath()
+{
+    for (std::vector<Position>::const_iterator it = _ppath.begin(); 
+        it != _ppath.end(); ++it)
+    {
+        Broodwar->drawCircleMap(it->x(), it->y(), 3, Colors::Yellow);
+    }
+}
+
 void BattleUnit::drawWalkability()
 {
     MapManager* mapm = & MapManager::Instance();

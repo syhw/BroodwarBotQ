@@ -15,7 +15,7 @@ class MapManager: public CSingleton<MapManager>
     friend class CSingleton<MapManager>;
 
 private:
-    //EUnitsFilter* eUnitsFilter;
+    EUnitsFilter* _eUnitsFilter;
     MapManager();
     ~MapManager();
     inline void modifyBuildings(BWAPI::Unit* u, bool b);

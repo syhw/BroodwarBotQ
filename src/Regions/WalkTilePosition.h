@@ -58,7 +58,7 @@ class WalkTilePosition
         {
             double xx = _x - position.x();
             double yy = _y - position.y();
-            return sqrt(xx*xx + yy*yy);
+            return sqrt(xx*xx + yy*yy); // in WALKTILES!!
         }
         BWAPI::Position getPosition() const
         {

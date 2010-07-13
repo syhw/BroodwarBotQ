@@ -18,10 +18,14 @@ protected:
 #endif
     void drawVelocityArrow();
     void drawPath();
+    void drawBTPath();
+    void drawPPath();
     void drawWalkability();
     void drawEnclosingBox();
     void drawTarget();
+    BWAPI::Position _unitPos;
     std::vector<WalkTilePosition> _path;
+    std::vector<BWAPI::TilePosition> _btpath;
     std::vector<BWAPI::Position> _ppath;
     static void pathFind(std::vector<WalkTilePosition>& path, const BWAPI::Position& p_start, const BWAPI::Position& p_end);
     unsigned int _tick;
