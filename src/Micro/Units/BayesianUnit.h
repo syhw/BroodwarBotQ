@@ -80,7 +80,6 @@ protected:
     UnitsGroup* _unitsGroup;
     std::multimap<double, BWAPI::Unit*> _rangeEnemies;
     std::map<occupation_type, double> _defaultProb;
-    bool _unitIncoming ;
 
     inline void initDefaultProb();
     inline void computeFlockValues();
