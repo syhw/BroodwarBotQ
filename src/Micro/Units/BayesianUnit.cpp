@@ -43,7 +43,6 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 , _ground_unit(!unit->getType().isFlyer())
 , _sheight(unit->getType().dimensionUp() + unit->getType().dimensionDown())
 , _slarge(unit->getType().dimensionRight() + unit->getType().dimensionLeft())
-, _unitIncoming(false)
 {
     updateDirV();
     mapManager = & MapManager::Instance();
@@ -84,7 +83,6 @@ void BayesianUnit::initDefaultProb()
 void BayesianUnit::computeInPosValues()
 {
     _inPosValues.clear();
-    _unitIncoming = false;
     for (unsigned int i = 0; i < _dirv.size(); ++i)
     {
         vector<inPos_value> tmpv;
@@ -94,13 +92,12 @@ void BayesianUnit::computeInPosValues()
         {
             if ( (*it) == this->unit) continue; 
 
-            bool appartient = false;
+            bool appartient = false; //*** [A CHANGER]
             for (vector<pBayesianUnit>::const_iterator it2 = 
                 _unitsGroup->getUnits()->begin(); 
             it2 != _unitsGroup->getUnits()->end() && !appartient; ++it2)
                     appartient = (*it2)->unit == (*it);
-
-            if (appartient) continue;
+            if (appartient) continue; //*** [FIN A CHANGER]
 
             Position tmp = _dirv[i].translate(this->unit->getPosition());
             Vec tmpvit((*it)->getVelocityX(), 
@@ -110,12 +107,17 @@ void BayesianUnit::computeInPosValues()
                 tmpvit.translate((*it)->getPosition())) / 32);
 
             if (value <= INPOS_CONTACT)
-            {
                 tmpv.push_back(INPOS_CONTACT);
-                _unitIncoming = true;
-            }
             else
-                tmpv.push_back(INPOS_OK);
+            {
+                value = (inPos_value)(1 + (int)tmp.getDistance(
+                    tmpvit.translate((*it)->getTargetPosition())) / 32);
+
+                if (value <= INPOS_CONTACT)
+                    tmpv.push_back(INPOS_CONTACT);
+                else
+                    tmpv.push_back(INPOS_OK);
+            }
         }
         _inPosValues.push_back(tmpv);
     }
@@ -422,8 +424,12 @@ void BayesianUnit::updateObj()
         if (_ppath.size() > 1)   // path[0] is the current unit position
         {
             Position p;
-            if (_path.size() >= 2) 
+            if (_path.size() > 2) 
                 p = _ppath[1];
+            else if (_path.size() == 1 || _path.size() == 2)
+                p = _ppath[0];
+            else
+                p = unit->getPosition();
             obj = Vec(p.x() - up.x(), p.y() - up.y());
         }
     }
@@ -632,8 +638,6 @@ void BayesianUnit::drawDir()
 
 void BayesianUnit::clickDir()
 {
-    if (!_unitIncoming && _mode == MODE_INPOS && unit->getDistance(this->target) < 16.0)
-        return;
     dir += unit->getPosition();
     if (unit->getPosition().getDistance(dir.toPosition()) >= 1.0) 
         unit->rightClick(dir.toPosition());
@@ -713,7 +717,7 @@ void BayesianUnit::update()
         drawObj(0); // green
         drawDir(); // red
         clickDir();
-        if (unit->getDistance(this->target) < 8.0)
+        if (unit->getDistance(this->target) < 4.0)
             switchMode(MODE_INPOS);
         //drawFlockValues();
     }
