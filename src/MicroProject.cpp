@@ -40,12 +40,10 @@ void MicroAIModule::onStart()
 		} 
 		else 
 		{
-            //Broodwar->printf("Took control of: %s\n", (*i)->getType().getName().c_str() );
+            // Broodwar->printf("Took control of: %s\n", (*i)->getType().getName().c_str() );
 			mm->takeControl(*i);
-			// center += (*i)->getPosition();
 		}
 	}
-	// center /= allUnits.size();
 
 	/* std::set<Player*> players=Broodwar->getPlayers();
 	Broodwar->printf("The following players are in this replay:");
