@@ -13,7 +13,7 @@
 class EUnitsFilter : public CSingleton<EUnitsFilter>, public BaseObject
 {
     TimeManager* timeManager;
-    std::map<BWAPI::Unit*, EViewedUnit> eViewedUnits;
+    std::map<BWAPI::Unit*, EViewedUnit> _eViewedUnits;
 public:
     EUnitsFilter();
     ~EUnitsFilter() { }
@@ -24,6 +24,7 @@ public:
 	void onUnitHide(BWAPI::Unit* u);
 	void onUnitRenegade(BWAPI::Unit* u);
 
+    void bwOutput();
 	virtual void update();
 	virtual QWidget* createWidget(QWidget* parent) const;
 	virtual void refreshWidget(QWidget* widget) const;

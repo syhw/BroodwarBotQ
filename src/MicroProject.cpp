@@ -18,17 +18,18 @@ void MicroAIModule::onStart()
 	//Broodwar->enableFlag(Flag::CompleteMapInformation);
 	BWTA::readMap();
 	BWTA::analyze();
+    this->eUnitsFilter = & EUnitsFilter::Instance();
     this->mapManager = & MapManager::Instance();
-		this->objectManager = & ObjectManager::Instance();
+	this->objectManager = & ObjectManager::Instance();
     this->regions = & Regions::Instance();
 
 	mm = new UnitsGroup();
-    mD = new UnitsGroup();
 
 	// Vec center;
 	std::set<Unit*> allUnits = Broodwar->getAllUnits();
 	for (std::set<Unit*>::iterator i=allUnits.begin(); i!=allUnits.end(); i++)
 	{
+        onUnitShow(*i);
         if ((*i)->getPlayer() != Broodwar->self())
             continue;
 		if ((*i)->getType().isBuilding())
@@ -81,26 +82,26 @@ void MicroAIModule::onStart()
 	{
 		if (!((*l) == mp))
 			p = BWAPI::Position(*l);
-    }
+	}
 
-   /* /// EXEMPLE FOR THE FLOCK_2 and FLOCK_8 MAPS
-    pFormation tmp_form = pFormation(new SquareFormation(Position(56*32,56*32), Vec(1,0)));
+    /// EXEMPLE FOR THE FLOCK_2 and FLOCK_8 MAPS
+  /*  pFormation tmp_form = pFormation(new SquareFormation(Position(56*32,56*32), Vec(1,0)));
 	pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(
         SL_AND, tmp_form, mm)
     );
     pGoal tmp_goal = pGoal(new Goal(tmp_subgoal));
-    goals.push_back(tmp_goal);*/
-
-    /// EXEMPLE FOR THE INPOS MAP
-    pFormation tmp_form = pFormation(new LineFormation(Position(25*32,9*32), Vec(1,0)));
-    pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form, mm));
+    goals.push_back(tmp_goal);
+*/
+    pFormation tmp_form = pFormation(new LineFormation(Position(30*32,9*32), Vec(1,0)));
+    pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(
+    SL_AND, tmp_form, mm)
+    );
     pGoal tmp_goal = pGoal(new Goal(tmp_subgoal));
     goals.push_back(tmp_goal);
-
-  //  tmp_form = pFormation(new LineFormation(Position(33*32,9*32), Vec(1,0)));
+  // tmp_form = pFormation(new LineFormation(Position(33*32,9*32), Vec(1,0)));
   //  tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form, mm));
   //  tmp_goal = pGoal(new Goal(tmp_subgoal));
-  //  goals2.push_back(tmp_goal);
+  //  goals.push_back(tmp_goal);
 	 
     //gl->setFormation(form);
 
@@ -230,6 +231,9 @@ bool MicroAIModule::onSendText(std::string text)
 			CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)AnalyzeThread, NULL, 0, NULL);
 		}
 		return false;
+    } else if (text=="/euf") // eUnitsFilter
+    {
+        eUnitsFilter->bwOutput();
     } else if (text.substr(0,3) == "/go")
     {
         int x = 0;
@@ -265,6 +269,7 @@ void MicroAIModule::onUnitCreate(Unit* unit)
 
 void MicroAIModule::onUnitDestroy(Unit* unit)
 {
+    eUnitsFilter->onUnitDestroy(unit);
     mapManager->onUnitDestroy(unit);
     regions->onUnitDestroy(unit);
     mm->onUnitDestroy(unit);
@@ -272,12 +277,14 @@ void MicroAIModule::onUnitDestroy(Unit* unit)
 
 void MicroAIModule::onUnitShow(Unit* unit)
 {
+    eUnitsFilter->onUnitShow(unit);
     mapManager->onUnitShow(unit);
 	regions->onUnitShow(unit);
     mm->onUnitShow(unit);
 }
 void MicroAIModule::onUnitHide(Unit* unit)
 {
+    eUnitsFilter->onUnitHide(unit);
     mapManager->onUnitHide(unit);
 	regions->onUnitHide(unit);
     mm->onUnitHide(unit);
