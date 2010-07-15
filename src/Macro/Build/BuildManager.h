@@ -2,12 +2,13 @@
 #include <CSingleton.h>
 #include <Arbitrator.h>
 #include <BWAPI.h>
+#include "BaseObject.h"
 
 class BuildingPlacer;
 class ConstructionManager;
 class ProductionManager;
 class MorphManager;
-class BuildManager : public CSingleton<BuildManager>
+class BuildManager : public CSingleton<BuildManager>, public BaseObject
 {
 	friend class CSingleton<BuildManager>;
 
@@ -26,6 +27,12 @@ class BuildManager : public CSingleton<BuildManager>
     int getStartedCount(BWAPI::UnitType type) const;
     int getCompletedCount(BWAPI::UnitType type) const;
     void setBuildDistance(int distance);
+
+#ifdef BW_QT_DEBUG
+    // Qt interface
+    virtual QWidget* createWidget(QWidget* parent) const;
+    virtual void refreshWidget(QWidget* widget) const;
+#endif
 
   private:
 		Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;

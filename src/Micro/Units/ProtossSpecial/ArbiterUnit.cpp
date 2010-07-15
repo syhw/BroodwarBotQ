@@ -16,18 +16,24 @@ ArbiterUnit::~ArbiterUnit()
 
 void ArbiterUnit::micro()
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("ArbiterUnit::micro non implémenté !");
+#endif
 }
 
 bool ArbiterUnit::canHit(BWAPI::Unit* enemy)
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("ArbiterUnit::canHit non implémenté !");
+#endif
     return false;
 }
 
 int ArbiterUnit::getTimeToAttack()
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("ArbiterUnit::getTimeToAttack non implémenté !");
+#endif
     return 0;
 }
 

@@ -36,11 +36,10 @@ class UnitsGroup
 {
 private:
     std::list<pBayesianUnit> unitsAvailables;
-    std::map<int, cEnemy> enemiesInRange;
+    std::map<int, cEnemy> enemiesInSight;
     std::set<BWAPI::Unit*> enemies;
 	int totalHP;
 	int totalPower;
-    BWAPI::Position center;
     std::vector<pBayesianUnit> units;
     std::map<BWAPI::Unit*, std::list<pBayesianUnit> > attackersEnemy;
     void goonMicro(pBayesianUnit u);
@@ -49,8 +48,8 @@ private:
     
 	std::list<pGoal> goals; // list of goals to accomplish
 	GoalManager* goalManager;
-    /// Mets à jour la liste des ennemis à portée de l'UnitsGroup, et ces derniers sont triés par ordre croissant de HP/SP
-    void updateEnemiesInRange(std::vector<pBayesianUnit>::iterator it);
+    /// Mets à jour la liste des ennemis en vue de l'UnitsGroup, et ces derniers sont triés par ordre croissant de HP/SP
+    void updateEnemiesInSight(std::vector<pBayesianUnit>::iterator it);
     /// Mets à jour la liste des unités capables de sélectionner une nouvelle cible
     void updateUnitsAvaibles(std::vector<pBayesianUnit>::iterator it);
     /// Assignation des cibles aux unités du UnitsGroup qui sont disponible pour sélectionner une nouvelle cible
@@ -62,6 +61,7 @@ public:
 	UnitsGroup();
 	~UnitsGroup();
 
+    BWAPI::Position center;
 	std::map<BWAPI::UnitSizeType, int> sizes;
 
 	virtual void update();
@@ -78,6 +78,7 @@ public:
 	
 	//virtual bool checkInFormation();
 	//virtual bool checkAtDestination();
+    int size();
 	virtual void updateCenter();
     virtual BWAPI::Position getCenter() const;
 
@@ -96,6 +97,7 @@ public:
     int getTotalHP() const;
     std::vector<pBayesianUnit>* getUnits();
     std::map<BWAPI::Unit*, std::list<pBayesianUnit> >& getAttackersEnemy();
+    
 
     static BWAPI::Unit* findWeakestEnemy(std::set<BWAPI::Unit*> enemies_in_range);
 

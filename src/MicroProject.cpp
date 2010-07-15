@@ -2,7 +2,9 @@
 #include "Goal.h"
 #include <AttackGoal.h>
 #include "DefendGoal.h"
+#include "FormationSubgoal.h"
 #include <stdio.h>
+#include <QtGui/QApplication.h>
 using namespace BWAPI;
 using namespace std;
 
@@ -17,12 +19,14 @@ void MicroAIModule::onStart()
 	BWTA::readMap();
 	BWTA::analyze();
     this->mapManager = & MapManager::Instance();
+		this->objectManager = & ObjectManager::Instance();
     this->regions = & Regions::Instance();
 
 	mm = new UnitsGroup();
 
 	// Vec center;
 	std::set<Unit*> allUnits = Broodwar->getAllUnits();
+
 	for (std::set<Unit*>::iterator i=allUnits.begin(); i!=allUnits.end(); i++)
 	{
         if ((*i)->getPlayer() != Broodwar->self())
@@ -73,7 +77,14 @@ void MicroAIModule::onStart()
 		if (!((*l) == mp))
 			p = BWAPI::Position(*l);
 	}
-    pFormation form = pFormation(new LineFormation(Position(22*32,37*32), Vec(1,0)));
+
+    /// EXEMPLE FOR THE FLOCK_2 and FLOCK_8 MAPS
+    pFormation tmp_form = pFormation(new SquareFormation(Position(56*32,56*32), Vec(1,0)));
+	pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(
+        SL_AND, tmp_form, mm)
+    );
+    pGoal tmp_goal = pGoal(new Goal(tmp_subgoal));
+    goals.push_back(tmp_goal);
 	 
     //gl->setFormation(form);
 
@@ -87,6 +98,10 @@ void MicroAIModule::onStart()
 	Broodwar->printf( "size: %i", mm->goals.size());
 	Broodwar->printf( "center: %f, %f", mm->goals.front().formation->center.x, mm->goals.front().formation->center.y);
 	//*/
+
+#ifdef BW_QT_DEBUG
+	g_onStartDone = true;
+#endif
 }
 
 void MicroAIModule::onFrame()
@@ -95,10 +110,9 @@ void MicroAIModule::onFrame()
     if (!*qapp)
         Broodwar->printf("Qt not connected\n");
 #endif
-    ObjectManager::updateOM();
+    objectManager->onFrame();
 	if (mm != NULL) 
         mm->update();
-    regions->update();
     regions->display();
 	/*if (Broodwar->getFrameCount()%300==0)
 	{
@@ -140,6 +154,7 @@ MicroAIModule::~MicroAIModule()
     (*qapp)->quit();
 #endif
     MapManager::Destroy();
+		ObjectManager::Destroy();
     Regions::Destroy();
     mm->~UnitsGroup();
 }

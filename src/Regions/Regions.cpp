@@ -65,6 +65,7 @@ void RegionData::add(Unit* unit)
 /////////////////////////////////////////////////
 
 Regions::Regions()
+: BaseObject("Regions")
 {
 	timeManager = &TimeManager::Instance();
     mapManager = & MapManager::Instance();
@@ -260,3 +261,15 @@ bool Regions::enemyFound() const{
 	return false;
 
 }
+
+#ifdef BW_QT_DEBUG
+QWidget* Regions::createWidget(QWidget* parent) const
+{
+	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
+}
+
+void Regions::refreshWidget(QWidget* widget) const
+{
+// TODO update your widget after having defined it in the previous method :)
+}
+#endif

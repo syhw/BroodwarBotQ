@@ -2,9 +2,10 @@
 #include <Arbitrator.h>
 #include <BWAPI.h>
 #include <BuildingPlacer.h>
+#include "BaseObject.h"
 
 
-class UpgradeManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public CSingleton<UpgradeManager>
+class UpgradeManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public CSingleton<UpgradeManager>, public BaseObject
 {
 	friend class CSingleton<UpgradeManager>;
 	private:
@@ -27,6 +28,12 @@ class UpgradeManager : public Arbitrator::Controller<BWAPI::Unit*,double>, publi
     int getPlannedLevel(BWAPI::UpgradeType type) const;
     int getStartedLevel(BWAPI::UpgradeType type) const;
     int getCompletedLevel(BWAPI::UpgradeType type) const;
+
+#ifdef BW_QT_DEBUG
+    // Qt interface
+    virtual QWidget* createWidget(QWidget* parent) const;
+    virtual void refreshWidget(QWidget* widget) const;
+#endif
 
   private:
     Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;

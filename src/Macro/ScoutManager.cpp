@@ -4,6 +4,7 @@
 
 using namespace BWAPI;
 ScoutManager::ScoutManager( )
+: BaseObject("ScoutManager")
 {
 	regions = & Regions::Instance();
 	microManager = & MicroManager::Instance();
@@ -135,3 +136,17 @@ UnitsGroup* ScoutManager::findUnitsGroup(pGoal goal){
 	}
 	return ug;
 }
+
+
+#ifdef BW_QT_DEBUG
+QWidget* ScoutManager::createWidget(QWidget* parent) const
+{
+	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
+}
+
+void ScoutManager::refreshWidget(QWidget* widget) const
+{
+// TODO update your widget after having defined it in the previous method :)
+}
+#endif
+

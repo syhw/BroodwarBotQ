@@ -9,10 +9,6 @@
 #include <map>
 #include <utility>
 #include "Data.h"
-#ifdef BW_QT_DEBUG
-#include "QtOutputer.h"
-#include <QtGui/QWidget.h>
-#endif
 
 class EUnitsFilter : public CSingleton<EUnitsFilter>, public BaseObject
 {
@@ -28,7 +24,7 @@ public:
 	void onUnitHide(BWAPI::Unit* u);
 	void onUnitRenegade(BWAPI::Unit* u);
 
-#ifdef BW_QT_DEBUG
-    QtOutputer qtOutputer;
-#endif
+	virtual void update();
+	virtual QWidget* createWidget(QWidget* parent) const;
+	virtual void refreshWidget(QWidget* widget) const;
 };

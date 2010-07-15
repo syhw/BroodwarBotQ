@@ -8,8 +8,9 @@ class DefendGoal: public Goal
 {
 public:
 	DefendGoal();
-	DefendGoal( const DefendGoal& g);
+	DefendGoal(const DefendGoal& g);
     DefendGoal(const BWAPI::Position& position);
+    DefendGoal(const Formation& f);
 	virtual ~DefendGoal();
 	virtual void achieve(UnitsGroup* ug);
 	virtual void checkAchievement(UnitsGroup* ug);

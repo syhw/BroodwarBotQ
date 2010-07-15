@@ -13,12 +13,15 @@
 #include "SeeSubgoal.h"
 #include "FindSubgoal.h"
 #include "MicroManager.h"
+#include "BaseObject.h"
 #include "ExploreGoal.h"
 class GoalManager;
 
 
 
-class ScoutManager :  public CSingleton<ScoutManager>
+class GoalManager;
+
+class ScoutManager : public CSingleton<ScoutManager>, public BaseObject
 {
 	friend class CSingleton<ScoutManager>;
 
@@ -39,6 +42,12 @@ public:
 	void onUnitCreate(BWAPI::Unit* unit);//New 
 	void onUnitShow(BWAPI::Unit* unit);
 	void findEnemy();//New
+
+#ifdef BW_QT_DEBUG
+	// Qt interface
+	virtual QWidget* createWidget(QWidget* parent) const;
+	virtual void refreshWidget(QWidget* widget) const;
+#endif
 private:
 	UnitsGroup* findUnitsGroup(pGoal goal);
 	bool to_remove;

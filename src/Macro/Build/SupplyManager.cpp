@@ -1,6 +1,7 @@
 #include <SupplyManager.h>
 
 SupplyManager::SupplyManager()
+: BaseObject("SupplyManager")
 {
   this->buildManager      = NULL;
   this->buildOrderManager = NULL;
@@ -56,3 +57,15 @@ int SupplyManager::getPlannedSupply() const
   plannedSupply+=buildManager->getPlannedCount(BWAPI::UnitTypes::Zerg_Hive)*BWAPI::UnitTypes::Zerg_Hive.supplyProvided();
   return plannedSupply;
 }
+
+#ifdef BW_QT_DEBUG
+QWidget* SupplyManager::createWidget(QWidget* parent) const
+{
+	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
+}
+
+void SupplyManager::refreshWidget(QWidget* widget) const
+{
+// TODO update your widget after having defined it in the previous method :)
+}
+#endif

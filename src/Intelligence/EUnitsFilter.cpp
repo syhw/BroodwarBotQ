@@ -1,4 +1,6 @@
 #include "EUnitsFilter.h"
+#include <QtGui/QTableWidgetItem>
+#include <QtGui/QApplication>
 
 using namespace BWAPI;
 using namespace std;
@@ -7,9 +9,49 @@ EUnitsFilter::EUnitsFilter()
 :BaseObject( "EUnitsFilter")
 {
     timeManager = & TimeManager::Instance();
-#ifdef BW_QT_DEBUG
-		/*
-    QWidget* qw = new QWidget(qmainwindow->menuWidget->ui->tabWidget);
+}
+
+void EUnitsFilter::update(Unit* u)
+{
+    if (u->getPlayer() == Broodwar->self()) return;
+    if (u->getPlayer()->isNeutral()) return;
+    if (eViewedUnits.count(u))
+        eViewedUnits[u].update(timeManager->getElapsedTime());
+    else 
+        eViewedUnits[u] = EViewedUnit(u, timeManager->getElapsedTime());
+        //eViewedUnits.insert(make_pair(u, EViewedUnit(u, timeManager->getElapsedTime())));
+}
+
+void EUnitsFilter::onUnitDestroy(Unit* u)
+{
+    if (u->getPlayer() == Broodwar->self()) return;
+    if (u->getPlayer()->isNeutral()) return;
+    eViewedUnits.erase(u);
+}
+
+void EUnitsFilter::onUnitMorph(Unit* u)
+{
+    update(u);
+}
+
+void EUnitsFilter::onUnitShow(Unit* u)
+{
+    update(u);
+}
+
+void EUnitsFilter::onUnitHide(Unit* u)
+{
+    update(u);
+}
+
+void EUnitsFilter::onUnitRenegade(Unit* u)
+{
+    update(u);
+}
+
+QWidget* EUnitsFilter::createWidget(QWidget* parent) const
+{
+    QWidget* qw = new QWidget(parent);
     qw->setObjectName(QString::fromUtf8("tab_EUFilter_test"));
     QHBoxLayout* horizontalLayout = new QHBoxLayout(qw);
     horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout_EUFilter"));
@@ -39,50 +81,13 @@ EUnitsFilter::EUnitsFilter()
     ___qtablewidgetitem4->setText(QApplication::translate("MenuWidget", "HP", 0, QApplication::UnicodeUTF8));
     horizontalLayout->addWidget(EVUnits);
 
-    qtOutputer.init(qw);
-		*/
-#endif
+		return qw;
 }
 
-void EUnitsFilter::update(Unit* u)
+void EUnitsFilter::update()
 {
-    if (u->getPlayer() == Broodwar->self()) return;
-    if (u->getPlayer()->isNeutral()) return;
-    if (eViewedUnits.count(u))
-        eViewedUnits[u].update(timeManager->getElapsedTime());
-    else 
-        eViewedUnits[u] = EViewedUnit(u, timeManager->getElapsedTime());
-        //eViewedUnits.insert(make_pair(u, EViewedUnit(u, timeManager->getElapsedTime())));
-#ifdef BW_QT_DEBUG
-    //qtOutputer.init();
-    //QWidget* qw;
-    //qtOutputer.output(qw);
-#endif
 }
 
-void EUnitsFilter::onUnitDestroy(Unit* u)
+void EUnitsFilter::refreshWidget(QWidget* /*widget*/) const
 {
-    if (u->getPlayer() == Broodwar->self()) return;
-    if (u->getPlayer()->isNeutral()) return;
-    eViewedUnits.erase(u);
-}
-
-void EUnitsFilter::onUnitMorph(Unit* u)
-{
-    update(u);
-}
-
-void EUnitsFilter::onUnitShow(Unit* u)
-{
-    update(u);
-}
-
-void EUnitsFilter::onUnitHide(Unit* u)
-{
-    update(u);
-}
-
-void EUnitsFilter::onUnitRenegade(Unit* u)
-{
-    update(u);
 }

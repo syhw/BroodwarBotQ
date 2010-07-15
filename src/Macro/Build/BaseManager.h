@@ -6,7 +6,10 @@
 #include <BWTA.h>
 #include <BuildOrderManager.h>
 #include "Base.h"
-class BaseManager: public CSingleton<BaseManager>
+#include "BaseObject.h"
+
+
+class BaseManager: public CSingleton<BaseManager>, public BaseObject
 {
 	friend class CSingleton<BaseManager>;
 
@@ -24,6 +27,12 @@ class BaseManager: public CSingleton<BaseManager>
 
   std::string getName();
   void onUnitDestroy(BWAPI::Unit* unit);
+
+#ifdef BW_QT_DEBUG
+  // Qt interface
+  virtual QWidget* createWidget(QWidget* parent) const;
+  virtual void refreshWidget(QWidget* widget) const;
+#endif
 
   BuildOrderManager* builder;
   std::map<BWTA::BaseLocation*,Base*> location2base;

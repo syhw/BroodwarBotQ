@@ -1,7 +1,9 @@
 #include <WorkerManager.h>
 #include <BaseManager.h>
 #include <algorithm>
+
 WorkerManager::WorkerManager()
+: BaseObject("WorkerManager")
 {
 	this->arbitrator     = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
   this->baseManager    = NULL;
@@ -209,3 +211,16 @@ void WorkerManager::setWorkersPerGas(int count)
 {
   this->WorkersPerGas=count;
 }
+
+#ifdef BW_QT_DEBUG
+QWidget* WorkerManager::createWidget(QWidget* parent) const
+{
+//TODO what do you want to display ?
+	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
+}
+
+void WorkerManager::refreshWidget(QWidget* widget) const
+{
+//TODO update your widget !!
+}
+#endif

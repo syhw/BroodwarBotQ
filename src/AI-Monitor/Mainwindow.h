@@ -1,11 +1,10 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
-
+#pragma once
 #include <QtGui/QMainWindow>
 #include <QtGui/QSplitter>
 #include "MiniMap.h"
 #include "MenuWidget.h"
 #include "ObjectManager.h"
+#include "QComponentWidget.h"
 
 namespace Ui {
     class MainWindow;
@@ -33,5 +32,3 @@ public:
     MiniMap* miniMap;
     ObjectManager* objManager;
 };
-
-#endif // MAINWINDOW_H

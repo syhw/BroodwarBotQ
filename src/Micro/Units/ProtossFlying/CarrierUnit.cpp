@@ -16,18 +16,24 @@ CarrierUnit::~CarrierUnit()
 
 void CarrierUnit::micro()
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("CarrierUnit::micro non implémenté !");
+#endif
 }
 
 bool CarrierUnit::canHit(BWAPI::Unit* enemy)
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("CarrierUnit::canHit non implémenté !");
+#endif
     return false;
 }
 
 int CarrierUnit::getTimeToAttack()
 {
+#ifdef __NON_IMPLEMENTE__
     BWAPI::Broodwar->printf("CarrierUnit::getTimeToAttack non implémenté !");
+#endif
     return 0;
 }
 

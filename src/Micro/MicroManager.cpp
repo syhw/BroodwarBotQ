@@ -12,6 +12,7 @@ using namespace BWAPI;
 using namespace BWTA;
 
 MicroManager::MicroManager() 
+: BaseObject("MicroManager")
 {
 	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
 	this->regions = & Regions::Instance();
@@ -185,3 +186,15 @@ std::set<Unit*> MicroManager::getEnemies()
     for(;iter != Broodwar->getPlayers().end() && !(*iter)->isEnemy(Broodwar->self());iter++);
     return (*iter)->getUnits();
 }
+
+#ifdef BW_QT_DEBUG
+QWidget* MicroManager::createWidget(QWidget* parent) const
+{
+	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
+}
+
+void MicroManager::refreshWidget(QWidget* widget) const
+{
+// TODO update your widget after having defined it in the previous method :)
+}
+#endif

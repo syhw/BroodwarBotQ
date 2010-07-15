@@ -5,14 +5,14 @@
 #include "Data.h"
 #include "BaseObject.h"
 
-class ObjectManager : public CSingleton<ObjectManager> // : public BaseData
+class ObjectManager : public CSingleton<ObjectManager>
 {
     friend class CSingleton<ObjectManager>;
 
 public:
     ObjectManager();
 	~ObjectManager();
-	virtual void updateOM(); // call for bwapi
+	virtual void onFrame(); // call for bwapi
 	void setGameSpeed(int speed); // call for qt appli
     void addObject(BaseObject* p);
     const std::vector<BaseObject*>& getObjects() const;

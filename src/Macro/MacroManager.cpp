@@ -1,8 +1,9 @@
 #include <MacroManager.h>
 #include <math.h>
 
-MacroManager::MacroManager():
-expanding(0)
+MacroManager::MacroManager()
+: BaseObject("MacroManager")
+, expanding(0)
 {
 	this->buildOrderManager = & BuildOrderManager::Instance();
 	this->productionManager = & ProductionManager::Instance();
@@ -257,3 +258,15 @@ bool MacroManager::shouldExpand()
 	}
 	return workerManager->workers.size() >= nbRessources;
 }
+
+#ifdef BW_QT_DEBUG
+QWidget* MacroManager::createWidget(QWidget* parent) const
+{
+	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
+}
+
+void MacroManager::refreshWidget(QWidget* widget) const
+{
+// TODO update your widget after having defined it in the previous method :)
+}
+#endif

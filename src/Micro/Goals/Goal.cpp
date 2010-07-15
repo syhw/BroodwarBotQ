@@ -13,6 +13,12 @@ status(GS_NOT_STARTED)
 {
 }
 
+Goal::Goal(pSubgoal s):
+status(GS_NOT_STARTED)
+{
+    addSubgoal(s);
+}
+
 void Goal::achieve(UnitsGroup* ug)
 {
 	checkAchievement(ug);

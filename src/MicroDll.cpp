@@ -9,8 +9,11 @@
 #include "MicroProject.h"
 
 MicroAIModule* broodAI = NULL;
+#ifdef BW_QT_DEBUG
 QApplication* qapplication = NULL;
 MainWindow* qmainwindow = NULL;
+bool g_onStartDone = false;
+#endif
 
 #define BUF_SIZE 255
 
@@ -85,8 +88,15 @@ DWORD WINAPI LaunchMonitor(LPVOID lpParam)
     char* name = "AI-Monitor";
     char** argv = &name;
     qapplication = new QApplication(argc, argv);
-    MainWindow w;//(0, (MicroAIModule*)broodAI);
-    w.show();
+    qmainwindow = new MainWindow;
+
+		while(!g_onStartDone)
+		{
+			Sleep(50);
+		}
+
+		qmainwindow->show();
+		qmainwindow->initComponentsTree();
     qapplication->exec();
 #endif
 

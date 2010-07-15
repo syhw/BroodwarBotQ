@@ -22,9 +22,10 @@ typedef enum
 class Subgoal
 {
 public:
-	//Constructors
-	~Subgoal();
-	//Accessors
+    Subgoal(SubgoalLogic l);
+    Subgoal(const Subgoal& s);
+    ~Subgoal();
+    //Accessors
 	SubgoalLogic getLogic() const;
 	//Check accomplishment
 	virtual bool isRealized() = 0;//Return if the subgoal is accomplished
@@ -36,9 +37,6 @@ public:
 	virtual double distanceToRealize(UnitsGroup *ug) = 0;//Return an estimated distance to accomplish the Subgoal
 	//if the return value is negative, it means that the subgoal cannot give suggestions to the UnitsGroup
 protected:
-	Subgoal(SubgoalLogic l);
 	virtual bool check() = 0;//Function that defines the condition of the subgoal
-private:
 	SubgoalLogic logic;
-
 };

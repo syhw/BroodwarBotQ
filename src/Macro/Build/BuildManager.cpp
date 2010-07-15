@@ -4,6 +4,7 @@
 #include <ProductionManager.h>
 #include <MorphManager.h>
 BuildManager::BuildManager()
+: BaseObject("BuildManager")
 {
 	this->arbitrator = &Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
 	this->buildingPlacer= & BuildingPlacer::Instance();
@@ -98,3 +99,15 @@ void BuildManager::setBuildDistance(int distance)
 {
   this->buildingPlacer->setBuildDistance(distance);
 }
+
+#ifdef BW_QT_DEBUG
+QWidget* BuildManager::createWidget(QWidget* parent) const
+{
+	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
+}
+
+void BuildManager::refreshWidget(QWidget* widget) const
+{
+// TODO update your widget after having defined it in the previous method :)
+}
+#endif

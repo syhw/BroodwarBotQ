@@ -1,6 +1,7 @@
 #include <BuildOrderManager.h>
 
 BuildOrderManager::BuildOrderManager()
+: BaseObject("BuildOrderManager")
 {
 	this->buildManager   = & BuildManager::Instance();
 	this->techManager    = & TechManager::Instance();
@@ -207,3 +208,15 @@ int BuildOrderManager::getPlannedCount( BWAPI::UnitType unitType)
 				plannedCount += it2->count;
 	return plannedCount + productionManager->getPlannedCount( unitType);
 }
+
+#ifdef BW_QT_DEBUG
+QWidget* BuildOrderManager::createWidget(QWidget* parent) const
+{
+	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
+}
+
+void BuildOrderManager::refreshWidget(QWidget* widget) const
+{
+// TODO update your widget after having defined it in the previous method :)
+}
+#endif
