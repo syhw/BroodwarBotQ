@@ -12,6 +12,8 @@
 using boost::math::normal;
 #endif
 
+#define _OUR_PATHFINDER_
+
 using namespace std;
 using namespace BWAPI;
 
@@ -407,6 +409,7 @@ void BayesianUnit::drawProbs(multimap<double, Vec>& probs, int number)
 
 void BayesianUnit::updateObj()
 {
+#ifndef _OUR_PATHFINDER_
     Position p;
     if (Broodwar->getFrameCount()%70 == 0 || !_path.size()) // hack to remove with the introduction of TimeManager
     {
@@ -439,6 +442,41 @@ void BayesianUnit::updateObj()
 
     obj = Vec(p.x() - _unitPos.x(), p.y() - _unitPos.y());
     //drawPath();
+#else
+    Position p;
+    if (Broodwar->getFrameCount()%70 == 0 || !_path.size()) // hack to remove with the introduction of TimeManager
+    {
+        //TIMINGclock_t start = clock();
+        buildingsAwarePathFind(_btpath, TilePosition(_unitPos), TilePosition(target));
+        _path.clear();
+        for (std::vector<TilePosition>::const_iterator it = _btpath.begin(); it != _btpath.end(); ++it)
+            _path.push_back(*it);
+        //TIMINGclock_t end = clock();
+        //TIMINGBroodwar->printf("Iterations took %f", (double)(end-start));
+    } else
+    {
+        // remove path points we passed
+        if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
+            _path.erase(_path.begin());
+        // I'm not drunk, do it twice! (path[2] if possible)        
+        if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
+            _path.erase(_path.begin());
+    }
+
+    if (_path.size() > 1)   // _ppath[0] is the current unit position
+    {
+        if (_path.size() > 2) 
+            p = _path[2].getPosition();
+        else
+            p = _path[1].getPosition();
+    }
+    else
+        p = _unitPos;
+
+    obj = Vec(p.x() - _unitPos.x(), p.y() - _unitPos.y());
+    //drawBTPath();
+    //drawPath();
+#endif
 }
 
 void BayesianUnit::drawObj(int number)
@@ -718,6 +756,7 @@ void BayesianUnit::update()
         return;
     }
 
+    _mode = MODE_FLOCK;
     if (_mode == MODE_FLOCK || _mode == MODE_INPOS) 
     {
         updateDir();
@@ -734,7 +773,6 @@ void BayesianUnit::update()
         && (p.getDistance(target) < 4 
             || (_ground_unit && BWTA::isConnected(TilePosition(p), TilePosition(target)))))
         switchMode(MODE_INPOS);
-    _mode = MODE_FLOCK;
 
 #ifdef __DEBUG_NICOLAS__
     this->drawTarget();

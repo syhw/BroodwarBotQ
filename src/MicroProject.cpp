@@ -40,16 +40,14 @@ void MicroAIModule::onStart()
 		} 
         else if ((*i)->getType() == BWAPI::UnitTypes::Protoss_Zealot)
 		{
-            //Broodwar->printf("Took control of: %s\n", (*i)->getType().getName().c_str() );
+            // Broodwar->printf("Took control of: %s\n", (*i)->getType().getName().c_str() );
 			mm->takeControl(*i);
-			// center += (*i)->getPosition();
 		}
  //       else
  //       {
  //           mD->takeControl(*i);
  //       }
 	}
-	// center /= allUnits.size();
 
 	/* std::set<Player*> players=Broodwar->getPlayers();
 	Broodwar->printf("The following players are in this replay:");

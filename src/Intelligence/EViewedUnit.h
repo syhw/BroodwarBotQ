@@ -8,6 +8,7 @@ struct EViewedUnit
 {
     friend std::ostream& operator <<(std::ostream&, const EViewedUnit&);
 
+    // TODO add probability to be in each of the regions.
     BWAPI::Unit* unit;
     int HP;
     BWAPI::Position position;
