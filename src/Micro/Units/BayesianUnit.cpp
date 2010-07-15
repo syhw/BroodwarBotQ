@@ -12,6 +12,8 @@
 using boost::math::normal;
 #endif
 
+#define _OUR_PATHFINDER_
+
 using namespace std;
 using namespace BWAPI;
 
@@ -56,6 +58,9 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
         _flockProb.push_back(0.29);                 //FLOCK_CLOSE
         _flockProb.push_back(0.30);                  //FLOCK_MEDIUM
         _flockProb.push_back(0.30);                 //FLOCK_FAR
+
+        _inPosProb.push_back(0.999); // INPOS_OK
+        _inPosProb.push_back(0.001); // INPOS_CONTACT
         // old (~~safe) params
 //        _flockProb.push_back(0.05);                  //FLOCK_CONTACT
 //        _flockProb.push_back(0.25);                 //FLOCK_CLOSE
@@ -77,6 +82,49 @@ void BayesianUnit::initDefaultProb()
     //_defaultProb.insert(make_pair(OCCUP_FLOCK, _PROB_NO_FLOCK_MOVE));       // P(there_is_flocking_attraction=false | we_go_in_this_case=true)
 }
 
+void BayesianUnit::computeInPosValues()
+{
+    _inPosValues.clear();
+    for (unsigned int i = 0; i < _dirv.size(); ++i)
+    {
+        vector<inPos_value> tmpv;
+        for (std::set<Unit*>::const_iterator it = 
+                Broodwar->self()->getUnits().begin(); 
+            it != Broodwar->self()->getUnits().end(); ++it)
+        {
+            if ( (*it) == this->unit) continue; 
+
+            bool appartient = false; //*** [A CHANGER]
+            for (vector<pBayesianUnit>::const_iterator it2 = 
+                _unitsGroup->getUnits()->begin(); 
+            it2 != _unitsGroup->getUnits()->end() && !appartient; ++it2)
+                    appartient = (*it2)->unit == (*it);
+            if (appartient) continue; //*** [FIN A CHANGER]
+
+            Position tmp = _dirv[i].translate(this->_unitPos);
+            Vec tmpvit((*it)->getVelocityX(), 
+                    (*it)->getVelocityY());
+
+            inPos_value value = (inPos_value)(1 + (int)tmp.getDistance(
+                tmpvit.translate((*it)->getPosition())) / 32);
+
+            if (value <= INPOS_CONTACT)
+                tmpv.push_back(INPOS_CONTACT);
+            else
+            {
+                value = (inPos_value)(1 + (int)tmp.getDistance(
+                    tmpvit.translate((*it)->getTargetPosition())) / 32);
+
+                if (value <= INPOS_CONTACT)
+                    tmpv.push_back(INPOS_CONTACT);
+                else
+                    tmpv.push_back(INPOS_OK);
+            }
+        }
+        _inPosValues.push_back(tmpv);
+    }
+}
+
 void BayesianUnit::computeFlockValues()
 {
     _flockValues.clear();
@@ -92,15 +140,15 @@ void BayesianUnit::computeFlockValues()
             
             //CODE flock_value value = (flock_value)
             //CODE (1 + (int)((*it)->unit->getDistance(
-            //CODE      _dirv[i].translate(this->unit->getPosition()))/32));
-            Position tmp = _dirv[i].translate(this->unit->getPosition());
+            //CODE      _dirv[i].translate(this->_unitPos()))/32));
+            Position tmp = _dirv[i].translate(this->_unitPos);
             Vec tmpvit((*it)->unit->getVelocityX(), 
                     (*it)->unit->getVelocityY()); 
             // we flock with the interpolated next position of other units
-            tmpvit *= 8;
+            //tmpvit *= 8;
             //TEST BWAPI::Broodwar->printf("X: %f, Y: %f \n", (*it)->unit->getVelocityX(), (*it)->unit->getVelocityY());
             flock_value value = (flock_value)(1 + (int)tmp.getDistance(
-                        tmpvit.translate((*it)->unit->getPosition())) / 32);
+                        tmpvit.translate((*it)->_unitPos)) / 32);
             //CODE if (value == FLOCK_FAR + 1) --value; 
             // some kind of hysteresis for FAR
             if (value <= FLOCK_FAR)
@@ -118,18 +166,16 @@ void BayesianUnit::computeFlockValues()
 void BayesianUnit::switchMode(unit_mode um)
 {
     // Comportement attendu ?
+    _mode = um;
     switch (um) 
     {
         case MODE_FLOCK:
-            _mode = um;
             _defaultProb[OCCUP_UNIT] = 0.6;
             //_defaultProb[OCCUP_FLOCK] = 0.1;
             break;
         case MODE_FIGHT_G:
-            _mode = um;
             break;
         default:
-            _mode = um;
             break;
     }
 }
@@ -186,14 +232,20 @@ void BayesianUnit::updateAttractors()
     {
         computeFlockValues();
     }
+    else if (_mode == MODE_INPOS)
+    {
+        computeInPosValues();
+    }
 
     // building and blocking attraction (repulsion)
     const int width = Broodwar->mapWidth();
-    Position up = unit->getPosition();
+    Position up = _unitPos;
     for (unsigned int i = 0; i < _dirv.size(); ++i)
     {
         Position tmp = _dirv[i].translate(up);
-        if (mapManager->buildings[tmp.x()/32 + (tmp.y()/32)*width])
+        //if (mapManager->buildings[tmp.x()/32 + (tmp.y()/32)*width])
+        //    _occupation.push_back(OCCUP_BUILDING);
+        if (mapManager->buildings_wt[tmp.x()/8 + (tmp.y()/8)*4*width])
             _occupation.push_back(OCCUP_BUILDING);
         else if (!mapManager->walkability[tmp.x()/8 + (tmp.y()/8)*4*width]) 
                                        // tmp.x()/8 + (tmp.y()/2)*width
@@ -205,7 +257,7 @@ void BayesianUnit::updateAttractors()
 
 void BayesianUnit::drawAttractors()
 {
-    Position up = unit->getPosition();
+    Position up = _unitPos;
     for (unsigned int i = 0; i < _dirv.size(); ++i)
     {
         Position p = _dirv[i].translate(up);
@@ -233,7 +285,7 @@ void BayesianUnit::drawFlockValues()
     {
         UnitType ut = this->unit->getType();
         string str = ut.getName();
-        Position p = _dirv[i].translate(this->unit->getPosition());
+        Position p = _dirv[i].translate(this->_unitPos);
         for (unsigned int j = 0; j < _flockValues[i].size(); ++j)
             Broodwar->drawBox(CoordinateType::Map, p.x() - 3 + j , p.y() - 3 + j, p.x() + 1 + j, p.y() + 1 + j, colors.rainbow[(_flockValues[i][j]+4) % 5], true);
     }
@@ -247,7 +299,7 @@ double BayesianUnit::computeProb(unsigned int i)
     double val = 1.;
     //for (multimap<Position, attractor_type>::const_iterator it = _prox.begin(); it != _prox.end(); ++it)
 
-    if (_mode == MODE_FLOCK)
+    if (_unitsGroup->getUnits()->size() > 1 && _mode == MODE_FLOCK)
     {
         /// FLOCKING INFLUENCE
         // one j for each attractor
@@ -255,7 +307,7 @@ double BayesianUnit::computeProb(unsigned int i)
             val *= _flockProb[_flockValues[i][j]];
 
         /// OBJECTIVE (pathfinder) INFLUENCE
-        double prob_obj = _PROB_GO_OBJ / _unitsGroup->getUnits()->size();
+        double prob_obj = _PROB_GO_OBJ / (_unitsGroup->getUnits()->size() - 1);
         if (_dirv[i] == obj)
             val *= prob_obj;
         else
@@ -265,10 +317,33 @@ double BayesianUnit::computeProb(unsigned int i)
             Vec objnorm = obj;
             objnorm.normalize();
             const double tmp = dirvtmp.dot(objnorm);
-            val *= (tmp > 0 ? prob_obj*tmp : (1.0 - prob_obj)*tmp);
+            val *= (tmp > 0 ? prob_obj*tmp : 0.01); 
+            // TODO 0.01 magic number (uniform prob to go in the half-quadrant opposite to obj)
         }
     }
-    return val; // TODO remove
+    else if (_mode == MODE_INPOS)
+    {
+        /// INPOS INFLUENCE
+        // one j for each attractor
+        for (unsigned int j = 0; j < _inPosValues[i].size(); ++j)
+            val *= _inPosProb[_inPosValues[i][j]];
+
+        /// OBJECTIVE (pathfinder) INFLUENCE
+        double prob_obj = _PROB_GO_OBJ / (_unitsGroup->getUnits()->size() - 1);
+
+        if (_dirv[i] == obj)
+            val *= prob_obj;
+        else
+        {
+            Vec dirvtmp = _dirv[i];
+            dirvtmp.normalize();
+            Vec objnorm = obj;
+            objnorm.normalize();
+            const double tmp = dirvtmp.dot(objnorm);
+            val *= (tmp > 0 ? prob_obj*tmp : 0.01); 
+            // TODO 0.01 magic number (uniform prob to go in the half-quadrant opposite to obj)
+        }
+    }
     if (_occupation[i] == OCCUP_BUILDING) /// NON-WALKABLE (BUILDING) INFLUENCE
     {	
         val *= 1.0-_PROB_NO_BUILDING_MOVE;
@@ -285,7 +360,7 @@ double BayesianUnit::computeProb(unsigned int i)
 void BayesianUnit::drawProbs(multimap<double, Vec>& probs, int number)
 {
     //Broodwar->printf("Size: %d\n", probs.size());
-    Position up = unit->getPosition();
+    Position up = _unitPos;
     Rainbow colors = Rainbow(Color(12, 12, 255), 51); // 5 colors
     multimap<double, Vec>::const_iterator itmax = probs.end();
     --itmax;
@@ -334,33 +409,79 @@ void BayesianUnit::drawProbs(multimap<double, Vec>& probs, int number)
 
 void BayesianUnit::updateObj()
 {
-    Position up = unit->getPosition();
-    if (Broodwar->getFrameCount()%70 == 0) // hack to remove with the introduction of TimeManager
+#ifndef _OUR_PATHFINDER_
+    Position p;
+    if (Broodwar->getFrameCount()%70 == 0 || !_path.size()) // hack to remove with the introduction of TimeManager
     {
-        clock_t start = clock();
-        std::vector<BWAPI::TilePosition> tmp;
-        tmp = BWTA::getShortestPath(TilePosition(unit->getPosition()), TilePosition(target));
+        //TIMINGclock_t start = clock();
+        _btpath = BWTA::getShortestPath(TilePosition(_unitPos), TilePosition(target));
         _path.clear();
-        for (std::vector<TilePosition>::const_iterator it = tmp.begin(); it != tmp.end(); ++it)
+        for (std::vector<TilePosition>::const_iterator it = _btpath.begin(); it != _btpath.end(); ++it)
             _path.push_back(*it);
-        clock_t end = clock();
-        //Broodwar->printf("Iterations took %f", (double)(end-start));
-    } else 
+        //TIMINGclock_t end = clock();
+        //TIMINGBroodwar->printf("Iterations took %f", (double)(end-start));
+    } else
     {
-        straightLine(_ppath, up, target, true);
-        if (_ppath.size() > 1)   // path[0] is the current unit position
-        {
-            Position p;
-            if (_path.size() >= 2) 
-                p = _ppath[1];
-            obj = Vec(p.x() - up.x(), p.y() - up.y());
-        }
+        // remove path points we passed
+        if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
+            _path.erase(_path.begin());
+        // I'm not drunk, do it twice! (path[2] if possible)        
+        if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
+            _path.erase(_path.begin());
     }
+
+    if (_path.size() > 1)   // _ppath[0] is the current unit position
+    {
+        if (_path.size() > 2) 
+            p = _path[2].getPosition();
+        else
+            p = _path[1].getPosition();
+    }
+    else
+        p = _unitPos;
+
+    obj = Vec(p.x() - _unitPos.x(), p.y() - _unitPos.y());
+    //drawPath();
+#else
+    Position p;
+    if (Broodwar->getFrameCount()%70 == 0 || !_path.size()) // hack to remove with the introduction of TimeManager
+    {
+        //TIMINGclock_t start = clock();
+        buildingsAwarePathFind(_btpath, TilePosition(_unitPos), TilePosition(target));
+        _path.clear();
+        for (std::vector<TilePosition>::const_iterator it = _btpath.begin(); it != _btpath.end(); ++it)
+            _path.push_back(*it);
+        //TIMINGclock_t end = clock();
+        //TIMINGBroodwar->printf("Iterations took %f", (double)(end-start));
+    } else
+    {
+        // remove path points we passed
+        if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
+            _path.erase(_path.begin());
+        // I'm not drunk, do it twice! (path[2] if possible)        
+        if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
+            _path.erase(_path.begin());
+    }
+
+    if (_path.size() > 1)   // _ppath[0] is the current unit position
+    {
+        if (_path.size() > 2) 
+            p = _path[2].getPosition();
+        else
+            p = _path[1].getPosition();
+    }
+    else
+        p = _unitPos;
+
+    obj = Vec(p.x() - _unitPos.x(), p.y() - _unitPos.y());
+    //drawBTPath();
+    //drawPath();
+#endif
 }
 
 void BayesianUnit::drawObj(int number)
 {
-    Position up = unit->getPosition();
+    Position up = _unitPos;
     Broodwar->drawLine(CoordinateType::Map, up.x(), up.y(), up.x() + (int)obj.x, up.y() + (int)obj.y, Colors::Green);
     if (number == 0) return;
     if (number == 1)
@@ -393,7 +514,7 @@ void BayesianUnit::drawObj(int number)
 
 void BayesianUnit::drawOccupation(int number)
 {
-    Position up = unit->getPosition();
+    Position up = _unitPos;
     if (number == 0) return;
     if (number == 1)
     {
@@ -430,16 +551,16 @@ void BayesianUnit::updateDirV()
     int accel = unit->getType().acceleration();
     double speed = unit->getType().topSpeed();
     //Broodwar->printf("unittype: %s, accel: %d, top speed: %f", unit->getType(). , accel, speed);
-    Position p = unit->getPosition();
+    Position p = _unitPos;
     WalkTilePosition wtp(p);
 //    const int minx = 0;
 //    const int maxx = 32*Broodwar->mapWidth();
 //    const int miny = 0;
 //    const int maxy = 32*Broodwar->mapHeight();
-    const int minx = max(p.x() - 1.5*_slarge, 0);
-    const int maxx = min(p.x() + 1.5*_slarge, 32*Broodwar->mapWidth());
-    const int miny = max(p.y() - 1.5*_sheight, 0);
-    const int maxy = min(p.y() + 1.5*_sheight, 32*Broodwar->mapHeight());
+    const int minx = max(p.x() - _slarge, 0);
+    const int maxx = min(p.x() + _slarge, 32*Broodwar->mapWidth());
+    const int miny = max(p.y() - _sheight, 0);
+    const int maxy = min(p.y() + _sheight, 32*Broodwar->mapHeight());
     for (int x = -4; x <= 4; ++x)
         for (int y = -4; y <= 4; ++y)
         {
@@ -457,7 +578,7 @@ void BayesianUnit::updateDirV()
     //Broodwar->printf("unit size : %d, %d\n", _sheight, _slarge);
     //Broodwar->printf("sh : %d, sl : %d\n", sh, sl);
     const int width = Broodwar->mapWidth();
-    Position p = unit->getPosition();
+    Position p = _unitPos();
     const int minx = max(p.x() - sl*8, 0);
     const int maxx = min(p.x() + sl*8, 32*width);
     const int miny = max(p.y() - sh*8, 0);
@@ -477,7 +598,7 @@ void BayesianUnit::updateDirV()
 
 void BayesianUnit::drawDirV()
 {
-    Position up = unit->getPosition();
+    Position up = _unitPos;
     for (unsigned int i = 0; i < _dirv.size(); ++i)
     {
         //Broodwar->printf("_dirv[i].x: %f, _dirv[i].y: %f \n", _dirv[i].x, _dirv[i].y);
@@ -491,9 +612,9 @@ void BayesianUnit::drawDirV()
 void BayesianUnit::attackMove(const Position& p)
 {
     target = p;
-    //pathFind(_path, unit->getPosition(), target);
+    //pathFind(_path, _unitPos(), target);
     /*std::vector<TilePosition> path;
-    pathFind(path, unit->getPosition(), target);
+    pathFind(path, _unitPos(), target);
     path = std::vector<TilePosition>(getShortestPath(
         unit->getTilePosition(), target));
     if (path.size() == 0) 
@@ -504,7 +625,7 @@ void BayesianUnit::attackMove(const Position& p)
 
 void BayesianUnit::updateDir()
 {
-    Position p = this->unit->getPosition();
+    Position p = this->_unitPos;
 
     // update possible directions vector
     updateDirV();
@@ -518,7 +639,6 @@ void BayesianUnit::updateDir()
     
     // update objectives
     updateObj();
-    //drawObj(2);
     //drawObj(_unitsGroup->size());
     //drawOccupation(_unitsGroup->size());
 
@@ -542,34 +662,36 @@ void BayesianUnit::updateDir()
         for (multimap<double, Vec>::const_iterator it = possible_dirs.first; it != possible_dirs.second; ++it)
         {
             double tmp = obj.dot(it->second);
-            if (tmp < max)
+            if (tmp > max)
             {
                 max = tmp;
                 dir = it->second;
             }
         }
     }
-    drawProbs(dirvProb, _unitsGroup->size());
+
+    //drawProbs(dirvProb, _unitsGroup->size());
 }
 
 void BayesianUnit::drawDir()
 {
-    Position up = unit->getPosition();
-    Broodwar->drawLineMap(up.x(), up.y(), dir.translate(up).x(), dir.translate(up).y(), Colors::Red);
+    Position up = _unitPos;
+    if (dir.translate(up).y() <= Broodwar->mapHeight()*BWAPI::TILE_SIZE && dir.translate(up).x() <= Broodwar->mapWidth()*BWAPI::TILE_SIZE)
+        Broodwar->drawLineMap(up.x(), up.y(), dir.translate(up).x(), dir.translate(up).y(), Colors::Red);
 }
 
 void BayesianUnit::clickDir()
 {
-    dir += unit->getPosition();
-    if (unit->getPosition().getDistance(dir.toPosition()) >= 1.0) 
+    dir += _unitPos;
+    if (_unitPos.getDistance(dir.toPosition()) >= 1.0) 
         unit->rightClick(dir.toPosition());
     ///unit->rightClick(target);
 }
 
 void BayesianUnit::drawArrow(Vec& v)
 {
-    int xfrom = unit->getPosition().x();
-    int yfrom = unit->getPosition().y();
+    int xfrom = _unitPos.x();
+    int yfrom = _unitPos.y();
     double xto = xfrom + 20*v.x; // 20, magic number
     double yto = yfrom + 20*v.y;
     double v_x = xto-xfrom; 
@@ -599,12 +721,12 @@ void BayesianUnit::updateRangeEnemiesWith(Unit* u)
     for (std::multimap<double, Unit*>::const_iterator it = _rangeEnemies.begin(); it != _rangeEnemies.end(); ++it)
         if (it->second == u)
         {
-            std::pair<double, Unit*> temp(u->getDistance(unit->getPosition()), u);
+            std::pair<double, Unit*> temp(u->getDistance(_unitPos), u);
             _rangeEnemies.erase(it);
             _rangeEnemies.insert(temp);
             return;
         }
-    std::pair<double, Unit*> temp(u->getDistance(unit->getPosition()), u);
+    std::pair<double, Unit*> temp(u->getDistance(_unitPos), u);
     _rangeEnemies.insert(temp);
 }
 
@@ -626,24 +748,32 @@ void BayesianUnit::onUnitHide(Unit* u)
 void BayesianUnit::update()
 {
     if (!unit->exists()) return;
+    _unitPos = unit->getPosition();
+
     if (targetEnemy != NULL && withinRange(targetEnemy))
     {
         attackEnemy(targetEnemy, BWAPI::Colors::Red);
         return;
     }
-    updateDir();
-    //drawObj(0); // green
-    drawDir(); // red
-    clickDir();
-    //drawFlockValues();
+
+    _mode = MODE_FLOCK;
+    if (_mode == MODE_FLOCK || _mode == MODE_INPOS) 
+    {
+        updateDir();
+        drawObj(0); // green
+        drawDir(); // red
+        clickDir();
+        if (unit->getDistance(this->target) < 4.0)
+            switchMode(MODE_INPOS);
+        //drawFlockValues();
+    }
     return;
 
-    Position p = unit->getPosition();
+    Position p = _unitPos;
     if ((_mode == MODE_FLOCK && _mode == MODE_FLOCKFORM)
         && (p.getDistance(target) < 4 
             || (_ground_unit && BWTA::isConnected(TilePosition(p), TilePosition(target)))))
         switchMode(MODE_INPOS);
-    _mode = MODE_FLOCK;
 
 #ifdef __DEBUG_NICOLAS__
     this->drawTarget();
@@ -666,7 +796,7 @@ void BayesianUnit::update()
                     --end;
                     continue;
                 }
-                double enemyDistance = rangeEnemyUnit->second->getDistance(unit->getPosition());
+                double enemyDistance = rangeEnemyUnit->second->getDistance(_unitPos());
                 if (enemyDistance < unit->getType().groundWeapon().maxRange()) { // attack former closer if in range
                     // unit->rightClick(rangeEnemyUnit->second->getPosition());
                     break;
@@ -694,7 +824,7 @@ void BayesianUnit::update()
         if (targetEnemy != NULL && unit->getGroundWeaponCooldown() == getTimeToAttack())//getTimeToAttack())
             attackEnemy(targetEnemy, BWAPI::Colors::Red);
         else if ( unit->isAttacking() && unit->getGroundWeaponCooldown() < 20)
-            unit->rightClick(Position(unit->getPosition().x()-100, unit->getPosition().y()));
+            unit->rightClick(Position(_unitPos.x()-100, _unitPos.y()));
         /*else if (targetEnemy != NULL && unit->getGroundWeaponCooldown() > getTimeToAttack())
             unit->rightClick(targetEnemy);
         else if (targetEnemyInRange != NULL && unit->getGroundWeaponCooldown() <= getTimeToAttack())*/
@@ -711,17 +841,17 @@ void BayesianUnit::update()
             clickDir();
             drawFlockValues();
         }
-        //Broodwar->drawLine(CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), target.x(), target.y(), BWAPI::Color(92, 92, 92));
+        //Broodwar->drawLine(CoordinateType::Map, _unitPos().x(), _unitPos().y(), target.x(), target.y(), BWAPI::Color(92, 92, 92));
     }
     /*if (tick())
     {
         _path = BWTA::getShortestPath(unit->getTilePosition(), target);
-        // pathFind(_path, unit->getPosition(), target);
+        // pathFind(_path, _unitPos(), target);
         updateDir();
     }*/
     // _path = BWTA::getShortestPath(unit->getTilePosition(), target);
     //if (tick()) 
-    //      pathFind(_path, unit->getPosition(), target);
+    //      pathFind(_path, _unitPos(), target);
     //      drawWalkability();
     //drawPath();
     // double velocity = sqrt(unit->getVelocityX()*unit->getVelocityX() + unit->getVelocityY()*unit->getVelocityY());
@@ -743,7 +873,7 @@ std::multimap<double, BWAPI::Unit*>& BayesianUnit::getRangeEnemies()
 void BayesianUnit::attackEnemy(BWAPI::Unit* u, BWAPI::Color col)
 {
 #ifdef __DEBUG_NICOLAS__
-    int ux = unit->getPosition().x(); int uy = unit->getPosition().y();
+    int ux = _unitPos().x(); int uy = _unitPos().y();
     int ex = u->getPosition().x(); int ey = u->getPosition().y();
 
     Broodwar->drawLineMap(ux, uy, ex, ey, col);

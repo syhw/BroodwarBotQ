@@ -37,7 +37,8 @@ enum unit_mode {
     MODE_FLOCK,
     MODE_FLOCKFORM, // flock in formation
     MODE_FIGHT_G,   // ground
-    MODE_FIGHT_A    // air
+    MODE_FIGHT_A,    // air
+    MODE_SCOUT
 }; 
 
 enum flock_value {
@@ -46,6 +47,11 @@ enum flock_value {
     FLOCK_CLOSE,
     FLOCK_MEDIUM,
     FLOCK_FAR
+};
+
+enum inPos_value {
+    INPOS_OK,
+    INPOS_CONTACT
 };
 
 class BayesianUnit : public BattleUnit
@@ -69,13 +75,16 @@ protected:
     This grid because there are only 16 possible directions in Broodwar */
     MapManager* mapManager;
     std::vector<std::vector<flock_value> > _flockValues; // one vector<flock_value> per unit with which we flock
+    std::vector<std::vector<inPos_value> > _inPosValues; // one vector<flock_value> per unit with which we flock
     std::vector<double> _flockProb; // TODO decide if static, perhaps unit dependant
+    std::vector<double> _inPosProb; // TODO decide if static, perhaps unit dependant
     UnitsGroup* _unitsGroup;
     std::multimap<double, BWAPI::Unit*> _rangeEnemies;
     std::map<occupation_type, double> _defaultProb;
 
     inline void initDefaultProb();
     inline void computeFlockValues();
+    inline void computeInPosValues();
     void straightLine(std::vector<BWAPI::Position>& ppath, 
         const BWAPI::Position& p_start, 
         const BWAPI::Position& p_end, 

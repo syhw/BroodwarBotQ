@@ -4,6 +4,7 @@
 #include <windows.h>
 #include "Defines.h"
 #include "Formations.h"
+#include "EUnitsFilter.h"
 #include "MapManager.h"
 #include "ObjectManager.h"
 #include "Regions.h"
@@ -19,8 +20,10 @@ class MicroAIModule : public BWAPI::AIModule
 {
 public:	    
     UnitsGroup* mm;
+    UnitsGroup* mD;
+    EUnitsFilter* eUnitsFilter;
     MapManager* mapManager;
-		ObjectManager* objectManager;
+    ObjectManager* objectManager;
     Regions* regions;
 	virtual void onStart();
 #ifdef BW_QT_DEBUG

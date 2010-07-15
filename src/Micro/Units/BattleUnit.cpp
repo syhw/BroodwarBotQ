@@ -16,6 +16,7 @@ BattleUnit::BattleUnit(BWAPI::Unit* unit)
 , _tick(0)
 , targetEnemy(NULL)
 , targetEnemyInRange(NULL)
+, target(unit->getPosition())
 #ifdef UNIT_DEBUG
 , _unitType(unit->getType().getName())
 #endif
@@ -69,6 +70,25 @@ void BattleUnit::drawPath()
     {
         Broodwar->drawBox(CoordinateType::Map, it->getPosition().x() - 3, it->getPosition().y() - 3, 
             it->getPosition().x() + 3, it->getPosition().y() + 3, Colors::Yellow);
+    }
+}
+
+void BattleUnit::drawBTPath()
+{
+    for (std::vector<TilePosition>::const_iterator it = _btpath.begin(); 
+        it != _btpath.end(); ++it)
+    {
+        Broodwar->drawBox(CoordinateType::Map, it->x()*32 - 14, it->y()*32 - 14, 
+            it->x()*32 + 14, it->y()*32 + 14, Colors::Yellow);
+    }
+}
+
+void BattleUnit::drawPPath()
+{
+    for (std::vector<Position>::const_iterator it = _ppath.begin(); 
+        it != _ppath.end(); ++it)
+    {
+        Broodwar->drawCircleMap(it->x(), it->y(), 3, Colors::Yellow);
     }
 }
 
@@ -192,6 +212,93 @@ void BattleUnit::pathFind(std::vector<WalkTilePosition>& path,
     }
     std::vector<WalkTilePosition> nopath;
     path = nopath;
+    return;
+}
+
+void BattleUnit::buildingsAwarePathFind(std::vector<TilePosition>& btpath, 
+                          const TilePosition& start, const TilePosition& end)
+{
+    btpath.clear();
+    MapManager* mapm = & MapManager::Instance();
+    std::multimap<int, TilePosition> openTiles;
+    openTiles.insert(std::make_pair(0, start));
+    std::map<TilePosition, int> gmap;
+    std::map<TilePosition, TilePosition> parent;
+    std::set<TilePosition> closedTiles;
+    gmap[start]=0;
+    parent[start]=start;
+    while(!openTiles.empty())
+    {
+        TilePosition p = openTiles.begin()->second;
+        if (p==end)
+        {
+            std::vector<TilePosition> reverse_path;
+            while(p!=parent[p])
+            {
+                reverse_path.push_back(p);
+                p=parent[p];
+            }
+            reverse_path.push_back(start);
+            for(int i=reverse_path.size()-1; i>=0; --i)
+                btpath.push_back(reverse_path[i]);
+            return;
+        }
+        int fvalue = openTiles.begin()->first;
+        int gvalue=gmap[p];
+        openTiles.erase(openTiles.begin());
+        closedTiles.insert(p);
+        const int width = BWAPI::Broodwar->mapWidth();
+        int minx = max(p.x() - 1, 0);
+        int maxx = min(p.x() + 1, width - 1);
+        int miny = max(p.y() - 1, 0);
+        int maxy = min(p.y() + 1, BWAPI::Broodwar->mapHeight() - 1);
+        for(int x = minx; x <= maxx; x++)
+            for(int y = miny; y <= maxy; y++)
+            {
+                if (!mapm->lowResWalkability[x + y*width]) continue;
+                if (mapm->buildings[x + y*width]) continue;        // buildingsAware
+                if (p.x() != x && p.y() != y && 
+                    !mapm->lowResWalkability[p.x() + y*width] 
+                    && !mapm->lowResWalkability[x + p.y()*width]
+                    && mapm->buildings[p.x() + y*width]            // buildingsAware
+                    && mapm->buildings[x + p.y()*width]) continue; // buildingsAware
+
+                TilePosition t(x,y);
+                if (closedTiles.find(t) != closedTiles.end()) continue;
+
+                int g=gvalue+10;
+                if (x != p.x() && y != p.y()) g+=4;
+                int dx=abs(x-end.x());
+                int dy=abs(y-end.y());
+                int h=abs(dx-dy)*10+min(dx,dy)*14;
+                int f=g+h;
+                if (gmap.find(t)==gmap.end() || g<gmap.find(t)->second)
+                {
+                    gmap[t]=g;
+                    std::pair<std::multimap<int, TilePosition>::iterator, 
+                        std::multimap<int, TilePosition>::iterator> itp 
+                        = openTiles.equal_range(f);
+                    if (itp.second == itp.first) 
+                        openTiles.insert(std::make_pair(f, t));
+                    else 
+                    {
+                        for (std::multimap<int, TilePosition>
+                            ::const_iterator it = itp.first;
+                            it != itp.second; ++it) 
+                        {
+                            if (it->second == t) 
+                            {
+                                openTiles.erase(it);
+                                break;
+                            } 
+                        }
+                        openTiles.insert(std::make_pair(f, t));
+                    }
+                    parent[t]=p;
+                }
+            }
+    }
+    // empty path
     return;
 }
 
