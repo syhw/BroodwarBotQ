@@ -243,13 +243,41 @@ void BayesianUnit::updateAttractors()
     for (unsigned int i = 0; i < _dirv.size(); ++i)
     {
         Position tmp = _dirv[i].translate(up);
-        //if (mapManager->buildings[tmp.x()/32 + (tmp.y()/32)*width])
-        //    _occupation.push_back(OCCUP_BUILDING);
+        
+        Position hG = Position(tmp.x() - this->unit->getType().dimensionUp(), tmp.y() - this->unit->getType().dimensionLeft());
+        Position hD = Position(tmp.x() - this->unit->getType().dimensionUp(), tmp.y() + this->unit->getType().dimensionRight());
+        Position bG = Position(tmp.x() + this->unit->getType().dimensionDown(), tmp.y() - this->unit->getType().dimensionLeft());
+        Position bD = Position(tmp.x() + this->unit->getType().dimensionDown(), tmp.y() + this->unit->getType().dimensionRight());
+        
         if (mapManager->buildings_wt[tmp.x()/8 + (tmp.y()/8)*4*width])
             _occupation.push_back(OCCUP_BUILDING);
-        else if (!mapManager->walkability[tmp.x()/8 + (tmp.y()/8)*4*width]) 
+        else if (!mapManager->walkability[hG.x()/8 + (hG.y()/8)*4*width])
+            _occupation.push_back(OCCUP_BLOCKING);
+        else if (!mapManager->walkability[bG.x()/8 + (bG.y()/8)*4*width])
+            _occupation.push_back(OCCUP_BLOCKING);
+        else if (!mapManager->walkability[hD.x()/8 + (hD.y()/8)*4*width])
+            _occupation.push_back(OCCUP_BLOCKING);
+        else if (!mapManager->walkability[bD.x()/8 + (bD.y()/8)*4*width])
+            _occupation.push_back(OCCUP_BLOCKING);
+
+
+        //if (mapManager->buildings[tmp.x()/32 + (tmp.y()/32)*width])
+        //    _occupation.push_back(OCCUP_BUILDING);
+
+
+
+
+/*
+        if (mapManager->buildings_wt[tmp.x()/8 + (tmp.y()/8)*4*width])
+            _occupation.push_back(OCCUP_BUILDING);
+        else if (!mapManager->walkability[tmp.x()/8 + (tmp.y()/8)*4*width])
                                        // tmp.x()/8 + (tmp.y()/2)*width
             _occupation.push_back(OCCUP_BLOCKING);
+            */
+
+
+
+
         else // TODO UNIT/EUNIT
             _occupation.push_back(OCCUP_NO);
     }
@@ -444,7 +472,7 @@ void BayesianUnit::updateObj()
     //drawPath();
 #else
     Position p;
-    if (Broodwar->getFrameCount()%70 == 0 || !_path.size()) // hack to remove with the introduction of TimeManager
+    if (Broodwar->getFrameCount()%40 == 0 || !_path.size()) // hack to remove with the introduction of TimeManager
     {
         //TIMINGclock_t start = clock();
         buildingsAwarePathFind(_btpath, TilePosition(_unitPos), TilePosition(target));
@@ -742,7 +770,7 @@ void BayesianUnit::onUnitShow(Unit* u)
 
 void BayesianUnit::onUnitHide(Unit* u)
 {
-    updateRangeEnemiesWith(u);
+    //updateRangeEnemiesWith(u);
 }
 
 void BayesianUnit::update()
