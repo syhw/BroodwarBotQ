@@ -27,9 +27,9 @@ bool FindSubgoal::check(){
 //	return regions->enemyFound();
 }
 
-void FindSubgoal::tryToRealize(UnitsGroup * ug){
+void FindSubgoal::tryToRealize(){
 }
 
-double FindSubgoal::distanceToRealize(UnitsGroup *ug){
+double FindSubgoal::distanceToRealize(){
 	return -1;
 }

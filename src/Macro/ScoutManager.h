@@ -9,7 +9,7 @@
 #include <BWTA.h>
 #include "Goal.h"
 #include "Subgoal.h"
-#include "ScoutGoal.h"
+#include "FindEnemyGoal.h"
 #include "SeeSubgoal.h"
 #include "FindSubgoal.h"
 #include "MicroManager.h"

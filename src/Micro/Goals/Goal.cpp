@@ -7,53 +7,60 @@
 Goal::~Goal()
 {
 }
-
 Goal::Goal():
-status(GS_NOT_STARTED)
+status(GS_NOT_ATTRIBUTED)
 {
 }
 
-Goal::Goal(pSubgoal s):
-status(GS_NOT_STARTED)
+Goal::Goal(UnitsGroup * ug):
+status(GS_IN_PROGRESS),
+unitsGroup(ug)
+{
+}
+
+Goal::Goal(UnitsGroup * ug, pSubgoal s):
+status(GS_IN_PROGRESS),
+unitsGroup(ug)
 {
     addSubgoal(s);
 }
 
-void Goal::achieve(UnitsGroup* ug)
+void Goal::achieve()
 {
-	checkAchievement(ug);
+	if(this->status != GS_NOT_ATTRIBUTED){
+		checkAchievement();
 			
-	if(this->status!=GS_ACHIEVED){
-		double test;
-		pSubgoal selected;
-		double min = DBL_MAX;
-		
-		for(std::list<pSubgoal>::iterator it = subgoals.begin(); it != subgoals.end(); ++it){
-			if (!(*it)->isRealized()){
-				test = (*it)->distanceToRealize(ug);
-				if ( test >= 0 && test < min ){
-					min = test;
-					selected = (*it);
+		if(this->status!=GS_ACHIEVED){
+			double test;
+			pSubgoal selected;
+			double min = DBL_MAX;
+			
+			for(std::list<pSubgoal>::iterator it = subgoals.begin(); it != subgoals.end(); ++it){
+				if (!(*it)->isRealized()){
+					test = (*it)->distanceToRealize();
+					if ( test >= 0 && test < min ){
+						min = test;
+						selected = (*it);
+					}
 				}
 			}
-		}
-		if(min > 0 && min < DBL_MAX){
-			selected->tryToRealize(ug);
+			if(min > 0 && min < DBL_MAX){
+				selected->tryToRealize();
 
-		}else{
-			//TODO
-			BWAPI::Broodwar->printf("Tell Louis this situation happened");
-		}
+			}else{
+				//TODO
+				BWAPI::Broodwar->printf("Tell Louis this situation happened");
+			}
 
+		}
 	}
-
 
 }
 
-void Goal::checkAchievement(UnitsGroup* ug)
+void Goal::checkAchievement()
 {
 
-	if(this->status!=GS_ACHIEVED){
+	if(this->status!=GS_ACHIEVED && this->status!=GS_NOT_ATTRIBUTED ){
 		//All the subgoals are tested because the check function might validate
 		//some subgoals
 			bool res_and=true;
@@ -76,15 +83,15 @@ void Goal::checkAchievement(UnitsGroup* ug)
 			}
 				
 			if(res_and || res_or){
-	#ifdef __DEBUG_LOUIS__
-				BWAPI::Broodwar->printf("Goal done");
-	#endif
 				this->status= GS_ACHIEVED;
 			}
 	}
 }
 
 void Goal::addSubgoal(pSubgoal s){
+	if(this->status != GS_NOT_ATTRIBUTED){
+		s->setUnitsGroup(unitsGroup);
+	}
 	this->subgoals.push_back(s);
 }
 
@@ -93,4 +100,13 @@ GoalStatus Goal::getStatus() const{
 }
 void Goal::setStatus(GoalStatus s) {
 	status = s;
+}
+
+
+void Goal::setUnitsGroup(UnitsGroup * ug){
+	this->status = GS_IN_PROGRESS;
+	for(std::list<pSubgoal>::iterator it = this->subgoals.begin(); it != subgoals.end(); ++it){
+		(*it)->setUnitsGroup(ug);
+	}
+	this->unitsGroup = ug;
 }

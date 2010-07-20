@@ -365,14 +365,14 @@ void UnitsGroup::setGoals(std::list<pGoal>& goals)
 {
     this->goals = goals;
 	if(!this->goals.empty())
-		this->goals.front()->achieve(this);
+		this->goals.front()->achieve();
 }
 
 void UnitsGroup::addGoal(pGoal goal)
 {
     this->goals.push_back(goal);
     if (goals.size() == 1 && !this->units.empty())
-    this->goals.front()->achieve(this);
+    this->goals.front()->achieve();
 }
 
 
@@ -446,7 +446,7 @@ void UnitsGroup::takeControl(Unit* u)
         this->units.push_back(tmp);
 	if(this->goals.size()==1){
 		if(this->goals.front()->getStatus()==GS_ACHIEVED){
-			goals.front()->achieve(this);
+			goals.front()->achieve();
 		}
 	}
 }
@@ -623,7 +623,7 @@ void UnitsGroup::accomplishGoal(){
 	
 	if(goals.size() > 0){
 		if (goals.front()->getStatus() != GS_ACHIEVED) {
-			goals.front()->achieve(this);
+			goals.front()->achieve();
 		} else {
 			if(goals.size() > 1 ){
 				goals.pop_front();

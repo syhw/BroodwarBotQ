@@ -2,7 +2,7 @@
 #include <Regions.h>
 #include <util.h>
 #include <UnitsGroup.h>
-#include "AttackGoal.h"
+
 
 using std::map;
 using std::set;

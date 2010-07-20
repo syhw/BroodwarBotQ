@@ -25,9 +25,7 @@ possible status : (new status can be created if you ask gently)
 	
 	-GS_MOVE_TO
 	
-	-GS_FLEE
-	
-	-GS_NOT_STARTED
+	-GS_NOT_ATTRIBUTED
 	
 	
 ###Subgoal
@@ -55,7 +53,7 @@ This is represented by the fact that their distanceToRealize function returns a 
  	
 ##Default behavior
 
-When creating a Goal, by default, its status is GS_NOT_STARTED. 
+When creating a Goal, by default, its status is GS_NOT_ATTRIBUTED if no unitsGroup is assigned and GS_IN_PROGRESS if a unitsGroup is assigned. 
 The checkAchievement function tests whether the goal is done and if so, set its status
 to GS_ACHIEVED. The goal is done when :
 
@@ -71,7 +69,7 @@ to achieve the subgoal. The goal will evaluate the smaller positive distance of 
 ##Creating new goals
 
 ###New goals
-It is possible to create new classes that extend Goal (like AttackGoal, DefendGoal and ScoutGoal).
+It is possible to create new classes that extend Goal (like AttackGoal, DefendGoal and FindEnemyGoal).
 These classes can overload, on need, the achieve and checkAchievement functions.
 It is not compulsory to overload both functions. The achieve function by default, will call checkAchievement (the overloaded one if it exists). 
 

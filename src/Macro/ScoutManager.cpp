@@ -78,33 +78,8 @@ void ScoutManager::onUnitCreate(BWAPI::Unit* unit){
 void ScoutManager::findEnemy(){
 
 	//Create a new scoutGoal 
-	pGoal goal = pGoal(new ScoutGoal());
-	pSubgoal sb;
-
-	//Scout the different possible bases
-	BWTA::BaseLocation * myStartLocation = BWTA::getStartLocation(BWAPI::Broodwar->self());
-	std::set<BWTA::BaseLocation*> path = BWTA::getStartLocations();
-		
-	for(std::set<BWTA::BaseLocation*>::iterator p=path.begin();p!=path.end();p++){
-		if( (*p) != myStartLocation){
-		sb=pSubgoal(new SeeSubgoal(SL_AND, (*p)->getPosition()));
-		goal->addSubgoal(sb);
-		}
-	}
-	sb=pSubgoal(new FindSubgoal(SL_OR));
-	goal->addSubgoal(sb);
-
-	UnitsGroup* ug = this->findUnitsGroup(goal);
-	//Check if the unitsGroup is not empty else Segfault ?
-	if (ug->getUnits()->size() != 0) {
-	//TOCHECK
-		ug->addGoal(goal);
-		microManager->unitsgroups.push_front(ug);
-		//	Broodwar->printf("Unit found, goal attributed");
-	}else{
-		Broodwar->printf("Could not find an appropriate unit for this scout goal");
-		Broodwar->printf("Problem...");
-	}
+	pGoal goal = pGoal(new FindEnemyGoal());
+	findUnitsGroup(goal);
 }
 
 
@@ -134,6 +109,9 @@ UnitsGroup* ScoutManager::findUnitsGroup(pGoal goal){
 			break;
 		}
 	}
+	ug->addGoal(goal);
+	goal->setUnitsGroup(ug);
+	microManager->unitsgroups.push_front(ug);
 	return ug;
 }
 

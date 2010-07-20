@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="MicroProject"
 	ProjectGUID="{305604F2-9728-4D61-AC29-4658B31533DF}"
 	RootNamespace="MicroProject"
@@ -319,14 +319,6 @@
 				Name="Goals"
 				>
 				<File
-					RelativePath="..\src\Micro\Goals\AttackGoal.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Micro\Goals\DefendGoal.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Micro\Goals\FormationSubgoal.cpp"
 					>
 				</File>
@@ -336,10 +328,6 @@
 				</File>
 				<File
 					RelativePath="..\src\Micro\Goals\GoalManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Micro\Goals\ScoutGoal.cpp"
 					>
 				</File>
 				<File
@@ -589,14 +577,6 @@
 				Name="Goals"
 				>
 				<File
-					RelativePath="..\src\Micro\Goals\AttackGoal.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Micro\Goals\DefendGoal.h"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Micro\Goals\FormationSubgoal.h"
 					>
 				</File>
@@ -606,10 +586,6 @@
 				</File>
 				<File
 					RelativePath="..\src\Micro\Goals\GoalManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Micro\Goals\ScoutGoal.h"
 					>
 				</File>
 				<File

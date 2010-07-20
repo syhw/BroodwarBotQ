@@ -1,8 +1,8 @@
 #include "ExploreGoal.h"
 using namespace BWAPI;
 
-ExploreGoal::ExploreGoal(BWTA::Region* region) 
-:Goal()
+ExploreGoal::ExploreGoal(UnitsGroup * ug,BWTA::Region* region) 
+:Goal(ug)
 {
 
 	BWTA::Polygon polygon = region->getPolygon();
@@ -45,9 +45,9 @@ ExploreGoal::ExploreGoal(BWTA::Region* region)
 	}
 }
 
-void ExploreGoal::achieve(UnitsGroup * ug){
+void ExploreGoal::achieve(){
 
-	checkAchievement(ug);
+	checkAchievement();
 	// !!! Accomplish the subgoals in order
 	if(this->status!=GS_ACHIEVED){
 		pSubgoal selected;
@@ -55,7 +55,7 @@ void ExploreGoal::achieve(UnitsGroup * ug){
 		
 		for(std::list<pSubgoal>::iterator it = subgoals.begin(); it != subgoals.end(); ++it){
 			if (!(*it)->isRealized()){
-				selected->tryToRealize(ug);
+				selected->tryToRealize();
 				break;
 			}
 		}
