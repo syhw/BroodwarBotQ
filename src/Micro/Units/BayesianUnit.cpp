@@ -67,6 +67,14 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 //        _flockProb.push_back(0.38);                  //FLOCK_MEDIUM
 //        _flockProb.push_back(0.22);                 //FLOCK_FAR
     }
+    else if (_mode == MODE_FIGHT_G)
+    {
+        _fightGProb.push_back(0.9); // FIGHTG_NO
+        _fightGProb.push_back(0.7); // FIGHTG_LIGHT
+        _fightGProb.push_back(0.5); // FIGHTG_MEDIUM
+        _fightGProb.push_back(0.3); // FIGHTG_HEAVY
+        _fightGProb.push_back(0.1); // FIGHTG_DEAD
+    }
 }
 
 BayesianUnit::~BayesianUnit()
@@ -80,6 +88,13 @@ void BayesianUnit::initDefaultProb()
     _defaultProb.insert(make_pair(OCCUP_BLOCKING, _PROB_NO_WALL_MOVE));       // P(this_case_is_blocking=false | we_go_in_this_case=true)
     _defaultProb.insert(make_pair(OCCUP_BUILDING, _PROB_NO_BUILDING_MOVE));   // P(there_is_a_building_in_this_case=false | we_go_in_this_case=true)
     //_defaultProb.insert(make_pair(OCCUP_FLOCK, _PROB_NO_FLOCK_MOVE));       // P(there_is_flocking_attraction=false | we_go_in_this_case=true)
+}
+
+
+void BayesianUnit::computeFightGValues()
+{
+    _fightGValues.clear();
+    // TODO
 }
 
 void BayesianUnit::computeInPosValues()
@@ -108,14 +123,14 @@ void BayesianUnit::computeInPosValues()
             inPos_value value = (inPos_value)(1 + (int)tmp.getDistance(
                 tmpvit.translate((*it)->getPosition())) / 32);
 
-            if (value <= INPOS_CONTACT)
+            if (value <= INPOS_CONTACT*2)
                 tmpv.push_back(INPOS_CONTACT);
             else
             {
                 value = (inPos_value)(1 + (int)tmp.getDistance(
                     tmpvit.translate((*it)->getTargetPosition())) / 32);
 
-                if (value <= INPOS_CONTACT)
+                if (value <= INPOS_CONTACT*2)
                     tmpv.push_back(INPOS_CONTACT);
                 else
                     tmpv.push_back(INPOS_OK);
@@ -232,9 +247,15 @@ void BayesianUnit::updateAttractors()
     {
         computeFlockValues();
     }
+    // inposition attractions
     else if (_mode == MODE_INPOS)
     {
         computeInPosValues();
+    }
+    // fight attractions
+    else if (_mode == MODE_FIGHT_G)
+    {
+        computeFightGValues();
     }
 
     // building and blocking attraction (repulsion)
@@ -243,13 +264,41 @@ void BayesianUnit::updateAttractors()
     for (unsigned int i = 0; i < _dirv.size(); ++i)
     {
         Position tmp = _dirv[i].translate(up);
-        //if (mapManager->buildings[tmp.x()/32 + (tmp.y()/32)*width])
-        //    _occupation.push_back(OCCUP_BUILDING);
+        
+        Position hG = Position(tmp.x() - this->unit->getType().dimensionUp(), tmp.y() - this->unit->getType().dimensionLeft());
+        Position hD = Position(tmp.x() - this->unit->getType().dimensionUp(), tmp.y() + this->unit->getType().dimensionRight());
+        Position bG = Position(tmp.x() + this->unit->getType().dimensionDown(), tmp.y() - this->unit->getType().dimensionLeft());
+        Position bD = Position(tmp.x() + this->unit->getType().dimensionDown(), tmp.y() + this->unit->getType().dimensionRight());
+        
         if (mapManager->buildings_wt[tmp.x()/8 + (tmp.y()/8)*4*width])
             _occupation.push_back(OCCUP_BUILDING);
-        else if (!mapManager->walkability[tmp.x()/8 + (tmp.y()/8)*4*width]) 
+        else if (!mapManager->walkability[hG.x()/8 + (hG.y()/8)*4*width])
+            _occupation.push_back(OCCUP_BLOCKING);
+        else if (!mapManager->walkability[bG.x()/8 + (bG.y()/8)*4*width])
+            _occupation.push_back(OCCUP_BLOCKING);
+        else if (!mapManager->walkability[hD.x()/8 + (hD.y()/8)*4*width])
+            _occupation.push_back(OCCUP_BLOCKING);
+        else if (!mapManager->walkability[bD.x()/8 + (bD.y()/8)*4*width])
+            _occupation.push_back(OCCUP_BLOCKING);
+
+
+        //if (mapManager->buildings[tmp.x()/32 + (tmp.y()/32)*width])
+        //    _occupation.push_back(OCCUP_BUILDING);
+
+
+
+
+/*
+        if (mapManager->buildings_wt[tmp.x()/8 + (tmp.y()/8)*4*width])
+            _occupation.push_back(OCCUP_BUILDING);
+        else if (!mapManager->walkability[tmp.x()/8 + (tmp.y()/8)*4*width])
                                        // tmp.x()/8 + (tmp.y()/2)*width
             _occupation.push_back(OCCUP_BLOCKING);
+            */
+
+
+
+
         else // TODO UNIT/EUNIT
             _occupation.push_back(OCCUP_NO);
     }
@@ -343,6 +392,10 @@ double BayesianUnit::computeProb(unsigned int i)
             val *= (tmp > 0 ? prob_obj*tmp : 0.01); 
             // TODO 0.01 magic number (uniform prob to go in the half-quadrant opposite to obj)
         }
+    }
+    else if (_mode == MODE_FIGHT_G)
+    {
+        // TODO
     }
     if (_occupation[i] == OCCUP_BUILDING) /// NON-WALKABLE (BUILDING) INFLUENCE
     {	
@@ -670,7 +723,7 @@ void BayesianUnit::updateDir()
         }
     }
 
-    //drawProbs(dirvProb, _unitsGroup->size());
+    drawProbs(dirvProb, _unitsGroup->size());
 }
 
 void BayesianUnit::drawDir()
@@ -750,7 +803,7 @@ void BayesianUnit::update()
     if (!unit->exists()) return;
     _unitPos = unit->getPosition();
 
-    if (targetEnemy != NULL && withinRange(targetEnemy))
+    if (targetEnemy != NULL && withinRange(targetEnemy) /* && Qu'elle est capable de tirer .. */)
     {
         attackEnemy(targetEnemy, BWAPI::Colors::Red);
         return;
@@ -765,10 +818,12 @@ void BayesianUnit::update()
         clickDir();
         if (unit->getDistance(this->target) < 4.0)
             switchMode(MODE_INPOS);
+
         //drawFlockValues();
     }
-    return;
 
+    drawTarget();
+    return;
     Position p = _unitPos;
     if ((_mode == MODE_FLOCK && _mode == MODE_FLOCKFORM)
         && (p.getDistance(target) < 4 
