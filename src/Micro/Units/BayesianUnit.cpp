@@ -497,23 +497,30 @@ void BayesianUnit::updateObj()
     //drawPath();
 #else
     Position p;
-    if (Broodwar->getFrameCount()%70 == 0 || !_path.size()) // hack to remove with the introduction of TimeManager
+    if (Broodwar->getFrameCount()%10 == 0 || !_path.size()) // hack to remove with the introduction of TimeManager
     {
-        //TIMINGclock_t start = clock();
-        buildingsAwarePathFind(_btpath, TilePosition(_unitPos), TilePosition(target));
+       // clock_t start = clock();
+        /*
+            Bug avec le pathfind.. Si 6 unités ou moins calculent leurs pathfind, le temps est de 9 ms / unité.
+            Si ça passe à plus de 6 unités, le temps est de 65 ms / unité et ça lag ...
+        */
+        if (_unitsGroup->_path.size() > 8)
+            buildingsAwarePathFind(_btpath, TilePosition(_unitPos), TilePosition(this->_unitsGroup->_path[8].getPosition()));
+        else
+             buildingsAwarePathFind(_btpath, TilePosition(_unitPos), TilePosition(target));
         _path.clear();
         for (std::vector<TilePosition>::const_iterator it = _btpath.begin(); it != _btpath.end(); ++it)
             _path.push_back(*it);
-        //TIMINGclock_t end = clock();
-        //TIMINGBroodwar->printf("Iterations took %f", (double)(end-start));
+        //clock_t end = clock();
+        //Broodwar->printf("Iterations took %f", (double)(end-start));
     } else
     {
-        // remove path points we passed
-        if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
-            _path.erase(_path.begin());
-        // I'm not drunk, do it twice! (path[2] if possible)        
-        if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
-            _path.erase(_path.begin());
+    // remove path points we passed
+    if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
+        _path.erase(_path.begin());
+    // I'm not drunk, do it twice! (path[2] if possible)        
+    if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
+        _path.erase(_path.begin());
     }
 
     if (_path.size() > 1)   // _ppath[0] is the current unit position

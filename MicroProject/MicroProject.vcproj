@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="MicroProject"
 	ProjectGUID="{305604F2-9728-4D61-AC29-4658B31533DF}"
 	RootNamespace="MicroProject"
@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Regions;../src/Utils;../src/Intelligence;../src/Utils/Component;../../BWAPI_Beta_2.8/include;../../BWAPI_Beta_2.8/include/BWAPI;../../BWAPI_Beta_2.8/include/BWTA;../../boost_1_43_0;&quot;C:\Program Files\boost\boost_1_42\&quot;;../../boost_1_42;C:\Qt\4.6.2\include;C:\Qt\4.6.3\include"
+				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Macro;../src/Arbitrator;../src/Micro/Units/ZergFlying;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossFlying;../src/Micro/Units/ProtossGround;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Regions;../src/Utils;../src/Intelligence;../src/Utils/Component;../../BWAPI_Beta_2.8/include;../../BWAPI_Beta_2.8/include/BWAPI;../../BWAPI_Beta_2.8/include/BWTA;../../boost_1_43_0;&quot;C:\Program Files\boost\boost_1_42\&quot;;../../boost_1_42;C:\Qt\4.6.2\include;C:\Qt\4.6.3\include"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
 				BasicRuntimeChecks="3"

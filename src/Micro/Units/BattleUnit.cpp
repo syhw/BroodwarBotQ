@@ -217,7 +217,7 @@ void BattleUnit::pathFind(std::vector<WalkTilePosition>& path,
 
 void BattleUnit::buildingsAwarePathFind(std::vector<TilePosition>& btpath, 
                           const TilePosition& start, const TilePosition& end)
-{
+{clock_t endTimer(0), startTimer(0) ;
     btpath.clear();
     MapManager* mapm = & MapManager::Instance();
     std::multimap<int, TilePosition> openTiles;
@@ -243,6 +243,7 @@ void BattleUnit::buildingsAwarePathFind(std::vector<TilePosition>& btpath,
                 btpath.push_back(reverse_path[i]);
             return;
         }
+        //startTimer = clock();
         int fvalue = openTiles.begin()->first;
         int gvalue=gmap[p];
         openTiles.erase(openTiles.begin());
@@ -252,6 +253,7 @@ void BattleUnit::buildingsAwarePathFind(std::vector<TilePosition>& btpath,
         int maxx = min(p.x() + 1, width - 1);
         int miny = max(p.y() - 1, 0);
         int maxy = min(p.y() + 1, BWAPI::Broodwar->mapHeight() - 1);
+        //startTimer = clock() - startTimer;
         for(int x = minx; x <= maxx; x++)
             for(int y = miny; y <= maxy; y++)
             {
@@ -297,8 +299,10 @@ void BattleUnit::buildingsAwarePathFind(std::vector<TilePosition>& btpath,
                     parent[t]=p;
                 }
             }
+    endTimer += startTimer;
     }
     // empty path
+    //Broodwar->printf("Iterations took %f", (double)(endTimer));
     return;
 }
 
