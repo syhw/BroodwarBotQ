@@ -5,8 +5,11 @@
 using namespace BWAPI;
 
 
-AttackGoal::AttackGoal()
+AttackGoal::AttackGoal(BWAPI::Position pos)
+:
+pos(pos)
 {
+
 }
 
 AttackGoal::AttackGoal(const AttackGoal& g)
