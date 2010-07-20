@@ -106,5 +106,6 @@ public:
 #endif
 	const BayesianUnit& operator[](int i);
 	void accomplishGoal();
+	void switchMode(unit_mode um);
 };
 

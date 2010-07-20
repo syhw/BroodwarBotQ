@@ -985,6 +985,18 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 		</Filter>
+		<File
+			RelativePath=".\ClassDiagram1.cd"
+			>
+		</File>
+		<File
+			RelativePath=".\ClassDiagram2.cd"
+			>
+		</File>
+		<File
+			RelativePath=".\ClassDiagram3.cd"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

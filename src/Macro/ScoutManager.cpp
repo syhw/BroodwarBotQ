@@ -99,7 +99,7 @@ void ScoutManager::findEnemy(){
 	if (ug->getUnits()->size() != 0) {
 	//TOCHECK
 		ug->addGoal(goal);
-		microManager->unitsgroups.push_back(ug);
+		microManager->unitsgroups.push_front(ug);
 		//	Broodwar->printf("Unit found, goal attributed");
 	}else{
 		Broodwar->printf("Could not find an appropriate unit for this scout goal");

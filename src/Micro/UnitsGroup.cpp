@@ -35,6 +35,7 @@ UnitsGroup::UnitsGroup()
 
 UnitsGroup::~UnitsGroup()
 {
+
 }
 
 bool comp_i_dist(const i_dist& l, const i_dist& r) { return (r.dist < l.dist); }
@@ -328,9 +329,6 @@ void UnitsGroup::attackMove(BWAPI::Position& p)
 
 void UnitsGroup::move(BWAPI::Position& p)
 {
-#ifdef __DEBUG_LOUIS__
-	BWAPI::Broodwar->printf("call to move");
-#endif 
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); it++)
     {
         (*it)->target = p;
@@ -624,12 +622,17 @@ void UnitsGroup::accomplishGoal(){
 	//TOCHECK Potential Memory Leak with accomplished goals => no thanks to smart pointers
 	
 	if(goals.size() > 0){
-		if (!goals.front()->getStatus() == GS_ACHIEVED) {
+		if (goals.front()->getStatus() != GS_ACHIEVED) {
 			goals.front()->achieve(this);
 		} else {
 			if(goals.size() > 1 ){
 				goals.pop_front();
 			}
 		}
+	}
+}
+void UnitsGroup::switchMode(unit_mode um){
+	for(std::vector<pBayesianUnit>::iterator it = getUnits()->begin(); it != getUnits()->end(); ++it){
+		(*it)->switchMode(um);
 	}
 }

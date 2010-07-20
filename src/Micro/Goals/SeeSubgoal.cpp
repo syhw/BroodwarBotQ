@@ -22,6 +22,7 @@ bool SeeSubgoal::check(){
 
 void SeeSubgoal::tryToRealize(UnitsGroup * ug){
 	ug->move(pos);
+	ug->switchMode(MODE_SCOUT);
 }
 double SeeSubgoal::distanceToRealize(UnitsGroup *ug){
 	return ug->getCenter().getDistance(pos); 

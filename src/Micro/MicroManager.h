@@ -23,6 +23,7 @@ private:
 	bool remove(UnitsGroup* u);
 public:
 	std::list<UnitsGroup*> unitsgroups;
+
 	Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
 	Regions* regions;
 
@@ -45,4 +46,5 @@ public:
 #endif
 
 	static std::set<BWAPI::Unit*> getEnemies();
+
 };

@@ -43,20 +43,21 @@ void MicroManager::update()
 
 
 void MicroManager::onOffer(std::set<BWAPI::Unit*> units)
-{ //TOREMOVE
+{ 
+	/*
 	for(std::set<BWAPI::Unit*>::iterator u = units.begin(); u != units.end(); u++)
 	{
 		if (!(*u)->getType().isWorker() && !(*u)->getType().isBuilding())
 		{
 			arbitrator->accept(this, *u);
 			if (unitsgroups.empty())
-		{	
+			{	
 				UnitsGroup* ug = new UnitsGroup();
 				unitsgroups.push_back( ug);
 				sendGroupToDefense (ug);
 			}
 			
-			//unitsgroups.back()->takeControl(*u);
+			unitsgroups.back()->takeControl(*u);
 			//Broodwar->printf("New %s added to the micro manager", (*u)->getType().getName().c_str());
 		}
 		else
@@ -64,7 +65,7 @@ void MicroManager::onOffer(std::set<BWAPI::Unit*> units)
 			arbitrator->decline(this, *u, 0);
 		}
 	}
-	
+	*/
 }
 
 void MicroManager::onRevoke(BWAPI::Unit* unit, double bid)
@@ -79,8 +80,13 @@ std::string MicroManager::getName() const
 
 void MicroManager::onUnitCreate(BWAPI::Unit* unit)
 {
+	
+
 	if (!unit->getType().isWorker() && unit->getPlayer()==Broodwar->self() && !unit->getType().isBuilding() && unit->getType().canAttack())
 		arbitrator->setBid(this, unit, 100);
+
+
+
 }
 
 void MicroManager::onUnitDestroy(BWAPI::Unit* unit)
@@ -165,6 +171,7 @@ void MicroManager::sendGroupToDefense( UnitsGroup* ug)
 	// Send the group defend the base
 	//ug->addGoal(pGoal(new DefendGoal(chokePoint)));
 }
+
 
 bool MicroManager::remove(UnitsGroup* u){
 	for(std::list<UnitsGroup *>::iterator it = unitsgroups.begin(); it != unitsgroups.end(); it ++){
