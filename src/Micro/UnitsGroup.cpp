@@ -636,3 +636,9 @@ void UnitsGroup::switchMode(unit_mode um){
 		(*it)->switchMode(um);
 	}
 }
+
+void UnitsGroup::idle(){
+	for(std::vector<pBayesianUnit>::iterator it = getUnits()->begin(); it != getUnits()->end(); ++it){
+		(*it)->target = (*it)->unit->getPosition();
+	}
+}

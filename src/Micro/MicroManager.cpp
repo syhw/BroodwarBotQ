@@ -28,6 +28,8 @@ void MicroManager::update()
 	//Suppress the list prompted to suppress 
 	for each (UnitsGroup * ug in this->promptedRemove){
 		this->remove(ug);
+		ug->idle();	//Set target of units to their position so that they are now idling
+		ug->~UnitsGroup();
 	}
 	promptedRemove.clear();
 
