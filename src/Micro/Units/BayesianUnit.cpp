@@ -534,7 +534,9 @@ void BayesianUnit::updateObj()
         p = _unitPos;
 
     obj = Vec(p.x() - _unitPos.x(), p.y() - _unitPos.y());
-    //drawBTPath();
+    drawBTPath();
+    MapManager* mapm = & MapManager::Instance();
+    mapm->drawLowResWalkability();
     //drawPath();
 #endif
 }
@@ -828,7 +830,7 @@ void BayesianUnit::update()
         drawObj(0); // green
         drawDir(); // red
         clickDir();
-        if (unit->getDistance(this->target) < 4.0)
+        if (_mode != MODE_INPOS && unit->getDistance(this->target) < 4.0)
             switchMode(MODE_INPOS);
 
         //drawFlockValues();
