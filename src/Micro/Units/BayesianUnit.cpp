@@ -123,14 +123,14 @@ void BayesianUnit::computeInPosValues()
             inPos_value value = (inPos_value)(1 + (int)tmp.getDistance(
                 tmpvit.translate((*it)->getPosition())) / 32);
 
-            if (value <= INPOS_CONTACT*2)
+            if (value <= INPOS_CONTACT)
                 tmpv.push_back(INPOS_CONTACT);
             else
             {
                 value = (inPos_value)(1 + (int)tmp.getDistance(
                     tmpvit.translate((*it)->getTargetPosition())) / 32);
 
-                if (value <= INPOS_CONTACT*2)
+                if (value <= INPOS_CONTACT)
                     tmpv.push_back(INPOS_CONTACT);
                 else
                     tmpv.push_back(INPOS_OK);
@@ -497,47 +497,56 @@ void BayesianUnit::updateObj()
     obj = Vec(p.x() - _unitPos.x(), p.y() - _unitPos.y());
     //drawPath();
 #else
-    Position p;
-    if (Broodwar->getFrameCount()%10 == 0 || !_path.size()) // hack to remove with the introduction of TimeManager
+    
+    if (_unitPos.getDistance(target) < 32)
     {
-       // clock_t start = clock();
-        /*
-            Bug avec le pathfind.. Si 6 unités ou moins calculent leurs pathfind, le temps est de 9 ms / unité.
-            Si ça passe à plus de 6 unités, le temps est de 65 ms / unité et ça lag ...
-        */
-        if (_unitsGroup->_path.size() > 8)
-            buildingsAwarePathFind(_btpath, TilePosition(_unitPos), TilePosition(this->_unitsGroup->_path[8].getPosition()));
-        else
-             buildingsAwarePathFind(_btpath, TilePosition(_unitPos), TilePosition(target));
-        _path.clear();
-        for (std::vector<TilePosition>::const_iterator it = _btpath.begin(); it != _btpath.end(); ++it)
-            _path.push_back(*it);
-        //clock_t end = clock();
-        //Broodwar->printf("Iterations took %f", (double)(end-start));
-    } else
-    {
-    // remove path points we passed
-    if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
-        _path.erase(_path.begin());
-    // I'm not drunk, do it twice! (path[2] if possible)        
-    if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
-        _path.erase(_path.begin());
-    }
-
-    if (_path.size() > 1)   // _ppath[0] is the current unit position
-    {
-        if (_path.size() > 2) 
-            p = _path[2].getPosition();
-        else
-            p = _path[1].getPosition();
+        obj = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y());
     }
     else
-        p = _unitPos;
+    {
+        Position p;
+        if (Broodwar->getFrameCount()%10 == 0 || !_path.size()) // hack to remove with the introduction of TimeManager
+        {
+           // clock_t start = clock();
+            /*
+                Bug avec le pathfind.. Si 6 unités ou moins calculent leurs pathfind, le temps est de 9 ms / unité.
+                Si ça passe à plus de 6 unités, le temps est de 65 ms / unité et ça lag ...
+            */
+            if (_unitsGroup->_path.size() > 8)
+                buildingsAwarePathFind(_btpath, TilePosition(_unitPos), TilePosition(this->_unitsGroup->_path[8].getPosition()));
+            else
+                 buildingsAwarePathFind(_btpath, TilePosition(_unitPos), TilePosition(target));
+            _path.clear();
+            for (std::vector<TilePosition>::const_iterator it = _btpath.begin(); it != _btpath.end(); ++it)
+                _path.push_back(*it);
+            //clock_t end = clock();
+            //Broodwar->printf("Iterations took %f", (double)(end-start));
+        } else
+        {
+        // remove path points we passed
+        if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
+            _path.erase(_path.begin());
+        // I'm not drunk, do it twice! (path[2] if possible)        
+        if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
+            _path.erase(_path.begin());
+        }
 
-    obj = Vec(p.x() - _unitPos.x() + 12, p.y() - _unitPos.y() + 12);
-    drawBTPath();
-    MapManager* mapm = & MapManager::Instance();
-    mapm->drawLowResWalkability();
+        if (_path.size() > 1)   // _ppath[0] is the current unit position
+        {
+            if (_path.size() > 2) 
+                p = _path[2].getPosition();
+            else
+                p = _path[1].getPosition();
+        }
+        else
+            p = _unitPos;
+        
+
+        obj = Vec(p.x() - _unitPos.x() + 12, p.y() - _unitPos.y() + 12);
+    }
+    //drawBTPath();
+    //MapManager* mapm = & MapManager::Instance();
+    //mapm->drawLowResWalkability();
     //drawPath();
 #endif
 }
@@ -738,7 +747,7 @@ void BayesianUnit::updateDir()
         }
     }
 
-    drawProbs(dirvProb, _unitsGroup->size());
+    //drawProbs(dirvProb, _unitsGroup->size());
 }
 
 void BayesianUnit::drawDir()
@@ -751,10 +760,8 @@ void BayesianUnit::drawDir()
 void BayesianUnit::clickDir()
 {
     dir += _unitPos;
-    Position newPos = Position(dir.toPosition().x(), dir.toPosition().y()); 
     if (_unitPos.getDistance(dir.toPosition()) >= 1.0) 
-        unit->rightClick(newPos);
-    ///unit->rightClick(target);
+        unit->rightClick(dir.toPosition());
 }
 
 void BayesianUnit::drawArrow(Vec& v)
@@ -830,20 +837,21 @@ void BayesianUnit::update()
         return;
     }
 
-    _mode = MODE_FLOCK;
     if (_mode == MODE_FLOCK || _mode == MODE_INPOS) 
     {
         updateDir();
         drawObj(0); // green
         drawDir(); // red
         clickDir();
-        if (_mode != MODE_INPOS && unit->getDistance(this->target) < 4.0)
-            switchMode(MODE_INPOS);
+        if (_mode != MODE_INPOS && _unitPos.getDistance(target) < 8.0)
+        {
+            this->switchMode(MODE_INPOS);
+        }
 
         //drawFlockValues();
     }
 
-    drawTarget();
+    //drawTarget();
     return;
     Position p = _unitPos;
     if ((_mode == MODE_FLOCK && _mode == MODE_FLOCKFORM)

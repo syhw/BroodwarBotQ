@@ -38,7 +38,7 @@ void MicroAIModule::onStart()
             regions->onUnitCreate(*i);
             mapManager->onUnitCreate(*i);
 		} 
-        else if ((*i)->getType() == BWAPI::UnitTypes::Protoss_Zealot && mm->size() < 1)
+        else if ((*i)->getType() == BWAPI::UnitTypes::Protoss_Zealot)
 		{
             // Broodwar->printf("Took control of: %s\n", (*i)->getType().getName().c_str() );
 			mm->takeControl(*i);
