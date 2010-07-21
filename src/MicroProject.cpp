@@ -38,15 +38,15 @@ void MicroAIModule::onStart()
             regions->onUnitCreate(*i);
             mapManager->onUnitCreate(*i);
 		} 
-        else if ((*i)->getType() == BWAPI::UnitTypes::Protoss_Zealot)
+        else //if ((*i)->getType() == BWAPI::UnitTypes::Protoss_Zealot)
 		{
             // Broodwar->printf("Took control of: %s\n", (*i)->getType().getName().c_str() );
 			mm->takeControl(*i);
 		}
-        else
-        {
-            mD->takeControl(*i);
-        }
+        //else
+        //{
+        //    mD->takeControl(*i);
+        //}
 	}
 
 	/* std::set<Player*> players=Broodwar->getPlayers();
@@ -91,13 +91,13 @@ void MicroAIModule::onStart()
     goals.push_back(tmp_goal);
 */
     /// TEST PATHFINDING
-    /*
+    
     pFormation tmp_form = pFormation(new LineFormation(Position(101*32,62*32), Vec(1,0)));
-    pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form, mm));
-    pGoal tmp_goal = pGoal(new Goal(tmp_subgoal));
+    pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
+    pGoal tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
     goals.push_back(tmp_goal);
-    */
-/*
+
+    /*
     pFormation tmp_form = pFormation(new LineFormation(Position(29*32,8*32), Vec(1,0)));
     pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form, mm));
     pGoal tmp_goal = pGoal(new Goal(tmp_subgoal));
@@ -106,8 +106,8 @@ void MicroAIModule::onStart()
     tmp_form = pFormation(new LineFormation(Position(35*32,8*32), Vec(1,0)));
     tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form, mD));
     tmp_goal = pGoal(new Goal(tmp_subgoal));
-    goals2.push_back(tmp_goal);
-*/
+    goals2.push_back(tmp_goal);*/
+
   // tmp_form = pFormation(new LineFormation(Position(33*32,9*32), Vec(1,0)));
   //  tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form, mm));
   //  tmp_goal = pGoal(new Goal(tmp_subgoal));

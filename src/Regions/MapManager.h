@@ -34,4 +34,5 @@ public:
     void onFrame();
     void drawBuildings();   // debug
     void drawWalkability(); // debug
+    void drawLowResWalkability(); // debug
 };

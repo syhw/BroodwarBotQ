@@ -286,17 +286,36 @@ void UnitsGroup::update()
     enemiesInSight.clear();
     enemies = MicroManager::getEnemies();
 
+    pBayesianUnit biggerUnit;
+
+    if (units.size() > 0)
+        biggerUnit = units.front();
+
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     { 
+        if (biggerUnit->unit->getType().size() < (*it)->unit->getType().size() 
+            || ( biggerUnit->unit->getType().size() == (*it)->unit->getType().size() && 
+                 biggerUnit->unit->getDistance(center) > (*it)->unit->getDistance(center) )
+            )
+            biggerUnit = *it;
         updateUnitsAvaibles(it);
         updateEnemiesInSight(it);
     }
 
     updateTargetOfUnitsAvailables();
 
+    std::vector<BWAPI::TilePosition> _btpath;
+    if (biggerUnit != NULL)
+    {
+        _path.clear();
+        BattleUnit::buildingsAwarePathFind(_btpath, TilePosition(biggerUnit->unit->getPosition()), TilePosition(biggerUnit->target));
+        for (std::vector<TilePosition>::const_iterator it = _btpath.begin(); it != _btpath.end(); ++it)
+            _path.push_back(*it);
+    }
+
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     {
-        (*it)->update();
+        (*it)->update(); 
         this->totalHP += (*it)->unit->getHitPoints();
         this->totalPower += (*it)->unit->getType().groundWeapon().damageAmount();
     }
@@ -323,7 +342,7 @@ void UnitsGroup::attackMove(BWAPI::Position& p)
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); it++)
     {
         (*it)->target = p;
-        (*it)->attackMove(p); // TODO, for the moment, each unit keeps a path, needs to be 1 unit per UnitsGroup + flocking
+        //(*it)->attackMove(p); // TODO, for the moment, each unit keeps a path, needs to be 1 unit per UnitsGroup + flocking
     }
 }
 

@@ -35,6 +35,15 @@ MapManager::MapManager()
             buildings[x + y*width/4] = false; // initialized with manual call to onUnitCreate() in onStart()
         }
     }
+    
+    /*for (int x = 0; x < width; ++x)
+    {
+        for (int y = 0; y < height; ++y)
+        {
+            lowResWalkability[x/4 + y/4 * width/4] &= walkability[x + y * width];
+            buildings[x/4 + y/4 * width/4] = false;
+        }
+    }*/
     _eUnitsFilter = & EUnitsFilter::Instance();
 }
 
@@ -117,5 +126,15 @@ void MapManager::drawWalkability()
         {
             if (!walkability[x + y*Broodwar->mapWidth()*4])
                 Broodwar->drawBox(CoordinateType::Map, 8*x - 3, 8*y - 3, 8*x + 3, 8*y + 3, Colors::Red);
+        }
+}
+
+void MapManager::drawLowResWalkability()
+{
+    for (int x = 0; x < Broodwar->mapWidth(); ++x)
+        for (int y = 0; y < Broodwar->mapHeight(); ++y)
+        {
+            if (!lowResWalkability[x + y*Broodwar->mapWidth()])
+                Broodwar->drawBox(CoordinateType::Map, 32*x + 2, 32*y + 2, 32*x + 30, 32*y + 30, Colors::Red);
         }
 }

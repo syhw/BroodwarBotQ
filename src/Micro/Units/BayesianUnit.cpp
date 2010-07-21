@@ -272,14 +272,14 @@ void BayesianUnit::updateAttractors()
         
         if (mapManager->buildings_wt[tmp.x()/8 + (tmp.y()/8)*4*width])
             _occupation.push_back(OCCUP_BUILDING);
-		/*else if (!mapManager->walkability[hG.x()/8 + (hG.y()/8)*4*width])
+		else if (!mapManager->walkability[hG.x()/8 + (hG.y()/8)*4*width])
             _occupation.push_back(OCCUP_BLOCKING);
         else if (!mapManager->walkability[bG.x()/8 + (bG.y()/8)*4*width])
             _occupation.push_back(OCCUP_BLOCKING);
         else if (!mapManager->walkability[hD.x()/8 + (hD.y()/8)*4*width])
             _occupation.push_back(OCCUP_BLOCKING);
         else if (!mapManager->walkability[bD.x()/8 + (bD.y()/8)*4*width])
-            _occupation.push_back(OCCUP_BLOCKING);*/
+            _occupation.push_back(OCCUP_BLOCKING);
 
 
         //if (mapManager->buildings[tmp.x()/32 + (tmp.y()/32)*width])
@@ -497,23 +497,30 @@ void BayesianUnit::updateObj()
     //drawPath();
 #else
     Position p;
-    if (Broodwar->getFrameCount()%70 == 0 || !_path.size()) // hack to remove with the introduction of TimeManager
+    if (Broodwar->getFrameCount()%10 == 0 || !_path.size()) // hack to remove with the introduction of TimeManager
     {
-        //TIMINGclock_t start = clock();
-        buildingsAwarePathFind(_btpath, TilePosition(_unitPos), TilePosition(target));
+       // clock_t start = clock();
+        /*
+            Bug avec le pathfind.. Si 6 unités ou moins calculent leurs pathfind, le temps est de 9 ms / unité.
+            Si ça passe à plus de 6 unités, le temps est de 65 ms / unité et ça lag ...
+        */
+        if (_unitsGroup->_path.size() > 8)
+            buildingsAwarePathFind(_btpath, TilePosition(_unitPos), TilePosition(this->_unitsGroup->_path[8].getPosition()));
+        else
+             buildingsAwarePathFind(_btpath, TilePosition(_unitPos), TilePosition(target));
         _path.clear();
         for (std::vector<TilePosition>::const_iterator it = _btpath.begin(); it != _btpath.end(); ++it)
             _path.push_back(*it);
-        //TIMINGclock_t end = clock();
-        //TIMINGBroodwar->printf("Iterations took %f", (double)(end-start));
+        //clock_t end = clock();
+        //Broodwar->printf("Iterations took %f", (double)(end-start));
     } else
     {
-        // remove path points we passed
-        if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
-            _path.erase(_path.begin());
-        // I'm not drunk, do it twice! (path[2] if possible)        
-        if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
-            _path.erase(_path.begin());
+    // remove path points we passed
+    if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
+        _path.erase(_path.begin());
+    // I'm not drunk, do it twice! (path[2] if possible)        
+    if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
+        _path.erase(_path.begin());
     }
 
     if (_path.size() > 1)   // _ppath[0] is the current unit position
@@ -527,7 +534,9 @@ void BayesianUnit::updateObj()
         p = _unitPos;
 
     obj = Vec(p.x() - _unitPos.x(), p.y() - _unitPos.y());
-    //drawBTPath();
+    drawBTPath();
+    MapManager* mapm = & MapManager::Instance();
+    mapm->drawLowResWalkability();
     //drawPath();
 #endif
 }
@@ -610,10 +619,10 @@ void BayesianUnit::updateDirV()
 //    const int maxx = 32*Broodwar->mapWidth();
 //    const int miny = 0;
 //    const int maxy = 32*Broodwar->mapHeight();
-    const int minx = max(p.x() - _slarge, 0);
-    const int maxx = min(p.x() + _slarge, 32*Broodwar->mapWidth());
-    const int miny = max(p.y() - _sheight, 0);
-    const int maxy = min(p.y() + _sheight, 32*Broodwar->mapHeight());
+    const int minx = max(p.x() - 1.5*_slarge, 0);
+    const int maxx = min(p.x() + 1.5*_slarge, 32*Broodwar->mapWidth());
+    const int miny = max(p.y() - 1.5*_sheight, 0);
+    const int maxy = min(p.y() + 1.5*_sheight, 32*Broodwar->mapHeight());
     for (int x = -4; x <= 4; ++x)
         for (int y = -4; y <= 4; ++y)
         {
@@ -803,7 +812,12 @@ void BayesianUnit::update()
     if (!unit->exists()) return;
     _unitPos = unit->getPosition();
 
+
+    if (_sheight > 32 || _slarge > 32)
+        Broodwar->printf("height: %d, large: %d", _sheight, _slarge);
+
     if (targetEnemy != NULL && withinRange(targetEnemy) /* && Qu'elle est capable de tirer .. */)
+
     {
         attackEnemy(targetEnemy, BWAPI::Colors::Red);
         return;
@@ -816,7 +830,7 @@ void BayesianUnit::update()
         drawObj(0); // green
         drawDir(); // red
         clickDir();
-        if (unit->getDistance(this->target) < 4.0)
+        if (_mode != MODE_INPOS && unit->getDistance(this->target) < 4.0)
             switchMode(MODE_INPOS);
 
         //drawFlockValues();

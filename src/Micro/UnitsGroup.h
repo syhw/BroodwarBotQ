@@ -57,6 +57,7 @@ private:
     /// Affiche les cibles des unités du UnitsGroup
     void displayTargets();
 public:
+    std::vector<WalkTilePosition> _path;
 	
 	UnitsGroup();
 	~UnitsGroup();
