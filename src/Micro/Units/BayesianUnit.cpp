@@ -535,7 +535,7 @@ void BayesianUnit::updateObj()
 
     obj = Vec(p.x() - _unitPos.x(), p.y() - _unitPos.y());
     //drawBTPath();
-    //drawPath();
+    drawPath();
 #endif
 }
 
