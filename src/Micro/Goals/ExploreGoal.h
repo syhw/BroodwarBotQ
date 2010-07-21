@@ -7,6 +7,7 @@
 #include "UnitsGroup.h"
 class ExploreGoal: public Goal
 {
-	ExploreGoal(UnitsGroup* ug,BWTA::Region* region);
+public:
+	ExploreGoal(BWTA::Region* region);
 	void achieve();
 };

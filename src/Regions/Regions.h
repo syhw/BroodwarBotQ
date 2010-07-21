@@ -61,6 +61,7 @@ public:
 	void onUnitHide(BWAPI::Unit* unit);
 	void display() const;
 	bool enemyFound() const;
+	BWTA::Region* whereIsEnemy();
 
 #ifdef BW_QT_DEBUG
 	// Qt interface

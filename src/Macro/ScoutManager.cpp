@@ -17,11 +17,8 @@ ScoutManager::~ScoutManager( )
 
 void ScoutManager::update()
 {
-
-	if(regions->enemyFound() && to_remove == false){
-		to_remove = true;
-		//enemy found, must explore his base
-		
+	if(regions->enemyFound()){
+		findUnitsGroup(pGoal(new ExploreGoal(regions->whereIsEnemy())));
 	}
 }
 
@@ -66,9 +63,6 @@ void ScoutManager::checkEmptyXP()
 
 void ScoutManager::onUnitCreate(BWAPI::Unit* unit){
 	if(BWAPI::Broodwar->self()->supplyUsed() == 10 && unit->getType().isWorker() && !regions->enemyFound()){
-#ifdef __DEBUG_LOUIS__
-		BWAPI::Broodwar->printf("gotta find the enemy, ScoutManager created the objective");
-#endif
 		findEnemy();
 		//exploreRegion( (*BWTA::getRegions().begin()));
 	}
@@ -76,8 +70,6 @@ void ScoutManager::onUnitCreate(BWAPI::Unit* unit){
 
 
 void ScoutManager::findEnemy(){
-
-	//Create a new scoutGoal 
 	pGoal goal = pGoal(new FindEnemyGoal());
 	findUnitsGroup(goal);
 }

@@ -15,8 +15,7 @@ class Base
 
   void setResourceDepot(BWAPI::Unit* unit);
   void setActive(bool active);
-
-	unsigned int exploitedGeysers;
+  unsigned int exploitedGeysers;
 
 private:
   BWTA::BaseLocation* baseLocation;

@@ -49,7 +49,7 @@ public:
 	virtual void refreshWidget(QWidget* widget) const;
 #endif
 private:
-	UnitsGroup* findUnitsGroup(pGoal goal);
+	UnitsGroup* findUnitsGroup(pGoal goal); //Match a UG with the goal (call setUnitsGroup and addGoal)
 	bool to_remove;
     void updateScoutAssignments();
 	MicroManager * microManager;

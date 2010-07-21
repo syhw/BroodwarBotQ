@@ -88,7 +88,7 @@ void ProtossStrat::buildDefenses()
 
 void ProtossStrat::initWantedUnits()
 {
-	wantedUnits[UnitTypes::Protoss_Zealot].plannedType = TYPE_RATIO;
+	wantedUnits[UnitTypes::Protoss_Zealot].plannedType = TYPE_NUMBER;
 	wantedUnits[UnitTypes::Protoss_Zealot].plannedValue = 1;
 	wantedUnits[UnitTypes::Protoss_Dragoon].plannedType = TYPE_RATIO;
 	wantedUnits[UnitTypes::Protoss_Dragoon].plannedValue = 1;
