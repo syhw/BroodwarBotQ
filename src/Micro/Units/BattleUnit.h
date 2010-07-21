@@ -29,13 +29,17 @@ protected:
     std::vector<BWAPI::Position> _ppath;
     static void pathFind(std::vector<WalkTilePosition>& path, 
         const BWAPI::Position& p_start, const BWAPI::Position& p_end);
-    unsigned int _tick;
     bool inline tick();
     BWAPI::Unit* oldTarget;
 
 public:
     static void buildingsAwarePathFind(std::vector<BWAPI::TilePosition>& btpath, 
         const BWAPI::TilePosition& start, const BWAPI::TilePosition& end);
+    static void buildingsAwarePathFind(unsigned int usize, 
+        std::vector<BWAPI::TilePosition>& btpath, 
+        const BWAPI::TilePosition& start, 
+        const BWAPI::TilePosition& end);
+    unsigned int _tick;
 	BWAPI::Unit* unit;
     BWAPI::Unit* targetEnemy;
     BWAPI::Unit* targetEnemyInRange;

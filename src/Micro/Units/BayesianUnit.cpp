@@ -536,7 +536,8 @@ void BayesianUnit::updateObj()
     obj = Vec(p.x() - _unitPos.x(), p.y() - _unitPos.y());
     drawBTPath();
     MapManager* mapm = & MapManager::Instance();
-    mapm->drawLowResWalkability();
+    mapm->drawWalkability(1);
+    mapm->drawBuildings(0);
     //drawPath();
 #endif
 }
@@ -813,8 +814,8 @@ void BayesianUnit::update()
     _unitPos = unit->getPosition();
 
 
-    if (_sheight > 32 || _slarge > 32)
-        Broodwar->printf("height: %d, large: %d", _sheight, _slarge);
+    //if (_sheight > 32 || _slarge > 32)
+    //    Broodwar->printf("height: %d, large: %d", _sheight, _slarge);
 
     if (targetEnemy != NULL && withinRange(targetEnemy) /* && Qu'elle est capable de tirer .. */)
 
