@@ -22,7 +22,7 @@ struct Vec {
     bool operator==(const Vec &b) { return (x==b.x && y==b.y); }
     Vec mult(const Vec &b) const { return Vec(x*b.x,y*b.y); }
     Vec& normalize() { return (x == 0 && y == 0) ? *this : *this = *this * (1/sqrt(x*x+y*y)); }
-    double norm() { return sqrt(x*x+y*y); }
+    double norm() const { return sqrt(x*x+y*y); } 
     double dot(const Vec &b) const { return x*b.x+y*b.y; } // cross:
     BWAPI::Position toPosition() const { return BWAPI::Position( (int)x, (int)y);};
     Vec operator%(Vec&b){return Vec(-y*b.x-x*b.y, x*b.y-y*b.x);}

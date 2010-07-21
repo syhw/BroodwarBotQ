@@ -354,6 +354,7 @@ double BayesianUnit::computeProb(unsigned int i)
         // one j for each attractor
         for (unsigned int j = 0; j < _flockValues[i].size(); ++j)
             val *= _flockProb[_flockValues[i][j]];
+        
 
         /// OBJECTIVE (pathfinder) INFLUENCE
         double prob_obj = _PROB_GO_OBJ / (_unitsGroup->getUnits()->size() - 1);
@@ -533,7 +534,7 @@ void BayesianUnit::updateObj()
     else
         p = _unitPos;
 
-    obj = Vec(p.x() - _unitPos.x(), p.y() - _unitPos.y());
+    obj = Vec(p.x() - _unitPos.x() + 12, p.y() - _unitPos.y() + 12);
     drawBTPath();
     MapManager* mapm = & MapManager::Instance();
     mapm->drawLowResWalkability();
@@ -623,7 +624,7 @@ void BayesianUnit::updateDirV()
     const int maxx = min(p.x() + 1.5*_slarge, 32*Broodwar->mapWidth());
     const int miny = max(p.y() - 1.5*_sheight, 0);
     const int maxy = min(p.y() + 1.5*_sheight, 32*Broodwar->mapHeight());
-    for (int x = -4; x <= 4; ++x)
+    for (int x = -4; x <= 4; ++x) // -4..4 overkill
         for (int y = -4; y <= 4; ++y)
         {
             Vec v(x*_slarge/2, y*_sheight/2);
@@ -721,12 +722,17 @@ void BayesianUnit::updateDir()
     {
         pair<multimap<double, Vec>::const_iterator, multimap<double, Vec>::const_iterator> possible_dirs = dirvProb.equal_range(last->first);
         double max = -100000.0;
+        double max2 = -100000.0;
         for (multimap<double, Vec>::const_iterator it = possible_dirs.first; it != possible_dirs.second; ++it)
         {
-            double tmp = obj.dot(it->second);
-            if (tmp > max)
+            Vec tmpTest = it->second;
+            Vec tmpVec = it->second;
+            double tmp = obj.dot(tmpVec.normalize());
+
+            if (tmp >= max && max2 < obj.dot(tmpTest))
             {
                 max = tmp;
+                max2 = obj.dot(tmpTest);
                 dir = it->second;
             }
         }
@@ -745,8 +751,9 @@ void BayesianUnit::drawDir()
 void BayesianUnit::clickDir()
 {
     dir += _unitPos;
+    Position newPos = Position(dir.toPosition().x(), dir.toPosition().y()); 
     if (_unitPos.getDistance(dir.toPosition()) >= 1.0) 
-        unit->rightClick(dir.toPosition());
+        unit->rightClick(newPos);
     ///unit->rightClick(target);
 }
 
