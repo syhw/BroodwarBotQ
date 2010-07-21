@@ -286,10 +286,10 @@ void UnitsGroup::update()
     enemiesInSight.clear();
     enemies = MicroManager::getEnemies();
 
-    BayesianUnit* biggerUnit = NULL;
+    pBayesianUnit biggerUnit;
 
     if (units.size() > 0)
-        biggerUnit = &(*(units.front()));
+        biggerUnit = units.front();
 
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     { 
@@ -297,7 +297,7 @@ void UnitsGroup::update()
             || ( biggerUnit->unit->getType().size() == (*it)->unit->getType().size() && 
                  biggerUnit->unit->getDistance(center) > (*it)->unit->getDistance(center) )
             )
-            biggerUnit = &(*(*it));
+            biggerUnit = *it;
         updateUnitsAvaibles(it);
         updateEnemiesInSight(it);
     }

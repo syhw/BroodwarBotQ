@@ -9,9 +9,8 @@
 class FormationSubgoal : public Subgoal
 {
     pFormation formation;
-    UnitsGroup* unitsgroup;
 public:
-    FormationSubgoal(SubgoalLogic l, pFormation f, UnitsGroup* ug);
+    FormationSubgoal(SubgoalLogic l, pFormation f);
 	virtual bool isRealized();
 	virtual void tryToRealize();
 	virtual double distanceToRealize();

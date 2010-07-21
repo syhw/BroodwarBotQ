@@ -93,9 +93,10 @@ void MicroAIModule::onStart()
     /// TEST PATHFINDING
     
     pFormation tmp_form = pFormation(new LineFormation(Position(101*32,62*32), Vec(1,0)));
-    pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form, mm));
-    pGoal tmp_goal = pGoal(new Goal(tmp_subgoal));
+    pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
+    pGoal tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
     goals.push_back(tmp_goal);
+
     /*
     pFormation tmp_form = pFormation(new LineFormation(Position(29*32,8*32), Vec(1,0)));
     pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form, mm));
