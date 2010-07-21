@@ -57,6 +57,7 @@ private:
     /// Affiche les cibles des unités du UnitsGroup
     void displayTargets();
 public:
+    std::vector<WalkTilePosition> _path;
 	
 	UnitsGroup();
 	~UnitsGroup();
@@ -106,5 +107,7 @@ public:
 #endif
 	const BayesianUnit& operator[](int i);
 	void accomplishGoal();
+	void switchMode(unit_mode um);
+	void idle();
 };
 

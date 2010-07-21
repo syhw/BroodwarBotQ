@@ -54,6 +54,14 @@ enum inPos_value {
     INPOS_CONTACT
 };
 
+enum fightG_value { 
+    FIGHTG_NO,
+    FIGHTG_LIGHT,
+    FIGHTG_MEDIUM,
+    FIGHTG_HEAVY,
+    FIGHTG_DEAD
+};
+
 class BayesianUnit : public BattleUnit
 {
 protected:
@@ -75,9 +83,11 @@ protected:
     This grid because there are only 16 possible directions in Broodwar */
     MapManager* mapManager;
     std::vector<std::vector<flock_value> > _flockValues; // one vector<flock_value> per unit with which we flock
-    std::vector<std::vector<inPos_value> > _inPosValues; // one vector<flock_value> per unit with which we flock
+    std::vector<std::vector<inPos_value> > _inPosValues;
+    std::vector<std::vector<fightG_value> > _fightGValues;
     std::vector<double> _flockProb; // TODO decide if static, perhaps unit dependant
     std::vector<double> _inPosProb; // TODO decide if static, perhaps unit dependant
+    std::vector<double> _fightGProb; // TODO decide if static, perhaps unit dependant
     UnitsGroup* _unitsGroup;
     std::multimap<double, BWAPI::Unit*> _rangeEnemies;
     std::map<occupation_type, double> _defaultProb;
@@ -85,11 +95,12 @@ protected:
     inline void initDefaultProb();
     inline void computeFlockValues();
     inline void computeInPosValues();
+    inline void computeFightGValues();
     void straightLine(std::vector<BWAPI::Position>& ppath, 
         const BWAPI::Position& p_start, 
         const BWAPI::Position& p_end, 
         bool quick=true);
-    void switchMode(unit_mode um);
+
     inline void updateDirV();
     void drawDirV();
     void updateObj();
@@ -110,6 +121,7 @@ protected:
     inline void deleteRangeEnemiesElem(BWAPI::Unit* u);
     inline void updateRangeEnemiesWith(BWAPI::Unit* u);
 public:
+	void switchMode(unit_mode um);
     Vec dir, obj; // dir=current direction, obj=pathfinder's direction
     // std::map<attractor_type, std::vector<BWAPI::Position>> prox; 
     BayesianUnit(BWAPI::Unit* u, UnitsGroup* ug);

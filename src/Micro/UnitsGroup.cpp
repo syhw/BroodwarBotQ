@@ -35,6 +35,7 @@ UnitsGroup::UnitsGroup()
 
 UnitsGroup::~UnitsGroup()
 {
+
 }
 
 bool comp_i_dist(const i_dist& l, const i_dist& r) { return (r.dist < l.dist); }
@@ -285,17 +286,36 @@ void UnitsGroup::update()
     enemiesInSight.clear();
     enemies = MicroManager::getEnemies();
 
+    pBayesianUnit biggerUnit;
+
+    if (units.size() > 0)
+        biggerUnit = units.front();
+
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     { 
+        if (biggerUnit->unit->getType().size() < (*it)->unit->getType().size() 
+            || ( biggerUnit->unit->getType().size() == (*it)->unit->getType().size() && 
+                 biggerUnit->unit->getDistance(center) > (*it)->unit->getDistance(center) )
+            )
+            biggerUnit = *it;
         updateUnitsAvaibles(it);
         updateEnemiesInSight(it);
     }
 
     updateTargetOfUnitsAvailables();
 
+    std::vector<BWAPI::TilePosition> _btpath;
+    if (biggerUnit != NULL)
+    {
+        _path.clear();
+        BattleUnit::buildingsAwarePathFind(_btpath, TilePosition(biggerUnit->unit->getPosition()), TilePosition(biggerUnit->target));
+        for (std::vector<TilePosition>::const_iterator it = _btpath.begin(); it != _btpath.end(); ++it)
+            _path.push_back(*it);
+    }
+
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     {
-        (*it)->update();
+        (*it)->update(); 
         this->totalHP += (*it)->unit->getHitPoints();
         this->totalPower += (*it)->unit->getType().groundWeapon().damageAmount();
     }
@@ -322,7 +342,7 @@ void UnitsGroup::attackMove(BWAPI::Position& p)
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); it++)
     {
         (*it)->target = p;
-        (*it)->attackMove(p); // TODO, for the moment, each unit keeps a path, needs to be 1 unit per UnitsGroup + flocking
+        //(*it)->attackMove(p); // TODO, for the moment, each unit keeps a path, needs to be 1 unit per UnitsGroup + flocking
     }
 }
 
@@ -364,14 +384,14 @@ void UnitsGroup::setGoals(std::list<pGoal>& goals)
 {
     this->goals = goals;
 	if(!this->goals.empty())
-		this->goals.front()->achieve(this);
+		this->goals.front()->achieve();
 }
 
 void UnitsGroup::addGoal(pGoal goal)
 {
     this->goals.push_back(goal);
     if (goals.size() == 1 && !this->units.empty())
-    this->goals.front()->achieve(this);
+    this->goals.front()->achieve();
 }
 
 
@@ -445,7 +465,7 @@ void UnitsGroup::takeControl(Unit* u)
         this->units.push_back(tmp);
 	if(this->goals.size()==1){
 		if(this->goals.front()->getStatus()==GS_ACHIEVED){
-			goals.front()->achieve(this);
+			goals.front()->achieve();
 		}
 	}
 }
@@ -621,12 +641,23 @@ void UnitsGroup::accomplishGoal(){
 	//TOCHECK Potential Memory Leak with accomplished goals => no thanks to smart pointers
 	
 	if(goals.size() > 0){
-		if (!goals.front()->getStatus() == GS_ACHIEVED) {
-			goals.front()->achieve(this);
+		if (goals.front()->getStatus() != GS_ACHIEVED) {
+			goals.front()->achieve();
 		} else {
 			if(goals.size() > 1 ){
 				goals.pop_front();
 			}
 		}
+	}
+}
+void UnitsGroup::switchMode(unit_mode um){
+	for(std::vector<pBayesianUnit>::iterator it = getUnits()->begin(); it != getUnits()->end(); ++it){
+		(*it)->switchMode(um);
+	}
+}
+
+void UnitsGroup::idle(){
+	for(std::vector<pBayesianUnit>::iterator it = getUnits()->begin(); it != getUnits()->end(); ++it){
+		(*it)->target = (*it)->unit->getPosition();
 	}
 }

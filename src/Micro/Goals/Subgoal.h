@@ -23,7 +23,7 @@ class Subgoal
 {
 public:
     Subgoal(SubgoalLogic l);
-    Subgoal(const Subgoal& s);
+
     ~Subgoal();
     //Accessors
 	SubgoalLogic getLogic() const;
@@ -33,10 +33,12 @@ public:
 	//be accomplished only once to complete the goal, others must be valid
 	//all along the goal accomplishment
 
-	virtual void tryToRealize(UnitsGroup * ug) = 0;//Give suggestions to the UnitsGroup
-	virtual double distanceToRealize(UnitsGroup *ug) = 0;//Return an estimated distance to accomplish the Subgoal
+	virtual void tryToRealize() = 0;//Give suggestions to the UnitsGroup
+	virtual double distanceToRealize() = 0;//Return an estimated distance to accomplish the Subgoal
 	//if the return value is negative, it means that the subgoal cannot give suggestions to the UnitsGroup
+	void setUnitsGroup(UnitsGroup * ug);
 protected:
 	virtual bool check() = 0;//Function that defines the condition of the subgoal
 	SubgoalLogic logic;
+	UnitsGroup * unitsGroup;
 };

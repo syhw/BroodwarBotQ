@@ -9,11 +9,14 @@
 #include <BWTA.h>
 #include "Goal.h"
 #include "Subgoal.h"
-#include "ScoutGoal.h"
+#include "FindEnemyGoal.h"
 #include "SeeSubgoal.h"
 #include "FindSubgoal.h"
 #include "MicroManager.h"
 #include "BaseObject.h"
+#include "ExploreGoal.h"
+class GoalManager;
+
 
 
 class GoalManager;
@@ -39,15 +42,14 @@ public:
 	void onUnitCreate(BWAPI::Unit* unit);//New 
 	void onUnitShow(BWAPI::Unit* unit);
 	void findEnemy();//New
-	void exploreRegion(BWTA::Region* region);//New
 
 #ifdef BW_QT_DEBUG
 	// Qt interface
 	virtual QWidget* createWidget(QWidget* parent) const;
 	virtual void refreshWidget(QWidget* widget) const;
 #endif
-
 private:
+	UnitsGroup* findUnitsGroup(pGoal goal);
 	bool to_remove;
     void updateScoutAssignments();
 	MicroManager * microManager;

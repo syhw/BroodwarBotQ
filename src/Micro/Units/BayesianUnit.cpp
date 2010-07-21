@@ -67,6 +67,14 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 //        _flockProb.push_back(0.38);                  //FLOCK_MEDIUM
 //        _flockProb.push_back(0.22);                 //FLOCK_FAR
     }
+    else if (_mode == MODE_FIGHT_G)
+    {
+        _fightGProb.push_back(0.9); // FIGHTG_NO
+        _fightGProb.push_back(0.7); // FIGHTG_LIGHT
+        _fightGProb.push_back(0.5); // FIGHTG_MEDIUM
+        _fightGProb.push_back(0.3); // FIGHTG_HEAVY
+        _fightGProb.push_back(0.1); // FIGHTG_DEAD
+    }
 }
 
 BayesianUnit::~BayesianUnit()
@@ -80,6 +88,13 @@ void BayesianUnit::initDefaultProb()
     _defaultProb.insert(make_pair(OCCUP_BLOCKING, _PROB_NO_WALL_MOVE));       // P(this_case_is_blocking=false | we_go_in_this_case=true)
     _defaultProb.insert(make_pair(OCCUP_BUILDING, _PROB_NO_BUILDING_MOVE));   // P(there_is_a_building_in_this_case=false | we_go_in_this_case=true)
     //_defaultProb.insert(make_pair(OCCUP_FLOCK, _PROB_NO_FLOCK_MOVE));       // P(there_is_flocking_attraction=false | we_go_in_this_case=true)
+}
+
+
+void BayesianUnit::computeFightGValues()
+{
+    _fightGValues.clear();
+    // TODO
 }
 
 void BayesianUnit::computeInPosValues()
@@ -232,9 +247,15 @@ void BayesianUnit::updateAttractors()
     {
         computeFlockValues();
     }
+    // inposition attractions
     else if (_mode == MODE_INPOS)
     {
         computeInPosValues();
+    }
+    // fight attractions
+    else if (_mode == MODE_FIGHT_G)
+    {
+        computeFightGValues();
     }
 
     // building and blocking attraction (repulsion)
@@ -251,7 +272,7 @@ void BayesianUnit::updateAttractors()
         
         if (mapManager->buildings_wt[tmp.x()/8 + (tmp.y()/8)*4*width])
             _occupation.push_back(OCCUP_BUILDING);
-        else if (!mapManager->walkability[hG.x()/8 + (hG.y()/8)*4*width])
+		else if (!mapManager->walkability[hG.x()/8 + (hG.y()/8)*4*width])
             _occupation.push_back(OCCUP_BLOCKING);
         else if (!mapManager->walkability[bG.x()/8 + (bG.y()/8)*4*width])
             _occupation.push_back(OCCUP_BLOCKING);
@@ -372,6 +393,10 @@ double BayesianUnit::computeProb(unsigned int i)
             // TODO 0.01 magic number (uniform prob to go in the half-quadrant opposite to obj)
         }
     }
+    else if (_mode == MODE_FIGHT_G)
+    {
+        // TODO
+    }
     if (_occupation[i] == OCCUP_BUILDING) /// NON-WALKABLE (BUILDING) INFLUENCE
     {	
         val *= 1.0-_PROB_NO_BUILDING_MOVE;
@@ -472,23 +497,30 @@ void BayesianUnit::updateObj()
     //drawPath();
 #else
     Position p;
-    if (Broodwar->getFrameCount()%40 == 0 || !_path.size()) // hack to remove with the introduction of TimeManager
+    if (Broodwar->getFrameCount()%10 == 0 || !_path.size()) // hack to remove with the introduction of TimeManager
     {
-        //TIMINGclock_t start = clock();
-        buildingsAwarePathFind(_btpath, TilePosition(_unitPos), TilePosition(target));
+       // clock_t start = clock();
+        /*
+            Bug avec le pathfind.. Si 6 unités ou moins calculent leurs pathfind, le temps est de 9 ms / unité.
+            Si ça passe à plus de 6 unités, le temps est de 65 ms / unité et ça lag ...
+        */
+        if (_unitsGroup->_path.size() > 8)
+            buildingsAwarePathFind(_btpath, TilePosition(_unitPos), TilePosition(this->_unitsGroup->_path[8].getPosition()));
+        else
+             buildingsAwarePathFind(_btpath, TilePosition(_unitPos), TilePosition(target));
         _path.clear();
         for (std::vector<TilePosition>::const_iterator it = _btpath.begin(); it != _btpath.end(); ++it)
             _path.push_back(*it);
-        //TIMINGclock_t end = clock();
-        //TIMINGBroodwar->printf("Iterations took %f", (double)(end-start));
+        //clock_t end = clock();
+        //Broodwar->printf("Iterations took %f", (double)(end-start));
     } else
     {
-        // remove path points we passed
-        if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
-            _path.erase(_path.begin());
-        // I'm not drunk, do it twice! (path[2] if possible)        
-        if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
-            _path.erase(_path.begin());
+    // remove path points we passed
+    if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
+        _path.erase(_path.begin());
+    // I'm not drunk, do it twice! (path[2] if possible)        
+    if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
+        _path.erase(_path.begin());
     }
 
     if (_path.size() > 1)   // _ppath[0] is the current unit position
@@ -770,7 +802,7 @@ void BayesianUnit::onUnitShow(Unit* u)
 
 void BayesianUnit::onUnitHide(Unit* u)
 {
-    //updateRangeEnemiesWith(u);
+    updateRangeEnemiesWith(u);
 }
 
 void BayesianUnit::update()
@@ -778,10 +810,12 @@ void BayesianUnit::update()
     if (!unit->exists()) return;
     _unitPos = unit->getPosition();
 
+
     if (_sheight > 32 || _slarge > 32)
         Broodwar->printf("height: %d, large: %d", _sheight, _slarge);
 
-    if (targetEnemy != NULL && withinRange(targetEnemy))
+    if (targetEnemy != NULL && withinRange(targetEnemy) /* && Qu'elle est capable de tirer .. */)
+
     {
         attackEnemy(targetEnemy, BWAPI::Colors::Red);
         return;
@@ -796,8 +830,11 @@ void BayesianUnit::update()
         clickDir();
         if (unit->getDistance(this->target) < 4.0)
             switchMode(MODE_INPOS);
+
         //drawFlockValues();
     }
+
+    drawTarget();
     return;
     Position p = _unitPos;
     if ((_mode == MODE_FLOCK && _mode == MODE_FLOCKFORM)
