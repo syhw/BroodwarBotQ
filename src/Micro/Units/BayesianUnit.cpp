@@ -585,10 +585,10 @@ void BayesianUnit::updateDirV()
 //    const int maxx = 32*Broodwar->mapWidth();
 //    const int miny = 0;
 //    const int maxy = 32*Broodwar->mapHeight();
-    const int minx = max(p.x() - _slarge, 0);
-    const int maxx = min(p.x() + _slarge, 32*Broodwar->mapWidth());
-    const int miny = max(p.y() - _sheight, 0);
-    const int maxy = min(p.y() + _sheight, 32*Broodwar->mapHeight());
+    const int minx = max(p.x() - 1.5*_slarge, 0);
+    const int maxx = min(p.x() + 1.5*_slarge, 32*Broodwar->mapWidth());
+    const int miny = max(p.y() - 1.5*_sheight, 0);
+    const int maxy = min(p.y() + 1.5*_sheight, 32*Broodwar->mapHeight());
     for (int x = -4; x <= 4; ++x)
         for (int y = -4; y <= 4; ++y)
         {
@@ -698,7 +698,7 @@ void BayesianUnit::updateDir()
         }
     }
 
-    //drawProbs(dirvProb, _unitsGroup->size());
+    drawProbs(dirvProb, _unitsGroup->size());
 }
 
 void BayesianUnit::drawDir()
@@ -777,6 +777,9 @@ void BayesianUnit::update()
 {
     if (!unit->exists()) return;
     _unitPos = unit->getPosition();
+
+    if (_sheight > 32 || _slarge > 32)
+        Broodwar->printf("height: %d, large: %d", _sheight, _slarge);
 
     if (targetEnemy != NULL && withinRange(targetEnemy))
     {
