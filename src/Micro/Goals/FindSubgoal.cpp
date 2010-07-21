@@ -12,24 +12,24 @@ bool FindSubgoal::isRealized(){
 	if(achieved)
 		return true;
 	else
-		check();
+		achieved=check();
 		return achieved;
 }
 
 bool FindSubgoal::check(){
-	if (regions->EnemyFound()){
-#ifdef __DEBUG__LOUIS
+	if (regions->enemyFound()){
+#ifdef __DEBUG_LOUIS__
 		BWAPI::Broodwar->printf("findSubgoal done");
 #endif
 		return true;
 	}
 	return false;
-//	return regions->EnemyFound();
+//	return regions->enemyFound();
 }
 
-void FindSubgoal::tryToRealize(UnitsGroup * ug){
+void FindSubgoal::tryToRealize(){
 }
 
-double FindSubgoal::distanceToRealize(UnitsGroup *ug){
+double FindSubgoal::distanceToRealize(){
 	return -1;
 }

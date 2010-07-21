@@ -13,8 +13,8 @@ class FormationSubgoal : public Subgoal
 public:
     FormationSubgoal(SubgoalLogic l, pFormation f, UnitsGroup* ug);
 	virtual bool isRealized();
-	virtual void tryToRealize(UnitsGroup* ug);
-	virtual double distanceToRealize(UnitsGroup* ug);
+	virtual void tryToRealize();
+	virtual double distanceToRealize();
 protected:
 	virtual bool check();
 };

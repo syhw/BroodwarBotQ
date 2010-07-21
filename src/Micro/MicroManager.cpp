@@ -2,7 +2,7 @@
 #include <Regions.h>
 #include <util.h>
 #include <UnitsGroup.h>
-#include "AttackGoal.h"
+
 
 using std::map;
 using std::set;
@@ -28,6 +28,8 @@ void MicroManager::update()
 	//Suppress the list prompted to suppress 
 	for each (UnitsGroup * ug in this->promptedRemove){
 		this->remove(ug);
+		ug->idle();	//Set target of units to their position so that they are now idling
+		ug->~UnitsGroup();
 	}
 	promptedRemove.clear();
 
@@ -43,14 +45,15 @@ void MicroManager::update()
 
 
 void MicroManager::onOffer(std::set<BWAPI::Unit*> units)
-{ //TOREMOVE
+{ 
+	/*
 	for(std::set<BWAPI::Unit*>::iterator u = units.begin(); u != units.end(); u++)
 	{
 		if (!(*u)->getType().isWorker() && !(*u)->getType().isBuilding())
 		{
 			arbitrator->accept(this, *u);
 			if (unitsgroups.empty())
-			{
+			{	
 				UnitsGroup* ug = new UnitsGroup();
 				unitsgroups.push_back( ug);
 				sendGroupToDefense (ug);
@@ -64,7 +67,7 @@ void MicroManager::onOffer(std::set<BWAPI::Unit*> units)
 			arbitrator->decline(this, *u, 0);
 		}
 	}
-	
+	*/
 }
 
 void MicroManager::onRevoke(BWAPI::Unit* unit, double bid)
@@ -79,8 +82,13 @@ std::string MicroManager::getName() const
 
 void MicroManager::onUnitCreate(BWAPI::Unit* unit)
 {
+	
+
 	if (!unit->getType().isWorker() && unit->getPlayer()==Broodwar->self() && !unit->getType().isBuilding() && unit->getType().canAttack())
 		arbitrator->setBid(this, unit, 100);
+
+
+
 }
 
 void MicroManager::onUnitDestroy(BWAPI::Unit* unit)
@@ -165,6 +173,7 @@ void MicroManager::sendGroupToDefense( UnitsGroup* ug)
 	// Send the group defend the base
 	//ug->addGoal(pGoal(new DefendGoal(chokePoint)));
 }
+
 
 bool MicroManager::remove(UnitsGroup* u){
 	for(std::list<UnitsGroup *>::iterator it = unitsgroups.begin(); it != unitsgroups.end(); it ++){

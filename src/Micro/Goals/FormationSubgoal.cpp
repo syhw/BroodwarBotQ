@@ -16,15 +16,15 @@ bool FormationSubgoal::isRealized()
     return check();
 }
 
-void FormationSubgoal::tryToRealize(UnitsGroup* ug)
+void FormationSubgoal::tryToRealize()
 {
-    ug->formation(formation);
+    unitsgroup->formation(formation);
 }
 
-double FormationSubgoal::distanceToRealize(UnitsGroup* ug)
+double FormationSubgoal::distanceToRealize()
 {
     Position p = Position((int)formation->center.x, (int)formation->center.y);
-    return p.getDistance(ug->center);
+    return p.getDistance(unitsgroup->center);
 }
 
 bool FormationSubgoal::check()

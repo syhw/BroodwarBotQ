@@ -35,6 +35,7 @@ UnitsGroup::UnitsGroup()
 
 UnitsGroup::~UnitsGroup()
 {
+
 }
 
 bool comp_i_dist(const i_dist& l, const i_dist& r) { return (r.dist < l.dist); }
@@ -383,14 +384,14 @@ void UnitsGroup::setGoals(std::list<pGoal>& goals)
 {
     this->goals = goals;
 	if(!this->goals.empty())
-		this->goals.front()->achieve(this);
+		this->goals.front()->achieve();
 }
 
 void UnitsGroup::addGoal(pGoal goal)
 {
     this->goals.push_back(goal);
     if (goals.size() == 1 && !this->units.empty())
-    this->goals.front()->achieve(this);
+    this->goals.front()->achieve();
 }
 
 
@@ -464,7 +465,7 @@ void UnitsGroup::takeControl(Unit* u)
         this->units.push_back(tmp);
 	if(this->goals.size()==1){
 		if(this->goals.front()->getStatus()==GS_ACHIEVED){
-			goals.front()->achieve(this);
+			goals.front()->achieve();
 		}
 	}
 }
@@ -640,12 +641,23 @@ void UnitsGroup::accomplishGoal(){
 	//TOCHECK Potential Memory Leak with accomplished goals => no thanks to smart pointers
 	
 	if(goals.size() > 0){
-		if (!goals.front()->getStatus() == GS_ACHIEVED) {
-			goals.front()->achieve(this);
+		if (goals.front()->getStatus() != GS_ACHIEVED) {
+			goals.front()->achieve();
 		} else {
 			if(goals.size() > 1 ){
 				goals.pop_front();
 			}
 		}
+	}
+}
+void UnitsGroup::switchMode(unit_mode um){
+	for(std::vector<pBayesianUnit>::iterator it = getUnits()->begin(); it != getUnits()->end(); ++it){
+		(*it)->switchMode(um);
+	}
+}
+
+void UnitsGroup::idle(){
+	for(std::vector<pBayesianUnit>::iterator it = getUnits()->begin(); it != getUnits()->end(); ++it){
+		(*it)->target = (*it)->unit->getPosition();
 	}
 }

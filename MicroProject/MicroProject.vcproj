@@ -319,14 +319,6 @@
 				Name="Goals"
 				>
 				<File
-					RelativePath="..\src\Micro\Goals\AttackGoal.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Micro\Goals\DefendGoal.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Micro\Goals\FormationSubgoal.cpp"
 					>
 				</File>
@@ -336,10 +328,6 @@
 				</File>
 				<File
 					RelativePath="..\src\Micro\Goals\GoalManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Micro\Goals\ScoutGoal.cpp"
 					>
 				</File>
 				<File
@@ -589,14 +577,6 @@
 				Name="Goals"
 				>
 				<File
-					RelativePath="..\src\Micro\Goals\AttackGoal.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Micro\Goals\DefendGoal.h"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Micro\Goals\FormationSubgoal.h"
 					>
 				</File>
@@ -606,10 +586,6 @@
 				</File>
 				<File
 					RelativePath="..\src\Micro\Goals\GoalManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Micro\Goals\ScoutGoal.h"
 					>
 				</File>
 				<File

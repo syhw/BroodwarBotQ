@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="MacroProject"
 	ProjectGUID="{F39C7417-770D-4635-8A47-77BD9CDDCD71}"
 	RootNamespace="MacroProject"
@@ -323,11 +323,11 @@
 					Name="Goals"
 					>
 					<File
-						RelativePath="..\src\Micro\Goals\AttackGoal.cpp"
+						RelativePath="..\src\Micro\Goals\ExploreGoal.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\src\Micro\Goals\DefendGoal.cpp"
+						RelativePath="..\src\Micro\Goals\FindEnemyGoal.cpp"
 						>
 					</File>
 					<File
@@ -347,7 +347,7 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\Micro\Goals\ScoutGoal.cpp"
+						RelativePath="..\src\Micro\Goals\KillSubgoal.cpp"
 						>
 					</File>
 					<File
@@ -517,6 +517,10 @@
 				</File>
 				<File
 					RelativePath="..\src\Intelligence\EStrat.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Intelligence\ETechEstimator.cpp"
 					>
 				</File>
 				<File
@@ -701,11 +705,11 @@
 					Name="Goals"
 					>
 					<File
-						RelativePath="..\src\Micro\Goals\AttackGoal.h"
+						RelativePath="..\src\Micro\Goals\ExploreGoal.h"
 						>
 					</File>
 					<File
-						RelativePath="..\src\Micro\Goals\DefendGoal.h"
+						RelativePath="..\src\Micro\Goals\FindEnemyGoal.h"
 						>
 					</File>
 					<File
@@ -725,7 +729,7 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\Micro\Goals\ScoutGoal.h"
+						RelativePath="..\src\Micro\Goals\KillSubgoal.h"
 						>
 					</File>
 					<File
@@ -939,6 +943,10 @@
 				</File>
 				<File
 					RelativePath="..\src\Intelligence\EStrat.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Intelligence\ETechEstimator.h"
 					>
 				</File>
 				<File

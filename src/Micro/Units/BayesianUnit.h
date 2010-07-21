@@ -100,7 +100,7 @@ protected:
         const BWAPI::Position& p_start, 
         const BWAPI::Position& p_end, 
         bool quick=true);
-    void switchMode(unit_mode um);
+
     inline void updateDirV();
     void drawDirV();
     void updateObj();
@@ -121,6 +121,7 @@ protected:
     inline void deleteRangeEnemiesElem(BWAPI::Unit* u);
     inline void updateRangeEnemiesWith(BWAPI::Unit* u);
 public:
+	void switchMode(unit_mode um);
     Vec dir, obj; // dir=current direction, obj=pathfinder's direction
     // std::map<attractor_type, std::vector<BWAPI::Position>> prox; 
     BayesianUnit(BWAPI::Unit* u, UnitsGroup* ug);

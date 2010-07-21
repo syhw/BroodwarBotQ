@@ -272,14 +272,14 @@ void BayesianUnit::updateAttractors()
         
         if (mapManager->buildings_wt[tmp.x()/8 + (tmp.y()/8)*4*width])
             _occupation.push_back(OCCUP_BUILDING);
-        else if (!mapManager->walkability[hG.x()/8 + (hG.y()/8)*4*width])
+		/*else if (!mapManager->walkability[hG.x()/8 + (hG.y()/8)*4*width])
             _occupation.push_back(OCCUP_BLOCKING);
         else if (!mapManager->walkability[bG.x()/8 + (bG.y()/8)*4*width])
             _occupation.push_back(OCCUP_BLOCKING);
         else if (!mapManager->walkability[hD.x()/8 + (hD.y()/8)*4*width])
             _occupation.push_back(OCCUP_BLOCKING);
         else if (!mapManager->walkability[bD.x()/8 + (bD.y()/8)*4*width])
-            _occupation.push_back(OCCUP_BLOCKING);
+            _occupation.push_back(OCCUP_BLOCKING);*/
 
 
         //if (mapManager->buildings[tmp.x()/32 + (tmp.y()/32)*width])

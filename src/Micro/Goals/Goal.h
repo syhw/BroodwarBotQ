@@ -15,29 +15,32 @@ typedef enum
 {
 	GS_ND_STATUS           = 0,
 	GS_ACHIEVED            = 0,
-	GS_IN_PROGRESS         = 1,
-	GS_FLEE                = 2,
-	GS_NOT_STARTED         = 3
+	GS_IN_PROGRESS         = 1, //When attributed
+	GS_NOT_ATTRIBUTED      = 2
 } GoalStatus;
 
 class Goal
 {
-	//A goal contain a list of subgoals
-	//Some subgoals must be validated only once (SC_ACTIVE),
-	//other must be validated all along the accomplishment (SC_ONCE).
+	
 protected:
+	UnitsGroup * unitsGroup;//Use setUnitsGroup
 	std::list<pSubgoal> subgoals; //The subgoals cannot be shared
 	GoalStatus status;      /**< status of the goal */
+
+
 public:
+	void setUnitsGroup(UnitsGroup * ug);
+	
 
 	//Constructors
-	Goal();
-    Goal(pSubgoal s);
+	Goal();//Don't forget to set the unitsGroup
+	Goal(UnitsGroup * ug);
+    Goal(UnitsGroup * ug,pSubgoal s);
 	virtual ~Goal();
 	
-	virtual void achieve(UnitsGroup* ug);//Start the goal
+	virtual void achieve();//Start the goal
 
-	virtual void checkAchievement(UnitsGroup* ug);//Check if accomplished
+	virtual void checkAchievement();//Check if accomplished
 	//(Check if all subgoals are accomplished)
 
 	//Mutators

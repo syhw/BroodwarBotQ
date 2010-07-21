@@ -20,9 +20,10 @@ bool SeeSubgoal::check(){
 	return BWAPI::Broodwar->isVisible(pos.x()/32, pos.y()/32);
 }
 
-void SeeSubgoal::tryToRealize(UnitsGroup * ug){
-	ug->move(pos);
+void SeeSubgoal::tryToRealize(){
+	unitsGroup->move(pos);
+	unitsGroup->switchMode(MODE_SCOUT);
 }
-double SeeSubgoal::distanceToRealize(UnitsGroup *ug){
-	return ug->getCenter().getDistance(pos); 
+double SeeSubgoal::distanceToRealize(){
+	return unitsGroup->getCenter().getDistance(pos); 
 }

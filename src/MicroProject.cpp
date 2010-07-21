@@ -1,7 +1,5 @@
 #include "MicroProject.h"
 #include "Goal.h"
-#include <AttackGoal.h>
-#include "DefendGoal.h"
 #include "FormationSubgoal.h"
 #include <stdio.h>
 #include <QtGui/QApplication.h>
@@ -28,6 +26,7 @@ void MicroAIModule::onStart()
 
 	// Vec center;
 	std::set<Unit*> allUnits = Broodwar->getAllUnits();
+
 	for (std::set<Unit*>::iterator i=allUnits.begin(); i!=allUnits.end(); i++)
 	{
         onUnitShow(*i);
@@ -98,7 +97,6 @@ void MicroAIModule::onStart()
     pGoal tmp_goal = pGoal(new Goal(tmp_subgoal));
     goals.push_back(tmp_goal);
     /*
-
     pFormation tmp_form = pFormation(new LineFormation(Position(29*32,8*32), Vec(1,0)));
     pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form, mm));
     pGoal tmp_goal = pGoal(new Goal(tmp_subgoal));

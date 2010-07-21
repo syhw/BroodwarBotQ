@@ -60,7 +60,7 @@ public:
 	void onUnitShow(BWAPI::Unit* unit);
 	void onUnitHide(BWAPI::Unit* unit);
 	void display() const;
-	bool EnemyFound() const;
+	bool enemyFound() const;
 
 #ifdef BW_QT_DEBUG
 	// Qt interface

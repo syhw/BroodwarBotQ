@@ -6,14 +6,14 @@ logic(l)
 {
 }
 
-Subgoal::Subgoal(const Subgoal& s) :
-logic(s.getLogic())
-{
-}
 
 Subgoal::~Subgoal(){
 }
 
 SubgoalLogic Subgoal::getLogic() const {
 	return this->logic;
+}
+
+void Subgoal::setUnitsGroup( UnitsGroup * ug){
+unitsGroup = ug;
 }
