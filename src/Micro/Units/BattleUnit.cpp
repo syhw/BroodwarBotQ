@@ -78,8 +78,8 @@ void BattleUnit::drawBTPath()
     for (std::vector<TilePosition>::const_iterator it = _btpath.begin(); 
         it != _btpath.end(); ++it)
     {
-        Broodwar->drawBox(CoordinateType::Map, it->x()*32 - 14, it->y()*32 - 14, 
-            it->x()*32 + 14, it->y()*32 + 14, Colors::Yellow);
+        Broodwar->drawBox(CoordinateType::Map, it->x()*32 + 2, it->y()*32 + 2, 
+            it->x()*32 + 30, it->y()*32 + 30, Colors::Yellow);
     }
 }
 
