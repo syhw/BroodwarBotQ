@@ -12,7 +12,7 @@ void MicroAIModule::onStart()
 	// Enable some cheat flags
     Broodwar->printf("ON START !!\n");
 	Broodwar->enableFlag(Flag::UserInput);
-    //Broodwar->setLocalSpeed(0);
+    Broodwar->setLocalSpeed(0);
 	//Broodwar->enableFlag(Flag::CompleteMapInformation);
 	BWTA::readMap();
 	BWTA::analyze();
@@ -43,7 +43,7 @@ void MicroAIModule::onStart()
             // Broodwar->printf("Took control of: %s\n", (*i)->getType().getName().c_str() );
 			mm->takeControl(*i);
 		}
-        else if ((*i)->getType() != BWAPI::UnitTypes::Protoss_Zealot)
+       else if ((*i)->getType() != BWAPI::UnitTypes::Protoss_Zealot)
         {
             mD->takeControl(*i);
         }
@@ -98,12 +98,12 @@ void MicroAIModule::onStart()
     goals.push_back(tmp_goal);
 */
     
-    pFormation tmp_form = pFormation(new LineFormation(Position(29*32,8*32), Vec(1,0)));
+    pFormation tmp_form = pFormation(new LineFormation(Position(33*32,6*32), Vec(1,0)));
     pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
     pGoal tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
     goals.push_back(tmp_goal);
 
-    tmp_form = pFormation(new LineFormation(Position(35*32,8*32), Vec(1,0)));
+    tmp_form = pFormation(new LineFormation(Position(40*32,3*32), Vec(1,0)));
     tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
     tmp_goal = pGoal(new Goal(mD, tmp_subgoal));
     goals2.push_back(tmp_goal);

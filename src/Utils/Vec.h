@@ -10,6 +10,7 @@ struct Vec {
     Vec(double x_=0.0, double y_=0.0){ x=x_; y=y_; }
     Vec(const Vec& v){ x=v.x; y=v.y; }
     Vec(const BWAPI::Position& p){ x=p.x(); y=p.y(); }
+    bool operator<(const Vec &b) const { return (x < b.x || (x == b.x && y < b.y)); }
     Vec operator+(const Vec &b) const { return Vec(x+b.x,y+b.y); }
     Vec operator+(const BWAPI::Position& p) { return BWAPI::Position(p.x() + (int)x, p.y() + (int)y); }
     Vec operator+=(const Vec &b) { x += b.x; y += b.y; return *this; }
