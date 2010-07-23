@@ -13,6 +13,7 @@ class BattleUnit
     friend void baseMicro();
     friend void zealotMicro();
 protected:
+    int _sheight, _slarge;
 #ifdef UNIT_DEBUG
     std::string _unitType;
 #endif
@@ -35,8 +36,7 @@ protected:
 public:
     static void buildingsAwarePathFind(std::vector<BWAPI::TilePosition>& btpath, 
         const BWAPI::TilePosition& start, const BWAPI::TilePosition& end);
-    static void buildingsAwarePathFind(unsigned int usize, 
-        std::vector<BWAPI::TilePosition>& btpath, 
+    void sizeAwarePathFind(std::vector<BWAPI::TilePosition>& btpath, 
         const BWAPI::TilePosition& start, 
         const BWAPI::TilePosition& end);
     unsigned int _tick;

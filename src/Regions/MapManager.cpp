@@ -228,7 +228,7 @@ void MapManager::drawWalkability()
         for (int y = 0; y < _height; ++y)
         {
             if (!walkability[x + y*_width])
-                Broodwar->drawBox(CoordinateType::Map, 8*x - 3, 8*y - 3, 8*x + 3, 8*y + 3, Colors::Red);
+                Broodwar->drawBox(CoordinateType::Map, 8*x + 1, 8*y + 1, 8*x + 7, 8*y + 7, Colors::Red);
         }
 }
 

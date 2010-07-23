@@ -43,8 +43,6 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 , _mode(MODE_FLOCK)
 , _unitsGroup(ug)
 , _ground_unit(!unit->getType().isFlyer())
-, _sheight(unit->getType().dimensionUp() + unit->getType().dimensionDown())
-, _slarge(unit->getType().dimensionRight() + unit->getType().dimensionLeft())
 {
     updateDirV();
     mapManager = & MapManager::Instance();
@@ -505,9 +503,9 @@ void BayesianUnit::updateObj()
             Si ça passe à plus de 6 unités, le temps est de 65 ms / unité et ça lag ...
         */
         if (_unitsGroup->_path.size() > 8)
-            buildingsAwarePathFind(_btpath, TilePosition(_unitPos), TilePosition(this->_unitsGroup->_path[8].getPosition()));
+            sizeAwarePathFind(_btpath, TilePosition(_unitPos), TilePosition(this->_unitsGroup->_path[8].getPosition()));
         else
-             buildingsAwarePathFind(_btpath, TilePosition(_unitPos), TilePosition(target));
+            sizeAwarePathFind(_btpath, TilePosition(_unitPos), TilePosition(target));
         _path.clear();
         for (std::vector<TilePosition>::const_iterator it = _btpath.begin(); it != _btpath.end(); ++it)
             _path.push_back(*it);
@@ -537,8 +535,8 @@ void BayesianUnit::updateObj()
 #ifdef __DEBUG_GABRIEL__
     drawBTPath();
     MapManager* mapm = & MapManager::Instance();
-    mapm->drawWalkability(0);
     mapm->drawBuildingsStrict();
+
     //mapm->drawBuildings(0);
     //drawPath();
 #endif

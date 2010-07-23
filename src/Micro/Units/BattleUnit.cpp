@@ -17,6 +17,8 @@ BattleUnit::BattleUnit(BWAPI::Unit* unit)
 , targetEnemy(NULL)
 , targetEnemyInRange(NULL)
 , target(unit->getPosition())
+, _sheight(unit->getType().dimensionUp() + unit->getType().dimensionDown())
+, _slarge(unit->getType().dimensionRight() + unit->getType().dimensionLeft())
 #ifdef UNIT_DEBUG
 , _unitType(unit->getType().getName())
 #endif
@@ -307,13 +309,17 @@ void BattleUnit::buildingsAwarePathFind(std::vector<TilePosition>& btpath,
     return;
 }
 
-void BattleUnit::buildingsAwarePathFind(unsigned int usize, 
-                                        std::vector<TilePosition>& btpath, 
+void BattleUnit::sizeAwarePathFind(std::vector<TilePosition>& btpath, 
                                         const TilePosition& start, 
                                         const TilePosition& end)
 {
     clock_t endTimer(0), startTimer(0) ;
     btpath.clear();
+    unsigned int usize = 0;
+    if (_sheight > 15) //&& _slarge > 15)
+        usize = 1;
+    if (_sheight > 32) // && _slarge > 32)
+        usize = 2;
     MapManager* mapm = & MapManager::Instance();
     std::multimap<int, TilePosition> openTiles;
     openTiles.insert(std::make_pair(0, start));
@@ -353,12 +359,9 @@ void BattleUnit::buildingsAwarePathFind(unsigned int usize,
             for(int y = miny; y <= maxy; y++)
             {
                 if (!mapm->vLowResWalkability[usize][x + y*width]) continue;
-                if (mapm->vBuildings[usize][x + y*width]) continue;        // buildingsAware
                 if (p.x() != x && p.y() != y && 
                     !mapm->vLowResWalkability[usize][p.x() + y*width] 
-                    && !mapm->vLowResWalkability[usize][x + p.y()*width]
-                    && mapm->vBuildings[usize][p.x() + y*width]            // buildingsAware
-                    && mapm->vBuildings[usize][x + p.y()*width]) continue; // buildingsAware
+                    && !mapm->vLowResWalkability[usize][x + p.y()*width]) continue;
 
                 TilePosition t(x,y);
                 if (closedTiles.find(t) != closedTiles.end()) continue;
@@ -396,6 +399,11 @@ void BattleUnit::buildingsAwarePathFind(unsigned int usize,
             }
     endTimer += startTimer;
     }
+#ifdef __DEBUG_GABRIEL__
+    mapm->drawWalkability();
+    mapm->drawWalkability(usize);
+    Broodwar->printf("large: %d, height: %d, usize: %d", _slarge, _sheight, usize);
+#endif
     // empty path
     //Broodwar->printf("Iterations took %f", (double)(endTimer));
     return;
