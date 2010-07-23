@@ -534,11 +534,14 @@ void BayesianUnit::updateObj()
         p = _unitPos;
 
     obj = Vec(p.x() - _unitPos.x(), p.y() - _unitPos.y());
+#ifdef __DEBUG_GABRIEL__
     drawBTPath();
     MapManager* mapm = & MapManager::Instance();
-    mapm->drawWalkability(1);
-    mapm->drawBuildings(0);
+    mapm->drawWalkability(0);
+    mapm->drawBuildingsStrict();
+    //mapm->drawBuildings(0);
     //drawPath();
+#endif
 #endif
 }
 
@@ -745,6 +748,7 @@ void BayesianUnit::drawDir()
 
 void BayesianUnit::clickDir()
 {
+    return;
     dir += _unitPos;
     if (_unitPos.getDistance(dir.toPosition()) >= 1.0) 
         unit->rightClick(dir.toPosition());

@@ -56,7 +56,7 @@ void QComponentWidget::refreshWidget()
 {
 #ifdef BW_QT_DEBUG
     baseObj->refreshWidget(tabWidget->widget (0));
-    textEdit_sout->sestText(QString(baseObj->getWarnings().c_str()));
+    textEdit_sout->setText(QString(baseObj->getWarnings().c_str()));
     textEdit_serr->setText(QString(baseObj->getErrors().c_str()));
 #endif
 }

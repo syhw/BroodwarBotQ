@@ -168,8 +168,13 @@ void BattleBroodAI::onEnd(bool isWinner)
 
 void BattleBroodAI::onFrame()
 {
-		if (Broodwar->isReplay()) return;
+	if (Broodwar->isReplay()) return;
     if (!this->analyzed) return;
+
+#ifdef BW_POS_MOUSE
+    sprintf_s(mousePos, "%d, %d", Broodwar->getMousePosition().x(), Broodwar->getMousePosition().y());
+    Broodwar->drawTextMouse(12, 0, mousePos);
+#endif
 
 		objManager->onFrame();
     this->arbitrator->update();

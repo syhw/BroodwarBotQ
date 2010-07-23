@@ -41,6 +41,9 @@ void MicroManager::update()
 		 ug = *it;
 		 ug->update();
 	}
+
+    sout << "LOL" << sendl; 
+    serr << "LOL" << sendl;
 }
 
 

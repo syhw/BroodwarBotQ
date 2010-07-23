@@ -1,32 +1,42 @@
 #pragma once
 #include "MapManager.h"
 #include "Vec.h"
+
+#include <stdio.h>
+#include <string.h>
+
 using namespace BWAPI;
 
 MapManager::MapManager()
 {
-    const int width = 4*Broodwar->mapWidth();
-    const int height = 4*Broodwar->mapHeight();
-    walkability = new bool[width * height];             // Walk Tiles resolution
-    buildings_wt = new bool[width * height];
-    lowResWalkability = new bool[width * height / 16];  // Build Tiles resolution
-    buildings = new bool[width * height / 16];          // Build Tiles resolution
+    _width = 4*Broodwar->mapWidth();
+    _height = 4*Broodwar->mapHeight();
+    walkability = new bool[_width * _height];             // Walk Tiles resolution
+    buildings_wt = new bool[_width * _height];
+    buildings_wt_strict = new bool[_width * _height];
+    lowResWalkability = new bool[_width * _height / 16];  // Build Tiles resolution
+    buildings = new bool[_width * _height / 16];          
     for (unsigned int i = 0; i < 3; ++i)
     {
-        vLowResWalkability.push_back(new bool[width * height / 16]);
-        vBuildings.push_back(new bool[width * height / 16]);
+        vLowResWalkability.push_back(new bool[_width * _height / 16]);
+        vBuildings.push_back(new bool[_width * _height / 16]);
     }
 
+    bool* tmp_walkability_med = new bool[_width*_height];
+    bool* tmp_walkability_big = new bool[_width*_height];
+
     // initialization
-    for (int x = 0; x < width; ++x) 
-        for (int y = 0; y < height; ++y) 
+    for (int x = 0; x < _width; ++x) 
+        for (int y = 0; y < _height; ++y) 
         {
-            walkability[x + y*width] = Broodwar->isWalkable(x, y);
-            buildings_wt[x + y*width] = false;
+            walkability[x + y*_width] = Broodwar->isWalkable(x, y);
+            tmp_walkability_med[x + y*_width] = walkability[x + y*_width];
+            tmp_walkability_big[x + y*_width] = walkability[x + y*_width];
+            buildings_wt[x + y*_width] = false;
         }
-    for (int x = 0; x < width/4; ++x) 
+    for (int x = 0; x < _width/4; ++x) 
     {
-        for (int y = 0; y < height/4; ++y) 
+        for (int y = 0; y < _height/4; ++y) 
         {
             int xx = 4*x;
             int yy = 4*y;
@@ -35,60 +45,84 @@ MapManager::MapManager()
             {
                 for (int j = 0; j < 4; ++j) 
                 {
-                    if (!walkability[xx+i + (yy+j)*width])
+                    if (!walkability[xx+i + (yy+j)*_width])
                         walkable = false;
+                    for (int ix = xx+i-1; ix < xx+i+1; ++ix)
+                    {
+                        if (ix < 0 || ix >= _width) continue;
+                        for (int iy = yy+j-1; iy < yy+j+1; ++iy)
+                        {
+                            if (iy < 0 || iy >= _height) continue;
+                            if (!walkability[ix + iy*_width]) 
+                            {
+                                tmp_walkability_med[xx+i + (yy+j)*_width] = false;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
-            lowResWalkability[x + y*width/4] = walkable;
-            vLowResWalkability[0][x + y*width/4] = walkable;
-            buildings[x + y*width/4] = false; // initialized with manual call to onUnitCreate() in onStart()
+            lowResWalkability[x + y*_width/4] = walkable;
+            vLowResWalkability[0][x + y*_width/4] = walkable;
+            buildings[x + y*_width/4] = false; // initialized with manual call to onUnitCreate() in onStart()
             for (std::vector<bool*>::iterator it = vBuildings.begin();
                 it != vBuildings.end(); ++it)
-                (*it)[x + y*width/4] = false; // initialized with manual call to onUnitCreate() in onStart()
+                (*it)[x + y*_width/4] = false; // initialized with manual call to onUnitCreate() in onStart()
         }
     }
-    for (int x = 0; x < width/4; ++x)
-        for (int y = 0; y < height/4; ++y)
+    for (int x = 0; x < _width/4; ++x)
+        for (int y = 0; y < _height/4; ++y)
         {
+            int xx = 4*x;
+            int yy = 4*y;
             bool walkable_med = true;
-            for (Vec v1(4*x-4, 4*y-1), Vec v2(4*x-3, 4*y-2), Vec v3(4*x-2, 4*y-3), Vec v4(4*x-1, 4*y-4), unsigned int i = 0;
-                    i < 8; ++v1, ++v2, ++v3, ++v4, ++i)
+            for (int i = 0; i < 4; ++i)
             {
-                if (!walkability[v1.x + v1.y * width] || !walkability[v2.x + v2.y * width] 
-                    || !walkability[v3.x + v3.y * width] || !walkability[v4.x + v4.y * width])
+                for (int j = 0; j < 4; ++j) 
+                {
+                    if (!tmp_walkability_med[xx+i + (yy+j)*_width])
                         walkable_med = false;
+                    for (int ix = xx+i-1; ix < xx+i+1; ++ix)
+                    {
+                        if (ix < 0 || ix > _width) continue;
+                        for (int iy = yy+j-1; iy < yy+j+1; ++iy)
+                        {
+                            if (iy < 0 || iy > _height) continue;
+                            if (!tmp_walkability_med[ix + iy*_width]) 
+                            {
+                                tmp_walkability_big[xx+i + (yy+j)*_width] = false;
+                                break;
+                            }
+                        }
+                    }
+                }
             }
-            for (Vec v1(4*x+3+4, 4*y-1), Vec v2(4*x+3+3, 4*y-2), Vec v3(4*x+3+2, 4*y-3), Vec v4(4*x+3+1, 4*y-4), unsigned int i = 0;
-                i < 8; --v1, --v2, --v3, --v4, ++i)
-            {
-                if (!walkability[v1.x + v1.y * width] || !walkability[v2.x + v2.y * width] 
-                || !walkability[v3.x + v3.y * width] || !walkability[v4.x + v4.y * width])
-                        walkable_med = false;
-            }
-
-            bool walkable_big = true;
-            if (x + 1 > width/4 || y + 1 > height/4)
-                walkable_big = false;
-            else
-            {
-                for (unsigned int i = 0; i < 2; ++i)
-                    for (unsigned int j = 0; j < 2; ++j)
-                        if (!lowResWalkability[x+i + (y+j)*width/4])
-                            walkable_big = false;
-            }
-            vLowResWalkability[1][x + y*width/4] = walkable_med;
-            vLowResWalkability[2][x + y*width/4] = walkable_big;
+            vLowResWalkability[1][x + y*_width/4] = walkable_med;
         }
-    
-    /*for (int x = 0; x < width; ++x)
-    {
-        for (int y = 0; y < height; ++y)
+    for (int x = 0; x < _width/4; ++x)
+        for (int y = 0; y < _height/4; ++y)
         {
-            lowResWalkability[x/4 + y/4 * width/4] &= walkability[x + y * width];
-            buildings[x/4 + y/4 * width/4] = false;
+            int xx = 4*x;
+            int yy = 4*y;
+            bool walkable_big = true;
+            for (int i = 0; i < 4; ++i)
+            {
+                for (int j = 0; j < 4; ++j) 
+                {
+                    if (!tmp_walkability_big[xx+i + (yy+j)*_width])
+                    {
+                        walkable_big = false;
+                        break;
+                    }
+                }
+            }
+            vLowResWalkability[2][x + y*_width/4] = walkable_big;
         }
-    }*/
+
+
     _eUnitsFilter = & EUnitsFilter::Instance();
+    delete [] tmp_walkability_med;
+    delete [] tmp_walkability_big;
 }
 
 MapManager::~MapManager()
@@ -113,11 +147,22 @@ void MapManager::modifyBuildings(Unit* u, bool b)
         for (int y = tpBd.y(); y < tpBd.y() + u->getType().tileHeight(); ++y)
         {
             buildings[x + y*Broodwar->mapWidth()] = b;
-            vBuildings[0][x + y*Broodwar->mapWidth()] = b;
         }
     for (int x = tpBd.x()*4 - 1; x < tpBd.x()*4 + u->getType().tileWidth()*4 + 1; ++x)
         for (int y = tpBd.y()*4 - 1; y < tpBd.y()*4 + u->getType().tileHeight()*4 + 1; ++y)
-            buildings_wt[x + y*Broodwar->mapWidth()*4] = b;
+            if (x >= 0 && x < _width && y >= 0 && y < _height)
+                buildings_wt[x + y*_width] = b;
+    for (int x = (u->getPosition().x() - u->getType().dimensionLeft() - 5) / 8; 
+        x <= (u->getPosition().x() + u->getType().dimensionRight() + 5) / 8; ++x)
+    {
+        for (int y = (u->getPosition().y() - u->getType().dimensionUp() - 5) / 8;
+            y <= (u->getPosition().y() + u->getType().dimensionDown() + 5) / 8; ++y)
+        {
+            buildings_wt_strict[x + y*_width] = b;
+            //buildings_wt[x + y*_width] = b;
+            //if (y > 0) buildings_wt[x + (y-1)*_width] = b;
+        }
+    }
 }
 
 void MapManager::addBuilding(Unit* u)
@@ -159,20 +204,30 @@ void MapManager::onFrame()
 
 void MapManager::drawBuildings()
 {
-    for (int x = 0; x < Broodwar->mapWidth()*4; ++x)
-        for (int y = 0; y < Broodwar->mapHeight()*4; ++y)
+    for (int x = 0; x < _width; ++x)
+        for (int y = 0; y < _height; ++y)
         {
-            if (buildings_wt[x + y*Broodwar->mapWidth()*4])
+            if (buildings_wt[x + y*_width])
+                Broodwar->drawBoxMap(8*x+1, 8*y+1, 8*x+7, 8*y+7, Colors::Orange);
+        }
+}
+
+void MapManager::drawBuildingsStrict()
+{
+    for (int x = 0; x < _width; ++x)
+        for (int y = 0; y < _height; ++y)
+        {
+            if (buildings_wt_strict[x + y*_width])
                 Broodwar->drawBoxMap(8*x+1, 8*y+1, 8*x+7, 8*y+7, Colors::Orange);
         }
 }
 
 void MapManager::drawWalkability()
 {
-    for (int x = 0; x < Broodwar->mapWidth()*4; ++x)
-        for (int y = 0; y < Broodwar->mapHeight()*4; ++y)
+    for (int x = 0; x < _width; ++x)
+        for (int y = 0; y < _height; ++y)
         {
-            if (!walkability[x + y*Broodwar->mapWidth()*4])
+            if (!walkability[x + y*_width])
                 Broodwar->drawBox(CoordinateType::Map, 8*x - 3, 8*y - 3, 8*x + 3, 8*y + 3, Colors::Red);
         }
 }

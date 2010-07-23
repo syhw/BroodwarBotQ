@@ -19,6 +19,8 @@ private:
     EUnitsFilter* _eUnitsFilter;
     MapManager();
     ~MapManager();
+    int _width;
+    int _height;
     inline void modifyBuildings(BWAPI::Unit* u, bool b);
     inline void addBuilding(BWAPI::Unit* u);
     inline void removeBuilding(BWAPI::Unit* u);
@@ -26,6 +28,7 @@ public:
     bool* walkability;          // walk tiles
     bool* lowResWalkability;    // low res => building tiles
     bool* buildings_wt;         // walk tiles
+    bool* buildings_wt_strict;
     bool* buildings;            // low res => building tiles
     std::vector<bool*> vLowResWalkability;    // low res => building tiles
     std::vector<bool*> vBuildings;            // low res => building tiles
@@ -36,6 +39,7 @@ public:
     void onUnitHide(BWAPI::Unit* u);
     void onFrame();
     void drawBuildings();   // debug
+    void drawBuildingsStrict();   // debug
     void drawWalkability(); // debug
     void drawBuildings(unsigned int i);   // debug
     void drawWalkability(unsigned int i); // debug

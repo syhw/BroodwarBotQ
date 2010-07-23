@@ -108,7 +108,7 @@ void MicroAIModule::onStart()
     tmp_goal = pGoal(new Goal(tmp_subgoal));
     goals2.push_back(tmp_goal);*/
 
-  // tmp_form = pFormation(new LineFormation(Position(33*32,9*32), Vec(1,0)));
+  //  stmp_form = pFormation(new LineFormation(Position(33*32,9*32), Vec(1,0)));
   //  tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form, mm));
   //  tmp_goal = pGoal(new Goal(tmp_subgoal));
   //  goals.push_back(tmp_goal);
@@ -144,6 +144,11 @@ void MicroAIModule::onFrame()
 	if (mD != NULL) 
         mD->update();
     regions->display();
+    char mousePos[100];
+#ifdef BW_POS_MOUSE
+    sprintf_s(mousePos, "%d, %d", Broodwar->getMousePosition().x(), Broodwar->getMousePosition().y());
+    Broodwar->drawTextMouse(12, 0, mousePos);
+#endif
 	/*if (Broodwar->getFrameCount()%300==0)
 	{
 	//Every 300 frames we will print some basic unit stats
