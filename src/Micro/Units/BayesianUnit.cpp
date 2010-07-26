@@ -5,6 +5,7 @@
 #include <Defines.h>
 #include <time.h>
 #include <UnitsGroup.h>
+#include <set>
 #ifdef PROBT
 #include <pl.h>
 #else
@@ -28,12 +29,17 @@ using namespace BWAPI;
 - repulsion area of effect damage
 */
 
-#define _PROB_NO_FLOCK_MOVE 0.1 // TODO change for const and set specific values depending on the unit type
+#define _PROB_NO_FLOCK_MOVE 0.19 // TODO change for const and set specific values depending on the unit type
 #define _PROB_NO_EUNIT_MOVE 0.9
 #define _PROB_NO_UNIT_MOVE 0.8
 #define _PROB_NO_WALL_MOVE 0.9999999
 #define _PROB_NO_BUILDING_MOVE 0.99999
 #define _PROB_GO_OBJ 0.9
+
+#define _PROB_CENTER_ATTRACT 0.4
+#define _PROB_CENTER_V1_ATTRACT 0.3
+#define _PROB_CENTER_V2_ATTRACT 0.2
+#define _PROB_CENTER_V3_ATTRACT 0.09
 
 // TODO optimize by removing the dirv inside the unit (but one, the center, when it's better not to move at all)
 
@@ -53,12 +59,16 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
     {
         _flockProb.push_back(_PROB_NO_FLOCK_MOVE);  //FLOCK_NO
         _flockProb.push_back(0.01);                  //FLOCK_CONTACT
-        _flockProb.push_back(0.29);                 //FLOCK_CLOSE
+        _flockProb.push_back(0.20);                 //FLOCK_CLOSE
         _flockProb.push_back(0.30);                  //FLOCK_MEDIUM
-        _flockProb.push_back(0.30);                 //FLOCK_FAR
+        _flockProb.push_back(0.25);                 //FLOCK_FAR
 
-        _inPosProb.push_back(0.999); // INPOS_OK
-        _inPosProb.push_back(0.001); // INPOS_CONTACT
+
+        _inPosProb.push_back(0.49);                // INPOS_OK
+        _inPosProb.push_back(0.01);                // INPOS_CONTACT
+        _inPosProb.push_back(0.1);                // INPOS_CLOSE
+        _inPosProb.push_back(0.15);                // INPOS_MEDIUM
+        _inPosProb.push_back(0.3);                // INPOS_FAR
         // old (~~safe) params
 //        _flockProb.push_back(0.05);                  //FLOCK_CONTACT
 //        _flockProb.push_back(0.25);                 //FLOCK_CLOSE
@@ -119,18 +129,17 @@ void BayesianUnit::computeInPosValues()
                     (*it)->getVelocityY());
 
             inPos_value value = (inPos_value)(1 + (int)tmp.getDistance(
-                tmpvit.translate((*it)->getPosition())) / 32);
-
-            if (value <= INPOS_CONTACT*2)
-                tmpv.push_back(INPOS_CONTACT);
-            else
-            {
-                value = (inPos_value)(1 + (int)tmp.getDistance(
                     tmpvit.translate((*it)->getTargetPosition())) / 32);
 
-                if (value <= INPOS_CONTACT*2)
-                    tmpv.push_back(INPOS_CONTACT);
-                else
+            if (value <= INPOS_FAR)
+                tmpv.push_back(value);
+            else
+            {
+                 /*value = (inPos_value)(1 + (int)tmp.getDistance(
+                                tmpvit.translate((*it)->getPosition())) / 32);
+                if (value <= INPOS_FAR)
+                    tmpv.push_back(value);
+                else*/
                     tmpv.push_back(INPOS_OK);
             }
         }
@@ -309,7 +318,8 @@ void BayesianUnit::updateAttractors()
             _occupation.push_back(OCCUP_BLOCKING);
             */
 
-
+        else if (0/*TODO TEST SI Y A UNE UNITE QUI BLOQUE en TMP*/)
+            _occupation.push_back(OCCUP_UNIT);
 
 
         else // TODO UNIT/EUNIT
@@ -367,9 +377,10 @@ double BayesianUnit::computeProb(unsigned int i)
         // one j for each attractor
         for (unsigned int j = 0; j < _flockValues[i].size(); ++j)
             val *= _flockProb[_flockValues[i][j]];
-
+       
         /// OBJECTIVE (pathfinder) INFLUENCE
         double prob_obj = _PROB_GO_OBJ / (_unitsGroup->getUnits()->size() - 1);
+
         if (_dirv[i] == obj)
             val *= prob_obj;
         else
@@ -390,20 +401,46 @@ double BayesianUnit::computeProb(unsigned int i)
         for (unsigned int j = 0; j < _inPosValues[i].size(); ++j)
             val *= _inPosProb[_inPosValues[i][j]];
 
-        /// OBJECTIVE (pathfinder) INFLUENCE
-        double prob_obj = _PROB_GO_OBJ / (_unitsGroup->getUnits()->size() - 1);
-
         if (_dirv[i] == obj)
-            val *= prob_obj;
+            val *= _PROB_CENTER_ATTRACT;
         else
         {
-            Vec dirvtmp = _dirv[i];
-            dirvtmp.normalize();
-            Vec objnorm = obj;
-            objnorm.normalize();
-            const double tmp = dirvtmp.dot(objnorm);
-            val *= (tmp > 0 ? prob_obj*tmp : 0.01); 
-            // TODO 0.01 magic number (uniform prob to go in the half-quadrant opposite to obj)
+            std::set<Vec> center_v1;
+            for(int ii = -8; ii <= 8 ; ii+=8)
+                for(int jj = -8; jj <= 8 ; jj+=8)
+                {
+                    if (ii == jj == 0) continue;
+                    Vec tmp(0,0);
+                    tmp += obj; tmp += Vec(ii,jj);
+                    center_v1.insert(tmp);
+                }
+            std::set<Vec> center_v2;
+            std::set<Vec> center_v3;
+            for(int ii = -16; ii <= 16 ; ii+=8)
+                for(int jj = -8; jj <= 8 ; jj+=8)
+                {
+                    if (ii == jj == 0) continue;
+                    Vec tmp(0,0);
+                    tmp += obj; tmp += Vec(ii,jj);
+                    center_v2.insert(tmp);
+                }
+            for(int ii = -32; ii <= 32 ; ii+=8)
+                for(int jj = -8; jj <= 8 ; jj+=8)
+                {
+                    if (ii == jj == 0) continue;
+                    Vec tmp(0,0);
+                    tmp += obj; tmp += Vec(ii,jj);
+                    center_v3.insert(tmp);
+                }
+
+            if (center_v1.count(_dirv[i]))
+                val *= _PROB_CENTER_V1_ATTRACT;
+            else if(center_v2.count(_dirv[i]))
+                val *= _PROB_CENTER_V2_ATTRACT;
+            else if(center_v3.count(_dirv[i]))
+                val *= _PROB_CENTER_V3_ATTRACT;
+            else 
+                val *= (1.0 - _PROB_CENTER_V1_ATTRACT -  _PROB_CENTER_ATTRACT -  _PROB_CENTER_V3_ATTRACT - _PROB_CENTER_V2_ATTRACT );
         }
     }
     else if (_mode == MODE_FIGHT_G)
@@ -417,6 +454,10 @@ double BayesianUnit::computeProb(unsigned int i)
     else if (_occupation[i] == OCCUP_BLOCKING) /// NON-WALKABLE INFLUENCE
     {
         val *= 1.0-_PROB_NO_WALL_MOVE;
+    }
+    else if (_occupation[i] == OCCUP_UNIT)
+    {
+        val *= 1.0-_PROB_NO_UNIT_MOVE;
     }
     //Broodwar->printf("val is %d \n", val);
 #endif
@@ -505,48 +546,56 @@ void BayesianUnit::updateObj()
     }
     else
         p = _unitPos;
-
-    obj = Vec(p.x() - _unitPos.x(), p.y() - _unitPos.y());
+    obj = Vec(p.x() - _unitPos.x() + 12, p.y() - _unitPos.y() + 12); // to center the Tile, change 12 for 16 - top/left sizes
     drawPath();
 #else
-    Position p;
-    if (Broodwar->getFrameCount()%10 == 0 || !_path.size()) // hack to remove with the introduction of TimeManager
-    {
-       // clock_t start = clock();
-        /*
-            Bug avec le pathfind.. Si 6 unités ou moins calculent leurs pathfind, le temps est de 9 ms / unité.
-            Si ça passe à plus de 6 unités, le temps est de 65 ms / unité et ça lag ...
-        */
-        if (_unitsGroup->_path.size() > 8)
-            quickPathFind(_btpath, TilePosition(_unitPos), TilePosition(this->_unitsGroup->_path[8].getPosition()));
-        else
-            quickPathFind(_btpath, TilePosition(_unitPos), TilePosition(target));
-        _path.clear();
-        for (std::vector<TilePosition>::const_iterator it = _btpath.begin(); it != _btpath.end(); ++it)
-            _path.push_back(*it);
-        //clock_t end = clock();
-        //Broodwar->printf("Iterations took %f", (double)(end-start));
-    } else
-    {
-    // remove path points we passed
-    if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
-        _path.erase(_path.begin());
-    // I'm not drunk, do it twice! (path[2] if possible)        
-    if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
-        _path.erase(_path.begin());
-    }
+    if (_unitPos.getDistance(target) < WALK_TILES_SIZE*2)
 
-    if (_path.size() > 1)   // _ppath[0] is the current unit position
     {
-        if (_path.size() > 2) 
-            p = _path[2].getPosition();
-        else
-            p = _path[1].getPosition();
+        obj = Vec(0, 0);
     }
     else
-        p = _unitPos;
+    {
+        Position p;
+        if (Broodwar->getFrameCount()%10 == 0 || !_path.size()) // hack to remove with the introduction of TimeManager
+        {
+            // clock_t start = clock();
+            /*
+            Bug avec le pathfind.. Si 6 unités ou moins calculent leurs pathfind, le temps est de 9 ms / unité.
+            Si ça passe à plus de 6 unités, le temps est de 65 ms / unité et ça lag ...
+            */
+            if (_unitsGroup->_path.size() > 8)
+                quickPathFind(_btpath, TilePosition(_unitPos), TilePosition(this->_unitsGroup->_path[10].getPosition()));
+            else
+                quickPathFind(_btpath, TilePosition(_unitPos), TilePosition(target));
+            _path.clear();
+            for (std::vector<TilePosition>::const_iterator it = _btpath.begin(); it != _btpath.end(); ++it)
+                _path.push_back(*it);
+            //clock_t end = clock();
+            //Broodwar->printf("Iterations took %f", (double)(end-start));
+        } else
+        {
+        // remove path points we passed
+        if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
+            _path.erase(_path.begin());
+        // I'm not drunk, do it twice! (path[2] if possible)        
+        if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
+            _path.erase(_path.begin());
+        }
 
-    obj = Vec(p.x() - _unitPos.x(), p.y() - _unitPos.y());
+        if (_path.size() > 1)   // _ppath[0] is the current unit position
+        {
+            if (_path.size() > 2) 
+                p = _path[2].getPosition();
+            else
+                p = _path[1].getPosition();
+        }
+        else
+            p = _unitPos;
+        obj = Vec(p.x() - _unitPos.x() + 12, p.y() - _unitPos.y() + 12); // to center the Tile, change 12 for 16 - top/left sizes
+    }        
+
+
 #ifdef __DEBUG_GABRIEL__
     drawBTPath();
     MapManager* mapm = & MapManager::Instance();
@@ -635,11 +684,11 @@ void BayesianUnit::updateDirV()
 //    const int maxx = 32*Broodwar->mapWidth();
 //    const int miny = 0;
 //    const int maxy = 32*Broodwar->mapHeight();
-    const int minx = max(p.x() - 1.5*_slarge, 0);
-    const int maxx = min(p.x() + 1.5*_slarge, 32*Broodwar->mapWidth());
-    const int miny = max(p.y() - 1.5*_sheight, 0);
-    const int maxy = min(p.y() + 1.5*_sheight, 32*Broodwar->mapHeight());
-    for (int x = -4; x <= 4; ++x)
+    const int minx = max(p.x() - 2*_slarge, 0);
+    const int maxx = min(p.x() + 2*_slarge, 32*Broodwar->mapWidth());
+    const int miny = max(p.y() - 2*_sheight, 0);
+    const int maxy = min(p.y() + 2*_sheight, 32*Broodwar->mapHeight());
+    for (int x = -4; x <= 4; ++x) // -4..4 overkill
         for (int y = -4; y <= 4; ++y)
         {
             Vec v(x*_slarge/2, y*_sheight/2);
@@ -737,18 +786,23 @@ void BayesianUnit::updateDir()
     {
         pair<multimap<double, Vec>::const_iterator, multimap<double, Vec>::const_iterator> possible_dirs = dirvProb.equal_range(last->first);
         double max = -100000.0;
+        double max2 = -100000.0;
         for (multimap<double, Vec>::const_iterator it = possible_dirs.first; it != possible_dirs.second; ++it)
         {
-            double tmp = obj.dot(it->second);
-            if (tmp > max)
+            Vec tmpTest = it->second;
+            Vec tmpVec = it->second;
+            double tmp = obj.dot(tmpVec.normalize());
+
+            if (tmp >= max && max2 < obj.dot(tmpTest))
             {
                 max = tmp;
+                max2 = obj.dot(tmpTest);
                 dir = it->second;
             }
         }
     }
 
-    drawProbs(dirvProb, _unitsGroup->size());
+    //drawProbs(dirvProb, _unitsGroup->size());
 }
 
 void BayesianUnit::drawDir()
@@ -760,11 +814,11 @@ void BayesianUnit::drawDir()
 
 void BayesianUnit::clickDir()
 {
-    return;
     dir += _unitPos;
     if (_unitPos.getDistance(dir.toPosition()) >= 1.0) 
         unit->rightClick(dir.toPosition());
-    unit->rightClick(target);
+    else
+        unit->stop();
 }
 
 void BayesianUnit::drawArrow(Vec& v)
@@ -829,27 +883,32 @@ void BayesianUnit::update()
     if (!unit->exists()) return;
     _unitPos = unit->getPosition();
 
-
     //if (_sheight > 32 || _slarge > 32)
     //    Broodwar->printf("height: %d, large: %d", _sheight, _slarge);
 
-    if (targetEnemy != NULL && withinRange(targetEnemy) /* && Qu'elle est capable de tirer .. */)
-
+    if (targetEnemy != NULL)// && withinRange(targetEnemy) /* && Qu'elle est capable de tirer .. */)
     {
+        _mode = MODE_FIGHT_G;
         attackEnemy(targetEnemy, BWAPI::Colors::Red);
         return;
     }
 
-    _mode = MODE_FLOCK;
     if (_mode == MODE_FLOCK || _mode == MODE_INPOS) 
     {
         updateDir();
         drawObj(0); // green
         drawDir(); // red
         clickDir();
-        if (_mode != MODE_INPOS && unit->getDistance(this->target) < 4.0)
-            switchMode(MODE_INPOS);
-
+        if (_mode != MODE_INPOS && _unitPos.getDistance(target) < WALK_TILES_SIZE*2)
+        {
+            Broodwar->printf("Switch INPOS!");
+            this->switchMode(MODE_INPOS);
+        }
+        else if (_mode == MODE_INPOS && _unitPos.getDistance(target) > WALK_TILES_SIZE*18)
+        {
+            Broodwar->printf("Switch FLOCK!");
+            this->switchMode(MODE_FLOCK);
+        }
         //drawFlockValues();
     }
 
