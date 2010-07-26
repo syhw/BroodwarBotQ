@@ -9,7 +9,7 @@ using namespace BWTA;
 ////////            UNIT DATA             ///////
 /////////////////////////////////////////////////
 
-UnitData::UnitData(Unit* u)
+RegionsUnitData::RegionsUnitData(Unit* u)
 : unit(u)
 , unitType(unit->getType())
 , position(unit->getPosition())
@@ -17,7 +17,7 @@ UnitData::UnitData(Unit* u)
 {
 }
 
-bool UnitData::operator == ( const UnitData& ud) const
+bool RegionsUnitData::operator == ( const RegionsUnitData& ud) const
 {
     if (unit == NULL || ud.unit == NULL)
         return false;
@@ -43,9 +43,9 @@ bool RegionData::isOccupied() const
 
 bool RegionData::contain(Unit* unit) const
 {
-	UnitData test( unit);
-	for( map<Player*, vector<UnitData> >::const_iterator itBuild = buildings.begin(); itBuild != buildings.end(); itBuild++)
-		for( vector<UnitData>::const_iterator itBD = itBuild->second.begin(); itBD != itBuild->second.end(); itBD++)
+	RegionsUnitData test( unit);
+	for( map<Player*, vector<RegionsUnitData> >::const_iterator itBuild = buildings.begin(); itBuild != buildings.end(); itBuild++)
+		for( vector<RegionsUnitData>::const_iterator itBD = itBuild->second.begin(); itBD != itBuild->second.end(); itBD++)
 			if( (*itBD) == test) return true;
 	return false;
 }
@@ -53,9 +53,9 @@ bool RegionData::contain(Unit* unit) const
 void RegionData::add(Unit* unit)
 {
     if (unit->getType().isBuilding())
-        buildings[unit->getPlayer()].push_back(UnitData(unit));
+        buildings[unit->getPlayer()].push_back(RegionsUnitData(unit));
     else 
-        units[unit->getPlayer()].push_back(UnitData(unit));  
+        units[unit->getPlayer()].push_back(RegionsUnitData(unit));  
     //BWAPI::Broodwar->printf("I just added %s \n", unit->getType().getName());
 }
 
@@ -131,11 +131,11 @@ void Regions::addUnits()
     {
         // units (if a building is no longer lifted, remove it from units and
         // add it in buildings)
-        for (map<Player*, vector<UnitData> >::iterator itBuild 
+        for (map<Player*, vector<RegionsUnitData> >::iterator itBuild 
             = itRD->second.buildings.begin(); 
             itBuild != itRD->second.buildings.end(); ++itBuild)
         {
-            for (vector<UnitData>::iterator itBD = itBuild->second.begin(); 
+            for (vector<RegionsUnitData>::iterator itBD = itBuild->second.begin(); 
                 itBD != itBuild->second.end(); ++itBD)
             {
                 if (Broodwar->isVisible(itBD->unit->getPosition().x()/32, 
@@ -172,9 +172,9 @@ void Regions::removeUnits()
     for (map<Region*, RegionData>::iterator itRD = regionsData.begin(); itRD != regionsData.end(); ++itRD)
 	{
         // buildings
-		for (map<Player*, vector<UnitData> >::iterator itBuild = itRD->second.buildings.begin(); itBuild != itRD->second.buildings.end();)
+		for (map<Player*, vector<RegionsUnitData> >::iterator itBuild = itRD->second.buildings.begin(); itBuild != itRD->second.buildings.end();)
 		{
-			for (vector<UnitData>::iterator itBD = itBuild->second.begin(); itBD != itBuild->second.end();)
+			for (vector<RegionsUnitData>::iterator itBD = itBuild->second.begin(); itBD != itBuild->second.end();)
 			{
 				if (Broodwar->isVisible(itBD->position.x()/32, itBD->position.y()/32))
                 {
@@ -200,9 +200,9 @@ void Regions::removeUnits()
 				++itBuild;
 		}
         // units
-        for (map<Player*, vector<UnitData> >::iterator itUnit = itRD->second.units.begin(); itUnit != itRD->second.units.end();)
+        for (map<Player*, vector<RegionsUnitData> >::iterator itUnit = itRD->second.units.begin(); itUnit != itRD->second.units.end();)
 		{
-			for (vector<UnitData>::iterator itUD = itUnit->second.begin(); itUD != itUnit->second.end();)
+			for (vector<RegionsUnitData>::iterator itUD = itUnit->second.begin(); itUD != itUnit->second.end();)
 			{
 				if (Broodwar->isVisible(itUD->position.x()/32, itUD->position.y()/32) && !itUD->unit->exists())
 					itUD = itUnit->second.erase(itUD);
@@ -221,15 +221,15 @@ void Regions::removeUnit(Unit* unit)
 {
     for (map<Region*, RegionData>::iterator itRD = regionsData.begin(); itRD != regionsData.end(); ++itRD)
 	    if (unit->getType().isBuilding())		
-			for (map<Player*, vector<UnitData> >::iterator itBuild = itRD->second.buildings.begin(); itBuild != itRD->second.buildings.end(); ++itBuild)
-				for (vector<UnitData>::iterator itBD = itBuild->second.begin(); itBD != itBuild->second.end(); )
+			for (map<Player*, vector<RegionsUnitData> >::iterator itBuild = itRD->second.buildings.begin(); itBuild != itRD->second.buildings.end(); ++itBuild)
+				for (vector<RegionsUnitData>::iterator itBD = itBuild->second.begin(); itBD != itBuild->second.end(); )
 					if (itBD->unit == unit)
 						itBD = itBuild->second.erase(itBD);
 					else
 						++itBD;
         else
-            for (map<Player*, vector<UnitData> >::iterator itUnit = itRD->second.units.begin(); itUnit != itRD->second.units.end(); ++itUnit)
-                for (vector<UnitData>::iterator itUD = itUnit->second.begin(); itUD != itUnit->second.end(); )
+            for (map<Player*, vector<RegionsUnitData> >::iterator itUnit = itRD->second.units.begin(); itUnit != itRD->second.units.end(); ++itUnit)
+                for (vector<RegionsUnitData>::iterator itUD = itUnit->second.begin(); itUD != itUnit->second.end(); )
                     if (itUD->unit == unit)
                         itUD = itUnit->second.erase(itUD);
                     else
@@ -239,8 +239,8 @@ void Regions::removeUnit(Unit* unit)
 void Regions::display() const
 {
 	for (map<Region*, RegionData>::const_iterator itRD = regionsData.begin(); itRD != regionsData.end(); ++itRD)
-		for (map<Player*, vector<UnitData> >::const_iterator itBuild = itRD->second.buildings.begin(); itBuild != itRD->second.buildings.end(); ++itBuild)
-			for (vector<UnitData>::const_iterator itBD = itBuild->second.begin(); itBD != itBuild->second.end(); ++itBD) 
+		for (map<Player*, vector<RegionsUnitData> >::const_iterator itBuild = itRD->second.buildings.begin(); itBuild != itRD->second.buildings.end(); ++itBuild)
+			for (vector<RegionsUnitData>::const_iterator itBD = itBuild->second.begin(); itBD != itBuild->second.end(); ++itBD) 
 				Broodwar->drawBox( CoordinateType::Map,
 				itBD->position.x() - itBD->unitType.dimensionLeft(),
 				itBD->position.y() - itBD->unitType.dimensionUp(),
@@ -253,7 +253,7 @@ void Regions::display() const
 bool Regions::enemyFound() const{
 	for(std::map<BWTA::Region*, RegionData>::const_iterator it = this->regionsData.begin(); it != regionsData.end(); ++it){
 	
-		for(std::map<Player*, std::vector<UnitData> >::const_iterator it_b = it->second.buildings.begin(); it_b != it->second.buildings.end(); ++it_b){
+		for(std::map<Player*, std::vector<RegionsUnitData> >::const_iterator it_b = it->second.buildings.begin(); it_b != it->second.buildings.end(); ++it_b){
 			if( it_b->first->isEnemy(BWAPI::Broodwar->self()) && !it_b->second.empty())
 				return true;
 		}

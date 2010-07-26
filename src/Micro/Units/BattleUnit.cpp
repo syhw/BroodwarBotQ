@@ -305,107 +305,95 @@ void BattleUnit::buildingsAwarePathFind(std::vector<TilePosition>& btpath,
     endTimer += startTimer;
     }
     // empty path
-    //Broodwar->printf("Iterations took %f", (double)(endTimer));
     return;
 }
 
-void BattleUnit::sizeAwarePathFind(std::vector<TilePosition>& btpath, 
+void BattleUnit::straightLine(std::vector<TilePosition>& btpath, 
+        const TilePosition& start, const TilePosition& end)
+{
+
+    // DO NOT CLEAR btpath for you
+    if (start.x() == end.x() && start.y() == end.y()) return;
+    TilePosition current = start;
+    btpath.push_back(current);
+    Position p_end = Position(end);
+    while (Position(current).getDistance(p_end) > 31) // 31 for BuildTile Resolution
+    {
+        Vec line = Vec(end.x() - current.x(), 
+            end.y() - current.y());
+        if (line.y == 0.0)
+        {
+            int currentx = (line.x > 0.0 ? current.x() + 1 : current.x() - 1);
+            current = TilePosition(currentx, current.y());
+            btpath.push_back(current);
+            continue;
+        }
+        double div = abs(line.x / line.y); // line.y != 0.0
+        if (div > 2.0)
+        {
+            int currentx = (line.x > 0.0 ? current.x() + 1 : current.x() - 1);
+            current = TilePosition(currentx, current.y());
+        } 
+        else if (div < 0.5)
+        {
+            int currenty = (line.y > 0.0 ? current.y() + 1 : current.y() - 1);
+            current = TilePosition(current.x(), currenty);
+        }
+        else
+        {
+            int currentx = (line.x > 0.0 ? current.x() + 1 : current.x() - 1);
+            int currenty = (line.y > 0.0 ? current.y() + 1 : current.y() - 1);
+            current = TilePosition(currentx, currenty);
+        }
+        btpath.push_back(current);
+    }
+}
+
+void BattleUnit::quickPathFind(std::vector<TilePosition>& btpath, 
                                         const TilePosition& start, 
                                         const TilePosition& end)
 {
     clock_t endTimer(0), startTimer(0) ;
     btpath.clear();
-    unsigned int usize = 0;
-    if (_sheight > 15) //&& _slarge > 15)
-        usize = 1;
-    if (_sheight > 32) // && _slarge > 32)
-        usize = 2;
-    MapManager* mapm = & MapManager::Instance();
-    std::multimap<int, TilePosition> openTiles;
-    openTiles.insert(std::make_pair(0, start));
-    std::map<TilePosition, int> gmap;
-    std::map<TilePosition, TilePosition> parent;
-    std::set<TilePosition> closedTiles;
-    gmap[start]=0;
-    parent[start]=start;
-    while(!openTiles.empty())
+    BWTA::Region* r_begin = BWTA::getRegion(start);
+    BWTA::Region* r_end = BWTA::getRegion(end);
+    if (!r_begin || !r_end) return; // defensive pgming w.r.t. BWTA
+    if (r_begin == r_end)
     {
-        TilePosition p = openTiles.begin()->second;
-        if (p==end)
-        {
-            std::vector<TilePosition> reverse_path;
-            while(p!=parent[p])
-            {
-                reverse_path.push_back(p);
-                p=parent[p];
-            }
-            reverse_path.push_back(start);
-            for(int i=reverse_path.size()-1; i>=0; --i)
-                btpath.push_back(reverse_path[i]);
-            return;
-        }
-        //startTimer = clock();
-        int fvalue = openTiles.begin()->first;
-        int gvalue=gmap[p];
-        openTiles.erase(openTiles.begin());
-        closedTiles.insert(p);
-        const int width = BWAPI::Broodwar->mapWidth();
-        int minx = max(p.x() - 1, 0);
-        int maxx = min(p.x() + 1, width - 1);
-        int miny = max(p.y() - 1, 0);
-        int maxy = min(p.y() + 1, BWAPI::Broodwar->mapHeight() - 1);
-        //startTimer = clock() - startTimer;
-        for(int x = minx; x <= maxx; x++)
-            for(int y = miny; y <= maxy; y++)
-            {
-                if (!mapm->vLowResWalkability[usize][x + y*width]) continue;
-                if (p.x() != x && p.y() != y && 
-                    !mapm->vLowResWalkability[usize][p.x() + y*width] 
-                    && !mapm->vLowResWalkability[usize][x + p.y()*width]) continue;
-
-                TilePosition t(x,y);
-                if (closedTiles.find(t) != closedTiles.end()) continue;
-
-                int g=gvalue+10;
-                if (x != p.x() && y != p.y()) g+=4;
-                int dx=abs(x-end.x());
-                int dy=abs(y-end.y());
-                int h=abs(dx-dy)*10+min(dx,dy)*14;
-                int f=g+h;
-                if (gmap.find(t)==gmap.end() || g<gmap.find(t)->second)
-                {
-                    gmap[t]=g;
-                    std::pair<std::multimap<int, TilePosition>::iterator, 
-                        std::multimap<int, TilePosition>::iterator> itp 
-                        = openTiles.equal_range(f);
-                    if (itp.second == itp.first) 
-                        openTiles.insert(std::make_pair(f, t));
-                    else 
-                    {
-                        for (std::multimap<int, TilePosition>
-                            ::const_iterator it = itp.first;
-                            it != itp.second; ++it) 
-                        {
-                            if (it->second == t) 
-                            {
-                                openTiles.erase(it);
-                                break;
-                            } 
-                        }
-                        openTiles.insert(std::make_pair(f, t));
-                    }
-                    parent[t]=p;
-                }
-            }
-    endTimer += startTimer;
+        btpath = BWTA::getShortestPath(start, end);
+        return;
     }
-#ifdef __DEBUG_GABRIEL__
-    mapm->drawWalkability();
-    mapm->drawWalkability(usize);
-    Broodwar->printf("large: %d, height: %d, usize: %d", _slarge, _sheight, usize);
-#endif
-    // empty path
-    //Broodwar->printf("Iterations took %f", (double)(endTimer));
+    if (!r_end->isReachable(r_begin)) return;
+
+    // only 2 regions
+    std::set<BWTA::Chokepoint*> chokes = r_begin->getChokepoints();
+    double dmin = 10000000000000000000000.0;
+    TilePosition checkpoint;
+    BWTA::Region* r_next;
+    for (std::set<BWTA::Chokepoint*>::const_iterator it = chokes.begin();
+        it != chokes.end(); ++it)
+    {
+        if (BWTA::getGroundDistance(TilePosition((*it)->getCenter()), end) < dmin) // to change?
+        {
+            checkpoint = TilePosition((*it)->getCenter());
+            r_next = ((*it)->getRegions().first == r_begin ? 
+                (*it)->getRegions().second : (*it)->getRegions().first);
+        }
+    }
+    btpath = BWTA::getShortestPath(start, checkpoint);
+    chokes = r_next->getChokepoints();
+    dmin = 10000000000000000000000.0;
+    TilePosition checkpoint2;
+    for (std::set<BWTA::Chokepoint*>::const_iterator it = chokes.begin();
+        it != chokes.end(); ++it)
+    {
+        if (BWTA::getGroundDistance(TilePosition((*it)->getCenter()), end) < dmin) // to change?
+            checkpoint2 = TilePosition((*it)->getCenter());
+    }
+    std::vector<TilePosition> temp_path = BWTA::getShortestPath(checkpoint, checkpoint2);
+    for (std::vector<TilePosition>::const_iterator it = temp_path.begin();
+        it != temp_path.end(); ++it)
+        btpath.push_back(*it);
     return;
 }
 

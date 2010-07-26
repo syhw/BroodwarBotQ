@@ -12,7 +12,7 @@
 using boost::math::normal;
 #endif
 
-#define _OUR_PATHFINDER_
+//#define _OUR_PATHFINDER_
 
 using namespace std;
 using namespace BWAPI;
@@ -208,7 +208,6 @@ void BayesianUnit::straightLine(vector<Position>& ppath,
     {
         for (int id = 0; p_current != p_end && id < 2; ++id)
         {
-            //Vec line = Vec(end.x() - current.x(), end.y() - current.y());
             Vec line = Vec(p_end.x() - p_current.x(), 
                 p_end.y() - p_current.y()); 
             Vec objnorm = line.normalize();
@@ -228,12 +227,28 @@ void BayesianUnit::straightLine(vector<Position>& ppath,
             ppath.push_back(p_current);
         }
     } 
-    else 
+    else // TODO: Test it, untested (bad bad bad)
     {
-        //while (current != end) // TODO correct that, current and end rarely match
-        //{
-            //TODO
-        //}
+        while (p_current.getDistance(p_end) > 31) // 31 for BuildTile Resolution
+        {
+            Vec line = Vec(p_end.x() - p_current.x(), 
+                p_end.y() - p_current.y()); 
+            Vec objnorm = line.normalize();
+            double maxv = -10.;
+            unsigned int imax = 0;
+            for (unsigned int i = 0; i < _dirv.size(); ++i)
+            {
+                double tmp = dirvnorm[i].dot(objnorm);
+                if (tmp > maxv || 
+                        (tmp >= maxv && _dirv[i].norm() > _dirv[imax].norm()))
+                {
+                    maxv = tmp;
+                    imax = i;
+                }
+            }
+            p_current = _dirv[imax].translate(p_current);
+            ppath.push_back(p_current);
+        }
     }
 }
 
@@ -462,7 +477,7 @@ void BayesianUnit::updateObj()
 {
 #ifndef _OUR_PATHFINDER_
     Position p;
-    if (Broodwar->getFrameCount()%70 == 0 || !_path.size()) // hack to remove with the introduction of TimeManager
+    if (Broodwar->getFrameCount()%10 == 0 || !_path.size()) // hack to remove with the introduction of TimeManager
     {
         //TIMINGclock_t start = clock();
         _btpath = BWTA::getShortestPath(TilePosition(_unitPos), TilePosition(target));
@@ -492,7 +507,7 @@ void BayesianUnit::updateObj()
         p = _unitPos;
 
     obj = Vec(p.x() - _unitPos.x(), p.y() - _unitPos.y());
-    //drawPath();
+    drawPath();
 #else
     Position p;
     if (Broodwar->getFrameCount()%10 == 0 || !_path.size()) // hack to remove with the introduction of TimeManager
@@ -503,9 +518,9 @@ void BayesianUnit::updateObj()
             Si ça passe à plus de 6 unités, le temps est de 65 ms / unité et ça lag ...
         */
         if (_unitsGroup->_path.size() > 8)
-            sizeAwarePathFind(_btpath, TilePosition(_unitPos), TilePosition(this->_unitsGroup->_path[8].getPosition()));
+            quickPathFind(_btpath, TilePosition(_unitPos), TilePosition(this->_unitsGroup->_path[8].getPosition()));
         else
-            sizeAwarePathFind(_btpath, TilePosition(_unitPos), TilePosition(target));
+            quickPathFind(_btpath, TilePosition(_unitPos), TilePosition(target));
         _path.clear();
         for (std::vector<TilePosition>::const_iterator it = _btpath.begin(); it != _btpath.end(); ++it)
             _path.push_back(*it);
@@ -536,8 +551,7 @@ void BayesianUnit::updateObj()
     drawBTPath();
     MapManager* mapm = & MapManager::Instance();
     mapm->drawBuildingsStrict();
-
-    //mapm->drawBuildings(0);
+    mapm->drawWalkability();
     //drawPath();
 #endif
 #endif
@@ -750,7 +764,7 @@ void BayesianUnit::clickDir()
     dir += _unitPos;
     if (_unitPos.getDistance(dir.toPosition()) >= 1.0) 
         unit->rightClick(dir.toPosition());
-    ///unit->rightClick(target);
+    unit->rightClick(target);
 }
 
 void BayesianUnit::drawArrow(Vec& v)

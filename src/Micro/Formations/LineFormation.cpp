@@ -28,6 +28,16 @@ void LineFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
 	Vec dir( direction.y, direction.x); // rotation of 90° of the normal to obtain director vector.
 	Vec begin = center - (dir * lineLength / 2); // Compute the first coord on the line.
 
-	for(unsigned int i = 0; i < vUnits.size(); i++)
-		end_positions.push_back( (begin + (dir * i * maxLength)).toPosition());
+    for(unsigned int i = 0; i < vUnits.size();)
+    {
+        Position topos = (begin + (dir * i * maxLength)).toPosition();
+        if (topos.isValid())
+            end_positions.push_back(topos);
+        else
+        {
+            topos.makeValid();
+            end_positions.push_back(topos);
+        }
+        ++i;
+    }
 }

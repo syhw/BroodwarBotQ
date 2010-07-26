@@ -30,14 +30,16 @@ protected:
     std::vector<BWAPI::Position> _ppath;
     static void pathFind(std::vector<WalkTilePosition>& path, 
         const BWAPI::Position& p_start, const BWAPI::Position& p_end);
+    static void straightLine(std::vector<BWAPI::TilePosition>& btpath, 
+        const BWAPI::TilePosition& start, const BWAPI::TilePosition& end);
     bool inline tick();
     BWAPI::Unit* oldTarget;
 
 public:
     static void buildingsAwarePathFind(std::vector<BWAPI::TilePosition>& btpath, 
         const BWAPI::TilePosition& start, const BWAPI::TilePosition& end);
-    void sizeAwarePathFind(std::vector<BWAPI::TilePosition>& btpath, 
-        const BWAPI::TilePosition& start, 
+    static void quickPathFind(std::vector<BWAPI::TilePosition>& btpath, // works only with correct Regions
+        const BWAPI::TilePosition& start,                               // often not the case on custom maps
         const BWAPI::TilePosition& end);
     unsigned int _tick;
 	BWAPI::Unit* unit;

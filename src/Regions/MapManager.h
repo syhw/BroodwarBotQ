@@ -29,10 +29,8 @@ public:
     bool* lowResWalkability;    // low res => building tiles
     bool* buildings_wt;         // walk tiles
     bool* buildings_wt_strict;
-    bool* buildings;            // low res => building tiles
-    std::vector<bool*> vLowResWalkability;    // low res => building tiles
-    std::vector<bool*> vBuildings;            // low res => building tiles
-    int   damages;              // walktiles, -1 for unknown
+    bool* buildings;            // low res => building tiless
+    int* damages;               // walktiles, -1 for unknown
     void onUnitCreate(BWAPI::Unit* u);
     void onUnitDestroy(BWAPI::Unit* u);
     void onUnitShow(BWAPI::Unit* u);
@@ -41,8 +39,6 @@ public:
     void drawBuildings();   // debug
     void drawBuildingsStrict();   // debug
     void drawWalkability(); // debug
-    void drawBuildings(unsigned int i);   // debug
-    void drawWalkability(unsigned int i); // debug
     void drawLowResWalkability(); // debug
     void drawLowResBuildings(); // debug
 };

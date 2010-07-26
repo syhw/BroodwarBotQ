@@ -36,7 +36,7 @@ public:
 	virtual void onEnd(bool isWinner);
 	virtual void onFrame();
 	//virtual void onRemove(BWAPI::Unit* unit);
-	virtual bool onSendText(std::string text);
+	virtual void onSendText(std::string text);
     virtual void onUnitCreate(Unit* unit);
     virtual void onUnitDestroy(Unit* unit);
     virtual void onUnitShow(BWAPI::Unit* unit);

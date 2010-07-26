@@ -82,8 +82,8 @@ BattleBroodAI::~BattleBroodAI()
 
 void BattleBroodAI::onStart()
 {
-  _CrtDumpMemoryLeaks();      // anti-memory leaks
-  //Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
+    _CrtDumpMemoryLeaks();      // anti-memory leaks
+    //Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
 	// Enable some cheat flags
 	Broodwar->enableFlag(Flag::UserInput);
 	// Uncomment to enable complete map information
@@ -172,6 +172,7 @@ void BattleBroodAI::onFrame()
     if (!this->analyzed) return;
 
 #ifdef BW_POS_MOUSE
+    char mousePos[100];
     sprintf_s(mousePos, "%d, %d", Broodwar->getMousePosition().x(), Broodwar->getMousePosition().y());
     Broodwar->drawTextMouse(12, 0, mousePos);
 #endif
@@ -513,16 +514,16 @@ void BattleBroodAI::onNukeDetect(BWAPI::Position target)
     //	Broodwar->printf("Nuclear Launch Detected");
 }
 
-bool BattleBroodAI::onSendText(std::string text)
+void BattleBroodAI::onSendText(std::string text)
 {
     if (text=="/show players")
     {
         showPlayers();
-        return false;
+        return;
     } else if (text=="/show forces")
     {
         showForces();
-        return false;
+        return;
     } else if (text=="/show visibility")
     {
         show_visibility_data=true;
@@ -533,7 +534,7 @@ bool BattleBroodAI::onSendText(std::string text)
            // Broodwar->printf("Analyzing map... this may take a minute");
             CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)AnalyzeThread, NULL, 0, NULL);
         }
-        return false;
+        return;
     }
     else if (text.substr(0,9) == "/setspeed")
     {
@@ -567,7 +568,7 @@ bool BattleBroodAI::onSendText(std::string text)
     if (text=="debug")
     {
         this->showManagerAssignments=true;
-        return true;
+        return;
     }
     if (type!=UnitTypes::Unknown)
     {
@@ -591,7 +592,7 @@ bool BattleBroodAI::onSendText(std::string text)
                 Broodwar->printf("You typed '%s'!",text.c_str());
         }
     }
-    return true;
+    return;
 }
 
 DWORD WINAPI AnalyzeThread()

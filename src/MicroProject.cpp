@@ -92,7 +92,9 @@ void MicroAIModule::onStart()
 */
     /// TEST PATHFINDING
     
-    pFormation tmp_form = pFormation(new LineFormation(Position(101*32,62*32), Vec(1,0)));
+    //pFormation tmp_form = pFormation(new LineFormation(Position(101*32,62*32), Vec(1,0)));
+    pFormation tmp_form = pFormation(new LineFormation(Position(
+        (Broodwar->mapWidth())/2*32, (Broodwar->mapHeight() - 4)/2*32), Vec(1,0)));
     pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
     pGoal tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
     goals.push_back(tmp_goal);
@@ -119,8 +121,10 @@ void MicroAIModule::onStart()
 	//goals.push_back(Goal("attack move right !!!!!!!", Position(1999,1000)));
 	//goals->push_back(new Goal("attack move just there", Position(500,1300)));
 	//goals->push_back(new Goal());
+    
 	mm->setGoals(goals);
     mD->setGoals(goals2);
+
 	/*/
 	mm->setGoals(Goal("formation line x+400", new LineFormation(center, Vec(1, 3))));
 	Broodwar->printf( "size: %i", mm->goals.size());
@@ -144,8 +148,9 @@ void MicroAIModule::onFrame()
 	if (mD != NULL) 
         mD->update();
     regions->display();
-    char mousePos[100];
+    
 #ifdef BW_POS_MOUSE
+    char mousePos[100];
     sprintf_s(mousePos, "%d, %d", Broodwar->getMousePosition().x(), Broodwar->getMousePosition().y());
     Broodwar->drawTextMouse(12, 0, mousePos);
 #endif
@@ -224,20 +229,20 @@ void MicroAIModule::onEnd(bool isWinner)
 	}
 }
 
-bool MicroAIModule::onSendText(std::string text)
+void MicroAIModule::onSendText(std::string text)
 {
 	if (text=="/show stats")
 	{
 		showStats();
-		return false;
+		return;
 	} else if (text=="/show players")
 	{
 		showPlayers();
-		return false;
+		return;
 	} else if (text=="/show forces")
 	{
 		showForces();
-		return false;
+		return;
 	} else if (text=="/analyze")
 	{
 		if (analyzed == false)
@@ -245,7 +250,7 @@ bool MicroAIModule::onSendText(std::string text)
 			Broodwar->printf("Analyzing map... this may take a minute");
 			CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)AnalyzeThread, NULL, 0, NULL);
 		}
-		return false;
+		return;
     } else if (text=="/euf") // eUnitsFilter
     {
         eUnitsFilter->bwOutput();
@@ -273,7 +278,7 @@ bool MicroAIModule::onSendText(std::string text)
 	{
 		Broodwar->printf("You typed '%s'!",text.c_str());
 	}
-	return true;
+	return;
 }
 
 void MicroAIModule::onUnitCreate(Unit* unit)
