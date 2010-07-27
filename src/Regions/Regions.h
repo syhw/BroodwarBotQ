@@ -12,23 +12,23 @@
 #include "BaseObject.h"
 
 
-class UnitData
+class RegionsUnitData
 {
 public:
 	Unit* unit;
 	UnitType unitType;
 	Position position;
 	int lastSeen;
-	UnitData(Unit* unit);
-	bool operator == (const UnitData& ud) const;
+	RegionsUnitData(Unit* unit);
+	bool operator == (const RegionsUnitData& ud) const;
 };
 
 class RegionData
 {
 public:
 	// TODO perhaps change vectors by sets (we need a quick find and don't care about the order)
-	std::map<Player*, std::vector<UnitData> > buildings;	// list of enemy building seen in this region for each player.
-	std::map<Player*, std::vector<UnitData> > units;      // list of enemy units seen in this region for each player.
+	std::map<Player*, std::vector<RegionsUnitData> > buildings;	// list of enemy building seen in this region for each player.
+	std::map<Player*, std::vector<RegionsUnitData> > units;      // list of enemy units seen in this region for each player.
 	int lastSeen; // Last seen frame.
 	int visited; //Number of the frame when a scout goal to explore was accomplished.
 	// 0 means never

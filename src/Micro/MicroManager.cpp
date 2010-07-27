@@ -41,6 +41,9 @@ void MicroManager::update()
 		 ug = *it;
 		 ug->update();
 	}
+
+    sout << "LOL" << sendl; 
+    serr << "LOL" << sendl;
 }
 
 
@@ -122,11 +125,11 @@ void MicroManager::sendGroupToAttack( UnitsGroup* ug)
 	Unit* enemyUnit;
 	for (map<Region*, RegionData>::const_iterator itRegions = regions->regionsData.begin(); itRegions != regions->regionsData.end(); itRegions++)
 	{
-		for (map<Player*, vector<UnitData> >::const_iterator itBuildings = itRegions->second.buildings.begin(); itBuildings != itRegions->second.buildings.end(); itBuildings++)
+		for (map<Player*, vector<RegionsUnitData> >::const_iterator itBuildings = itRegions->second.buildings.begin(); itBuildings != itRegions->second.buildings.end(); itBuildings++)
 		{
 			if (itBuildings->first->isEnemy(Broodwar->self()))
 			{
-				for (vector<UnitData>::const_iterator itBD = itBuildings->second.begin(); itBD != itBuildings->second.end(); ++itBD)
+				for (vector<RegionsUnitData>::const_iterator itBD = itBuildings->second.begin(); itBD != itBuildings->second.end(); ++itBD)
 				{
 					double distance = getGroundDistance( ug->getCenter(), itBD->position);
 					if( distance < minDist)

@@ -1,24 +1,32 @@
 #pragma once
 #include "MapManager.h"
+#include "Vec.h"
+
+#include <stdio.h>
+#include <string.h>
+
 using namespace BWAPI;
 
 MapManager::MapManager()
 {
-    const int width = 4*Broodwar->mapWidth();
-    const int height = 4*Broodwar->mapHeight();
-    walkability = new bool[width * height];             // Walk Tiles resolution
-    buildings_wt = new bool[width * height];
-    lowResWalkability = new bool[width * height / 16];  // Build Tiles resolution
-    buildings = new bool[width * height / 16];          // Build Tiles resolution
-    for (int x = 0; x < width; ++x) 
-        for (int y = 0; y < height; ++y) 
+    _width = 4*Broodwar->mapWidth();
+    _height = 4*Broodwar->mapHeight();
+    walkability = new bool[_width * _height];             // Walk Tiles resolution
+    buildings_wt = new bool[_width * _height];
+    buildings_wt_strict = new bool[_width * _height];
+    lowResWalkability = new bool[_width * _height / 16];  // Build Tiles resolution
+    buildings = new bool[_width * _height / 16];          
+
+    // initialization
+    for (int x = 0; x < _width; ++x) 
+        for (int y = 0; y < _height; ++y) 
         {
-            walkability[x + y*width] = Broodwar->isWalkable(x, y);
-            buildings_wt[x + y*width] = false;
+            walkability[x + y*_width] = Broodwar->isWalkable(x, y);
+            buildings_wt[x + y*_width] = false;
         }
-    for (int x = 0; x < width/4; ++x) 
+    for (int x = 0; x < _width/4; ++x) 
     {
-        for (int y = 0; y < height/4; ++y) 
+        for (int y = 0; y < _height/4; ++y) 
         {
             int xx = 4*x;
             int yy = 4*y;
@@ -27,41 +35,51 @@ MapManager::MapManager()
             {
                 for (int j = 0; j < 4; ++j) 
                 {
-                    if (!walkability[xx+i + (yy+j)*width])
+                    if (!walkability[xx+i + (yy+j)*_width])
                         walkable = false;
                 }
             }
-            lowResWalkability[x + y*width/4] = walkable;
-            buildings[x + y*width/4] = false; // initialized with manual call to onUnitCreate() in onStart()
+            lowResWalkability[x + y*_width/4] = walkable;
+            buildings[x + y*_width/4] = false; // initialized with manual call to onUnitCreate() in onStart()
         }
     }
-    
-    /*for (int x = 0; x < width; ++x)
-    {
-        for (int y = 0; y < height; ++y)
-        {
-            lowResWalkability[x/4 + y/4 * width/4] &= walkability[x + y * width];
-            buildings[x/4 + y/4 * width/4] = false;
-        }
-    }*/
+
     _eUnitsFilter = & EUnitsFilter::Instance();
 }
 
 MapManager::~MapManager()
 {
     delete [] walkability;
+    delete [] lowResWalkability;
+    delete [] buildings_wt;
+    delete [] buildings;
 }
 
 void MapManager::modifyBuildings(Unit* u, bool b)
 {
+    // TODO Optimize (2 loops are unecessary)
     if (!u->getType().isBuilding() || (u->isLifted() && b)) return;
     TilePosition tpBd = u->getTilePosition(); // top left corner of the building
     for (int x = tpBd.x(); x < tpBd.x() + u->getType().tileWidth(); ++x)
         for (int y = tpBd.y(); y < tpBd.y() + u->getType().tileHeight(); ++y)
+        {
             buildings[x + y*Broodwar->mapWidth()] = b;
+        }
     for (int x = tpBd.x()*4 - 1; x < tpBd.x()*4 + u->getType().tileWidth()*4 + 1; ++x)
         for (int y = tpBd.y()*4 - 1; y < tpBd.y()*4 + u->getType().tileHeight()*4 + 1; ++y)
-            buildings_wt[x + y*Broodwar->mapWidth()*4] = b;
+            if (x >= 0 && x < _width && y >= 0 && y < _height)
+                buildings_wt[x + y*_width] = b;
+    for (int x = (u->getPosition().x() - u->getType().dimensionLeft() - 5) / 8; 
+        x <= (u->getPosition().x() + u->getType().dimensionRight() + 5) / 8; ++x)
+    {
+        for (int y = (u->getPosition().y() - u->getType().dimensionUp() - 5) / 8;
+            y <= (u->getPosition().y() + u->getType().dimensionDown() + 5) / 8; ++y)
+        {
+            buildings_wt_strict[x + y*_width] = b;
+            //buildings_wt[x + y*_width] = b;
+            //if (y > 0) buildings_wt[x + (y-1)*_width] = b;
+        }
+    }
 }
 
 void MapManager::addBuilding(Unit* u)
@@ -103,29 +121,31 @@ void MapManager::onFrame()
 
 void MapManager::drawBuildings()
 {
-    for (int x = 0; x < Broodwar->mapWidth(); ++x)
-        for (int y = 0; y < Broodwar->mapHeight(); ++y)
+    for (int x = 0; x < _width; ++x)
+        for (int y = 0; y < _height; ++y)
         {
-            if (buildings[x + y*Broodwar->mapWidth()])
-                Broodwar->drawBox(CoordinateType::Map, 32*x + 2, 32*y + 2, 32*x + 30, 32*y + 30, Colors::Orange);
-                //Broodwar->drawBox(CoordinateType::Map, 32*x - 15, 32*y - 15, 32*x + 15, 32*y + 15, Colors::Orange);
+            if (buildings_wt[x + y*_width])
+                Broodwar->drawBoxMap(8*x+1, 8*y+1, 8*x+7, 8*y+7, Colors::Orange);
         }
+}
 
-    for (int x = 0; x < Broodwar->mapWidth()*4; ++x)
-        for (int y = 0; y < Broodwar->mapHeight()*4; ++y)
+void MapManager::drawBuildingsStrict()
+{
+    for (int x = 0; x < _width; ++x)
+        for (int y = 0; y < _height; ++y)
         {
-            if (buildings_wt[x + y*Broodwar->mapWidth()*4])
+            if (buildings_wt_strict[x + y*_width])
                 Broodwar->drawBoxMap(8*x+1, 8*y+1, 8*x+7, 8*y+7, Colors::Orange);
         }
 }
 
 void MapManager::drawWalkability()
 {
-    for (int x = 0; x < Broodwar->mapWidth()*4; ++x)
-        for (int y = 0; y < Broodwar->mapHeight()*4; ++y)
+    for (int x = 0; x < _width; ++x)
+        for (int y = 0; y < _height; ++y)
         {
-            if (!walkability[x + y*Broodwar->mapWidth()*4])
-                Broodwar->drawBox(CoordinateType::Map, 8*x - 3, 8*y - 3, 8*x + 3, 8*y + 3, Colors::Red);
+            if (!walkability[x + y*_width])
+                Broodwar->drawBox(CoordinateType::Map, 8*x + 1, 8*y + 1, 8*x + 7, 8*y + 7, Colors::Red);
         }
 }
 
@@ -136,5 +156,16 @@ void MapManager::drawLowResWalkability()
         {
             if (!lowResWalkability[x + y*Broodwar->mapWidth()])
                 Broodwar->drawBox(CoordinateType::Map, 32*x + 2, 32*y + 2, 32*x + 30, 32*y + 30, Colors::Red);
+        }
+}
+
+void MapManager::drawLowResBuildings()
+{
+    for (int x = 0; x < Broodwar->mapWidth(); ++x)
+        for (int y = 0; y < Broodwar->mapHeight(); ++y)
+        {
+            if (buildings[x + y*Broodwar->mapWidth()])
+                Broodwar->drawBox(CoordinateType::Map, 32*x + 2, 32*y + 2, 32*x + 30, 32*y + 30, Colors::Orange);
+            //Broodwar->drawBox(CoordinateType::Map, 32*x - 15, 32*y - 15, 32*x + 15, 32*y + 15, Colors::Orange);
         }
 }

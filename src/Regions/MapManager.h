@@ -2,6 +2,7 @@
 #include <BWAPI.h>
 #include "CSingleton.h"
 #include "EUnitsFilter.h"
+#include <vector>
 
 /** From BWAPI's doc:
 * Positions are measured in pixels and are the highest resolution
@@ -18,21 +19,26 @@ private:
     EUnitsFilter* _eUnitsFilter;
     MapManager();
     ~MapManager();
+    int _width;
+    int _height;
     inline void modifyBuildings(BWAPI::Unit* u, bool b);
     inline void addBuilding(BWAPI::Unit* u);
     inline void removeBuilding(BWAPI::Unit* u);
 public:
     bool* walkability;          // walk tiles
     bool* lowResWalkability;    // low res => building tiles
-    bool* buildings;            // low res => building tiles
-    bool* buildings_wt;
-    int   damages;              // walktiles, -1 for unknown
+    bool* buildings_wt;         // walk tiles
+    bool* buildings_wt_strict;
+    bool* buildings;            // low res => building tiless
+    int* damages;               // walktiles, -1 for unknown
     void onUnitCreate(BWAPI::Unit* u);
     void onUnitDestroy(BWAPI::Unit* u);
     void onUnitShow(BWAPI::Unit* u);
     void onUnitHide(BWAPI::Unit* u);
     void onFrame();
     void drawBuildings();   // debug
+    void drawBuildingsStrict();   // debug
     void drawWalkability(); // debug
     void drawLowResWalkability(); // debug
+    void drawLowResBuildings(); // debug
 };

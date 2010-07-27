@@ -13,6 +13,7 @@ class BattleUnit
     friend void baseMicro();
     friend void zealotMicro();
 protected:
+    int _sheight, _slarge;
 #ifdef UNIT_DEBUG
     std::string _unitType;
 #endif
@@ -29,13 +30,18 @@ protected:
     std::vector<BWAPI::Position> _ppath;
     static void pathFind(std::vector<WalkTilePosition>& path, 
         const BWAPI::Position& p_start, const BWAPI::Position& p_end);
-    unsigned int _tick;
+    static void straightLine(std::vector<BWAPI::TilePosition>& btpath, 
+        const BWAPI::TilePosition& start, const BWAPI::TilePosition& end);
     bool inline tick();
     BWAPI::Unit* oldTarget;
 
 public:
     static void buildingsAwarePathFind(std::vector<BWAPI::TilePosition>& btpath, 
         const BWAPI::TilePosition& start, const BWAPI::TilePosition& end);
+    static void quickPathFind(std::vector<BWAPI::TilePosition>& btpath, // works only with correct Regions
+        const BWAPI::TilePosition& start,                               // often not the case on custom maps
+        const BWAPI::TilePosition& end);
+    unsigned int _tick;
 	BWAPI::Unit* unit;
     BWAPI::Unit* targetEnemy;
     BWAPI::Unit* targetEnemyInRange;

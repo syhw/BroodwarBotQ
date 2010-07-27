@@ -54,6 +54,9 @@ from and to are required to be of the same size()
 */
 void mid_based_align(const std::vector<Position>& from, const std::vector<Position>& to, std::vector<unsigned int>& alignment)
 {
+    if (!from.size())
+        return;
+    assert(from.size() != 0);
     assert(to.size() == from.size());
     Position from_center;
     Position to_center;

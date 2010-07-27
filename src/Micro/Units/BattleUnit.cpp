@@ -17,6 +17,8 @@ BattleUnit::BattleUnit(BWAPI::Unit* unit)
 , targetEnemy(NULL)
 , targetEnemyInRange(NULL)
 , target(unit->getPosition())
+, _sheight(unit->getType().dimensionUp() + unit->getType().dimensionDown())
+, _slarge(unit->getType().dimensionRight() + unit->getType().dimensionLeft())
 #ifdef UNIT_DEBUG
 , _unitType(unit->getType().getName())
 #endif
@@ -217,7 +219,8 @@ void BattleUnit::pathFind(std::vector<WalkTilePosition>& path,
 
 void BattleUnit::buildingsAwarePathFind(std::vector<TilePosition>& btpath, 
                           const TilePosition& start, const TilePosition& end)
-{clock_t endTimer(0), startTimer(0) ;
+{
+    clock_t endTimer(0), startTimer(0) ;
     btpath.clear();
     MapManager* mapm = & MapManager::Instance();
     std::multimap<int, TilePosition> openTiles;
@@ -302,7 +305,95 @@ void BattleUnit::buildingsAwarePathFind(std::vector<TilePosition>& btpath,
     endTimer += startTimer;
     }
     // empty path
-    //Broodwar->printf("Iterations took %f", (double)(endTimer));
+    return;
+}
+
+void BattleUnit::straightLine(std::vector<TilePosition>& btpath, 
+        const TilePosition& start, const TilePosition& end)
+{
+
+    // DO NOT CLEAR btpath for you
+    if (start.x() == end.x() && start.y() == end.y()) return;
+    TilePosition current = start;
+    btpath.push_back(current);
+    Position p_end = Position(end);
+    while (Position(current).getDistance(p_end) > 31) // 31 for BuildTile Resolution
+    {
+        Vec line = Vec(end.x() - current.x(), 
+            end.y() - current.y());
+        if (line.y == 0.0)
+        {
+            int currentx = (line.x > 0.0 ? current.x() + 1 : current.x() - 1);
+            current = TilePosition(currentx, current.y());
+            btpath.push_back(current);
+            continue;
+        }
+        double div = abs(line.x / line.y); // line.y != 0.0
+        if (div > 2.0)
+        {
+            int currentx = (line.x > 0.0 ? current.x() + 1 : current.x() - 1);
+            current = TilePosition(currentx, current.y());
+        } 
+        else if (div < 0.5)
+        {
+            int currenty = (line.y > 0.0 ? current.y() + 1 : current.y() - 1);
+            current = TilePosition(current.x(), currenty);
+        }
+        else
+        {
+            int currentx = (line.x > 0.0 ? current.x() + 1 : current.x() - 1);
+            int currenty = (line.y > 0.0 ? current.y() + 1 : current.y() - 1);
+            current = TilePosition(currentx, currenty);
+        }
+        btpath.push_back(current);
+    }
+}
+
+void BattleUnit::quickPathFind(std::vector<TilePosition>& btpath, 
+                                        const TilePosition& start, 
+                                        const TilePosition& end)
+{
+    clock_t endTimer(0), startTimer(0) ;
+    btpath.clear();
+    BWTA::Region* r_begin = BWTA::getRegion(start);
+    BWTA::Region* r_end = BWTA::getRegion(end);
+    if (!r_begin || !r_end) return; // defensive pgming w.r.t. BWTA
+    if (r_begin == r_end)
+    {
+        btpath = BWTA::getShortestPath(start, end);
+        return;
+    }
+    if (!r_end->isReachable(r_begin)) return;
+
+    // only 2 regions
+    std::set<BWTA::Chokepoint*> chokes = r_begin->getChokepoints();
+    double dmin = 10000000000000000000000.0;
+    TilePosition checkpoint;
+    BWTA::Region* r_next;
+    for (std::set<BWTA::Chokepoint*>::const_iterator it = chokes.begin();
+        it != chokes.end(); ++it)
+    {
+        if (BWTA::getGroundDistance(TilePosition((*it)->getCenter()), end) < dmin) // to change?
+        {
+            checkpoint = TilePosition((*it)->getCenter());
+            r_next = ((*it)->getRegions().first == r_begin ? 
+                (*it)->getRegions().second : (*it)->getRegions().first);
+        }
+    }
+    btpath = BWTA::getShortestPath(start, checkpoint);
+    chokes = r_next->getChokepoints();
+    dmin = 10000000000000000000000.0;
+    TilePosition checkpoint2;
+    for (std::set<BWTA::Chokepoint*>::const_iterator it = chokes.begin();
+        it != chokes.end(); ++it)
+    {
+        if (BWTA::getGroundDistance(TilePosition((*it)->getCenter()), end) < dmin) // to change?
+            checkpoint2 = TilePosition((*it)->getCenter());
+    }
+    std::vector<TilePosition> temp_path = BWTA::getShortestPath(checkpoint, checkpoint2);
+    for (std::vector<TilePosition>::const_iterator it = temp_path.begin();
+        it != temp_path.end(); ++it)
+        btpath.push_back(*it);
     return;
 }
 

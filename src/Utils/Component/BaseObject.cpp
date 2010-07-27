@@ -27,11 +27,11 @@ void BaseObject::onFrame()
 	timeEllapsed = (endTime - beginTime) / CLOCKS_PER_SEC;
 
 	// refresh QtWidget all half seconds
-	if(!(clock()%12))
+	if (!(clock()%12))
 		refreshWidgetEmiter->refresh(); // maybe replace this call by a timer should be better ?
 
-	if( !sout.str().empty()) processStream( sout);
-	if( !serr.str().empty()) processStream( serr);
+	if (!sout.str().empty()) processStream(sout);
+	if (!serr.str().empty()) processStream(serr);
 #else
 	update();
 #endif

@@ -51,7 +51,10 @@ enum flock_value {
 
 enum inPos_value {
     INPOS_OK,
-    INPOS_CONTACT
+    INPOS_CONTACT,
+    INPOS_CLOSE,
+    INPOS_MEDIUM,
+    INPOS_FAR
 };
 
 enum fightG_value { 
@@ -67,7 +70,6 @@ class BayesianUnit : public BattleUnit
 protected:
     bool _ground_unit; // true when unit can move only on the ground
     unit_mode _mode;
-    int _sheight, _slarge;
     std::vector<Vec> _dirv;
     //std::multimap<BWAPI::Position, attractor_type> _prox;
     std::vector<occupation_type> _occupation;

@@ -60,8 +60,6 @@ BOOL APIENTRY DllMain(HANDLE hModule,
         CloseHandle(&hThreadArrayMonitor);
         break;
     }
-
-
     return TRUE;
 }
 
