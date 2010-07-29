@@ -12,7 +12,7 @@ void MicroAIModule::onStart()
 	// Enable some cheat flags
     Broodwar->printf("ON START !!\n");
 	Broodwar->enableFlag(Flag::UserInput);
-    Broodwar->setLocalSpeed(0);
+    ////////Broodwar->setLocalSpeed(0);
 	//Broodwar->enableFlag(Flag::CompleteMapInformation);
 	BWTA::readMap();
 	BWTA::analyze();

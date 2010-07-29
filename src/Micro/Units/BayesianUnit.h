@@ -71,6 +71,7 @@ protected:
     bool _ground_unit; // true when unit can move only on the ground
     unit_mode _mode;
     std::vector<Vec> _dirv;
+    int _dirvNeededSize;
     //std::multimap<BWAPI::Position, attractor_type> _prox;
     std::vector<occupation_type> _occupation;
     // dirv[attractor] = direction relative to an attractor
