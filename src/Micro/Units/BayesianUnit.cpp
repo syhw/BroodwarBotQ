@@ -49,6 +49,7 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 , _mode(MODE_FLOCK)
 , _unitsGroup(ug)
 , _ground_unit(!unit->getType().isFlyer())
+//, _dirvNeededSize(unit->getType().acceleration)
 {
     updateDirV();
     mapManager = & MapManager::Instance();
@@ -675,52 +676,44 @@ void BayesianUnit::drawOccupation(int number)
 void BayesianUnit::updateDirV()
 {
     _dirv.clear();
-    int accel = unit->getType().acceleration();
-    double speed = unit->getType().topSpeed();
-    //Broodwar->printf("unittype: %s, accel: %d, top speed: %f", unit->getType(). , accel, speed);
     Position p = _unitPos;
     WalkTilePosition wtp(p);
-//    const int minx = 0;
-//    const int maxx = 32*Broodwar->mapWidth();
-//    const int miny = 0;
-//    const int maxy = 32*Broodwar->mapHeight();
-    const int minx = max(p.x() - 2*_slarge, 0);
-    const int maxx = min(p.x() + 2*_slarge, 32*Broodwar->mapWidth());
-    const int miny = max(p.y() - 2*_sheight, 0);
-    const int maxy = min(p.y() + 2*_sheight, 32*Broodwar->mapHeight());
-    for (int x = -4; x <= 4; ++x) // -4..4 overkill
-        for (int y = -4; y <= 4; ++y)
+
+    int pixs = min(_slarge, _sheight) + 1; // TODO review this value
+    if (pixs < _accel * _topSpeed) // 2*pixs < (_accel/2) * topSpeed because (_accel/2) \approxeq #frames_to_go_to_topspeed
+        pixs = _accel * _topSpeed / 2;
+    for (int x = -3; x <= 3; ++x)
+        for (int y = -3; y <= 3; ++y)
         {
-            Vec v(x*_slarge/2, y*_sheight/2);
+            int xx, yy;
+            int pixs_far = 0; // outer layer of dirvectors
+            if (x == -3 || x == 3 || y == -3 || y == 3)
+            {
+                if (!pixs_far)
+                {
+                    if (pixs < 32) // 3*pixs < 96
+                    {
+                        pixs_far = 32;
+                    }
+                    else
+                        pixs_far = pixs;
+                }
+                xx = x*pixs_far;
+                yy = y*pixs_far;
+            }
+            else
+            {
+                xx = x*pixs;
+                yy = y*pixs;
+            }
+            Vec v(xx, yy);
             Position tmp = v.translate(p);
-            if (tmp.x() <= maxx && tmp.y() <= maxy 
-                    && tmp.x() >= minx && tmp.y() >= miny)
+            if (tmp.x() <= 32*Broodwar->mapWidth() && tmp.y() <= 32*Broodwar->mapHeight() 
+                    && tmp.x() >= 0 && tmp.y() >= 0)
             {
                 _dirv.push_back(v);
             }
         }  
-    /*
-    const int sh = 1 + _sheight/8;
-    const int sl = 1 + _slarge/8;
-    //Broodwar->printf("unit size : %d, %d\n", _sheight, _slarge);
-    //Broodwar->printf("sh : %d, sl : %d\n", sh, sl);
-    const int width = Broodwar->mapWidth();
-    Position p = _unitPos();
-    const int minx = max(p.x() - sl*8, 0);
-    const int maxx = min(p.x() + sl*8, 32*width);
-    const int miny = max(p.y() - sh*8, 0);
-    const int maxy = min(p.y() + sh*8, 32*Broodwar->mapHeight());
-    _dirv.clear();
-    for (int x = - sl; x <= sl; ++x)
-        for (int y = -sh; y <= sh; ++y)
-        {
-            Vec v(x, y);
-            v *= 8;
-            Position tmp = v.translate(p);
-            if (tmp.x() <= maxx && tmp.y() <= maxy && tmp.x() >= minx && tmp.y() >= miny)
-                _dirv.push_back(v);
-        }
-    */
 }
 
 void BayesianUnit::drawDirV()
@@ -802,7 +795,7 @@ void BayesianUnit::updateDir()
         }
     }
 
-    //drawProbs(dirvProb, _unitsGroup->size());
+    drawProbs(dirvProb, _unitsGroup->size());
 }
 
 void BayesianUnit::drawDir()
