@@ -78,7 +78,7 @@ class BayesianUnit : public BattleUnit
 protected:
     bool _ground_unit; // true when unit can move only on the ground
     std::vector<Vec> _dirv;
-    std::vector<Vec> _dirvNorm;
+    int _dirvNeededSize;
     //std::multimap<BWAPI::Position, attractor_type> _prox;
     std::vector<occupation_type> _occupation;
     // dirv[attractor] = direction relative to an attractor

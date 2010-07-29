@@ -14,6 +14,8 @@ class BattleUnit
     friend void zealotMicro();
 protected:
     int _sheight, _slarge;
+    int _accel;
+    double _topSpeed;
 #ifdef UNIT_DEBUG
     std::string _unitType;
 #endif

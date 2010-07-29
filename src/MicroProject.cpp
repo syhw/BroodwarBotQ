@@ -12,7 +12,7 @@ void MicroAIModule::onStart()
 	// Enable some cheat flags
     //Broodwar->printf("ON START !!\n");
     Broodwar->enableFlag(Flag::UserInput);
-    Broodwar->setLocalSpeed(0);
+    //Broodwar->setLocalSpeed(0);
 	//Broodwar->enableFlag(Flag::CompleteMapInformation);
 	BWTA::readMap();
 	BWTA::analyze();
@@ -117,7 +117,7 @@ void MicroAIModule::onStart()
     tmp_goal = pGoal(new Goal(mD, tmp_subgoal));
     goals2.push_back(tmp_goal);*/
 
-    pFormation tmp_form = pFormation(new LineFormation(Position(33*32,33*32), Vec(1,0)));
+    pFormation tmp_form = pFormation(new LineFormation(Position(18*32,36*32), Vec(1,0)));
     pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
     pGoal tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
     goals.push_back(tmp_goal);

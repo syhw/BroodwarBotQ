@@ -19,6 +19,8 @@ BattleUnit::BattleUnit(BWAPI::Unit* unit)
 , target(unit->getPosition())
 , _sheight(unit->getType().dimensionUp() + unit->getType().dimensionDown())
 , _slarge(unit->getType().dimensionRight() + unit->getType().dimensionLeft())
+, _accel(unit->getType().acceleration())
+, _topSpeed(unit->getType().topSpeed())
 #ifdef UNIT_DEBUG
 , _unitType(unit->getType().getName())
 #endif
@@ -130,7 +132,6 @@ void BattleUnit::drawTarget()
 
 
 /// TODO change this to use geometry (faster) and direct lines. 
-/// We here consider only 8 possible directions and there are 16.
 void BattleUnit::pathFind(std::vector<WalkTilePosition>& path, 
                           const Position& p_start, const Position& p_end)
 {
