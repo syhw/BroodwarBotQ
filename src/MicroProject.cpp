@@ -10,8 +10,8 @@ void MicroAIModule::onStart()
 {
 	///Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
 	// Enable some cheat flags
-    Broodwar->printf("ON START !!\n");
-	Broodwar->enableFlag(Flag::UserInput);
+    //Broodwar->printf("ON START !!\n");
+    Broodwar->enableFlag(Flag::UserInput);
     Broodwar->setLocalSpeed(0);
 	//Broodwar->enableFlag(Flag::CompleteMapInformation);
 	BWTA::readMap();
@@ -22,7 +22,7 @@ void MicroAIModule::onStart()
     this->regions = & Regions::Instance();
 
 	mm = new UnitsGroup();
-    mD = new UnitsGroup();
+ //   mD = new UnitsGroup();
 
 	// Vec center;
 	std::set<Unit*> allUnits = Broodwar->getAllUnits();
@@ -38,15 +38,15 @@ void MicroAIModule::onStart()
             regions->onUnitCreate(*i);
             mapManager->onUnitCreate(*i);
 		} 
-        else if ((*i)->getType() == BWAPI::UnitTypes::Protoss_Zealot)
+        else// if ((*i)->getType() == BWAPI::UnitTypes::Protoss_Zealot)
 		{
             // Broodwar->printf("Took control of: %s\n", (*i)->getType().getName().c_str() );
 			mm->takeControl(*i);
 		}
-       else if ((*i)->getType() != BWAPI::UnitTypes::Protoss_Zealot)
+       /*else if ((*i)->getType() != BWAPI::UnitTypes::Protoss_Zealot)
         {
             mD->takeControl(*i);
-        }
+        }*/
 	}
 
 	/* std::set<Player*> players=Broodwar->getPlayers();
@@ -65,7 +65,7 @@ void MicroAIModule::onStart()
 
 	//*
 	std::list<pGoal> goals;
-	std::list<pGoal> goals2;
+	//std::list<pGoal> goals2;
 	// goals.push_back(Formation(0,1,Position(1000,1000)); 
     /// TEST test_path with tanks & vultures: 
     /// goals.push_back(new Goal("direct line to 1120, 704", new Formation(Vec(1120, 704), Vec(-0.5, -0.5))));
@@ -99,7 +99,9 @@ void MicroAIModule::onStart()
     pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
     pGoal tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
     goals.push_back(tmp_goal);
-    */
+*/
+    
+  /*  pFormation tmp_form = pFormation(new LineFormation(Position(33*32,6*32), Vec(1,0)));
 
     pFormation tmp_form = pFormation(new LineFormation(Position(
         (Broodwar->mapWidth())/2*32, (Broodwar->mapHeight() - 4)/2*32), Vec(1,0)));
@@ -113,7 +115,12 @@ void MicroAIModule::onStart()
     //tmp_form = pFormation(new LineFormation(Position(40*32,3*32), Vec(1,0)));
     tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
     tmp_goal = pGoal(new Goal(mD, tmp_subgoal));
-    goals2.push_back(tmp_goal);
+    goals2.push_back(tmp_goal);*/
+
+    pFormation tmp_form = pFormation(new LineFormation(Position(33*32,33*32), Vec(1,0)));
+    pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
+    pGoal tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+    goals.push_back(tmp_goal);
 
   //  tmp_form = pFormation(new LineFormation(Position(33*32,9*32), Vec(1,0)));
   //  tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form, mm));
@@ -128,8 +135,7 @@ void MicroAIModule::onStart()
 	//goals->push_back(new Goal());
     
 	mm->setGoals(goals);
-    mD->setGoals(goals2);
-
+    //mD->setGoals(goals2);
 	/*/
 	mm->setGoals(Goal("formation line x+400", new LineFormation(center, Vec(1, 3))));
 	Broodwar->printf( "size: %i", mm->goals.size());
@@ -150,13 +156,13 @@ void MicroAIModule::onFrame()
     objectManager->onFrame();
 	if (mm != NULL) 
         mm->update();
-	if (mD != NULL) 
-        mD->update();
+	//if (mD != NULL) 
+   //     mD->update();
     regions->display();
     
 #ifdef BW_POS_MOUSE
     char mousePos[100];
-    sprintf_s(mousePos, "%d, %d", Broodwar->getMousePosition().x(), Broodwar->getMousePosition().y());
+    sprintf_s(mousePos, "%d, %d", Broodwar->getScreenPosition().x()+Broodwar->getMousePosition().x(), Broodwar->getScreenPosition().y()+Broodwar->getMousePosition().y());
     Broodwar->drawTextMouse(12, 0, mousePos);
 #endif
 	/*if (Broodwar->getFrameCount()%300==0)
@@ -202,7 +208,7 @@ MicroAIModule::~MicroAIModule()
 		ObjectManager::Destroy();
     Regions::Destroy();
     mm->~UnitsGroup();
-    mD->~UnitsGroup();
+  //  mD->~UnitsGroup();
 }
 
 #ifdef BW_QT_DEBUG

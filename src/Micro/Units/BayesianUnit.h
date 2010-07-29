@@ -65,12 +65,20 @@ enum fightG_value {
     FIGHTG_DEAD
 };
 
+enum dodge_value {
+    DODGE_NO,
+    DODGE_CONTACT,
+    DODGE_CLOSE,
+    DODGE_MEDIUM
+
+};
+
 class BayesianUnit : public BattleUnit
 {
 protected:
     bool _ground_unit; // true when unit can move only on the ground
-    unit_mode _mode;
     std::vector<Vec> _dirv;
+    std::vector<Vec> _dirvNorm;
     //std::multimap<BWAPI::Position, attractor_type> _prox;
     std::vector<occupation_type> _occupation;
     // dirv[attractor] = direction relative to an attractor
@@ -87,9 +95,11 @@ protected:
     std::vector<std::vector<flock_value> > _flockValues; // one vector<flock_value> per unit with which we flock
     std::vector<std::vector<inPos_value> > _inPosValues;
     std::vector<std::vector<fightG_value> > _fightGValues;
+    std::vector<std::vector<dodge_value> > _dodgeValues;
     std::vector<double> _flockProb; // TODO decide if static, perhaps unit dependant
     std::vector<double> _inPosProb; // TODO decide if static, perhaps unit dependant
     std::vector<double> _fightGProb; // TODO decide if static, perhaps unit dependant
+    std::vector<double> _dodgeProb; // TODO decide if static, perhaps unit dependant
     UnitsGroup* _unitsGroup;
     std::multimap<double, BWAPI::Unit*> _rangeEnemies;
     std::map<occupation_type, double> _defaultProb;
@@ -123,6 +133,7 @@ protected:
     inline void deleteRangeEnemiesElem(BWAPI::Unit* u);
     inline void updateRangeEnemiesWith(BWAPI::Unit* u);
 public:
+    unit_mode _mode; // TODO : faudra le remettre en protected, c'est juste pour quelques tests
 	void switchMode(unit_mode um);
     Vec dir, obj; // dir=current direction, obj=pathfinder's direction
     // std::map<attractor_type, std::vector<BWAPI::Position>> prox; 

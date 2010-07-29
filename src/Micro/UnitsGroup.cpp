@@ -284,6 +284,9 @@ void UnitsGroup::displayTargets()
 
 void UnitsGroup::update()
 {
+    //static clock_t timeToExec(clock());
+    //static bool show(true);
+    //clock_t end;
     this->totalHP = 0;
     unitsAvailables.clear();
     enemiesInSight.clear();
@@ -326,6 +329,20 @@ void UnitsGroup::update()
     updateCenter();
     keepDistance(); // Temporary call to test micro tech
 	accomplishGoal();
+
+    /*bool inFlock = true;
+    for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end() && inFlock; ++it)
+    {
+        if ( (*it)->_mode != MODE_INPOS )
+            inFlock = false;
+    }
+    if (inFlock && show)
+    {
+        end = clock();
+        BWAPI::Broodwar->printf("Temps pour arriver à l'objectif : %i", end-timeToExec);
+        show = false;
+    }*/
+
 
 #ifdef __DEBUG_NICOLAS__
     displayTargets();
