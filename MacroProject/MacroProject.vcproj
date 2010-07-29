@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="MacroProject"
 	ProjectGUID="{F39C7417-770D-4635-8A47-77BD9CDDCD71}"
 	RootNamespace="MacroProject"
@@ -373,6 +373,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Macro\UnitGroup.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\UnitGroupManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Macro\WorkerManager.cpp"
 					>
 				</File>
@@ -396,11 +404,19 @@
 					Name="Build"
 					>
 					<File
+						RelativePath="..\src\Macro\Build\Assignment.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\src\Macro\Build\Base.cpp"
 						>
 					</File>
 					<File
 						RelativePath="..\src\Macro\Build\BaseManager.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Macro\BorderManager.cpp"
 						>
 					</File>
 					<File
@@ -420,6 +436,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\src\Macro\Build\MetaUnit.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\src\Macro\Build\MorphManager.cpp"
 						>
 					</File>
@@ -429,6 +449,10 @@
 					</File>
 					<File
 						RelativePath="..\src\Macro\Build\SupplyManager.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Macro\Build\UnitItem.cpp"
 						>
 					</File>
 				</Filter>
@@ -529,7 +553,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\ScoutManager.cpp"
+					RelativePath="..\src\Macro\InformationManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Intelligence\ScoutManager.cpp"
 					>
 				</File>
 			</Filter>
@@ -755,6 +783,14 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Macro\UnitGroup.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\UnitGroupManager.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Macro\WorkerManager.h"
 					>
 				</File>
@@ -771,6 +807,10 @@
 					</File>
 					<File
 						RelativePath="..\src\Macro\Build\BaseManager.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Macro\BorderManager.h"
 						>
 					</File>
 					<File
@@ -803,6 +843,14 @@
 					</File>
 					<File
 						RelativePath="..\src\Macro\Build\SupplyManager.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Macro\Build\TechItem.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Macro\Build\UnitItem.h"
 						>
 					</File>
 				</Filter>
@@ -951,7 +999,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\ScoutManager.h"
+					RelativePath="..\src\Macro\InformationManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Intelligence\ScoutManager.h"
 					>
 				</File>
 			</Filter>

@@ -12,6 +12,7 @@ ZergStrat::~ZergStrat()
 
 void ZergStrat::buildGeyser()
 {
+	/*
 	std::set<Base*>& bases = baseManager->getActiveBases();
 	for( set<Base*>::iterator it = bases.begin(); it != bases.end(); it++)
 	{
@@ -22,19 +23,23 @@ void ZergStrat::buildGeyser()
 			(*it)->exploitedGeysers++; // TODO enlever les geyser detruits.
 		}
 	}
+	*/
 }
 
 void ZergStrat::createProdBuildings()
 {
+	/*
 	if( buildOrderManager->getUnusedMinerals() >= UnitTypes::Zerg_Hatchery.mineralPrice())
 	{
 		this->buildOrderManager->buildAdditional(1,UnitTypes::Zerg_Hatchery,20);
 		underConstruction[UnitTypes::Zerg_Hatchery] = true;
 	}
+	*/
 }
 
 void ZergStrat::createTechBuildings()
 {
+	/*
 	if( canCreateTechBuildings( UnitTypes::Zerg_Spawning_Pool, UnitTypes::None, 1))
 	{
 		this->buildOrderManager->buildAdditional(1,UnitTypes::Zerg_Spawning_Pool,40);
@@ -45,6 +50,7 @@ void ZergStrat::createTechBuildings()
 		this->buildOrderManager->buildAdditional(1,UnitTypes::Zerg_Hydralisk_Den,30);
 		techBuildings.insert( UnitTypes::Zerg_Hydralisk_Den);
 	}
+	*/
 }
 
 void ZergStrat::initWantedUnits()
@@ -59,6 +65,7 @@ void ZergStrat::initWantedUnits()
 // TODO : accorder la creation de workers et de combattants
 void ZergStrat::trainUnits()
 {
+	/*
 	std::list<BWAPI::Unit*> larva;
 	const set<Unit*>& myUnits = Broodwar->self()->getUnits();
 	for( set<Unit*>::const_iterator itMyUnits = myUnits.begin(); itMyUnits != myUnits.end(); itMyUnits++)
@@ -93,4 +100,5 @@ void ZergStrat::trainUnits()
 			}
 		}
 	}
+	*/
 }

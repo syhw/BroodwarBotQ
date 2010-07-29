@@ -2,9 +2,6 @@
 #include <fstream>
 #include <stdarg.h>
 #include <sys/stat.h>
-
-using namespace std;
-
 char buffer[1024];
 void log(const char* text, ...)
 {
@@ -17,15 +14,9 @@ void log(const char* text, ...)
   va_end(ap);
 
   FILE *outfile;
-  fopen_s(&outfile, "bwapi-data\\logs\\BWAI_Log.txt", "a+");
-  fprintf_s(outfile, buffer);
-  fprintf_s(outfile, "\n");
-  fclose(outfile);
-}
-
-void clearLog()
-{
-  FILE *outfile;
-  fopen_s(&outfile, "bwapi-data\\logs\\BWAI_Log.txt", "w");
-  fclose(outfile);
+  if (fopen_s(&outfile, "bwapi-data\\logs\\BWSAL.log", "a+")==0)
+  {
+    fprintf_s(outfile, buffer);
+    fclose(outfile);
+  }
 }

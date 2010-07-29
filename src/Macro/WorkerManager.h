@@ -1,18 +1,12 @@
 #pragma once
-#include <CSingleton.h>
 #include <Arbitrator.h>
 #include <BWAPI.h>
 #include <BaseManager.h>
-#include "BaseObject.h"
-
-class WorkerManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public CSingleton<WorkerManager>, public BaseObject
+#include "CSingleton.h"
+class BuildOrderManager;
+class WorkerManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public CSingleton<WorkerManager>
 {
 	friend class CSingleton<WorkerManager>;
-
-	private:
-		WorkerManager();
-		~WorkerManager();
-
   public:
     class WorkerData
     {
@@ -22,33 +16,43 @@ class WorkerManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public
         BWAPI::Unit* newResource;
         int lastFrameSpam;
     };
-    void setBaseManager(BaseManager* baseManager);
+	void setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, BaseManager * bm, BuildOrderManager * bom);
+
     virtual void onOffer(std::set<BWAPI::Unit*> units);
     virtual void onRevoke(BWAPI::Unit* unit, double bid);
     virtual void update();
     virtual std::string getName() const;
+    virtual std::string getShortName() const;
 
-#ifdef BW_QT_DEBUG
-    // Qt interface
-    virtual QWidget* createWidget(QWidget* parent) const;
-    virtual void refreshWidget(QWidget* widget) const;
-#endif
-
-    void onUnitDestroy(BWAPI::Unit* unit);
+    void onRemoveUnit(BWAPI::Unit* unit);
     void setWorkersPerGas(int count);
+    double getMineralRate() const;
+    double getGasRate() const;
+    int getOptimalWorkerCount() const;
+    void enableAutoBuild();
+    void disableAutoBuild();
+    void setAutoBuildPriority(int priority);
+  private:
+
+	      WorkerManager();
     Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
     BaseManager* baseManager;
-    std::map<BWAPI::Unit*,WorkerData> workers; // <worker, workerData>
-    std::map<BWAPI::Unit*, std::set<BWAPI::Unit*> > currentWorkers; // <mineral block, worker>
-    std::map<BWAPI::Unit*, Base*> resourceBase; // <min/gas, base>
-    std::map<BWAPI::Unit*, int> desiredWorkerCount; // <min/gas, nbWorkers>
-    std::vector<std::pair<BWAPI::Unit*, int> > mineralOrder; // <min block, interest> depending on ressource quantity - 2* distance to the base.
+    BuildOrderManager* buildOrderManager;
+    std::map<BWAPI::Unit*,WorkerData> workers;
+    std::map<BWAPI::Unit*, std::set<BWAPI::Unit*> > currentWorkers;
+    std::map<BWAPI::Unit*, Base*> resourceBase;
+    std::map<BWAPI::Unit*, int> desiredWorkerCount;
+    std::vector<std::pair<BWAPI::Unit*, int> > mineralOrder;
     int mineralOrderIndex;
     int lastSCVBalance;
     std::set<Base*> basesCache;
     int WorkersPerGas;
     
-  private:
     void rebalanceWorkers();
     void updateWorkerAssignments();
+    double mineralRate;
+    double gasRate;
+    bool autoBuild;
+    int autoBuildPriority;
+    int optimalWorkerCount;
 };

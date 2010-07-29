@@ -1,43 +1,38 @@
 #pragma once
-#include <CSingleton.h>
 #include <Arbitrator.h>
 #include <BWAPI.h>
-#include "BaseObject.h"
-
+#include "CSingleton.h"
 class BuildingPlacer;
 class ConstructionManager;
 class ProductionManager;
 class MorphManager;
-class BuildManager : public CSingleton<BuildManager>, public BaseObject
+class BuildManager : public CSingleton<BuildManager>
 {
 	friend class CSingleton<BuildManager>;
-
-	private:
-		BuildManager();
-		~BuildManager();
-
-	public:
-    void update();
+  public:
+	void setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, BuildingPlacer * bp, ConstructionManager * cm, ProductionManager * pm, MorphManager * mm);
+	BuildingPlacer* getBuildingPlacer();
+	void update();
     std::string getName() const;
-    BuildingPlacer* getBuildingPlacer() const;
-    void onUnitDestroy(BWAPI::Unit* unit);
+    void onRemoveUnit(BWAPI::Unit* unit);
     bool build(BWAPI::UnitType type);
+    bool build(BWAPI::UnitType type, bool forceNoAddon);
     bool build(BWAPI::UnitType type, BWAPI::TilePosition goalPosition);
+    bool build(BWAPI::UnitType type, BWAPI::TilePosition goalPosition, bool forceNoAddon);
     int getPlannedCount(BWAPI::UnitType type) const;
     int getStartedCount(BWAPI::UnitType type) const;
     int getCompletedCount(BWAPI::UnitType type) const;
     void setBuildDistance(int distance);
-
-#ifdef BW_QT_DEBUG
-    // Qt interface
-    virtual QWidget* createWidget(QWidget* parent) const;
-    virtual void refreshWidget(QWidget* widget) const;
-#endif
+    BWAPI::UnitType getBuildType(BWAPI::Unit* unit) const;
+    void setDebugMode(bool debugMode);
 
   private:
-		Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
+	 BuildManager();
+    ~BuildManager();
+    Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
     BuildingPlacer* buildingPlacer;
     ConstructionManager* constructionManager;
     ProductionManager* productionManager;
     MorphManager* morphManager;
+    bool debugMode;
 };

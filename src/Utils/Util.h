@@ -1,2 +1,4 @@
+#include <RectangleArray.h>
+#include <map>
 void log(const char* text, ...);
-void clearLog();
+std::map<int, int> computeAssignments(Util::RectangleArray< double> &cost);

@@ -1,9 +1,8 @@
 #include <UpgradeManager.h>
 
 UpgradeManager::UpgradeManager()
-: BaseObject("UpgradeManager")
 {
-	arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
+	this->arbitrator = NULL;
   this->placer = NULL;
   for(std::set<BWAPI::UpgradeType>::iterator i=BWAPI::UpgradeTypes::allUpgradeTypes().begin();i!=BWAPI::UpgradeTypes::allUpgradeTypes().end();i++)
   {
@@ -11,10 +10,12 @@ UpgradeManager::UpgradeManager()
     startedLevel[*i]=0;
   }
 }
-void UpgradeManager::setBuildingPlacer(BuildingPlacer* placer)
-{
-  this->placer = placer;
+
+void UpgradeManager::setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, BuildingPlacer* bp){
+	this->arbitrator = arb;
+	this->placer=bp;
 }
+
 void UpgradeManager::onOffer(std::set<BWAPI::Unit*> units)
 {
   for(std::set<BWAPI::Unit*>::iterator i=units.begin();i!=units.end();i++)
@@ -25,10 +26,12 @@ void UpgradeManager::onOffer(std::set<BWAPI::Unit*> units)
     {
       for(std::list<Upgrade>::iterator t=q->second.begin();t!=q->second.end();t++)
       {
-        if (BWAPI::Broodwar->canUpgrade(*i,t->type) && (*i)->isIdle())
+        if (BWAPI::Broodwar->canUpgrade(*i,t->type))
         {
           upgradingUnits.insert(std::make_pair(*i,*t));
           q->second.erase(t);
+
+          //tell the arbitrator we accept the unit, and raise the bid to hopefully prevent other managers from using it
           arbitrator->accept(this,*i);
           arbitrator->setBid(this,*i,100.0);
           used=true;
@@ -36,6 +39,7 @@ void UpgradeManager::onOffer(std::set<BWAPI::Unit*> units)
         }
       }
     }
+    //if we didnt use this unit, tell the arbitrator we decline it
     if (!used)
     {
       arbitrator->decline(this,*i,0);
@@ -46,7 +50,7 @@ void UpgradeManager::onOffer(std::set<BWAPI::Unit*> units)
 
 void UpgradeManager::onRevoke(BWAPI::Unit* unit, double bid)
 {
-  this->onUnitDestroy(unit);
+  this->onRemoveUnit(unit);
 }
 
 void UpgradeManager::update()
@@ -55,17 +59,20 @@ void UpgradeManager::update()
   for(std::set<BWAPI::Unit*>::iterator u = myPlayerUnits.begin(); u != myPlayerUnits.end(); u++)
   {
     std::map<BWAPI::UnitType,std::list<Upgrade> >::iterator r=upgradeQueues.find((*u)->getType());
-    if (r!=upgradeQueues.end() && !r->second.empty())
+    if ((*u)->isCompleted() && r!=upgradeQueues.end() && !r->second.empty())
+    {
       arbitrator->setBid(this, *u, 50);
+    }
   }
   std::map<BWAPI::Unit*,Upgrade>::iterator i_next;
+  //iterate through all the upgrading units
   for(std::map<BWAPI::Unit*,Upgrade>::iterator i=upgradingUnits.begin();i!=upgradingUnits.end();i=i_next)
   {
     i_next=i;
     i_next++;
     if (i->first->isUpgrading())
     {
-      if (i->first->getUpgrade()!=i->second.type)
+      if (i->first->getUpgrade()!=i->second.type) //if our unit is upgrading the wrong thing, cancel it
       {
         i->first->cancelUpgrade();
       }
@@ -77,22 +84,29 @@ void UpgradeManager::update()
     }
     else
     {
-      if (BWAPI::Broodwar->self()->getUpgradeLevel(i->second.type)>=i->second.level)
+      if (BWAPI::Broodwar->self()->getUpgradeLevel(i->second.type)>=i->second.level) //if we have reached the desired upgrade level, we are done
       {
-        upgradingUnits.erase(i);
         arbitrator->removeBid(this, i->first);
+        upgradingUnits.erase(i);
       }
-      else
+      else //otherwise, we need to tell this unit to upgrade
       {
-        if (i->first->isLifted())
+        if (i->first->isLifted()) //the unit is lifted, tell it to land nearby
         {
           if (i->first->isIdle())
             i->first->land(placer->getBuildLocationNear(i->first->getTilePosition()+BWAPI::TilePosition(0,1),i->first->getType()));
         }
         else
         {
-          if (BWAPI::Broodwar->canUpgrade(i->first,i->second.type))
-            i->first->upgrade(i->second.type);
+          if (i->first->isResearching())
+          {
+            i->first->cancelResearch();
+          }
+          else
+          {
+            if (BWAPI::Broodwar->canUpgrade(i->first,i->second.type))
+              i->first->upgrade(i->second.type);
+          }
         }
       }
     }
@@ -104,7 +118,7 @@ std::string UpgradeManager::getName() const
   return "Upgrade Manager";
 }
 
-void UpgradeManager::onUnitDestroy(BWAPI::Unit* unit)
+void UpgradeManager::onRemoveUnit(BWAPI::Unit* unit)
 {
   std::map<BWAPI::Unit*,Upgrade>::iterator r=upgradingUnits.find(unit);
   if (r!=upgradingUnits.end())
@@ -116,9 +130,10 @@ void UpgradeManager::onUnitDestroy(BWAPI::Unit* unit)
   }
 }
 
-bool UpgradeManager::upgrade(BWAPI::UpgradeType type)
+bool UpgradeManager::upgrade(BWAPI::UpgradeType type, int level)
 {
-  int level=BWAPI::Broodwar->self()->getUpgradeLevel(type)+1;
+  if (level<=0)
+    level=this->getPlannedLevel(type)+1;
   if (level>type.maxRepeats()) return false;
   Upgrade newUpgrade;
   newUpgrade.type=type;
@@ -148,15 +163,3 @@ int UpgradeManager::getCompletedLevel(BWAPI::UpgradeType type) const
 {
   return BWAPI::Broodwar->self()->getUpgradeLevel(type);
 }
-
-#ifdef BW_QT_DEBUG
-QWidget* UpgradeManager::createWidget(QWidget* parent) const
-{
-	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
-}
-
-void UpgradeManager::refreshWidget(QWidget* widget) const
-{
-// TODO update your widget after having defined it in the previous method :)
-}
-#endif

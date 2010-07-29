@@ -5,15 +5,24 @@ MacroManager::MacroManager()
 : BaseObject("MacroManager")
 , expanding(0)
 {
-	this->buildOrderManager = & BuildOrderManager::Instance();
-	this->productionManager = & ProductionManager::Instance();
-	this->buildManager = & BuildManager::Instance();
-	this->baseManager = & BaseManager::Instance();
-	this->workerManager = & WorkerManager::Instance();
+	this->buildOrderManager = NULL;
+	this->productionManager = NULL;
+	this->buildManager = NULL;
+	this->baseManager = NULL;
+	this->workerManager = NULL;
 }
 
 MacroManager::~MacroManager()
 {
+}
+
+void MacroManager::setDependencies(BuildOrderManager * bom, ProductionManager * pm, BuildManager * bm,
+BaseManager * base, WorkerManager * wm){
+	this->buildOrderManager = bom;
+	this->productionManager = pm;
+	this->buildManager = bm;
+	this->baseManager = base;
+	this->workerManager = wm;
 }
 
 std::string MacroManager::getName() const
@@ -21,8 +30,12 @@ std::string MacroManager::getName() const
 	return "Macro Manager";
 }
 
+void MacroManager::onStart(){
+
+}
 void MacroManager::onUnitCreate(BWAPI::Unit* unit)
 {
+	/*
 
 	// ***********   Expand   *********** //
 	if( unit->getType().isResourceDepot())
@@ -56,6 +69,7 @@ void MacroManager::onUnitCreate(BWAPI::Unit* unit)
 			wantedUnits[unit->getType()].criteria += 1.0 / float(wantedUnits[unit->getType()].plannedValue);
 		}
 	}
+	*/
 }
 
 void MacroManager::onUnitDestroy(BWAPI::Unit* unit)
@@ -66,6 +80,7 @@ void MacroManager::onUnitDestroy(BWAPI::Unit* unit)
 
 void MacroManager::update()
 {
+	/*
 	buildGeyser();
 	trainWorkers();
 	createProdBuildings();
@@ -74,10 +89,12 @@ void MacroManager::update()
 	researchTech();
 	expand();
 	buildDefenses();
+	*/
 }
 
 void MacroManager::trainWorkers()
 {
+	/*
 	BWAPI::UnitType workerType=(Broodwar->self()->getRace().getWorker());
 	if( workerManager->workers.size() >= MAX_WORKERS_NB ||  // max nb worker reached
 		workerType.mineralPrice() > buildOrderManager->getUnusedMinerals())
@@ -116,10 +133,12 @@ void MacroManager::trainWorkers()
 	if( nbWorkers <= (unsigned int)(2*nbMinedBlocks) &&
 		(remainingPlaces - buildOrderManager->getPlannedCount( workerType)) > 0)
 		this->buildOrderManager->buildAdditional( 1, workerType, 150);
+		*/
 }
 
 void MacroManager::trainUnits()
 {
+	/*
 	for( map<UnitType, list<Unit*> >::iterator pb = prodBuildings.begin(); pb != prodBuildings.end(); pb++)
 	{
 		if( !pb->first.canProduce()) continue;
@@ -155,6 +174,7 @@ void MacroManager::trainUnits()
 			}
 		}
 	}
+	*/
 }
 
 void MacroManager::createTechBuildings()
@@ -167,6 +187,7 @@ void MacroManager::researchTech()
 
 void MacroManager::expand()
 {
+	/*
 	if( expanding ) return;
 	if( shouldExpand())
 	{
@@ -198,6 +219,7 @@ void MacroManager::expand()
 			expanding = true;
 		}
 	}
+	*/
 }
 
 void MacroManager::buildDefenses()
@@ -249,6 +271,7 @@ bool MacroManager::canCreateDefenseBuildings( UnitType techBuilding, UnitType bu
 
 bool MacroManager::shouldExpand()
 {
+	/*
 	// Expand if all the bases are fully functionnal
 	unsigned int nbRessources = 0;
 	const std::set<Base*>& bases = baseManager->getAllBases();
@@ -257,6 +280,7 @@ bool MacroManager::shouldExpand()
 		nbRessources += 2 * (*it)->getMinerals().size() + 3 * (*it)->getGeysers().size();
 	}
 	return workerManager->workers.size() >= nbRessources;
+	*/
 }
 
 #ifdef BW_QT_DEBUG

@@ -11,6 +11,7 @@ TerranStrat::~TerranStrat()
 
 void TerranStrat::buildGeyser()
 {
+	/*
 	std::set<Base*>& bases = baseManager->getActiveBases();
 	for( set<Base*>::iterator it = bases.begin(); it != bases.end(); it++)
 	{
@@ -21,6 +22,7 @@ void TerranStrat::buildGeyser()
 			(*it)->exploitedGeysers++; // TODO enlever les geyser detruits.
 		}
 	}
+	*/
 }
 
 void TerranStrat::createTechBuildings()

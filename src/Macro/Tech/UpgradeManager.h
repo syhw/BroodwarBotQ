@@ -2,15 +2,10 @@
 #include <Arbitrator.h>
 #include <BWAPI.h>
 #include <BuildingPlacer.h>
-#include "BaseObject.h"
-
-
-class UpgradeManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public CSingleton<UpgradeManager>, public BaseObject
+#include "CSingleton.h"
+class UpgradeManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public CSingleton<UpgradeManager>
 {
 	friend class CSingleton<UpgradeManager>;
-	private:
-    UpgradeManager();
-		
   public:
     class Upgrade
     {
@@ -18,24 +13,20 @@ class UpgradeManager : public Arbitrator::Controller<BWAPI::Unit*,double>, publi
         BWAPI::UpgradeType type;
         int level;
     };
-    void setBuildingPlacer(BuildingPlacer* placer);
+	void setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, BuildingPlacer* bp);
+    
     virtual void onOffer(std::set<BWAPI::Unit*> units);
     virtual void onRevoke(BWAPI::Unit* unit, double bid);
     virtual void update();
     virtual std::string getName() const;
-    void onUnitDestroy(BWAPI::Unit* unit);
-    bool upgrade(BWAPI::UpgradeType type);
+    void onRemoveUnit(BWAPI::Unit* unit);
+    bool upgrade(BWAPI::UpgradeType type, int level = -1);
     int getPlannedLevel(BWAPI::UpgradeType type) const;
     int getStartedLevel(BWAPI::UpgradeType type) const;
     int getCompletedLevel(BWAPI::UpgradeType type) const;
 
-#ifdef BW_QT_DEBUG
-    // Qt interface
-    virtual QWidget* createWidget(QWidget* parent) const;
-    virtual void refreshWidget(QWidget* widget) const;
-#endif
-
   private:
+	      UpgradeManager();
     Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
     BuildingPlacer* placer;
     std::map<BWAPI::UnitType,std::list< Upgrade > > upgradeQueues;

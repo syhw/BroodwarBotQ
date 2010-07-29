@@ -11,7 +11,8 @@ class ProtossStrat: public MacroManager, public CSingleton<ProtossStrat>
 	~ProtossStrat();
 
 public:
-
+	void onStart();
+	void update();
 	virtual void buildGeyser();
 	virtual void createProdBuildings();
 	virtual void createTechBuildings();

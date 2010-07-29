@@ -14,8 +14,8 @@ using namespace BWTA;
 MicroManager::MicroManager() 
 : BaseObject("MicroManager")
 {
-	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
-	this->regions = & Regions::Instance();
+	this->arbitrator = NULL;
+	this->regions = NULL;
 }
 
 MicroManager::~MicroManager() 
@@ -23,6 +23,11 @@ MicroManager::~MicroManager()
 	//Broodwar->printf("INOUT MicroManager::~MicroManager()");
 }
 
+void MicroManager::setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, Regions * reg){
+	this->arbitrator = arb;
+	this->regions = reg;
+
+}
 void MicroManager::update()
 {
 	//Suppress the list prompted to suppress 

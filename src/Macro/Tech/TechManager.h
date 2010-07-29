@@ -1,40 +1,26 @@
 #pragma once
-#include <CSingleton.h>
 #include <Arbitrator.h>
 #include <BWAPI.h>
 #include <BuildingPlacer.h>
-#include "TimeManaged.h"
-#include "BaseObject.h"
-
-
-class TechManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public CSingleton<TechManager>,
-    public TimeManaged, public BaseObject
+#include "CSingleton.h"
+class TechManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public CSingleton<TechManager>
 {
 	friend class CSingleton<TechManager>;
-	private:
-		TechManager();
-		~TechManager();
+  public:
 
-	public:
-    void setBuildingPlacer(BuildingPlacer* placer);
-
+	void setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, BuildingPlacer* bp);
     virtual void onOffer(std::set<BWAPI::Unit*> units);
     virtual void onRevoke(BWAPI::Unit* unit, double bid);
     virtual void update();
     virtual std::string getName() const;
-    void onUnitDestroy(BWAPI::Unit* unit);
+    void onRemoveUnit(BWAPI::Unit* unit);
     bool research(BWAPI::TechType type);
     bool planned(BWAPI::TechType type) const;
-
-#ifdef BW_QT_DEBUG
-    // Qt interface
-    virtual QWidget* createWidget(QWidget* parent) const;
-    virtual void refreshWidget(QWidget* widget) const;
-#endif
-
     Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
     BuildingPlacer* placer;
     std::map<BWAPI::UnitType,std::list<BWAPI::TechType> > researchQueues;
     std::map<BWAPI::Unit*,BWAPI::TechType> researchingUnits;
     std::set<BWAPI::TechType> plannedTech;
+private:
+	    TechManager();
 };
