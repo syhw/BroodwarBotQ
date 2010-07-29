@@ -52,12 +52,14 @@ class MacroManager: public BaseObject
 public:
 	MacroManager();
 	~MacroManager();
-
+	
+	void setDependencies(BuildOrderManager * bom, ProductionManager * pm, BuildManager * bm,
+BaseManager * base, WorkerManager * wm);
+	virtual void onStart();
 	std::string getName() const;
-	void onUnitCreate(BWAPI::Unit* unit);
 	void onUnitDestroy(BWAPI::Unit* unit);
 	virtual void update();
-
+	virtual void onUnitCreate(BWAPI::Unit* unit);
 	virtual void buildGeyser() = 0;
 	void trainWorkers();
 	virtual void createProdBuildings() = 0;

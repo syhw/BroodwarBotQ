@@ -1,19 +1,14 @@
 #include <TechManager.h>
 
 TechManager::TechManager()
-: BaseObject("TechManager")
 {
-	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
+  this->arbitrator = NULL;
   this->placer = NULL;
 }
 
-TechManager::~TechManager()
-{
-}
-
-void TechManager::setBuildingPlacer(BuildingPlacer* placer)
-{
-  this->placer = placer;
+void TechManager::setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, BuildingPlacer* bp){
+  this->arbitrator = arb;
+  this->placer = bp;
 }
 
 void TechManager::onOffer(std::set<BWAPI::Unit*> units)
@@ -30,6 +25,8 @@ void TechManager::onOffer(std::set<BWAPI::Unit*> units)
         {
           researchingUnits.insert(std::make_pair(*i,*t));
           q->second.erase(t);
+
+          //tell the arbitrator we accept the unit, and raise the bid to hopefully prevent other managers from using it
           arbitrator->accept(this,*i);
           arbitrator->setBid(this,*i,100.0);
           used=true;
@@ -37,6 +34,7 @@ void TechManager::onOffer(std::set<BWAPI::Unit*> units)
         }
       }
     }
+    //if we didnt use this unit, tell the arbitrator we decline it
     if (!used)
     {
       arbitrator->decline(this,*i,0);
@@ -47,71 +45,53 @@ void TechManager::onOffer(std::set<BWAPI::Unit*> units)
 
 void TechManager::onRevoke(BWAPI::Unit* unit, double bid)
 {
-  this->onUnitDestroy(unit);
+  this->onRemoveUnit(unit);
 }
 
 void TechManager::update()
 {
-    try 
+  std::set<BWAPI::Unit*> myPlayerUnits=BWAPI::Broodwar->self()->getUnits();
+  for(std::set<BWAPI::Unit*>::iterator u = myPlayerUnits.begin(); u != myPlayerUnits.end(); u++)
+  {
+    std::map<BWAPI::UnitType,std::list<BWAPI::TechType> >::iterator r=researchQueues.find((*u)->getType());
+    if ((*u)->isCompleted() && r!=researchQueues.end() && !r->second.empty())
+      arbitrator->setBid(this, *u, 50);
+  }
+  std::map<BWAPI::Unit*,BWAPI::TechType>::iterator i_next;
+  //iterate through all the researching units
+  for(std::map<BWAPI::Unit*,BWAPI::TechType>::iterator i=researchingUnits.begin();i!=researchingUnits.end();i=i_next)
+  {
+    i_next=i;
+    i_next++;
+    if (i->first->isResearching())
     {
-#ifdef TEST_TIME_MANAGER_CUT_TOO_LONG
-        TimeManager* tm = & TimeManager::Instance();
-        if (tm->getElapsedTime() > 200)
-        {
-            volatile int i = 0;
-            while (!i) 
-                i = 0;
-        }
-#endif
-
-        std::set<BWAPI::Unit*> myPlayerUnits=BWAPI::Broodwar->self()->getUnits();
-        for(std::set<BWAPI::Unit*>::iterator u = myPlayerUnits.begin(); u != myPlayerUnits.end(); u++)
-        {
-            std::map<BWAPI::UnitType,std::list<BWAPI::TechType> >::iterator r=researchQueues.find((*u)->getType());
-            if (r!=researchQueues.end() && !r->second.empty())
-                arbitrator->setBid(this, *u, 50);
-        }
-        std::map<BWAPI::Unit*,BWAPI::TechType>::iterator i_next;
-        for(std::map<BWAPI::Unit*,BWAPI::TechType>::iterator i=researchingUnits.begin();i!=researchingUnits.end();i=i_next)
-        {
-            i_next=i;
-            i_next++;
-            if (i->first->isResearching())
-            {
-                if (i->first->getTech()!=i->second)
-                {
-                    i->first->cancelResearch();
-                }
-            }
-            else
-            {
-                if (BWAPI::Broodwar->self()->hasResearched(i->second))
-                {
-                    researchingUnits.erase(i);
-                    arbitrator->removeBid(this, i->first);
-                }
-                else
-                {
-                    if (i->first->isLifted())
-                    {
-                        if (i->first->isIdle())
-                            i->first->land(placer->getBuildLocationNear(i->first->getTilePosition()+BWAPI::TilePosition(0,1),i->first->getType()));
-                    }
-                    else
-                    {
-                        if (BWAPI::Broodwar->canResearch(i->first,i->second))
-                            i->first->research(i->second);
-                    }
-                }
-            }
-        }
-    } 
-    catch (std::exception* /*e*/)
-    {
-        // TODO used exception, bufferize in str and printf str
-        BWAPI::Broodwar->printf("Too long I think");
-        return;
+      if (i->first->getTech()!=i->second) //if the unit is researching the wrong tech, cancel it
+      {
+        i->first->cancelResearch();
+      }
     }
+    else //if the unit is not researching
+    {
+      if (BWAPI::Broodwar->self()->hasResearched(i->second)) //if we have researched the given tech, we are done
+      {
+        arbitrator->removeBid(this, i->first);
+        researchingUnits.erase(i);
+      }
+      else //if we haven't researched the given tech, we need to order this unit to research it
+      {
+        if (i->first->isLifted()) //if the unit is lifted, tell it to land somewhere nearby
+        {
+          if (i->first->isIdle())
+            i->first->land(placer->getBuildLocationNear(i->first->getTilePosition()+BWAPI::TilePosition(0,1),i->first->getType()));
+        }
+        else //if its landed, we can tell it to research the given tech
+        {
+          if (BWAPI::Broodwar->canResearch(i->first,i->second)) //only give the order if we can research it
+            i->first->research(i->second);
+        }
+      }
+    }
+  }
 }
 
 std::string TechManager::getName() const
@@ -119,7 +99,7 @@ std::string TechManager::getName() const
   return "Tech Manager";
 }
 
-void TechManager::onUnitDestroy(BWAPI::Unit* unit)
+void TechManager::onRemoveUnit(BWAPI::Unit* unit)
 {
   std::map<BWAPI::Unit*,BWAPI::TechType>::iterator r=researchingUnits.find(unit);
   if (r!=researchingUnits.end())
@@ -133,8 +113,9 @@ void TechManager::onUnitDestroy(BWAPI::Unit* unit)
 
 bool TechManager::research(BWAPI::TechType type)
 {
-  researchQueues[type.whatResearches()].push_back(type);
-  plannedTech.insert(type);
+  //research order starts here
+  researchQueues[type.whatResearches()].push_back(type); //add this tech to the end of the research queue
+  plannedTech.insert(type); //add this tech to our set of planned tech
   return true;
 }
 
@@ -143,15 +124,3 @@ bool TechManager::planned(BWAPI::TechType type) const
   std::set<BWAPI::TechType>::const_iterator i=plannedTech.find(type);
   return (i!=plannedTech.end());
 }
-
-#ifdef BW_QT_DEBUG
-QWidget* TechManager::createWidget(QWidget* parent) const
-{
-	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
-}
-
-void TechManager::refreshWidget(QWidget* widget) const
-{
-// TODO update your widget after having defined it in the previous method :)
-}
-#endif

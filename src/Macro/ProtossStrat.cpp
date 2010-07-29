@@ -10,8 +10,37 @@ ProtossStrat::~ProtossStrat()
 {
 }
 
+void ProtossStrat::onStart(){
+	BWAPI::Broodwar->printf("call to onStart");
+	this->buildOrderManager->buildAdditional(4,BWAPI::UnitTypes::Protoss_Probe,100);
+	this->buildOrderManager->build(1,BWAPI::UnitTypes::Protoss_Pylon,99);
+	this->buildOrderManager->buildAdditional(2,BWAPI::UnitTypes::Protoss_Probe,98);
+	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Gateway,97);
+	this->buildOrderManager->buildAdditional(2,BWAPI::UnitTypes::Protoss_Probe,96);
+	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Assimilator,95);
+	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Probe,94);
+	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Cybernetics_Core,93);
+	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Probe,92);
+	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Gateway,91);
+	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Dragoon,90);
+	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Pylon,89);
+	this->buildOrderManager->upgrade(1,BWAPI::UpgradeTypes::Singularity_Charge, 88);
+	this->buildOrderManager->build(40,BWAPI::UnitTypes::Protoss_Dragoon, 87);
+	//this->buildOrderManager->enableDependencyResolver();
+}
+
+void ProtossStrat::update(){
+	/*
+	if(BWAPI::Broodwar->self()->supplyUsed() == 16){
+		this->buildOrderManager->build(1,BWAPI::UnitTypes::Protoss_Pylon,100);
+		this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Probe,99);
+	}*/
+	
+}
+
 void ProtossStrat::buildGeyser()
 {
+	/*
 	std::set<Base*>& bases = baseManager->getActiveBases();
 	for( set<Base*>::iterator it = bases.begin(); it != bases.end(); it++)
 	{
@@ -22,6 +51,7 @@ void ProtossStrat::buildGeyser()
 			(*it)->exploitedGeysers++; // TODO enlever les geyser detruits.
 		}
 	}
+	*/
 }
 
 void ProtossStrat::createProdBuildings()
@@ -32,6 +62,7 @@ void ProtossStrat::createProdBuildings()
 
 void ProtossStrat::buildGates()
 {
+	/*
 	bool allGatesFull = true;
 	const list<Unit*>& buildings = prodBuildings[UnitTypes::Protoss_Gateway];
 	for( list<Unit*>::const_iterator it = buildings.begin(); it != buildings.end(); it++)
@@ -45,6 +76,7 @@ void ProtossStrat::buildGates()
 		this->buildOrderManager->buildAdditional(1,UnitTypes::Protoss_Gateway,20);
 		underConstruction[UnitTypes::Protoss_Gateway] = true;
 	}
+	*/
 }
 
 void ProtossStrat::createTechBuildings()
@@ -78,17 +110,19 @@ void ProtossStrat::createTechBuildings()
 
 void ProtossStrat::buildDefenses()
 {
+	/*
 	return;
 	if( canCreateDefenseBuildings( UnitTypes::Protoss_Photon_Cannon, UnitTypes::Protoss_Forge))
 	{
 		this->buildOrderManager->buildAdditional(1,UnitTypes::Protoss_Photon_Cannon,70);
 		underConstruction[UnitTypes::Protoss_Photon_Cannon]++;
 	}
+	*/
 }
 
 void ProtossStrat::initWantedUnits()
 {
-	wantedUnits[UnitTypes::Protoss_Zealot].plannedType = TYPE_RATIO;
+	wantedUnits[UnitTypes::Protoss_Zealot].plannedType = TYPE_NUMBER;
 	wantedUnits[UnitTypes::Protoss_Zealot].plannedValue = 1;
 	wantedUnits[UnitTypes::Protoss_Dragoon].plannedType = TYPE_RATIO;
 	wantedUnits[UnitTypes::Protoss_Dragoon].plannedValue = 1;

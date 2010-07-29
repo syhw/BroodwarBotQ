@@ -18,12 +18,15 @@
 class GoalManager;
 
 
+
+class GoalManager;
+
 class ScoutManager : public CSingleton<ScoutManager>, public BaseObject
 {
 	friend class CSingleton<ScoutManager>;
 
 public:
-	void setDependencies(Regions * reg, MicroManager * micro);
+	void setDependencies(Regions * region, MicroManager * micro);
 	virtual void update();
 	virtual std::string getName() const;
 	// Goals // Just ideas, not yet implemented
@@ -44,7 +47,6 @@ public:
 	virtual void refreshWidget(QWidget* widget) const;
 #endif
 private:
-
 		ScoutManager();
 		~ScoutManager();
 	UnitsGroup* findUnitsGroup(pGoal goal); //Match a UG with the goal (call setUnitsGroup and addGoal)

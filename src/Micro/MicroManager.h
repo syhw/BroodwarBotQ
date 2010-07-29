@@ -21,12 +21,11 @@ private:
 	~MicroManager();
 	std::list<UnitsGroup *> promptedRemove;
 	bool remove(UnitsGroup* u);
-public:
-	std::list<UnitsGroup*> unitsgroups;
-
 	Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
 	Regions* regions;
-
+public:
+	void setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, Regions * reg);
+	std::list<UnitsGroup*> unitsgroups;
 	virtual void onOffer(std::set<BWAPI::Unit*> units);
 	virtual void onRevoke(BWAPI::Unit* unit, double bid);
 	virtual std::string getName() const;

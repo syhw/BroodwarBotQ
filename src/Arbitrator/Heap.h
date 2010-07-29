@@ -16,11 +16,14 @@ namespace Arbitrator
   class Heap
   {
     private :
-     /** Heap data, stored as a vector */
-     std::vector< std::pair< _Tp, _Val > > data;
+    /** Heap data, stored as a vector */
+    std::vector< std::pair< _Tp, _Val > > data;
 
     /** Maps objects to their positions in the data vector */
     std::map< _Tp, int> mapping;
+
+    /** True if the heap is a min heap, otherwise the heap is a max heap*/
+    bool minHeap;
 
     /**
      * Percolates the given element in the heap up
@@ -37,7 +40,7 @@ namespace Arbitrator
     int percolate_down(int index);
 
     public :
-    Heap() {}
+    Heap(bool isMinHeap = false) : minHeap(isMinHeap) {}
     ~Heap() {}
     /**
      * Pushes an object associated with the given value onto the heap
@@ -99,13 +102,16 @@ namespace Arbitrator
     if (index<0 || index>=(int)data.size())
       return -1;
     unsigned int parent=(index-1)/2;
-    while(index>0 && data[parent].second<data[index].second)
+    int m=1;
+    if (this->minHeap) m=-1;
+    while(index>0 && m*data[parent].second<m*data[index].second)
     {
       std::pair<_Tp,_Val> temp=data[parent];
       data[parent]=data[index];
       data[index]=temp;
       (*mapping.find(data[index].first)).second=index;
       index=parent;
+      parent=(index-1)/2;
     }
     (*mapping.find(data[index].first)).second=index;
     return index;
@@ -120,11 +126,13 @@ namespace Arbitrator
     unsigned int lchild=index*2+1;
     unsigned int rchild=index*2+2;
     unsigned int mchild;
-    while((data.size()>lchild && data[index].second<data[lchild].second) ||
-      (data.size()>rchild && data[index].second<data[rchild].second))
+    int m=1;
+    if (this->minHeap) m=-1;
+    while((data.size()>lchild && m*data[index].second<m*data[lchild].second) ||
+      (data.size()>rchild && m*data[index].second<m*data[rchild].second))
     {
       mchild=lchild;
-      if (data.size()>rchild && data[rchild].second>data[lchild].second)
+      if (data.size()>rchild && m*data[rchild].second>m*data[lchild].second)
         mchild=rchild;
       std::pair< _Tp, _Val > temp=data[mchild];
       data[mchild]=data[index];
@@ -142,9 +150,11 @@ namespace Arbitrator
   void Heap<_Tp,_Val>::push(std::pair< _Tp, _Val > x)
   {
     int index=data.size();
-    mapping[x.first]=index;
-    data.push_back(x);
-    percolate_up(index);
+    if (mapping.insert(std::make_pair(x.first,index)).second)
+    {
+      data.push_back(x);
+      percolate_up(index);
+    }
   }
 
   //----------------------------------- POP --------------------------------------
@@ -192,8 +202,13 @@ namespace Arbitrator
     }
     int index=(*iter).second;
     data[index].second=v;
-    index=percolate_down(percolate_up(index));
-    return (index>=0 && index<(int)data.size());
+    index=percolate_up(index);
+    if (index>=0 && index<(int)data.size())
+    {
+      percolate_down(index);
+      return true;
+    }
+    return false;
   }
 
   //----------------------------------- GET --------------------------------------

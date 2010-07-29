@@ -27,13 +27,16 @@ EEcoEstimator::EEcoEstimator()
 		gaz_owned ++;
 	}
 
-	timeManager = & TimeManager::Instance();
+	timeManager = NULL;
 }
 
 EEcoEstimator::~EEcoEstimator(){
 
 }
 
+void EEcoEstimator::setDependencies(TimeManager * tm){
+	this->timeManager = tm;
+}
 
 void EEcoEstimator::update()
 {

@@ -1,8 +1,8 @@
 #include "ExploreGoal.h"
 using namespace BWAPI;
 
-ExploreGoal::ExploreGoal(UnitsGroup * ug,BWTA::Region* region) 
-:Goal(ug)
+ExploreGoal::ExploreGoal(BWTA::Region* region) 
+:Goal()
 {
 
 	BWTA::Polygon polygon = region->getPolygon();

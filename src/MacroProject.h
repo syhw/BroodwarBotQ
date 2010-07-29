@@ -26,10 +26,16 @@
 #include "ObjectManager.h"
 #include "EUnitsFilter.h"
 #include "EEcoEstimator.h"
-#include "ScoutObjectives.h"
+#include "ETechEstimator.h"
 #include "GoalManager.h"
 #include "TimeManaged.h"
-
+#include "InformationManager.h"
+#include "BorderManager.h"
+#include "UnitGroupManager.h"
+#include "BuildingPlacer.h"
+#include "ConstructionManager.h"
+#include "MorphManager.h"
+#include "ProductionManager.h"
 
 class BattleBroodAI;
 extern BattleBroodAI* broodAI;
@@ -48,23 +54,39 @@ public:
 	BWTA::Region* enemy_base;
 	bool analyzed;
 	std::map<BWAPI::Unit*,BWAPI::UnitType> buildings;
+
+	//Managers
 	Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
 	BaseManager* baseManager;
+	BorderManager * borderManager;
+	BuildingPlacer * buildingPlacer;
 	BuildManager* buildManager;
+	//Depends of BuildManager :
+		ConstructionManager * constructionManager;
+		MorphManager * morphManager;
+		ProductionManager * productionManager;
+
 	BuildOrderManager* buildOrderManager;
-	MacroManager* macroManager;
-	MicroManager* microManager;
-	Regions* regions;
-	ScoutManager* scoutManager;
 	SupplyManager* supplyManager;
 	TechManager* techManager;
-	TimeManager* timeManager;
 	UpgradeManager* upgradeManager;
+	UnitGroupManager * unitGroupManager;
+	InformationManager * informationManager;
+	ScoutManager* scoutManager;
+	MapManager* mapManager;
 	WorkerManager* workerManager;
-    MapManager* mapManager;
-    EUnitsFilter* eUnitsFilter;
+	Regions* regions;
+	MacroManager* macroManager;
+	MicroManager* microManager;
+	EUnitsFilter* eUnitsFilter;
 	EEcoEstimator* eEcoEstimator;
+	ETechEstimator* eTechEstimator;
+	TimeManager* timeManager;
 	GoalManager* goalManager;
+	
+
+	
+
 
 	bool showManagerAssignments;
     ObjectManager* objManager;

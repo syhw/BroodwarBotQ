@@ -1,34 +1,23 @@
 #pragma once
-#include <CSingleton.h>
 #include <Arbitrator.h>
 #include <BWAPI.h>
 #include <BuildManager.h>
 #include <BuildOrderManager.h>
-#include "BaseObject.h"
-
-
-class SupplyManager : public CSingleton<SupplyManager>, public BaseObject
+#include "CSingleton.h"
+class SupplyManager: public CSingleton<SupplyManager>
 {
 	friend class CSingleton<SupplyManager>;
-
-	private:
-		SupplyManager();
-		~SupplyManager();
-
   public:
-    void setBuildManager(BuildManager* buildManager);
-    void setBuildOrderManager(BuildOrderManager* buildOrderManager);
+	void setDependencies(BuildManager* bm, BuildOrderManager* bom);
     void update();
     std::string getName() const;
     int getPlannedSupply() const;
-
-#ifdef BW_QT_DEBUG
-    // Qt interface
-    virtual QWidget* createWidget(QWidget* parent) const;
-    virtual void refreshWidget(QWidget* widget) const;
-#endif
-
+    int getSupplyTime(int supplyCount) const;
+    void setSeedPosition(BWAPI::TilePosition p);
     BuildManager* buildManager;
     BuildOrderManager* buildOrderManager;
     int lastFrameCheck;
+    BWAPI::TilePosition seedPosition;
+ private :
+	   SupplyManager();
 };

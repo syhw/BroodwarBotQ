@@ -31,15 +31,16 @@ class ETechEstimator : public CSingleton<ETechEstimator>
 {
 	friend class CSingleton<ETechEstimator>;
 public:
-	
-	ETechEstimator();
-	~ETechEstimator();
+
 	double canProduce(BWAPI::UnitType ut);
 	double hasTech(BWAPI::TechType tt);
 	double hasUpgrade(BWAPI::UpgradeType upt);
 	void updateProbs();
 	void sayProbs();
 private:
+		
+	ETechEstimator();
+	~ETechEstimator();
 	std::list<Building> buildings;
 	Building getBuilding(BWAPI::UnitType ut);
 

@@ -15,11 +15,10 @@ ScoutManager::~ScoutManager( )
 {
 }
 
-void ScoutManager::setDependencies(Regions * reg, MicroManager * micro){
-	this->regions = reg;
+void ScoutManager::setDependencies(Regions * region, MicroManager * micro){
+	this->regions = region;
 	this->microManager = micro;
 }
-
 
 void ScoutManager::update()
 {
@@ -70,7 +69,7 @@ void ScoutManager::checkEmptyXP()
 void ScoutManager::onUnitCreate(BWAPI::Unit* unit){
 	//if(BWAPI::Broodwar->self()->supplyUsed() == 10 && unit->getType().isWorker() && !regions->enemyFound()){
 	//	findEnemy();
-		
+		//exploreRegion( (*BWTA::getRegions().begin()));
 	//}
 }
 
