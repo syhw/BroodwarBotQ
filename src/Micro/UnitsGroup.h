@@ -51,8 +51,8 @@ private:
     /// Affiche les cibles des unités du UnitsGroup
     void displayTargets();
 public:
-    std::map<BWAPI::Unit*, EUnit> enemiesInSight;
     std::vector<WalkTilePosition> _path;
+    std::map<BWAPI::Unit*, EUnit> enemiesInSight;
 	
 	UnitsGroup();
 	~UnitsGroup();
@@ -106,5 +106,6 @@ public:
 	void accomplishGoal();
 	void switchMode(unit_mode um);
 	void idle();
+    void updateTargets(pBayesianUnit);
 };
 

@@ -319,7 +319,7 @@ EUnit* UnitsGroup::getClosestEnemy()
 
 void UnitsGroup::update()
 {
-    drawEnemiesDetected();
+    //drawEnemiesDetected();
     updateEnemiesInSight();
     this->totalHP = 0;
     Broodwar->drawCircleMap(center.x(), center.y(), DISTANCE_MAX, BWAPI::Colors::Yellow);
@@ -356,6 +356,7 @@ void UnitsGroup::update()
 
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     {
+        updateTargets(*it);
         (*it)->update(); 
         this->totalHP += (*it)->unit->getHitPoints();
         this->totalPower += (*it)->unit->getType().groundWeapon().damageAmount();
@@ -731,4 +732,17 @@ void UnitsGroup::idle(){
 	for(std::vector<pBayesianUnit>::iterator it = getUnits()->begin(); it != getUnits()->end(); ++it){
 		(*it)->target = (*it)->unit->getPosition();
 	}
+}
+
+
+
+void UnitsGroup::updateTargets(pBayesianUnit u)
+{
+    u->listTargets.clear();
+    for (std::map<BWAPI::Unit*, EUnit>::iterator iter = enemiesInSight.begin();
+         iter != enemiesInSight.end();
+         iter++)
+    {
+        u->listTargets.insert(std::pair<int, EUnit*>(iter->second.getPrio(u),&(iter->second)));
+    }
 }
