@@ -319,7 +319,6 @@ EUnit* UnitsGroup::getClosestEnemy()
 
 void UnitsGroup::update()
 {
-    listTargets.clear();
     drawEnemiesDetected();
     updateEnemiesInSight();
     this->totalHP = 0;

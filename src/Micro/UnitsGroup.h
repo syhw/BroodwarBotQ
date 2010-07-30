@@ -18,6 +18,7 @@
 //class Goal;
 class Formation;
 class GoalManager;
+class EUnit;
 
 struct i_dist 
 {
@@ -30,8 +31,6 @@ struct i_dist
 class UnitsGroup
 {
 private:
-    std::map<BWAPI::Unit*, EUnit> enemiesInSight;
-    std::set<EUnit> listTargets;
     std::list<pBayesianUnit> unitsAvailables;
     //std::map<int, cEnemy> enemiesInSight;
     std::set<BWAPI::Unit*> enemies;
@@ -52,6 +51,7 @@ private:
     /// Affiche les cibles des unités du UnitsGroup
     void displayTargets();
 public:
+    std::map<BWAPI::Unit*, EUnit> enemiesInSight;
     std::vector<WalkTilePosition> _path;
 	
 	UnitsGroup();
