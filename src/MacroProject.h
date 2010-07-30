@@ -105,6 +105,8 @@ public:
 	virtual void onUnitShow(BWAPI::Unit* unit);
 	virtual void onUnitHide(BWAPI::Unit* unit);
 	virtual void onUnitRenegade(BWAPI::Unit* unit);
+	virtual void onUnitDiscover(BWAPI::Unit* unit);
+	virtual void onUnitEvade(BWAPI::Unit* unit);
 	void drawStats(); //not part of BWAPI::AIModule
 	void showPlayers();
 	void showForces();

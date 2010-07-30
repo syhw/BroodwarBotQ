@@ -38,6 +38,9 @@ UnitsGroup::~UnitsGroup()
 
 }
 
+
+
+
 bool comp_i_dist(const i_dist& l, const i_dist& r) { return (r.dist < l.dist); }
 
 void simple_align(std::vector<Position>& from, std::vector<unsigned int>& alignment)

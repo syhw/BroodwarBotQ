@@ -90,7 +90,7 @@ void BattleBroodAI::onStart()
 	//Broodwar->enableFlag(Flag::CompleteMapInformation);
 
 	// Speed up the game to the maximum
-    Broodwar->setLocalSpeed(0);
+    //Broodwar->setLocalSpeed(0);
 	
 	this->showManagerAssignments=false;
 
@@ -168,7 +168,8 @@ void BattleBroodAI::onStart()
 	this->microManager->setDependencies(this->arbitrator,this->regions);
 	this->goalManager->setDependencies(this->microManager,this->regions);
 	this->macroManager->setDependencies(this->buildOrderManager,this->productionManager,this->buildManager,this->baseManager,this->workerManager);
-    //Broodwar->printf("The match up is %s v %s",
+	this->mapManager->setDependencies(this->eUnitsFilter);
+	//Broodwar->printf("The match up is %s v %s",
     Broodwar->self()->getRace().getName().c_str();
     Broodwar->enemy()->getRace().getName().c_str();
 
@@ -200,45 +201,53 @@ void BattleBroodAI::onFrame()
     Broodwar->drawTextMouse(12, 0, mousePos);
 #endif
 
-	objManager->onFrame();
-    this->arbitrator->update();
+
+
 
 	//Added by  Louis
-	this->buildOrderManager->update();
-	this->workerManager->update();
-	this->supplyManager->update();
 	this->buildManager->update();
+	this->buildOrderManager->update();
 	this->baseManager->update();
+	this->workerManager->update();
+	this->techManager->update();
+	this->upgradeManager->update();
+	this->supplyManager->update();
+	objManager->onFrame();
+
 	this->borderManager->update();
 	this->buildManager->update();
 
 	this->buildOrderManager->update();
 	this->supplyManager->update();
-	this->techManager->update();
-	this->upgradeManager->update();
-	this->mapManager->onFrame();
-	this->workerManager->update();
-    this->macroManager->update();
 
-    std::set<Unit*> units=Broodwar->self()->getUnits();
-    if (this->showManagerAssignments)
+	this->mapManager->onFrame();
+
+    this->macroManager->update();
+	this->arbitrator->update();
+  std::set<Unit*> units=Broodwar->self()->getUnits();
+  if (this->showManagerAssignments)
+  {
+    for(std::set<Unit*>::iterator i=units.begin();i!=units.end();i++)
     {
-        for(std::set<Unit*>::iterator i=units.begin();i!=units.end();i++)
+      if (this->arbitrator->hasBid(*i))
+      {
+        int x=(*i)->getPosition().x();
+        int y=(*i)->getPosition().y();
+        std::list< std::pair< Arbitrator::Controller<BWAPI::Unit*,double>*, double> > bids=this->arbitrator->getAllBidders(*i);
+        int y_off=0;
+        bool first = false;
+        const char activeColor = '\x07', inactiveColor = '\x16';
+        char color = activeColor;
+        for(std::list< std::pair< Arbitrator::Controller<BWAPI::Unit*,double>*, double> >::iterator j=bids.begin();j!=bids.end();j++)
         {
-            if (this->arbitrator->hasBid(*i))
-            {
-                int x=(*i)->getPosition().x();
-                int y=(*i)->getPosition().y();
-                std::list< std::pair< Arbitrator::Controller<BWAPI::Unit*,double>*, double> > bids=this->arbitrator->getAllBidders(*i);
-                int y_off=0;
-                for(std::list< std::pair< Arbitrator::Controller<BWAPI::Unit*,double>*, double> >::iterator j=bids.begin();j!=bids.end();j++)
-                {
-                    Broodwar->drawText(CoordinateType::Map,x,y+y_off,"%s: %d",j->first->getName().c_str(),(int)j->second);
-                    y_off+=20;
-                }
-            }
+          Broodwar->drawTextMap(x,y+y_off,"%c%s: %d",color,j->first->getShortName().c_str(),(int)j->second);
+          y_off+=15;
+          color = inactiveColor;
         }
+      }
     }
+  }
+
     /*
     for(std::set<Unit*>::iterator i=units.begin();i!=units.end();i++)
     {
@@ -425,11 +434,21 @@ void BattleBroodAI::onFrame()
     //Broodwar->printf("Iterations took %f", (double)(end-start)/CLOCKS_PER_SEC);
 }
 
+void BattleBroodAI::onUnitDiscover(BWAPI::Unit* unit){
+	  if (Broodwar->isReplay()) return;
+  this->informationManager->onUnitDiscover(unit);
+  this->unitGroupManager->onUnitDiscover(unit);
+}
+
+void BattleBroodAI::onUnitEvade(BWAPI::Unit* unit){
+	  if (Broodwar->isReplay()) return;
+  this->informationManager->onUnitEvade(unit);
+  this->unitGroupManager->onUnitEvade(unit);
+}
+
 void BattleBroodAI::onUnitCreate(BWAPI::Unit* unit)
 {
 	//Update Managers
-	this->unitGroupManager->onUnitDiscover(unit);
-	this->informationManager->onUnitDiscover(unit);
 	this->scoutManager->onUnitCreate(unit);
 	this->mapManager->onUnitCreate(unit);
 	this->regions->onUnitCreate(unit);
@@ -486,18 +505,16 @@ void BattleBroodAI::onUnitDestroy(BWAPI::Unit* unit)
     //	Broodwar->sendText("A %s [%x] has been destroyed at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x(),unit->getPosition().y());
 
     this->arbitrator->onRemoveObject(unit);
-	this->baseManager->onRemoveUnit(unit);
 	this->buildManager->onRemoveUnit(unit);
-    this->macroManager->onUnitDestroy( unit);
-    this->microManager->onUnitDestroy(unit);
-    this->regions->onUnitDestroy(unit);
+	this->baseManager->onRemoveUnit(unit);
 	this->techManager->onRemoveUnit(unit);
 	this->upgradeManager->onRemoveUnit(unit);
 	this->workerManager->onRemoveUnit(unit);
+    this->macroManager->onUnitDestroy( unit);
+    this->microManager->onUnitDestroy(unit);
+    this->regions->onUnitDestroy(unit);
     this->mapManager->onUnitDestroy(unit);
     this->eUnitsFilter->onUnitDestroy(unit);
-	this->techManager->onRemoveUnit(unit);
-	this->upgradeManager->onRemoveUnit(unit);
 	this->informationManager->onUnitDestroy(unit);
 }
 
@@ -545,6 +562,7 @@ void BattleBroodAI::onUnitRenegade(BWAPI::Unit* unit)
 {
 	//if (!Broodwar->isReplay())
 	//	Broodwar->sendText("A %s [%x] is now owned by %s",unit->getType().getName().c_str(),unit,unit->getPlayer()->getName().c_str());
+	this->unitGroupManager->onUnitRenegade(unit);
     eUnitsFilter->update(unit);
 }
 

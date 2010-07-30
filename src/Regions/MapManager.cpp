@@ -44,7 +44,7 @@ MapManager::MapManager()
         }
     }
 
-    _eUnitsFilter = & EUnitsFilter::Instance();
+    _eUnitsFilter = NULL;
 }
 
 MapManager::~MapManager()
@@ -53,6 +53,10 @@ MapManager::~MapManager()
     delete [] lowResWalkability;
     delete [] buildings_wt;
     delete [] buildings;
+}
+
+void MapManager::setDependencies(EUnitsFilter * eu){
+	this->_eUnitsFilter = eu;
 }
 
 void MapManager::modifyBuildings(Unit* u, bool b)

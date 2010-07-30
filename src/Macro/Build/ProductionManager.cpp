@@ -87,6 +87,7 @@ bool ProductionManager::canMake(BWAPI::Unit* builder, BWAPI::UnitType type)
 
 void ProductionManager::onOffer(std::set<BWAPI::Unit*> units)
 {
+	
   //go through all the units that are being offered to us
   for(std::set<BWAPI::Unit*>::iterator i=units.begin();i!=units.end();i++)
   {
@@ -131,14 +132,18 @@ void ProductionManager::onRevoke(BWAPI::Unit* unit, double bid)
 
 void ProductionManager::update()
 {
+
+	
   std::set<BWAPI::Unit*> myPlayerUnits=BWAPI::Broodwar->self()->getUnits();
-  for(std::set<BWAPI::Unit*>::iterator u = myPlayerUnits.begin(); u != myPlayerUnits.end(); u++)
+
+  for(std::set<BWAPI::Unit*>::const_iterator u = myPlayerUnits.begin(); u != myPlayerUnits.end(); u++)
   {
     std::map<BWAPI::UnitType,std::list<ProductionUnitType> >::iterator p=productionQueues.find((*u)->getType());
-    if (p!=productionQueues.end() && !p->second.empty() && (*u)->isCompleted() && producingUnits.find(*u)==producingUnits.end())
-      arbitrator->setBid(this, *u, 50);
+	if (p!=productionQueues.end() && !p->second.empty() && (*u)->isCompleted() && producingUnits.find(*u)==producingUnits.end()){
+	//	BWAPI::Broodwar->printf("Bid set on %s at adress %d coming from %d", (*u)->getType().getName().c_str(), (int)arbitrator, (int)this);
+		arbitrator->setBid(this, *u, 50);
+	}
   }
-
   std::map<BWAPI::Unit*,Unit>::iterator i_next;
   //go through all the factories that are producing units
   for(std::map<BWAPI::Unit*,Unit>::iterator i=producingUnits.begin();i!=producingUnits.end();i=i_next)
@@ -181,6 +186,7 @@ void ProductionManager::update()
           if (i->second.unit->getType()==i->second.type.type)
           {
             //we are done!
+			 // BWAPI::Broodwar->printf("here");
             arbitrator->removeBid(this, i->first);
             startedCount[i->second.type.type]--;
             plannedCount[i->second.type.type]--;

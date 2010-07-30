@@ -3,7 +3,6 @@
 ProtossStrat::ProtossStrat():MacroManager()
 {
 	//Broodwar->printf("Protoss Macro Manager is used.");
-	initWantedUnits();
 }
 
 ProtossStrat::~ProtossStrat()

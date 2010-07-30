@@ -5,11 +5,11 @@
 #include <MorphManager.h>
 BuildManager::BuildManager()
 {
-	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
-	this->buildingPlacer= & BuildingPlacer::Instance();
-	this->constructionManager= & ConstructionManager::Instance();
-	this->productionManager= & ProductionManager::Instance();
-	this->morphManager= & MorphManager::Instance();
+	this->arbitrator = NULL;
+	this->buildingPlacer= NULL;
+	this->constructionManager= NULL;
+	this->productionManager= NULL;
+	this->morphManager= NULL;
 	this->debugMode = true;
 }
 

@@ -25,6 +25,7 @@ private:
     inline void addBuilding(BWAPI::Unit* u);
     inline void removeBuilding(BWAPI::Unit* u);
 public:
+	void setDependencies(EUnitsFilter * eu);
     bool* walkability;          // walk tiles
     bool* lowResWalkability;    // low res => building tiles
     bool* buildings_wt;         // walk tiles
