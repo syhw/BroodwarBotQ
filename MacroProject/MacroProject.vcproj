@@ -228,6 +228,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\src\Micro\EUnit.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\src\Micro\Units\FlyingUnit.cpp"
 						>
 					</File>
@@ -631,6 +635,10 @@
 					</File>
 					<File
 						RelativePath="..\src\Micro\Units\BayesianUnit.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\EUnit.h"
 						>
 					</File>
 					<File

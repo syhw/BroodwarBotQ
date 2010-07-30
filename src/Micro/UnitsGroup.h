@@ -10,12 +10,15 @@
 #include <set>
 #include "MicroManager.h"
 #include "GoalManager.h"
+#include "EUnit.h"
 
 #define _UNITS_DEBUG 1
+#define DISTANCE_MAX 500
 
 //class Goal;
 class Formation;
 class GoalManager;
+class EUnit;
 
 struct i_dist 
 {
@@ -25,38 +28,30 @@ struct i_dist
 	//bool operator<(i_dist& ext) { return (ext.dist < dist); }
 };
 
-typedef struct __enemy
-{
-    BWAPI::Unit* self;
-    int damageTaken;
-} cEnemy;
-
-
 class UnitsGroup
 {
 private:
     std::list<pBayesianUnit> unitsAvailables;
-    std::map<int, cEnemy> enemiesInSight;
+    //std::map<int, cEnemy> enemiesInSight;
     std::set<BWAPI::Unit*> enemies;
 	int totalHP;
 	int totalPower;
     std::vector<pBayesianUnit> units;
     std::map<BWAPI::Unit*, std::list<pBayesianUnit> > attackersEnemy;
-    void goonMicro(pBayesianUnit u);
-    void zealotMicro(pBayesianUnit u);
-    void dragoonIA(std::set<BWAPI::Unit*> enemies, double maxRangeGoonEnemy);
     
 	std::list<pGoal> goals; // list of goals to accomplish
 	GoalManager* goalManager;
+    void updateEnemiesInSight();
     /// Mets à jour la liste des ennemis en vue de l'UnitsGroup, et ces derniers sont triés par ordre croissant de HP/SP
-    void updateEnemiesInSight(std::vector<pBayesianUnit>::iterator it);
+    //void updateEnemiesInSight(std::vector<pBayesianUnit>::iterator it);
     /// Mets à jour la liste des unités capables de sélectionner une nouvelle cible
-    void updateUnitsAvaibles(std::vector<pBayesianUnit>::iterator it);
+    //void updateUnitsAvaibles(std::vector<pBayesianUnit>::iterator it);
     /// Assignation des cibles aux unités du UnitsGroup qui sont disponible pour sélectionner une nouvelle cible
-    void updateTargetOfUnitsAvailables();
+    //void updateTargetOfUnitsAvailables();
     /// Affiche les cibles des unités du UnitsGroup
     void displayTargets();
 public:
+    std::map<BWAPI::Unit*, EUnit> enemiesInSight;
     std::vector<WalkTilePosition> _path;
 	
 	UnitsGroup();
@@ -67,7 +62,8 @@ public:
 
 	virtual void update();
 	virtual void display();
-
+    void drawEnemiesDetected();
+    EUnit* getClosestEnemy();
 	// Goals interface
 	virtual void attackMove(int x, int y);
 	virtual void attackMove(BWAPI::Position& p);
@@ -82,6 +78,7 @@ public:
     int size();
 	virtual void updateCenter();
     virtual BWAPI::Position getCenter() const;
+    inline double getDistance(BWAPI::Unit* u) const;
 
 	// Micro tech (to be placed in other classes. For instance DistantUnits...)
 	void keepDistance();

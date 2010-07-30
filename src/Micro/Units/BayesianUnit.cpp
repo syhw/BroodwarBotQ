@@ -13,7 +13,7 @@
 using boost::math::normal;
 #endif
 
-//#define _OUR_PATHFINDER_
+#define _OUR_PATHFINDER_
 
 using namespace std;
 using namespace BWAPI;
@@ -56,34 +56,33 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
     switchMode(_mode);
     updateAttractors();
     initDefaultProb();
-    if (_mode == MODE_FLOCK)
-    {
-        _flockProb.push_back(_PROB_NO_FLOCK_MOVE);  //FLOCK_NO
-        _flockProb.push_back(0.01);                  //FLOCK_CONTACT
-        _flockProb.push_back(0.20);                 //FLOCK_CLOSE
-        _flockProb.push_back(0.30);                  //FLOCK_MEDIUM
-        _flockProb.push_back(0.25);                 //FLOCK_FAR
+    _flockProb.push_back(_PROB_NO_FLOCK_MOVE);  //FLOCK_NO
+    _flockProb.push_back(0.01);                  //FLOCK_CONTACT
+    _flockProb.push_back(0.20);                 //FLOCK_CLOSE
+    _flockProb.push_back(0.30);                  //FLOCK_MEDIUM
+    _flockProb.push_back(0.25);                 //FLOCK_FAR
 
+    _inPosProb.push_back(0.44);                // INPOS_OK
+    _inPosProb.push_back(0.01);                // INPOS_CONTACT
+    _inPosProb.push_back(0.1);                // INPOS_CLOSE
+    _inPosProb.push_back(0.15);                 // INPOS_MEDIUM
+    _inPosProb.push_back(0.3);                // INPOS_FAR
 
-        _inPosProb.push_back(0.49);                // INPOS_OK
-        _inPosProb.push_back(0.01);                // INPOS_CONTACT
-        _inPosProb.push_back(0.1);                // INPOS_CLOSE
-        _inPosProb.push_back(0.15);                // INPOS_MEDIUM
-        _inPosProb.push_back(0.3);                // INPOS_FAR
-        // old (~~safe) params
+    _dodgeProb.push_back(0.4);                  // DODGE_NO
+    _dodgeProb.push_back(0.0000001);            // DODGE_CONTACT
+    _dodgeProb.push_back(0.2599995);            // DODGE_CLOSE
+    _dodgeProb.push_back(0.4399994);            // DODGE_MEDIUM
+
+    // old (~~safe) params
 //        _flockProb.push_back(0.05);                  //FLOCK_CONTACT
 //        _flockProb.push_back(0.25);                 //FLOCK_CLOSE
 //        _flockProb.push_back(0.38);                  //FLOCK_MEDIUM
 //        _flockProb.push_back(0.22);                 //FLOCK_FAR
-    }
-    else if (_mode == MODE_FIGHT_G)
-    {
-        _fightGProb.push_back(0.9); // FIGHTG_NO
-        _fightGProb.push_back(0.7); // FIGHTG_LIGHT
-        _fightGProb.push_back(0.5); // FIGHTG_MEDIUM
-        _fightGProb.push_back(0.3); // FIGHTG_HEAVY
-        _fightGProb.push_back(0.1); // FIGHTG_DEAD
-    }
+    _fightGProb.push_back(0.9); // FIGHTG_NO
+    _fightGProb.push_back(0.7); // FIGHTG_LIGHT
+    _fightGProb.push_back(0.5); // FIGHTG_MEDIUM
+    _fightGProb.push_back(0.3); // FIGHTG_HEAVY
+    _fightGProb.push_back(0.1); // FIGHTG_DEAD
 }
 
 BayesianUnit::~BayesianUnit()
@@ -150,6 +149,7 @@ void BayesianUnit::computeInPosValues()
 
 void BayesianUnit::computeFlockValues()
 {
+    _dodgeValues.clear();
     _flockValues.clear();
     for (unsigned int i = 0; i < _dirv.size(); ++i)
     {
@@ -183,7 +183,29 @@ void BayesianUnit::computeFlockValues()
         }
         _flockValues.push_back(tmpv);
     }
-    // TODO: <OR> Heat dissipation model
+    for (unsigned int i = 0; i < _dirv.size(); ++i)
+    {
+        vector<dodge_value> tmpv2;
+         for (set<Unit*>::const_iterator it = 
+                Broodwar->getAllUnits().begin(); 
+            it != Broodwar->getAllUnits().end(); ++it)
+        {
+            if ((*it) == this->unit) continue; 
+
+            Position tmp = _dirv[i].translate(this->_unitPos);
+            Vec tmpvit((*it)->getVelocityX(), 
+                    (*it)->getVelocityY()); 
+
+            dodge_value value = (dodge_value)(1 + (int)tmp.getDistance(
+                        (*it)->getPosition()) / 32);
+
+            if (value <= DODGE_MEDIUM )
+                tmpv2.push_back(value);
+            else
+                tmpv2.push_back(DODGE_NO);
+        }
+        _dodgeValues.push_back(tmpv2);
+    }
 }
 
 void BayesianUnit::switchMode(unit_mode um)
@@ -378,6 +400,9 @@ double BayesianUnit::computeProb(unsigned int i)
         // one j for each attractor
         for (unsigned int j = 0; j < _flockValues[i].size(); ++j)
             val *= _flockProb[_flockValues[i][j]];
+
+        for (unsigned int j = 0; j < _dodgeValues[i].size(); ++j)
+            val *= _dodgeProb[_dodgeValues[i][j]];
        
         /// OBJECTIVE (pathfinder) INFLUENCE
         double prob_obj = _PROB_GO_OBJ / (_unitsGroup->getUnits()->size() - 1);
@@ -407,6 +432,8 @@ double BayesianUnit::computeProb(unsigned int i)
         else
         {
             std::set<Vec> center_v1;
+            std::set<Vec> center_v2;
+            std::set<Vec> center_v3;
             for(int ii = -8; ii <= 8 ; ii+=8)
                 for(int jj = -8; jj <= 8 ; jj+=8)
                 {
@@ -415,10 +442,8 @@ double BayesianUnit::computeProb(unsigned int i)
                     tmp += obj; tmp += Vec(ii,jj);
                     center_v1.insert(tmp);
                 }
-            std::set<Vec> center_v2;
-            std::set<Vec> center_v3;
             for(int ii = -16; ii <= 16 ; ii+=8)
-                for(int jj = -8; jj <= 8 ; jj+=8)
+                for(int jj = -16; jj <= 16 ; jj+=8)
                 {
                     if (ii == jj == 0) continue;
                     Vec tmp(0,0);
@@ -426,7 +451,7 @@ double BayesianUnit::computeProb(unsigned int i)
                     center_v2.insert(tmp);
                 }
             for(int ii = -32; ii <= 32 ; ii+=8)
-                for(int jj = -8; jj <= 8 ; jj+=8)
+                for(int jj = -32; jj <= 32 ; jj+=8)
                 {
                     if (ii == jj == 0) continue;
                     Vec tmp(0,0);
@@ -550,10 +575,15 @@ void BayesianUnit::updateObj()
     obj = Vec(p.x() - _unitPos.x() + 12, p.y() - _unitPos.y() + 12); // to center the Tile, change 12 for 16 - top/left sizes
     drawPath();
 #else
-    if (_unitPos.getDistance(target) < WALK_TILES_SIZE*2)
-
+    /*if (_unitPos.getDistance(target) < WALK_TILES_SIZE/2)
     {
         obj = Vec(0, 0);
+    }
+    else if (_unitPos.getDistance(target) >= WALK_TILES_SIZE/2 && _unitPos.getDistance(target) < BWAPI::TILE_SIZE)
+    {*/
+    if (_unitPos.getDistance(target) < BWAPI::TILE_SIZE)
+    {
+        obj = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y());
     }
     else
     {
@@ -565,7 +595,7 @@ void BayesianUnit::updateObj()
             Bug avec le pathfind.. Si 6 unités ou moins calculent leurs pathfind, le temps est de 9 ms / unité.
             Si ça passe à plus de 6 unités, le temps est de 65 ms / unité et ça lag ...
             */
-            if (_unitsGroup->_path.size() > 8)
+            if (_unitsGroup->_path.size() > 10)
                 quickPathFind(_btpath, TilePosition(_unitPos), TilePosition(this->_unitsGroup->_path[10].getPosition()));
             else
                 quickPathFind(_btpath, TilePosition(_unitPos), TilePosition(target));
@@ -594,9 +624,7 @@ void BayesianUnit::updateObj()
         else
             p = _unitPos;
         obj = Vec(p.x() - _unitPos.x() + 12, p.y() - _unitPos.y() + 12); // to center the Tile, change 12 for 16 - top/left sizes
-    }        
-
-
+    }     
 #ifdef __DEBUG_GABRIEL__
     drawBTPath();
     MapManager* mapm = & MapManager::Instance();
@@ -605,6 +633,53 @@ void BayesianUnit::updateObj()
     //drawPath();
 #endif
 #endif
+    double norm = obj.norm();
+    double norm_far = min(_slarge, _sheight);
+    obj.normalize();
+    if (norm < norm_far)
+    {
+        double max = -1000000.0;
+        int i = 17; // 17
+
+        int ind_max;
+        while (i != 33) // 33
+        {
+            Vec tmp = _dirv[i];
+            tmp.normalize();
+            double val = tmp.dot(obj);
+            if (val > max)
+            {
+                max = val;
+                ind_max = i;
+            }
+            if (i == 19) // 19
+                i = 24; // 24
+            else if (i == 26) // 26
+                i = 31; // 31
+            else
+                i++;
+        }
+        obj = _dirv[ind_max];
+    }
+    else
+    {
+        double max = -1000000.0;
+        double normMax = -1000000.0;
+        int ind_max;
+        for(int i = 0; i < 49; i++)
+        { 
+            Vec tmp = _dirv[i];
+            tmp.normalize();
+            double val = tmp.dot(obj);
+            if (val > max || (val == max && norm > normMax ) )
+            {
+                max = val;
+                ind_max = i;
+                normMax = norm;
+            }
+        }
+        obj = _dirv[ind_max];
+    }
 }
 
 void BayesianUnit::drawObj(int number)
@@ -676,6 +751,7 @@ void BayesianUnit::drawOccupation(int number)
 void BayesianUnit::updateDirV()
 {
     _dirv.clear();
+
     Position p = _unitPos;
     WalkTilePosition wtp(p);
 
@@ -707,6 +783,7 @@ void BayesianUnit::updateDirV()
                 yy = y*pixs;
             }
             Vec v(xx, yy);
+
             Position tmp = v.translate(p);
             if (tmp.x() <= 32*Broodwar->mapWidth() && tmp.y() <= 32*Broodwar->mapHeight() 
                     && tmp.x() >= 0 && tmp.y() >= 0)
@@ -785,7 +862,7 @@ void BayesianUnit::updateDir()
             Vec tmpTest = it->second;
             Vec tmpVec = it->second;
             double tmp = obj.dot(tmpVec.normalize());
-
+            
             if (tmp >= max && max2 < obj.dot(tmpTest))
             {
                 max = tmp;
@@ -794,8 +871,8 @@ void BayesianUnit::updateDir()
             }
         }
     }
-
-    drawProbs(dirvProb, _unitsGroup->size());
+    //if (_mode == MODE_FLOCK)
+        //drawProbs(dirvProb, _unitsGroup->size());
 }
 
 void BayesianUnit::drawDir()
@@ -807,8 +884,13 @@ void BayesianUnit::drawDir()
 
 void BayesianUnit::clickDir()
 {
+    if (dir == Vec(0,0))
+    {
+        unit->stop();
+        return;
+    }
     dir += _unitPos;
-    if (_unitPos.getDistance(dir.toPosition()) >= 1.0) 
+    if (_unitPos.getDistance(target) > 11.32) 
         unit->rightClick(dir.toPosition());
     else
         unit->stop();
@@ -874,16 +956,22 @@ void BayesianUnit::onUnitHide(Unit* u)
 void BayesianUnit::update()
 {
     if (!unit->exists()) return;
-    _unitPos = unit->getPosition();
+        _unitPos = unit->getPosition();
+
+//    BWAPI::Broodwar->drawCircleMap(_unitPos.x(), _unitPos.y(), 5, BWAPI::Colors::Blue);
 
     //if (_sheight > 32 || _slarge > 32)
     //    Broodwar->printf("height: %d, large: %d", _sheight, _slarge);
 
-    if (targetEnemy != NULL)// && withinRange(targetEnemy) /* && Qu'elle est capable de tirer .. */)
+    if (_unitsGroup->getClosestEnemy() != NULL && _unitsGroup->getDistance(_unitsGroup->getClosestEnemy()->self()) <= DISTANCE_MAX)
     {
-        _mode = MODE_FIGHT_G;
-        attackEnemy(targetEnemy, BWAPI::Colors::Red);
-        return;
+        Broodwar->printf("Switch MODE_FIGHT_G!");
+        switchMode(MODE_FIGHT_G);
+    }
+    else if (_mode == MODE_FIGHT_G)
+    {
+            Broodwar->printf("Switch FLOCK!");
+            this->switchMode(MODE_FLOCK);
     }
 
     if (_mode == MODE_FLOCK || _mode == MODE_INPOS) 
@@ -892,7 +980,7 @@ void BayesianUnit::update()
         drawObj(0); // green
         drawDir(); // red
         clickDir();
-        if (_mode != MODE_INPOS && _unitPos.getDistance(target) < WALK_TILES_SIZE*2)
+        if (_mode != MODE_INPOS && _unitPos.getDistance(target) < WALK_TILES_SIZE/2)
         {
             Broodwar->printf("Switch INPOS!");
             this->switchMode(MODE_INPOS);
@@ -1011,7 +1099,7 @@ std::multimap<double, BWAPI::Unit*>& BayesianUnit::getRangeEnemies()
 void BayesianUnit::attackEnemy(BWAPI::Unit* u, BWAPI::Color col)
 {
 #ifdef __DEBUG_NICOLAS__
-    int ux = _unitPos().x(); int uy = _unitPos().y();
+    int ux = _unitPos.x(); int uy = _unitPos.y();
     int ex = u->getPosition().x(); int ey = u->getPosition().y();
 
     Broodwar->drawLineMap(ux, uy, ex, ey, col);
