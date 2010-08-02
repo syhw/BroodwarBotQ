@@ -271,13 +271,13 @@ void UnitsGroup::displayTargets()
         {
             int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
             int ex = u->unit->getOrderTarget()->getPosition().x(); int ey = u->unit->getOrderTarget()->getPosition().y();
-            BWAPI::Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Orange);
+            //BWAPI::Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Orange);
         
             if (u->targetEnemy && u->unit->getOrderTarget() != u->targetEnemy)
             {
                 int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
                 int ex = u->targetEnemy->getPosition().x(); int ey = u->targetEnemy->getPosition().y();
-                BWAPI::Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Blue);
+                //BWAPI::Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Blue);
             }
         }
     }
@@ -297,7 +297,7 @@ void UnitsGroup::updateEnemiesInSight()
             std::vector<pBayesianUnit>::iterator it = units.begin();
             while(it != units.end() && (*it)->unit != (*iter)->getSource()) it++;
             if (it != units.end())
-                enemiesInSight.find((*iter)->getTarget())->second.damageTaken() += (*it)->damagesOn((*iter)->getTarget());
+                (enemiesInSight.find((*iter)->getTarget()))->second.damageTaken() += (*it)->damagesOn((*iter)->getTarget());
         }
     }
 }
@@ -322,7 +322,6 @@ void UnitsGroup::update()
     //drawEnemiesDetected();
     updateEnemiesInSight();
     this->totalHP = 0;
-    Broodwar->drawCircleMap(center.x(), center.y(), DISTANCE_MAX, BWAPI::Colors::Yellow);
 
     //unitsAvailables.clear();
     //enemiesInSight.clear();
@@ -739,9 +738,7 @@ void UnitsGroup::idle(){
 void UnitsGroup::updateTargets(pBayesianUnit u)
 {
     u->listTargets.clear();
-    for (std::map<BWAPI::Unit*, EUnit>::iterator iter = enemiesInSight.begin();
-         iter != enemiesInSight.end();
-         iter++)
+    for (std::map<BWAPI::Unit*, EUnit>::iterator iter = enemiesInSight.begin();iter != enemiesInSight.end();iter++)
     {
         u->listTargets.insert(std::pair<int, EUnit*>(iter->second.getPrio(u),&(iter->second)));
     }
