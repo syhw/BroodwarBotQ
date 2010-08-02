@@ -1,8 +1,6 @@
-#pragma once
-
 namespace Arbitrator
 {
-template <class _Tp,class _Val>
+  template <class _Tp,class _Val>
   Arbitrator<_Tp,_Val>::Arbitrator()
   {
     inUpdate=false;
@@ -13,7 +11,6 @@ template <class _Tp,class _Val>
   template <class _Tp,class _Val>
   bool Arbitrator<_Tp,_Val>::setBid(Controller<_Tp,_Val>* c, _Tp obj, _Val bid)
   {
-	 // BWAPI::Broodwar->printf("%d here, well received setBid", (int)this);
     if (c == NULL || obj == NULL)
       return false;
 
@@ -162,6 +159,7 @@ template <class _Tp,class _Val>
     objects[c].insert(obj); //insert this object into the set of objects owned by this controller
     updatedObjects.insert(obj); //since the object was updated, insert it into the updated objects set
 
+
     //cannot decrease bid via accept()
     if (bids[obj].contains(c) && bid<bids[obj].get(c))
       return true;
@@ -249,7 +247,6 @@ template <class _Tp,class _Val>
     this->inUpdate=true;
     bool first=true;
     //first we construct a map for the objects to offer
-	
     std::map<Controller<_Tp,_Val>*, std::set<_Tp> > objectsToOffer;
 
     while(first || !objectsToOffer.empty())
@@ -280,8 +277,7 @@ template <class _Tp,class _Val>
       }
       //reset updated objects
       updatedObjects.clear();
-	  if(objectsToOffer.size()>0)
-	
+
       //offer the objects to the top bidders
       for(std::map< Controller<_Tp,_Val>*, std::set<_Tp> >::iterator i = objectsToOffer.begin(); i != objectsToOffer.end(); i++)
       {
@@ -289,7 +285,6 @@ template <class _Tp,class _Val>
         unansweredObjected=i->second;
 
         inOnOffer=true;
-		//BWAPI::Broodwar->printf("call to on offer of %s", i->first->getName().c_str());
         i->first->onOffer(i->second);
         inOnOffer=false;
 
@@ -301,4 +296,3 @@ template <class _Tp,class _Val>
     this->inUpdate=false;
   }
 }
-

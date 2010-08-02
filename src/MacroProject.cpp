@@ -215,13 +215,7 @@ void BattleBroodAI::onFrame()
 	objManager->onFrame();
 
 	this->borderManager->update();
-	this->buildManager->update();
-
-	this->buildOrderManager->update();
-	this->supplyManager->update();
-
 	this->mapManager->onFrame();
-
     this->macroManager->update();
 	this->arbitrator->update();
   std::set<Unit*> units=Broodwar->self()->getUnits();

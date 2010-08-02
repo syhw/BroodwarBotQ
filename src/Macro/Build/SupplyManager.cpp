@@ -4,7 +4,7 @@ SupplyManager::SupplyManager()
 {
   this->buildManager      = NULL;
   this->buildOrderManager = NULL;
-  this->lastFrameCheck    = 100000;
+  this->lastFrameCheck    = 0;
   this->seedPosition      = BWAPI::TilePositions::None;
 }
 
