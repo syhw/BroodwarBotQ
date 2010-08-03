@@ -1,7 +1,6 @@
 #pragma once
 #include <BWAPI.h>
-#include <UnitsGroup.h>
-
+#include <BayesianUnit.h>
 class EUnit
 {
     private:
