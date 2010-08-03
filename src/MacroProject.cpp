@@ -181,6 +181,7 @@ void BattleBroodAI::onStart()
 
 	//Call on start functions
 	this->macroManager->onStart();
+	this->microManager->onStart();
 }
 
 void BattleBroodAI::onEnd(bool isWinner)

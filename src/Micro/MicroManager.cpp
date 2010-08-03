@@ -190,7 +190,8 @@ void MicroManager::sendGroupToDefense( UnitsGroup* ug)
 	}*/
 
 	// Send the group defend the base
-	ug->addGoal(pGoal(new DefendChokeGoal(ug,(*BorderManager::Instance().getMyBorder().begin()))));
+	pGoal g = pGoal(new DefendChokeGoal(ug,(*BorderManager::Instance().getMyBorder().begin())));
+	ug->addGoal(g);
 }
 
 

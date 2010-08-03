@@ -10,7 +10,7 @@ ProtossStrat::~ProtossStrat()
 }
 
 void ProtossStrat::onStart(){
-	BWAPI::Broodwar->printf("call to onStart");
+	
 	this->buildOrderManager->buildAdditional(4,BWAPI::UnitTypes::Protoss_Probe,100);
 	this->buildOrderManager->build(1,BWAPI::UnitTypes::Protoss_Pylon,99);
 	this->buildOrderManager->buildAdditional(2,BWAPI::UnitTypes::Protoss_Probe,98);
@@ -25,7 +25,7 @@ void ProtossStrat::onStart(){
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Dragoon,89);
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Pylon,88);
 	this->buildOrderManager->upgrade(1,BWAPI::UpgradeTypes::Singularity_Charge, 87);
-	this->buildOrderManager->build(40,BWAPI::UnitTypes::Protoss_Dragoon, 86);
+	this->buildOrderManager->build(40,BWAPI::UnitTypes::Protoss_Dragoon, 10);
 	//this->buildOrderManager->enableDependencyResolver();
 }
 
@@ -38,9 +38,10 @@ void ProtossStrat::update(){
 			this->workerManager->enableAutoBuild();
 		}
 	}
-	if(this->shouldExpand()){
+	if(this->shouldExpand() && !expanding ){
+		this->expanding = true;
 		BWAPI::Broodwar->printf("Expanding at the nearest location");
-		this->baseManager->expand(100);
+		this->baseManager->expand(80);
 	}
 	
 }

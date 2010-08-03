@@ -35,12 +35,14 @@ void MacroManager::onStart(){
 }
 void MacroManager::onUnitCreate(BWAPI::Unit* unit)
 {
-	/*
+	
 
 	// ***********   Expand   *********** //
 	if( unit->getType().isResourceDepot())
 		expanding = false;
 
+
+	/*
 	// *******   ProdBuildings   ******** //
 	if( unit->getType().isBuilding() && !unit->getType().isResourceDepot())
 	{
