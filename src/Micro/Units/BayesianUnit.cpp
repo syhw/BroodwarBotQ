@@ -575,12 +575,6 @@ void BayesianUnit::updateObj()
     obj = Vec(p.x() - _unitPos.x() + 12, p.y() - _unitPos.y() + 12); // to center the Tile, change 12 for 16 - top/left sizes
     drawPath();
 #else
-    /*if (_unitPos.getDistance(target) < WALK_TILES_SIZE/2)
-    {
-        obj = Vec(0, 0);
-    }
-    else if (_unitPos.getDistance(target) >= WALK_TILES_SIZE/2 && _unitPos.getDistance(target) < BWAPI::TILE_SIZE)
-    {*/
     if (_unitPos.getDistance(target) < BWAPI::TILE_SIZE)
     {
         obj = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y());
@@ -963,7 +957,7 @@ void BayesianUnit::update()
     //if (_sheight > 32 || _slarge > 32)
     //    Broodwar->printf("height: %d, large: %d", _sheight, _slarge);
 
-    if (_unitsGroup->getClosestEnemy() != NULL && _unitsGroup->getDistance(_unitsGroup->getClosestEnemy()->self()) <= DISTANCE_MAX)
+    /*if (_unitsGroup->getClosestEnemy() != NULL && _unitsGroup->getDistance(_unitsGroup->getClosestEnemy()->self()) <= DISTANCE_MAX)
     {
         Broodwar->printf("Switch MODE_FIGHT_G!");
         switchMode(MODE_FIGHT_G);
@@ -972,6 +966,15 @@ void BayesianUnit::update()
     {
             Broodwar->printf("Switch FLOCK!");
             this->switchMode(MODE_FLOCK);
+    }*/
+
+    if (!listTargets.empty())
+    {
+        EUnit* e = listTargets.begin()->second;
+        attackEnemy(e->self());
+        e->damageTaken() += this->damagesOn(e->self());
+        targetEnemy = e->self();
+        return;
     }
 
     if (_mode == MODE_FLOCK || _mode == MODE_INPOS) 
@@ -1104,7 +1107,6 @@ void BayesianUnit::attackEnemy(BWAPI::Unit* u, BWAPI::Color col)
 
     Broodwar->drawLineMap(ux, uy, ex, ey, col);
 #endif
-    
     if (unit->getOrderTarget() != u)
     {
         unit->rightClick(u);

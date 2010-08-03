@@ -1,4 +1,5 @@
 #include "EUnit.h"
+#include <UnitsGroup.h>
 
 EUnit::EUnit(BWAPI::Unit *self, double distance):m_self(self), m_distance(distance), m_damageTaken(0), m_hp(self->getHitPoints()+self->getShields())
 {

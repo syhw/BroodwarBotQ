@@ -274,13 +274,13 @@ void UnitsGroup::displayTargets()
         {
             int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
             int ex = u->unit->getOrderTarget()->getPosition().x(); int ey = u->unit->getOrderTarget()->getPosition().y();
-            BWAPI::Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Orange);
+            //BWAPI::Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Orange);
         
             if (u->targetEnemy && u->unit->getOrderTarget() != u->targetEnemy)
             {
                 int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
                 int ex = u->targetEnemy->getPosition().x(); int ey = u->targetEnemy->getPosition().y();
-                BWAPI::Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Blue);
+                //BWAPI::Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Blue);
             }
         }
     }
@@ -300,7 +300,7 @@ void UnitsGroup::updateEnemiesInSight()
             std::vector<pBayesianUnit>::iterator it = units.begin();
             while(it != units.end() && (*it)->unit != (*iter)->getSource()) it++;
             if (it != units.end())
-                enemiesInSight.find((*iter)->getTarget())->second.damageTaken() += (*it)->damagesOn((*iter)->getTarget());
+                (enemiesInSight.find((*iter)->getTarget()))->second.damageTaken() += (*it)->damagesOn((*iter)->getTarget());
         }
     }
 }
@@ -322,10 +322,9 @@ EUnit* UnitsGroup::getClosestEnemy()
 
 void UnitsGroup::update()
 {
-    drawEnemiesDetected();
+    //drawEnemiesDetected();
     updateEnemiesInSight();
     this->totalHP = 0;
-    Broodwar->drawCircleMap(center.x(), center.y(), DISTANCE_MAX, BWAPI::Colors::Yellow);
 
     //unitsAvailables.clear();
     //enemiesInSight.clear();
@@ -359,6 +358,7 @@ void UnitsGroup::update()
 
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     {
+        updateTargets(*it);
         (*it)->update(); 
         this->totalHP += (*it)->unit->getHitPoints();
         this->totalPower += (*it)->unit->getType().groundWeapon().damageAmount();
@@ -710,8 +710,8 @@ void UnitsGroup::selectedUnits(std::set<pBayesianUnit>& u)
 #endif
 
 
-void UnitsGroup::accomplishGoal(){
-	
+void UnitsGroup::accomplishGoal()
+{
 	//TOCHECK Potential Memory Leak with accomplished goals => no thanks to smart pointers
 	
 	if(goals.size() > 0){
@@ -724,14 +724,27 @@ void UnitsGroup::accomplishGoal(){
 		}
 	}
 }
-void UnitsGroup::switchMode(unit_mode um){
+void UnitsGroup::switchMode(unit_mode um)
+{
 	for(std::vector<pBayesianUnit>::iterator it = getUnits()->begin(); it != getUnits()->end(); ++it){
 		(*it)->switchMode(um);
 	}
 }
 
-void UnitsGroup::idle(){
+void UnitsGroup::idle()
+{
 	for(std::vector<pBayesianUnit>::iterator it = getUnits()->begin(); it != getUnits()->end(); ++it){
 		(*it)->target = (*it)->unit->getPosition();
 	}
+}
+
+
+
+void UnitsGroup::updateTargets(pBayesianUnit u)
+{
+    u->listTargets.clear();
+    for (std::map<BWAPI::Unit*, EUnit>::iterator iter = enemiesInSight.begin();iter != enemiesInSight.end();iter++)
+    {
+        u->listTargets.insert(std::pair<int, EUnit*>(iter->second.getPrio(u),&(iter->second)));
+    }
 }
