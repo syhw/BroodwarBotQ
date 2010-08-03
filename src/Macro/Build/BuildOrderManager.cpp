@@ -27,7 +27,7 @@ BuildOrderManager::BuildOrderManager(){
   this->usedMinerals       = 0;
   this->usedGas            = 0;
   this->dependencyResolver = false;
-  this->debugMode          = true;
+  this->debugMode          = false;
 
   for(set<BWAPI::UnitType>::iterator i=UnitTypes::allUnitTypes().begin();i!=UnitTypes::allUnitTypes().end();i++)
   {
