@@ -575,12 +575,6 @@ void BayesianUnit::updateObj()
     obj = Vec(p.x() - _unitPos.x() + 12, p.y() - _unitPos.y() + 12); // to center the Tile, change 12 for 16 - top/left sizes
     drawPath();
 #else
-    /*if (_unitPos.getDistance(target) < WALK_TILES_SIZE/2)
-    {
-        obj = Vec(0, 0);
-    }
-    else if (_unitPos.getDistance(target) >= WALK_TILES_SIZE/2 && _unitPos.getDistance(target) < BWAPI::TILE_SIZE)
-    {*/
     if (_unitPos.getDistance(target) < BWAPI::TILE_SIZE)
     {
         obj = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y());
@@ -1113,7 +1107,6 @@ void BayesianUnit::attackEnemy(BWAPI::Unit* u, BWAPI::Color col)
 
     Broodwar->drawLineMap(ux, uy, ex, ey, col);
 #endif
-    
     if (unit->getOrderTarget() != u)
     {
         unit->rightClick(u);
