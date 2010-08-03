@@ -36,6 +36,7 @@
 #include "ConstructionManager.h"
 #include "MorphManager.h"
 #include "ProductionManager.h"
+#include "EnhancedUI.h"
 
 class BattleBroodAI;
 extern BattleBroodAI* broodAI;
@@ -83,6 +84,8 @@ public:
 	ETechEstimator* eTechEstimator;
 	TimeManager* timeManager;
 	GoalManager* goalManager;
+	EnhancedUI * enhancedUI;
+
 	
 
 	

@@ -142,6 +142,7 @@ void BattleBroodAI::onStart()
 	this->eTechEstimator = & ETechEstimator::Instance();
 	this->timeManager = & TimeManager::Instance();
 	this->goalManager = & GoalManager::Instance();
+	this->enhancedUI = & EnhancedUI::Instance();
     if( Broodwar->self()->getRace() == Races::Protoss)
         this->macroManager = & ProtossStrat::Instance();
     else if( Broodwar->self()->getRace() == Races::Terran)
@@ -218,6 +219,7 @@ void BattleBroodAI::onFrame()
 	this->mapManager->onFrame();
     this->macroManager->update();
 	this->arbitrator->update();
+	this->enhancedUI->update();
   std::set<Unit*> units=Broodwar->self()->getUnits();
   if (this->showManagerAssignments)
   {

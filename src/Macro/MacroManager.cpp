@@ -271,7 +271,7 @@ bool MacroManager::canCreateDefenseBuildings( UnitType techBuilding, UnitType bu
 
 bool MacroManager::shouldExpand()
 {
-	/*
+	
 	// Expand if all the bases are fully functionnal
 	unsigned int nbRessources = 0;
 	const std::set<Base*>& bases = baseManager->getAllBases();
@@ -280,7 +280,7 @@ bool MacroManager::shouldExpand()
 		nbRessources += 2 * (*it)->getMinerals().size() + 3 * (*it)->getGeysers().size();
 	}
 	return workerManager->workers.size() >= nbRessources;
-	*/
+	
 }
 
 #ifdef BW_QT_DEBUG

@@ -2,6 +2,8 @@
 #include <Regions.h>
 #include <util.h>
 #include <UnitsGroup.h>
+#include "DefendChokeGoal.h"
+#include "BorderManager.h"
 
 
 using std::map;
@@ -14,6 +16,8 @@ using namespace BWTA;
 MicroManager::MicroManager() 
 : BaseObject("MicroManager")
 {
+	this->defgroup = new UnitsGroup();
+
 	this->arbitrator = NULL;
 	this->regions = NULL;
 }
@@ -28,6 +32,11 @@ void MicroManager::setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* 
 	this->regions = reg;
 
 }
+
+void MicroManager::onStart(){
+	this->sendGroupToDefense(defgroup);
+
+}
 void MicroManager::update()
 {
 	//Suppress the list prompted to suppress 
@@ -39,6 +48,18 @@ void MicroManager::update()
 	promptedRemove.clear();
 
 
+	//Set bid on appropriate units (not workers and not building)
+	std::set<BWAPI::Unit *> myUnits = BWAPI::Broodwar->self()->getUnits();
+
+	for(std::set<BWAPI::Unit *>::iterator it = myUnits.begin(); it != myUnits.end(); ++it){
+		if( !(*it)->getType().isBuilding() && !(*it)->getType().isWorker() ){
+			this->arbitrator->setBid(this,(*it),40);
+		}
+	}
+
+
+	//Update unitsgroup
+	defgroup->update();
 	if (unitsgroups.empty()) return;
 	UnitsGroup* ug;
 	for (std::list<UnitsGroup*>::iterator it = unitsgroups.begin(); it != unitsgroups.end(); it++)
@@ -54,20 +75,14 @@ void MicroManager::update()
 
 void MicroManager::onOffer(std::set<BWAPI::Unit*> units)
 { 
-	/*
+	
 	for(std::set<BWAPI::Unit*>::iterator u = units.begin(); u != units.end(); u++)
 	{
 		if (!(*u)->getType().isWorker() && !(*u)->getType().isBuilding())
 		{
 			arbitrator->accept(this, *u);
-			if (unitsgroups.empty())
-			{	
-				UnitsGroup* ug = new UnitsGroup();
-				unitsgroups.push_back( ug);
-				sendGroupToDefense (ug);
-			}
 			
-			unitsgroups.back()->takeControl(*u);
+			defgroup->takeControl(*u);
 			//Broodwar->printf("New %s added to the micro manager", (*u)->getType().getName().c_str());
 		}
 		else
@@ -75,7 +90,6 @@ void MicroManager::onOffer(std::set<BWAPI::Unit*> units)
 			arbitrator->decline(this, *u, 0);
 		}
 	}
-	*/
 }
 
 void MicroManager::onRevoke(BWAPI::Unit* unit, double bid)
@@ -90,13 +104,10 @@ std::string MicroManager::getName() const
 
 void MicroManager::onUnitCreate(BWAPI::Unit* unit)
 {
-	
-
+	/*
 	if (!unit->getType().isWorker() && unit->getPlayer()==Broodwar->self() && !unit->getType().isBuilding() && unit->getType().canAttack())
 		arbitrator->setBid(this, unit, 100);
-
-
-
+	*/
 }
 
 void MicroManager::onUnitDestroy(BWAPI::Unit* unit)
@@ -156,11 +167,11 @@ void MicroManager::sendGroupToAttack( UnitsGroup* ug)
 
 void MicroManager::sendGroupToDefense( UnitsGroup* ug)
 {
+	/*
 	// Go to the nearest choke point.
 	BaseLocation* startLoc = BWTA::getStartLocation(BWAPI::Broodwar->self());
 
 	BWAPI::Position chokePoint;
-
 	const std::set<Region*>& region = getRegions();
 	const std::set<Chokepoint*>& chocke = getChokepoints();
 	for( std::set<Region*>::const_iterator itRegion = region.begin(); itRegion != region.end(); itRegion++)
@@ -176,10 +187,10 @@ void MicroManager::sendGroupToDefense( UnitsGroup* ug)
 				}
 			}
 		}
-	}
+	}*/
 
 	// Send the group defend the base
-	//ug->addGoal(pGoal(new DefendGoal(chokePoint)));
+	ug->addGoal(pGoal(new DefendChokeGoal(ug,(*BorderManager::Instance().getMyBorder().begin()))));
 }
 
 

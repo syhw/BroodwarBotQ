@@ -24,8 +24,11 @@ private:
 	Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
 	Regions* regions;
 public:
+
 	void setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, Regions * reg);
+	void onStart();
 	std::list<UnitsGroup*> unitsgroups;
+	UnitsGroup* defgroup;
 	virtual void onOffer(std::set<BWAPI::Unit*> units);
 	virtual void onRevoke(BWAPI::Unit* unit, double bid);
 	virtual std::string getName() const;
@@ -33,7 +36,6 @@ public:
 	void onUnitCreate(BWAPI::Unit* unit);
 	void onUnitDestroy(BWAPI::Unit* unit);
 	void display();
-
 	void sendGroupToAttack( UnitsGroup* ug);
 	void sendGroupToDefense( UnitsGroup* ug);
 	void promptRemove(UnitsGroup* ug);//Guarantee that on the nextFrame :

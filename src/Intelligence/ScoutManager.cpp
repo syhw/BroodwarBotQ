@@ -22,9 +22,9 @@ void ScoutManager::setDependencies(Regions * region, MicroManager * micro){
 
 void ScoutManager::update()
 {
-	if(regions->enemyFound()){
-		findUnitsGroup(pGoal(new ExploreGoal(regions->whereIsEnemy())));
-	}
+	//if(regions->enemyFound()){
+	//	findUnitsGroup(pGoal(new ExploreGoal(regions->whereIsEnemy())));
+	//}
 }
 
 std::string ScoutManager::getName() const
