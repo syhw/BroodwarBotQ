@@ -20,6 +20,7 @@ private:
 	WarManager();
 	~WarManager();
 	std::list<UnitsGroup *> promptedRemove;
+    void checkDefense();
 	bool remove(UnitsGroup* u);
 	Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
 	Regions* regions;
