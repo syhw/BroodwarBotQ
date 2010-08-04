@@ -158,28 +158,21 @@ void BayesianUnit::computeFlockValues()
                 _unitsGroup->getUnits()->begin(); 
             it != _unitsGroup->getUnits()->end(); ++it)
         {
-            if ((*it)->unit == this->unit) continue; 
-            // we don't flock with ourselves!
-            
-            //CODE flock_value value = (flock_value)
-            //CODE (1 + (int)((*it)->unit->getDistance(
-            //CODE      _dirv[i].translate(this->_unitPos()))/32));
+            if ((*it)->unit == this->unit) continue; // we don't flock with ourselves!
+
             Position tmp = _dirv[i].translate(this->_unitPos);
             Vec tmpvit((*it)->unit->getVelocityX(), 
                     (*it)->unit->getVelocityY()); 
             // we flock with the interpolated next position of other units
-            //tmpvit *= 8;
-            //TEST BWAPI::Broodwar->printf("X: %f, Y: %f \n", (*it)->unit->getVelocityX(), (*it)->unit->getVelocityY());
             flock_value value = (flock_value)(1 + (int)tmp.getDistance(
                         tmpvit.translate((*it)->_unitPos)) / 32);
-            //CODE if (value == FLOCK_FAR + 1) --value; 
-            // some kind of hysteresis for FAR
+            
+            if (value == FLOCK_FAR + 1) value = FLOCK_FAR; // some kind of hysteresis for FAR
+            
             if (value <= FLOCK_FAR)
                 tmpv.push_back(value);
             else
                 tmpv.push_back(FLOCK_NO);
-            //TEST Broodwar->printf("distance int: %d, double %f\n", (int)(*it)->unit->getDistance(this->unit), (*it)->unit->getDistance(this->unit));
-            //TEST Broodwar->printf("Flock value %d\n", value);
         }
         _flockValues.push_back(tmpv);
     }
@@ -758,22 +751,19 @@ void BayesianUnit::updateDirV()
     int pixs = min(_slarge, _sheight) + 1; // TODO review this value
     if (pixs < _accel * _topSpeed) // 2*pixs < (_accel/2) * topSpeed because (_accel/2) \approxeq #frames_to_go_to_topspeed
         pixs = _accel * _topSpeed / 2;
+    int pixs_far = 0; // outer layer of dirvectors
+    if (pixs < 32) // 3*pixs < 96
+    {
+        pixs_far = 32;
+    }
+    else
+        pixs_far = pixs;
     for (int x = -3; x <= 3; ++x)
         for (int y = -3; y <= 3; ++y)
         {
             int xx, yy;
-            int pixs_far = 0; // outer layer of dirvectors
             if (x == -3 || x == 3 || y == -3 || y == 3)
             {
-                if (!pixs_far)
-                {
-                    if (pixs < 32) // 3*pixs < 96
-                    {
-                        pixs_far = 32;
-                    }
-                    else
-                        pixs_far = pixs;
-                }
                 xx = x*pixs_far;
                 yy = y*pixs_far;
             }
