@@ -24,7 +24,7 @@ private:
 	Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
 	Regions* regions;
 public:
-
+	void checkDefense();
 	void setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, Regions * reg);
 	void onStart();
 	std::list<UnitsGroup*> unitsgroups;
