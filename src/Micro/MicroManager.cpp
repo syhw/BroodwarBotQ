@@ -197,7 +197,7 @@ void MicroManager::sendGroupToDefense( UnitsGroup* ug)
 
 void MicroManager::checkDefense(){
 	//Run through all our bases. Set defense in the main OR in the natural expo, and some defenses in all bases
-
+	
 
 }
 
