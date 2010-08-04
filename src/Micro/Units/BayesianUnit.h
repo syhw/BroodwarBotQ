@@ -78,7 +78,8 @@ class BayesianUnit : public BattleUnit
 protected:
     bool _ground_unit; // true when unit can move only on the ground
     std::vector<Vec> _dirv;
-    int _dirvNeededSize;
+    int _maxDimension;
+    double _maxDiag;
     //std::multimap<BWAPI::Position, attractor_type> _prox;
     std::vector<occupation_type> _occupation;
     // dirv[attractor] = direction relative to an attractor
@@ -103,6 +104,7 @@ protected:
     UnitsGroup* _unitsGroup;
     std::multimap<double, BWAPI::Unit*> _rangeEnemies;
     std::map<occupation_type, double> _defaultProb;
+    std::multimap<double, Vec> _dirvProb;
 
     inline void initDefaultProb();
     inline void computeFlockValues();
@@ -129,6 +131,8 @@ protected:
     // goal direction
     // range enemies
     inline double computeProb(unsigned int i);
+    inline void computeProbs();
+    inline void selectDir();
     void drawProbs(std::multimap<double, Vec>& probs, int number=0);
     inline void deleteRangeEnemiesElem(BWAPI::Unit* u);
     inline void updateRangeEnemiesWith(BWAPI::Unit* u);

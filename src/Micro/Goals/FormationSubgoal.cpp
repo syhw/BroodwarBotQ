@@ -2,7 +2,7 @@
 using namespace BWAPI;
 using namespace std;
 
-#define _OK_DISTANCE_ 4.0
+#define _OK_DISTANCE_ 2.0
 
 FormationSubgoal::FormationSubgoal(SubgoalLogic l, pFormation f): 
 Subgoal(l),

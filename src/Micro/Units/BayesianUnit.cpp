@@ -6,14 +6,11 @@
 #include <time.h>
 #include <UnitsGroup.h>
 #include <set>
-#ifdef PROBT
-#include <pl.h>
-#else
-#include <boost/math/distributions/normal.hpp>
-using boost::math::normal;
-#endif
+#include <stdio.h>
+//#include <boost/math/distributions/normal.hpp>
+//using boost::math::normal;
 
-#define _OUR_PATHFINDER_
+//#define _OUR_PATHFINDER_
 
 using namespace std;
 using namespace BWAPI;
@@ -49,7 +46,8 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 , _mode(MODE_FLOCK)
 , _unitsGroup(ug)
 , _ground_unit(!unit->getType().isFlyer())
-//, _dirvNeededSize(unit->getType().acceleration)
+, _maxDimension(max(_slarge, _sheight))
+, _maxDiag(sqrt((double)(_slarge*_slarge + _sheight*_sheight)))
 {
     updateDirV();
     mapManager = & MapManager::Instance();
@@ -162,7 +160,8 @@ void BayesianUnit::computeFlockValues()
 
             Position tmp = _dirv[i].translate(this->_unitPos);
             Vec tmpvit((*it)->unit->getVelocityX(), 
-                    (*it)->unit->getVelocityY()); 
+                    (*it)->unit->getVelocityY());
+            tmpvit *= tmp.getDistance((*it)->unit->getPosition()) / _topSpeed;
             // we flock with the interpolated next position of other units
             flock_value value = (flock_value)(1 + (int)tmp.getDistance(
                         tmpvit.translate((*it)->_unitPos)) / 32);
@@ -381,9 +380,6 @@ void BayesianUnit::drawFlockValues()
 
 double BayesianUnit::computeProb(unsigned int i)
 {
-#ifdef PROBT
-    // plSymbol A("A", PL_BINARY_TYPE);
-#else
     double val = 1.;
     //for (multimap<Position, attractor_type>::const_iterator it = _prox.begin(); it != _prox.end(); ++it)
 
@@ -479,7 +475,6 @@ double BayesianUnit::computeProb(unsigned int i)
         val *= 1.0-_PROB_NO_UNIT_MOVE;
     }
     //Broodwar->printf("val is %d \n", val);
-#endif
     return val;
 }
 
@@ -537,7 +532,7 @@ void BayesianUnit::updateObj()
 {
 #ifndef _OUR_PATHFINDER_
     Position p;
-    if (Broodwar->getFrameCount()%10 == 0 || !_path.size()) // hack to remove with the introduction of TimeManager
+    if (!_path.size()) // hack to remove with the introduction of TimeManager
     {
         //TIMINGclock_t start = clock();
         _btpath = BWTA::getShortestPath(TilePosition(_unitPos), TilePosition(target));
@@ -565,8 +560,7 @@ void BayesianUnit::updateObj()
     }
     else
         p = _unitPos;
-    obj = Vec(p.x() - _unitPos.x() + 12, p.y() - _unitPos.y() + 12); // to center the Tile, change 12 for 16 - top/left sizes
-    drawPath();
+
 #else
     /*if (_unitPos.getDistance(target) < WALK_TILES_SIZE/2)
     {
@@ -616,7 +610,6 @@ void BayesianUnit::updateObj()
         }
         else
             p = _unitPos;
-        obj = Vec(p.x() - _unitPos.x() + 12, p.y() - _unitPos.y() + 12); // to center the Tile, change 12 for 16 - top/left sizes
     }     
 #ifdef __DEBUG_GABRIEL__
     drawBTPath();
@@ -625,7 +618,10 @@ void BayesianUnit::updateObj()
     mapm->drawWalkability();
     //drawPath();
 #endif
+
 #endif
+    obj = Vec(p.x() - _unitPos.x() + 12, p.y() - _unitPos.y() + 12); // to center the Tile, change 12 for 16 - top/left sizes
+    drawPath();
     double norm = obj.norm();
     double norm_far = min(_slarge, _sheight);
     obj.normalize();
@@ -799,21 +795,49 @@ void BayesianUnit::drawDirV()
 void BayesianUnit::attackMove(const Position& p)
 {
     target = p;
-    //pathFind(_path, _unitPos(), target);
-    /*std::vector<TilePosition> path;
-    pathFind(path, _unitPos(), target);
-    path = std::vector<TilePosition>(getShortestPath(
-        unit->getTilePosition(), target));
-    if (path.size() == 0) 
-        Broodwar->printf("Scandale path.size()==0");*/
-    //unit->rightClick(path.pop....
 	unit->attackMove(p);
+}
+
+void BayesianUnit::computeProbs()
+{
+    _dirvProb.clear();
+    for (unsigned int i = 0; i < _dirv.size(); ++i)
+        _dirvProb.insert(make_pair(computeProb(i), _dirv[i]));
+}
+
+void BayesianUnit::selectDir()
+{
+    multimap<double, Vec>::const_iterator last = _dirvProb.end(); 
+    // I want the right probabilities and not 1-prob in the multimap
+    --last;
+    if (_dirvProb.count(_dirvProb.begin()->first) == 1) 
+    {
+        dir = last->second;
+    }
+    // or the equally most probable and most in the direction of obj
+    else
+    {
+        pair<multimap<double, Vec>::const_iterator, multimap<double, Vec>::const_iterator> possible_dirs = _dirvProb.equal_range(last->first);
+        double max = -100000.0;
+        double max2 = -100000.0;
+        for (multimap<double, Vec>::const_iterator it = possible_dirs.first; it != possible_dirs.second; ++it)
+        {
+            Vec tmpTest = it->second;
+            Vec tmpVec = it->second;
+            double tmp = obj.dot(tmpVec.normalize());
+
+            if (tmp >= max && max2 < obj.dot(tmpTest))
+            {
+                max = tmp;
+                max2 = obj.dot(tmpTest);
+                dir = it->second;
+            }
+        }
+    }
 }
 
 void BayesianUnit::updateDir()
 {
-    Position p = this->_unitPos;
-
     // update possible directions vector
     updateDirV();
     //Affiche les différents axes de directions de l'unité
@@ -826,43 +850,19 @@ void BayesianUnit::updateDir()
     
     // update objectives
     updateObj();
+#ifdef __DEBUG_GABRIEL__
     //drawObj(_unitsGroup->size());
     //drawOccupation(_unitsGroup->size());
-
+#endif
+    
     // compute the probability to go in each dirv(ector)
-    multimap<double, Vec> dirvProb;
-    for (unsigned int i = 0; i < _dirv.size(); ++i)
-        dirvProb.insert(make_pair(computeProb(i), _dirv[i]));
-    multimap<double, Vec>::const_iterator last = dirvProb.end(); 
-    // I want the right probabilities and not 1-prob in the multimap
-    --last;
+    computeProbs();
+#ifdef __DEBUG_GABRIEL__
+    //drawProbs(_dirvProb, _unitsGroup->size());
+#endif
+
     // select the most probable
-    if (dirvProb.count(dirvProb.begin()->first) == 1) 
-    {
-        dir = last->second;
-    }
-    // or the equally most probable and most in the direction of obj
-    else
-    {
-        pair<multimap<double, Vec>::const_iterator, multimap<double, Vec>::const_iterator> possible_dirs = dirvProb.equal_range(last->first);
-        double max = -100000.0;
-        double max2 = -100000.0;
-        for (multimap<double, Vec>::const_iterator it = possible_dirs.first; it != possible_dirs.second; ++it)
-        {
-            Vec tmpTest = it->second;
-            Vec tmpVec = it->second;
-            double tmp = obj.dot(tmpVec.normalize());
-            
-            if (tmp >= max && max2 < obj.dot(tmpTest))
-            {
-                max = tmp;
-                max2 = obj.dot(tmpTest);
-                dir = it->second;
-            }
-        }
-    }
-    //if (_mode == MODE_FLOCK)
-        //drawProbs(dirvProb, _unitsGroup->size());
+    selectDir();
 }
 
 void BayesianUnit::drawDir()
@@ -874,16 +874,28 @@ void BayesianUnit::drawDir()
 
 void BayesianUnit::clickDir()
 {
-    if (dir == Vec(0,0))
+    double dist = _unitPos.getDistance(target);
+    if (dir == Vec(0,0) || dist < 0.5) // 0.5 arbitrary
     {
-        unit->stop();
+        if (!unit->isAttacking())
+            unit->holdPosition();
         return;
     }
-    dir += _unitPos;
-    if (_unitPos.getDistance(target) > 11.32) 
+    //if (dist > 11.32) // sqrt(8^2 + 8^2), one walk tile
+    //if (dist > 45.26) // sqrt(32^2 + 32^2), one build tile
+    if (dist > _maxDiag + 10.0)
+    {
+        dir += _unitPos;
         unit->rightClick(dir.toPosition());
+    }
+    else if (!unit->isMoving())
+    {
+        unit->rightClick(target);
+    } 
     else
-        unit->stop();
+    {
+        // DO NOTHING
+    }
 }
 
 void BayesianUnit::drawArrow(Vec& v)
@@ -946,7 +958,7 @@ void BayesianUnit::onUnitHide(Unit* u)
 void BayesianUnit::update()
 {
     if (!unit->exists()) return;
-        _unitPos = unit->getPosition();
+    _unitPos = unit->getPosition();
 
 //    BWAPI::Broodwar->drawCircleMap(_unitPos.x(), _unitPos.y(), 5, BWAPI::Colors::Blue);
 
