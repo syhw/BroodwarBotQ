@@ -963,17 +963,6 @@ void BayesianUnit::update()
     //if (_sheight > 32 || _slarge > 32)
     //    Broodwar->printf("height: %d, large: %d", _sheight, _slarge);
 
-    if (_unitsGroup->getClosestEnemy() != NULL && _unitsGroup->getDistance(_unitsGroup->getClosestEnemy()->self()) <= DISTANCE_MAX)
-    {
-        Broodwar->printf("Switch MODE_FIGHT_G!");
-        switchMode(MODE_FIGHT_G);
-    }
-    else if (_mode == MODE_FIGHT_G)
-    {
-            Broodwar->printf("Switch FLOCK!");
-            this->switchMode(MODE_FLOCK);
-    }
-
     if (_mode == MODE_FLOCK || _mode == MODE_INPOS) 
     {
         updateDir();

@@ -52,13 +52,13 @@ void MicroAIModule::onStart()
     }
 
     pFormation tmp_form = pFormation(new LineFormation(
-        Position(Broodwar->mapWidth()/2*32,(Broodwar->mapHeight()/2 + 8)*32), Vec(1,0)));
+        Position(Broodwar->mapWidth()/2*32,(Broodwar->mapHeight()/2 + 4)*32), Vec(1,0)));
     pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
     pGoal tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
     goals.push_back(tmp_goal);
 
     tmp_form = pFormation(new SquareFormation(
-        Position((Broodwar->mapWidth() - mp)*32, (Broodwar->mapHeight()/2 + 8)*32)));
+        Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
     tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
     tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
     goals.push_back(tmp_goal);    

@@ -10,7 +10,6 @@
 #include <set>
 #include "MicroManager.h"
 #include "GoalManager.h"
-#include "EUnit.h"
 
 #define _UNITS_DEBUG 1
 #define DISTANCE_MAX 500
@@ -30,27 +29,13 @@ struct i_dist
 class UnitsGroup
 {
 private:
-    std::map<BWAPI::Unit*, EUnit> enemiesInSight;
-    std::set<EUnit> listTargets;
-    std::list<pBayesianUnit> unitsAvailables;
-    //std::map<int, cEnemy> enemiesInSight;
     std::set<BWAPI::Unit*> enemies;
 	int totalHP;
 	int totalPower;
     std::vector<pBayesianUnit> units;
-    std::map<BWAPI::Unit*, std::list<pBayesianUnit> > attackersEnemy;
     
 	std::list<pGoal> goals; // list of goals to accomplish
-	GoalManager* goalManager;
-    void updateEnemiesInSight();
-    /// Mets à jour la liste des ennemis en vue de l'UnitsGroup, et ces derniers sont triés par ordre croissant de HP/SP
-    //void updateEnemiesInSight(std::vector<pBayesianUnit>::iterator it);
-    /// Mets à jour la liste des unités capables de sélectionner une nouvelle cible
-    //void updateUnitsAvaibles(std::vector<pBayesianUnit>::iterator it);
-    /// Assignation des cibles aux unités du UnitsGroup qui sont disponible pour sélectionner une nouvelle cible
-    //void updateTargetOfUnitsAvailables();
-    /// Affiche les cibles des unités du UnitsGroup
-    void displayTargets();
+    void displayTargets();  // debug purpose
 public:
     std::vector<WalkTilePosition> _path;
 	
@@ -62,8 +47,7 @@ public:
 
 	virtual void update();
 	virtual void display();
-    void drawEnemiesDetected();
-    EUnit* getClosestEnemy();
+
 	// Goals interface
 	virtual void attackMove(int x, int y);
 	virtual void attackMove(BWAPI::Position& p);
@@ -73,31 +57,23 @@ public:
 	virtual void setGoals(std::list<pGoal>& goals);
 	virtual void addGoal(pGoal goal);
 	
-	//virtual bool checkInFormation();
-	//virtual bool checkAtDestination();
-    int size();
 	virtual void updateCenter();
     virtual BWAPI::Position getCenter() const;
     inline double getDistance(BWAPI::Unit* u) const;
 
-	// Micro tech (to be placed in other classes. For instance DistantUnits...)
-	void keepDistance();
-
-	// Units interface
+    // BWAPI interface
     virtual void onUnitDestroy(BWAPI::Unit* u);
     virtual void onUnitShow(BWAPI::Unit* u);
     virtual void onUnitHide(BWAPI::Unit* u);
+
+    // Units interface
     virtual void takeControl(BWAPI::Unit* u);
     virtual void giveUpControl(BWAPI::Unit* u);
 	bool emptyUnits();
 	bool emptyGoals();
-	unsigned int getNbUnits() const;
+    int size() const;
     int getTotalHP() const;
     std::vector<pBayesianUnit>* getUnits();
-    std::map<BWAPI::Unit*, std::list<pBayesianUnit> >& getAttackersEnemy();
-    
-
-    static BWAPI::Unit* findWeakestEnemy(std::set<BWAPI::Unit*> enemies_in_range);
 
 #ifdef _UNITS_DEBUG
     void selectedUnits(std::set<pBayesianUnit>& u);

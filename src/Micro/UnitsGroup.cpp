@@ -30,7 +30,6 @@ using namespace BWAPI;
 
 UnitsGroup::UnitsGroup()
 {
-	goalManager = & GoalManager::Instance();
 }
 
 UnitsGroup::~UnitsGroup()
@@ -156,112 +155,6 @@ void align(std::vector<Position>& from, std::vector<Position>& to, std::vector<u
         }
     }
 }
-/*
-Unit* UnitsGroup::findWeakestEnemy(std::set<Unit*> enemies_in_range)
-{
-    Unit* weakestenemy( enemies_in_range.empty() ? NULL : *enemies_in_range.begin() );
-    for each(Unit* enemy in enemies_in_range)
-    {
-        int weakesthp = weakestenemy->getHitPoints() + weakestenemy->getShields();
-        int enemyhp = enemy->getHitPoints() + enemy->getShields();
-        if (weakesthp > enemyhp && enemy->isVisible())
-        {
-            weakestenemy = enemy;
-        }
-    }
-    return weakestenemy;
-}
-
-void UnitsGroup::updateEnemiesInSight(std::vector<pBayesianUnit>::iterator it)
-{
-    for each(Unit* v in enemies)
-    {
-        if ((*it)->canHit(v))
-        {
-            // Si l'unité u est en train d'attaquer l'unité v, alors damageTaken = u->damagesOn(v), sinon 0
-            int damageDoneByUnit =  (*it)->targetEnemy == v && (*it)->unit->getGroundWeaponCooldown() != (*it)->getTimeToAttack() && ((*it)->unit->isStartingAttack() || (*it)->unit->isAttacking()) ? (*it)->damagesOn(v) : 0;
-
-            // Si l'unité v n'existe pas dans enemiesInSight, alors je la crée et je la rajoute
-            if (enemiesInSight.count(v->getHitPoints()+v->getShields()) == 0)
-            {
-                cEnemy temp = {v, damageDoneByUnit};
-                enemiesInSight.insert(std::pair<int, cEnemy>(v->getHitPoints()+v->getShields(), temp));
-            }
-            // Sinon je rajoute les dégâts à ses damageTaken
-            else
-            {
-                enemiesInSight[v->getHitPoints()+v->getShields()].damageTaken += damageDoneByUnit;
-            }
-        }
-    }
-}
-
-void UnitsGroup::updateUnitsAvaibles(std::vector<pBayesianUnit>::iterator it)
-{
-    if((*it)->unit->getType().groundWeapon().damageCooldown() - (*it)->unit->getGroundWeaponCooldown() > (*it)->getTimeToAttack()  //HACK -->  
-        || !(*it)->unit->isAttacking())
-        unitsAvailables.push_back(*it);
-}
-
-void UnitsGroup::updateTargetOfUnitsAvailables()
-{
-    for (unsigned int i = 0; i < NUMBER_OF_PRIORITY; i++)
-    {
-        for each(std::pair<int, cEnemy> eUnit in enemiesInSight)
-        {
-            for (std::list<pBayesianUnit>::iterator iter = unitsAvailables.begin(); iter != unitsAvailables.end();)
-            {
-                if ((*iter)->getListPriorite()[i] == eUnit.second.self->getType() && eUnit.second.damageTaken < eUnit.first && (*iter)->canHit(eUnit.second.self))
-                {
-                    (*iter)->targetEnemy = eUnit.second.self;
-                    eUnit.second.damageTaken += (*iter)->damagesOn(eUnit.second.self);
-
-                    std::list<pBayesianUnit>::iterator tmp = iter;
-                    ++iter;
-                    //if (!(*tmp)->withinRange(eUnit.second.self))
-                    //{
-                    //    copy.push_front(pBayesianUnit(*tmp));
-                    //}
-                    
-                    unitsAvailables.erase(tmp);
-                }
-                else
-                {
-                    ++iter;
-                }
-            }
-        }
-    }/*
-    if (!copy.empty())
-    {
-        for (unsigned int i = 0; i < NUMBER_OF_PRIORITY; i++)
-        {
-            for each(std::pair<int, cEnemy> eUnit in enemiesInSight)
-            {
-                for (std::list<pBayesianUnit>::iterator iter = copy.begin(); iter != copy.end();)
-                {
-                    if ((*iter)->getListPriorite()[i] == eUnit.second.self->getType() && eUnit.second.damageTaken < eUnit.first && (*iter)->canHit(eUnit.second.self) && (*iter)->withinRange(eUnit.second.self))
-                    {
-                        (*iter)->targetEnemyInRange = eUnit.second.self;
-                        eUnit.second.damageTaken += (*iter)->damagesOn(eUnit.second.self);
-                        std::list<pBayesianUnit>::iterator tmp = iter;
-                        ++iter;
-                        if (!(*tmp)->withinRange(eUnit.second.self))
-                        {
-                            copy.push_front(*tmp);
-                        }
-                        
-                        copy.erase(tmp);
-                    }
-                    else
-                    {
-                        ++iter;
-                    }
-                }
-            }
-        }
-    }*/
-//}
 
 void UnitsGroup::displayTargets()
 {
@@ -283,50 +176,10 @@ void UnitsGroup::displayTargets()
     }
 }
 
-void UnitsGroup::updateEnemiesInSight()
-{
-    for (std::map<BWAPI::Unit*, EUnit>::iterator iter = enemiesInSight.begin(); iter != enemiesInSight.end(); iter++)
-    {
-        iter->second.distance() = getDistance(iter->first);
-        iter->second.update();
-    }
-    for(std::set<BWAPI::Bullet*>::iterator iter = Broodwar->getBullets().begin(); iter != Broodwar->getBullets().end(); iter++)
-    {
-        if (enemiesInSight.count((*iter)->getTarget()) != 0 && !units.empty())
-        {
-            std::vector<pBayesianUnit>::iterator it = units.begin();
-            while(it != units.end() && (*it)->unit != (*iter)->getSource()) it++;
-            if (it != units.end())
-                enemiesInSight.find((*iter)->getTarget())->second.damageTaken() += (*it)->damagesOn((*iter)->getTarget());
-        }
-    }
-}
-
-EUnit* UnitsGroup::getClosestEnemy()
-{
-    double min = 100000;
-    EUnit* eu = NULL;
-    for (std::map<BWAPI::Unit*, EUnit>::iterator iter = enemiesInSight.begin(); iter != enemiesInSight.end(); iter++)
-    {
-        if ( iter->second.distance() < min )
-        {
-            min = iter->second.distance();
-            eu = &(iter->second);
-        }
-    }
-    return eu;
-}
-
 void UnitsGroup::update()
 {
-    listTargets.clear();
-    drawEnemiesDetected();
-    updateEnemiesInSight();
     this->totalHP = 0;
     Broodwar->drawCircleMap(center.x(), center.y(), DISTANCE_MAX, BWAPI::Colors::Yellow);
-
-    //unitsAvailables.clear();
-    //enemiesInSight.clear();
 
     pBayesianUnit biggerUnit;
 
@@ -340,11 +193,7 @@ void UnitsGroup::update()
                  biggerUnit->unit->getDistance(center) > (*it)->unit->getDistance(center) )
             )
             biggerUnit = *it;
-        //updateUnitsAvaibles(it);
-        //updateEnemiesInSight(it);
     }
-
-    //updateTargetOfUnitsAvailables();
 
     std::vector<BWAPI::TilePosition> _btpath;
     if (biggerUnit != NULL)
@@ -360,13 +209,9 @@ void UnitsGroup::update()
         (*it)->update(); 
         this->totalHP += (*it)->unit->getHitPoints();
         this->totalPower += (*it)->unit->getType().groundWeapon().damageAmount();
-        EUnit* closestEnemy = getClosestEnemy();
-        if (closestEnemy != NULL)
-            (*it)->targetEnemy = closestEnemy->self();
     }
 
     updateCenter();
-    keepDistance(); // Temporary call to test micro tech
 	accomplishGoal();
 
 #ifdef __DEBUG_NICOLAS__
@@ -396,7 +241,6 @@ void UnitsGroup::move(BWAPI::Position& p)
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); it++)
     {
         (*it)->target = p;
-        // (*it)->unit->rightClick(p); // we don't want rightClicks bypassing BayesianUnit!!!
     }
 }
 
@@ -460,34 +304,12 @@ void UnitsGroup::onUnitShow(Unit* u)
 {
     for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
         (*it)->onUnitShow(u);
-
-    if (Broodwar->self()->isEnemy(u->getPlayer()))
-        enemiesInSight.insert(std::make_pair(u, EUnit(u, getDistance(u))));
 }
 
 void UnitsGroup::onUnitHide(Unit* u)
 {    
     for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
         (*it)->onUnitHide(u);
-
-    if (enemiesInSight.count(u) != 0)
-        enemiesInSight.erase(enemiesInSight.find(u));
-}
-
-void UnitsGroup::drawEnemiesDetected()
-{
-    for (std::map<BWAPI::Unit*, EUnit>::iterator iter = enemiesInSight.begin(); iter != enemiesInSight.end(); iter++)
-    {
-        BWAPI::Color tmp = iter->second.damageTaken() > 0 ? BWAPI::Colors::Red : BWAPI::Colors::White;
-
-
-        if (getDistance(iter->first) <= DISTANCE_MAX)
-        Broodwar->drawBoxMap(iter->first->getPosition().x() - 5,
-                             iter->first->getPosition().y() - 5,
-                             iter->first->getPosition().x() + 5,
-                             iter->first->getPosition().y() + 5,
-                             tmp);
-    }
 }
 
 double UnitsGroup::getDistance(BWAPI::Unit* u) const
@@ -552,69 +374,14 @@ void UnitsGroup::giveUpControl(Unit* u)
         }
 }
 
-void UnitsGroup::keepDistance()
-{
-    if (units.empty()) return;
-
-    // List all enemy units in a range < 500
-    std::set<Unit*>& allUnits = Broodwar->getAllUnits(); 
-    std::set<Unit*> enemies;
-    for each (Unit* itAllUnits in allUnits)
-    {
-        Unit* u = itAllUnits;
-        if( u->getType().isBuilding() || u->getType().isWorker()) continue;
-        if (u->getPlayer()->isEnemy(Broodwar->self()) && u->getPosition().getDistance(center) < 500)
-        {
-            enemies.insert( u);
-            Broodwar->drawTextMap( u->getPosition().x(), u->getPosition().y(), "KD");
-        }
-    }
-
-    // keep distance
-    for each (pBayesianUnit itUnit in units)
-    {
-        Unit* unit = itUnit->unit;
-        if (itUnit->timeIdle >= 0) 
-            itUnit->timeIdle++;
-        if (itUnit->timeIdle > 75)
-        {
-            itUnit->timeIdle = -1;
-        }
-
-        if (enemies.empty()) continue;
-
-        // Get the closest unit
-        Unit* closestUnit = *enemies.begin();
-        for each (Unit* itEnemies in enemies)
-        {
-            if (closestUnit->getPosition().getDistance(unit->getPosition()) > 
-                itEnemies->getPosition().getDistance(unit->getPosition()))
-                closestUnit = itEnemies;
-        }
-
-        int attackRange = unit->getType().groundWeapon().maxRange();
-        if (closestUnit->getType().groundWeapon().maxRange() < attackRange &&
-            closestUnit->getDistance(unit) < closestUnit->getType().groundWeapon().maxRange())
-        {
-            //(unit)->rightClick( Broodwar->self()->getStartLocation());
-            itUnit->timeIdle = 0;
-        }
-    }
-}
-
 bool UnitsGroup::emptyUnits()
 {
     return units.empty();
 }
+
 bool UnitsGroup::emptyGoals()
 {
     return goals.empty();
-}
-
-
-unsigned int UnitsGroup::getNbUnits() const
-{
-    return units.size();
 }
 
 int UnitsGroup::getTotalHP() const
@@ -625,11 +392,6 @@ int UnitsGroup::getTotalHP() const
 std::vector<pBayesianUnit>* UnitsGroup::getUnits()
 {
     return &units;
-}
-
-std::map<BWAPI::Unit*, std::list<pBayesianUnit> >& UnitsGroup::getAttackersEnemy()
-{
-    return attackersEnemy;
 }
 
 const BayesianUnit& UnitsGroup::operator[](int i)
@@ -672,7 +434,7 @@ void UnitsGroup::display()
 	
 }
 
-int UnitsGroup::size()
+int UnitsGroup::size() const
 {
     return units.size();
 }
