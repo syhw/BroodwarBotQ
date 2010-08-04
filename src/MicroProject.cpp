@@ -22,7 +22,6 @@ void MicroAIModule::onStart()
     this->regions = & Regions::Instance();
 
 	mm = new UnitsGroup();
- //   mD = new UnitsGroup();
 
 	// Vec center;
 	std::set<Unit*> allUnits = Broodwar->getAllUnits();
@@ -38,41 +37,11 @@ void MicroAIModule::onStart()
             regions->onUnitCreate(*i);
             mapManager->onUnitCreate(*i);
 		} 
-        else// if ((*i)->getType() == BWAPI::UnitTypes::Protoss_Zealot)
-		{
-            // Broodwar->printf("Took control of: %s\n", (*i)->getType().getName().c_str() );
+        else
 			mm->takeControl(*i);
-		}
-       /*else if ((*i)->getType() != BWAPI::UnitTypes::Protoss_Zealot)
-        {
-            mD->takeControl(*i);
-        }*/
 	}
 
-	/* std::set<Player*> players=Broodwar->getPlayers();
-	Broodwar->printf("The following players are in this replay:");
-	for(std::set<Player*>::iterator p=players.begin();p!=players.end();p++)
-	{
-	if (!(*p)->getUnits().empty() && !(*p)->isNeutral())
-	{
-	Broodwar->printf("%s, playing as a %s",(*p)->getName().c_str(),(*p)->getRace().getName().c_str());
-	}
-	} */
-
-	/* Broodwar->printf("The match up is %s v %s",
-	Broodwar->self()->getRace().getName().c_str(),
-	Broodwar->enemy()->getRace().getName().c_str()); */
-
-	//*
 	std::list<pGoal> goals;
-	//std::list<pGoal> goals2;
-	// goals.push_back(Formation(0,1,Position(1000,1000)); 
-    /// TEST test_path with tanks & vultures: 
-    /// goals.push_back(new Goal("direct line to 1120, 704", new Formation(Vec(1120, 704), Vec(-0.5, -0.5))));
-    /// TEST test_square
-    /// goals.push_back(Goal("direct square 480, 1600", new SquareFormation(Vec(480, 1600))));
-    /// TEST test_pathfinding
-    /// goals.push_back(pGoal(new Goal("direct square 384, 768", pFormation(new SquareFormation(Vec(60*32, 61*32))))));
 
 	BWAPI::TilePosition mp = Broodwar->self()->getStartLocation();
 	Position p;
@@ -80,67 +49,21 @@ void MicroAIModule::onStart()
 	{
 		if (!((*l) == mp))
 			p = BWAPI::Position(*l);
-	}
+    }
 
-    /// EXEMPLE FOR THE FLOCK_2 and FLOCK_8 MAPS
-    /*  pFormation tmp_form = pFormation(new SquareFormation(Position(56*32,56*32), Vec(1,0)));
-	pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(
-        SL_AND, tmp_form, mm)
-    );
-    pGoal tmp_goal = pGoal(new Goal(tmp_subgoal));
-    goals.push_back(tmp_goal);
-    */
-    /// TEST PATHFINDING
-
-    //pFormation tmp_form = pFormation(new LineFormation(Position(101*32,62*32), Vec(1,0)));
-
-    /*
-    pFormation tmp_form = pFormation(new LineFormation(Position(101*32,62*32), Vec(1,0)));
-    pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-    pGoal tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
-    goals.push_back(tmp_goal);
-*/
-    
-  /*  pFormation tmp_form = pFormation(new LineFormation(Position(33*32,6*32), Vec(1,0)));
-
-    pFormation tmp_form = pFormation(new LineFormation(Position(
-        (Broodwar->mapWidth())/2*32, (Broodwar->mapHeight() - 4)/2*32), Vec(1,0)));
-    //pFormation tmp_form = pFormation(new LineFormation(Position(33*32,6*32), Vec(1,0)));
+    pFormation tmp_form = pFormation(new LineFormation(
+        Position(Broodwar->mapWidth()/2*32,(Broodwar->mapHeight()/2 + 8)*32), Vec(1,0)));
     pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
     pGoal tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
     goals.push_back(tmp_goal);
 
-    tmp_form = pFormation(new LineFormation(Position(
-        (Broodwar->mapWidth())/2*32, (Broodwar->mapHeight() - 4)/2*32), Vec(1,0)));
-    //tmp_form = pFormation(new LineFormation(Position(40*32,3*32), Vec(1,0)));
+    tmp_form = pFormation(new SquareFormation(
+        Position((Broodwar->mapWidth() - mp)*32, (Broodwar->mapHeight()/2 + 8)*32)));
     tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-    tmp_goal = pGoal(new Goal(mD, tmp_subgoal));
-    goals2.push_back(tmp_goal);*/
-
-    pFormation tmp_form = pFormation(new LineFormation(Position(18*32,36*32), Vec(1,0)));
-    pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-    pGoal tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
-    goals.push_back(tmp_goal);
-
-  //  tmp_form = pFormation(new LineFormation(Position(33*32,9*32), Vec(1,0)));
-  //  tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form, mm));
-  //  tmp_goal = pGoal(new Goal(tmp_subgoal));
-  //  goals.push_back(tmp_goal);
-	 
-    //gl->setFormation(form);
-
-	//goals.push_back(Formation(0,1,Position(400,0)));
-	//goals.push_back(Goal("attack move right !!!!!!!", Position(1999,1000)));
-	//goals->push_back(new Goal("attack move just there", Position(500,1300)));
-	//goals->push_back(new Goal());
+    tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+    goals.push_back(tmp_goal);    
     
 	mm->setGoals(goals);
-    //mD->setGoals(goals2);
-	/*/
-	mm->setGoals(Goal("formation line x+400", new LineFormation(center, Vec(1, 3))));
-	Broodwar->printf( "size: %i", mm->goals.size());
-	Broodwar->printf( "center: %f, %f", mm->goals.front().formation->center.x, mm->goals.front().formation->center.y);
-	//*/
 
 #ifdef BW_QT_DEBUG
 	g_onStartDone = true;
@@ -156,8 +79,6 @@ void MicroAIModule::onFrame()
     objectManager->onFrame();
 	if (mm != NULL) 
         mm->update();
-	//if (mD != NULL) 
-   //     mD->update();
     regions->display();
     
 #ifdef BW_POS_MOUSE
@@ -208,7 +129,6 @@ MicroAIModule::~MicroAIModule()
 		ObjectManager::Destroy();
     Regions::Destroy();
     mm->~UnitsGroup();
-  //  mD->~UnitsGroup();
 }
 
 #ifdef BW_QT_DEBUG
