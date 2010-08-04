@@ -10,7 +10,7 @@ ProtossStrat::~ProtossStrat()
 }
 
 void ProtossStrat::onStart(){
-	
+	MacroManager::onStart();
 	this->buildOrderManager->buildAdditional(4,BWAPI::UnitTypes::Protoss_Probe,100);
 	this->buildOrderManager->build(1,BWAPI::UnitTypes::Protoss_Pylon,99);
 	this->buildOrderManager->buildAdditional(2,BWAPI::UnitTypes::Protoss_Probe,98);
@@ -38,11 +38,13 @@ void ProtossStrat::update(){
 			this->workerManager->enableAutoBuild();
 		}
 	}
+	
 	if(this->shouldExpand() && !expanding ){
 		this->expanding = true;
 		BWAPI::Broodwar->printf("Expanding at the nearest location");
-		this->baseManager->expand(80);
+		this->baseManager->expand(this->naturalExpand,80);
 	}
+	BWAPI::Broodwar->drawCircleMap(naturalExpand->getPosition().x(),naturalExpand->getPosition().y(),20,BWAPI::Colors::Green, true);
 	
 }
 
