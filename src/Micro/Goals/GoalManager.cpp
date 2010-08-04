@@ -2,15 +2,15 @@
 
 using namespace BWAPI;
 GoalManager::GoalManager(){
-	this->microManager = NULL;
+	this->warManager = NULL;
 	this->regions = NULL;
 }
 
 GoalManager::~GoalManager(){
 }
 
-void GoalManager::setDependencies(MicroManager * micro, Regions * reg){
-	this->microManager = micro;
+void GoalManager::setDependencies(WarManager * micro, Regions * reg){
+	this->warManager = micro;
 	this->regions = reg;
 }
 

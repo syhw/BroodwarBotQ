@@ -12,13 +12,13 @@ class UnitsGroup;
 class Regions;
 class ScoutManager;
 
-class MicroManager: public CSingleton<MicroManager>, public Arbitrator::Controller<BWAPI::Unit*,double>, public BaseObject
+class WarManager: public CSingleton<WarManager>, public Arbitrator::Controller<BWAPI::Unit*,double>, public BaseObject
 {
-	friend class CSingleton<MicroManager>;
+	friend class CSingleton<WarManager>;
 
 private:
-	MicroManager();
-	~MicroManager();
+	WarManager();
+	~WarManager();
 	std::list<UnitsGroup *> promptedRemove;
 	bool remove(UnitsGroup* u);
 	Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;

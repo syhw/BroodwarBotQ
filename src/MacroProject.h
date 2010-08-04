@@ -22,7 +22,7 @@
 #include "ZergStrat.h"
 #include "TimeManager.h"
 #include "Regions.h"
-#include "MicroManager.h"
+#include "WarManager.h"
 #include "ObjectManager.h"
 #include "EUnitsFilter.h"
 #include "EEcoEstimator.h"
@@ -78,7 +78,7 @@ public:
 	WorkerManager* workerManager;
 	Regions* regions;
 	MacroManager* macroManager;
-	MicroManager* microManager;
+	WarManager* warManager;
 	EUnitsFilter* eUnitsFilter;
 	EEcoEstimator* eEcoEstimator;
 	ETechEstimator* eTechEstimator;

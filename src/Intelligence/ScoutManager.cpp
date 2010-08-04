@@ -7,7 +7,7 @@ ScoutManager::ScoutManager( )
 : BaseObject("ScoutManager")
 {
 	regions = NULL;
-	microManager = NULL;
+	warManager = NULL;
 	to_remove = false;
 }
 
@@ -15,9 +15,9 @@ ScoutManager::~ScoutManager( )
 {
 }
 
-void ScoutManager::setDependencies(Regions * region, MicroManager * micro){
+void ScoutManager::setDependencies(Regions * region, WarManager * micro){
 	this->regions = region;
-	this->microManager = micro;
+	this->warManager = micro;
 }
 
 void ScoutManager::update()
@@ -108,7 +108,7 @@ UnitsGroup* ScoutManager::findUnitsGroup(pGoal goal){
 	}
 	ug->addGoal(goal);
 	goal->setUnitsGroup(ug);
-	microManager->unitsgroups.push_front(ug);
+	warManager->unitsgroups.push_front(ug);
 	return ug;
 }
 

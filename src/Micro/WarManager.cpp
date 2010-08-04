@@ -1,4 +1,4 @@
-#include <MicroManager.h>
+#include <WarManager.h>
 #include <Regions.h>
 #include <util.h>
 #include <UnitsGroup.h>
@@ -13,8 +13,8 @@ using std::list;
 using namespace BWAPI;
 using namespace BWTA;
 
-MicroManager::MicroManager() 
-: BaseObject("MicroManager")
+WarManager::WarManager() 
+: BaseObject("WarManager")
 {
 	this->defgroup = new UnitsGroup();
 
@@ -22,22 +22,22 @@ MicroManager::MicroManager()
 	this->regions = NULL;
 }
 
-MicroManager::~MicroManager() 
+WarManager::~WarManager() 
 {
-	//Broodwar->printf("INOUT MicroManager::~MicroManager()");
+	//Broodwar->printf("INOUT WarManager::~WarManager()");
 }
 
-void MicroManager::setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, Regions * reg){
+void WarManager::setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, Regions * reg){
 	this->arbitrator = arb;
 	this->regions = reg;
 
 }
 
-void MicroManager::onStart(){
+void WarManager::onStart(){
 	this->sendGroupToDefense(defgroup);
 
 }
-void MicroManager::update()
+void WarManager::update()
 {
 	//Suppress the list prompted to suppress 
 	for each (UnitsGroup * ug in this->promptedRemove){
@@ -73,7 +73,7 @@ void MicroManager::update()
 }
 
 
-void MicroManager::onOffer(std::set<BWAPI::Unit*> units)
+void WarManager::onOffer(std::set<BWAPI::Unit*> units)
 { 
 	
 	for(std::set<BWAPI::Unit*>::iterator u = units.begin(); u != units.end(); u++)
@@ -92,17 +92,17 @@ void MicroManager::onOffer(std::set<BWAPI::Unit*> units)
 	}
 }
 
-void MicroManager::onRevoke(BWAPI::Unit* unit, double bid)
+void WarManager::onRevoke(BWAPI::Unit* unit, double bid)
 {
 	this->onUnitDestroy(unit);
 }
 
-std::string MicroManager::getName() const
+std::string WarManager::getName() const
 {
 	return "Micro Manager";
 }
 
-void MicroManager::onUnitCreate(BWAPI::Unit* unit)
+void WarManager::onUnitCreate(BWAPI::Unit* unit)
 {
 	/*
 	if (!unit->getType().isWorker() && unit->getPlayer()==Broodwar->self() && !unit->getType().isBuilding() && unit->getType().canAttack())
@@ -110,7 +110,7 @@ void MicroManager::onUnitCreate(BWAPI::Unit* unit)
 	*/
 }
 
-void MicroManager::onUnitDestroy(BWAPI::Unit* unit)
+void WarManager::onUnitDestroy(BWAPI::Unit* unit)
 {
 	for (std::list<UnitsGroup*>::iterator it = unitsgroups.begin(); it != unitsgroups.end();)
 	{
@@ -126,13 +126,13 @@ void MicroManager::onUnitDestroy(BWAPI::Unit* unit)
 	}
 }
 
-void MicroManager::display()
+void WarManager::display()
 {
 	for( std::list<UnitsGroup*>::iterator it = unitsgroups.begin(); it != unitsgroups.end(); it++)
 		(*it)->display();
 }
 
-void MicroManager::sendGroupToAttack( UnitsGroup* ug)
+void WarManager::sendGroupToAttack( UnitsGroup* ug)
 {
 	// Get the nearest enemy position
 	bool found = false;
@@ -165,7 +165,7 @@ void MicroManager::sendGroupToAttack( UnitsGroup* ug)
 	//Broodwar->printf( "Let's fight !!");
 }
 
-void MicroManager::sendGroupToDefense( UnitsGroup* ug)
+void WarManager::sendGroupToDefense( UnitsGroup* ug)
 {
 	/*
 	// Go to the nearest choke point.
@@ -194,8 +194,13 @@ void MicroManager::sendGroupToDefense( UnitsGroup* ug)
 	ug->addGoal(g);
 }
 
+void WarManager::checkDefense(){
+	//Run through all our bases. Set defense in the main OR in the natural expo, and some defenses in all bases
 
-bool MicroManager::remove(UnitsGroup* u){
+}
+
+
+bool WarManager::remove(UnitsGroup* u){
 	for(std::list<UnitsGroup *>::iterator it = unitsgroups.begin(); it != unitsgroups.end(); it ++){
 		if( (*it) == u){
 			unitsgroups.erase(it);
@@ -205,11 +210,11 @@ bool MicroManager::remove(UnitsGroup* u){
 	return false;
 }
 
-void MicroManager::promptRemove(UnitsGroup* ug){
+void WarManager::promptRemove(UnitsGroup* ug){
 	this->promptedRemove.push_back(ug);
 }
 
-std::set<Unit*> MicroManager::getEnemies()
+std::set<Unit*> WarManager::getEnemies()
 {
     std::set<BWAPI::Player*>::iterator iter = Broodwar->getPlayers().begin();
     for(;iter != Broodwar->getPlayers().end() && !(*iter)->isEnemy(Broodwar->self());iter++);
@@ -217,12 +222,12 @@ std::set<Unit*> MicroManager::getEnemies()
 }
 
 #ifdef BW_QT_DEBUG
-QWidget* MicroManager::createWidget(QWidget* parent) const
+QWidget* WarManager::createWidget(QWidget* parent) const
 {
 	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
 }
 
-void MicroManager::refreshWidget(QWidget* widget) const
+void WarManager::refreshWidget(QWidget* widget) const
 {
 // TODO update your widget after having defined it in the previous method :)
 }
