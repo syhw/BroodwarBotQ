@@ -27,6 +27,5 @@ void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnit
             topos.makeValid();
             end_positions.push_back(topos);
         }
-        ++i;
     }
 }
