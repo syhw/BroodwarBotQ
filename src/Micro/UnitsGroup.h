@@ -8,7 +8,7 @@
 #include "Formations.h"
 #include <Vec.h>
 #include <set>
-#include "MicroManager.h"
+#include "WarManager.h"
 #include "GoalManager.h"
 #include "EUnit.h"
 

@@ -63,7 +63,7 @@ BattleBroodAI::~BattleBroodAI()
     WorkerManager::Destroy();
     BaseManager::Destroy();
     SupplyManager::Destroy();
-    MicroManager::Destroy();
+    WarManager::Destroy();
     Regions::Destroy();
     MapManager::Destroy();
     EUnitsFilter::Destroy();
@@ -136,7 +136,7 @@ void BattleBroodAI::onStart()
 	this->mapManager = & MapManager::Instance();
 	this->workerManager = & WorkerManager::Instance();
 	this->regions = & Regions::Instance();
-	this->microManager = & MicroManager::Instance();
+	this->warManager = & WarManager::Instance();
 	this->eUnitsFilter = & EUnitsFilter::Instance();
 	this->eEcoEstimator = & EEcoEstimator::Instance();
 	this->eTechEstimator = & ETechEstimator::Instance();
@@ -162,12 +162,12 @@ void BattleBroodAI::onStart()
 	this->supplyManager->setDependencies(this->buildManager,this->buildOrderManager);
 	this->techManager->setDependencies(this->arbitrator,this->buildingPlacer);
 	this->upgradeManager->setDependencies(this->arbitrator,this->buildingPlacer);
-	this->scoutManager->setDependencies(this->regions,this->microManager);
+	this->scoutManager->setDependencies(this->regions,this->warManager);
 	this->workerManager->setDependencies(this->arbitrator,this->baseManager,this->buildOrderManager);
 	this->regions->setDependencies(this->timeManager,this->mapManager);
 	this->eEcoEstimator->setDependencies(this->timeManager);
-	this->microManager->setDependencies(this->arbitrator,this->regions);
-	this->goalManager->setDependencies(this->microManager,this->regions);
+	this->warManager->setDependencies(this->arbitrator,this->regions);
+	this->goalManager->setDependencies(this->warManager,this->regions);
 	this->macroManager->setDependencies(this->buildOrderManager,this->productionManager,this->buildManager,this->baseManager,this->workerManager);
 	this->mapManager->setDependencies(this->eUnitsFilter);
 	//Broodwar->printf("The match up is %s v %s",
@@ -181,7 +181,7 @@ void BattleBroodAI::onStart()
 
 	//Call on start functions
 	this->macroManager->onStart();
-	this->microManager->onStart();
+	this->warManager->onStart();
 }
 
 void BattleBroodAI::onEnd(bool isWinner)
@@ -449,7 +449,7 @@ void BattleBroodAI::onUnitCreate(BWAPI::Unit* unit)
 	this->scoutManager->onUnitCreate(unit);
 	this->mapManager->onUnitCreate(unit);
 	this->regions->onUnitCreate(unit);
-	this->microManager->onUnitCreate(unit);
+	this->warManager->onUnitCreate(unit);
 	this->macroManager->onUnitCreate(unit);
 
 	/*
@@ -508,7 +508,7 @@ void BattleBroodAI::onUnitDestroy(BWAPI::Unit* unit)
 	this->upgradeManager->onRemoveUnit(unit);
 	this->workerManager->onRemoveUnit(unit);
     this->macroManager->onUnitDestroy( unit);
-    this->microManager->onUnitDestroy(unit);
+    this->warManager->onUnitDestroy(unit);
     this->regions->onUnitDestroy(unit);
     this->mapManager->onUnitDestroy(unit);
     this->eUnitsFilter->onUnitDestroy(unit);
@@ -611,7 +611,7 @@ void BattleBroodAI::onSendText(std::string text)
     else if (text=="/target")
     {
         set<pBayesianUnit> tmp;
-        for (std::list<UnitsGroup*>::iterator it = this->microManager->unitsgroups.begin(); it != this->microManager->unitsgroups.end(); it++)
+        for (std::list<UnitsGroup*>::iterator it = this->warManager->unitsgroups.begin(); it != this->warManager->unitsgroups.end(); it++)
         {
             set<pBayesianUnit> tmp;
             (*it)->selectedUnits(tmp);
@@ -723,5 +723,5 @@ void BattleBroodAI::showForces()
 void BattleBroodAI::display()
 {
     regions->display();
-    microManager->display();
+    warManager->display();
 }

@@ -6,7 +6,7 @@
 #include "SeeSubgoal.h"
 #include "FindSubgoal.h"
 #include "ScoutManager.h"
-#include "MicroManager.h"
+#include "WarManager.h"
 class FindEnemyGoal: public Goal
 {
 public:
@@ -14,5 +14,5 @@ public:
 	void achieve();
 private:
 	ScoutManager * scoutManager;
-	MicroManager * microManager;
+	WarManager * warManager;
 };

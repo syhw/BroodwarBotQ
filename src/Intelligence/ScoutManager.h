@@ -12,7 +12,7 @@
 #include "FindEnemyGoal.h"
 #include "SeeSubgoal.h"
 #include "FindSubgoal.h"
-#include "MicroManager.h"
+#include "WarManager.h"
 #include "BaseObject.h"
 #include "ExploreGoal.h"
 class GoalManager;
@@ -26,7 +26,7 @@ class ScoutManager : public CSingleton<ScoutManager>, public BaseObject
 	friend class CSingleton<ScoutManager>;
 
 public:
-	void setDependencies(Regions * region, MicroManager * micro);
+	void setDependencies(Regions * region, WarManager * micro);
 	virtual void update();
 	virtual std::string getName() const;
 	// Goals // Just ideas, not yet implemented
@@ -52,7 +52,7 @@ private:
 	UnitsGroup* findUnitsGroup(pGoal goal); //Match a UG with the goal (call setUnitsGroup and addGoal)
 	bool to_remove;
     void updateScoutAssignments();
-	MicroManager * microManager;
+	WarManager * warManager;
 	Regions* regions;
 };
 #endif 

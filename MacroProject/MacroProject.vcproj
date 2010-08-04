@@ -197,11 +197,11 @@
 				Name="Micro"
 				>
 				<File
-					RelativePath="..\src\Micro\MicroManager.cpp"
+					RelativePath="..\src\Micro\UnitsGroup.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\Micro\UnitsGroup.cpp"
+					RelativePath="..\src\Micro\WarManager.cpp"
 					>
 				</File>
 				<Filter
@@ -611,15 +611,15 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Micro\MicroManager.h"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Micro\UnitManager.h"
 					>
 				</File>
 				<File
 					RelativePath="..\src\Micro\UnitsGroup.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\WarManager.h"
 					>
 				</File>
 				<Filter
