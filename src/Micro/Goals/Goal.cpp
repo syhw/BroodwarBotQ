@@ -7,23 +7,20 @@
 Goal::~Goal()
 {
 }
-Goal::Goal()
-: status(GS_NOT_ATTRIBUTED)
-, firstFrame(BWAPI::Broodwar->getFrameCount())
+Goal::Goal():
+status(GS_NOT_ATTRIBUTED)
 {
 }
 
-Goal::Goal(UnitsGroup * ug)
-: status(GS_IN_PROGRESS)
-, unitsGroup(ug)
-, firstFrame(BWAPI::Broodwar->getFrameCount())
+Goal::Goal(UnitsGroup * ug):
+status(GS_IN_PROGRESS),
+unitsGroup(ug)
 {
 }
 
-Goal::Goal(UnitsGroup * ug, pSubgoal s)
-: status(GS_IN_PROGRESS)
-, unitsGroup(ug)
-, firstFrame(BWAPI::Broodwar->getFrameCount())
+Goal::Goal(UnitsGroup * ug, pSubgoal s):
+status(GS_IN_PROGRESS),
+unitsGroup(ug)
 {
     addSubgoal(s);
 }
@@ -87,9 +84,6 @@ void Goal::checkAchievement()
 				
 			if(res_and || res_or){
 				this->status= GS_ACHIEVED;
-#ifdef __DEBUG_GABRIEL__
-                BWAPI::Broodwar->printf("\x13 \x04 goal finished in ~ %d seconds", (BWAPI::Broodwar->getFrameCount() - firstFrame)/24);
-#endif
 			}
 	}
 }

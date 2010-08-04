@@ -26,7 +26,7 @@ protected:
 	UnitsGroup * unitsGroup;//Use setUnitsGroup
 	std::list<pSubgoal> subgoals; //The subgoals cannot be shared
 	GoalStatus status;      /**< status of the goal */
-    int firstFrame;
+
 
 public:
 	void setUnitsGroup(UnitsGroup * ug);
