@@ -37,6 +37,7 @@
 #include "MorphManager.h"
 #include "ProductionManager.h"
 #include "EnhancedUI.h"
+#include "DefenseManager.h"
 
 class BattleBroodAI;
 extern BattleBroodAI* broodAI;
@@ -85,14 +86,10 @@ public:
 	TimeManager* timeManager;
 	GoalManager* goalManager;
 	EnhancedUI * enhancedUI;
-
-	
-
-	
-
-
-	bool showManagerAssignments;
+	DefenseManager * defenseManager;
     ObjectManager* objManager;
+	bool showManagerAssignments;
+
 
     BattleBroodAI();
     ~BattleBroodAI();

@@ -197,6 +197,10 @@
 				Name="Micro"
 				>
 				<File
+					RelativePath="..\src\Micro\DefenseManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Micro\UnitsGroup.cpp"
 					>
 				</File>
@@ -606,6 +610,10 @@
 			<Filter
 				Name="Micro"
 				>
+				<File
+					RelativePath="..\src\Micro\DefenseManager.h"
+					>
+				</File>
 				<File
 					RelativePath="..\src\Micro\Formations.h"
 					>

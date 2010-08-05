@@ -143,6 +143,7 @@ void BattleBroodAI::onStart()
 	this->timeManager = & TimeManager::Instance();
 	this->goalManager = & GoalManager::Instance();
 	this->enhancedUI = & EnhancedUI::Instance();
+	this->defenseManager = & DefenseManager::Instance();
     if( Broodwar->self()->getRace() == Races::Protoss)
         this->macroManager = & ProtossStrat::Instance();
     else if( Broodwar->self()->getRace() == Races::Terran)
@@ -170,6 +171,8 @@ void BattleBroodAI::onStart()
 	this->goalManager->setDependencies(this->warManager,this->regions);
 	this->macroManager->setDependencies(this->buildOrderManager,this->productionManager,this->buildManager,this->baseManager,this->workerManager);
 	this->mapManager->setDependencies(this->eUnitsFilter);
+	this->defenseManager->setDependencies(this->arbitrator,this->borderManager);
+
 	//Broodwar->printf("The match up is %s v %s",
     Broodwar->self()->getRace().getName().c_str();
     Broodwar->enemy()->getRace().getName().c_str();
@@ -221,6 +224,7 @@ void BattleBroodAI::onFrame()
     this->macroManager->update();
 	this->arbitrator->update();
 	this->enhancedUI->update();
+	this->defenseManager->update();
   std::set<Unit*> units=Broodwar->self()->getUnits();
   if (this->showManagerAssignments)
   {

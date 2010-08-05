@@ -57,7 +57,6 @@ void WarManager::update()
 		}
 	}
 
-
 	//Update unitsgroup
 	defgroup->update();
 	if (unitsgroups.empty()) return;
@@ -192,11 +191,6 @@ void WarManager::sendGroupToDefense( UnitsGroup* ug)
 	// Send the group defend the base
 	pGoal g = pGoal(new DefendChokeGoal(ug,(*BorderManager::Instance().getMyBorder().begin())));
 	ug->addGoal(g);
-}
-
-void WarManager::checkDefense(){
-	//Run through all our bases. Set defense in the main OR in the natural expo, and some defenses in all bases
-
 }
 
 
