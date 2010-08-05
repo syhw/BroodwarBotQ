@@ -11,6 +11,7 @@ void DefenseManager::setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>
 }
 void DefenseManager::onOffer(std::set<BWAPI::Unit*> units)
 {
+	/*
   for(std::set<BWAPI::Unit*>::iterator u = units.begin(); u != units.end(); u++)
   {
     if (defenders.find(*u) == defenders.end())
@@ -20,16 +21,17 @@ void DefenseManager::onOffer(std::set<BWAPI::Unit*> units)
       defenders.insert(std::make_pair(*u, temp));
     }
   }
+  */
 }
 
 void DefenseManager::onRevoke(BWAPI::Unit* unit, double bid)
 {
-  defenders.erase(unit);
+ // defenders.erase(unit);
 }
 
 void DefenseManager::onRemoveUnit(BWAPI::Unit* unit)
 {
-  defenders.erase(unit);
+//  defenders.erase(unit);
 }
 
 void DefenseManager::update()

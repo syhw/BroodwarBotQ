@@ -4,6 +4,7 @@
 #include <BWTA.h>
 #include "CSingleton.h"
 #include "Base.h"
+#include "UnitsGroup.h"
 class BorderManager;
 class DefenseManager : Arbitrator::Controller<BWAPI::Unit*,double>, public CSingleton<DefenseManager>
 {
