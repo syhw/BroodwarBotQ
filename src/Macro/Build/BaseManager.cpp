@@ -6,6 +6,7 @@ BaseManager::BaseManager()
   this->builder = NULL;
   this->RefineryNeeded  = 1;
   this->refineryBuildPriority = 0;
+  computeNatural();
 }
 
 void BaseManager::setDependencies(BuildOrderManager * bom, BorderManager * bm){
@@ -292,4 +293,25 @@ bool BaseManager::hasRefinery(BWTA::BaseLocation* location)
   }
   
   return refinery;
+}
+
+void BaseManager::computeNatural(){
+
+	double minDist = 10000000000;
+	double test;
+	BWTA::BaseLocation * minBase;
+	std::set<BWTA::BaseLocation * > allBaseLocations = BWTA::getBaseLocations();
+	BWTA::BaseLocation * myBaseLocation = BWTA::getStartLocation(BWAPI::Broodwar->self());
+	
+	for(std::set<BWTA::BaseLocation *>::iterator it = allBaseLocations.begin(); it != allBaseLocations.end(); ++it){
+		if( (*it) !=  myBaseLocation && !(*it)->isMineralOnly() ){
+			//not our main
+			test = (*it)->getPosition().getDistance(myBaseLocation->getPosition());
+			if(test < minDist){
+				minDist = test;
+				minBase = (*it);
+			}
+		}
+	}
+	this->naturalExpand = minBase;
 }

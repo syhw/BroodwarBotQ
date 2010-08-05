@@ -29,7 +29,7 @@ class BaseManager : public CSingleton<BaseManager>
   bool isRefineryNeeded();
   void setRefineryBuildPriority(int priority);
   int  getRefineryBuildPriority();
-
+  BWTA::BaseLocation* naturalExpand;
   private:
 	BaseManager();
   void addBase(BWTA::BaseLocation* location);
@@ -40,4 +40,5 @@ class BaseManager : public CSingleton<BaseManager>
   std::set<Base*> allBases;
   int RefineryNeeded;
   int refineryBuildPriority;
+  void computeNatural();//Set the naturalExpandField
 };

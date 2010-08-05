@@ -42,9 +42,9 @@ void ProtossStrat::update(){
 	if(this->shouldExpand() && !expanding ){
 		this->expanding = true;
 		BWAPI::Broodwar->printf("Expanding at the nearest location");
-		this->baseManager->expand(this->naturalExpand,80);
+		this->baseManager->expand(BaseManager::Instance().naturalExpand,80);
 	}
-	BWAPI::Broodwar->drawCircleMap(naturalExpand->getPosition().x(),naturalExpand->getPosition().y(),20,BWAPI::Colors::Green, true);
+	
 	
 }
 

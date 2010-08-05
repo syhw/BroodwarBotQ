@@ -36,27 +36,6 @@ std::string MacroManager::getName() const
 
 void MacroManager::onStart(){
 	
-	double minDist = 10000000000;
-	double test;
-	BWTA::BaseLocation * minBase;
-	std::set<BWTA::BaseLocation * > allBaseLocations = BWTA::getBaseLocations();
-	BWTA::BaseLocation * myBaseLocation = BWTA::getStartLocation(BWAPI::Broodwar->self());
-	
-	assert(BorderManager::Instance().getMyBorder().size() == 1);
-	//Sometimes we have 2 chokepoints
-	BWAPI::Position choke = (*BorderManager::Instance().getMyBorder().begin())->getCenter();
-
-	for(std::set<BWTA::BaseLocation *>::iterator it = allBaseLocations.begin(); it != allBaseLocations.end(); ++it){
-		if( (*it) !=  myBaseLocation ){
-			//not our main
-			test = (*it)->getPosition().getDistance(choke);
-			if(test < minDist){
-				minDist = test;
-				minBase = (*it);
-			}
-		}
-	}
-	naturalExpand = minBase;
 }
 void MacroManager::onUnitCreate(BWAPI::Unit* unit)
 {
