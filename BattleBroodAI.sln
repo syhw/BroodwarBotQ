@@ -1,12 +1,17 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual C++ Express 2008
+# Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MacroProject", "MacroProject\MacroProject.vcproj", "{F39C7417-770D-4635-8A47-77BD9CDDCD71}"
 	ProjectSection(ProjectDependencies) = postProject
 		{305604F2-9728-4D61-AC29-4658B31533DF} = {305604F2-9728-4D61-AC29-4658B31533DF}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MicroProject", "MicroProject\MicroProject.vcproj", "{305604F2-9728-4D61-AC29-4658B31533DF}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Éléments de solution", "Éléments de solution", "{B9790B35-680A-48B7-BE32-1CC8B96CAD17}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\..\Documents and Settings\Jack\Desktop\BattleBroodAI.vsd = ..\..\..\..\Documents and Settings\Jack\Desktop\BattleBroodAI.vsd
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
