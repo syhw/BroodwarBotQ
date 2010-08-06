@@ -37,11 +37,13 @@ private:
 public:
     std::vector<BWAPI::TilePosition> btpath;
     std::set<BWAPI::Unit*> enemies;
+    pBayesianUnit leadingUnit;
 	
 	UnitsGroup();
 	~UnitsGroup();
 
     BWAPI::Position center;
+    Vec centerSpeed;
 	std::map<BWAPI::UnitSizeType, int> sizes;
 
 	virtual void update();

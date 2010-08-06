@@ -180,20 +180,18 @@ void UnitsGroup::update()
 {
     this->totalHP = 0;
 
-    pBayesianUnit biggestUnit;
-
     if (units.size())
-        biggestUnit = units.front();
+        leadingUnit = units.front();
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     { 
-        if (biggestUnit->unit->getType().size() < (*it)->unit->getType().size() 
-            || ( biggestUnit->unit->getType().size() == (*it)->unit->getType().size() && 
-                 biggestUnit->unit->getDistance(center) > (*it)->unit->getDistance(center) )
+        if (leadingUnit->unit->getType().size() < (*it)->unit->getType().size() 
+            || ( leadingUnit->unit->getType().size() == (*it)->unit->getType().size() && 
+                 leadingUnit->unit->getDistance(center) > (*it)->unit->getDistance(center) )
             )
-            biggestUnit = *it;
+            leadingUnit = *it;
     }
-    if (biggestUnit != NULL)
-        btpath = BWTA::getShortestPath(biggestUnit->unit->getPosition(), biggestUnit->target);
+    if (leadingUnit != NULL) // defensive
+        btpath = BWTA::getShortestPath(leadingUnit->unit->getPosition(), leadingUnit->target);
 
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     {

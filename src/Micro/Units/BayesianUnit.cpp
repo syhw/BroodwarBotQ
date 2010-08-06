@@ -50,8 +50,8 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 , _minDimension(min(_slarge, _sheight))
 , _maxDiag(sqrt((double)(_slarge*_slarge + _sheight*_sheight)))
 , _lastRightClick(unit->getPosition())
-, _posAtMost13FramesAgo(Position(unit->getPosition().x() + 1, unit->getPosition().y() + 1))
-, _posAtMost23FramesAgo(unit->getPosition())
+, _posAtMost13FramesAgo(Position(unit->getPosition().x() + 1, unit->getPosition().y() + 1)) // we don't want posAtMost13FramesAgo  
+, _posAtMost23FramesAgo(unit->getPosition())                                                // and posAtMost23FramesAgo to be equal
 , _iThinkImBlocked(false)
 {
     updateDirV();
@@ -532,14 +532,17 @@ void BayesianUnit::updateObj()
 #ifndef __OUR_PATHFINDER__
     Position p;
     TilePosition tptarget;
-    if (0 && _unitPos.getDistance(target) > 32 * _unitsGroup->size())
+    if (_unitPos.getDistance(target) > 32 * _unitsGroup->size())
     {
-        if (_unitsGroup->btpath.size() > 2)
-            tptarget = _unitsGroup->btpath[2];
-        else if (_unitsGroup->btpath.size() > 1)
-            tptarget = _unitsGroup->btpath[1];
+        Vec leadingVit(_unitsGroup->leadingUnit->unit->getVelocityX(), _unitsGroup->leadingUnit->unit->getVelocityY());
+        if (leadingVit.x != 0 || leadingVit.y != 0)
+        {
+            Vec posMeet(_unitsGroup->center.x(), _unitsGroup->center.y());
+            posMeet += leadingVit * _unitPos.getDistance(_unitsGroup->center) / _topSpeed; // linear interpolation of the center
+            tptarget = TilePosition(posMeet.x, posMeet.y);
+        }
         else 
-            tptarget = target;
+            tptarget = TilePosition(_unitsGroup->leadingUnit->unit->getPosition());
     }
     else
     {
@@ -982,7 +985,7 @@ void BayesianUnit::update()
         if (_iThinkImBlocked)
         {
 #ifdef __DEBUG_GABRIEL__
-            Broodwar->printf("I think I'm blocked");
+            //Broodwar->printf("I think I'm blocked");
 #endif
             unit->rightClick(target);
             _lastRightClick = target;
