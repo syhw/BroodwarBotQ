@@ -29,16 +29,19 @@ void MicroAIModule::onStart()
 	for (std::set<Unit*>::iterator i=allUnits.begin(); i!=allUnits.end(); i++)
 	{
         onUnitShow(*i);
-        if ((*i)->getPlayer() != Broodwar->self())
-            continue;
-		if ((*i)->getType().isBuilding())
+        if ((*i)->getType().isBuilding())
 		{
 			this->buildings.insert(std::make_pair(*i,(*i)->getType()));
             regions->onUnitCreate(*i);
             mapManager->onUnitCreate(*i);
 		} 
-        else
-			mm->takeControl(*i);
+        else 
+        {
+            if ((*i)->getPlayer() != Broodwar->self())
+                continue;
+            else
+                mm->takeControl(*i);
+        }
 	}
 
 	std::list<pGoal> goals;
@@ -126,7 +129,7 @@ MicroAIModule::~MicroAIModule()
     (*qapp)->quit();
 #endif
     MapManager::Destroy();
-		ObjectManager::Destroy();
+    ObjectManager::Destroy();
     Regions::Destroy();
     mm->~UnitsGroup();
 }

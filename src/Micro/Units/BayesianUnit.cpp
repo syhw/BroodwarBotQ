@@ -47,6 +47,7 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 , _unitsGroup(ug)
 , _ground_unit(!unit->getType().isFlyer())
 , _maxDimension(max(_slarge, _sheight))
+, _minDimension(min(_slarge, _sheight))
 , _maxDiag(sqrt((double)(_slarge*_slarge + _sheight*_sheight)))
 {
     updateDirV();
@@ -56,9 +57,9 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
     initDefaultProb();
     _flockProb.push_back(_PROB_NO_FLOCK_MOVE);  //FLOCK_NO
     _flockProb.push_back(0.01);                  //FLOCK_CONTACT
-    _flockProb.push_back(0.20);                 //FLOCK_CLOSE
+    _flockProb.push_back(0.22);                 //FLOCK_CLOSE
     _flockProb.push_back(0.30);                  //FLOCK_MEDIUM
-    _flockProb.push_back(0.25);                 //FLOCK_FAR
+    _flockProb.push_back(0.23);                 //FLOCK_FAR
 
     _inPosProb.push_back(0.44);                // INPOS_OK
     _inPosProb.push_back(0.01);                // INPOS_CONTACT
@@ -318,24 +319,8 @@ void BayesianUnit::updateAttractors()
         else if (!mapManager->walkability[bD.x()/8 + (bD.y()/8)*4*width])
             _occupation.push_back(OCCUP_BLOCKING);
 
-
-        //if (mapManager->buildings[tmp.x()/32 + (tmp.y()/32)*width])
-        //    _occupation.push_back(OCCUP_BUILDING);
-
-
-
-
-/*
-        if (mapManager->buildings_wt[tmp.x()/8 + (tmp.y()/8)*4*width])
-            _occupation.push_back(OCCUP_BUILDING);
-        else if (!mapManager->walkability[tmp.x()/8 + (tmp.y()/8)*4*width])
-                                       // tmp.x()/8 + (tmp.y()/2)*width
-            _occupation.push_back(OCCUP_BLOCKING);
-            */
-
-        else if (0/*TODO TEST SI Y A UNE UNITE QUI BLOQUE en TMP*/)
-            _occupation.push_back(OCCUP_UNIT);
-
+        //else if (0/*TODO TEST SI Y A UNE UNITE QUI BLOQUE en TMP*/)
+        //    _occupation.push_back(OCCUP_UNIT);
 
         else // TODO UNIT/EUNIT
             _occupation.push_back(OCCUP_NO);
@@ -390,8 +375,8 @@ double BayesianUnit::computeProb(unsigned int i)
         for (unsigned int j = 0; j < _flockValues[i].size(); ++j)
             val *= _flockProb[_flockValues[i][j]];
 
-        for (unsigned int j = 0; j < _dodgeValues[i].size(); ++j)
-            val *= _dodgeProb[_dodgeValues[i][j]];
+        //for (unsigned int j = 0; j < _dodgeValues[i].size(); ++j)
+        //    val *= _dodgeProb[_dodgeValues[i][j]];
        
         /// OBJECTIVE (pathfinder) INFLUENCE
         double prob_obj = _PROB_GO_OBJ / (_unitsGroup->getUnits()->size() - 1);
@@ -532,35 +517,43 @@ void BayesianUnit::updateObj()
 {
 #ifndef _OUR_PATHFINDER_
     Position p;
-    if (!_path.size()) // hack to remove with the introduction of TimeManager
+    if (_unitPos.getDistance(target) < 45.26) // sqrt(BWAPI::TILE_SIZE^2 + BWAPI::TILE_SIZE^2)
     {
-        //TIMINGclock_t start = clock();
-        _btpath = BWTA::getShortestPath(TilePosition(_unitPos), TilePosition(target));
-        _path.clear();
-        for (std::vector<TilePosition>::const_iterator it = _btpath.begin(); it != _btpath.end(); ++it)
-            _path.push_back(*it);
-        //TIMINGclock_t end = clock();
-        //TIMINGBroodwar->printf("Iterations took %f", (double)(end-start));
-    } else
-    {
-        // remove path points we passed
-        if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
-            _path.erase(_path.begin());
-        // I'm not drunk, do it twice! (path[2] if possible)        
-        if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
-            _path.erase(_path.begin());
+        obj = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y());
     }
-
-    if (_path.size() > 1)   // _ppath[0] is the current unit position
+    else 
     {
-        if (_path.size() > 2) 
-            p = _path[2].getPosition();
+        if (!_ppath.size()) // hack to remove with the introduction of TimeManager
+        {
+            //TIMINGclock_t start = clock();
+            _btpath = BWTA::getShortestPath(TilePosition(_unitPos), TilePosition(target));
+            _ppath.clear();
+            for (std::vector<TilePosition>::const_iterator it = _btpath.begin(); it != _btpath.end(); ++it)
+                _ppath.push_back(*it);
+            //TIMINGclock_t end = clock();
+            //TIMINGBroodwar->printf("Iterations took %f", (double)(end-start));
+        } else
+        {
+            // remove path points we passed
+            if (_ppath.size() > 1 && _ppath[1].getDistance(_unitPos) < 45.26) // sqrt(BWAPI::TILE_SIZE^2 + BWAPI::TILE_SIZE^2)
+                _ppath.erase(_ppath.begin());
+            // I'm not drunk, do it twice! (path[2] if possible)        
+            if (_ppath.size() > 1 && _ppath[1].getDistance(_unitPos) < 45.26) // sqrt(BWAPI::TILE_SIZE^2 + BWAPI::TILE_SIZE^2)
+                _ppath.erase(_ppath.begin());
+        }
+
+        if (_ppath.size() > 1)   // _ppath[0] is the current unit position
+        {
+            if (_ppath.size() > 2) 
+                p = _ppath[2];
+            else
+                p = _ppath[1];
+        }
         else
-            p = _path[1].getPosition();
-    }
-    else
-        p = _unitPos;
+            p = _unitPos;
 
+        obj = Vec(p.x() - _unitPos.x() + 15, p.y() - _unitPos.y() + 15); // top left Position in a Build Tile -> middle Position = +15
+    }
 #else
     /*if (_unitPos.getDistance(target) < WALK_TILES_SIZE/2)
     {
@@ -610,65 +603,35 @@ void BayesianUnit::updateObj()
         }
         else
             p = _unitPos;
+        obj = Vec(p.x() - _unitPos.x() + 15, p.y() - _unitPos.y() + 15); // top left Positoin in a Build Tile -> middle Position = +15
     }     
+
+#endif
+
 #ifdef __DEBUG_GABRIEL__
-    drawBTPath();
-    MapManager* mapm = & MapManager::Instance();
-    mapm->drawBuildingsStrict();
-    mapm->drawWalkability();
+    //drawBTPath();
     //drawPath();
+    drawPPath();
 #endif
-
-#endif
-    obj = Vec(p.x() - _unitPos.x() + 12, p.y() - _unitPos.y() + 12); // to center the Tile, change 12 for 16 - top/left sizes
-    drawPath();
+    //int dirvsize = _dirv.size();
+    //int rawsize = (int)(sqrt((double)dirvsize));
     double norm = obj.norm();
-    double norm_far = min(_slarge, _sheight);
     obj.normalize();
-    if (norm < norm_far)
-    {
-        double max = -1000000.0;
-        int i = 17; // 17
 
-        int ind_max;
-        while (i != 33) // 33
+    double max = -1000000.0;
+    unsigned int ind_max;
+    for(unsigned int i = 0; i < _dirv.size(); ++i)
+    { 
+        Vec tmp = _dirv[i];
+        tmp.normalize();
+        double val = tmp.dot(obj);
+        if ((val > max && norm >= _dirv[i].norm())) // most in the direction of obj AND not past obj
         {
-            Vec tmp = _dirv[i];
-            tmp.normalize();
-            double val = tmp.dot(obj);
-            if (val > max)
-            {
-                max = val;
-                ind_max = i;
-            }
-            if (i == 19) // 19
-                i = 24; // 24
-            else if (i == 26) // 26
-                i = 31; // 31
-            else
-                i++;
+            max = val;
+            ind_max = i;
         }
-        obj = _dirv[ind_max];
     }
-    else
-    {
-        double max = -1000000.0;
-        double normMax = -1000000.0;
-        int ind_max;
-        for(int i = 0; i < 49; i++)
-        { 
-            Vec tmp = _dirv[i];
-            tmp.normalize();
-            double val = tmp.dot(obj);
-            if (val > max || (val == max && norm > normMax ) )
-            {
-                max = val;
-                ind_max = i;
-                normMax = norm;
-            }
-        }
-        obj = _dirv[ind_max];
-    }
+    obj = _dirv[ind_max];
 }
 
 void BayesianUnit::drawObj(int number)
@@ -875,7 +838,7 @@ void BayesianUnit::drawDir()
 void BayesianUnit::clickDir()
 {
     double dist = _unitPos.getDistance(target);
-    if (dir == Vec(0,0) || dist < 0.5) // 0.5 arbitrary
+    if (dir == Vec(0,0) || dist < 0.9) // 0.9 arbitrary
     {
         if (!unit->isAttacking())
             unit->holdPosition();
@@ -883,7 +846,7 @@ void BayesianUnit::clickDir()
     }
     //if (dist > 11.32) // sqrt(8^2 + 8^2), one walk tile
     //if (dist > 45.26) // sqrt(32^2 + 32^2), one build tile
-    if (dist > _maxDiag + 10.0)
+    if (dist > _maxDiag)
     {
         dir += _unitPos;
         unit->rightClick(dir.toPosition());
