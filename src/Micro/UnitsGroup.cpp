@@ -430,6 +430,7 @@ int UnitsGroup::size() const
 
 void UnitsGroup::updateCenter()
 {
+    // update center
     center = Position(0, 0);
     for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
     {
@@ -440,6 +441,17 @@ void UnitsGroup::updateCenter()
         center.x() /= units.size();
         center.y() /= units.size();
     }
+    // update stdDevRadius and maxRadius
+    maxRadius = -1.0;
+    double sum = 0.0;
+    for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
+    {
+        double dist = center.getDistance((*it)->unit->getPosition());
+        if (dist > maxRadius)
+            maxRadius = dist;
+        sum += (dist * dist);
+    }
+    stdDevRadius = sqrt((1/units.size()) * sum); // 1/(units.size() - 1) for the sample std dev
 }
 
 Position UnitsGroup::getCenter() const

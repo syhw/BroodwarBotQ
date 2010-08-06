@@ -43,6 +43,7 @@ public:
 	~UnitsGroup();
 
     BWAPI::Position center;
+    double stdDevRadius, maxRadius;
     Vec centerSpeed;
 	std::map<BWAPI::UnitSizeType, int> sizes;
 
@@ -58,7 +59,7 @@ public:
 	virtual void setGoals(std::list<pGoal>& goals);
 	virtual void addGoal(pGoal goal);
 	
-	virtual void updateCenter();
+	inline void updateCenter();
     virtual BWAPI::Position getCenter() const;
     inline double getDistance(BWAPI::Unit* u) const;
 

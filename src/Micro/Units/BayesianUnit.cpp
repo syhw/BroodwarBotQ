@@ -532,6 +532,7 @@ void BayesianUnit::updateObj()
 #ifndef __OUR_PATHFINDER__
     Position p;
     TilePosition tptarget;
+    /* TODO TODO TODO sharing one path for the whole UnitsGroup doesn't work
     if (_unitPos.getDistance(target) > 32 * _unitsGroup->size())
     {
         Vec posMeet(_unitsGroup->center.x(), _unitsGroup->center.y());
@@ -548,10 +549,8 @@ void BayesianUnit::updateObj()
         else 
             tptarget = target;
     }
-    else
-    {
+    else */
         tptarget = target;
-    }
 
     if (_unitPos.getDistance(target) < 45.26) // sqrt(BWAPI::TILE_SIZE^2 + BWAPI::TILE_SIZE^2)
     {
