@@ -534,15 +534,19 @@ void BayesianUnit::updateObj()
     TilePosition tptarget;
     if (_unitPos.getDistance(target) > 32 * _unitsGroup->size())
     {
-        Vec leadingVit(_unitsGroup->leadingUnit->unit->getVelocityX(), _unitsGroup->leadingUnit->unit->getVelocityY());
-        if (leadingVit.x != 0 || leadingVit.y != 0)
+        Vec posMeet(_unitsGroup->center.x(), _unitsGroup->center.y());
+        if (_unitsGroup->btpath.size() > 2)
         {
-            Vec posMeet(_unitsGroup->center.x(), _unitsGroup->center.y());
-            posMeet += leadingVit * _unitPos.getDistance(_unitsGroup->center) / _topSpeed; // linear interpolation of the center
+            posMeet += Vec(_unitsGroup->btpath[2].x() + 15 - _unitsGroup->leadingUnit->_unitPos.x(), _unitsGroup->btpath[2].y() + 15 - _unitsGroup->leadingUnit->_unitPos.y());
+            tptarget = TilePosition(posMeet.x, posMeet.y);
+        }
+        else if (_unitsGroup->btpath.size() > 1)
+        {
+            posMeet += Vec(_unitsGroup->btpath[1].x() + 15 - _unitsGroup->leadingUnit->_unitPos.x(), _unitsGroup->btpath[1].y() + 15 - _unitsGroup->leadingUnit->_unitPos.y());
             tptarget = TilePosition(posMeet.x, posMeet.y);
         }
         else 
-            tptarget = TilePosition(_unitsGroup->leadingUnit->unit->getPosition());
+            tptarget = target;
     }
     else
     {
