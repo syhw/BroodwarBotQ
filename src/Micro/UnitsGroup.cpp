@@ -179,30 +179,21 @@ void UnitsGroup::displayTargets()
 void UnitsGroup::update()
 {
     this->totalHP = 0;
-    Broodwar->drawCircleMap(center.x(), center.y(), DISTANCE_MAX, BWAPI::Colors::Yellow);
 
-    pBayesianUnit biggerUnit;
+    pBayesianUnit biggestUnit;
 
-    if (units.size() > 0)
-        biggerUnit = units.front();
-
+    if (units.size())
+        biggestUnit = units.front();
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     { 
-        if (biggerUnit->unit->getType().size() < (*it)->unit->getType().size() 
-            || ( biggerUnit->unit->getType().size() == (*it)->unit->getType().size() && 
-                 biggerUnit->unit->getDistance(center) > (*it)->unit->getDistance(center) )
+        if (biggestUnit->unit->getType().size() < (*it)->unit->getType().size() 
+            || ( biggestUnit->unit->getType().size() == (*it)->unit->getType().size() && 
+                 biggestUnit->unit->getDistance(center) > (*it)->unit->getDistance(center) )
             )
-            biggerUnit = *it;
+            biggestUnit = *it;
     }
-
-    std::vector<BWAPI::TilePosition> _btpath;
-    if (biggerUnit != NULL)
-    {
-        _path.clear();
-        BattleUnit::buildingsAwarePathFind(_btpath, TilePosition(biggerUnit->unit->getPosition()), TilePosition(biggerUnit->target));
-        for (std::vector<TilePosition>::const_iterator it = _btpath.begin(); it != _btpath.end(); ++it)
-            _path.push_back(*it);
-    }
+    if (biggestUnit != NULL)
+        btpath = BWTA::getShortestPath(biggestUnit->unit->getPosition(), biggestUnit->target);
 
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     {
@@ -470,10 +461,8 @@ void UnitsGroup::selectedUnits(std::set<pBayesianUnit>& u)
 #endif
 
 
-void UnitsGroup::accomplishGoal(){
-	
-	//TOCHECK Potential Memory Leak with accomplished goals => no thanks to smart pointers
-	
+void UnitsGroup::accomplishGoal()
+{	
 	if(goals.size() > 0){
 		if (goals.front()->getStatus() != GS_ACHIEVED) {
 			goals.front()->achieve();
@@ -484,6 +473,7 @@ void UnitsGroup::accomplishGoal(){
 		}
 	}
 }
+
 void UnitsGroup::switchMode(unit_mode um){
 	for(std::vector<pBayesianUnit>::iterator it = getUnits()->begin(); it != getUnits()->end(); ++it){
 		(*it)->switchMode(um);

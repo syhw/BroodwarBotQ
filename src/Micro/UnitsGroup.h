@@ -12,7 +12,6 @@
 #include "GoalManager.h"
 
 #define _UNITS_DEBUG 1
-#define DISTANCE_MAX 500
 
 //class Goal;
 class Formation;
@@ -29,7 +28,6 @@ struct i_dist
 class UnitsGroup
 {
 private:
-    std::set<BWAPI::Unit*> enemies;
 	int totalHP;
 	int totalPower;
     std::vector<pBayesianUnit> units;
@@ -37,7 +35,8 @@ private:
 	std::list<pGoal> goals; // list of goals to accomplish
     void displayTargets();  // debug purpose
 public:
-    std::vector<WalkTilePosition> _path;
+    std::vector<BWAPI::TilePosition> btpath;
+    std::set<BWAPI::Unit*> enemies;
 	
 	UnitsGroup();
 	~UnitsGroup();

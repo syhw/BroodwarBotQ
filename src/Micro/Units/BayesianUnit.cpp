@@ -39,7 +39,6 @@ using namespace BWAPI;
 #define _PROB_CENTER_V2_ATTRACT 0.2
 #define _PROB_CENTER_V3_ATTRACT 0.09
 
-// TODO optimize by removing the dirv inside the unit (but one, the center, when it's better not to move at all)
 
 BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 : BattleUnit(u)
@@ -51,8 +50,8 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 , _minDimension(min(_slarge, _sheight))
 , _maxDiag(sqrt((double)(_slarge*_slarge + _sheight*_sheight)))
 , _lastRightClick(unit->getPosition())
-, _posAtMost13FramesAgo(unit->getPosition())
-, _posAtMost7FramesAgo(unit->getPosition())
+, _posAtMost13FramesAgo(Position(unit->getPosition().x() + 1, unit->getPosition().y() + 1))
+, _posAtMost23FramesAgo(unit->getPosition())
 , _iThinkImBlocked(false)
 {
     updateDirV();
@@ -532,6 +531,21 @@ void BayesianUnit::updateObj()
 {
 #ifndef __OUR_PATHFINDER__
     Position p;
+    TilePosition tptarget;
+    if (0 && _unitPos.getDistance(target) > 32 * _unitsGroup->size())
+    {
+        if (_unitsGroup->btpath.size() > 2)
+            tptarget = _unitsGroup->btpath[2];
+        else if (_unitsGroup->btpath.size() > 1)
+            tptarget = _unitsGroup->btpath[1];
+        else 
+            tptarget = target;
+    }
+    else
+    {
+        tptarget = target;
+    }
+
     if (_unitPos.getDistance(target) < 45.26) // sqrt(BWAPI::TILE_SIZE^2 + BWAPI::TILE_SIZE^2)
     {
         _ppath.clear();
@@ -542,7 +556,7 @@ void BayesianUnit::updateObj()
         if (!_ppath.size()) // hack to remove with the introduction of TimeManager
         {
             //TIMINGclock_t start = clock();
-            _btpath = BWTA::getShortestPath(TilePosition(_unitPos), TilePosition(target));
+            _btpath = BWTA::getShortestPath(TilePosition(_unitPos), tptarget);
             _ppath.clear();
             for (std::vector<TilePosition>::const_iterator it = _btpath.begin(); it != _btpath.end(); ++it)
                 _ppath.push_back(*it);
@@ -952,14 +966,14 @@ void BayesianUnit::update()
     if (!unit->exists()) return;
     _unitPos = unit->getPosition();
 
-    if (_mode == MODE_FLOCK || _mode == MODE_FLOCKFORM || _mode == MODE_INPOS)
+    if (_mode == MODE_FLOCK || _mode == MODE_FLOCKFORM)
     {
-        if (Broodwar->getFrameCount() % 13)
+        if (!(Broodwar->getFrameCount() % 13))
             _posAtMost13FramesAgo = _unitPos;
-        if (Broodwar->getFrameCount() % 7)
-            _posAtMost7FramesAgo = _unitPos;
-        if (Broodwar->getFrameCount() % 11)
-            _iThinkImBlocked = (_posAtMost13FramesAgo == _unitPos && _posAtMost7FramesAgo == _unitPos) ? true : false;
+        if (!(Broodwar->getFrameCount() % 23))
+            _posAtMost23FramesAgo = _unitPos;
+        if (!(Broodwar->getFrameCount() % 11))
+            _iThinkImBlocked = (_posAtMost13FramesAgo == _unitPos && _posAtMost23FramesAgo == _unitPos) ? true : false;
     }
 
     switch(_mode)
@@ -967,6 +981,9 @@ void BayesianUnit::update()
     case MODE_FLOCK:
         if (_iThinkImBlocked)
         {
+#ifdef __DEBUG_GABRIEL__
+            Broodwar->printf("I think I'm blocked");
+#endif
             unit->rightClick(target);
             _lastRightClick = target;
             return;
