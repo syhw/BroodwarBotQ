@@ -226,6 +226,7 @@ void BayesianUnit::switchMode(unit_mode um)
 #ifdef __DEBUG_GABRIEL__
             Broodwar->printf("Switch FIGHT_G!");
 #endif
+            unit->holdPosition();
             break;
         default:
             break;
@@ -790,6 +791,79 @@ void BayesianUnit::updateDirV()
         }  
 }
 
+void BayesianUnit::testIfBlocked()
+{
+    if (!(Broodwar->getFrameCount() % 13))
+        _posAtMost13FramesAgo = _unitPos;
+    if (!(Broodwar->getFrameCount() % 23))
+        _posAtMost23FramesAgo = _unitPos;
+    if (!(Broodwar->getFrameCount() % 11))
+        _iThinkImBlocked = (_posAtMost13FramesAgo == _unitPos && _posAtMost23FramesAgo == _unitPos) ? true : false;
+}
+
+void BayesianUnit::updateRangeEnemies()
+{
+    _rangeEnemies.clear();
+    for (std::set<Unit*>::const_iterator it = _unitsGroup->enemies.begin(); 
+        it != _unitsGroup->enemies.end(); ++it)
+    {
+        _rangeEnemies.insert(std::make_pair<double, Unit*>(_unitPos.getDistance((*it)->getPosition()), *it));
+    }
+}
+
+void BayesianUnit::updateTargetEnemy()
+{
+    return; // TODO
+    // clear old damage
+    if (_unitsGroup->unitDamages.left.count(targetEnemy))
+    {
+        UnitDmgBimap::left_iterator it = _unitsGroup->unitDamages.left.find(targetEnemy);
+        UnitDmgBimap::left_value_type v = *it;
+        v.second.dmg = v.second.dmg - computeDmg(targetEnemy);
+        UnitDmgBimap.left.replace(it, v);
+        //UnitDmgBimap.left.modify( it, _second -= computeDmg(targetEnemy) );
+    }
+    
+    // choose new targetEnemy
+    for (UnitDmgBimap::right_iterator it = _unitsGroup->unitDamages.right.begin();
+        it != _unitsGroup->unitDamages.right.end(); ++it)
+    {
+        if (it->first.dmg == 0) // iterate on the interesting part only
+            break;
+        if (it->first.dmg < it->second->getHitPoints()
+            && _unitPos.getDistance(it->second->getPosition())
+            < (double)unit->getType().groundWeapon().maxRange())
+        {
+            setTargetEnemy(it->second);
+            return;
+        }
+    }
+    if (targetEnemy 
+        && _unitPos.getDistance(targetEnemy->getPosition())
+        < (double)unit->getType().groundWeapon().maxRange())
+    {
+        setTargetEnemy(targetEnemy);
+        return;
+    }
+    setTargetEnemy(_rangeEnemies.begin()->second);
+}
+
+void BayesianUnit::setTargetEnemy(Unit* u)
+{
+    targetEnemy = u;
+    if (_unitsGroup->unitDamages.left.count(u))
+        _unitsGroup->unitDamages.left[u] += computeDmg(u);
+    else
+        _unitsGroup->unitDamages.insert(UnitDmg(u, Dmg(computeDmg(u), u)));
+}
+
+int BayesianUnit::computeDmg(Unit* u)
+{
+    // TODO complete: air, attack types, armors, upgrades, shields, spells (matrix...)
+    return (unit->getType().groundWeapon().damageAmount() - u->getType().armor()) 
+        * unit->getType().maxGroundHits();
+}
+
 void BayesianUnit::drawDirV()
 {
     Position up = _unitPos;
@@ -922,49 +996,16 @@ void BayesianUnit::drawArrow(Vec& v)
     Broodwar->drawTriangle(CoordinateType::Map, (int)(xto - 0.1*v_y), (int)(yto + 0.1*v_x), (int)(xto + 0.1*v_y), (int)(yto - 0.1*v_x), (int)(xto + 0.1*v_x), (int)(yto + 0.1*v_y), Colors::Orange); // 0.1, magic number
 }
 
-void BayesianUnit::deleteRangeEnemiesElem(Unit* u)
-{
-    // TODO change with Boost's Multi-Index or BiMap to avoid the O(n) search in the map
-    // http://www.boost.org/doc/libs/1_42_0/libs/multi_index/doc/examples.html#example4
-    // http://www.boost.org/doc/libs/1_42_0/libs/bimap/doc/html/boost_bimap/one_minute_tutorial.html
-    for (std::multimap<double, Unit*>::const_iterator it = _rangeEnemies.begin(); it != _rangeEnemies.end(); ++it)
-        if (it->second == u)
-        {
-            _rangeEnemies.erase(it);
-            return;
-        }
-}
-
-void BayesianUnit::updateRangeEnemiesWith(Unit* u)
-{
-    // TODO change with Boost's Multi-Index or BiMap to avoid the O(n) search in the map
-    // http://www.boost.org/doc/libs/1_42_0/libs/multi_index/doc/examples.html#example4
-    // http://www.boost.org/doc/libs/1_42_0/libs/bimap/doc/html/boost_bimap/one_minute_tutorial.html
-    for (std::multimap<double, Unit*>::const_iterator it = _rangeEnemies.begin(); it != _rangeEnemies.end(); ++it)
-        if (it->second == u)
-        {
-            std::pair<double, Unit*> temp(u->getDistance(_unitPos), u);
-            _rangeEnemies.erase(it);
-            _rangeEnemies.insert(temp);
-            return;
-        }
-    std::pair<double, Unit*> temp(u->getDistance(_unitPos), u);
-    _rangeEnemies.insert(temp);
-}
-
 void BayesianUnit::onUnitDestroy(Unit* u)
 {
-    deleteRangeEnemiesElem(u);
 }
 
 void BayesianUnit::onUnitShow(Unit* u)
 {
-    updateRangeEnemiesWith(u);
 }
 
 void BayesianUnit::onUnitHide(Unit* u)
 {
-    updateRangeEnemiesWith(u);
 }
 
 void BayesianUnit::update()
@@ -972,19 +1013,21 @@ void BayesianUnit::update()
     if (!unit->exists()) return;
     _unitPos = unit->getPosition();
 
-    if (_mode == MODE_FLOCK || _mode == MODE_FLOCKFORM)
+    if (_mode != MODE_FIGHT_G && !_unitsGroup->enemies.empty())
     {
-        if (!(Broodwar->getFrameCount() % 13))
-            _posAtMost13FramesAgo = _unitPos;
-        if (!(Broodwar->getFrameCount() % 23))
-            _posAtMost23FramesAgo = _unitPos;
-        if (!(Broodwar->getFrameCount() % 11))
-            _iThinkImBlocked = (_posAtMost13FramesAgo == _unitPos && _posAtMost23FramesAgo == _unitPos) ? true : false;
+        Broodwar->setLocalSpeed(42);
+        this->switchMode(MODE_FIGHT_G);
     }
 
-    switch(_mode)
+    switch (_mode)
     {
     case MODE_FLOCK:
+        if (_unitPos.getDistance(target) < 0.9)
+        {
+            this->switchMode(MODE_INPOS);
+            return;
+        } else 
+        testIfBlocked();
         if (_iThinkImBlocked)
         {
 #ifdef __DEBUG_GABRIEL__
@@ -1000,19 +1043,15 @@ void BayesianUnit::update()
         drawDir(); // red
 #endif
         clickDir();
-        if (_unitPos.getDistance(target) < 0.9)
-        {
-            this->switchMode(MODE_INPOS);
-        }
-        
-        //drawFlockValues();
         break;
 
     case MODE_INPOS:       
         if (_unitPos.getDistance(target) > WALK_TILES_SIZE*18)
         {
             this->switchMode(MODE_FLOCK);
+            return;
         }
+        // TODO To re-do
         break;
 
     case MODE_FIGHT_G:
@@ -1020,6 +1059,12 @@ void BayesianUnit::update()
         {
             this->switchMode(MODE_FLOCK);
         }
+        if (unit->getGroundWeaponCooldown() > 0)
+            return;
+
+        updateRangeEnemies();
+        updateTargetEnemy();
+        unit->attackUnit(targetEnemy);        
         break;
 
     default:
@@ -1030,97 +1075,6 @@ void BayesianUnit::update()
     drawTarget();
 #endif
     return;
-
-    
-    if (_mode == MODE_FIGHT_G || 1) {
-        // TODO not every update()s, perhaps even asynchronously
-        // TODO inline function!
-      /*
-      if (!unit->getGroundWeaponCooldown()) {
-            std::multimap<double, Unit*>::const_iterator rangeEnemyUnit;
-            rangeEnemyUnit = _rangeEnemies.begin();
-            unsigned int i = 0;
-            unsigned int end = _rangeEnemies.size();
-            while (i < end && rangeEnemyUnit != _rangeEnemies.end())
-            {
-                if (!rangeEnemyUnit->second->exists()) {
-                    _rangeEnemies.erase(rangeEnemyUnit);
-                    rangeEnemyUnit = _rangeEnemies.begin();
-                    --end;
-                    continue;
-                }
-                double enemyDistance = rangeEnemyUnit->second->getDistance(_unitPos());
-                if (enemyDistance < unit->getType().groundWeapon().maxRange()) { // attack former closer if in range
-                    // unit->rightClick(rangeEnemyUnit->second->getPosition());
-                    break;
-                } else { // replace former close that is now out of range in the right position
-                    if (enemyDistance > unit->getType().groundWeapon().maxRange() + rangeEnemyUnit->second->getType().groundWeapon().maxRange()) {
-                        _rangeEnemies.erase(rangeEnemyUnit);
-                    } else {
-                        std::pair<double, Unit*> temp = *rangeEnemyUnit;
-                        _rangeEnemies.erase(rangeEnemyUnit);
-                        _rangeEnemies.insert(temp);
-                    }
-                    ++rangeEnemyUnit;
-                    ++i;
-                }
-            }
-            if (++i == end) 
-            {
-                // NOT IMPL TODO
-                // perhaps fill _rangeEnemies in the UnitsGroup (higher level)
-                //Broodwar->printf("me think I have no enemy unit in range, me perhaps stoodpid!\n");
-            }
-        }
-
-        */
-        if (targetEnemy != NULL && unit->getGroundWeaponCooldown() == getTimeToAttack())//getTimeToAttack())
-            attackEnemy(targetEnemy, BWAPI::Colors::Red);
-        else if ( unit->isAttacking() && unit->getGroundWeaponCooldown() < 20)
-            unit->rightClick(Position(_unitPos.x()-100, _unitPos.y()));
-        /*else if (targetEnemy != NULL && unit->getGroundWeaponCooldown() > getTimeToAttack())
-            unit->rightClick(targetEnemy);
-        else if (targetEnemyInRange != NULL && unit->getGroundWeaponCooldown() <= getTimeToAttack())*/
-        /*if (targetEnemyInRange != NULL && targetEnemyInRange->exists())
-            attackEnemy(targetEnemyInRange, BWAPI::Colors::Red);*/
-
-    } else if (_mode == MODE_FLOCK) {
-        //if (tick())
-        {
-            drawAttractors();
-            drawTarget();
-            updateDir();
-            drawDir();
-            clickDir();
-            drawFlockValues();
-        }
-        //Broodwar->drawLine(CoordinateType::Map, _unitPos().x(), _unitPos().y(), target.x(), target.y(), BWAPI::Color(92, 92, 92));
-    }
-    /*if (tick())
-    {
-        _path = BWTA::getShortestPath(unit->getTilePosition(), target);
-        // pathFind(_path, _unitPos(), target);
-        updateDir();
-    }*/
-    // _path = BWTA::getShortestPath(unit->getTilePosition(), target);
-    //if (tick()) 
-    //      pathFind(_path, _unitPos(), target);
-    //      drawWalkability();
-    //drawPath();
-    // double velocity = sqrt(unit->getVelocityX()*unit->getVelocityX() + unit->getVelocityY()*unit->getVelocityY());
-    // if (velocity > 0)
-    //    Broodwar->printf("Velocity: %d\n", velocity);
-    
-    //drawVelocityArrow();
-    //drawArrow(obj);
-    //drawArrow(dir);
-    //drawEnclosingBox();
-    //drawPath();
-}
-
-std::multimap<double, BWAPI::Unit*>& BayesianUnit::getRangeEnemies()
-{
-    return _rangeEnemies;
 }
 
 void BayesianUnit::attackEnemy(BWAPI::Unit* u, BWAPI::Color col)

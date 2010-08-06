@@ -12,7 +12,7 @@ void MicroAIModule::onStart()
 	// Enable some cheat flags
     //Broodwar->printf("ON START !!\n");
     Broodwar->enableFlag(Flag::UserInput);
-    //Broodwar->setLocalSpeed(0);
+    Broodwar->setLocalSpeed(0);
 	//Broodwar->enableFlag(Flag::CompleteMapInformation);
 	BWTA::readMap();
 	BWTA::analyze();
@@ -20,6 +20,7 @@ void MicroAIModule::onStart()
     this->mapManager = & MapManager::Instance();
 	this->objectManager = & ObjectManager::Instance();
     this->regions = & Regions::Instance();
+    this->unitGroupManager = & UnitGroupManager::Instance();
 
 	mm = new UnitsGroup();
 
@@ -234,6 +235,7 @@ void MicroAIModule::onUnitShow(Unit* unit)
     eUnitsFilter->onUnitShow(unit);
     mapManager->onUnitShow(unit);
 	regions->onUnitShow(unit);
+    unitGroupManager->onUnitDiscover(unit);
     mm->onUnitShow(unit);
 }
 void MicroAIModule::onUnitHide(Unit* unit)
@@ -241,6 +243,7 @@ void MicroAIModule::onUnitHide(Unit* unit)
     eUnitsFilter->onUnitHide(unit);
     mapManager->onUnitHide(unit);
 	regions->onUnitHide(unit);
+    unitGroupManager->onUnitEvade(unit);
     mm->onUnitHide(unit);
 }
 

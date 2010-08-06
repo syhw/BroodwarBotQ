@@ -1,5 +1,5 @@
 #include <Defines.h>
-#include <UnitsGroup.h>
+#include "UnitsGroup.h"
 #include <Position.h>
 #include <algorithm>
 #include <util.h>
@@ -25,6 +25,7 @@
 #include <MutaliskUnit.h>
 #include <stack>
 #include <typeinfo>
+#include "Nearby.h"
 
 using namespace BWAPI;
 
@@ -178,10 +179,10 @@ void UnitsGroup::displayTargets()
 
 void UnitsGroup::update()
 {
-    this->totalHP = 0;
+    if (units.empty())
+        return;
 
-    if (units.size())
-        leadingUnit = units.front();
+    leadingUnit = units.front();
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     { 
         if (leadingUnit->unit->getType().size() < (*it)->unit->getType().size() 
@@ -190,9 +191,10 @@ void UnitsGroup::update()
             )
             leadingUnit = *it;
     }
-    if (leadingUnit != NULL) // defensive
+    if (leadingUnit != NULL) // defensive prog
         btpath = BWTA::getShortestPath(leadingUnit->unit->getPosition(), leadingUnit->target);
 
+    this->totalHP = 0;
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     {
         (*it)->update(); 
@@ -201,14 +203,14 @@ void UnitsGroup::update()
     }
 
     updateCenter();
+    double maxRange = max(leadingUnit->unit->getType().groundWeapon().maxRange(), leadingUnit->unit->getType().airWeapon().maxRange()); // + TODO upgrades et s/leading/biggestRange
+    enemies = std::set<Unit*>(nearbyEnemyUnits(center, maxRadius + maxRange + 46)); // > 45.26 == sqrt(32^2+32^2)
+    Broodwar->drawCircleMap(center.x(), center.y(), maxRadius + maxRange, Colors::Yellow);
 	accomplishGoal();
 
 #ifdef __DEBUG_NICOLAS__
     displayTargets();
 #endif
-
-    // for each(pBayesianUnit u in units)
-    //     u->micro();
 }
 
 void UnitsGroup::attackMove(int x, int y)
@@ -287,12 +289,14 @@ void UnitsGroup::onUnitDestroy(Unit* u)
                 return;
             }
     }
+    unitDamages.left.erase(u);
 }
 
 void UnitsGroup::onUnitShow(Unit* u)
 {
     for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
         (*it)->onUnitShow(u);
+    unitDamages.insert(UnitDmg(u, Dmg(0, u)));
 }
 
 void UnitsGroup::onUnitHide(Unit* u)
@@ -430,17 +434,17 @@ int UnitsGroup::size() const
 
 void UnitsGroup::updateCenter()
 {
+    if (!units.size())
+        return;
     // update center
     center = Position(0, 0);
     for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
     {
         center += (*it)->unit->getPosition();
     }
-    if( units.size() != 0)
-    {
-        center.x() /= units.size();
-        center.y() /= units.size();
-    }
+    center.x() /= units.size();
+    center.y() /= units.size();
+
     // update stdDevRadius and maxRadius
     maxRadius = -1.0;
     double sum = 0.0;

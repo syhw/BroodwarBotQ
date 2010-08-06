@@ -70,7 +70,6 @@ enum dodge_value {
     DODGE_CONTACT,
     DODGE_CLOSE,
     DODGE_MEDIUM
-
 };
 
 class BayesianUnit : public BattleUnit
@@ -118,6 +117,11 @@ protected:
         bool quick=true);
 
     inline void updateDirV();
+    inline void testIfBlocked();
+    inline void updateRangeEnemies();
+    inline void updateTargetEnemy();
+    inline void setTargetEnemy(BWAPI::Unit* u);
+    inline int computeDmg(BWAPI::Unit* u);
     void drawDirV();
     void updateObj();
     void drawObj(int number=0);
@@ -136,21 +140,19 @@ protected:
     inline void computeProbs();
     inline void selectDir();
     void drawProbs(std::multimap<double, Vec>& probs, int number=0);
-    inline void deleteRangeEnemiesElem(BWAPI::Unit* u);
-    inline void updateRangeEnemiesWith(BWAPI::Unit* u);
 public:
     unit_mode _mode; // TODO : faudra le remettre en protected, c'est juste pour quelques tests
 	void switchMode(unit_mode um);
     Vec dir, obj; // dir=current direction, obj=pathfinder's direction
-    // std::map<attractor_type, std::vector<BWAPI::Position>> prox; 
     BayesianUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~BayesianUnit();
+
     virtual void onUnitDestroy(BWAPI::Unit* u);
     virtual void onUnitShow(BWAPI::Unit* u);
     virtual void onUnitHide(BWAPI::Unit* u);
+    
     void update();
     virtual void attackMove(const BWAPI::Position& p);
-    std::multimap<double, BWAPI::Unit*>& getRangeEnemies();
 
     void attackEnemy(BWAPI::Unit* u, BWAPI::Color col);
     virtual void micro() = 0;

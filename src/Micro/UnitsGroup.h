@@ -10,8 +10,29 @@
 #include <set>
 #include "MicroManager.h"
 #include "GoalManager.h"
+#include <boost/bimap/bimap.hpp>
 
 #define _UNITS_DEBUG 1
+
+struct Dmg
+{
+    Dmg(int d, BWAPI::Unit* u) 
+        : dmg(d)
+        , unit(u)
+    { }
+    Dmg(const Dmg& d)
+        : dmg(d.dmg)
+        , unit(d.unit)
+    { }
+    int dmg;
+    BWAPI::Unit* unit;
+    bool operator<(const Dmg& d) const { return this->dmg > d.dmg || (this->dmg == d.dmg && this->unit < d.unit); }
+    Dmg operator-=(int i) { this->dmg -= i; return *this; }
+    Dmg operator+=(int i) { this->dmg += i; return *this; }
+};
+
+typedef boost::bimaps::bimap<BWAPI::Unit*, Dmg> UnitDmgBimap;
+typedef UnitDmgBimap::relation UnitDmg;
 
 //class Goal;
 class Formation;
@@ -37,6 +58,7 @@ private:
 public:
     std::vector<BWAPI::TilePosition> btpath;
     std::set<BWAPI::Unit*> enemies;
+    UnitDmgBimap unitDamages;
     pBayesianUnit leadingUnit;
 	
 	UnitsGroup();

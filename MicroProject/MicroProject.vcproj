@@ -233,6 +233,14 @@
 					RelativePath="..\src\Micro\Units\SpecialUnit.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\src\Macro\UnitGroup.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\UnitGroupManager.cpp"
+					>
+				</File>
 				<Filter
 					Name="ProtossFlying"
 					>
@@ -491,6 +499,14 @@
 					RelativePath="..\src\Micro\Units\SpecialUnit.h"
 					>
 				</File>
+				<File
+					RelativePath="..\src\Macro\UnitGroup.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\UnitGroupManager.h"
+					>
+				</File>
 				<Filter
 					Name="ProtossFlying"
 					>
@@ -597,6 +613,10 @@
 				>
 				<File
 					RelativePath="..\src\Utils\CSingleton.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Utils\Nearby.h"
 					>
 				</File>
 				<File
