@@ -10,7 +10,8 @@
 //#include <boost/math/distributions/normal.hpp>
 //using boost::math::normal;
 
-//#define _OUR_PATHFINDER_
+//#define __OUR_PATHFINDER__
+#define __EXACT_OBJ__
 
 using namespace std;
 using namespace BWAPI;
@@ -49,6 +50,10 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 , _maxDimension(max(_slarge, _sheight))
 , _minDimension(min(_slarge, _sheight))
 , _maxDiag(sqrt((double)(_slarge*_slarge + _sheight*_sheight)))
+, _lastRightClick(unit->getPosition())
+, _posAtMost13FramesAgo(unit->getPosition())
+, _posAtMost7FramesAgo(unit->getPosition())
+, _iThinkImBlocked(false)
 {
     updateDirV();
     mapManager = & MapManager::Instance();
@@ -203,15 +208,25 @@ void BayesianUnit::computeFlockValues()
 
 void BayesianUnit::switchMode(unit_mode um)
 {
-    // Comportement attendu ?
     _mode = um;
     switch (um) 
     {
         case MODE_FLOCK:
+#ifdef __DEBUG_GABRIEL__
+            Broodwar->printf("Switch FLOCK!");
+#endif
             _defaultProb[OCCUP_UNIT] = 0.6;
             //_defaultProb[OCCUP_FLOCK] = 0.1;
             break;
+        case MODE_INPOS:
+#ifdef __DEBUG_GABRIEL__
+            Broodwar->printf("Switch INPOS!");
+#endif
+            break;
         case MODE_FIGHT_G:
+#ifdef __DEBUG_GABRIEL__
+            Broodwar->printf("Switch FIGHT_G!");
+#endif
             break;
         default:
             break;
@@ -515,10 +530,11 @@ void BayesianUnit::drawProbs(multimap<double, Vec>& probs, int number)
 
 void BayesianUnit::updateObj()
 {
-#ifndef _OUR_PATHFINDER_
+#ifndef __OUR_PATHFINDER__
     Position p;
     if (_unitPos.getDistance(target) < 45.26) // sqrt(BWAPI::TILE_SIZE^2 + BWAPI::TILE_SIZE^2)
     {
+        _ppath.clear();
         obj = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y());
     }
     else 
@@ -532,27 +548,39 @@ void BayesianUnit::updateObj()
                 _ppath.push_back(*it);
             //TIMINGclock_t end = clock();
             //TIMINGBroodwar->printf("Iterations took %f", (double)(end-start));
-        } else
+        } 
+        else
         {
             // remove path points we passed
-            if (_ppath.size() > 1 && _ppath[1].getDistance(_unitPos) < 45.26) // sqrt(BWAPI::TILE_SIZE^2 + BWAPI::TILE_SIZE^2)
-                _ppath.erase(_ppath.begin());
-            // I'm not drunk, do it twice! (path[2] if possible)        
-            if (_ppath.size() > 1 && _ppath[1].getDistance(_unitPos) < 45.26) // sqrt(BWAPI::TILE_SIZE^2 + BWAPI::TILE_SIZE^2)
+            unsigned int count = 0;
+            for (unsigned int i = 0; i < _ppath.size(); ++i) 
+                if (_ppath[i].getDistance(_unitPos) < 45.26) // sqrt(BWAPI::TILE_SIZE^2 + BWAPI::TILE_SIZE^2)
+                    count = i;
+            for (; count > 0; --count) 
                 _ppath.erase(_ppath.begin());
         }
 
         if (_ppath.size() > 1)   // _ppath[0] is the current unit position
         {
-            if (_ppath.size() > 2) 
+            if (_ppath.size() > 3)
+                p = _ppath[3];
+            else if (_ppath.size() > 2) 
                 p = _ppath[2];
             else
                 p = _ppath[1];
+            obj = Vec(p.x() - _unitPos.x() + 15, p.y() - _unitPos.y() + 15); // top left Position in a Build Tile -> middle Position = +15
         }
-        else
-            p = _unitPos;
-
-        obj = Vec(p.x() - _unitPos.x() + 15, p.y() - _unitPos.y() + 15); // top left Position in a Build Tile -> middle Position = +15
+        else if (_unitPos.getDistance(target) < 0.9)
+        {
+            obj = Vec(0, 0);
+        }
+        else 
+        {
+#ifdef __DEBUG_GABRIEL
+            Broodwar->printf("bug in updateObj()?");
+#endif
+            obj = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y());
+        }
     }
 #else
     /*if (_unitPos.getDistance(target) < WALK_TILES_SIZE/2)
@@ -613,8 +641,7 @@ void BayesianUnit::updateObj()
     //drawPath();
     drawPPath();
 #endif
-    //int dirvsize = _dirv.size();
-    //int rawsize = (int)(sqrt((double)dirvsize));
+#ifdef __EXACT_OBJ__
     double norm = obj.norm();
     obj.normalize();
 
@@ -632,6 +659,7 @@ void BayesianUnit::updateObj()
         }
     }
     obj = _dirv[ind_max];
+#endif
 }
 
 void BayesianUnit::drawObj(int number)
@@ -840,20 +868,21 @@ void BayesianUnit::clickDir()
     double dist = _unitPos.getDistance(target);
     if (dir == Vec(0,0) || dist < 0.9) // 0.9 arbitrary
     {
-        if (!unit->isAttacking())
-            unit->holdPosition();
+        //if (!unit->isAttacking())
+        //    unit->holdPosition();
         return;
     }
     //if (dist > 11.32) // sqrt(8^2 + 8^2), one walk tile
-    //if (dist > 45.26) // sqrt(32^2 + 32^2), one build tile
-    if (dist > _maxDiag)
+    if (dist > _maxDimension && !_iThinkImBlocked) //45.26) // sqrt(32^2 + 32^2), one build tile
     {
         dir += _unitPos;
         unit->rightClick(dir.toPosition());
+        _lastRightClick = dir.toPosition();
     }
-    else if (!unit->isMoving())
+    else if (_lastRightClick!=target)
     {
         unit->rightClick(target);
+        _lastRightClick = target;
     } 
     else
     {
@@ -923,41 +952,62 @@ void BayesianUnit::update()
     if (!unit->exists()) return;
     _unitPos = unit->getPosition();
 
-//    BWAPI::Broodwar->drawCircleMap(_unitPos.x(), _unitPos.y(), 5, BWAPI::Colors::Blue);
-
-    //if (_sheight > 32 || _slarge > 32)
-    //    Broodwar->printf("height: %d, large: %d", _sheight, _slarge);
-
-    if (_mode == MODE_FLOCK || _mode == MODE_INPOS) 
+    if (_mode == MODE_FLOCK || _mode == MODE_FLOCKFORM || _mode == MODE_INPOS)
     {
-        updateDir();
-        drawObj(0); // green
-        drawDir(); // red
-        clickDir();
-        if (_mode != MODE_INPOS && _unitPos.getDistance(target) < WALK_TILES_SIZE/2)
-        {
-            Broodwar->printf("Switch INPOS!");
-            this->switchMode(MODE_INPOS);
-        }
-        else if (_mode == MODE_INPOS && _unitPos.getDistance(target) > WALK_TILES_SIZE*18)
-        {
-            Broodwar->printf("Switch FLOCK!");
-            this->switchMode(MODE_FLOCK);
-        }
-        //drawFlockValues();
+        if (Broodwar->getFrameCount() % 13)
+            _posAtMost13FramesAgo = _unitPos;
+        if (Broodwar->getFrameCount() % 7)
+            _posAtMost7FramesAgo = _unitPos;
+        if (Broodwar->getFrameCount() % 11)
+            _iThinkImBlocked = (_posAtMost13FramesAgo == _unitPos && _posAtMost7FramesAgo == _unitPos) ? true : false;
     }
 
-    drawTarget();
-    return;
-    Position p = _unitPos;
-    if ((_mode == MODE_FLOCK && _mode == MODE_FLOCKFORM)
-        && (p.getDistance(target) < 4 
-            || (_ground_unit && BWTA::isConnected(TilePosition(p), TilePosition(target)))))
-        switchMode(MODE_INPOS);
-
-#ifdef __DEBUG_NICOLAS__
-    this->drawTarget();
+    switch(_mode)
+    {
+    case MODE_FLOCK:
+        if (_iThinkImBlocked)
+        {
+            unit->rightClick(target);
+            _lastRightClick = target;
+            return;
+        }
+        updateDir();
+#ifdef __DEBUG_GABRIEL__
+        drawObj(0); // green
+        drawDir(); // red
 #endif
+        clickDir();
+        if (_unitPos.getDistance(target) < 0.9)
+        {
+            this->switchMode(MODE_INPOS);
+        }
+        
+        //drawFlockValues();
+        break;
+
+    case MODE_INPOS:       
+        if (_unitPos.getDistance(target) > WALK_TILES_SIZE*18)
+        {
+            this->switchMode(MODE_FLOCK);
+        }
+        break;
+
+    case MODE_FIGHT_G:
+        if (_unitsGroup->enemies.empty())
+        {
+            this->switchMode(MODE_FLOCK);
+        }
+        break;
+
+    default:
+        break;
+    }
+
+#ifdef __DEBUG_GABRIEL__
+    drawTarget();
+#endif
+    return;
+
     
     if (_mode == MODE_FIGHT_G || 1) {
         // TODO not every update()s, perhaps even asynchronously

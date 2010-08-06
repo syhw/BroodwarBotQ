@@ -80,6 +80,8 @@ protected:
     std::vector<Vec> _dirv;
     int _maxDimension, _minDimension;
     double _maxDiag;
+    BWAPI::Position _lastRightClick, _posAtMost13FramesAgo, _posAtMost7FramesAgo;
+    bool _iThinkImBlocked;
     //std::multimap<BWAPI::Position, attractor_type> _prox;
     std::vector<occupation_type> _occupation;
     // dirv[attractor] = direction relative to an attractor
