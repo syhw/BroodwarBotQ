@@ -2,7 +2,7 @@
 using namespace BWAPI;
 using namespace std;
 
-#define _OK_DISTANCE_ 2.0
+#define _OK_DISTANCE_ 2.0 // should perhaps be (WALTILE/2)^2 = 16.0
 
 FormationSubgoal::FormationSubgoal(SubgoalLogic l, pFormation f): 
 Subgoal(l),
@@ -28,8 +28,8 @@ double FormationSubgoal::distanceToRealize()
 
 bool FormationSubgoal::check()
 {
-    if (distanceToRealize() <= unitsGroup->size()*_OK_DISTANCE_) 
+    if (distanceToRealize() <= sqrt(unitsGroup->size()*unitsGroup->size()*_OK_DISTANCE_)) 
         return true;
-    //Broodwar->printf("dist: %f", distanceToRealize(unitsgroup));
+    //Broodwar->printf("dist: %f", distanceToRealize());
     return false;
 }

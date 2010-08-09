@@ -553,10 +553,16 @@ void BayesianUnit::updateObj()
     else */
         tptarget = target;
 
-    if (_unitPos.getDistance(target) < 45.26) // sqrt(BWAPI::TILE_SIZE^2 + BWAPI::TILE_SIZE^2)
+    if (_unitPos.getDistance(target) <= 45.26) // sqrt(BWAPI::TILE_SIZE^2 + BWAPI::TILE_SIZE^2)
     {
         _ppath.clear();
-        obj = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y());
+        if (_unitPos.getDistance(target) <= _maxDimension) // dirty hack to clicker farther than the unit size when really near
+        {
+            obj = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y());
+            obj *= 2;
+        }
+        else
+            obj = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y());
     }
     else 
     {
@@ -813,15 +819,14 @@ void BayesianUnit::updateRangeEnemies()
 
 void BayesianUnit::updateTargetEnemy()
 {
-    return; // TODO
     // clear old damage
     if (_unitsGroup->unitDamages.left.count(targetEnemy))
     {
         UnitDmgBimap::left_iterator it = _unitsGroup->unitDamages.left.find(targetEnemy);
-        UnitDmgBimap::left_value_type v = *it;
-        v.second.dmg = v.second.dmg - computeDmg(targetEnemy);
-        UnitDmgBimap.left.replace(it, v);
-        //UnitDmgBimap.left.modify( it, _second -= computeDmg(targetEnemy) );
+        int tmp_dmg = it->second.dmg - computeDmg(targetEnemy);
+        Unit* tmp_unit = it->first;
+        _unitsGroup->unitDamages.left.erase(it);
+        _unitsGroup->unitDamages.insert(UnitDmg(tmp_unit, Dmg(tmp_dmg, tmp_unit)));
     }
     
     // choose new targetEnemy
@@ -830,7 +835,7 @@ void BayesianUnit::updateTargetEnemy()
     {
         if (it->first.dmg == 0) // iterate on the interesting part only
             break;
-        if (it->first.dmg < it->second->getHitPoints()
+        if (it->first.dmg < it->second->getHitPoints() + it->second->getShields()
             && _unitPos.getDistance(it->second->getPosition())
             < (double)unit->getType().groundWeapon().maxRange())
         {
@@ -852,7 +857,13 @@ void BayesianUnit::setTargetEnemy(Unit* u)
 {
     targetEnemy = u;
     if (_unitsGroup->unitDamages.left.count(u))
-        _unitsGroup->unitDamages.left[u] += computeDmg(u);
+    {
+        /// <=> _unitsGroup->unitDamages.left[u] += computeDmg(u);
+        UnitDmgBimap::left_iterator it = _unitsGroup->unitDamages.left.find(u);
+        int tmp_dmg = it->second.dmg + computeDmg(u);
+        _unitsGroup->unitDamages.left.erase(it);
+        _unitsGroup->unitDamages.insert(UnitDmg(u, Dmg(tmp_dmg, u)));
+    }
     else
         _unitsGroup->unitDamages.insert(UnitDmg(u, Dmg(computeDmg(u), u)));
 }
@@ -1058,15 +1069,36 @@ void BayesianUnit::update()
         if (_unitsGroup->enemies.empty())
         {
             this->switchMode(MODE_FLOCK);
-        }
-        if (unit->getGroundWeaponCooldown() > 0)
             return;
-
-        updateRangeEnemies();
-        updateTargetEnemy();
-        unit->attackUnit(targetEnemy);        
+        }
+        
+        targetEnemy = *(_unitsGroup->enemies.begin());
+        if (unit->getGroundWeaponCooldown() == Broodwar->getLatency() && (unit->getOrderTarget() != targetEnemy || unit->isMoving()))// || (unit->getGroundWeaponCooldown() == 0 && !unit->isAttacking()))
+            unit->attackUnit(targetEnemy);
+        
+        if (unit->getGroundWeaponCooldown() ==  unit->getType().groundWeapon().damageCooldown() + Broodwar->getLatency() - 10) // 10 IS AN ACCURATE DRAGOON SHOOT TIME 
+        {
+            unit->rightClick(Position(_unitPos.x(), _unitPos.y() + 32));
+        }
+        Broodwar->printf("ground weapon cd: %d, weapon cooldown: %d, Latency: %d", unit->getGroundWeaponCooldown(), unit->getType().groundWeapon().damageCooldown(), Broodwar->getLatency());
+        
+        /*
+        if (unit->isAttacking())
+            return;
+        else if (unit->getGroundWeaponCooldown() > 0)
+        {
+            if (!unit->isMoving() && !unit->isAttacking())
+                unit->attackMove(target);
+        }
+        else if (unit->getGroundWeaponCooldown() == 0)
+        {
+            updateRangeEnemies();
+            updateTargetEnemy();
+            unit->attackUnit(targetEnemy);        
+        }
+        */
         break;
-
+        
     default:
         break;
     }
