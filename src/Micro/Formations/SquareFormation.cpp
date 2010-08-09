@@ -33,4 +33,6 @@ void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnit
             end_positions.push_back(topos);
         }
     }
+
+    computeMean();
 }

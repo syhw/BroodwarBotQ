@@ -22,8 +22,8 @@ void FormationSubgoal::tryToRealize()
 
 double FormationSubgoal::distanceToRealize()
 {
-    Position p = Position((int)formation->center.x, (int)formation->center.y);
-    return p.getDistance(unitsGroup->center);
+    Position p = Position((int)formation->mean.x, (int)formation->mean.y);
+    return p.getDistance(unitsGroup->center);    
 }
 
 bool FormationSubgoal::check()

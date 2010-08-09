@@ -204,6 +204,10 @@
 					Name="Formations"
 					>
 					<File
+						RelativePath="..\src\Micro\Formations\ArcFormation.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\src\Micro\Formations\Formation.cpp"
 						>
 					</File>
@@ -609,6 +613,10 @@
 				<Filter
 					Name="Formations"
 					>
+					<File
+						RelativePath="..\src\Micro\Formations\ArcFormation.h"
+						>
+					</File>
 					<File
 						RelativePath="..\src\Micro\Formations\Formation.h"
 						>
