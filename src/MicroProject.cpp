@@ -21,6 +21,7 @@ void MicroAIModule::onStart()
 	this->objectManager = & ObjectManager::Instance();
     this->regions = & Regions::Instance();
     this->unitGroupManager = & UnitGroupManager::Instance();
+    regions->setDependencies(NULL, mapManager);
 
 	mm = new UnitsGroup();
 
