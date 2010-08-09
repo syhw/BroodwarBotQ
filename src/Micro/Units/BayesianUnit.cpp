@@ -50,6 +50,7 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 , _minDimension(min(_slarge, _sheight))
 , _maxDiag(sqrt((double)(_slarge*_slarge + _sheight*_sheight)))
 , _lastRightClick(unit->getPosition())
+, _lastAttackOrder(0)
 , _posAtMost13FramesAgo(Position(unit->getPosition().x() + 1, unit->getPosition().y() + 1)) // we don't want posAtMost13FramesAgo  
 , _posAtMost23FramesAgo(unit->getPosition())                                                // and posAtMost23FramesAgo to be equal
 , _iThinkImBlocked(false)
@@ -830,7 +831,8 @@ void BayesianUnit::updateTargetEnemy()
     }
     
     // choose new targetEnemy
-    for (UnitDmgBimap::right_iterator it = _unitsGroup->unitDamages.right.begin();
+    UnitDmgBimap::right_iterator it;
+    for (it = _unitsGroup->unitDamages.right.begin();
         it != _unitsGroup->unitDamages.right.end(); ++it)
     {
         if (it->first.dmg == 0) // iterate on the interesting part only
@@ -845,12 +847,17 @@ void BayesianUnit::updateTargetEnemy()
     }
     if (targetEnemy 
         && _unitPos.getDistance(targetEnemy->getPosition())
-        < (double)unit->getType().groundWeapon().maxRange())
+        < (double)unit->getType().groundWeapon().maxRange() + 64) // TODO 64 is the goon range upgrade
     {
         setTargetEnemy(targetEnemy);
         return;
     }
-    setTargetEnemy(_rangeEnemies.begin()->second);
+    if (_rangeEnemies.size())
+        setTargetEnemy(_rangeEnemies.begin()->second);
+    else if (targetEnemy)
+        setTargetEnemy(targetEnemy);
+    else
+        setTargetEnemy(_unitsGroup->unitDamages.left.begin()->first);
 }
 
 void BayesianUnit::setTargetEnemy(Unit* u)
@@ -1072,31 +1079,21 @@ void BayesianUnit::update()
             return;
         }
         
-        targetEnemy = *(_unitsGroup->enemies.begin());
-        if (unit->getGroundWeaponCooldown() == Broodwar->getLatency() && (unit->getOrderTarget() != targetEnemy || unit->isMoving()))// || (unit->getGroundWeaponCooldown() == 0 && !unit->isAttacking()))
-            unit->attackUnit(targetEnemy);
-        
-        if (unit->getGroundWeaponCooldown() ==  unit->getType().groundWeapon().damageCooldown() + Broodwar->getLatency() - 10) // 10 IS AN ACCURATE DRAGOON SHOOT TIME 
-        {
-            unit->rightClick(Position(_unitPos.x(), _unitPos.y() + 32));
-        }
-        Broodwar->printf("ground weapon cd: %d, weapon cooldown: %d, Latency: %d", unit->getGroundWeaponCooldown(), unit->getType().groundWeapon().damageCooldown(), Broodwar->getLatency());
-        
-        /*
-        if (unit->isAttacking())
-            return;
-        else if (unit->getGroundWeaponCooldown() > 0)
-        {
-            if (!unit->isMoving() && !unit->isAttacking())
-                unit->attackMove(target);
-        }
-        else if (unit->getGroundWeaponCooldown() == 0)
+        //if ((unit->getGroundWeaponCooldown() <=  unit->getType().groundWeapon().damageCooldown() + Broodwar->getLatency()) - 10 && (unit->getGroundWeaponCooldown() > Broodwar->getLatency()))  // 10 IS AN ACCURATE/SAFE DRAGOON SHOOT TIME 
+        //{
+        //    if (!unit->isMoving())
+        //        unit->attackMove(target);
+        //}
+        //else 
+        if ((Broodwar->getFrameCount() - _lastAttackOrder > 10) 
+            && (unit->getGroundWeaponCooldown() <= Broodwar->getLatency()) 
+            && (unit->getOrderTarget() != targetEnemy || unit->isMoving()))
         {
             updateRangeEnemies();
             updateTargetEnemy();
-            unit->attackUnit(targetEnemy);        
+            unit->attackUnit(targetEnemy);
+            _lastAttackOrder = Broodwar->getFrameCount();
         }
-        */
         break;
         
     default:

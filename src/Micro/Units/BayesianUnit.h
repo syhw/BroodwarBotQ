@@ -78,6 +78,7 @@ protected:
     bool _ground_unit; // true when unit can move only on the ground
     std::vector<Vec> _dirv;
     int _maxDimension, _minDimension;
+    int _lastAttackOrder;
     double _maxDiag;
     BWAPI::Position _lastRightClick, _posAtMost13FramesAgo, _posAtMost23FramesAgo;
     bool _iThinkImBlocked;
