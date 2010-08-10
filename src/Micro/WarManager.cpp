@@ -34,6 +34,7 @@ void WarManager::setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* ar
 
 void WarManager::onStart(){
 
+	this->ugIdle->addGoal(pGoal(new DefendChokeGoal(ugIdle, (*BaseManager::Instance().getAllBases().begin())->chokeToDef)));
 
 }
 void WarManager::update()
@@ -52,7 +53,7 @@ void WarManager::update()
 
 	for(std::set<BWAPI::Unit *>::iterator it = myUnits.begin(); it != myUnits.end(); ++it){
 		if( !(*it)->getType().isBuilding() && !(*it)->getType().isWorker() ){
-			this->arbitrator->setBid(this,(*it),40);
+			this->arbitrator->setBid(this,(*it),20);
 		}
 	}
 
@@ -66,9 +67,10 @@ void WarManager::update()
 		 ug = *it;
 		 ug->update();
 	}
-
+/*
     sout << "LOL" << sendl; 
     serr << "LOL" << sendl;
+*/
 }
 
 
@@ -189,8 +191,8 @@ void WarManager::sendGroupToDefense( UnitsGroup* ug)
 	}*/
 
 	// Send the group defend the base
-	pGoal g = pGoal(new DefendChokeGoal(ug,(*BorderManager::Instance().getMyBorder().begin())));
-	ug->addGoal(g);
+//	pGoal g = pGoal(new DefendChokeGoal(ug,(*BorderManager::Instance().getMyBorder().begin())));
+//	ug->addGoal(g);
 }
 
 
