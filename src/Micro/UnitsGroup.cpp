@@ -195,15 +195,20 @@ void UnitsGroup::update()
         btpath = BWTA::getShortestPath(leadingUnit->unit->getPosition(), leadingUnit->target);
 
     this->totalHP = 0;
+    double maxRange = -1.0;
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     {
         (*it)->update(); 
         this->totalHP += (*it)->unit->getHitPoints();
         this->totalPower += (*it)->unit->getType().groundWeapon().damageAmount();
+        double tmp_max = max(max((*it)->unit->getType().groundWeapon().maxRange(), (*it)->unit->getType().airWeapon().maxRange()), 
+            (*it)->unit->getType().sightRange()); // TODO: upgrades
+        if (tmp_max > maxRange) 
+            maxRange = tmp_max;
     }
 
     updateCenter();
-    double maxRange = max(leadingUnit->unit->getType().groundWeapon().maxRange(), leadingUnit->unit->getType().airWeapon().maxRange()); // + TODO upgrades et s/leading/biggestRange
+    
     enemies = std::set<Unit*>(nearbyEnemyUnits(center, maxRadius + maxRange + 46)); // > 45.26 == sqrt(32^2+32^2)
     Broodwar->drawCircleMap(center.x(), center.y(), maxRadius + maxRange, Colors::Yellow);
 	accomplishGoal();
