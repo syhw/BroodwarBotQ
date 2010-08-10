@@ -142,8 +142,8 @@ void DefenseManager::update()
 void DefenseManager::addBase(Base * b){
 	UnitsGroup * ug = new UnitsGroup();
 	assert(this->groundDefenders.count(b) == 0);//We must not have already the groundDefenders for this base
-	this->groundDefenders.insert(std::make_pair(b,ug));
 	ug->addGoal(pGoal(new DefendChokeGoal(ug,b->chokeToDef)));
+	this->groundDefenders.insert(std::make_pair(b,ug));
 	WarManager::Instance().unitsgroups.push_back(ug);
 
 }

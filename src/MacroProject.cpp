@@ -449,6 +449,9 @@ void BattleBroodAI::onUnitEvade(BWAPI::Unit* unit){
 
 void BattleBroodAI::onUnitCreate(BWAPI::Unit* unit)
 {
+	if(unit->getType() == BWAPI::UnitTypes::Protoss_Dragoon){
+
+	}
 	//Update Managers
 	this->scoutManager->onUnitCreate(unit);
 	this->mapManager->onUnitCreate(unit);
