@@ -18,9 +18,17 @@ public:
   virtual std::string getName() const;
   virtual std::string getShortName() const;
 
+  void checkDefenses();
+  void addBase(Base * b); 
 private:
+	void checkGroundDefense(Base * b, bool toDef);//Check if the right amonts of units is defending 
+	//and if the goal is accomplished
+
+
   DefenseManager();
   BorderManager* borderManager;
   Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
-  std::map<Base *,std::set<UnitsGroup *> > defenders;
+  std::map<Base *, UnitsGroup * > groundDefenders;
+  std::map<Base *, UnitsGroup * > airDefenders;
+  std::list<UnitsGroup * > requesters;
 };

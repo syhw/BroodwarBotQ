@@ -31,7 +31,7 @@ class BaseManager : public CSingleton<BaseManager>
   int  getRefineryBuildPriority();
   BWTA::BaseLocation* naturalExpand;
   private:
-	BaseManager();
+  BaseManager();
   void addBase(BWTA::BaseLocation* location);
   void removeBase(BWTA::BaseLocation* location);
   BuildOrderManager* builder;

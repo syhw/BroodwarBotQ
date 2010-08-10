@@ -6,8 +6,10 @@
 class DefendChokeGoal : public Goal
 {
 public:
-	DefendChokeGoal(UnitsGroup * ug, BWTA::Chokepoint * choke);
+	DefendChokeGoal(UnitsGroup * ug, BWTA::Chokepoint * choke); //This goal must have max 1 subgoal : a formation subgoal
 	~DefendChokeGoal();
-	UnitsGroup * unitsGroup;
-
+	virtual void checkAchievement();
+	virtual void achieve();
+private:
+	bool enoughUnits();
 };

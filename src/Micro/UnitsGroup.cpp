@@ -748,3 +748,8 @@ void UnitsGroup::updateTargets(pBayesianUnit u)
         u->listTargets.insert(std::pair<int, EUnit*>(iter->second.getPrio(u),&(iter->second)));
     }
 }
+
+
+pGoal UnitsGroup::getLastGoal(){
+	return this->goals.front();
+}

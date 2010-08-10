@@ -1,6 +1,7 @@
 #include <BaseManager.h>
 #include <BuildOrderManager.h>
 #include <BorderManager.h>
+#include "DefenseManager.h"
 BaseManager::BaseManager()
 {
   this->builder = NULL;
@@ -142,10 +143,12 @@ int BaseManager::getRefineryBuildPriority()
 
 void BaseManager::addBase(BWTA::BaseLocation* location)
 {
+	BWAPI::Broodwar->printf("call to addBase");
   Base* newBase = new Base(location);
   allBases.insert(newBase);
   this->location2base[location] = newBase;
   this->borderManager->addMyBase(location);
+  DefenseManager::Instance().addBase(newBase);
 }
 void BaseManager::removeBase(BWTA::BaseLocation* location)
 {
