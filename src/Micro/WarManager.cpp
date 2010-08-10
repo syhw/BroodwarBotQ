@@ -16,7 +16,7 @@ using namespace BWTA;
 WarManager::WarManager() 
 : BaseObject("WarManager")
 {
-	this->defgroup = new UnitsGroup();
+	this->ugIdle = new UnitsGroup();
 
 	this->arbitrator = NULL;
 	this->regions = NULL;
@@ -35,7 +35,6 @@ void WarManager::setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* ar
 
 void WarManager::onStart(){
 
-	this->ugIdle->addGoal(pGoal(new DefendChokeGoal(ugIdle, (*BaseManager::Instance().getAllBases().begin())->chokeToDef)));
 
 }
 void WarManager::update()
@@ -61,7 +60,7 @@ void WarManager::update()
 	
 
 	//Update unitsgroup
-	defgroup->update();
+	ugIdle->update();
 	if (unitsgroups.empty()) return;
 	UnitsGroup* ug;
 	for (std::list<UnitsGroup*>::iterator it = unitsgroups.begin(); it != unitsgroups.end(); it++)
@@ -85,7 +84,7 @@ void WarManager::onOffer(std::set<BWAPI::Unit*> units)
 		{
 			arbitrator->accept(this, *u);
 			
-			defgroup->takeControl(*u);
+			ugIdle->takeControl(*u);
 			//Broodwar->printf("New %s added to the micro manager", (*u)->getType().getName().c_str());
 		}
 		else

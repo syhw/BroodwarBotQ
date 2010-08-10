@@ -27,7 +27,6 @@ public:
 	void setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, Regions * reg);
 	void onStart();
 	std::list<UnitsGroup*> unitsgroups;
-	UnitsGroup* defgroup;
 	virtual void onOffer(std::set<BWAPI::Unit*> units);
 	virtual void onRevoke(BWAPI::Unit* unit, double bid);
 	virtual std::string getName() const;
@@ -40,7 +39,8 @@ public:
 	void promptRemove(UnitsGroup* ug);//Guarantee that on the nextFrame :
 	//-The target of the units of this UG will be their position so they are idling
 	//-The unitsgroup will be removed from unitsgroups and deleted
-
+	
+	UnitsGroup * ugIdle;
 
 #ifdef BW_QT_DEBUG
 	// Qt interface

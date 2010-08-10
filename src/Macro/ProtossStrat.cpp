@@ -38,14 +38,15 @@ void ProtossStrat::update(){
 			this->workerManager->enableAutoBuild();
 		}
 	}
-	
+/*
+//This must be uncommented if we want the bot to expand. Yet expanding twice is not possible for the moment.
 	if(this->shouldExpand() && !expanding ){
 		this->expanding = true;
 		BWAPI::Broodwar->printf("Expanding at the nearest location");
 		this->baseManager->expand(this->naturalExpand,80);
 	}
 	BWAPI::Broodwar->drawCircleMap(naturalExpand->getPosition().x(),naturalExpand->getPosition().y(),20,BWAPI::Colors::Green, true);
-	
+	*/
 }
 
 void ProtossStrat::buildGeyser()
