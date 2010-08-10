@@ -8,7 +8,6 @@
 #include "Formations.h"
 #include <Vec.h>
 #include <set>
-#include "MicroManager.h"
 #include "GoalManager.h"
 #include <boost/bimap/bimap.hpp>
 
@@ -34,7 +33,6 @@ struct Dmg
 typedef boost::bimaps::bimap<BWAPI::Unit*, Dmg> UnitDmgBimap;
 typedef UnitDmgBimap::relation UnitDmg;
 
-//class Goal;
 class Formation;
 class GoalManager;
 
