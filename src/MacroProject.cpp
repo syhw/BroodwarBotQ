@@ -153,7 +153,7 @@ void BattleBroodAI::onStart()
 
 	//Set dependencies
 
-	this->baseManager->setDependencies(this->buildOrderManager, this->borderManager);
+	this->baseManager->setDependencies(this->buildOrderManager, this->borderManager, this->defenseManager);
 	this->borderManager->setDependencies(this->informationManager);
 	this->buildManager->setDependencies(this->arbitrator, this->buildingPlacer,this->constructionManager,this->productionManager,this->morphManager);
 	this->constructionManager->setDependencies(this->arbitrator,this->buildingPlacer);
@@ -171,7 +171,7 @@ void BattleBroodAI::onStart()
 	this->goalManager->setDependencies(this->warManager,this->regions);
 	this->macroManager->setDependencies(this->buildOrderManager,this->productionManager,this->buildManager,this->baseManager,this->workerManager);
 	this->mapManager->setDependencies(this->eUnitsFilter);
-	this->defenseManager->setDependencies(this->arbitrator,this->borderManager);
+	this->defenseManager->setDependencies(this->arbitrator,this->borderManager, this->warManager);
 
 	//Broodwar->printf("The match up is %s v %s",
     Broodwar->self()->getRace().getName().c_str();
@@ -205,11 +205,9 @@ void BattleBroodAI::onFrame()
     sprintf_s(mousePos, "%d, %d", Broodwar->getMousePosition().x(), Broodwar->getMousePosition().y());
     Broodwar->drawTextMouse(12, 0, mousePos);
 #endif
-
-
-
-
 	//Added by  Louis
+
+	this->arbitrator->update();
 	this->buildManager->update();
 	this->buildOrderManager->update();
 	this->baseManager->update();
@@ -217,14 +215,15 @@ void BattleBroodAI::onFrame()
 	this->techManager->update();
 	this->upgradeManager->update();
 	this->supplyManager->update();
-	objManager->onFrame();
-
-	this->borderManager->update();
-	this->mapManager->onFrame();
-    this->macroManager->update();
-	this->arbitrator->update();
 	this->enhancedUI->update();
+	this->borderManager->update();
+	objManager->onFrame();
+	this->mapManager->onFrame();
 	this->defenseManager->update();
+
+
+
+
   std::set<Unit*> units=Broodwar->self()->getUnits();
   if (this->showManagerAssignments)
   {

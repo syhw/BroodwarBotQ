@@ -5,12 +5,13 @@
 #include "CSingleton.h"
 #include "Base.h"
 #include "UnitsGroup.h"
+#include "WarManager.h"
 class BorderManager;
 class DefenseManager : Arbitrator::Controller<BWAPI::Unit*,double>, public CSingleton<DefenseManager>
 {
 	friend class CSingleton<DefenseManager>;
 public:
-  void setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, BorderManager* borderManager);
+  void setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, BorderManager* borderManager, WarManager* wm);
   virtual void onOffer(std::set<BWAPI::Unit*> units);
   virtual void onRevoke(BWAPI::Unit* unit, double bid);
   void onRemoveUnit(BWAPI::Unit* unit);
@@ -28,6 +29,8 @@ private:
   DefenseManager();
   BorderManager* borderManager;
   Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
+  WarManager * warManager;
+
   std::map<Base *, UnitsGroup * > groundDefenders;
   std::map<Base *, UnitsGroup * > airDefenders;
   std::list<UnitsGroup * > requesters;

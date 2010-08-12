@@ -743,6 +743,7 @@ void UnitsGroup::idle()
 void UnitsGroup::updateTargets(pBayesianUnit u)
 {
     u->listTargets.clear();
+	
     for (std::map<BWAPI::Unit*, EUnit>::iterator iter = enemiesInSight.begin();iter != enemiesInSight.end();iter++)
     {
         u->listTargets.insert(std::pair<int, EUnit*>(iter->second.getPrio(u),&(iter->second)));
@@ -750,6 +751,6 @@ void UnitsGroup::updateTargets(pBayesianUnit u)
 }
 
 
-pGoal UnitsGroup::getLastGoal(){
-	return this->goals.front();
+std::list<pGoal> UnitsGroup::getGoals(){
+	return this->goals;
 }

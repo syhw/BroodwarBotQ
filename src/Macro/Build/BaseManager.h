@@ -6,13 +6,14 @@
 #include <BWTA.h>
 #include "Base.h"
 #include "CSingleton.h"
+#include "DefenseManager.h"
 class BuildOrderManager;
 class BorderManager;
 class BaseManager : public CSingleton<BaseManager>
 {
 	friend class CSingleton<BaseManager>;
   public:
-  void setDependencies(BuildOrderManager * bom, BorderManager * bm);
+  void setDependencies(BuildOrderManager * bom, BorderManager * bm, DefenseManager * dm);
   void update();
   void updateRefineries();
   Base* getBase(BWTA::BaseLocation* location);
@@ -36,6 +37,7 @@ class BaseManager : public CSingleton<BaseManager>
   void removeBase(BWTA::BaseLocation* location);
   BuildOrderManager* builder;
   BorderManager* borderManager;
+  DefenseManager * defenseManager;
   std::map<BWTA::BaseLocation*,Base*> location2base;
   std::set<Base*> allBases;
   int RefineryNeeded;

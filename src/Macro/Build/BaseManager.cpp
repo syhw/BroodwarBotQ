@@ -1,7 +1,7 @@
 #include <BaseManager.h>
 #include <BuildOrderManager.h>
 #include <BorderManager.h>
-#include "DefenseManager.h"
+
 BaseManager::BaseManager()
 {
   this->builder = NULL;
@@ -10,10 +10,11 @@ BaseManager::BaseManager()
   computeNatural();
 }
 
-void BaseManager::setDependencies(BuildOrderManager * bom, BorderManager * bm){
+void BaseManager::setDependencies(BuildOrderManager * bom, BorderManager * bm, DefenseManager * dm){
 	this->builder = bom;
 	this->borderManager = bm;
-
+	this->defenseManager = dm;
+	
 }
 
 void BaseManager::update()
@@ -148,8 +149,9 @@ void BaseManager::addBase(BWTA::BaseLocation* location)
   allBases.insert(newBase);
   this->location2base[location] = newBase;
   this->borderManager->addMyBase(location);
-  DefenseManager::Instance().addBase(newBase);
+  defenseManager->addBase(newBase);
 }
+
 void BaseManager::removeBase(BWTA::BaseLocation* location)
 {
   std::map<BWTA::BaseLocation*,Base*>::iterator removebase;

@@ -39,6 +39,7 @@ void WarManager::onStart(){
 }
 void WarManager::update()
 {
+	
 	//Suppress the list prompted to suppress 
 	for each (UnitsGroup * ug in this->promptedRemove){
 		this->remove(ug);
@@ -47,7 +48,7 @@ void WarManager::update()
 	}
 	promptedRemove.clear();
 
-
+	
 	//Set bid on appropriate units (not workers and not building)
 	std::set<BWAPI::Unit *> myUnits = BWAPI::Broodwar->self()->getUnits();
 
@@ -58,7 +59,6 @@ void WarManager::update()
 	}
 
 	
-
 	//Update unitsgroup
 	if (unitsgroups.empty()) return;
 	UnitsGroup* ug;
@@ -67,10 +67,8 @@ void WarManager::update()
 		 ug = *it;
 		 ug->update();
 	}
-/*
-    sout << "LOL" << sendl; 
-    serr << "LOL" << sendl;
-*/
+
+
 }
 
 

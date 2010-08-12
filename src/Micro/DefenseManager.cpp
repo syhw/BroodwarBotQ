@@ -12,10 +12,11 @@ DefenseManager::DefenseManager()
 {
   this->arbitrator = NULL;
 }
-void DefenseManager::setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, BorderManager* borderManager)
+void DefenseManager::setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, BorderManager* borderManager, WarManager* wm)
 {
   this->arbitrator= arb;
   this->borderManager=borderManager;
+  this->warManager = wm;
 }
 
 void DefenseManager::checkDefenses(){
@@ -60,24 +61,23 @@ void DefenseManager::checkGroundDefense(Base * b, bool toDef){
 	//Find the unitsGroup that must defend this base against ground attack
 	assert(this->groundDefenders.count(b) == 1);
 	UnitsGroup * ug = (*this->groundDefenders.find(b)).second;
-	
+
 
 	//Check if they must defend at middle or at chokepoint
 	if(b->chokeToDef != NULL){
 		//If they must defend the chokepoint check if their DefendChokeGoal is accomplished (enough units)
 		if(toDef){
-			if(ug->getLastGoal() != NULL){
-				if( ug->getLastGoal()->getStatus() == GS_NOT_ENOUGH_UNITS){
+			if(ug->getGoals().size() != 0){
+				if( ug->getGoals().front()->getStatus() == GS_NOT_ENOUGH_UNITS){
 					//We need more units
 					
 					//Set bid on 1 unit until we have enough and record the unitsgroup that needed it
-					
 
 					std::set<BWAPI::Unit *> allUnits = BWAPI::Broodwar->getAllUnits();
 					for(std::set<BWAPI::Unit * >::iterator selection = allUnits.begin() ; selection != allUnits.end() ; ++selection){
 						if((*selection)->getType() == BWAPI::UnitTypes::Protoss_Zealot || (*selection)->getType() == BWAPI::UnitTypes::Protoss_Dragoon ){
 							this->requesters.push_back(ug);
-							this->arbitrator->setBid(this, (*selection), 40);
+							this->arbitrator->setBid(this, (*selection), 60);
 							break;
 						}
 					}
@@ -113,9 +113,9 @@ void DefenseManager::onOffer(std::set<BWAPI::Unit*> units)
 	for(std::set<BWAPI::Unit*>::iterator u = units.begin(); u != units.end(); u++){
 		
 		if(this->requesters.size() != 0 ){
+			this->arbitrator->accept(this, *u);
 			this->requesters.front()->takeControl(*u);
 			this->requesters.pop_front();
-			this->arbitrator->accept(this, *u);
 
 		} else {
 			this->arbitrator->decline(this, *u, 0);
@@ -135,16 +135,16 @@ void DefenseManager::onRemoveUnit(BWAPI::Unit* unit)
 
 void DefenseManager::update()
 {
-	this->checkDefenses();
-
+this->checkDefenses();
 }
 
 void DefenseManager::addBase(Base * b){
 	UnitsGroup * ug = new UnitsGroup();
 	assert(this->groundDefenders.count(b) == 0);//We must not have already the groundDefenders for this base
-	ug->addGoal(pGoal(new DefendChokeGoal(ug,b->chokeToDef)));
+	Goal * g = new DefendChokeGoal(ug,b->chokeToDef);
+	ug->addGoal(pGoal(g));
 	this->groundDefenders.insert(std::make_pair(b,ug));
-	WarManager::Instance().unitsgroups.push_back(ug);
+	warManager->unitsgroups.push_back(ug);
 
 }
 

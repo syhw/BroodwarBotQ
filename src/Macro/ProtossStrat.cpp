@@ -45,7 +45,6 @@ void ProtossStrat::update(){
 		this->baseManager->expand(BaseManager::Instance().naturalExpand,80);
 	}
 	
-	
 }
 
 void ProtossStrat::buildGeyser()
