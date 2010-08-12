@@ -72,7 +72,7 @@ public:
 	virtual void formation(pFormation f);
 	virtual void setGoals(std::list<pGoal>& goals);
 	virtual void addGoal(pGoal goal);
-	std::list<pGoal> getGoals();
+	pGoal getLastGoal();
 
 
 	//virtual bool checkInFormation();

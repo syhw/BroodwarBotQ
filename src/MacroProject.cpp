@@ -207,7 +207,7 @@ void BattleBroodAI::onFrame()
 #endif
 	//Added by  Louis
 
-	this->arbitrator->update();
+
 	this->buildManager->update();
 	this->buildOrderManager->update();
 	this->baseManager->update();
@@ -221,6 +221,7 @@ void BattleBroodAI::onFrame()
 	this->mapManager->onFrame();
 	this->defenseManager->update();
 
+	this->arbitrator->update();
 
 
 
@@ -444,6 +445,7 @@ void BattleBroodAI::onUnitEvade(BWAPI::Unit* unit){
 	  if (Broodwar->isReplay()) return;
   this->informationManager->onUnitEvade(unit);
   this->unitGroupManager->onUnitEvade(unit);
+  this->arbitrator->onRemoveObject(unit);
 }
 
 void BattleBroodAI::onUnitCreate(BWAPI::Unit* unit)

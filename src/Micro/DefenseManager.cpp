@@ -67,8 +67,8 @@ void DefenseManager::checkGroundDefense(Base * b, bool toDef){
 	if(b->chokeToDef != NULL){
 		//If they must defend the chokepoint check if their DefendChokeGoal is accomplished (enough units)
 		if(toDef){
-			if(ug->getGoals().size() != 0){
-				if( ug->getGoals().front()->getStatus() == GS_NOT_ENOUGH_UNITS){
+			if(ug->getLastGoal() != NULL){
+				if( ug->getLastGoal()->getStatus() == GS_NOT_ENOUGH_UNITS){
 					//We need more units
 					
 					//Set bid on 1 unit until we have enough and record the unitsgroup that needed it
@@ -125,12 +125,12 @@ void DefenseManager::onOffer(std::set<BWAPI::Unit*> units)
 
 void DefenseManager::onRevoke(BWAPI::Unit* unit, double bid)
 {
- // defenders.erase(unit);
+ this->onRemoveUnit(unit);
 }
 
 void DefenseManager::onRemoveUnit(BWAPI::Unit* unit)
 {
-//  defenders.erase(unit);
+	BWAPI::Broodwar->printf("essai");
 }
 
 void DefenseManager::update()

@@ -751,6 +751,6 @@ void UnitsGroup::updateTargets(pBayesianUnit u)
 }
 
 
-std::list<pGoal> UnitsGroup::getGoals(){
-	return this->goals;
+pGoal UnitsGroup::getLastGoal(){
+	return this->goals.front();
 }
