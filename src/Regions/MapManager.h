@@ -17,6 +17,7 @@ class MapManager: public CSingleton<MapManager>
 
 private:
     EUnitsFilter* _eUnitsFilter;
+    std::map<BWAPI::Unit*, BWAPI::Position> _trackedUnits;
     MapManager();
     ~MapManager();
     int _width;
@@ -24,14 +25,17 @@ private:
     inline void modifyBuildings(BWAPI::Unit* u, bool b);
     inline void addBuilding(BWAPI::Unit* u);
     inline void removeBuilding(BWAPI::Unit* u);
+    inline void modifyDamages(int* tab, Position p, int minRadius, int maxRadius, int damages);
+    inline void removeDmg(BWAPI::UnitType ut, BWAPI::Position p);
+    inline void addDmg(BWAPI::UnitType ut, BWAPI::Position p);
 public:
-	void setDependencies(EUnitsFilter * eu);
     bool* walkability;          // walk tiles
     bool* lowResWalkability;    // low res => building tiles
     bool* buildings_wt;         // walk tiles
     bool* buildings_wt_strict;
     bool* buildings;            // low res => building tiless
-    int* damages;               // walktiles, -1 for unknown
+    int* groundDamages;         // build tiles
+    int* airDamages;            // build tiles
     void onUnitCreate(BWAPI::Unit* u);
     void onUnitDestroy(BWAPI::Unit* u);
     void onUnitShow(BWAPI::Unit* u);
@@ -42,4 +46,6 @@ public:
     void drawWalkability(); // debug
     void drawLowResWalkability(); // debug
     void drawLowResBuildings(); // debug
+    void drawGroundDamages(); // debug
+    void drawAirDamages(); // debug
 };

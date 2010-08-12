@@ -95,7 +95,7 @@ void WarManager::onRevoke(BWAPI::Unit* unit, double bid)
 
 std::string WarManager::getName() const
 {
-	return "Micro Manager";
+	return "War Manager";
 }
 
 void WarManager::onUnitCreate(BWAPI::Unit* unit)

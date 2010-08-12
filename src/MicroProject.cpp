@@ -139,6 +139,7 @@ void MicroAIModule::onFrame()
 	}
     //mapManager->drawBuildings();
     //mapManager->drawWalkability();
+    mapManager->onFrame();
 }
 
 MicroAIModule::~MicroAIModule()
@@ -162,16 +163,6 @@ MicroAIModule::MicroAIModule()
 {
 }
 #endif
-
-/* void MicroAIModule::onRemove(BWAPI::Unit* unit)
-{
-BWAPI::Broodwar->printf("just entered onRemove()");
-int a = 69;
-for(int i = 0; i < 5000000; i++) a = 42;
-int b = a;
-//this will erase the unit from our set of buildings, if it is in the set.
-this->buildings.erase(unit);
-} */
 
 void MicroAIModule::onEnd(bool isWinner)
 {

@@ -1,6 +1,9 @@
 #####  Plantage(s) #####
-Quand on ne ferme pas d'abord Qt avant SC. Voir autour de 
-case DLL_PROCESS_DETACH: dans MacroDll.cpp
+
+
+#####  Etrange	   #####
+- Ligne bleue vers la droite par moments (target morte et acquisition d'une
+nouvelle ?) en mode fight_g avec les goons
 
 #####  En général  #####
 Micro:

@@ -6,7 +6,7 @@ using namespace BWAPI;
 using namespace std;
 
 EUnitsFilter::EUnitsFilter()
-:BaseObject( "EUnitsFilter")
+: BaseObject( "EUnitsFilter")
 {
     timeManager = & TimeManager::Instance();
 }
@@ -19,7 +19,6 @@ void EUnitsFilter::update(Unit* u)
         _eViewedUnits[u].update(timeManager->getElapsedTime());
     else 
         _eViewedUnits[u] = EViewedUnit(u, timeManager->getElapsedTime());
-        //_eViewedUnits.insert(make_pair(u, EViewedUnit(u, timeManager->getElapsedTime())));
 }
 
 void EUnitsFilter::onUnitDestroy(Unit* u)
@@ -86,6 +85,16 @@ QWidget* EUnitsFilter::createWidget(QWidget* parent) const
 
 void EUnitsFilter::update()
 {
+}
+
+const std::map<BWAPI::Unit*, EViewedUnit>& EUnitsFilter::getViewedUnits()
+{
+    return _eViewedUnits;
+}
+
+bool EUnitsFilter::empty()
+{
+    return _eViewedUnits.empty();
 }
 
 void EUnitsFilter::bwOutput()
