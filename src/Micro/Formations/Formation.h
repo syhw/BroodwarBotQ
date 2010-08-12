@@ -18,6 +18,7 @@ class Formation
 public:
 	Vec center;
 	Vec direction;
+    Vec mean;
 	std::vector<BWAPI::Position> end_positions;
 	int space; // space between units. 0 means units are only sperated by their sizes.
 
@@ -25,6 +26,8 @@ public:
 	Formation(const Vec& center, const Vec& direction = Vec(0,0));
 	Formation(const BWAPI::Position& p, const Vec& direction = Vec(0,0));
 	~Formation();
+
+    void computeMean();
 
     // TODO should be called on onUnitDestroy for us
 	virtual void computeToPositions(const std::vector<pBayesianUnit>& vUnit);

@@ -45,8 +45,7 @@ public:
         const BWAPI::TilePosition& end);
     unsigned int _tick;
 	BWAPI::Unit* unit;
-    BWAPI::Unit* targetEnemy;
-    BWAPI::Unit* targetEnemyInRange;
+    BWAPI::Unit* targetEnemy; // public for debug purpose, __USE__ setTargetEnemy(Unit*)
 	BWAPI::Position target; // display debug purpose
 	int timeIdle; // hack to remove soon... evite le conflit avec la reussite d'objectif dans le test UnitsGroup::keepDistance().
 	              // Cette variable sera inutile avec le flocking.

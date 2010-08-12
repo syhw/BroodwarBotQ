@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Regions;../src/Utils;../src/Intelligence;../src/Utils/Component;../../BWAPI_Beta_2.8/include;../../BWAPI_Beta_2.8/include/BWAPI;../../BWAPI_Beta_2.8/include/BWTA;../../boost_1_43_0;&quot;C:\Program Files\boost\boost_1_42\&quot;;../../boost_1_42;C:\Qt\4.6.2\include;C:\Qt\4.6.3\include"
+				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Intelligence;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ZergFlying;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Utils/Component;../../BWAPI_Beta_3.0.3/include;../../BWAPI_Beta_3.0.3/include/BWAPI;../../BWAPI_Beta_3.0.3/include/BWTA;../../boost_1_43_0;&quot;C:\Program Files\boost\boost_1_42\&quot;;../../probt/include;../../boost_1_42;C:\Qt\4.6.2\include;C:\Qt\4.6.3\include"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
 				BasicRuntimeChecks="3"
@@ -60,7 +60,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="../../BWAPI_Beta_3.0.3/lib/Debug/BWAPI.lib ../../BWAPI_Beta_3.0.3/lib/Debug/BWTA.lib ../../BWAPI_Beta_3.0.3/lib/Debug/CGAL-vc90-mt.lib ../../BWAPI_Beta_3.0.3/lib/Debug/gmp-vc90-mt.lib ../../BWAPI_Beta_3.0.3/lib/Debug/libboost_thread-vc90-mt-1_40.lib ../../BWAPI_Beta_3.0.3/lib/Debug/mpfr-vc90-mt.lib ../../BWAPI_Beta_3.0.3/lib/Debug/tinyxml.lib QtCore4.lib QtGui4.lib QtOpenGL4.lib QtXml4.lib opengl32.lib glu32.lib"
+				AdditionalDependencies="../../BWAPI_Beta_3.0.3/lib/Debug/BWAPI.lib ../../BWAPI_Beta_3.0.3/lib/Debug/BWTA.lib ../../BWAPI_Beta_3.0.3/lib/Debug/CGAL-vc90-mt-gd.lib ../../BWAPI_Beta_3.0.3/lib/Debug/gmp-vc90-mt-gd.lib ../../BWAPI_Beta_3.0.3/lib/Debug/libboost_thread-vc90-mt-gd-1_40.lib ../../BWAPI_Beta_3.0.3/lib/Debug/mpfr-vc90-mt-gd.lib ../../BWAPI_Beta_3.0.3/lib/Debug/tinyxmld.lib QtCore4.lib QtGui4.lib QtOpenGL4.lib QtXml4.lib opengl32.lib glu32.lib"
 				AdditionalLibraryDirectories="C:\Qt\4.6.2\lib;C:\Qt\4.6.3\lib;&quot;C:\dev\libQGLViewer-2.3.5\QGLViewer\release&quot;"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
@@ -198,6 +198,10 @@
 				Name="Formations"
 				>
 				<File
+					RelativePath="..\src\Micro\Formations\ArcFormation.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Micro\Formations\Formation.cpp"
 					>
 				</File>
@@ -222,10 +226,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Micro\EUnit.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Micro\Units\FlyingUnit.cpp"
 					>
 				</File>
@@ -235,6 +235,14 @@
 				</File>
 				<File
 					RelativePath="..\src\Micro\Units\SpecialUnit.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\UnitGroup.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\UnitGroupManager.cpp"
 					>
 				</File>
 				<Filter
@@ -464,6 +472,10 @@
 				Name="Formations"
 				>
 				<File
+					RelativePath="..\src\Micro\Formations\ArcFormation.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Micro\Formations\Formation.h"
 					>
 				</File>
@@ -501,6 +513,14 @@
 				</File>
 				<File
 					RelativePath="..\src\Micro\Units\SpecialUnit.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\UnitGroup.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\UnitGroupManager.h"
 					>
 				</File>
 				<Filter
@@ -617,6 +637,10 @@
 				>
 				<File
 					RelativePath="..\src\Utils\CSingleton.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Utils\Nearby.h"
 					>
 				</File>
 				<File
