@@ -870,9 +870,64 @@ void BayesianUnit::setTargetEnemy(Unit* u)
 
 int BayesianUnit::computeDmg(Unit* u)
 {
-    // TODO complete: air, attack types, armors, upgrades, shields, spells (matrix...)
-    return (unit->getType().groundWeapon().damageAmount() - u->getType().armor()) 
-        * unit->getType().maxGroundHits();
+    // TODO complete: armors, upgrades, shields, spells (matrix...)
+
+    if (u->getType().isFlyer())
+    {
+        if (u->getShields() 
+            >= (unit->getType().airWeapon().damageAmount() /* - shield armor */) * unit->getType().maxAirHits())
+        {
+            return (unit->getType().airWeapon().damageAmount() /* - shield armor */)
+                * unit->getType().maxAirHits();
+        }
+        else
+        {
+            double factor = 1.0;
+            if (unit->getType().airWeapon().damageType() == BWAPI::DamageTypes::Explosive)
+            {
+                if (u->getType().size() == BWAPI::UnitSizeTypes::Small)
+                    factor = 0.25;
+                else if (u->getType().size() == BWAPI::UnitSizeTypes::Medium)
+                    factor = 0.5;
+            } else if (unit->getType().airWeapon().damageType() == BWAPI::DamageTypes::Concussive)
+            {
+                if (u->getType().size() == BWAPI::UnitSizeTypes::Medium)
+                    factor = 0.75;
+                else if (u->getType().size() == BWAPI::UnitSizeTypes::Large)
+                    factor = 0.5;
+            }
+            return (unit->getType().airWeapon().damageAmount() * factor - u->getType().armor())
+                * unit->getType().maxAirHits();
+        }
+    }
+    else
+    {        
+        if (u->getShields() 
+            >= (unit->getType().groundWeapon().damageAmount() /* - shield armor */) * unit->getType().maxGroundHits())
+        {
+            return (unit->getType().groundWeapon().damageAmount() /* - shield armor */)
+                * unit->getType().maxGroundHits();
+        }
+        else
+        {
+            double factor = 1.0;
+            if (unit->getType().groundWeapon().damageType() == BWAPI::DamageTypes::Explosive)
+            {
+                if (u->getType().size() == BWAPI::UnitSizeTypes::Small)
+                    factor = 0.25;
+                else if (u->getType().size() == BWAPI::UnitSizeTypes::Medium)
+                    factor = 0.5;
+            } else if (unit->getType().groundWeapon().damageType() == BWAPI::DamageTypes::Concussive)
+            {
+                if (u->getType().size() == BWAPI::UnitSizeTypes::Medium)
+                    factor = 0.75;
+                else if (u->getType().size() == BWAPI::UnitSizeTypes::Large)
+                    factor = 0.5;
+            }
+            return (unit->getType().groundWeapon().damageAmount() * factor - u->getType().armor())
+                * unit->getType().maxGroundHits();
+        }
+    }
 }
 
 void BayesianUnit::drawDirV()
