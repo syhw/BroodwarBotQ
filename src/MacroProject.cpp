@@ -615,7 +615,7 @@ void BattleBroodAI::onSendText(std::string text)
     else if (text=="/target")
     {
         set<pBayesianUnit> tmp;
-        for (std::list<UnitsGroup*>::iterator it = this->warManager->unitsgroups.begin(); it != this->warManager->unitsgroups.end(); it++)
+        for (std::list<UnitsGroup*>::iterator it = this->warManager->unitsGroups.begin(); it != this->warManager->unitsGroups.end(); it++)
         {
             set<pBayesianUnit> tmp;
             (*it)->selectedUnits(tmp);

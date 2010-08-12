@@ -108,7 +108,7 @@ UnitsGroup* ScoutManager::findUnitsGroup(pGoal goal){
 	}
 	ug->addGoal(goal);
 	goal->setUnitsGroup(ug);
-	warManager->unitsgroups.push_front(ug);
+	warManager->unitsGroups.push_back(ug);
 	return ug;
 }
 

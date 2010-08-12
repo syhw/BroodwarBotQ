@@ -6,7 +6,7 @@
 #include <Arbitrator.h>
 #include <stdlib.h>
 #include "BaseObject.h"
-
+#include "InformationManager.h"
 
 class UnitsGroup;
 class Regions;
@@ -17,16 +17,18 @@ class WarManager: public CSingleton<WarManager>, public Arbitrator::Controller<B
 	friend class CSingleton<WarManager>;
 
 private:
+    BWTA::BaseLocation* home;
 	WarManager();
 	~WarManager();
 	std::list<UnitsGroup *> promptedRemove;
 	bool remove(UnitsGroup* u);
 	Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
 	Regions* regions;
+    InformationManager* informationManager;
 public:
 	void setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, Regions * reg);
 	void onStart();
-	std::list<UnitsGroup*> unitsgroups;
+	std::list<UnitsGroup*> unitsGroups;
 	virtual void onOffer(std::set<BWAPI::Unit*> units);
 	virtual void onRevoke(BWAPI::Unit* unit, double bid);
 	virtual std::string getName() const;
@@ -38,8 +40,7 @@ public:
 	void sendGroupToDefense( UnitsGroup* ug);
 	void promptRemove(UnitsGroup* ug);//Guarantee that on the nextFrame :
 	//-The target of the units of this UG will be their position so they are idling
-	//-The unitsgroup will be removed from unitsgroups and deleted
-	UnitsGroup * ugIdle;
+	//-The unitsgroup will be removed from unitsGroups and deleted
 
 #ifdef BW_QT_DEBUG
 	// Qt interface

@@ -4,6 +4,7 @@
 #include <UnitsGroup.h>
 #include "DefendChokeGoal.h"
 #include "BorderManager.h"
+#include "AttackGoal.h"
 
 
 using std::map;
@@ -16,10 +17,11 @@ using namespace BWTA;
 WarManager::WarManager() 
 : BaseObject("WarManager")
 {
-	this->ugIdle = new UnitsGroup();
-
-	this->arbitrator = NULL;
-	this->regions = NULL;
+	arbitrator = NULL;
+	regions = NULL;
+    unitsGroups.push_front(new UnitsGroup()); // to garbage collect idle units
+    informationManager = & InformationManager::Instance();
+    home = BWTA::getStartLocation(Broodwar->self());
 }
 
 WarManager::~WarManager() 
@@ -57,21 +59,14 @@ void WarManager::update()
 		}
 	}
 
-	
-
-	//Update unitsgroup
-	ugIdle->update();
-	if (unitsgroups.empty()) return;
-	UnitsGroup* ug;
-	for (std::list<UnitsGroup*>::iterator it = unitsgroups.begin(); it != unitsgroups.end(); it++)
+	//Update unitsgroup;
+	if (unitsGroups.empty()) return;
+	for (std::list<UnitsGroup*>::iterator it = unitsGroups.begin(); it != unitsGroups.end(); it++)
 	{
-		 ug = *it;
-		 ug->update();
+        if ((*it)->size() > 2 && (*it)->emptyGoals())
+            sendGroupToAttack(*it);
+        (*it)->update();
 	}
-/*
-    sout << "LOL" << sendl; 
-    serr << "LOL" << sendl;
-*/
 }
 
 
@@ -83,8 +78,7 @@ void WarManager::onOffer(std::set<BWAPI::Unit*> units)
 		if (!(*u)->getType().isWorker() && !(*u)->getType().isBuilding())
 		{
 			arbitrator->accept(this, *u);
-			
-			ugIdle->takeControl(*u);
+			unitsGroups.front()->takeControl(*u);
 			//Broodwar->printf("New %s added to the micro manager", (*u)->getType().getName().c_str());
 		}
 		else
@@ -114,13 +108,13 @@ void WarManager::onUnitCreate(BWAPI::Unit* unit)
 
 void WarManager::onUnitDestroy(BWAPI::Unit* unit)
 {
-	for (std::list<UnitsGroup*>::iterator it = unitsgroups.begin(); it != unitsgroups.end();)
+	for (std::list<UnitsGroup*>::iterator it = unitsGroups.begin(); it != unitsGroups.end();)
 	{
 		(*it)->giveUpControl(unit);
 		if( (*it)->emptyUnits())
 		{
 			UnitsGroup* ug = *it;
-			it = unitsgroups.erase( it);
+			it = unitsGroups.erase( it);
 			delete ug;
 		}
 		else
@@ -130,12 +124,13 @@ void WarManager::onUnitDestroy(BWAPI::Unit* unit)
 
 void WarManager::display()
 {
-	for( std::list<UnitsGroup*>::iterator it = unitsgroups.begin(); it != unitsgroups.end(); it++)
+	for( std::list<UnitsGroup*>::iterator it = unitsGroups.begin(); it != unitsGroups.end(); it++)
 		(*it)->display();
 }
 
 void WarManager::sendGroupToAttack( UnitsGroup* ug)
 {
+    Broodwar->printf("sending a group to attack");
 	// Get the nearest enemy position
 	bool found = false;
 	double minDist = 0xFFFF;
@@ -149,8 +144,8 @@ void WarManager::sendGroupToAttack( UnitsGroup* ug)
 			{
 				for (vector<RegionsUnitData>::const_iterator itBD = itBuildings->second.begin(); itBD != itBuildings->second.end(); ++itBD)
 				{
-					double distance = getGroundDistance( ug->getCenter(), itBD->position);
-					if( distance < minDist)
+					double distance = getGroundDistance(ug->getCenter(), itBD->position);
+					if (distance < minDist)
 					{
 						minDist = distance;
 						nearestEnemyLocation = itBD->position;
@@ -162,8 +157,25 @@ void WarManager::sendGroupToAttack( UnitsGroup* ug)
 		}
 	}
 
-	if (!found) return;
-	//	ug->addGoal(pGoal(new AttackGoal(nearestEnemyLocation)));
+    if (found)
+        return;
+
+    // works only for 1v1 (2 players) maps: 
+    for (std::set<TilePosition>::const_iterator it = Broodwar->getStartLocations().begin();
+        it != Broodwar->getStartLocations().end(); ++it)
+    {
+        if (*it == home->getTilePosition())
+            continue;
+        double distance = getGroundDistance(ug->getCenter(), *it);
+        if (distance < minDist)
+        {
+            minDist = distance;
+            nearestEnemyLocation = *it;
+            found = true;
+        }
+    }
+    ug->addGoal(pGoal(new AttackGoal(ug, nearestEnemyLocation)));
+
 	//Broodwar->printf( "Let's fight !!");
 }
 
@@ -198,9 +210,9 @@ void WarManager::sendGroupToDefense( UnitsGroup* ug)
 
 
 bool WarManager::remove(UnitsGroup* u){
-	for(std::list<UnitsGroup *>::iterator it = unitsgroups.begin(); it != unitsgroups.end(); it ++){
+	for(std::list<UnitsGroup *>::iterator it = unitsGroups.begin(); it != unitsGroups.end(); it ++){
 		if( (*it) == u){
-			unitsgroups.erase(it);
+			unitsGroups.erase(it);
 			return true;
 		}
 	}

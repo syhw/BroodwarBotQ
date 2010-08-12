@@ -340,6 +340,10 @@
 					Name="Goals"
 					>
 					<File
+						RelativePath="..\src\Micro\Goals\AttackGoal.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\src\Micro\Goals\DefendChokeGoal.cpp"
 						>
 					</File>
@@ -765,6 +769,10 @@
 				<Filter
 					Name="Goals"
 					>
+					<File
+						RelativePath="..\src\Micro\Goals\AttackGoal.h"
+						>
+					</File>
 					<File
 						RelativePath="..\src\Micro\Goals\DefendChokeGoal.h"
 						>
