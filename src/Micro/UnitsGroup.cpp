@@ -301,7 +301,8 @@ void UnitsGroup::onUnitShow(Unit* u)
 {
     for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
         (*it)->onUnitShow(u);
-    unitDamages.insert(UnitDmg(u, Dmg(0, u)));
+    if (!u->getType().isBuilding())
+        unitDamages.insert(UnitDmg(u, Dmg(0, u)));
 }
 
 void UnitsGroup::onUnitHide(Unit* u)

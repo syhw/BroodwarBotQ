@@ -14,8 +14,9 @@ MapManager::MapManager()
     walkability = new bool[_width * _height];             // Walk Tiles resolution
     buildings_wt = new bool[_width * _height];
     buildings_wt_strict = new bool[_width * _height];
-    lowResWalkability = new bool[_width * _height / 16];  // Build Tiles resolution
-    buildings = new bool[Broodwar->mapWidth() * Broodwar->mapHeight()];//[_width * _height / 16];       
+    lowResWalkability = new bool[Broodwar->mapWidth() * Broodwar->mapHeight()]; // Build Tiles resolution
+    buildings = new bool[Broodwar->mapWidth() * Broodwar->mapHeight()];         // [_width * _height / 16];
+    damages = new int[Broodwar->mapWidth() * Broodwar->mapHeight()];
 
     // initialization
     for (int x = 0; x < _width; ++x) 
@@ -42,9 +43,9 @@ MapManager::MapManager()
             }
             lowResWalkability[x + y*_width/4] = walkable;
             buildings[x + y*_width/4] = false; // initialized with manual call to onUnitCreate() in onStart()
+            damages[x + y*_width/4] = 0;
         }
     }
-
     _eUnitsFilter = NULL;
 }
 
@@ -57,6 +58,7 @@ MapManager::~MapManager()
     delete [] lowResWalkability;
     delete [] buildings_wt;
     delete [] buildings;
+    delete [] damages;
 }
 
 void MapManager::setDependencies(EUnitsFilter * eu){
