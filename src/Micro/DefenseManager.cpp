@@ -135,7 +135,12 @@ void DefenseManager::onRemoveUnit(BWAPI::Unit* unit)
 
 void DefenseManager::update()
 {
-this->checkDefenses();
+	this->checkDefenses();
+
+//update unitsgroups depending of the defenseManager
+	for(std::map<Base *, UnitsGroup *>::iterator it = this->groundDefenders.begin(); it != this->groundDefenders.end(); ++it){
+		it->second->update();
+	}
 }
 
 void DefenseManager::addBase(Base * b){
@@ -144,7 +149,6 @@ void DefenseManager::addBase(Base * b){
 	Goal * g = new DefendChokeGoal(ug,b->chokeToDef);
 	ug->addGoal(pGoal(g));
 	this->groundDefenders.insert(std::make_pair(b,ug));
-	warManager->unitsgroups.push_back(ug);
 
 }
 
