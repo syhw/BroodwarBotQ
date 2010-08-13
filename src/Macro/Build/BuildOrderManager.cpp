@@ -43,12 +43,12 @@ BuildOrderManager::BuildOrderManager(){
   }
 }
 
-void BuildOrderManager::setDependencies(BuildManager * bm, TechManager * tm, UpgradeManager * um, WorkerManager * wm, SupplyManager * sm){
-	this->buildManager = bm;
-	this->techManager = tm;
-	this->upgradeManager = um;
-	this->workerManager = wm;
-	this->supplyManager = sm;
+void BuildOrderManager::setDependencies(){
+	this->buildManager = & BuildManager::Instance();
+	this->techManager = & TechManager::Instance();
+	this->upgradeManager = & UpgradeManager::Instance();
+	this->workerManager = & WorkerManager::Instance();
+	this->supplyManager = & SupplyManager::Instance();
 	UnitItem::getBuildManager() = buildManager;
 }
 

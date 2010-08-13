@@ -11,9 +11,9 @@ ProductionManager::ProductionManager()
     startedCount[*i]=0;
   }
 }
-void ProductionManager::setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, BuildingPlacer * bp){
-	this->arbitrator = arb;
-	this->placer = bp;
+void ProductionManager::setDependencies(){
+	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
+	this->placer = & BuildingPlacer::Instance();
 }
 
 

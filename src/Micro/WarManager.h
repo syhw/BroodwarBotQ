@@ -23,7 +23,7 @@ private:
 	Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
 	Regions* regions;
 public:
-	void setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, Regions * reg);
+	void setDependencies();
 	void onStart();
 	std::list<UnitsGroup*> unitsgroups;
 	virtual void onOffer(std::set<BWAPI::Unit*> units);

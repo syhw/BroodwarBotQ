@@ -1,8 +1,8 @@
 #include <BorderManager.h>
 #include <InformationManager.h>
-void BorderManager::setDependencies(InformationManager * im)
+void BorderManager::setDependencies()
 {
-  this->informationManager=im;
+	this->informationManager=& InformationManager::Instance();
 }
 
 void BorderManager::addMyBase(BWTA::BaseLocation* location)

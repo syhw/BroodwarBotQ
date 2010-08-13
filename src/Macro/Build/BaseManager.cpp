@@ -10,10 +10,10 @@ BaseManager::BaseManager()
   computeNatural();
 }
 
-void BaseManager::setDependencies(BuildOrderManager * bom, BorderManager * bm, DefenseManager * dm){
-	this->builder = bom;
-	this->borderManager = bm;
-	this->defenseManager = dm;
+void BaseManager::setDependencies(){
+	this->builder = & BuildOrderManager::Instance();
+	this->borderManager = & BorderManager::Instance();
+	this->defenseManager = & DefenseManager::Instance();
 	
 }
 

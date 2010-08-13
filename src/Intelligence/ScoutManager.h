@@ -26,7 +26,7 @@ class ScoutManager : public CSingleton<ScoutManager>, public BaseObject
 	friend class CSingleton<ScoutManager>;
 
 public:
-	void setDependencies(Regions * region, WarManager * micro);
+	void setDependencies();
 	virtual void update();
 	virtual std::string getName() const;
 	// Goals // Just ideas, not yet implemented

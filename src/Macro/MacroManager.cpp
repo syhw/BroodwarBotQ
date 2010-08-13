@@ -20,13 +20,12 @@ MacroManager::~MacroManager()
 {
 }
 
-void MacroManager::setDependencies(BuildOrderManager * bom, ProductionManager * pm, BuildManager * bm,
-BaseManager * base, WorkerManager * wm){
-	this->buildOrderManager = bom;
-	this->productionManager = pm;
-	this->buildManager = bm;
-	this->baseManager = base;
-	this->workerManager = wm;
+void MacroManager::setDependencies(){
+	this->buildOrderManager = & BuildOrderManager::Instance();
+	this->productionManager = & ProductionManager::Instance();
+	this->buildManager = & BuildManager::Instance();
+	this->baseManager = & BaseManager::Instance();
+	this->workerManager = & WorkerManager::Instance();
 }
 
 std::string MacroManager::getName() const

@@ -7,7 +7,7 @@ class BorderManager : public CSingleton<BorderManager>
 {
 	friend class CSingleton<BorderManager>;
   public:
-	void setDependencies(InformationManager * im);
+	void setDependencies();
     void addMyBase(BWTA::BaseLocation* location);
     void removeMyBase(BWTA::BaseLocation* location);
     const std::set<BWTA::Chokepoint*>& getMyBorder() const;

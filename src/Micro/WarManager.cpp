@@ -26,9 +26,9 @@ WarManager::~WarManager()
 	//Broodwar->printf("INOUT WarManager::~WarManager()");
 }
 
-void WarManager::setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, Regions * reg){
-	this->arbitrator = arb;
-	this->regions = reg;
+void WarManager::setDependencies(){
+	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
+	this->regions = & Regions::Instance();
 
 }
 

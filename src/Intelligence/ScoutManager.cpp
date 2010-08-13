@@ -15,9 +15,9 @@ ScoutManager::~ScoutManager( )
 {
 }
 
-void ScoutManager::setDependencies(Regions * region, WarManager * micro){
-	this->regions = region;
-	this->warManager = micro;
+void ScoutManager::setDependencies(){
+	this->regions = & Regions::Instance();
+	this->warManager = & WarManager::Instance();
 }
 
 void ScoutManager::update()

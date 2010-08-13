@@ -10,7 +10,7 @@ class EEcoEstimator : public CSingleton<EEcoEstimator>, public BaseObject
 {
 	friend class CSingleton<EEcoEstimator>;
 public:
-	void setDependencies(TimeManager * tm);
+	void setDependencies();
 	virtual void update();
 	int m_per_mn() const;//Requires a first call to update workers else uses theorical number of workers
 	int g_per_mn() const;//Requires a first call to update workers else uses theorical number of workers

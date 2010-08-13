@@ -11,7 +11,7 @@ class DefenseManager : Arbitrator::Controller<BWAPI::Unit*,double>, public CSing
 {
 	friend class CSingleton<DefenseManager>;
 public:
-  void setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, BorderManager* borderManager, WarManager* wm);
+  void setDependencies();
   virtual void onOffer(std::set<BWAPI::Unit*> units);
   virtual void onRevoke(BWAPI::Unit* unit, double bid);
   void onRemoveUnit(BWAPI::Unit* unit);

@@ -12,11 +12,11 @@ DefenseManager::DefenseManager()
 {
   this->arbitrator = NULL;
 }
-void DefenseManager::setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, BorderManager* borderManager, WarManager* wm)
+void DefenseManager::setDependencies()
 {
-  this->arbitrator= arb;
-  this->borderManager=borderManager;
-  this->warManager = wm;
+  this->arbitrator= & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
+  this->borderManager = & BorderManager::Instance();
+  this->warManager = & WarManager::Instance();
 }
 
 void DefenseManager::checkDefenses(){

@@ -53,8 +53,7 @@ public:
 	MacroManager();
 	~MacroManager();
 	
-	void setDependencies(BuildOrderManager * bom, ProductionManager * pm, BuildManager * bm,
-BaseManager * base, WorkerManager * wm);
+	void setDependencies();
 	virtual void onStart();
 	std::string getName() const;
 	void onUnitDestroy(BWAPI::Unit* unit);
