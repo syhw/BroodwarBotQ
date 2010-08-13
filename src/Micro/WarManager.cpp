@@ -93,7 +93,7 @@ void WarManager::onOffer(std::set<BWAPI::Unit*> units)
 
 void WarManager::onRevoke(BWAPI::Unit* unit, double bid)
 {
-	this->onUnitDestroy(unit);
+
 }
 
 std::string WarManager::getName() const
