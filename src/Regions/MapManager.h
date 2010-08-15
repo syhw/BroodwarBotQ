@@ -22,6 +22,8 @@ private:
     ~MapManager();
     int _width;
     int _height;
+    int _pix_width;
+    int _pix_height;
     inline void modifyBuildings(BWAPI::Unit* u, bool b);
     inline void addBuilding(BWAPI::Unit* u);
     inline void removeBuilding(BWAPI::Unit* u);

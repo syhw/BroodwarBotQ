@@ -4,13 +4,16 @@
 #include "UnitGroupManager.h"
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 using namespace BWAPI;
 
 MapManager::MapManager()
+: _pix_width(Broodwar->mapWidth() * 32)
+, _pix_height(Broodwar->mapHeight() * 32)
+, _width(Broodwar->mapWidth() * 4)
+, _height(Broodwar->mapHeight() * 4)
 {
-    _width = 4*Broodwar->mapWidth();
-    _height = 4*Broodwar->mapHeight();   
     walkability = new bool[_width * _height];             // Walk Tiles resolution
     buildings_wt = new bool[_width * _height];
     buildings_wt_strict = new bool[_width * _height];
@@ -107,26 +110,29 @@ void MapManager::removeBuilding(Unit* u)
 void MapManager::modifyDamages(int* tab, Position p, int minRadius, int maxRadius, int damages)
 {
     // TODO optimize
-    Broodwar->printf("modify minRadius: %d, maxRadius %d, Position(%d, %d)", minRadius, maxRadius, p.x(), p.y());
-    unsigned int lowerX = (p.x() - maxRadius - 1) > 0 ? p.x() - maxRadius - 1 : 0;
-    unsigned int higherX = (p.x() + maxRadius + 1) < _width ? p.x() + maxRadius + 1 : _width;
-    unsigned int lowerY = (p.y() - maxRadius - 1) > 0 ? p.y() - maxRadius - 1 : 0;
-    unsigned int higherY = (p.y() + maxRadius + 1) < _height ? p.y() + maxRadius + 1 : _height;
-    for (unsigned int x = lowerX; x <= higherX; x += 32)
-        for (unsigned int y = lowerY; y <= higherY; y += 32)
+    int tmpMaxRadius = maxRadius + 32;
+    //Broodwar->printf("modify minRadius: %d, maxRadius %d, Position(%d, %d)", minRadius, maxRadius, p.x(), p.y());
+    int lowerX = (p.x() - tmpMaxRadius) > 0 ? p.x() - tmpMaxRadius : 0;
+    int higherX = (p.x() + tmpMaxRadius) < _width ? p.x() + tmpMaxRadius : _pix_width;
+    int lowerY = (p.y() - tmpMaxRadius) > 0 ? p.y() - tmpMaxRadius : 0;
+    int higherY = (p.y() + tmpMaxRadius) < _height ? p.y() + tmpMaxRadius : _pix_height;
+    assert(higherX > lowerX);
+    assert(higherY > lowerY);
+    for (int x = lowerX; x <= higherX; x += 32)
+        for (int y = lowerY; y <= higherY; y += 32)
         {
             double dist = p.getDistance(Position(x, y));
-            if (dist <= maxRadius && dist > minRadius)
+            if (dist <= tmpMaxRadius && dist > minRadius)
             {
-                //tab[x/32 + y/32*Broodwar->mapWidth()] += damages;
-                groundDamages[x/32 + y/32*Broodwar->mapWidth()] += damages;
-                Broodwar->printf("writing");
+                tab[x/32 + y/32*Broodwar->mapWidth()] += damages;
             }                
         }
 }
 
 void MapManager::removeDmg(UnitType ut, Position p)
 {
+    if (p.x() == 0 && p.y() == 0)
+        Broodwar->printf("0,0 : %s", ut.getName().c_str());
     if (ut.groundWeapon() != BWAPI::WeaponTypes::None)
     {
         modifyDamages(this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange(), 
@@ -141,6 +147,8 @@ void MapManager::removeDmg(UnitType ut, Position p)
 
 void MapManager::addDmg(UnitType ut, Position p)
 {
+    if (p.x() == 0 && p.y() == 0)
+        Broodwar->printf("0,0 : %s", ut.getName().c_str());
     if (ut.groundWeapon() != BWAPI::WeaponTypes::None)
     {
         modifyDamages(this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange(), 
@@ -161,6 +169,7 @@ void MapManager::onUnitCreate(Unit* u)
 void MapManager::onUnitDestroy(Unit* u)
 {
     removeBuilding(u);
+    removeDmg(u->getType(), u->getPosition());
 }
 
 void MapManager::onUnitShow(Unit* u)
@@ -175,36 +184,22 @@ void MapManager::onUnitHide(Unit* u)
 
 void MapManager::onFrame()
 {
-
-    // check/update the damage maps
-    //if (_eUnitsFilter->empty())
-    //    return;
+    // check/update the damage maps. BEWARE: hidden units are not removed in presence of doubt!
     std::map<BWAPI::Unit*, EViewedUnit> tmp = _eUnitsFilter->getViewedUnits();
     //std::map<BWAPI::Unit*, EViewedUnit> tmp = _eUnitsFilter->_eViewedUnits;
     for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = tmp.begin();
         it != tmp.end(); ++it)
     {
-        if (it->first->isVisible())
+        if (it->first->isVisible() 
+            && it->first->exists()
+            && _trackedUnits[it->first] != it->first->getPosition())
         {
-            if (_trackedUnits[it->first] != it->first->getPosition())
-            {
-                // update EUnitsFilter
-                _eUnitsFilter->update(it->first);
-                // update the map
-                removeDmg(it->first->getType(), _trackedUnits[it->first]);
-                addDmg(it->first->getType(), it->first->getPosition());
-                _trackedUnits[it->first] = it->first->getPosition();
-            }
-        }
-        else    // TODO: should it happen? I don't think so (huge simplification to come then)
-        {
-            if (_trackedUnits[it->first] != it->second.position)
-            {
-                // update the map
-                removeDmg(it->second.type, _trackedUnits[it->first]);
-                addDmg(it->second.type, it->second.position);
-                _trackedUnits[it->first] = it->second.position;
-            }
+            // update EUnitsFilter
+            _eUnitsFilter->update(it->first);
+            // update the map
+            removeDmg(it->first->getType(), _trackedUnits[it->first]);
+            addDmg(it->first->getType(), it->first->getPosition());
+            _trackedUnits[it->first] = it->first->getPosition();
         }
     }
 

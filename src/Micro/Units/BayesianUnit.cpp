@@ -832,7 +832,7 @@ void BayesianUnit::updateTargetEnemy()
             break;
         if (it->first.dmg < it->second->getHitPoints() + it->second->getShields()
             && _unitPos.getDistance(it->second->getPosition())
-            < (double)unit->getType().groundWeapon().maxRange())
+            < (double)unit->getType().groundWeapon().maxRange() + 64) // TODO 64 is the goon range upgrade
         {
             setTargetEnemy(it->second);
             return;
