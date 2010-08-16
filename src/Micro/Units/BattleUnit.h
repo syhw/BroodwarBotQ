@@ -13,7 +13,6 @@ class BattleUnit
     friend void baseMicro();
     friend void zealotMicro();
 protected:
-    int _sheight, _slarge;
     int _accel;
     double _topSpeed;
 #ifdef UNIT_DEBUG
@@ -38,6 +37,7 @@ protected:
     BWAPI::Unit* oldTarget;
 
 public:
+	int _sheight, _slarge;
     static void buildingsAwarePathFind(std::vector<BWAPI::TilePosition>& btpath, 
         const BWAPI::TilePosition& start, const BWAPI::TilePosition& end);
     static void quickPathFind(std::vector<BWAPI::TilePosition>& btpath, // works only with correct Regions

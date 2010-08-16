@@ -152,26 +152,25 @@ void BattleBroodAI::onStart()
         this->macroManager = & ZergStrat::Instance();
 
 	//Set dependencies
-
-	this->baseManager->setDependencies(this->buildOrderManager, this->borderManager);
-	this->borderManager->setDependencies(this->informationManager);
-	this->buildManager->setDependencies(this->arbitrator, this->buildingPlacer,this->constructionManager,this->productionManager,this->morphManager);
-	this->constructionManager->setDependencies(this->arbitrator,this->buildingPlacer);
-	this->morphManager->setDependencies(this->arbitrator);
-	this->productionManager->setDependencies(this->arbitrator,this->buildingPlacer);
-	this->buildOrderManager->setDependencies(this->buildManager,this->techManager,this->upgradeManager,this->workerManager,this->supplyManager);
-	this->supplyManager->setDependencies(this->buildManager,this->buildOrderManager);
-	this->techManager->setDependencies(this->arbitrator,this->buildingPlacer);
-	this->upgradeManager->setDependencies(this->arbitrator,this->buildingPlacer);
-	this->scoutManager->setDependencies(this->regions,this->warManager);
-	this->workerManager->setDependencies(this->arbitrator,this->baseManager,this->buildOrderManager);
-	this->regions->setDependencies(this->timeManager,this->mapManager);
-	this->eEcoEstimator->setDependencies(this->timeManager);
-	this->warManager->setDependencies(this->arbitrator,this->regions);
-	this->goalManager->setDependencies(this->warManager,this->regions);
-	this->macroManager->setDependencies(this->buildOrderManager,this->productionManager,this->buildManager,this->baseManager,this->workerManager);
+	this->baseManager->setDependencies();
+	this->borderManager->setDependencies();
+	this->buildManager->setDependencies();
+	this->constructionManager->setDependencies();
+	this->morphManager->setDependencies();
+	this->productionManager->setDependencies();
+	this->buildOrderManager->setDependencies();
+	this->supplyManager->setDependencies();
+	this->techManager->setDependencies();
+	this->upgradeManager->setDependencies();
+	this->scoutManager->setDependencies();
+	this->workerManager->setDependencies();
+	this->regions->setDependencies();
+	this->eEcoEstimator->setDependencies();
+	this->warManager->setDependencies();
+	this->goalManager->setDependencies();
+	this->macroManager->setDependencies();
 	this->mapManager->setDependencies(this->eUnitsFilter);
-	this->defenseManager->setDependencies(this->arbitrator,this->borderManager);
+	this->defenseManager->setDependencies();
 
 	//Broodwar->printf("The match up is %s v %s",
     Broodwar->self()->getRace().getName().c_str();
@@ -205,11 +204,6 @@ void BattleBroodAI::onFrame()
     sprintf_s(mousePos, "%d, %d", Broodwar->getMousePosition().x(), Broodwar->getMousePosition().y());
     Broodwar->drawTextMouse(12, 0, mousePos);
 #endif
-
-
-
-
-	//Added by  Louis
 	this->buildManager->update();
 	this->buildOrderManager->update();
 	this->baseManager->update();
@@ -217,14 +211,14 @@ void BattleBroodAI::onFrame()
 	this->techManager->update();
 	this->upgradeManager->update();
 	this->supplyManager->update();
-	objManager->onFrame();
-
-	this->borderManager->update();
-	this->mapManager->onFrame();
-    this->macroManager->update();
-	this->arbitrator->update();
 	this->enhancedUI->update();
+	this->borderManager->update();
+	objManager->onFrame();
+	this->mapManager->onFrame();
 	this->defenseManager->update();
+
+	this->arbitrator->update();
+
   std::set<Unit*> units=Broodwar->self()->getUnits();
   if (this->showManagerAssignments)
   {
@@ -445,6 +439,7 @@ void BattleBroodAI::onUnitEvade(BWAPI::Unit* unit){
 	  if (Broodwar->isReplay()) return;
   this->informationManager->onUnitEvade(unit);
   this->unitGroupManager->onUnitEvade(unit);
+  this->arbitrator->onRemoveObject(unit);
 }
 
 void BattleBroodAI::onUnitCreate(BWAPI::Unit* unit)

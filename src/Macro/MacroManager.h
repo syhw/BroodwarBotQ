@@ -52,9 +52,7 @@ class MacroManager: public BaseObject
 public:
 	MacroManager();
 	~MacroManager();
-	
-	void setDependencies(BuildOrderManager * bom, ProductionManager * pm, BuildManager * bm,
-BaseManager * base, WorkerManager * wm);
+	void setDependencies();
 	virtual void onStart();
 	std::string getName() const;
 	void onUnitDestroy(BWAPI::Unit* unit);
@@ -75,7 +73,6 @@ BaseManager * base, WorkerManager * wm);
 	bool canCreateTechBuildings( UnitType techBuilding, UnitType buildingRequiered, int nbRequieredBuilding);
 	bool canCreateDefenseBuildings( UnitType techBuilding, UnitType buildingRequiered);
 	bool shouldExpand();
-	BWTA::BaseLocation* naturalExpand;
 #ifdef BW_QT_DEBUG
     // Qt interface
 	virtual QWidget* createWidget(QWidget* parent) const;

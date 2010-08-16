@@ -112,12 +112,14 @@ namespace Arbitrator
     unansweredObjected.erase(obj);
     if (owner[obj]) //if someone else already own this object, take it away from them
     {
+		
       inOnOffer=false;
       inOnRevoke=true;
       owner[obj]->onRevoke(obj,bids[obj].top().second);
       inOnRevoke=false;
       inOnOffer=true;
       objects[owner[obj]].erase(obj); //remove this object from the set of objects owned by the former owner
+	  
     }
     owner[obj] = c; //set the new owner
     objects[c].insert(obj); //insert this object into the set of objects owned by this controller

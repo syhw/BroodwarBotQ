@@ -47,6 +47,7 @@ void ProtossStrat::update(){
 	}
 	BWAPI::Broodwar->drawCircleMap(naturalExpand->getPosition().x(),naturalExpand->getPosition().y(),20,BWAPI::Colors::Green, true);
 	*/
+
 }
 
 void ProtossStrat::buildGeyser()

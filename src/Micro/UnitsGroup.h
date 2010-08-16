@@ -36,7 +36,6 @@ private:
     std::set<BWAPI::Unit*> enemies;
 	int totalHP;
 	int totalPower;
-    std::vector<pBayesianUnit> units;
     std::map<BWAPI::Unit*, std::list<pBayesianUnit> > attackersEnemy;
     
 	std::list<pGoal> goals; // list of goals to accomplish
@@ -51,6 +50,7 @@ private:
     /// Affiche les cibles des unités du UnitsGroup
     void displayTargets();
 public:
+	std::vector<pBayesianUnit> units;
     std::vector<WalkTilePosition> _path;
     std::map<BWAPI::Unit*, EUnit> enemiesInSight;
 	
@@ -72,7 +72,8 @@ public:
 	virtual void formation(pFormation f);
 	virtual void setGoals(std::list<pGoal>& goals);
 	virtual void addGoal(pGoal goal);
-	
+	pGoal getLastGoal();
+
 	//virtual bool checkInFormation();
 	//virtual bool checkAtDestination();
     int size();
@@ -93,7 +94,6 @@ public:
 	bool emptyGoals();
 	unsigned int getNbUnits() const;
     int getTotalHP() const;
-    std::vector<pBayesianUnit>* getUnits();
     std::map<BWAPI::Unit*, std::list<pBayesianUnit> >& getAttackersEnemy();
     
 

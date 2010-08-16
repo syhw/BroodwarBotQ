@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include "BaseObject.h"
 
-
 class UnitsGroup;
 class Regions;
 class ScoutManager;
@@ -24,7 +23,7 @@ private:
 	Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
 	Regions* regions;
 public:
-	void setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, Regions * reg);
+	void setDependencies();
 	void onStart();
 	std::list<UnitsGroup*> unitsgroups;
 	virtual void onOffer(std::set<BWAPI::Unit*> units);
@@ -39,8 +38,8 @@ public:
 	void promptRemove(UnitsGroup* ug);//Guarantee that on the nextFrame :
 	//-The target of the units of this UG will be their position so they are idling
 	//-The unitsgroup will be removed from unitsgroups and deleted
-	
-	UnitsGroup * ugIdle;
+	UnitsGroup* ugIdle; //UnitsGroup defending before attacking
+	std::set<BWAPI::Unit *> usedUnits; // Units used by other Managers
 
 #ifdef BW_QT_DEBUG
 	// Qt interface

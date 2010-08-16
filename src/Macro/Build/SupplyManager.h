@@ -8,7 +8,7 @@ class SupplyManager: public CSingleton<SupplyManager>
 {
 	friend class CSingleton<SupplyManager>;
   public:
-	void setDependencies(BuildManager* bm, BuildOrderManager* bom);
+	void setDependencies();
     void update();
     std::string getName() const;
     int getPlannedSupply() const;

@@ -76,9 +76,9 @@ Regions::~Regions()
 
 }
 
-void Regions::setDependencies(TimeManager * tm, MapManager * map){
-	this->timeManager = tm;
-	this->mapManager = map;
+void Regions::setDependencies(){
+	this->timeManager = & TimeManager::Instance();
+	this->mapManager = & MapManager::Instance();
 }
 
 Region* Regions::findRegion(BWAPI::Position p)

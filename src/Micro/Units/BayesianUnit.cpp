@@ -119,8 +119,8 @@ void BayesianUnit::computeInPosValues()
 
             bool appartient = false; //*** [A CHANGER]
             for (vector<pBayesianUnit>::const_iterator it2 = 
-                _unitsGroup->getUnits()->begin(); 
-            it2 != _unitsGroup->getUnits()->end() && !appartient; ++it2)
+                _unitsGroup->units.begin(); 
+            it2 != _unitsGroup->units.end() && !appartient; ++it2)
                     appartient = (*it2)->unit == (*it);
             if (appartient) continue; //*** [FIN A CHANGER]
 
@@ -155,8 +155,8 @@ void BayesianUnit::computeFlockValues()
     {
         vector<flock_value> tmpv;
         for (vector<pBayesianUnit>::const_iterator it = 
-                _unitsGroup->getUnits()->begin(); 
-            it != _unitsGroup->getUnits()->end(); ++it)
+                _unitsGroup->units.begin(); 
+            it != _unitsGroup->units.end(); ++it)
         {
             if ((*it)->unit == this->unit) continue; 
             // we don't flock with ourselves!
@@ -394,7 +394,7 @@ double BayesianUnit::computeProb(unsigned int i)
     double val = 1.;
     //for (multimap<Position, attractor_type>::const_iterator it = _prox.begin(); it != _prox.end(); ++it)
 
-    if (_unitsGroup->getUnits()->size() > 1 && _mode == MODE_FLOCK)
+    if (_unitsGroup->units.size() > 1 && _mode == MODE_FLOCK)
     {
         /// FLOCKING INFLUENCE
         // one j for each attractor
@@ -405,7 +405,7 @@ double BayesianUnit::computeProb(unsigned int i)
             val *= _dodgeProb[_dodgeValues[i][j]];
        
         /// OBJECTIVE (pathfinder) INFLUENCE
-        double prob_obj = _PROB_GO_OBJ / (_unitsGroup->getUnits()->size() - 1);
+        double prob_obj = _PROB_GO_OBJ / (_unitsGroup->units.size() - 1);
 
         if (_dirv[i] == obj)
             val *= prob_obj;

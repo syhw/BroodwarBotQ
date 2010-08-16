@@ -1,17 +1,19 @@
 #include <BaseManager.h>
 #include <BuildOrderManager.h>
 #include <BorderManager.h>
+
 BaseManager::BaseManager()
 {
   this->builder = NULL;
   this->RefineryNeeded  = 1;
   this->refineryBuildPriority = 0;
+  computeNatural();
 }
 
-void BaseManager::setDependencies(BuildOrderManager * bom, BorderManager * bm){
-	this->builder = bom;
-	this->borderManager = bm;
-
+void BaseManager::setDependencies(){
+	this->builder = & BuildOrderManager::Instance();
+	this->borderManager = & BorderManager::Instance();
+	this->defenseManager = & DefenseManager::Instance();
 }
 
 void BaseManager::update()
@@ -145,7 +147,9 @@ void BaseManager::addBase(BWTA::BaseLocation* location)
   allBases.insert(newBase);
   this->location2base[location] = newBase;
   this->borderManager->addMyBase(location);
+  defenseManager->addBase(newBase);
 }
+
 void BaseManager::removeBase(BWTA::BaseLocation* location)
 {
   std::map<BWTA::BaseLocation*,Base*>::iterator removebase;
@@ -292,4 +296,25 @@ bool BaseManager::hasRefinery(BWTA::BaseLocation* location)
   }
   
   return refinery;
+}
+
+void BaseManager::computeNatural(){
+
+	double minDist = 10000000000;
+	double test;
+	BWTA::BaseLocation * minBase;
+	std::set<BWTA::BaseLocation * > allBaseLocations = BWTA::getBaseLocations();
+	BWTA::BaseLocation * myBaseLocation = BWTA::getStartLocation(BWAPI::Broodwar->self());
+	
+	for(std::set<BWTA::BaseLocation *>::iterator it = allBaseLocations.begin(); it != allBaseLocations.end(); ++it){
+		if( (*it) !=  myBaseLocation && !(*it)->isMineralOnly() ){
+			//not our main
+			test = (*it)->getPosition().getDistance(myBaseLocation->getPosition());
+			if(test < minDist){
+				minDist = test;
+				minBase = (*it);
+			}
+		}
+	}
+	this->naturalExpand = minBase;
 }

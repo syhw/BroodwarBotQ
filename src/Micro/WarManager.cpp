@@ -17,7 +17,6 @@ WarManager::WarManager()
 : BaseObject("WarManager")
 {
 	this->ugIdle = new UnitsGroup();
-
 	this->arbitrator = NULL;
 	this->regions = NULL;
 }
@@ -27,14 +26,14 @@ WarManager::~WarManager()
 	//Broodwar->printf("INOUT WarManager::~WarManager()");
 }
 
-void WarManager::setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, Regions * reg){
-	this->arbitrator = arb;
-	this->regions = reg;
-
+void WarManager::setDependencies(){
+	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
+	this->regions = & Regions::Instance();
 }
 
 void WarManager::onStart(){
 
+	this->ugIdle->addGoal(pGoal(new DefendChokeGoal(ugIdle, (*BaseManager::Instance().getAllBases().begin())->chokeToDef)));
 
 }
 void WarManager::update()
@@ -47,7 +46,6 @@ void WarManager::update()
 	}
 	promptedRemove.clear();
 
-
 	//Set bid on appropriate units (not workers and not building)
 	std::set<BWAPI::Unit *> myUnits = BWAPI::Broodwar->self()->getUnits();
 
@@ -58,9 +56,7 @@ void WarManager::update()
 	}
 
 	
-
 	//Update unitsgroup
-	ugIdle->update();
 	if (unitsgroups.empty()) return;
 	UnitsGroup* ug;
 	for (std::list<UnitsGroup*>::iterator it = unitsgroups.begin(); it != unitsgroups.end(); it++)
@@ -68,10 +64,6 @@ void WarManager::update()
 		 ug = *it;
 		 ug->update();
 	}
-/*
-    sout << "LOL" << sendl; 
-    serr << "LOL" << sendl;
-*/
 }
 
 
@@ -96,7 +88,6 @@ void WarManager::onOffer(std::set<BWAPI::Unit*> units)
 
 void WarManager::onRevoke(BWAPI::Unit* unit, double bid)
 {
-	this->onUnitDestroy(unit);
 }
 
 std::string WarManager::getName() const

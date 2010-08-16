@@ -11,9 +11,9 @@ UpgradeManager::UpgradeManager()
   }
 }
 
-void UpgradeManager::setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, BuildingPlacer* bp){
-	this->arbitrator = arb;
-	this->placer=bp;
+void UpgradeManager::setDependencies(){
+	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
+	this->placer= & BuildingPlacer::Instance();
 }
 
 void UpgradeManager::onOffer(std::set<BWAPI::Unit*> units)

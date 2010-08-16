@@ -19,10 +19,11 @@ WorkerManager::WorkerManager()
   this->autoBuild         = false;
   this->autoBuildPriority = 80;
 }
-void WorkerManager::setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, BaseManager * bm, BuildOrderManager * bom){
-	this->arbitrator = arb;
-	this->baseManager = bm;
-	this->buildOrderManager = bom;
+
+void WorkerManager::setDependencies(){
+	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
+	this->baseManager = & BaseManager::Instance();
+	this->buildOrderManager = & BuildOrderManager::Instance();
 }
 
 void WorkerManager::onOffer(set<Unit*> units)
