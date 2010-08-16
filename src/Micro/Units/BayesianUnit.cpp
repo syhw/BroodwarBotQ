@@ -1079,7 +1079,8 @@ void BayesianUnit::update()
     if (!unit->exists()) return;
     _unitPos = unit->getPosition();
 
-    if (_mode != MODE_FIGHT_G && !_unitsGroup->enemies.empty())
+    if (_mode != MODE_FIGHT_G && !_unitsGroup->enemies.empty()
+        && unit->getGroundWeaponCooldown() <= Broodwar->getLatency())
     {
         Broodwar->setLocalSpeed(42);
         this->switchMode(MODE_FIGHT_G);
@@ -1132,15 +1133,22 @@ void BayesianUnit::update()
         //    if (!unit->isMoving())
         //        unit->attackMove(target);
         //}
-        //else 
-        if ((Broodwar->getFrameCount() - _lastAttackOrder > 10) 
-            && (unit->getGroundWeaponCooldown() <= Broodwar->getLatency()) 
-            && (unit->getOrderTarget() != targetEnemy || unit->isMoving()))
+        //else
+        if (Broodwar->getFrameCount() - _lastAttackOrder > 10) 
         {
-            updateRangeEnemies();
-            updateTargetEnemy();
-            unit->attackUnit(targetEnemy);
-            _lastAttackOrder = Broodwar->getFrameCount();
+            if ((unit->getGroundWeaponCooldown() <= Broodwar->getLatency()) 
+                && (unit->getOrderTarget() != targetEnemy || unit->isMoving()))
+            {
+                updateRangeEnemies();
+                updateTargetEnemy();
+                unit->attackUnit(targetEnemy);
+                _lastAttackOrder = Broodwar->getFrameCount();
+            }
+            else if (!unit->getShields())
+            {
+                unit->rightClick(Position(Broodwar->mapWidth()*16, Broodwar->mapHeight()*16));
+                
+            }
         }
         break;
         
