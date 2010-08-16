@@ -91,7 +91,7 @@ void DefenseManager::checkGroundDefense(Base * b, bool toDef){
 			//We do not need to defend
 			if(ug->getNbUnits() > 0){
 				//We must give back those units to the WarManager
-				for(std::vector<pBayesianUnit>::iterator units = (*ug->getUnits()).begin(); units != (*ug->getUnits()).end(); ++ units){
+				for(std::vector<pBayesianUnit>::iterator units = ((*ug).units).begin(); units != ((*ug).units).end(); ++ units){
 					this->arbitrator->setBid(this,(*units)->unit, 0);
 					ug->giveUpControl((*units)->unit);
 				}

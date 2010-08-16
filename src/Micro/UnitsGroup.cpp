@@ -624,10 +624,6 @@ int UnitsGroup::getTotalHP() const
     return totalHP;
 }
 
-std::vector<pBayesianUnit>* UnitsGroup::getUnits()
-{
-    return &units;
-}
 
 std::map<BWAPI::Unit*, std::list<pBayesianUnit> >& UnitsGroup::getAttackersEnemy()
 {
@@ -726,14 +722,14 @@ void UnitsGroup::accomplishGoal()
 }
 void UnitsGroup::switchMode(unit_mode um)
 {
-	for(std::vector<pBayesianUnit>::iterator it = getUnits()->begin(); it != getUnits()->end(); ++it){
+	for(std::vector<pBayesianUnit>::iterator it = units.begin(); it != units.end(); ++it){
 		(*it)->switchMode(um);
 	}
 }
 
 void UnitsGroup::idle()
 {
-	for(std::vector<pBayesianUnit>::iterator it = getUnits()->begin(); it != getUnits()->end(); ++it){
+	for(std::vector<pBayesianUnit>::iterator it = units.begin(); it != units.end(); ++it){
 		(*it)->target = (*it)->unit->getPosition();
 	}
 }
