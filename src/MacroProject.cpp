@@ -91,6 +91,7 @@ void BattleBroodAI::onStart()
 
 	// Speed up the game to the maximum
     //Broodwar->setLocalSpeed(0);
+
 	
 	this->showManagerAssignments=false;
 
@@ -152,6 +153,7 @@ void BattleBroodAI::onStart()
         this->macroManager = & ZergStrat::Instance();
 
 	//Set dependencies
+<<<<<<< HEAD
 	this->baseManager->setDependencies();
 	this->borderManager->setDependencies();
 	this->buildManager->setDependencies();
@@ -173,6 +175,7 @@ void BattleBroodAI::onStart()
 	this->defenseManager->setDependencies();
 
 	//Broodwar->printf("The match up is %s v %s",
+
     Broodwar->self()->getRace().getName().c_str();
     Broodwar->enemy()->getRace().getName().c_str();
 
@@ -204,6 +207,7 @@ void BattleBroodAI::onFrame()
     sprintf_s(mousePos, "%d, %d", Broodwar->getMousePosition().x(), Broodwar->getMousePosition().y());
     Broodwar->drawTextMouse(12, 0, mousePos);
 #endif
+<<<<<<< HEAD
 	this->buildManager->update();
 	this->buildOrderManager->update();
 	this->baseManager->update();
@@ -429,6 +433,7 @@ void BattleBroodAI::onFrame()
     //Broodwar->printf("Iterations took %f", (double)(end-start)/CLOCKS_PER_SEC);
 }
 
+<<<<<<< HEAD
 void BattleBroodAI::onUnitDiscover(BWAPI::Unit* unit){
 	  if (Broodwar->isReplay()) return;
   this->informationManager->onUnitDiscover(unit);

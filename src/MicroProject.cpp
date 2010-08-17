@@ -12,7 +12,11 @@ void MicroAIModule::onStart()
 	// Enable some cheat flags
     //Broodwar->printf("ON START !!\n");
     Broodwar->enableFlag(Flag::UserInput);
+<<<<<<< HEAD
     //Broodwar->setLocalSpeed(0);
+=======
+    Broodwar->setLocalSpeed(0);
+>>>>>>> essai
 	//Broodwar->enableFlag(Flag::CompleteMapInformation);
 	BWTA::readMap();
 	BWTA::analyze();
@@ -20,9 +24,16 @@ void MicroAIModule::onStart()
     this->mapManager = & MapManager::Instance();
 	this->objectManager = & ObjectManager::Instance();
     this->regions = & Regions::Instance();
+<<<<<<< HEAD
 
 	mm = new UnitsGroup();
  //   mD = new UnitsGroup();
+=======
+    this->unitGroupManager = & UnitGroupManager::Instance();
+    regions->setDependencies(NULL, mapManager);
+
+	mm = new UnitsGroup();
+>>>>>>> essai
 
 	// Vec center;
 	std::set<Unit*> allUnits = Broodwar->getAllUnits();
@@ -30,14 +41,19 @@ void MicroAIModule::onStart()
 	for (std::set<Unit*>::iterator i=allUnits.begin(); i!=allUnits.end(); i++)
 	{
         onUnitShow(*i);
+<<<<<<< HEAD
         if ((*i)->getPlayer() != Broodwar->self())
             continue;
 		if ((*i)->getType().isBuilding())
+=======
+        if ((*i)->getType().isBuilding())
+>>>>>>> essai
 		{
 			this->buildings.insert(std::make_pair(*i,(*i)->getType()));
             regions->onUnitCreate(*i);
             mapManager->onUnitCreate(*i);
 		} 
+<<<<<<< HEAD
         else// if ((*i)->getType() == BWAPI::UnitTypes::Protoss_Zealot)
 		{
             // Broodwar->printf("Took control of: %s\n", (*i)->getType().getName().c_str() );
@@ -73,6 +89,18 @@ void MicroAIModule::onStart()
     /// goals.push_back(Goal("direct square 480, 1600", new SquareFormation(Vec(480, 1600))));
     /// TEST test_pathfinding
     /// goals.push_back(pGoal(new Goal("direct square 384, 768", pFormation(new SquareFormation(Vec(60*32, 61*32))))));
+=======
+        else 
+        {
+            if ((*i)->getPlayer() != Broodwar->self())
+                continue;
+            else
+                mm->takeControl(*i);
+        }
+	}
+
+	std::list<pGoal> goals;
+>>>>>>> essai
 
 	BWAPI::TilePosition mp = Broodwar->self()->getStartLocation();
 	Position p;
@@ -80,6 +108,7 @@ void MicroAIModule::onStart()
 	{
 		if (!((*l) == mp))
 			p = BWAPI::Position(*l);
+<<<<<<< HEAD
 	}
 
     /// EXEMPLE FOR THE FLOCK_2 and FLOCK_8 MAPS
@@ -141,6 +170,36 @@ void MicroAIModule::onStart()
 	Broodwar->printf( "size: %i", mm->goals.size());
 	Broodwar->printf( "center: %f, %f", mm->goals.front().formation->center.x, mm->goals.front().formation->center.y);
 	//*/
+=======
+    }
+
+    int sign = mp.x() < Broodwar->mapWidth()/2*32 ? 1 : -1;
+
+    /* LINE IN THE MIDDLE (+/- 64 pixs)
+    pFormation tmp_form = pFormation(new LineFormation(
+        Position(Broodwar->mapWidth()/2*32 + sign*64,(Broodwar->mapHeight()/2 + 4)*32), Vec(1,0)));
+    pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
+    pGoal tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+    goals.push_back(tmp_goal);
+    */
+
+    /* ARC IN THE MIDDLE (+/- 196 pixs) */
+    pFormation tmp_form = pFormation(new ArcFormation(
+        Position(Broodwar->mapWidth()/2*32 + sign*196,(Broodwar->mapHeight()/2 + 4)*32), 
+        Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
+    pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
+    pGoal tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+    goals.push_back(tmp_goal);
+    
+    /* SQUARE ON THE OTHER SIDE */
+    tmp_form = pFormation(new SquareFormation(
+        Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
+    tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
+    tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+    goals.push_back(tmp_goal);    
+    
+	mm->setGoals(goals);
+>>>>>>> essai
 
 #ifdef BW_QT_DEBUG
 	g_onStartDone = true;
@@ -156,8 +215,11 @@ void MicroAIModule::onFrame()
     objectManager->onFrame();
 	if (mm != NULL) 
         mm->update();
+<<<<<<< HEAD
 	//if (mD != NULL) 
    //     mD->update();
+=======
+>>>>>>> essai
     regions->display();
     
 #ifdef BW_POS_MOUSE
@@ -205,10 +267,16 @@ MicroAIModule::~MicroAIModule()
     (*qapp)->quit();
 #endif
     MapManager::Destroy();
+<<<<<<< HEAD
 		ObjectManager::Destroy();
     Regions::Destroy();
     mm->~UnitsGroup();
   //  mD->~UnitsGroup();
+=======
+    ObjectManager::Destroy();
+    Regions::Destroy();
+    mm->~UnitsGroup();
+>>>>>>> essai
 }
 
 #ifdef BW_QT_DEBUG
@@ -311,6 +379,10 @@ void MicroAIModule::onUnitShow(Unit* unit)
     eUnitsFilter->onUnitShow(unit);
     mapManager->onUnitShow(unit);
 	regions->onUnitShow(unit);
+<<<<<<< HEAD
+=======
+    unitGroupManager->onUnitDiscover(unit);
+>>>>>>> essai
     mm->onUnitShow(unit);
 }
 void MicroAIModule::onUnitHide(Unit* unit)
@@ -318,6 +390,10 @@ void MicroAIModule::onUnitHide(Unit* unit)
     eUnitsFilter->onUnitHide(unit);
     mapManager->onUnitHide(unit);
 	regions->onUnitHide(unit);
+<<<<<<< HEAD
+=======
+    unitGroupManager->onUnitEvade(unit);
+>>>>>>> essai
     mm->onUnitHide(unit);
 }
 

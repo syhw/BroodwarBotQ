@@ -5,12 +5,21 @@
 #include <MorphManager.h>
 BuildManager::BuildManager()
 {
+<<<<<<< HEAD
 	this->arbitrator = NULL;
 	this->buildingPlacer= NULL;
 	this->constructionManager= NULL;
 	this->productionManager= NULL;
 	this->morphManager= NULL;
 	this->debugMode = false;
+=======
+	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
+	this->buildingPlacer= & BuildingPlacer::Instance();
+	this->constructionManager= & ConstructionManager::Instance();
+	this->productionManager= & ProductionManager::Instance();
+	this->morphManager= & MorphManager::Instance();
+	this->debugMode = true;
+>>>>>>> essai
 }
 
 BuildManager::~BuildManager()
@@ -21,12 +30,23 @@ BuildManager::~BuildManager()
     MorphManager::Destroy();
 }
 
+<<<<<<< HEAD
 void BuildManager::setDependencies(){
 	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance() ;
 	this->buildingPlacer = & BuildingPlacer::Instance();
 	this->constructionManager = & ConstructionManager::Instance();
 	this->productionManager = & ProductionManager::Instance();
 	this->morphManager = & MorphManager::Instance();
+=======
+void BuildManager::setDependencies(
+Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, BuildingPlacer * bp, ConstructionManager * cm,
+ProductionManager * pm, MorphManager * mm){
+	this->arbitrator = arb;
+	this->buildingPlacer = bp;
+	this->constructionManager = cm;
+	this->productionManager = pm;
+	this->morphManager = mm;
+>>>>>>> essai
 }
 
 BuildingPlacer* BuildManager::getBuildingPlacer(){

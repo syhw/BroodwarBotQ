@@ -6,6 +6,7 @@
 #include "BorderManager.h"
 
 
+
 using std::map;
 using std::set;
 using std::vector;
@@ -73,7 +74,6 @@ void WarManager::onOffer(std::set<BWAPI::Unit*> units)
 		if (!(*u)->getType().isWorker() && !(*u)->getType().isBuilding())
 		{
 			arbitrator->accept(this, *u);
-			
 			ugIdle->takeControl(*u);
 			//Broodwar->printf("New %s added to the micro manager", (*u)->getType().getName().c_str());
 		}
@@ -93,6 +93,7 @@ std::string WarManager::getName() const
 	return "Micro Manager";
 }
 
+<<<<<<< HEAD:src/Micro/WarManager.cpp
 void WarManager::onUnitCreate(BWAPI::Unit* unit)
 {
 	/*

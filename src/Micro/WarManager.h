@@ -38,8 +38,6 @@ public:
 	void promptRemove(UnitsGroup* ug);//Guarantee that on the nextFrame :
 	//-The target of the units of this UG will be their position so they are idling
 	//-The unitsgroup will be removed from unitsgroups and deleted
-	UnitsGroup* ugIdle; //UnitsGroup defending before attacking
-	std::set<BWAPI::Unit *> usedUnits; // Units used by other Managers
 
 #ifdef BW_QT_DEBUG
 	// Qt interface

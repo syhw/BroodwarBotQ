@@ -14,7 +14,6 @@ class UpgradeManager : public Arbitrator::Controller<BWAPI::Unit*,double>, publi
         int level;
     };
 	void setDependencies();
-    
     virtual void onOffer(std::set<BWAPI::Unit*> units);
     virtual void onRevoke(BWAPI::Unit* unit, double bid);
     virtual void update();

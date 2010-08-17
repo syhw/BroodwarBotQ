@@ -15,7 +15,7 @@ MapManager::MapManager()
     buildings_wt = new bool[_width * _height];
     buildings_wt_strict = new bool[_width * _height];
     lowResWalkability = new bool[_width * _height / 16];  // Build Tiles resolution
-    buildings = new bool[_width * _height / 16];          
+    buildings = new bool[Broodwar->mapWidth() * Broodwar->mapHeight()];//[_width * _height / 16];       
 
     // initialization
     for (int x = 0; x < _width; ++x) 
@@ -23,6 +23,7 @@ MapManager::MapManager()
         {
             walkability[x + y*_width] = Broodwar->isWalkable(x, y);
             buildings_wt[x + y*_width] = false;
+            buildings_wt_strict[x + y*_width] = false;
         }
     for (int x = 0; x < _width/4; ++x) 
     {
@@ -44,25 +45,26 @@ MapManager::MapManager()
         }
     }
 
-    _eUnitsFilter = NULL;
+    _eUnitsFilter = & EUnitsFilter::Instance();
 }
 
 MapManager::~MapManager()
 {
+#ifdef __DEBUG_GABRIEL__
+    Broodwar->printf("MapManager destructor");
+#endif
     delete [] walkability;
     delete [] lowResWalkability;
     delete [] buildings_wt;
     delete [] buildings;
 }
 
-void MapManager::setDependencies(EUnitsFilter * eu){
-	this->_eUnitsFilter = eu;
-}
-
 void MapManager::modifyBuildings(Unit* u, bool b)
 {
     // TODO Optimize (2 loops are unecessary)
-    if (!u->getType().isBuilding() || (u->isLifted() && b)) return;
+    if (!u->getType().isBuilding() 
+        || (u->isLifted() && b)) // lifted building won't be added (b==true)
+        return;
     TilePosition tpBd = u->getTilePosition(); // top left corner of the building
     for (int x = tpBd.x(); x < tpBd.x() + u->getType().tileWidth(); ++x)
         for (int y = tpBd.y(); y < tpBd.y() + u->getType().tileHeight(); ++y)
@@ -74,10 +76,10 @@ void MapManager::modifyBuildings(Unit* u, bool b)
             if (x >= 0 && x < _width && y >= 0 && y < _height)
                 buildings_wt[x + y*_width] = b;
     for (int x = (u->getPosition().x() - u->getType().dimensionLeft() - 5) / 8; 
-        x <= (u->getPosition().x() + u->getType().dimensionRight() + 5) / 8; ++x)
+        x <= (u->getPosition().x() + u->getType().dimensionRight() + 5) / 8; ++x) // x += 8
     {
         for (int y = (u->getPosition().y() - u->getType().dimensionUp() - 5) / 8;
-            y <= (u->getPosition().y() + u->getType().dimensionDown() + 5) / 8; ++y)
+            y <= (u->getPosition().y() + u->getType().dimensionDown() + 5) / 8; ++y) // y += 8
         {
             buildings_wt_strict[x + y*_width] = b;
             //buildings_wt[x + y*_width] = b;
@@ -88,7 +90,7 @@ void MapManager::modifyBuildings(Unit* u, bool b)
 
 void MapManager::addBuilding(Unit* u)
 {
-    // Broodwar->printf("modified buildings\n");
+    //Broodwar->printf("%x %s \n", u, u->getType().getName().c_str());
     modifyBuildings(u, true);
 }
 
@@ -99,7 +101,6 @@ void MapManager::removeBuilding(Unit* u)
 
 void MapManager::onUnitCreate(Unit* u)
 {
-
     addBuilding(u);
 }
 

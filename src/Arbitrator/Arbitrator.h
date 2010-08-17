@@ -13,7 +13,6 @@ namespace Arbitrator
   {
 	  friend class CSingleton<Arbitrator<_Tp, _Val> >;
  public:
-    Arbitrator();
     bool setBid(Controller<_Tp,_Val>* c, _Tp obj, _Val bid);
     bool setBid(Controller<_Tp,_Val>* c, std::set<_Tp> objs, _Val bid);
     bool removeBid(Controller<_Tp,_Val>* c, _Tp obj);
@@ -32,6 +31,7 @@ namespace Arbitrator
     _Val getBid(Controller<_Tp,_Val>* c, _Tp obj) const;
     void update();
   private:
+	Arbitrator();
     std::map<_Tp,Heap<Controller<_Tp,_Val>*, _Val> > bids;
     std::map<_Tp,Controller<_Tp,_Val>* > owner;
     std::map<Controller<_Tp,_Val>*, std::set<_Tp> > objects;
@@ -42,6 +42,5 @@ namespace Arbitrator
     bool inOnOffer;
     bool inOnRevoke;
   };
-
 }
 #include "Arbitrator.inl"

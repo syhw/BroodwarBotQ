@@ -1,5 +1,8 @@
 #include <BaseManager.h>
+<<<<<<< HEAD
 using namespace BWTA;
+=======
+>>>>>>> essai
 Base::Base(BWTA::BaseLocation* location)
 {
   this->baseLocation     = location;
@@ -8,6 +11,7 @@ Base::Base(BWTA::BaseLocation* location)
   this->active           = false;
   this->activeGas        = false;
   this->beingConstructed = false;
+<<<<<<< HEAD
   this->chokeToDef = NULL;
   computeChoke();
 }
@@ -70,6 +74,10 @@ void Base::computeChoke(){
 	}
 
 }
+=======
+}
+
+>>>>>>> essai
 BWTA::BaseLocation* Base::getBaseLocation() const
 {
   return this->baseLocation;

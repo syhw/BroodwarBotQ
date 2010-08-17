@@ -198,6 +198,10 @@
 				Name="Formations"
 				>
 				<File
+					RelativePath="..\src\Micro\Formations\ArcFormation.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Micro\Formations\Formation.cpp"
 					>
 				</File>
@@ -235,6 +239,14 @@
 				</File>
 				<File
 					RelativePath="..\src\Micro\Units\SpecialUnit.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\UnitGroup.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\UnitGroupManager.cpp"
 					>
 				</File>
 				<Filter
@@ -464,6 +476,10 @@
 				Name="Formations"
 				>
 				<File
+					RelativePath="..\src\Micro\Formations\ArcFormation.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Micro\Formations\Formation.h"
 					>
 				</File>
@@ -501,6 +517,14 @@
 				</File>
 				<File
 					RelativePath="..\src\Micro\Units\SpecialUnit.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\UnitGroup.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\UnitGroupManager.h"
 					>
 				</File>
 				<Filter
@@ -617,6 +641,10 @@
 				>
 				<File
 					RelativePath="..\src\Utils\CSingleton.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Utils\Nearby.h"
 					>
 				</File>
 				<File

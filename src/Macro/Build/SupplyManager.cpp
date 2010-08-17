@@ -4,6 +4,7 @@ SupplyManager::SupplyManager()
 {
   this->buildManager      = NULL;
   this->buildOrderManager = NULL;
+<<<<<<< HEAD
   this->lastFrameCheck    = 0;
   this->seedPosition      = BWAPI::TilePositions::None;
 }
@@ -11,6 +12,15 @@ SupplyManager::SupplyManager()
 void SupplyManager::setDependencies(){
 	this->buildManager = & BuildManager::Instance();
 	this->buildOrderManager = & BuildOrderManager::Instance();
+=======
+  this->lastFrameCheck    = 100000;
+  this->seedPosition      = BWAPI::TilePositions::None;
+}
+
+void SupplyManager::setDependencies(BuildManager* bm, BuildOrderManager* bom){
+	this->buildManager = bm;
+	this->buildOrderManager = bom;
+>>>>>>> essai
 }
 
 void SupplyManager::update()

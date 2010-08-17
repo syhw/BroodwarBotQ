@@ -7,7 +7,11 @@ ScoutManager::ScoutManager( )
 : BaseObject("ScoutManager")
 {
 	regions = NULL;
+<<<<<<< HEAD
 	warManager = NULL;
+=======
+	microManager = NULL;
+>>>>>>> essai
 	to_remove = false;
 }
 
@@ -15,16 +19,28 @@ ScoutManager::~ScoutManager( )
 {
 }
 
+<<<<<<< HEAD
 void ScoutManager::setDependencies(){
 	this->regions = & Regions::Instance();
 	this->warManager = & WarManager::Instance();
+=======
+void ScoutManager::setDependencies(Regions * region, MicroManager * micro){
+	this->regions = region;
+	this->microManager = micro;
+>>>>>>> essai
 }
 
 void ScoutManager::update()
 {
+<<<<<<< HEAD
 	//if(regions->enemyFound()){
 	//	findUnitsGroup(pGoal(new ExploreGoal(regions->whereIsEnemy())));
 	//}
+=======
+	if(regions->enemyFound()){
+		findUnitsGroup(pGoal(new ExploreGoal(regions->whereIsEnemy())));
+	}
+>>>>>>> essai
 }
 
 std::string ScoutManager::getName() const
@@ -108,7 +124,11 @@ UnitsGroup* ScoutManager::findUnitsGroup(pGoal goal){
 	}
 	ug->addGoal(goal);
 	goal->setUnitsGroup(ug);
+<<<<<<< HEAD
 	warManager->unitsgroups.push_front(ug);
+=======
+	microManager->unitsgroups.push_front(ug);
+>>>>>>> essai
 	return ug;
 }
 

@@ -1,9 +1,12 @@
 #include <MacroManager.h>
 #include <math.h>
+<<<<<<< HEAD
 #include "BorderManager.h"
 #include <assert.h>
 using namespace BWAPI;
 using namespace BWTA;
+=======
+>>>>>>> essai
 
 MacroManager::MacroManager()
 : BaseObject("MacroManager")
@@ -20,12 +23,22 @@ MacroManager::~MacroManager()
 {
 }
 
+<<<<<<< HEAD
 void MacroManager::setDependencies(){
 	this->buildOrderManager = & BuildOrderManager::Instance();
 	this->productionManager = & ProductionManager::Instance();
 	this->buildManager = & BuildManager::Instance();
 	this->baseManager = & BaseManager::Instance();
 	this->workerManager = & WorkerManager::Instance();
+=======
+void MacroManager::setDependencies(BuildOrderManager * bom, ProductionManager * pm, BuildManager * bm,
+BaseManager * base, WorkerManager * wm){
+	this->buildOrderManager = bom;
+	this->productionManager = pm;
+	this->buildManager = bm;
+	this->baseManager = base;
+	this->workerManager = wm;
+>>>>>>> essai
 }
 
 std::string MacroManager::getName() const
@@ -34,19 +47,29 @@ std::string MacroManager::getName() const
 }
 
 void MacroManager::onStart(){
+<<<<<<< HEAD
 	
+=======
+>>>>>>> essai
 
 }
 void MacroManager::onUnitCreate(BWAPI::Unit* unit)
 {
+<<<<<<< HEAD
 	
+=======
+	/*
+>>>>>>> essai
 
 	// ***********   Expand   *********** //
 	if( unit->getType().isResourceDepot())
 		expanding = false;
 
+<<<<<<< HEAD
 
 	/*
+=======
+>>>>>>> essai
 	// *******   ProdBuildings   ******** //
 	if( unit->getType().isBuilding() && !unit->getType().isResourceDepot())
 	{
@@ -221,7 +244,11 @@ void MacroManager::expand()
 		}
 		if( nearestLocation)
 		{
+<<<<<<< HEAD
 			this->baseManager->expand( nearestLocation, 80);
+=======
+			this->baseManager->expand( nearestLocation);
+>>>>>>> essai
 			expanding = true;
 		}
 	}
@@ -277,7 +304,11 @@ bool MacroManager::canCreateDefenseBuildings( UnitType techBuilding, UnitType bu
 
 bool MacroManager::shouldExpand()
 {
+<<<<<<< HEAD
 	
+=======
+	/*
+>>>>>>> essai
 	// Expand if all the bases are fully functionnal
 	unsigned int nbRessources = 0;
 	const std::set<Base*>& bases = baseManager->getAllBases();
@@ -286,7 +317,11 @@ bool MacroManager::shouldExpand()
 		nbRessources += 2 * (*it)->getMinerals().size() + 3 * (*it)->getGeysers().size();
 	}
 	return workerManager->workers.size() >= nbRessources;
+<<<<<<< HEAD
 	
+=======
+	*/
+>>>>>>> essai
 }
 
 #ifdef BW_QT_DEBUG

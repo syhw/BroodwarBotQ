@@ -212,6 +212,10 @@
 					Name="Formations"
 					>
 					<File
+						RelativePath="..\src\Micro\Formations\ArcFormation.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\src\Micro\Formations\Formation.cpp"
 						>
 					</File>
@@ -634,6 +638,10 @@
 					Name="Formations"
 					>
 					<File
+						RelativePath="..\src\Micro\Formations\ArcFormation.h"
+						>
+					</File>
+					<File
 						RelativePath="..\src\Micro\Formations\Formation.h"
 						>
 					</File>
@@ -904,6 +912,10 @@
 				>
 				<File
 					RelativePath="..\src\Utils\CSingleton.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Utils\Nearby.h"
 					>
 				</File>
 				<File

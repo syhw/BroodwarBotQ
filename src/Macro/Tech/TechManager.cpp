@@ -6,9 +6,15 @@ TechManager::TechManager()
   this->placer = NULL;
 }
 
+<<<<<<< HEAD
 void TechManager::setDependencies(){
 	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
 	this->placer = & BuildingPlacer::Instance();
+=======
+void TechManager::setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, BuildingPlacer* bp){
+  this->arbitrator = arb;
+  this->placer = bp;
+>>>>>>> essai
 }
 
 void TechManager::onOffer(std::set<BWAPI::Unit*> units)

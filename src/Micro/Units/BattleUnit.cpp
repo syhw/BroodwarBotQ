@@ -15,7 +15,10 @@ BattleUnit::BattleUnit(BWAPI::Unit* unit)
 , timeIdle(0)
 , _tick(0)
 , targetEnemy(NULL)
+<<<<<<< HEAD
 , targetEnemyInRange(NULL)
+=======
+>>>>>>> essai
 , target(unit->getPosition())
 , _sheight(unit->getType().dimensionUp() + unit->getType().dimensionDown())
 , _slarge(unit->getType().dimensionRight() + unit->getType().dimensionLeft())

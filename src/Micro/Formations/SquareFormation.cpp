@@ -14,6 +14,14 @@ SquareFormation::SquareFormation(const Position& p, const Vec& direction)
 void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnit)
 {
 	end_positions.clear();
+<<<<<<< HEAD
+=======
+    if (vUnit.size() == 1)
+    {
+        end_positions.push_back(Position(center.x, center.y));
+        return;
+    }
+>>>>>>> essai
 
 	unsigned int sizeSide = (unsigned int)sqrt( (double)vUnit.size());
 	Vec corner = center - Position( (int)(sizeSide/2.0 * space), (int)(sizeSide/2.0 * space));
@@ -28,4 +36,9 @@ void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnit
             end_positions.push_back(topos);
         }
     }
+<<<<<<< HEAD
+=======
+
+    computeMean();
+>>>>>>> essai
 }

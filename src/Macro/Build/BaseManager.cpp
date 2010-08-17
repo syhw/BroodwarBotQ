@@ -1,12 +1,16 @@
 #include <BaseManager.h>
 #include <BuildOrderManager.h>
 #include <BorderManager.h>
+<<<<<<< HEAD
 
+=======
+>>>>>>> essai
 BaseManager::BaseManager()
 {
   this->builder = NULL;
   this->RefineryNeeded  = 1;
   this->refineryBuildPriority = 0;
+<<<<<<< HEAD
   computeNatural();
 }
 
@@ -14,6 +18,14 @@ void BaseManager::setDependencies(){
 	this->builder = & BuildOrderManager::Instance();
 	this->borderManager = & BorderManager::Instance();
 	this->defenseManager = & DefenseManager::Instance();
+=======
+}
+
+void BaseManager::setDependencies(BuildOrderManager * bom, BorderManager * bm){
+	this->builder = bom;
+	this->borderManager = bm;
+
+>>>>>>> essai
 }
 
 void BaseManager::update()
@@ -147,9 +159,13 @@ void BaseManager::addBase(BWTA::BaseLocation* location)
   allBases.insert(newBase);
   this->location2base[location] = newBase;
   this->borderManager->addMyBase(location);
+<<<<<<< HEAD
   defenseManager->addBase(newBase);
 }
 
+=======
+}
+>>>>>>> essai
 void BaseManager::removeBase(BWTA::BaseLocation* location)
 {
   std::map<BWTA::BaseLocation*,Base*>::iterator removebase;
@@ -297,6 +313,7 @@ bool BaseManager::hasRefinery(BWTA::BaseLocation* location)
   
   return refinery;
 }
+<<<<<<< HEAD
 
 void BaseManager::computeNatural(){
 
@@ -318,3 +335,5 @@ void BaseManager::computeNatural(){
 	}
 	this->naturalExpand = minBase;
 }
+=======
+>>>>>>> essai

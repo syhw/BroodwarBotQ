@@ -89,8 +89,7 @@ public:
 	DefenseManager * defenseManager;
     ObjectManager* objManager;
 	bool showManagerAssignments;
-
-
+	
     BattleBroodAI();
     ~BattleBroodAI();
 	virtual void onStart();

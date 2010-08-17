@@ -14,7 +14,16 @@ LineFormation::LineFormation(const Position& p, const Vec& direction)
 void LineFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
 {
 	end_positions.clear();
+<<<<<<< HEAD
 	int maxLength = 0;
+=======
+    if (vUnits.size() == 1)
+    {
+        end_positions.push_back(Position(center.x, center.y));
+        return;
+    }
+    int maxLength = 0;
+>>>>>>> essai
 	for(std::vector<pBayesianUnit>::const_iterator it = vUnits.begin(); it != vUnits.end(); it++)
 	{
 		BayesianUnit* bayesianUnit = it->get();
@@ -25,7 +34,11 @@ void LineFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
 	}
 	maxLength *= TILE_SIZE + 8;
 	int lineLength = maxLength * vUnits.size();
+<<<<<<< HEAD
 	Vec dir( direction.y, direction.x); // rotation of 90° of the normal to obtain director vector.
+=======
+	Vec dir(- direction.y, direction.x); // rotation of 90° of the normal to obtain director vector.
+>>>>>>> essai
 	Vec begin = center - (dir * lineLength / 2); // Compute the first coord on the line.
 
     for(unsigned int i = 0; i < vUnits.size();++i)
@@ -39,4 +52,9 @@ void LineFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
             end_positions.push_back(topos);
         }
     }
+<<<<<<< HEAD
+=======
+
+    computeMean();
+>>>>>>> essai
 }

@@ -65,7 +65,6 @@ class BuildOrderManager : public CSingleton<BuildOrderManager>
       int priority;
       int time;
     };
-
 	void setDependencies();
     void update();
     std::string getName() const;

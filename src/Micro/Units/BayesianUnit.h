@@ -10,21 +10,18 @@
 #include <map>
 #include <set>
 #include <boost/shared_ptr.hpp>
-class BayesianUnit;
-typedef boost::shared_ptr<BayesianUnit> pBayesianUnit;
-#include <EUnit.h>
 
 // #define PROBT 1
 
 #define NUMBER_OF_PRIORITY 5
-
+class BayesianUnit;
+typedef boost::shared_ptr<BayesianUnit> pBayesianUnit;
 
 
 // TODO, this class has to be derived to take Flying/Ground/Special Units 
 // (templars, tanks, lurkers, etc.) into account
 
 class UnitsGroup;
-class EUnit;
 
 enum occupation_type {
     OCCUP_NO,
@@ -72,7 +69,6 @@ enum dodge_value {
     DODGE_CONTACT,
     DODGE_CLOSE,
     DODGE_MEDIUM
-
 };
 
 class BayesianUnit : public BattleUnit
@@ -80,7 +76,11 @@ class BayesianUnit : public BattleUnit
 protected:
     bool _ground_unit; // true when unit can move only on the ground
     std::vector<Vec> _dirv;
-    int _dirvNeededSize;
+    int _maxDimension, _minDimension;
+    int _lastAttackOrder;
+    double _maxDiag;
+    BWAPI::Position _lastRightClick, _posAtMost13FramesAgo, _posAtMost23FramesAgo;
+    bool _iThinkImBlocked;
     //std::multimap<BWAPI::Position, attractor_type> _prox;
     std::vector<occupation_type> _occupation;
     // dirv[attractor] = direction relative to an attractor
@@ -105,6 +105,7 @@ protected:
     UnitsGroup* _unitsGroup;
     std::multimap<double, BWAPI::Unit*> _rangeEnemies;
     std::map<occupation_type, double> _defaultProb;
+    std::multimap<double, Vec> _dirvProb;
 
     inline void initDefaultProb();
     inline void computeFlockValues();
@@ -116,6 +117,11 @@ protected:
         bool quick=true);
 
     inline void updateDirV();
+    inline void testIfBlocked();
+    inline void updateRangeEnemies();
+    inline void updateTargetEnemy();
+    inline void setTargetEnemy(BWAPI::Unit* u);
+    inline int computeDmg(BWAPI::Unit* u);
     void drawDirV();
     void updateObj();
     void drawObj(int number=0);
@@ -131,25 +137,24 @@ protected:
     // goal direction
     // range enemies
     inline double computeProb(unsigned int i);
+    inline void computeProbs();
+    inline void selectDir();
     void drawProbs(std::multimap<double, Vec>& probs, int number=0);
-    inline void deleteRangeEnemiesElem(BWAPI::Unit* u);
-    inline void updateRangeEnemiesWith(BWAPI::Unit* u);
 public:
-    std::map<int, EUnit*> listTargets;
     unit_mode _mode; // TODO : faudra le remettre en protected, c'est juste pour quelques tests
 	void switchMode(unit_mode um);
     Vec dir, obj; // dir=current direction, obj=pathfinder's direction
-    // std::map<attractor_type, std::vector<BWAPI::Position>> prox; 
     BayesianUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~BayesianUnit();
+
     virtual void onUnitDestroy(BWAPI::Unit* u);
     virtual void onUnitShow(BWAPI::Unit* u);
     virtual void onUnitHide(BWAPI::Unit* u);
+    
     void update();
     virtual void attackMove(const BWAPI::Position& p);
-    std::multimap<double, BWAPI::Unit*>& getRangeEnemies();
 
-    void attackEnemy(BWAPI::Unit* u, BWAPI::Color col = BWAPI::Colors::Red);
+    void attackEnemy(BWAPI::Unit* u, BWAPI::Color col);
     virtual void micro() = 0;
     virtual bool canHit(BWAPI::Unit* enemy) = 0;
     virtual int damagesOn(BWAPI::Unit* enemy) = 0;
