@@ -2,7 +2,7 @@
 #include <BorderManager.h>
 #include "BaseManager.h"
 #include "Base.h"
-#include "DefendChokeGoal.h"
+#include "DefendBaseGroundGoal.h"
 #include <map>
 #include "WarManager.h"
 
@@ -65,7 +65,7 @@ void DefenseManager::checkGroundDefense(Base * b, bool toDef){
 
 	//Check if they must defend at middle or at chokepoint
 	if(b->chokeToDef != NULL){
-		//If they must defend the chokepoint check if their DefendChokeGoal is accomplished (enough units)
+		//If they must defend the chokepoint check if their DefendBaseGroundGoal is accomplished (enough units)
 		if(toDef){
 			if(ug->getLastGoal() != NULL){
 				if( ug->getLastGoal()->getStatus() == GS_NOT_ENOUGH_UNITS){
@@ -146,7 +146,7 @@ void DefenseManager::update()
 void DefenseManager::addBase(Base * b){
 	UnitsGroup * ug = new UnitsGroup();
 	assert(this->groundDefenders.count(b) == 0);//We must not have already the groundDefenders for this base
-	Goal * g = new DefendChokeGoal(ug,b->chokeToDef);
+	Goal * g = new DefendBaseGroundGoal(ug,b);
 	ug->addGoal(pGoal(g));
 	this->groundDefenders.insert(std::make_pair(b,ug));
 

@@ -336,7 +336,7 @@
 					Name="Goals"
 					>
 					<File
-						RelativePath="..\src\Micro\Goals\DefendChokeGoal.cpp"
+						RelativePath="..\src\Micro\Goals\DefendBaseGroundGoal.cpp"
 						>
 					</File>
 					<File
@@ -758,7 +758,7 @@
 					Name="Goals"
 					>
 					<File
-						RelativePath="..\src\Micro\Goals\DefendChokeGoal.h"
+						RelativePath="..\src\Micro\Goals\DefendBaseGroundGoal.h"
 						>
 					</File>
 					<File

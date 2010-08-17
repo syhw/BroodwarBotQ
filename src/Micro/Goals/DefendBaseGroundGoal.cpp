@@ -1,28 +1,31 @@
-#include "DefendChokeGoal.h"
+#include "DefendBaseGroundGoal.h"
 #include "SeeSubgoal.h"
 #include "FormationSubgoal.h"
 #include "Subgoal.h"
 #include "Formations.h"
 
 
-DefendChokeGoal::DefendChokeGoal(UnitsGroup * ug,BWTA::Chokepoint * choke) : 
+DefendBaseGroundGoal::DefendBaseGroundGoal(UnitsGroup * ug, Base * b) : 
 Goal(ug)
 {
-this->choke = choke;
+this->choke = b->chokeToDef;
 if(choke != NULL){
 	double aa = this->choke->getSides().first.x() - this->choke->getSides().second.x();
 	double bb = this->choke->getSides().first.y() - this->choke->getSides().second.y();  
 	this->addSubgoal(pSubgoal(new FormationSubgoal(SL_AND,pFormation(new LineFormation(this->choke->getCenter(), Vec(bb/aa,1).normalize())))));
-}
-}
-
-
-
-DefendChokeGoal::~DefendChokeGoal(){
+} else {
+	addSubgoal(pSubgoal(new FormationSubgoal(SL_AND,pFormation(new SquareFormation(b->getBaseLocation()->getPosition(),Vec(0,0))))));
 
 }
+}
 
-void DefendChokeGoal::achieve(){
+
+
+DefendBaseGroundGoal::~DefendBaseGroundGoal(){
+
+}
+
+void DefendBaseGroundGoal::achieve(){
 	this->checkAchievement();
 	if(this->status != GS_ACHIEVED){
 		//If they are not inPos make them move
@@ -30,12 +33,12 @@ void DefendChokeGoal::achieve(){
 	}
 }
 
-void DefendChokeGoal::checkAchievement(){
+void DefendBaseGroundGoal::checkAchievement(){
 	//Check if we have the right amount of units. If not, set GS_NOT_ENOUGH_UNITS and return
 	if(this->unitsGroup == NULL){
 		//Strange...But must be avoided
 	}else{
-		if(this->enoughUnits() ||  this->unitsGroup->getNbUnits() < 4){
+		if( !this->enoughUnits() ||  this->unitsGroup->getNbUnits() < 4){
 			this->status = GS_NOT_ENOUGH_UNITS;
 		}else{
 			BWAPI::Broodwar->printf("ok enough");
@@ -49,7 +52,7 @@ void DefendChokeGoal::checkAchievement(){
 
 }
 	
-bool DefendChokeGoal::enoughUnits(){
+bool DefendBaseGroundGoal::enoughUnits(){
 	if(this->choke != NULL){
 		double sizeChoke = this->choke->getSides().first.getDistance(choke->getSides().second);
 		//Sum size of units

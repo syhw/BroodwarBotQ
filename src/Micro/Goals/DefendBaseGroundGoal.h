@@ -1,13 +1,15 @@
 #pragma once
 #include "BWTA.h"
+#include "BWAPI.h"
 #include "Goal.h"
 #include "UnitsGroup.h"
+#include "Base.h"
 
-class DefendChokeGoal : public Goal
+class DefendBaseGroundGoal : public Goal
 {
 public:
-	DefendChokeGoal(UnitsGroup * ug, BWTA::Chokepoint * choke);
-	~DefendChokeGoal();
+	DefendBaseGroundGoal(UnitsGroup * ug,  Base * b);
+	~DefendBaseGroundGoal();
 	virtual void checkAchievement();
 	virtual void achieve();
 private:

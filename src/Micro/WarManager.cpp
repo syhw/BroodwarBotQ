@@ -2,7 +2,7 @@
 #include <Regions.h>
 #include <util.h>
 #include <UnitsGroup.h>
-#include "DefendChokeGoal.h"
+#include "DefendBaseGroundGoal.h"
 #include "BorderManager.h"
 
 
@@ -32,8 +32,6 @@ void WarManager::setDependencies(){
 }
 
 void WarManager::onStart(){
-
-	this->ugIdle->addGoal(pGoal(new DefendChokeGoal(ugIdle, (*BaseManager::Instance().getAllBases().begin())->chokeToDef)));
 
 }
 void WarManager::update()
