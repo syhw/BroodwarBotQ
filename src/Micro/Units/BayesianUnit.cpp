@@ -943,7 +943,7 @@ void BayesianUnit::updateDir()
     // compute the probability to go in each dirv(ector)
     computeProbs();
 #ifdef __DEBUG_GABRIEL__
-    drawProbs(_dirvProb, _unitsGroup->size());
+    //drawProbs(_dirvProb, _unitsGroup->size());
 #endif
 
     // select the most probable
@@ -1012,27 +1012,9 @@ void BayesianUnit::update()
 {
     if (!unit->exists()) return;
     _unitPos = unit->getPosition();
-Broodwar->setLocalSpeed(42);
 
-    switchMode(MODE_SCOUT);
-    testIfBlocked();
-    if (_iThinkImBlocked)
-    {
-#ifdef __DEBUG_GABRIEL__
-        Broodwar->printf("I think I'm blocked!");
-#endif
-        unit->rightClick(target);
-        _lastRightClick = target;
-        return;
-    }
-    updateDir();
-    drawObj(0); // green
-    drawDir(); // red
-    clickDir();
-    return;
-
-
-    if (_mode != MODE_FIGHT_G && !_unitsGroup->enemies.empty()
+    if (_mode != MODE_FIGHT_G && _mode != MODE_SCOUT 
+        && !_unitsGroup->enemies.empty()
         && unit->getGroundWeaponCooldown() <= Broodwar->getLatency())
     {
 #ifdef __DEBUG_GABRIEL__
@@ -1053,7 +1035,7 @@ Broodwar->setLocalSpeed(42);
         if (_iThinkImBlocked)
         {
 #ifdef __DEBUG_GABRIEL__
-            Broodwar->printf("I think I'm blocked!");
+            //Broodwar->printf("I think I'm blocked!");
 #endif
             unit->rightClick(target);
             _lastRightClick = target;
@@ -1061,8 +1043,8 @@ Broodwar->setLocalSpeed(42);
         }
         updateDir();
 #ifdef __DEBUG_GABRIEL__
-        drawObj(0); // green
-        drawDir(); // red
+        //drawObj(0); // green
+        //drawDir(); // red
 #endif
         clickDir();
         break;
