@@ -12,7 +12,9 @@
 #include <boost/shared_ptr.hpp>
 class BayesianUnit;
 typedef boost::shared_ptr<BayesianUnit> pBayesianUnit;
-#include <EUnit.h>
+
+#include <windows.h>
+#include <process.h>
 
 // #define PROBT 1
 
@@ -74,9 +76,19 @@ enum dodge_value {
     DODGE_MEDIUM
 };
 
+enum damage_value {
+    DAMAGE_NO,
+    DAMAGE_LOW,
+    DAMAGE_MED,
+    DAMAGE_HIGH
+};
+
 class BayesianUnit : public BattleUnit
 {
 protected:
+    HANDLE _pathMutex;
+    static DWORD WINAPI StaticLaunchPathfinding(void* obj);
+    DWORD LaunchPathfinding();
     bool _ground_unit; // true when unit can move only on the ground
     std::vector<Vec> _dirv;
     int _maxDimension, _minDimension;
@@ -84,6 +96,7 @@ protected:
     double _maxDiag;
     BWAPI::Position _lastRightClick, _posAtMost13FramesAgo, _posAtMost23FramesAgo;
     bool _iThinkImBlocked;
+    int _lastTotalHP;
     //std::multimap<BWAPI::Position, attractor_type> _prox;
     std::vector<occupation_type> _occupation;
     // dirv[attractor] = direction relative to an attractor
@@ -98,13 +111,9 @@ protected:
     This grid because there are only 16 possible directions in Broodwar */
     MapManager* mapManager;
     std::vector<std::vector<flock_value> > _flockValues; // one vector<flock_value> per unit with which we flock
-    std::vector<std::vector<inPos_value> > _inPosValues;
-    std::vector<std::vector<fightG_value> > _fightGValues;
-    std::vector<std::vector<dodge_value> > _dodgeValues;
+    std::vector<damage_value> _damageValues;
     std::vector<double> _flockProb; // TODO decide if static, perhaps unit dependant
-    std::vector<double> _inPosProb; // TODO decide if static, perhaps unit dependant
-    std::vector<double> _fightGProb; // TODO decide if static, perhaps unit dependant
-    std::vector<double> _dodgeProb; // TODO decide if static, perhaps unit dependant
+    std::vector<double> _damageProb; // TODO decide if static, perhaps unit dependant
     UnitsGroup* _unitsGroup;
     std::multimap<double, BWAPI::Unit*> _rangeEnemies;
     std::map<occupation_type, double> _defaultProb;
@@ -112,8 +121,7 @@ protected:
 
     inline void initDefaultProb();
     inline void computeFlockValues();
-    inline void computeInPosValues();
-    inline void computeFightGValues();
+    inline void computeDamageValues();
     void straightLine(std::vector<BWAPI::Position>& ppath, 
         const BWAPI::Position& p_start, 
         const BWAPI::Position& p_end, 
