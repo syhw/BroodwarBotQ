@@ -68,7 +68,7 @@ void DefenseManager::checkGroundDefense(Base * b, bool toDef){
 		//If they must defend the chokepoint check if their DefendBaseGroundGoal is accomplished (enough units)
 		if(toDef){
 			if(ug->getLastGoal() != NULL){
-				if( ug->getLastGoal()->getStatus() == GS_NOT_ENOUGH_UNITS){
+				if( ug->getLastGoal()->getStatus() == GS_NOT_ENOUGH_UNITS ){
 					//We need more units
 					
 					//Set bid on 1 unit until we have enough and record the unitsgroup that needed it
@@ -89,7 +89,7 @@ void DefenseManager::checkGroundDefense(Base * b, bool toDef){
 			}
 		} else {
 			//We do not need to defend
-			if(ug->getNbUnits() > 0){
+			if(ug->size() > 0){
 				//We must give back those units to the WarManager
 				for(std::vector<pBayesianUnit>::iterator units = ((*ug).units).begin(); units != ((*ug).units).end(); ++ units){
 					this->arbitrator->setBid(this,(*units)->unit, 0);
@@ -125,12 +125,32 @@ void DefenseManager::onOffer(std::set<BWAPI::Unit*> units)
 
 void DefenseManager::onRevoke(BWAPI::Unit* unit, double bid)
 {
- this->onRemoveUnit(unit);
+	for(std::map<Base *, UnitsGroup *>::iterator it = this->groundDefenders.begin(); it != this->groundDefenders.end(); ++it){
+		for(std::vector<pBayesianUnit>::iterator u = (*it).second->units.begin(); u != (*it).second->units.end(); ++u ){
+			if((*u)->unit == unit ){
+				(*it).second->giveUpControl((*u)->unit);
+			}
+		}
+	}
+
 }
 
 void DefenseManager::onRemoveUnit(BWAPI::Unit* unit)
 {
-	BWAPI::Broodwar->printf("essai");
+	//Find the unit in the unitsGroup
+	for(std::map<Base *, UnitsGroup *>::iterator it = this->groundDefenders.begin(); it != this->groundDefenders.end(); ++it){
+
+		if( it->second->size() != 0 ){
+			for(std::vector<pBayesianUnit>::iterator u = (*it).second->units.begin(); u != (*it).second->units.end(); ++u ){
+				if((*u)->unit == unit ){
+					(*it).second->getLastGoal()->setStatus(GS_IN_PROGRESS);
+					(*it).second->giveUpControl((*u)->unit);
+					return;
+				}
+			}
+		}
+	}
+
 }
 
 void DefenseManager::update()
@@ -144,6 +164,9 @@ void DefenseManager::update()
 }
 
 void DefenseManager::addBase(Base * b){
+#ifdef __DEBUG_LOUIS__
+	BWAPI::Broodwar->printf("Appel à addBase");
+#endif
 	UnitsGroup * ug = new UnitsGroup();
 	assert(this->groundDefenders.count(b) == 0);//We must not have already the groundDefenders for this base
 	Goal * g = new DefendBaseGroundGoal(ug,b);

@@ -153,7 +153,8 @@ void BattleBroodAI::onStart()
         this->macroManager = & ZergStrat::Instance();
 
 	//Set dependencies
-<<<<<<< HEAD
+
+
 	this->baseManager->setDependencies();
 	this->borderManager->setDependencies();
 	this->buildManager->setDependencies();
@@ -171,7 +172,6 @@ void BattleBroodAI::onStart()
 	this->warManager->setDependencies();
 	this->goalManager->setDependencies();
 	this->macroManager->setDependencies();
-	this->mapManager->setDependencies(this->eUnitsFilter);
 	this->defenseManager->setDependencies();
 
 	//Broodwar->printf("The match up is %s v %s",
@@ -207,7 +207,6 @@ void BattleBroodAI::onFrame()
     sprintf_s(mousePos, "%d, %d", Broodwar->getMousePosition().x(), Broodwar->getMousePosition().y());
     Broodwar->drawTextMouse(12, 0, mousePos);
 #endif
-<<<<<<< HEAD
 	this->buildManager->update();
 	this->buildOrderManager->update();
 	this->baseManager->update();
@@ -433,7 +432,6 @@ void BattleBroodAI::onFrame()
     //Broodwar->printf("Iterations took %f", (double)(end-start)/CLOCKS_PER_SEC);
 }
 
-<<<<<<< HEAD
 void BattleBroodAI::onUnitDiscover(BWAPI::Unit* unit){
 	  if (Broodwar->isReplay()) return;
   this->informationManager->onUnitDiscover(unit);
@@ -505,7 +503,7 @@ void BattleBroodAI::onUnitDestroy(BWAPI::Unit* unit)
     //if (!Broodwar->isReplay())
     //	Broodwar->sendText("A %s [%x] has been destroyed at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x(),unit->getPosition().y());
 
-    this->arbitrator->onRemoveObject(unit);
+
 	this->buildManager->onRemoveUnit(unit);
 	this->baseManager->onRemoveUnit(unit);
 	this->techManager->onRemoveUnit(unit);
@@ -517,6 +515,8 @@ void BattleBroodAI::onUnitDestroy(BWAPI::Unit* unit)
     this->mapManager->onUnitDestroy(unit);
     this->eUnitsFilter->onUnitDestroy(unit);
 	this->informationManager->onUnitDestroy(unit);
+	this->defenseManager->onRemoveUnit(unit);
+	this->arbitrator->onRemoveObject(unit);
 }
 
 void BattleBroodAI::onUnitMorph(BWAPI::Unit* unit)

@@ -38,7 +38,7 @@ void DefendBaseGroundGoal::checkAchievement(){
 	if(this->unitsGroup == NULL){
 		//Strange...But must be avoided
 	}else{
-		if( !this->enoughUnits() ||  this->unitsGroup->getNbUnits() < 4){
+		if(!this->enoughUnits() && this->unitsGroup->size() < 4){
 			this->status = GS_NOT_ENOUGH_UNITS;
 		}else{
 			BWAPI::Broodwar->printf("ok enough");
@@ -53,6 +53,7 @@ void DefendBaseGroundGoal::checkAchievement(){
 }
 	
 bool DefendBaseGroundGoal::enoughUnits(){
+	//Return true if we have enough units to wall the chokepoint (if the chokepoint is not null)
 	if(this->choke != NULL){
 		double sizeChoke = this->choke->getSides().first.getDistance(choke->getSides().second);
 		//Sum size of units
@@ -60,7 +61,7 @@ bool DefendBaseGroundGoal::enoughUnits(){
 		for(std::vector<pBayesianUnit>::iterator it = this->unitsGroup->units.begin(); it != this->unitsGroup->units.end(); ++it){
 			size += (*it)->_slarge;
 		}
-		if(size < sizeChoke + BWAPI::UnitTypes::Zerg_Zergling.dimensionLeft() + BWAPI::UnitTypes::Zerg_Zergling.dimensionRight()){
+		if(size + BWAPI::UnitTypes::Zerg_Zergling.dimensionLeft() + BWAPI::UnitTypes::Zerg_Zergling.dimensionRight() < sizeChoke ){
 			return false;
 		}
 		return true;

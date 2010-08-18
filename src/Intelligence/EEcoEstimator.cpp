@@ -34,13 +34,8 @@ EEcoEstimator::~EEcoEstimator(){
 
 }
 
-<<<<<<< HEAD
 void EEcoEstimator::setDependencies(){
 	this->timeManager = & TimeManager::Instance();
-=======
-void EEcoEstimator::setDependencies(TimeManager * tm){
-	this->timeManager = tm;
->>>>>>> essai
 }
 
 void EEcoEstimator::update()

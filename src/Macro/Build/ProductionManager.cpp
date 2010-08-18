@@ -11,15 +11,9 @@ ProductionManager::ProductionManager()
     startedCount[*i]=0;
   }
 }
-<<<<<<< HEAD
 void ProductionManager::setDependencies(){
 	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
 	this->placer = & BuildingPlacer::Instance();
-=======
-void ProductionManager::setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, BuildingPlacer * bp){
-	this->arbitrator = arb;
-	this->placer = bp;
->>>>>>> essai
 }
 
 
@@ -93,10 +87,6 @@ bool ProductionManager::canMake(BWAPI::Unit* builder, BWAPI::UnitType type)
 
 void ProductionManager::onOffer(std::set<BWAPI::Unit*> units)
 {
-<<<<<<< HEAD
-	
-=======
->>>>>>> essai
   //go through all the units that are being offered to us
   for(std::set<BWAPI::Unit*>::iterator i=units.begin();i!=units.end();i++)
   {
@@ -141,7 +131,6 @@ void ProductionManager::onRevoke(BWAPI::Unit* unit, double bid)
 
 void ProductionManager::update()
 {
-<<<<<<< HEAD
 
 	
   std::set<BWAPI::Unit*> myPlayerUnits=BWAPI::Broodwar->self()->getUnits();
@@ -154,16 +143,6 @@ void ProductionManager::update()
 		arbitrator->setBid(this, *u, 50);
 	}
   }
-=======
-  std::set<BWAPI::Unit*> myPlayerUnits=BWAPI::Broodwar->self()->getUnits();
-  for(std::set<BWAPI::Unit*>::iterator u = myPlayerUnits.begin(); u != myPlayerUnits.end(); u++)
-  {
-    std::map<BWAPI::UnitType,std::list<ProductionUnitType> >::iterator p=productionQueues.find((*u)->getType());
-    if (p!=productionQueues.end() && !p->second.empty() && (*u)->isCompleted() && producingUnits.find(*u)==producingUnits.end())
-      arbitrator->setBid(this, *u, 50);
-  }
-
->>>>>>> essai
   std::map<BWAPI::Unit*,Unit>::iterator i_next;
   //go through all the factories that are producing units
   for(std::map<BWAPI::Unit*,Unit>::iterator i=producingUnits.begin();i!=producingUnits.end();i=i_next)
@@ -206,10 +185,6 @@ void ProductionManager::update()
           if (i->second.unit->getType()==i->second.type.type)
           {
             //we are done!
-<<<<<<< HEAD
-			 // BWAPI::Broodwar->printf("here");
-=======
->>>>>>> essai
             arbitrator->removeBid(this, i->first);
             startedCount[i->second.type.type]--;
             plannedCount[i->second.type.type]--;

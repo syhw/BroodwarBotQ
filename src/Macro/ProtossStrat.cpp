@@ -3,10 +3,6 @@
 ProtossStrat::ProtossStrat():MacroManager()
 {
 	//Broodwar->printf("Protoss Macro Manager is used.");
-<<<<<<< HEAD
-=======
-	initWantedUnits();
->>>>>>> essai
 }
 
 ProtossStrat::~ProtossStrat()
@@ -14,11 +10,7 @@ ProtossStrat::~ProtossStrat()
 }
 
 void ProtossStrat::onStart(){
-<<<<<<< HEAD
 	MacroManager::onStart();
-=======
-	BWAPI::Broodwar->printf("call to onStart");
->>>>>>> essai
 	this->buildOrderManager->buildAdditional(4,BWAPI::UnitTypes::Protoss_Probe,100);
 	this->buildOrderManager->build(1,BWAPI::UnitTypes::Protoss_Pylon,99);
 	this->buildOrderManager->buildAdditional(2,BWAPI::UnitTypes::Protoss_Probe,98);
@@ -29,23 +21,15 @@ void ProtossStrat::onStart(){
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Cybernetics_Core,93);
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Probe,92);
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Gateway,91);
-<<<<<<< HEAD
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Probe,90);
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Dragoon,89);
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Pylon,88);
 	this->buildOrderManager->upgrade(1,BWAPI::UpgradeTypes::Singularity_Charge, 87);
 	this->buildOrderManager->build(40,BWAPI::UnitTypes::Protoss_Dragoon, 10);
-=======
-	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Dragoon,90);
-	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Pylon,89);
-	this->buildOrderManager->upgrade(1,BWAPI::UpgradeTypes::Singularity_Charge, 88);
-	this->buildOrderManager->build(40,BWAPI::UnitTypes::Protoss_Dragoon, 87);
->>>>>>> essai
 	//this->buildOrderManager->enableDependencyResolver();
 }
 
 void ProtossStrat::update(){
-<<<<<<< HEAD
 
 	this->createProdBuildings();
 	if(this->buildManager->getCompletedCount(BWAPI::UnitTypes::Protoss_Dragoon)>=4){
@@ -64,14 +48,6 @@ void ProtossStrat::update(){
 	BWAPI::Broodwar->drawCircleMap(naturalExpand->getPosition().x(),naturalExpand->getPosition().y(),20,BWAPI::Colors::Green, true);
 	*/
 
-=======
-	/*
-	if(BWAPI::Broodwar->self()->supplyUsed() == 16){
-		this->buildOrderManager->build(1,BWAPI::UnitTypes::Protoss_Pylon,100);
-		this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Probe,99);
-	}*/
-	
->>>>>>> essai
 }
 
 void ProtossStrat::buildGeyser()
@@ -98,11 +74,7 @@ void ProtossStrat::createProdBuildings()
 
 void ProtossStrat::buildGates()
 {
-<<<<<<< HEAD
 	
-=======
-	/*
->>>>>>> essai
 	bool allGatesFull = true;
 	const list<Unit*>& buildings = prodBuildings[UnitTypes::Protoss_Gateway];
 	for( list<Unit*>::const_iterator it = buildings.begin(); it != buildings.end(); it++)
@@ -116,11 +88,6 @@ void ProtossStrat::buildGates()
 		this->buildOrderManager->buildAdditional(1,UnitTypes::Protoss_Gateway,20);
 		underConstruction[UnitTypes::Protoss_Gateway] = true;
 	}
-<<<<<<< HEAD
-	
-=======
-	*/
->>>>>>> essai
 }
 
 void ProtossStrat::createTechBuildings()

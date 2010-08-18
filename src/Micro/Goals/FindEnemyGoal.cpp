@@ -3,11 +3,7 @@
 
 FindEnemyGoal::FindEnemyGoal(){
 	scoutManager = & ScoutManager::Instance();
-<<<<<<< HEAD
 	warManager = & WarManager::Instance();
-=======
-	microManager = & MicroManager::Instance();
->>>>>>> essai
 	pSubgoal sb;
 
 	//Scout the different possible bases
@@ -52,11 +48,8 @@ void FindEnemyGoal::achieve(){
 
 		}else{
 			//The goal is achieved, deleting the unitgroup
-<<<<<<< HEAD
 			warManager->promptRemove(unitsGroup);
-=======
-			microManager->promptRemove(unitsGroup);
->>>>>>> essai
+
 		}
 	}
 }

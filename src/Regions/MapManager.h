@@ -24,7 +24,7 @@ private:
     inline void modifyBuildings(BWAPI::Unit* u, bool b);
     inline void addBuilding(BWAPI::Unit* u);
     inline void removeBuilding(BWAPI::Unit* u);
-public
+public:
     bool* walkability;          // walk tiles
     bool* lowResWalkability;    // low res => building tiles
     bool* buildings_wt;         // walk tiles

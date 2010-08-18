@@ -5,10 +5,7 @@ using namespace BWAPI;
 Formation::Formation(const Formation& f)
 : center(f.center)
 , direction(f.direction)
-<<<<<<< HEAD
-=======
 , mean(f.center)
->>>>>>> essai
 , end_positions(f.end_positions)
 , space(30)
 {
@@ -17,10 +14,7 @@ Formation::Formation(const Formation& f)
 Formation::Formation(const Vec& center, const Vec& direction)
 : center(center)
 , direction(direction)
-<<<<<<< HEAD
-=======
 , mean(center)
->>>>>>> essai
 , space(30)
 {
 }
@@ -28,10 +22,7 @@ Formation::Formation(const Vec& center, const Vec& direction)
 Formation::Formation(const Position& p, const Vec& direction)
 : center(p.x(), p.y())
 , direction( direction)
-<<<<<<< HEAD
-=======
 , mean(p.x(), p.y())
->>>>>>> essai
 , space(30)
 {
 }
@@ -40,8 +31,6 @@ Formation::~Formation()
 {
 }
 
-<<<<<<< HEAD
-=======
 void Formation::computeMean()
 {
     if (!end_positions.size())
@@ -55,8 +44,6 @@ void Formation::computeMean()
     }
     mean /= end_positions.size();
 }
-
->>>>>>> essai
 // No formations => on one point
 void Formation::computeToPositions(const std::vector<pBayesianUnit>& vUnit)
 {

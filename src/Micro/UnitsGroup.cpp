@@ -179,8 +179,10 @@ void UnitsGroup::displayTargets()
 
 void UnitsGroup::update()
 {
-    if (units.empty())
-        return;
+	if (units.empty()){
+		this->accomplishGoal();
+		return;
+	}
 
     leadingUnit = units.front();
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
@@ -502,4 +504,8 @@ void UnitsGroup::idle(){
 	for(std::vector<pBayesianUnit>::iterator it = getUnits()->begin(); it != getUnits()->end(); ++it){
 		(*it)->target = (*it)->unit->getPosition();
 	}
+}
+
+pGoal UnitsGroup::getLastGoal(){
+	return this->goals.front();
 }

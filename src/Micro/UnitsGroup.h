@@ -49,11 +49,13 @@ class UnitsGroup
 private:
 	int totalHP;
 	int totalPower;
-    std::vector<pBayesianUnit> units;
+
     
 	std::list<pGoal> goals; // list of goals to accomplish
     void displayTargets();  // debug purpose
 public:
+	pGoal getLastGoal();
+	std::vector<pBayesianUnit> units;
     std::vector<BWAPI::TilePosition> btpath;
     std::set<BWAPI::Unit*> enemies;
     UnitDmgBimap unitDamages;
@@ -77,7 +79,6 @@ public:
 	virtual void formation(pFormation f);
 	virtual void setGoals(std::list<pGoal>& goals);
 	virtual void addGoal(pGoal goal);
-	pGoal getLastGoal();
 	
 	inline void updateCenter();
     virtual BWAPI::Position getCenter() const;

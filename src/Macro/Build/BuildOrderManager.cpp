@@ -27,11 +27,7 @@ BuildOrderManager::BuildOrderManager(){
   this->usedMinerals       = 0;
   this->usedGas            = 0;
   this->dependencyResolver = false;
-<<<<<<< HEAD
   this->debugMode          = false;
-=======
-  this->debugMode          = true;
->>>>>>> essai
 
   for(set<BWAPI::UnitType>::iterator i=UnitTypes::allUnitTypes().begin();i!=UnitTypes::allUnitTypes().end();i++)
   {
@@ -47,21 +43,12 @@ BuildOrderManager::BuildOrderManager(){
   }
 }
 
-<<<<<<< HEAD
 void BuildOrderManager::setDependencies(){
 	this->buildManager = & BuildManager::Instance();
 	this->techManager = & TechManager::Instance();
 	this->upgradeManager = & UpgradeManager::Instance();
 	this->workerManager = & WorkerManager::Instance();
 	this->supplyManager = & SupplyManager::Instance();
-=======
-void BuildOrderManager::setDependencies(BuildManager * bm, TechManager * tm, UpgradeManager * um, WorkerManager * wm, SupplyManager * sm){
-	this->buildManager = bm;
-	this->techManager = tm;
-	this->upgradeManager = um;
-	this->workerManager = wm;
-	this->supplyManager = sm;
->>>>>>> essai
 	UnitItem::getBuildManager() = buildManager;
 }
 
