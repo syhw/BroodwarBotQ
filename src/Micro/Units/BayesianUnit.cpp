@@ -353,7 +353,7 @@ double BayesianUnit::computeProb(unsigned int i)
             objnorm.normalize();
             const double tmp = dirvtmp.dot(objnorm);
             val *= (tmp > 0 ? prob_obj*tmp : 0.01);
-            // TODO 0.01 magic number (uniform prob to go in the half-quadrant opposite to obj)
+            // TOCHANGE 0.01 magic number (uniform prob to go in the half-quadrant opposite to obj)
         }
     }
     if (_occupation[i] == OCCUP_BUILDING) /// NON-WALKABLE (BUILDING) INFLUENCE
@@ -444,7 +444,8 @@ DWORD BayesianUnit::LaunchPathfinding()
 
         // The thread got ownership of an abandoned mutex
         // The database is in an indeterminate state
-    case WAIT_ABANDONED: 
+    case WAIT_ABANDONED:
+        ReleaseMutex(_pathMutex);
         return -1;
     }
     return 0;
@@ -489,7 +490,7 @@ void BayesianUnit::updateObj()
     else 
     {
         if (WaitForSingleObject(_pathMutex, 0) == WAIT_OBJECT_0
-            && !(Broodwar->getFrameCount() % Broodwar->getLatency()))
+            && !(Broodwar->getFrameCount() % Broodwar->getLatency() + 3)) // TOCHANGE 3 !!
         {
             // _btpath = BWTA::getShortestPath(TilePosition(_unitPos), tptarget); // is now threaded
             if (_btpath.size())                
@@ -501,6 +502,7 @@ void BayesianUnit::updateObj()
             ReleaseMutex(_pathMutex);
             DWORD threadId;
             // Create the thread to begin execution on its own.
+            Broodwar->printf("creating a thread");
             HANDLE thread = CreateThread( 
                 NULL,                   // default security attributes
                 0,                      // use default stack size  
@@ -521,8 +523,6 @@ void BayesianUnit::updateObj()
             {
                 if (_ppath[i].getDistance(_unitPos) < 45.26) // sqrt(BWAPI::TILE_SIZE^2 + BWAPI::TILE_SIZE^2)
                     count = i;
-                //else if (BWTA::getGroundDistance(_ppath[i], target) > BWTA::getGroundDistance(_unitPos, target))
-                //    count = i;
             }
             for (; count > 0; --count) 
                 _ppath.erase(_ppath.begin());
@@ -577,10 +577,10 @@ void BayesianUnit::updateObj()
         } else
         {
         // remove path points we passed
-        if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
+        if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TOCHANGE
             _path.erase(_path.begin());
         // I'm not drunk, do it twice! (path[2] if possible)        
-        if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TODO to change perhaps
+        if (_path.size() > 1 && _path[1].getPosition().getDistance(_unitPos) < 35.0) // 35 pixels, TOCHANGE
             _path.erase(_path.begin());
         }
 
@@ -697,7 +697,7 @@ void BayesianUnit::updateDirV()
     Position p = _unitPos;
     WalkTilePosition wtp(p);
  
-    int pixs = min(_slarge, _sheight) + 1; // TODO review this value
+    int pixs = min(_slarge, _sheight) + 1; // TOCHANGE
     int pixs_far = 0; // outer layer of dirvectors
     if (pixs < 32) // 3*pixs < 96
     {
@@ -1017,24 +1017,8 @@ void BayesianUnit::update()
 {
     if (!unit->exists()) return;
     _unitPos = unit->getPosition();
-
-    /*for (std::set<Player*>::const_iterator it = Broodwar->getPlayers().begin();
-        it != Broodwar->getPlayers().end(); ++it)
-    {
-        if (*it != Broodwar->self() && !(*it)->isNeutral())
-        {
-            for (std::set<UpgradeType>::const_iterator i = unit->getType().upgrades().begin();
-                i != unit->getType().upgrades().end(); ++i)
-            {
-                Broodwar->printf("upgrade %s level : %d", i->getName().c_str(), (*it)->getUpgradeLevel(*i));
-            }
-        }
-    }*/
-    for (std::set<UpgradeType>::const_iterator i = unit->getType().upgrades().begin();
-        i != unit->getType().upgrades().end(); ++i)
-    {
-        Broodwar->printf("upgrade %s level : %d", i->getName().c_str(), Broodwar->self()->getUpgradeLevel(*i));
-    }
+    if (unit->isAttacking())
+        Broodwar->printf("frame %d, damage cooldown %d", Broodwar->getFrameCount(), unit->getType().groundWeapon().damageCooldown());
 
     if (_mode != MODE_FIGHT_G && _mode != MODE_SCOUT 
         && !_unitsGroup->enemies.empty()
@@ -1109,7 +1093,7 @@ void BayesianUnit::update()
         //        unit->attackMove(target);
         //}
         //else
-        if (Broodwar->getFrameCount() - _lastAttackOrder > 10) 
+        if (Broodwar->getFrameCount() - _lastAttackOrder > 10) // TOCHANGE 10 for goons, others are lower
         {
             if ((unit->getGroundWeaponCooldown() <= Broodwar->getLatency()) 
                 && (unit->getOrderTarget() != targetEnemy || unit->isMoving()))
