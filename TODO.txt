@@ -15,6 +15,8 @@ Micro:
 Macro:
 - Goal de Drop
 
+Scout:
+- perhaps include the damage map in the pathfinder
 
 
 #####  Post it Guillaume #####

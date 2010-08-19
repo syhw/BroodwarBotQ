@@ -97,6 +97,7 @@ protected:
     BWAPI::Position _lastRightClick, _posAtMost13FramesAgo, _posAtMost23FramesAgo;
     bool _iThinkImBlocked;
     int _lastTotalHP;
+    int _addRange;
     //std::multimap<BWAPI::Position, attractor_type> _prox;
     std::vector<occupation_type> _occupation;
     // dirv[attractor] = direction relative to an attractor

@@ -55,6 +55,7 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 , _posAtMost23FramesAgo(unit->getPosition())                                                // and posAtMost23FramesAgo to be equal
 , _iThinkImBlocked(false)
 , _lastTotalHP(unit->getHitPoints() + unit->getShields())
+, _addRange(0)
 {
     updateDirV();
     mapManager = & MapManager::Instance();
@@ -77,6 +78,10 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 //        _flockProb.push_back(0.25);                 //FLOCK_CLOSE
 //        _flockProb.push_back(0.38);                  //FLOCK_MEDIUM
 //        _flockProb.push_back(0.22);                 //FLOCK_FAR
+    
+    // TODO to put in Dragoon Unit
+    if (unit->getType() == UnitTypes::Protoss_Dragoon && Broodwar->self()->getUpgradeLevel(UpgradeTypes::Singularity_Charge))
+        _addRange = 64; // += 64
 }
 
 BayesianUnit::~BayesianUnit()
@@ -766,7 +771,7 @@ void BayesianUnit::updateTargetEnemy()
             break;
         if (it->first.dmg < it->second->getHitPoints() + it->second->getShields()
             && _unitPos.getDistance(it->second->getPosition())
-            < (double)unit->getType().groundWeapon().maxRange() + 64) // TODO 64 is the goon range upgrade
+            < (double)unit->getType().groundWeapon().maxRange() + _addRange)
         {
             setTargetEnemy(it->second);
             return;
@@ -774,7 +779,7 @@ void BayesianUnit::updateTargetEnemy()
     }
     if (targetEnemy 
         && _unitPos.getDistance(targetEnemy->getPosition())
-        < (double)unit->getType().groundWeapon().maxRange() + 64) // TODO 64 is the goon range upgrade
+        < (double)unit->getType().groundWeapon().maxRange() + _addRange)
     {
         setTargetEnemy(targetEnemy);
         return;
@@ -1012,6 +1017,24 @@ void BayesianUnit::update()
 {
     if (!unit->exists()) return;
     _unitPos = unit->getPosition();
+
+    /*for (std::set<Player*>::const_iterator it = Broodwar->getPlayers().begin();
+        it != Broodwar->getPlayers().end(); ++it)
+    {
+        if (*it != Broodwar->self() && !(*it)->isNeutral())
+        {
+            for (std::set<UpgradeType>::const_iterator i = unit->getType().upgrades().begin();
+                i != unit->getType().upgrades().end(); ++i)
+            {
+                Broodwar->printf("upgrade %s level : %d", i->getName().c_str(), (*it)->getUpgradeLevel(*i));
+            }
+        }
+    }*/
+    for (std::set<UpgradeType>::const_iterator i = unit->getType().upgrades().begin();
+        i != unit->getType().upgrades().end(); ++i)
+    {
+        Broodwar->printf("upgrade %s level : %d", i->getName().c_str(), Broodwar->self()->getUpgradeLevel(*i));
+    }
 
     if (_mode != MODE_FIGHT_G && _mode != MODE_SCOUT 
         && !_unitsGroup->enemies.empty()
