@@ -110,7 +110,7 @@ void MapManager::removeBuilding(Unit* u)
 void MapManager::modifyDamages(int* tab, Position p, int minRadius, int maxRadius, int damages)
 {
     // TODO optimize
-    int tmpMaxRadius = maxRadius + 32;
+    int tmpMaxRadius = maxRadius + 32; // TOCHANGE 32
     //Broodwar->printf("modify minRadius: %d, maxRadius %d, Position(%d, %d)", minRadius, maxRadius, p.x(), p.y());
     int lowerX = (p.x() - tmpMaxRadius) > 0 ? p.x() - tmpMaxRadius : 0;
     int higherX = (p.x() + tmpMaxRadius) < _width ? p.x() + tmpMaxRadius : _pix_width;

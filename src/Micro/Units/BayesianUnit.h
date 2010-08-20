@@ -53,12 +53,10 @@ enum flock_value {
     FLOCK_FAR
 };
 
-enum inPos_value {
-    INPOS_OK,
-    INPOS_CONTACT,
-    INPOS_CLOSE,
-    INPOS_MEDIUM,
-    INPOS_FAR
+enum repulse_value {
+    REPULSE_NO,
+    REPULSE_LOW,
+    REPULSE_HIGH
 };
 
 enum fightG_value { 
@@ -98,6 +96,9 @@ protected:
     bool _iThinkImBlocked;
     int _lastTotalHP;
     int _addRange;
+    const int _refreshPathFramerate;
+    int _maxDistWhileRefreshingPath;
+    int _attackDuration;
     //std::multimap<BWAPI::Position, attractor_type> _prox;
     std::vector<occupation_type> _occupation;
     // dirv[attractor] = direction relative to an attractor
@@ -112,9 +113,11 @@ protected:
     This grid because there are only 16 possible directions in Broodwar */
     MapManager* mapManager;
     std::vector<std::vector<flock_value> > _flockValues; // one vector<flock_value> per unit with which we flock
+    std::vector<repulse_value> _repulseValues;
     std::vector<damage_value> _damageValues;
     std::vector<double> _flockProb; // TODO decide if static, perhaps unit dependant
     std::vector<double> _damageProb; // TODO decide if static, perhaps unit dependant
+    std::vector<double> _repulseProb;
     UnitsGroup* _unitsGroup;
     std::multimap<double, BWAPI::Unit*> _rangeEnemies;
     std::map<occupation_type, double> _defaultProb;
@@ -122,6 +125,7 @@ protected:
 
     inline void initDefaultProb();
     inline void computeFlockValues();
+    inline void computeRepulseValues();
     inline void computeDamageValues();
     void straightLine(std::vector<BWAPI::Position>& ppath, 
         const BWAPI::Position& p_start, 
@@ -144,6 +148,7 @@ protected:
     inline void updateAttractors();
     void drawAttractors();
     void drawFlockValues();
+    void drawRepulseValues();
     void drawOccupation(int number);
     // TODO:
     // goal direction

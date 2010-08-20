@@ -40,7 +40,7 @@ void MicroAIModule::onStart()
 		} 
         else 
         {
-            if ((*i)->getPlayer() != Broodwar->self())
+            if ((*i)->getPlayer() != Broodwar->self() || (*i)->getType() == UnitTypes::Protoss_Archon)
                 continue;
             else
                 mm->takeControl(*i);
@@ -81,8 +81,8 @@ void MicroAIModule::onStart()
     tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
     tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
     goals.push_back(tmp_goal);*/
-    goals.push_back(pGoal(new AttackGoal(mm, 
-        Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32))));
+    //goals.push_back(pGoal(new AttackGoal(mm, 
+    //    Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32))));
     
 	mm->setGoals(goals);
 
