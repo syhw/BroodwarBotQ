@@ -18,6 +18,7 @@ ScoutManager::~ScoutManager( )
 void ScoutManager::setDependencies(){
 	this->regions = & Regions::Instance();
 	this->warManager = & WarManager::Instance();
+	this->arbitrator = &  Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
 }
 
 void ScoutManager::update()
@@ -73,10 +74,75 @@ void ScoutManager::onUnitCreate(BWAPI::Unit* unit){
 	//}
 }
 
+void ScoutManager::onOffer(std::set<BWAPI::Unit*> units){
+
+	std::vector<pGoal> goalsDone;
+	BWAPI::Broodwar->printf("call to onoffer");
+	std::set<BWAPI::Unit*> remainingUnits = units;//Does it copy the set ?
+
+	//find the best unit for each goal
+	//Obs are always the best
+	BWAPI::Unit * bestUnit;
+	int dist= 0; 
+
+	for(std::list<pGoal>::iterator goals = this->awaitingGoals.begin(); goals != this->awaitingGoals.end(); ++goals){
+		
+		dist = 0;
+		bestUnit = NULL;
+
+		for(std::set<BWAPI::Unit *>::iterator units = remainingUnits.begin(); units != remainingUnits.end(); ++units ){
+			
+			if(bestUnit == NULL){
+				bestUnit = (*units);
+			}
+
+			if((*units)->getType() == BWAPI::UnitTypes::Protoss_Observer){
+				bestUnit = (*units);
+				break;
+			}
+		}
+
+	this->arbitrator->accept(this, bestUnit, 90);
+	UnitsGroup * ug = new UnitsGroup();
+	ug->takeControl(bestUnit);
+	remainingUnits.erase(bestUnit);
+	ug->addGoal((*goals));
+	(*goals)->setUnitsGroup(ug);
+	warManager->unitsgroups.push_back(ug);
+	//ug->switchMode(MODE_SCOUT);
+	goalsDone.push_back((*goals));
+	}
+
+	for(std::set<BWAPI::Unit *>::iterator it = remainingUnits.begin(); it != remainingUnits.end(); ++it){
+		this->arbitrator->decline(this,(*it), 0);
+	}
+
+	for(std::vector<pGoal>::const_iterator it = goalsDone.begin(); it != goalsDone.end(); ++it ){
+		this->awaitingGoals.remove(*it);
+	}
+
+}
+
+
+void ScoutManager::onRevoke(BWAPI::Unit* unit, double bid){
+
+
+
+}
 
 void ScoutManager::findEnemy(){
-	pGoal goal = pGoal(new FindEnemyGoal());
-	findUnitsGroup(goal);
+
+	this->awaitingGoals.push_back(pGoal(new FindEnemyGoal()));
+	//Set bid on all units that can scout for this goal
+
+	for(std::set<BWAPI::Unit *>::const_iterator it = BWAPI::Broodwar->self()->getUnits().begin(); it != BWAPI::Broodwar->self()->getUnits().end(); ++it){
+		
+		if( (*it)->getType().isWorker() || (*it)->getType() == BWAPI::UnitTypes::Protoss_Observer ){
+			this->arbitrator->setBid(this, (*it),90);
+		}
+	}
+
+	//findUnitsGroup(goal);
 }
 
 
@@ -87,29 +153,6 @@ void ScoutManager::onUnitShow(BWAPI::Unit* unit){
 
 UnitsGroup* ScoutManager::findUnitsGroup(pGoal goal){
 
-		//Find the appropriate UnitsGroup
-	
-	//Select a worker
-	UnitsGroup* ug;	
-	double minDist=999999;
-	double curDist=0;
-	
-		//Check over all the already created unitsGroup which one is near the first subgoal to accomplish
-		//TODO
-
-		
-	//NO unitsgroup already found, must create a new one
-	ug = new UnitsGroup();	
-	for each(Unit* u in Broodwar->getAllUnits()){
-		if (u->getPlayer()==Broodwar->self()&&u->getType().isWorker()&& !(u->isConstructing())){
-			ug->takeControl(u);
-			break;
-		}
-	}
-	ug->addGoal(goal);
-	goal->setUnitsGroup(ug);
-	warManager->unitsgroups.push_front(ug);
-	return ug;
 }
 
 

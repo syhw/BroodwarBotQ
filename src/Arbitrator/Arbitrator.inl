@@ -286,6 +286,7 @@ template <class _Tp,class _Val>
         unansweredObjected=i->second;
 
         inOnOffer=true;
+		BWAPI::Broodwar->printf("onOffer to %s ", i->first->getName().c_str());
         i->first->onOffer(i->second);
         inOnOffer=false;
 

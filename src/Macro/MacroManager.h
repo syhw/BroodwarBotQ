@@ -55,6 +55,8 @@ public:
 	void setDependencies();
 	virtual void onStart();
 	std::string getName() const;
+	virtual void eRush();
+
 	void onUnitDestroy(BWAPI::Unit* unit);
 	virtual void update();
 	virtual void onUnitCreate(BWAPI::Unit* unit);
@@ -97,4 +99,6 @@ protected:
 	// Units
 	map<UnitType, PlannedUnit> wantedUnits;// wanted ratio for each unit.
 	bool expanding;
+	int firstScout;
+	bool scouting;
 };

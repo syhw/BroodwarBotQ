@@ -47,7 +47,7 @@ public:
 	//Mutators
 	void addSubgoal(pSubgoal s);
 	void setStatus(GoalStatus s);
-
+	virtual int estimateDistance(BWAPI::Position);
 	//Accessors
 	GoalStatus getStatus() const;
 };

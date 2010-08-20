@@ -436,6 +436,10 @@ void BattleBroodAI::onUnitDiscover(BWAPI::Unit* unit){
 	  if (Broodwar->isReplay()) return;
   this->informationManager->onUnitDiscover(unit);
   this->unitGroupManager->onUnitDiscover(unit);
+  if(unit->getPlayer() != BWAPI::Broodwar->self()){
+	  this->macroManager->eRush();
+  }
+
 }
 
 void BattleBroodAI::onUnitEvade(BWAPI::Unit* unit){

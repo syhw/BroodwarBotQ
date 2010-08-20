@@ -9,24 +9,38 @@ ProtossStrat::~ProtossStrat()
 {
 }
 
+void ProtossStrat::eRush(){
+	this->buildOrderManager->build(2,BWAPI::UnitTypes::Protoss_Gateway,94);
+	this->buildOrderManager->build(5,BWAPI::UnitTypes::Protoss_Zealot,92);
+}
+
 void ProtossStrat::onStart(){
 	MacroManager::onStart();
 	this->buildOrderManager->buildAdditional(4,BWAPI::UnitTypes::Protoss_Probe,100);
-	this->buildOrderManager->build(1,BWAPI::UnitTypes::Protoss_Pylon,99);
-	this->buildOrderManager->buildAdditional(2,BWAPI::UnitTypes::Protoss_Probe,98);
-	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Gateway,97);
+	this->buildOrderManager->build(1,BWAPI::UnitTypes::Protoss_Pylon,98);
 	this->buildOrderManager->buildAdditional(2,BWAPI::UnitTypes::Protoss_Probe,96);
-	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Assimilator,95);
-	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Probe,94);
-	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Cybernetics_Core,93);
-	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Probe,92);
-	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Gateway,91);
-	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Probe,90);
-	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Dragoon,89);
-	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Pylon,88);
-	this->buildOrderManager->upgrade(1,BWAPI::UpgradeTypes::Singularity_Charge, 87);
-	this->buildOrderManager->build(40,BWAPI::UnitTypes::Protoss_Dragoon, 10);
+	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Gateway,94);
+	this->buildOrderManager->buildAdditional(2,BWAPI::UnitTypes::Protoss_Probe,92);
+	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Assimilator,90);
+	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Probe,88);
+	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Cybernetics_Core,86);
+	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Probe,84);
+	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Gateway,82);
+	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Probe,80);
+	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Dragoon,78);
+	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Pylon,76);
+	this->buildOrderManager->upgrade(1,BWAPI::UpgradeTypes::Singularity_Charge, 74);
+	this->buildOrderManager->build(40,BWAPI::UnitTypes::Protoss_Dragoon, 20);
+
+	setScoutTime();
 	//this->buildOrderManager->enableDependencyResolver();
+}
+
+void ProtossStrat::setScoutTime(){
+	BWAPI::Broodwar->printf("%s", BWAPI::Broodwar->mapFileName().c_str());
+	if(BWAPI::Broodwar->mapFileName() == "(2)Astral Balance.scm"){
+		BWAPI::Broodwar->printf(" ok ");
+	}
 }
 
 void ProtossStrat::update(){
@@ -38,6 +52,7 @@ void ProtossStrat::update(){
 			this->workerManager->enableAutoBuild();
 		}
 	}
+
 /*
 //This must be uncommented if we want the bot to expand. Yet expanding twice is not possible for the moment.
 	if(this->shouldExpand() && !expanding ){

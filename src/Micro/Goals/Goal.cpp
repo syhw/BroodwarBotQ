@@ -116,3 +116,9 @@ void Goal::setUnitsGroup(UnitsGroup * ug){
 	}
 	this->unitsGroup = ug;
 }
+
+
+int Goal::estimateDistance(BWAPI::Position){
+	
+	return 0;
+}

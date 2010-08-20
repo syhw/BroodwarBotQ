@@ -18,6 +18,7 @@ public:
 	virtual void createTechBuildings();
 	virtual void buildDefenses();
 	virtual void initWantedUnits();
-
+	void setScoutTime();
 	void buildGates();
+	void eRush(); // To call on detection of a rush
 };

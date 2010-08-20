@@ -2,6 +2,7 @@
 #include <math.h>
 #include "BorderManager.h"
 #include <assert.h>
+#include "ScoutManager.h"
 using namespace BWAPI;
 using namespace BWTA;
 
@@ -9,6 +10,8 @@ using namespace BWTA;
 MacroManager::MacroManager()
 : BaseObject("MacroManager")
 , expanding(0)
+, scouting(false)
+, firstScout(10)
 {
 	this->buildOrderManager = NULL;
 	this->productionManager = NULL;
@@ -37,8 +40,20 @@ std::string MacroManager::getName() const
 void MacroManager::onStart(){
 
 }
+
+void MacroManager::eRush(){
+
+
+}
+
 void MacroManager::onUnitCreate(BWAPI::Unit* unit)
 {
+	
+	if(unit->getType().isBuilding() && scouting == false && BWAPI::Broodwar->self()->supplyUsed() == 16){
+		this->scouting = true;
+		ScoutManager::Instance().findEnemy();
+	}
+
 
 	// ***********   Expand   *********** //
 	if( unit->getType().isResourceDepot())
