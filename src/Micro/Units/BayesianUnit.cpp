@@ -191,6 +191,8 @@ void BayesianUnit::computeRepulseValues()
                     && (*it)->getType().size() != BWAPI::UnitSizeTypes::Small)
                     value = REPULSE_HIGH;
             }
+            if (!value && tmp.getDistance((*it)->getPosition()) < max(_maxDiag, otherMaxDiag ))
+                value = REPULSE_LOW;
         }
         _repulseValues.push_back(value);
     }
