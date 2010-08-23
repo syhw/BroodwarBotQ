@@ -59,14 +59,15 @@ void MicroAIModule::onStart()
 
     int sign = mp.x() < Broodwar->mapWidth()/2*32 ? 1 : -1;
 
-    /* LINE IN THE MIDDLE (+/- 64 pixs)
+    /* LINE IN THE MIDDLE (+/- 64 pixs) */
+    /*
     pFormation tmp_form = pFormation(new LineFormation(
         Position(Broodwar->mapWidth()/2*32 + sign*64,(Broodwar->mapHeight()/2 + 4)*32), Vec(1,0)));
     pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
     pGoal tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
     goals.push_back(tmp_goal);
     */
-
+    
     /* ARC IN THE MIDDLE (+/- 256 pixs) */
     pFormation tmp_form = pFormation(new ArcFormation(
         Position(Broodwar->mapWidth()/2*32 + sign*256,(Broodwar->mapHeight()/2 + 4)*32), 
@@ -74,15 +75,15 @@ void MicroAIModule::onStart()
     pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
     pGoal tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
     goals.push_back(tmp_goal);
-    
+
     /* SQUARE ON THE OTHER SIDE */
     /*tmp_form = pFormation(new SquareFormation(
         Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
     tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
     tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
     goals.push_back(tmp_goal);*/
-    //goals.push_back(pGoal(new AttackGoal(mm, 
-    //    Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32))));
+    goals.push_back(pGoal(new AttackGoal(mm, 
+        Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32))));
     
 	mm->setGoals(goals);
 

@@ -59,6 +59,7 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 , _refreshPathFramerate(Broodwar->getLatency() + 2)
 , _maxDistWhileRefreshingPath(max(_refreshPathFramerate * _topSpeed, 45.26)) // 45.26 = sqrt(BWAPI::TILE_SIZE^2 + BWAPI::TILE_SIZE^2)
 , _attackDuration(Broodwar->getLatency())
+, _inPos(Position(0, 0))
 {
     updateDirV();
     mapManager = & MapManager::Instance();
@@ -172,7 +173,15 @@ void BayesianUnit::computeRepulseValues()
         for (std::set<Unit*>::const_iterator it = Broodwar->self()->getUnits().begin();
             it != Broodwar->self()->getUnits().end(); ++it)
         {
-            if (tmp.getDistance((*it)->getPosition()) < 45.26)
+            if (*it == unit)
+                continue;
+            Vec tmpvit((*it)->getVelocityX(), 
+                    (*it)->getVelocityY());
+            tmpvit *= tmp.getDistance((*it)->getPosition()) / (*it)->getType().topSpeed();
+            Position interp_pos = tmpvit.translate((*it)->getPosition());
+            double otherMaxDiag = 1.4143 * max((*it)->getType().dimensionDown() - (*it)->getType().dimensionUp(),
+                (*it)->getType().dimensionRight() - (*it)->getType().dimensionLeft());
+            if (tmp.getDistance(interp_pos) < max(_maxDiag, otherMaxDiag)) // collision route
             {
                 if (value == REPULSE_NO && (*it)->getType().size() == BWAPI::UnitSizeTypes::Small)
                     value = REPULSE_LOW;
@@ -201,6 +210,7 @@ void BayesianUnit::switchMode(unit_mode um)
 #ifdef __DEBUG_GABRIEL__
             //Broodwar->printf("Switch INPOS!");
 #endif
+            _inPos = _unitPos;
             break;
         case MODE_FIGHT_G:
 #ifdef __DEBUG_GABRIEL__
@@ -287,7 +297,7 @@ void BayesianUnit::updateAttractors()
     else
     {
         computeRepulseValues();
-        drawRepulseValues();
+        //drawRepulseValues();
     }
 
     // building and blocking attraction (repulsion)
@@ -514,7 +524,10 @@ void BayesianUnit::updateObj()
     double targetDistance = _unitPos.getDistance(target);
     if (_mode == MODE_INPOS)
     {
-        obj = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y());
+        if (_unitPos.getDistance(_inPos) < 3.9)
+            obj = Vec(0, 0);
+        else
+            obj = Vec(_inPos.x() - _unitPos.x(), _inPos.y() - _unitPos.y());
         return;
     }
 #ifndef __OUR_PATHFINDER__
@@ -565,6 +578,7 @@ void BayesianUnit::updateObj()
             }
             ReleaseMutex(_pathMutex);
             DWORD threadId;
+            Broodwar->printf("creating a thread");
             // Create the thread to begin execution on its own.
             HANDLE thread = CreateThread( 
                 NULL,                   // default security attributes
@@ -814,6 +828,27 @@ void BayesianUnit::updateRangeEnemies()
     }
 }
 
+void BayesianUnit::updateUnitsImInRange()
+{
+    _unitsImInRange.clear();
+    for (std::multimap<double, Unit*>::const_iterator it = _rangeEnemies.begin();
+        it != _rangeEnemies.end(); ++it)
+    {
+        if (unit->isFlyer() && it->second->getType().airWeapon() != BWAPI::WeaponTypes::None)
+        {
+        }
+        else if (!units->isFlyer() && it->second->getType().groundWeapon() != BWAPI::WeaponTypes::None)
+        {
+        }
+        int range = it->second->getType().
+        if (it->second->getType() == UnitTypes::Protoss_Dragoon 
+            && Broo)
+            range += 64; // += 64
+        if (it->first < range)
+            _unitsImInRange.insert(it->second);
+    }
+}
+
 void BayesianUnit::updateTargetEnemy()
 {
     // clear old damage
@@ -979,6 +1014,8 @@ void BayesianUnit::selectDir()
             {
                 obj += it->second;
             }
+            //if (obj.norm() < 3.9)
+            //    obj = Vec(0, 0);
             /* // I don't like 0s
             if (obj == Vec(0,0))
             {
@@ -1111,7 +1148,7 @@ void BayesianUnit::update()
         && unit->getGroundWeaponCooldown() <= Broodwar->getLatency())
     {
 #ifdef __DEBUG_GABRIEL__
-        Broodwar->setLocalSpeed(42);
+        Broodwar->setLocalSpeed(51);
 #endif
         this->switchMode(MODE_FIGHT_G);
     }
@@ -1192,8 +1229,11 @@ void BayesianUnit::update()
             }
             else if (_lastTotalHP - (unit->getShields() + unit->getHitPoints()) > 0)
             {
-                updateDir();
-                clickDir();
+                clickFlee();
+            }
+            else
+            {
+                switchMode(MODE_INPOS);
             }
         }
         break;

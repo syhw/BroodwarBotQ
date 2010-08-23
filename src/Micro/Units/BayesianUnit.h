@@ -99,6 +99,7 @@ protected:
     const int _refreshPathFramerate;
     int _maxDistWhileRefreshingPath;
     int _attackDuration;
+    Position _inPos;
     //std::multimap<BWAPI::Position, attractor_type> _prox;
     std::vector<occupation_type> _occupation;
     // dirv[attractor] = direction relative to an attractor
@@ -119,6 +120,7 @@ protected:
     std::vector<double> _damageProb; // TODO decide if static, perhaps unit dependant
     std::vector<double> _repulseProb;
     UnitsGroup* _unitsGroup;
+    std::set<BWAPI::Unit*> _unitsImInRange;
     std::multimap<double, BWAPI::Unit*> _rangeEnemies;
     std::map<occupation_type, double> _defaultProb;
     std::multimap<double, Vec> _dirvProb;

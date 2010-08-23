@@ -30,7 +30,7 @@ void ArcFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
 		if (length > maxLength)
 			maxLength = length;	
     }
-	maxLength *= TILE_SIZE + 8;
+	maxLength *= TILE_SIZE + 10;
     
     Vec radius(direction.x - center.x, direction.y - center.y);
 
