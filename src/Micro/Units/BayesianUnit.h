@@ -91,6 +91,7 @@ protected:
     std::vector<Vec> _dirv;
     int _maxDimension, _minDimension;
     int _lastAttackOrder;
+    int _lastClickFrame;
     double _maxDiag;
     BWAPI::Position _lastRightClick, _posAtMost13FramesAgo, _posAtMost23FramesAgo;
     bool _iThinkImBlocked;
@@ -100,6 +101,7 @@ protected:
     int _maxDistWhileRefreshingPath;
     int _attackDuration;
     Position _inPos;
+    bool _fleeing;
     //std::multimap<BWAPI::Position, attractor_type> _prox;
     std::vector<occupation_type> _occupation;
     // dirv[attractor] = direction relative to an attractor
@@ -145,7 +147,7 @@ protected:
     void updateDir();
     void drawDir();
     inline void clickDir();
-    inline void clickFlee();
+    inline void flee();
     void drawArrow(Vec& v);
     inline void updateAttractors();
     void drawAttractors();
@@ -163,6 +165,7 @@ public:
     std::map<int, EUnit*> listTargets;
     unit_mode _mode; // TODO : faudra le remettre en protected, c'est juste pour quelques tests
 	void switchMode(unit_mode um);
+    int getMaxDimension();
     Vec dir, obj; // dir=current direction, obj=pathfinder's direction
     BayesianUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~BayesianUnit();
@@ -170,7 +173,7 @@ public:
     virtual void onUnitDestroy(BWAPI::Unit* u);
     virtual void onUnitShow(BWAPI::Unit* u);
     virtual void onUnitHide(BWAPI::Unit* u);
-    
+
     void update();
     virtual void attackMove(const BWAPI::Position& p);
 

@@ -51,6 +51,7 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 , _maxDiag(sqrt((double)(_slarge*_slarge + _sheight*_sheight)))
 , _lastRightClick(unit->getPosition())
 , _lastAttackOrder(0)
+, _lastClickFrame(0)
 , _posAtMost13FramesAgo(Position(unit->getPosition().x() + 1, unit->getPosition().y() + 1)) // we don't want posAtMost13FramesAgo  
 , _posAtMost23FramesAgo(unit->getPosition())                                                // and posAtMost23FramesAgo to be equal
 , _iThinkImBlocked(false)
@@ -60,6 +61,7 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 , _maxDistWhileRefreshingPath(max(_refreshPathFramerate * _topSpeed, 45.26)) // 45.26 = sqrt(BWAPI::TILE_SIZE^2 + BWAPI::TILE_SIZE^2)
 , _attackDuration(Broodwar->getLatency())
 , _inPos(Position(0, 0))
+, _fleeing(false)
 {
     updateDirV();
     mapManager = & MapManager::Instance();
@@ -226,6 +228,11 @@ void BayesianUnit::switchMode(unit_mode um)
         default:
             break;
     }
+}
+
+int BayesianUnit::getMaxDimension()
+{
+    return _maxDimension;
 }
 
 void BayesianUnit::straightLine(vector<Position>& ppath, 
@@ -411,7 +418,10 @@ double BayesianUnit::computeProb(unsigned int i)
 
     if (_mode != MODE_FLOCK)
     {
-        val *= _repulseProb[_repulseValues[i]];
+        if (_mode != MODE_FIGHT_G)
+        {
+            val *= _repulseProb[_repulseValues[i]];
+        }
         double prob_obj = _PROB_GO_OBJ;
         if (_dirv[i] != obj)
         {
@@ -1066,11 +1076,13 @@ void BayesianUnit::clickDir()
     if (_mode != MODE_INPOS && (dir == Vec(0,0) || dist < 0.9)) // 0.9 arbitrary
     {
         return;
-    } else if (_mode == MODE_INPOS && dir != Vec(0, 0))
+    } 
+    else if (_mode == MODE_INPOS && dir != Vec(0, 0))
     {
         dir += _unitPos;
         unit->rightClick(dir.toPosition());
         _lastRightClick = dir.toPosition();
+        _lastClickFrame = Broodwar->getFrameCount();
         return;
     }
     //if (dist > 11.32) // sqrt(8^2 + 8^2), one walk tile
@@ -1079,11 +1091,13 @@ void BayesianUnit::clickDir()
         dir += _unitPos;
         unit->rightClick(dir.toPosition());
         _lastRightClick = dir.toPosition();
+        _lastClickFrame = Broodwar->getFrameCount();
     }
     else if (_lastRightClick!=target)
     {
         unit->rightClick(target);
         _lastRightClick = target;
+        _lastClickFrame = Broodwar->getFrameCount();
     } 
     else
     {
@@ -1091,8 +1105,42 @@ void BayesianUnit::clickDir()
     }
 }
 
-void BayesianUnit::clickFlee()
+void BayesianUnit::flee()
 {
+    _fleeing = true;
+    Vec current = this->mapManager->groundDamagesGrad[_unitPos.x()/32 + _unitPos.y()/32*Broodwar->mapWidth()];
+    if (current.norm() > 0.9)
+    {
+        updateDirV();
+        updateAttractors();
+
+        // update objectives
+        //updateObj();
+#ifdef __EXACT_OBJ__
+        current.normalize();
+        double max = -10000000.0;
+        double max_norm = -10000000.0;
+        unsigned int ind_max;
+        for(unsigned int i = 0; i < _dirv.size(); ++i)
+        { 
+            Vec tmp = _dirv[i];
+            tmp.normalize();
+            double val = tmp.dot(obj);
+            if ((val >= max && _dirv[i].norm() > max_norm)) // most in the direction of obj
+            {
+                max = val;
+                max_norm = _dirv[i].norm();
+                ind_max = i;
+            }
+        }
+        obj = _dirv[ind_max];
+#endif
+        computeProbs();
+        selectDir();
+        clickDir();
+    }
+    if (!this->mapManager->groundDamages[_unitPos.x()/32 + _unitPos.y()/32*Broodwar->mapWidth()])
+        _fleeing = false;
 }
 
 void BayesianUnit::drawArrow(Vec& v)
@@ -1123,8 +1171,8 @@ void BayesianUnit::update()
 {
     if (!unit->exists()) return;
     _unitPos = unit->getPosition();
-    if (unit->isAttacking())
-        Broodwar->printf("frame %d, damage cooldown %d", Broodwar->getFrameCount(), unit->getType().groundWeapon().damageCooldown());
+    //if (unit->isAttacking())
+    //    Broodwar->printf("frame %d, damage cooldown %d", Broodwar->getFrameCount(), unit->getType().groundWeapon().damageCooldown());
 
     if (_mode != MODE_FIGHT_G && _mode != MODE_SCOUT 
         && !_unitsGroup->enemies.empty()
@@ -1135,8 +1183,6 @@ void BayesianUnit::update()
 #endif
         this->switchMode(MODE_FIGHT_G);
     }
-    if (_mode == MODE_INPOS)
-        Broodwar->printf("Unit mode INPOS");
 
     switch (_mode)
     {
@@ -1152,8 +1198,10 @@ void BayesianUnit::update()
 #ifdef __DEBUG_GABRIEL__
             Broodwar->printf("I think I'm blocked!");
 #endif
-            unit->rightClick(target);
+            if (_lastRightClick != target || !((Broodwar->getFrameCount() - _lastClickFrame) % 11))
+                unit->rightClick(target);
             _lastRightClick = target;
+            _lastClickFrame = Broodwar->getFrameCount();
             return;
         }
         updateDir();
@@ -1212,14 +1260,14 @@ void BayesianUnit::update()
                 unit->attackUnit(targetEnemy);
                 _lastAttackOrder = Broodwar->getFrameCount();
             }
-            else if (_lastTotalHP - (unit->getShields() + unit->getHitPoints()) > 0)
+            else if (_fleeing || _lastTotalHP - (unit->getShields() + unit->getHitPoints()) > 0)
             {
-                clickFlee();
+                flee();
             }
-            //else
-            //{
-            //    switchMode(MODE_INPOS);
-            //}
+            else if (!unit->isMoving() && targetEnemy != NULL)
+            {
+                switchMode(MODE_INPOS);
+            }
         }
         break;
         
