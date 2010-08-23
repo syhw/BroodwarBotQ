@@ -153,8 +153,8 @@ void MapManager::updateDamagesGrad(Vec* grad, int* tab, Position p, int minRadiu
                 int xx = x/32;
                 int yy = y/32;
                 grad[xx + yy*Broodwar->mapWidth()] = Vec(0, 0);
-                for (int tmpx = xx - 1; tmpx < xx + 1; ++tmpx)
-                    for (int tmpy = yy - 1; tmpy < yy + 1; ++tmpy)
+                for (int tmpx = xx - 1; tmpx <= xx + 1; ++tmpx)
+                    for (int tmpy = yy - 1; tmpy <= yy + 1; ++tmpy)
                     {
                         int deltax = tmpx - xx;
                         int deltay = tmpy - yy;
