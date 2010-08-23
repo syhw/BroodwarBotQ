@@ -828,27 +828,6 @@ void BayesianUnit::updateRangeEnemies()
     }
 }
 
-void BayesianUnit::updateUnitsImInRange()
-{
-    _unitsImInRange.clear();
-    for (std::multimap<double, Unit*>::const_iterator it = _rangeEnemies.begin();
-        it != _rangeEnemies.end(); ++it)
-    {
-        if (unit->isFlyer() && it->second->getType().airWeapon() != BWAPI::WeaponTypes::None)
-        {
-        }
-        else if (!units->isFlyer() && it->second->getType().groundWeapon() != BWAPI::WeaponTypes::None)
-        {
-        }
-        int range = it->second->getType().
-        if (it->second->getType() == UnitTypes::Protoss_Dragoon 
-            && Broo)
-            range += 64; // += 64
-        if (it->first < range)
-            _unitsImInRange.insert(it->second);
-    }
-}
-
 void BayesianUnit::updateTargetEnemy()
 {
     // clear old damage
@@ -1112,6 +1091,10 @@ void BayesianUnit::clickDir()
     }
 }
 
+void BayesianUnit::clickFlee()
+{
+}
+
 void BayesianUnit::drawArrow(Vec& v)
 {
     int xfrom = _unitPos.x();
@@ -1152,6 +1135,8 @@ void BayesianUnit::update()
 #endif
         this->switchMode(MODE_FIGHT_G);
     }
+    if (_mode == MODE_INPOS)
+        Broodwar->printf("Unit mode INPOS");
 
     switch (_mode)
     {
@@ -1231,10 +1216,10 @@ void BayesianUnit::update()
             {
                 clickFlee();
             }
-            else
-            {
-                switchMode(MODE_INPOS);
-            }
+            //else
+            //{
+            //    switchMode(MODE_INPOS);
+            //}
         }
         break;
         

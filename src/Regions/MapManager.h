@@ -3,6 +3,7 @@
 #include "CSingleton.h"
 #include "EUnitsFilter.h"
 #include <vector>
+#include "Vec.h"
 
 /** From BWAPI's doc:
 * Positions are measured in pixels and are the highest resolution
@@ -28,6 +29,7 @@ private:
     inline void addBuilding(BWAPI::Unit* u);
     inline void removeBuilding(BWAPI::Unit* u);
     inline void modifyDamages(int* tab, Position p, int minRadius, int maxRadius, int damages);
+    inline void updateDamagesGrad(Vec* grad, int* tab, Position p, int minRadius, int maxRadius);
     inline void removeDmg(BWAPI::UnitType ut, BWAPI::Position p);
     inline void addDmg(BWAPI::UnitType ut, BWAPI::Position p);
 public:
@@ -38,6 +40,8 @@ public:
     bool* buildings;            // low res => building tiless
     int* groundDamages;         // build tiles
     int* airDamages;            // build tiles
+    Vec* groundDamagesGrad;
+    Vec* airDamagesGrad;
     void onUnitCreate(BWAPI::Unit* u);
     void onUnitDestroy(BWAPI::Unit* u);
     void onUnitShow(BWAPI::Unit* u);
@@ -50,4 +54,6 @@ public:
     void drawLowResBuildings(); // debug
     void drawGroundDamages(); // debug
     void drawAirDamages(); // debug
+    void drawGroundDamagesGrad(); // debug
+    void drawAirDamagesGrad(); // debug
 };

@@ -120,7 +120,6 @@ protected:
     std::vector<double> _damageProb; // TODO decide if static, perhaps unit dependant
     std::vector<double> _repulseProb;
     UnitsGroup* _unitsGroup;
-    std::set<BWAPI::Unit*> _unitsImInRange;
     std::multimap<double, BWAPI::Unit*> _rangeEnemies;
     std::map<occupation_type, double> _defaultProb;
     std::multimap<double, Vec> _dirvProb;
@@ -146,6 +145,7 @@ protected:
     void updateDir();
     void drawDir();
     inline void clickDir();
+    inline void clickFlee();
     void drawArrow(Vec& v);
     inline void updateAttractors();
     void drawAttractors();

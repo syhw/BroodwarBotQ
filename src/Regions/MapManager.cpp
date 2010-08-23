@@ -1,6 +1,5 @@
 #pragma once
 #include "MapManager.h"
-#include "Vec.h"
 #include "UnitGroupManager.h"
 #include <stdio.h>
 #include <string.h>
@@ -21,6 +20,8 @@ MapManager::MapManager()
     buildings = new bool[Broodwar->mapWidth() * Broodwar->mapHeight()];         // [_width * _height / 16];
     groundDamages = new int[Broodwar->mapWidth() * Broodwar->mapHeight()];
     airDamages = new int[Broodwar->mapWidth() * Broodwar->mapHeight()];
+    groundDamagesGrad = new Vec[Broodwar->mapWidth() * Broodwar->mapHeight()];
+    airDamagesGrad = new Vec[Broodwar->mapWidth() * Broodwar->mapHeight()];
 
     // initialization
     for (int x = 0; x < _width; ++x) 
@@ -48,7 +49,9 @@ MapManager::MapManager()
             lowResWalkability[x + y*_width/4] = walkable;
             buildings[x + y*_width/4] = false; // initialized with manual call to onUnitCreate() in onStart()
             groundDamages[x + y*_width/4] = 0;
+            groundDamagesGrad[x + y*_width/4] = Vec(0, 0);
             airDamages[x + y*_width/4] = 0;
+            airDamagesGrad[x + y*_width/4] = Vec(0, 0);
         }
     }
     _eUnitsFilter = & EUnitsFilter::Instance();
@@ -65,6 +68,8 @@ MapManager::~MapManager()
     delete [] buildings;
     delete [] groundDamages;
     delete [] airDamages;
+    delete [] groundDamagesGrad;
+    delete [] airDamagesGrad;
 }
 
 void MapManager::modifyBuildings(Unit* u, bool b)
@@ -129,6 +134,43 @@ void MapManager::modifyDamages(int* tab, Position p, int minRadius, int maxRadiu
         }
 }
 
+void MapManager::updateDamagesGrad(Vec* grad, int* tab, Position p, int minRadius, int maxRadius)
+{
+    int tmpMaxRadius = maxRadius + 32 + 32; // TOCHANGE 32+32
+    int tmpMinRadius = max(0, minRadius - 32);
+    int lowerX = (p.x() - tmpMaxRadius) > 0 ? p.x() - tmpMaxRadius : 0;
+    int higherX = (p.x() + tmpMaxRadius) < _width ? p.x() + tmpMaxRadius : _pix_width;
+    int lowerY = (p.y() - tmpMaxRadius) > 0 ? p.y() - tmpMaxRadius : 0;
+    int higherY = (p.y() + tmpMaxRadius) < _height ? p.y() + tmpMaxRadius : _pix_height;
+    assert(higherX > lowerX);
+    assert(higherY > lowerY);
+    for (int x = lowerX; x <= higherX; x += 32)
+        for (int y = lowerY; y <= higherY; y += 32)
+        {
+            double dist = p.getDistance(Position(x, y));
+            if (dist <= tmpMaxRadius && dist > tmpMinRadius)
+            {
+                int xx = x/32;
+                int yy = y/32;
+                grad[xx + yy*Broodwar->mapWidth()] = Vec(0, 0);
+                for (int tmpx = xx - 1; tmpx < xx + 1; ++tmpx)
+                    for (int tmpy = yy - 1; tmpy < yy + 1; ++tmpy)
+                    {
+                        int deltax = tmpx - xx;
+                        int deltay = tmpy - yy;
+                        if (deltax == 0 && deltay == 0)
+                            continue;
+                        if (tmpx < 0 || tmpy < 0)
+                            continue;
+                        if (tmpx >= Broodwar->mapWidth() || tmpy >= Broodwar->mapHeight())
+                            continue;
+                        grad[xx + yy*Broodwar->mapWidth()] += 
+                            Vec(deltax, deltay)*tab[tmpx + (tmpy)*Broodwar->mapWidth()];
+                    }
+            }                
+        }
+}
+
 void MapManager::removeDmg(UnitType ut, Position p)
 {
     if (p.x() == 0 && p.y() == 0)
@@ -137,11 +179,13 @@ void MapManager::removeDmg(UnitType ut, Position p)
     {
         modifyDamages(this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange(), 
             - ut.groundWeapon().damageAmount() * ut.maxGroundHits());
+        updateDamagesGrad(this->groundDamagesGrad, this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange());
     }
     if (ut.airWeapon() != BWAPI::WeaponTypes::None)
     {
         modifyDamages(this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange(), 
             - ut.airWeapon().damageAmount() * ut.maxAirHits());
+        updateDamagesGrad(this->airDamagesGrad, this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange());
     }
 }
 
@@ -169,7 +213,8 @@ void MapManager::onUnitCreate(Unit* u)
 void MapManager::onUnitDestroy(Unit* u)
 {
     removeBuilding(u);
-    removeDmg(u->getType(), u->getPosition());
+    removeDmg(u->getType(), _trackedUnits[u]);
+    _trackedUnits.erase(u);
 }
 
 void MapManager::onUnitShow(Unit* u)
@@ -203,6 +248,7 @@ void MapManager::onFrame()
         }
     }
 
+    this->drawGroundDamagesGrad();
     this->drawGroundDamages();
 }
 
@@ -301,6 +347,62 @@ void MapManager::drawAirDamages()
             else if (airDamages[x + y*Broodwar->mapWidth()] > 160)
             {
                 Broodwar->drawBox(CoordinateType::Map, 32*x - 14, 32*y - 14, 32*x +14, 32*y +14, Colors::Red);
+            }
+        }
+}
+
+void MapManager::drawGroundDamagesGrad()
+{
+    for (int x = 0; x < Broodwar->mapWidth(); ++x)
+        for (int y = 0; y < Broodwar->mapHeight(); ++y)
+        {
+            Vec tmp = groundDamagesGrad[x + y*Broodwar->mapWidth()];
+            tmp.normalize();
+            tmp *= 14;
+            Position tmpPos = Position(x*32, y*32);
+            if (groundDamagesGrad[x + y*Broodwar->mapWidth()].norm() > 0 && groundDamagesGrad[x + y*Broodwar->mapWidth()].norm() <= 40)
+            {
+                Broodwar->drawLineMap(tmpPos.x(), tmpPos.y(), tmp.translate(tmpPos).x(), tmp.translate(tmpPos).y(), Colors::White);
+            }
+            else if (groundDamagesGrad[x + y*Broodwar->mapWidth()].norm() > 40 && groundDamagesGrad[x + y*Broodwar->mapWidth()].norm() <= 80)
+            {
+                Broodwar->drawLineMap(tmpPos.x(), tmpPos.y(), tmp.translate(tmpPos).x(), tmp.translate(tmpPos).y(), Colors::Yellow);
+            }
+            else if (groundDamagesGrad[x + y*Broodwar->mapWidth()].norm() > 80 && groundDamagesGrad[x + y*Broodwar->mapWidth()].norm() <= 160)
+            {
+                Broodwar->drawLineMap(tmpPos.x(), tmpPos.y(), tmp.translate(tmpPos).x(), tmp.translate(tmpPos).y(), Colors::Orange);
+            }
+            else if (groundDamagesGrad[x + y*Broodwar->mapWidth()].norm() > 160)
+            {
+                Broodwar->drawLineMap(tmpPos.x(), tmpPos.y(), tmp.translate(tmpPos).x(), tmp.translate(tmpPos).y(), Colors::Red);
+            }
+        }
+}
+
+void MapManager::drawAirDamagesGrad()
+{
+    for (int x = 0; x < Broodwar->mapWidth(); ++x)
+        for (int y = 0; y < Broodwar->mapHeight(); ++y)
+        {
+            Vec tmp = airDamagesGrad[x + y*Broodwar->mapWidth()];
+            tmp.normalize();
+            tmp *= 14;
+            Position tmpPos = Position(x*32, y*32);
+            if (airDamagesGrad[x + y*Broodwar->mapWidth()].norm() > 0 && airDamagesGrad[x + y*Broodwar->mapWidth()].norm() <= 40)
+            {
+                Broodwar->drawLineMap(tmpPos.x(), tmpPos.y(), tmp.translate(tmpPos).x(), tmp.translate(tmpPos).y(), Colors::White);
+            }
+            else if (airDamagesGrad[x + y*Broodwar->mapWidth()].norm() > 40 && airDamagesGrad[x + y*Broodwar->mapWidth()].norm() <= 80)
+            {
+                Broodwar->drawLineMap(tmpPos.x(), tmpPos.y(), tmp.translate(tmpPos).x(), tmp.translate(tmpPos).y(), Colors::Yellow);
+            }
+            else if (airDamagesGrad[x + y*Broodwar->mapWidth()].norm() > 80 && airDamagesGrad[x + y*Broodwar->mapWidth()].norm() <= 160)
+            {
+                Broodwar->drawLineMap(tmpPos.x(), tmpPos.y(), tmp.translate(tmpPos).x(), tmp.translate(tmpPos).y(), Colors::Orange);
+            }
+            else if (airDamagesGrad[x + y*Broodwar->mapWidth()].norm() > 160)
+            {
+                Broodwar->drawLineMap(tmpPos.x(), tmpPos.y(), tmp.translate(tmpPos).x(), tmp.translate(tmpPos).y(), Colors::Red);
             }
         }
 }
