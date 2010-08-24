@@ -30,7 +30,7 @@ using namespace BWAPI;
 #define _PROB_NO_UNIT_MOVE 0.9
 #define _PROB_NO_FLOCK_MOVE 0.19 // TODO change for const and set specific values depending on the unit type
 #define _PROB_NO_DAMAGE_MOVE 0.9
-#define _PROB_NO_REPULSE_MOVE 0.9
+#define _PROB_NO_REPULSE_MOVE 0.7
 #define _PROB_NO_WALL_MOVE 0.9999999
 #define _PROB_NO_BUILDING_MOVE 0.99999
 #define _PROB_GO_OBJ 0.9
@@ -81,8 +81,8 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
     _damageProb.push_back(0.005);                 //DAMAGE_HIGH
 
     _repulseProb.push_back(_PROB_NO_REPULSE_MOVE); // REPULSE_NO
-    _repulseProb.push_back(0.08);                  // REPULSE_LOW
-    _repulseProb.push_back(0.02);                  // REPULSE_HIGH
+    _repulseProb.push_back(0.2);                  // REPULSE_LOW
+    _repulseProb.push_back(0.1);                  // REPULSE_HIGH
 
     // old (~~safe) params
 //        _flockProb.push_back(0.05);                  //FLOCK_CONTACT
