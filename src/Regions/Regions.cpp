@@ -158,7 +158,9 @@ void Regions::addUnit(BWAPI::Unit* unit)
         Broodwar->printf("Unit is NULL, WTF?\n");
         return;
     }
-    if (unit->getPlayer()->isNeutral()) return;      
+    if (!unit->exists())
+        return;
+    if (unit->getPlayer()->isNeutral() || !unit->getPlayer()->isEnemy(Broodwar->self())) return;      
     RegionData& rd = regionsData[findRegion(unit->getPosition())]; // if findRegion returns NULL, something really bad happened
     if (!rd.contain(unit)) {
         rd.add(unit);
