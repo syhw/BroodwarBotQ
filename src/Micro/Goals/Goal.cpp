@@ -118,7 +118,12 @@ void Goal::setUnitsGroup(UnitsGroup * ug){
 }
 
 
-int Goal::estimateDistance(BWAPI::Position){
+int Goal::estimateDistance(BWAPI::Position p){
 	
-	return 0;
+	for(std::list<pSubgoal>::iterator it = this->subgoals.begin(); it != this->subgoals.end(); ++it){
+		if( (*it)->distanceToRealize(p) > 0){
+			return (*it)->distanceToRealize(p);
+		}
+	}
+	return -1;
 }

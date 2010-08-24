@@ -36,6 +36,10 @@ public:
 	virtual void tryToRealize() = 0;//Give suggestions to the UnitsGroup
 	virtual double distanceToRealize() = 0;//Return an estimated distance to accomplish the Subgoal
 	//if the return value is negative, it means that the subgoal cannot give suggestions to the UnitsGroup
+	virtual double distanceToRealize(BWAPI::Position);// Returns distanceToRealize() if not extended
+	
+
+
 	void setUnitsGroup(UnitsGroup * ug);
 protected:
 	virtual bool check() = 0;//Function that defines the condition of the subgoal

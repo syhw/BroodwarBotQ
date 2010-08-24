@@ -4,7 +4,8 @@
 
 using namespace BWAPI;
 ScoutManager::ScoutManager( )
-: BaseObject("ScoutManager")
+: BaseObject("ScoutManager"),
+exploringEnemy(false)
 {
 	regions = NULL;
 	warManager = NULL;
@@ -23,9 +24,22 @@ void ScoutManager::setDependencies(){
 
 void ScoutManager::update()
 {
-	//if(regions->enemyFound()){
-	//	findUnitsGroup(pGoal(new ExploreGoal(regions->whereIsEnemy())));
-	//}
+	
+	if(regions->enemyFound() && ! exploringEnemy ){
+		BWAPI::Broodwar->printf("Exploring the Region");
+		exploringEnemy = true;
+		this->awaitingGoals.push_back(pGoal(new ExploreGoal(regions->whereIsEnemy())));
+		
+		for(std::set<BWAPI::Unit *>::const_iterator it = BWAPI::Broodwar->self()->getUnits().begin(); it != BWAPI::Broodwar->self()->getUnits().end(); ++it){
+		
+			if( (*it)->getType().isWorker() || (*it)->getType() == BWAPI::UnitTypes::Protoss_Observer ){
+				this->arbitrator->setBid(this, (*it),90);
+			}
+		
+		}
+		
+	}
+
 }
 
 std::string ScoutManager::getName() const
@@ -77,7 +91,7 @@ void ScoutManager::onUnitCreate(BWAPI::Unit* unit){
 void ScoutManager::onOffer(std::set<BWAPI::Unit*> units){
 
 	std::vector<pGoal> goalsDone;
-	BWAPI::Broodwar->printf("call to onoffer");
+
 	std::set<BWAPI::Unit*> remainingUnits = units;//Does it copy the set ?
 
 	//find the best unit for each goal
@@ -85,7 +99,7 @@ void ScoutManager::onOffer(std::set<BWAPI::Unit*> units){
 	BWAPI::Unit * bestUnit;
 	int dist= 0; 
 
-	for(std::list<pGoal>::iterator goals = this->awaitingGoals.begin(); goals != this->awaitingGoals.end(); ++goals){
+	for(std::list<pGoal>::const_iterator goals = this->awaitingGoals.begin(); goals != this->awaitingGoals.end(); ++goals){
 		
 		dist = 0;
 		bestUnit = NULL;
@@ -106,8 +120,10 @@ void ScoutManager::onOffer(std::set<BWAPI::Unit*> units){
 	UnitsGroup * ug = new UnitsGroup();
 	ug->takeControl(bestUnit);
 	remainingUnits.erase(bestUnit);
-	ug->addGoal((*goals));
+
 	(*goals)->setUnitsGroup(ug);
+	ug->addGoal((*goals));
+	
 	warManager->unitsgroups.push_back(ug);
 	//ug->switchMode(MODE_SCOUT);
 	goalsDone.push_back((*goals));
@@ -125,8 +141,6 @@ void ScoutManager::onOffer(std::set<BWAPI::Unit*> units){
 
 
 void ScoutManager::onRevoke(BWAPI::Unit* unit, double bid){
-
-
 
 }
 

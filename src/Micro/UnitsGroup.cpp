@@ -277,8 +277,8 @@ void UnitsGroup::setGoals(std::list<pGoal>& goals)
 void UnitsGroup::addGoal(pGoal goal)
 {
     this->goals.push_back(goal);
-    if (goals.size() == 1 && !this->units.empty())
-    this->goals.front()->achieve();
+   // if (goals.size() == 1 && !this->units.empty())
+   // this->goals.front()->achieve();
 }
 
 
@@ -303,7 +303,7 @@ void UnitsGroup::onUnitShow(Unit* u)
 {
     for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
         (*it)->onUnitShow(u);
-    unitDamages.insert(UnitDmg(u, Dmg(0, u)));
+	unitDamages.insert(UnitDmg(u, Dmg(0, u)));
 }
 
 void UnitsGroup::onUnitHide(Unit* u)

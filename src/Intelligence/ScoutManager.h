@@ -59,5 +59,6 @@ private:
 	Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
 	Regions* regions;
 	std::list<pGoal> awaitingGoals;
+	bool exploringEnemy;
 };
 #endif 

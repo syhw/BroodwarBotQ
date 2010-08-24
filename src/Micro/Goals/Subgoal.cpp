@@ -17,3 +17,7 @@ SubgoalLogic Subgoal::getLogic() const {
 void Subgoal::setUnitsGroup( UnitsGroup * ug){
 unitsGroup = ug;
 }
+
+double Subgoal::distanceToRealize(BWAPI::Position){
+	return this->distanceToRealize();
+}

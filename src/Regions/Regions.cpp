@@ -267,14 +267,13 @@ bool Regions::enemyFound() const{
 
 }
 BWTA::Region* Regions::whereIsEnemy() {
-	/*
+	
 	for(std::map<BWTA::Region*, RegionData>::const_iterator it = this->regionsData.begin(); it != regionsData.end(); ++it){
-		for(std::map<Player*, std::vector<UnitData> >::const_iterator it_b = it->second.buildings.begin(); it_b != it->second.buildings.end(); ++it_b){
+		for(std::map<Player*, std::vector<RegionsUnitData> >::const_iterator it_b = it->second.buildings.begin(); it_b != it->second.buildings.end(); ++it_b){
 			if( it_b->first->isEnemy(BWAPI::Broodwar->self()) && !it_b->second.empty())
 				return it->first;
 		}
 	}
-	*/
 	return NULL;
 }
 
