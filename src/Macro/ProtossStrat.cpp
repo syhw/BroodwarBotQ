@@ -12,7 +12,7 @@ ProtossStrat::~ProtossStrat()
 void ProtossStrat::eRush(){
 	this->buildOrderManager->build(2,BWAPI::UnitTypes::Protoss_Gateway,94);
 	this->buildOrderManager->build(5,BWAPI::UnitTypes::Protoss_Zealot,92);
-	this->buildOrderManager->build(1,BWAPI::UnitTypes::Protoss_Pylon,92);
+	this->buildOrderManager->build(2,BWAPI::UnitTypes::Protoss_Pylon,93);
 }
 
 void ProtossStrat::onStart(){
