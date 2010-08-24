@@ -31,6 +31,7 @@ using namespace BWAPI;
 
 UnitsGroup::UnitsGroup()
 {
+
 }
 
 UnitsGroup::~UnitsGroup()

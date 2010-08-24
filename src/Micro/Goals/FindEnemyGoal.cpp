@@ -45,11 +45,6 @@ void FindEnemyGoal::achieve(){
 				//TODO
 				BWAPI::Broodwar->printf("Tell Louis this situation happened");
 			}
-
-		}else{
-			//The goal is achieved, deleting the unitgroup
-			warManager->promptRemove(unitsGroup);
-
 		}
 	}
 }

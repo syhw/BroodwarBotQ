@@ -60,5 +60,6 @@ private:
 	Regions* regions;
 	std::list<pGoal> awaitingGoals;
 	bool exploringEnemy;
+	std::map<pGoal,UnitsGroup *> attributedGoals;
 };
 #endif 

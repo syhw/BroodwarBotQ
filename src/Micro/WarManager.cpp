@@ -37,10 +37,12 @@ void WarManager::onStart(){
 void WarManager::update()
 {
 	//Suppress the list prompted to suppress 
-	for each (UnitsGroup * ug in this->promptedRemove){
-		this->remove(ug);
-		ug->idle();	//Set target of units to their position so that they are now idling
-		ug->~UnitsGroup();
+	for(std::list<UnitsGroup *>::iterator ug = this->promptedRemove.begin(); ug != this->promptedRemove.end(); ++ug){
+		
+		this->remove(*ug);
+		(*ug)->idle();	//Set target of units to their position so that they are now idling
+		delete (*ug);
+		
 	}
 	promptedRemove.clear();
 
@@ -196,6 +198,7 @@ bool WarManager::remove(UnitsGroup* u){
 }
 
 void WarManager::promptRemove(UnitsGroup* ug){
+	BWAPI::Broodwar->printf("1 call");
 	this->promptedRemove.push_back(ug);
 }
 

@@ -40,6 +40,22 @@ void ScoutManager::update()
 		
 	}
 
+	//Free units that need to be freed
+	for(std::map<pGoal, UnitsGroup *>::iterator it = this->attributedGoals.begin(); it != this->attributedGoals.end(); ++it ){
+		
+		if(it->first->getStatus() == GS_ACHIEVED){
+
+			for(std::vector<pBayesianUnit>::iterator u = it->second->units.begin(); u != it->second->units.end(); ++u){
+				this->arbitrator->setBid(this, (*u)->unit, 0);
+			}
+
+			this->warManager->promptRemove(it->second);
+			this->attributedGoals.erase(it);
+			
+		}
+		
+	}
+
 }
 
 std::string ScoutManager::getName() const
@@ -97,17 +113,23 @@ void ScoutManager::onOffer(std::set<BWAPI::Unit*> units){
 	//find the best unit for each goal
 	//Obs are always the best
 	BWAPI::Unit * bestUnit;
-	int dist= 0; 
+	int dist= 999999999; 
+	int test;
 
 	for(std::list<pGoal>::const_iterator goals = this->awaitingGoals.begin(); goals != this->awaitingGoals.end(); ++goals){
 		
-		dist = 0;
+		dist = 999999999;
 		bestUnit = NULL;
 
 		for(std::set<BWAPI::Unit *>::iterator units = remainingUnits.begin(); units != remainingUnits.end(); ++units ){
 			
 			if(bestUnit == NULL){
 				bestUnit = (*units);
+			}
+			test = (*goals)->estimateDistance((*units)->getPosition());
+			if( test < dist ){
+				bestUnit = (*units);
+				dist = test;
 			}
 
 			if((*units)->getType() == BWAPI::UnitTypes::Protoss_Observer){
@@ -123,9 +145,10 @@ void ScoutManager::onOffer(std::set<BWAPI::Unit*> units){
 
 	(*goals)->setUnitsGroup(ug);
 	ug->addGoal((*goals));
+	this->attributedGoals.insert(std::make_pair((*goals),ug));
 	
 	warManager->unitsgroups.push_back(ug);
-	//ug->switchMode(MODE_SCOUT);
+	ug->switchMode(MODE_SCOUT);
 	goalsDone.push_back((*goals));
 	}
 

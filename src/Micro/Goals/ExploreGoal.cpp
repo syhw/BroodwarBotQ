@@ -76,5 +76,3 @@ void ExploreGoal::achieve(){
 
 }
 
-
-

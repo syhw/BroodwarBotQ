@@ -62,7 +62,7 @@ public:
     pBayesianUnit leadingUnit;
 	
 	UnitsGroup();
-	~UnitsGroup();
+	virtual ~UnitsGroup();
 
     BWAPI::Position center;
     double stdDevRadius, maxRadius;
