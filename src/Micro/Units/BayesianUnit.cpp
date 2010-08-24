@@ -191,7 +191,7 @@ void BayesianUnit::computeRepulseValues()
                     && (*it)->getType().size() != BWAPI::UnitSizeTypes::Small)
                     value = REPULSE_HIGH;
             }
-            if (!value && tmp.getDistance((*it)->getPosition()) < max(_maxDiag, otherMaxDiag ))
+            if (!value && tmp.getDistance((*it)->getPosition()) < max(_maxDiag, otherMaxDiag))
                 value = REPULSE_LOW;
         }
         _repulseValues.push_back(value);
@@ -536,7 +536,7 @@ void BayesianUnit::updateObj()
     double targetDistance = _unitPos.getDistance(target);
     if (_mode == MODE_INPOS)
     {
-        if (_unitPos.getDistance(_inPos) < 3.9)
+        if (_unitPos.getDistance(_inPos) < 1.0) // TOCHANGE 1.0
             obj = Vec(0, 0);
         else
             obj = Vec(_inPos.x() - _unitPos.x(), _inPos.y() - _unitPos.y());
@@ -828,6 +828,8 @@ void BayesianUnit::testIfBlocked()
         _posAtMost23FramesAgo = _unitPos;
     if (!(Broodwar->getFrameCount() % 11))
         _iThinkImBlocked = (_posAtMost13FramesAgo == _unitPos && _posAtMost23FramesAgo == _unitPos) ? true : false;
+    if (!target.isValid())
+        target.makeValid();
 }
 
 void BayesianUnit::updateRangeEnemies()
@@ -1186,10 +1188,13 @@ void BayesianUnit::update()
         this->switchMode(MODE_FIGHT_G);
     }
 
+if (_mode == MODE_FLOCK)
+Broodwar->printf("MODE FLOCK");
+
     switch (_mode)
     {
     case MODE_FLOCK:
-        if (_unitPos.getDistance(target) < 0.9)
+        if (_unitPos.getDistance(target) < 3.9)
         {
             this->switchMode(MODE_INPOS);
             return;
@@ -1200,10 +1205,23 @@ void BayesianUnit::update()
 #ifdef __DEBUG_GABRIEL__
             Broodwar->printf("I think I'm blocked!");
 #endif
-            if (_lastRightClick != target || !((Broodwar->getFrameCount() - _lastClickFrame) % 11))
+            if (_lastRightClick != target && !((Broodwar->getFrameCount() - _lastClickFrame) % 17))
+            {
                 unit->rightClick(target);
-            _lastRightClick = target;
-            _lastClickFrame = Broodwar->getFrameCount();
+                _lastRightClick = target;
+                _lastClickFrame = Broodwar->getFrameCount();
+                _iThinkImBlocked = false;
+            } else if (_lastRightClick == target && !((Broodwar->getFrameCount() - _lastClickFrame) % 17))
+            {
+                Vec tmpv = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y()) * 2;
+                Position tmpp = tmpv.translate(_unitPos);
+                if (!tmpp.isValid())
+                    tmpp.makeValid();
+                unit->rightClick(tmpp);
+                _lastRightClick = tmpp;
+                _lastClickFrame = Broodwar->getFrameCount();
+                _iThinkImBlocked = false;
+            }
             return;
         }
         updateDir();
