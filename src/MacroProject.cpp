@@ -173,7 +173,7 @@ void BattleBroodAI::onStart()
 	this->goalManager->setDependencies();
 	this->macroManager->setDependencies();
 	this->defenseManager->setDependencies();
-	this->mapManager->setDependencies; // added @merge
+	this->mapManager->setDependencies(); // added @merge
 
 	//Broodwar->printf("The match up is %s v %s",
 
@@ -621,7 +621,7 @@ void BattleBroodAI::onSendText(std::string text)
     {
         set<pBayesianUnit> tmp;
         // for (std::list<UnitsGroup*>::iterator it = this->warManager->unitsGroups.begin(); it != this->warManager->unitsGroups.end(); it++) // why HEAD does have a different warManager->unitsGroups? @merge
-        for (std::list<UnitsGroup*>::iterator it = this->warManager->unitsgroups.begin(); it != this->warManager->unitsgroups.end(); it++)
+        for (std::list<UnitsGroup*>::iterator it = this->warManager->unitsGroups.begin(); it != this->warManager->unitsGroups.end(); it++)
         {
             set<pBayesianUnit> tmp;
             (*it)->selectedUnits(tmp);

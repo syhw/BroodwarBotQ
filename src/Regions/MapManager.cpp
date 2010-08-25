@@ -54,7 +54,7 @@ MapManager::MapManager()
             airDamagesGrad[x + y*_width/4] = Vec(0, 0);
         }
     }
-    _eUnitsFilter = & EUnitsFilter::Instance();
+    _eUnitsFilter = NULL;
 }
 
 MapManager::~MapManager()
@@ -70,6 +70,11 @@ MapManager::~MapManager()
     delete [] airDamages;
     delete [] groundDamagesGrad;
     delete [] airDamagesGrad;
+}
+
+void MapManager::setDependencies()
+{
+    _eUnitsFilter = & EUnitsFilter::Instance();
 }
 
 void MapManager::modifyBuildings(Unit* u, bool b)
