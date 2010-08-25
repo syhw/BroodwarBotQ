@@ -147,7 +147,7 @@ void ScoutManager::onOffer(std::set<BWAPI::Unit*> units){
 	ug->addGoal((*goals));
 	this->attributedGoals.insert(std::make_pair((*goals),ug));
 	
-	warManager->unitsgroups.push_back(ug);
+	warManager->unitsGroups.push_back(ug);
 	ug->switchMode(MODE_SCOUT);
 	goalsDone.push_back((*goals));
 	}

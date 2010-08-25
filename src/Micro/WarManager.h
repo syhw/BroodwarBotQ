@@ -26,7 +26,7 @@ private:
 	Regions* regions;
     InformationManager* informationManager;
 public:
-	void setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, Regions * reg);
+	void setDependencies();
 	void onStart();
 	std::list<UnitsGroup*> unitsGroups;
 	virtual void onOffer(std::set<BWAPI::Unit*> units);

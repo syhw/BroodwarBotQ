@@ -2,7 +2,7 @@
 #include <Regions.h>
 #include <util.h>
 #include <UnitsGroup.h>
-#include "DefendChokeGoal.h"
+#include "DefendBaseGroundGoal.h"
 #include "BorderManager.h"
 #include "AttackGoal.h"
 
@@ -29,10 +29,10 @@ WarManager::~WarManager()
 	//Broodwar->printf("INOUT WarManager::~WarManager()");
 }
 
-void WarManager::setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, Regions * reg){
-	this->arbitrator = arb;
-	this->regions = reg;
-
+void WarManager::setDependencies()
+{
+	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
+	this->regions = & Regions::Instance();
 }
 
 void WarManager::onStart(){
@@ -45,7 +45,7 @@ void WarManager::update()
 	for each (UnitsGroup * ug in this->promptedRemove){
 		this->remove(ug);
 		ug->idle();	//Set target of units to their position so that they are now idling
-		delete *ug; // @merge
+		delete ug; // @merge
 		// @merge ug->~UnitsGroup();
 	}
 	promptedRemove.clear();
@@ -182,31 +182,7 @@ void WarManager::sendGroupToAttack( UnitsGroup* ug)
 
 void WarManager::sendGroupToDefense( UnitsGroup* ug)
 {
-	/*
-	// Go to the nearest choke point.
-	BaseLocation* startLoc = BWTA::getStartLocation(BWAPI::Broodwar->self());
 
-	BWAPI::Position chokePoint;
-	const std::set<Region*>& region = getRegions();
-	const std::set<Chokepoint*>& chocke = getChokepoints();
-	for( std::set<Region*>::const_iterator itRegion = region.begin(); itRegion != region.end(); itRegion++)
-	{
-		if( (*itRegion)->getPolygon().isInside(startLoc->getPosition()))
-		{
-			for( std::set<Chokepoint*>::const_iterator itChocke = chocke.begin(); itChocke != chocke.end(); itChocke++)
-			{
-				const std::pair<Region*,Region*>& border = (*itChocke)->getRegions();
-				if( border.first == *itRegion || border.second == *itRegion )
-				{
-					chokePoint = (*itChocke)->getCenter();
-				}
-			}
-		}
-	}*/
-
-	// Send the group defend the base
-//	pGoal g = pGoal(new DefendChokeGoal(ug,(*BorderManager::Instance().getMyBorder().begin())));
-//	ug->addGoal(g);
 }
 
 

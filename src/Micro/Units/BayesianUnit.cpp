@@ -590,7 +590,7 @@ void BayesianUnit::updateObj()
             }
             ReleaseMutex(_pathMutex);
             DWORD threadId;
-            Broodwar->printf("creating a thread");
+            //Broodwar->printf("creating a thread");
             // Create the thread to begin execution on its own.
             HANDLE thread = CreateThread( 
                 NULL,                   // default security attributes
@@ -1184,25 +1184,20 @@ void BayesianUnit::update()
     //if (unit->isAttacking())
     //    Broodwar->printf("frame %d, damage cooldown %d", Broodwar->getFrameCount(), unit->getType().groundWeapon().damageCooldown());
 
-<<<<<<< HEAD
     if (_mode != MODE_FIGHT_G && _mode != MODE_SCOUT 
         && !_unitsGroup->enemies.empty()
         && unit->getGroundWeaponCooldown() <= Broodwar->getLatency())
-=======
-    if (_mode != MODE_FIGHT_G && !_unitsGroup->enemies.empty())
->>>>>>> louis
     {
 #ifdef __DEBUG_GABRIEL__
         Broodwar->setLocalSpeed(51);
 #endif
         this->switchMode(MODE_FIGHT_G);
     }
-<<<<<<< HEAD
 
-if (_mode == MODE_FLOCK)
-Broodwar->printf("MODE FLOCK");
-=======
->>>>>>> louis
+//if (_mode == MODE_FLOCK)
+//Broodwar->printf("MODE FLOCK");
+    //if (_mode == MODE_SCOUT)
+    //    Broodwar->printf("MODE SCOUT");
 
     switch (_mode)
     {

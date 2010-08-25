@@ -22,7 +22,8 @@ void MicroAIModule::onStart()
 	this->objectManager = & ObjectManager::Instance();
     this->regions = & Regions::Instance();
     this->unitGroupManager = & UnitGroupManager::Instance();
-    regions->setDependencies();
+    this->regions->setDependencies();
+    this->mapManager->setDependencies();
 
 	mm = new UnitsGroup();
 
@@ -88,8 +89,8 @@ void MicroAIModule::onStart()
     tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
     tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
     goals.push_back(tmp_goal);*/
-    //goals.push_back(pGoal(new AttackGoal(mm, 
-    //    Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32))));
+    goals.push_back(pGoal(new AttackGoal(mm, 
+        Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32))));
     
 	mm->setGoals(goals);
 

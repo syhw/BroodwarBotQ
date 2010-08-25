@@ -42,6 +42,7 @@ public:
     int* airDamages;            // build tiles
     Vec* groundDamagesGrad;
     Vec* airDamagesGrad;
+    void setDependencies();
     void onUnitCreate(BWAPI::Unit* u);
     void onUnitDestroy(BWAPI::Unit* u);
     void onUnitShow(BWAPI::Unit* u);
