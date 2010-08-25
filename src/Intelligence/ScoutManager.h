@@ -12,7 +12,7 @@
 #include "FindEnemyGoal.h"
 #include "SeeSubgoal.h"
 #include "FindSubgoal.h"
-#include "MicroManager.h"
+#include "WarManager.h"
 #include "BaseObject.h"
 #include "ExploreGoal.h"
 class GoalManager;
@@ -21,13 +21,15 @@ class GoalManager;
 
 class GoalManager;
 
-class ScoutManager : public CSingleton<ScoutManager>, public BaseObject
+class ScoutManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public CSingleton<ScoutManager>, public BaseObject
 {
 	friend class CSingleton<ScoutManager>;
 
 public:
-	void setDependencies(Regions * region, MicroManager * micro);
+	void setDependencies();
 	virtual void update();
+	virtual void onOffer(std::set<BWAPI::Unit*> units);
+    virtual void onRevoke(BWAPI::Unit* unit, double bid);
 	virtual std::string getName() const;
 	// Goals // Just ideas, not yet implemented
 	void scoutAllEnemies();
@@ -47,12 +49,17 @@ public:
 	virtual void refreshWidget(QWidget* widget) const;
 #endif
 private:
-		ScoutManager();
-		~ScoutManager();
+
+	ScoutManager();
+	~ScoutManager();
 	UnitsGroup* findUnitsGroup(pGoal goal); //Match a UG with the goal (call setUnitsGroup and addGoal)
 	bool to_remove;
     void updateScoutAssignments();
-	MicroManager * microManager;
+	WarManager * warManager;
+	Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
 	Regions* regions;
+	std::list<pGoal> awaitingGoals;
+	bool exploringEnemy;
+	std::map<pGoal,UnitsGroup *> attributedGoals;
 };
 #endif 

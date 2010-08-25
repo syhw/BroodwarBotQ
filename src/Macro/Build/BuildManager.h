@@ -10,7 +10,7 @@ class BuildManager : public CSingleton<BuildManager>
 {
 	friend class CSingleton<BuildManager>;
   public:
-	void setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, BuildingPlacer * bp, ConstructionManager * cm, ProductionManager * pm, MorphManager * mm);
+	void setDependencies();
 	BuildingPlacer* getBuildingPlacer();
 	void update();
     std::string getName() const;

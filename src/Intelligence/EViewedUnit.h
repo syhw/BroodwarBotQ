@@ -10,6 +10,7 @@ struct EViewedUnit
 
     // TODO add probability to be in each of the regions.
     BWAPI::Unit* unit;
+    BWAPI::UnitType type;
     int HP;
     BWAPI::Position position;
     int kills;
@@ -21,7 +22,7 @@ struct EViewedUnit
     void update(unsigned long time);
     ~EViewedUnit() { }
     //std::ostream& operator <<(std::ostream& os) const;
-	const std::istream& operator >>(const std::istream& is) const;
+    const std::istream& operator >>(const std::istream& is) const;
 };
 
 std::ostream& operator <<(std::ostream& os, const EViewedUnit& evu);

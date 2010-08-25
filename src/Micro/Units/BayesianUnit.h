@@ -10,21 +10,24 @@
 #include <map>
 #include <set>
 #include <boost/shared_ptr.hpp>
+
 class BayesianUnit;
 typedef boost::shared_ptr<BayesianUnit> pBayesianUnit;
-#include <EUnit.h>
+
+#include <windows.h>
+#include <process.h>
 
 // #define PROBT 1
 
 #define NUMBER_OF_PRIORITY 5
-
+class BayesianUnit;
+typedef boost::shared_ptr<BayesianUnit> pBayesianUnit;
 
 
 // TODO, this class has to be derived to take Flying/Ground/Special Units 
 // (templars, tanks, lurkers, etc.) into account
 
 class UnitsGroup;
-class EUnit;
 
 enum occupation_type {
     OCCUP_NO,
@@ -51,12 +54,10 @@ enum flock_value {
     FLOCK_FAR
 };
 
-enum inPos_value {
-    INPOS_OK,
-    INPOS_CONTACT,
-    INPOS_CLOSE,
-    INPOS_MEDIUM,
-    INPOS_FAR
+enum repulse_value {
+    REPULSE_NO,
+    REPULSE_LOW,
+    REPULSE_HIGH
 };
 
 enum fightG_value { 
@@ -72,15 +73,36 @@ enum dodge_value {
     DODGE_CONTACT,
     DODGE_CLOSE,
     DODGE_MEDIUM
+};
 
+enum damage_value {
+    DAMAGE_NO,
+    DAMAGE_LOW,
+    DAMAGE_MED,
+    DAMAGE_HIGH
 };
 
 class BayesianUnit : public BattleUnit
 {
 protected:
+    HANDLE _pathMutex;
+    static DWORD WINAPI StaticLaunchPathfinding(void* obj);
+    DWORD LaunchPathfinding();
     bool _ground_unit; // true when unit can move only on the ground
     std::vector<Vec> _dirv;
-    int _dirvNeededSize;
+    int _maxDimension, _minDimension;
+    int _lastAttackOrder;
+    int _lastClickFrame;
+    double _maxDiag;
+    BWAPI::Position _lastRightClick, _posAtMost13FramesAgo, _posAtMost23FramesAgo;
+    bool _iThinkImBlocked;
+    int _lastTotalHP;
+    int _addRange;
+    const int _refreshPathFramerate;
+    int _maxDistWhileRefreshingPath;
+    int _attackDuration;
+    Position _inPos;
+    bool _fleeing;
     //std::multimap<BWAPI::Position, attractor_type> _prox;
     std::vector<occupation_type> _occupation;
     // dirv[attractor] = direction relative to an attractor
@@ -95,61 +117,67 @@ protected:
     This grid because there are only 16 possible directions in Broodwar */
     MapManager* mapManager;
     std::vector<std::vector<flock_value> > _flockValues; // one vector<flock_value> per unit with which we flock
-    std::vector<std::vector<inPos_value> > _inPosValues;
-    std::vector<std::vector<fightG_value> > _fightGValues;
-    std::vector<std::vector<dodge_value> > _dodgeValues;
+    std::vector<repulse_value> _repulseValues;
+    std::vector<damage_value> _damageValues;
     std::vector<double> _flockProb; // TODO decide if static, perhaps unit dependant
-    std::vector<double> _inPosProb; // TODO decide if static, perhaps unit dependant
-    std::vector<double> _fightGProb; // TODO decide if static, perhaps unit dependant
-    std::vector<double> _dodgeProb; // TODO decide if static, perhaps unit dependant
+    std::vector<double> _damageProb; // TODO decide if static, perhaps unit dependant
+    std::vector<double> _repulseProb;
     UnitsGroup* _unitsGroup;
     std::multimap<double, BWAPI::Unit*> _rangeEnemies;
     std::map<occupation_type, double> _defaultProb;
+    std::multimap<double, Vec> _dirvProb;
 
     inline void initDefaultProb();
     inline void computeFlockValues();
-    inline void computeInPosValues();
-    inline void computeFightGValues();
+    inline void computeRepulseValues();
+    inline void computeDamageValues();
     void straightLine(std::vector<BWAPI::Position>& ppath, 
         const BWAPI::Position& p_start, 
         const BWAPI::Position& p_end, 
         bool quick=true);
 
     inline void updateDirV();
+    inline void testIfBlocked();
+    inline void updateRangeEnemies();
+    inline void updateTargetEnemy();
+    inline void setTargetEnemy(BWAPI::Unit* u);
+    inline int computeDmg(BWAPI::Unit* u);
     void drawDirV();
     void updateObj();
     void drawObj(int number=0);
     void updateDir();
     void drawDir();
     inline void clickDir();
+    inline void flee();
     void drawArrow(Vec& v);
     inline void updateAttractors();
     void drawAttractors();
     void drawFlockValues();
+    void drawRepulseValues();
     void drawOccupation(int number);
     // TODO:
     // goal direction
     // range enemies
     inline double computeProb(unsigned int i);
+    inline void computeProbs();
+    inline void selectDir();
     void drawProbs(std::multimap<double, Vec>& probs, int number=0);
-    inline void deleteRangeEnemiesElem(BWAPI::Unit* u);
-    inline void updateRangeEnemiesWith(BWAPI::Unit* u);
 public:
-    std::map<int, EUnit*> listTargets;
     unit_mode _mode; // TODO : faudra le remettre en protected, c'est juste pour quelques tests
 	void switchMode(unit_mode um);
+    int getMaxDimension();
     Vec dir, obj; // dir=current direction, obj=pathfinder's direction
-    // std::map<attractor_type, std::vector<BWAPI::Position>> prox; 
     BayesianUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~BayesianUnit();
+
     virtual void onUnitDestroy(BWAPI::Unit* u);
     virtual void onUnitShow(BWAPI::Unit* u);
     virtual void onUnitHide(BWAPI::Unit* u);
+
     void update();
     virtual void attackMove(const BWAPI::Position& p);
-    std::multimap<double, BWAPI::Unit*>& getRangeEnemies();
 
-    void attackEnemy(BWAPI::Unit* u, BWAPI::Color col = BWAPI::Colors::Red);
+    void attackEnemy(BWAPI::Unit* u, BWAPI::Color col);
     virtual void micro() = 0;
     virtual bool canHit(BWAPI::Unit* enemy) = 0;
     virtual int damagesOn(BWAPI::Unit* enemy) = 0;

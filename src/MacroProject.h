@@ -22,7 +22,7 @@
 #include "ZergStrat.h"
 #include "TimeManager.h"
 #include "Regions.h"
-#include "MicroManager.h"
+#include "WarManager.h"
 #include "ObjectManager.h"
 #include "EUnitsFilter.h"
 #include "EEcoEstimator.h"
@@ -37,6 +37,7 @@
 #include "MorphManager.h"
 #include "ProductionManager.h"
 #include "EnhancedUI.h"
+#include "DefenseManager.h"
 
 class BattleBroodAI;
 extern BattleBroodAI* broodAI;
@@ -78,22 +79,17 @@ public:
 	WorkerManager* workerManager;
 	Regions* regions;
 	MacroManager* macroManager;
-	MicroManager* microManager;
+	WarManager* warManager;
 	EUnitsFilter* eUnitsFilter;
 	EEcoEstimator* eEcoEstimator;
 	ETechEstimator* eTechEstimator;
 	TimeManager* timeManager;
 	GoalManager* goalManager;
 	EnhancedUI * enhancedUI;
-
-	
-
-	
-
-
-	bool showManagerAssignments;
+	DefenseManager * defenseManager;
     ObjectManager* objManager;
-
+	bool showManagerAssignments;
+	
     BattleBroodAI();
     ~BattleBroodAI();
 	virtual void onStart();

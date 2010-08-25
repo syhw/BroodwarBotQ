@@ -7,7 +7,7 @@ class ProductionManager : public Arbitrator::Controller<BWAPI::Unit*,double>, pu
 {
 	friend class CSingleton<ProductionManager>;
   public:
-	void setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, BuildingPlacer * bp);
+	void setDependencies();
     virtual void onOffer(std::set<BWAPI::Unit*> units);
     virtual void onRevoke(BWAPI::Unit* unit, double bid);
     virtual void update();

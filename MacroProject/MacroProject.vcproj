@@ -197,16 +197,24 @@
 				Name="Micro"
 				>
 				<File
-					RelativePath="..\src\Micro\MicroManager.cpp"
+					RelativePath="..\src\Micro\DefenseManager.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\src\Micro\UnitsGroup.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\src\Micro\WarManager.cpp"
+					>
+				</File>
 				<Filter
 					Name="Formations"
 					>
+					<File
+						RelativePath="..\src\Micro\Formations\ArcFormation.cpp"
+						>
+					</File>
 					<File
 						RelativePath="..\src\Micro\Formations\Formation.cpp"
 						>
@@ -332,7 +340,7 @@
 					Name="Goals"
 					>
 					<File
-						RelativePath="..\src\Micro\Goals\DefendChokeGoal.cpp"
+						RelativePath="..\src\Micro\Goals\DefendBaseGroundGoal.cpp"
 						>
 					</File>
 					<File
@@ -607,11 +615,11 @@
 				Name="Micro"
 				>
 				<File
-					RelativePath="..\src\Micro\Formations.h"
+					RelativePath="..\src\Micro\DefenseManager.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\Micro\MicroManager.h"
+					RelativePath="..\src\Micro\Formations.h"
 					>
 				</File>
 				<File
@@ -622,9 +630,17 @@
 					RelativePath="..\src\Micro\UnitsGroup.h"
 					>
 				</File>
+				<File
+					RelativePath="..\src\Micro\WarManager.h"
+					>
+				</File>
 				<Filter
 					Name="Formations"
 					>
+					<File
+						RelativePath="..\src\Micro\Formations\ArcFormation.h"
+						>
+					</File>
 					<File
 						RelativePath="..\src\Micro\Formations\Formation.h"
 						>
@@ -750,7 +766,7 @@
 					Name="Goals"
 					>
 					<File
-						RelativePath="..\src\Micro\Goals\DefendChokeGoal.h"
+						RelativePath="..\src\Micro\Goals\DefendBaseGroundGoal.h"
 						>
 					</File>
 					<File
@@ -896,6 +912,10 @@
 				>
 				<File
 					RelativePath="..\src\Utils\CSingleton.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Utils\Nearby.h"
 					>
 				</File>
 				<File

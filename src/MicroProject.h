@@ -9,6 +9,7 @@
 #include "ObjectManager.h"
 #include "Regions.h"
 #include "UnitsGroup.h"
+#include <UnitGroupManager.h>
 
 static bool analyzed;
 static bool analysis_just_finished;
@@ -20,11 +21,11 @@ class MicroAIModule : public BWAPI::AIModule
 {
 public:	    
     UnitsGroup* mm;
-    UnitsGroup* mD;
     EUnitsFilter* eUnitsFilter;
     MapManager* mapManager;
     ObjectManager* objectManager;
     Regions* regions;
+    UnitGroupManager * unitGroupManager;
 	virtual void onStart();
 #ifdef BW_QT_DEBUG
 	MicroAIModule(QApplication** qapplication);

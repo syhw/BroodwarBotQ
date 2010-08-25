@@ -13,7 +13,6 @@ class BattleUnit
     friend void baseMicro();
     friend void zealotMicro();
 protected:
-    int _sheight, _slarge;
     int _accel;
     double _topSpeed;
 #ifdef UNIT_DEBUG
@@ -38,6 +37,7 @@ protected:
     BWAPI::Unit* oldTarget;
 
 public:
+	int _sheight, _slarge;
     static void buildingsAwarePathFind(std::vector<BWAPI::TilePosition>& btpath, 
         const BWAPI::TilePosition& start, const BWAPI::TilePosition& end);
     static void quickPathFind(std::vector<BWAPI::TilePosition>& btpath, // works only with correct Regions
@@ -45,8 +45,7 @@ public:
         const BWAPI::TilePosition& end);
     unsigned int _tick;
 	BWAPI::Unit* unit;
-    BWAPI::Unit* targetEnemy;
-    BWAPI::Unit* targetEnemyInRange;
+    BWAPI::Unit* targetEnemy; // public for debug purpose, __USE__ setTargetEnemy(Unit*)
 	BWAPI::Position target; // display debug purpose
 	int timeIdle; // hack to remove soon... evite le conflit avec la reussite d'objectif dans le test UnitsGroup::keepDistance().
 	              // Cette variable sera inutile avec le flocking.

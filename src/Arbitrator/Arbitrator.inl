@@ -1,6 +1,8 @@
+#pragma once
+
 namespace Arbitrator
 {
-  template <class _Tp,class _Val>
+template <class _Tp,class _Val>
   Arbitrator<_Tp,_Val>::Arbitrator()
   {
     inUpdate=false;
@@ -158,7 +160,6 @@ namespace Arbitrator
     owner[obj] = c; //set the new owner
     objects[c].insert(obj); //insert this object into the set of objects owned by this controller
     updatedObjects.insert(obj); //since the object was updated, insert it into the updated objects set
-
 
     //cannot decrease bid via accept()
     if (bids[obj].contains(c) && bid<bids[obj].get(c))

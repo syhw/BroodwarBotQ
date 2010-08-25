@@ -1,16 +1,22 @@
 #####  Plantage(s) #####
-Quand on ne ferme pas d'abord Qt avant SC. Voir autour de 
-case DLL_PROCESS_DETACH: dans MacroDll.cpp
+
+
+#####  Etrange	   #####
+- Ligne bleue vers la droite par moments (target morte et acquisition d'une
+nouvelle ?) en mode fight_g avec les goons
 
 #####  En général  #####
 Micro:
-- Goal has to be instancied by smart pointer (memory leak for the moment)
-- commencer a gerer templars et medics
+- Zealots
+- Templars
+- Flocking in Formation
+- Dancing
 
 Macro:
-- reponse a l'attaque (envoyer des troupes la ou on se fait attaquer).
-- attaque des drones qd ca devient trop tendu (rush...)
+- Goal de Drop
 
+Scout:
+- perhaps include the damage map in the pathfinder
 
 
 #####  Post it Guillaume #####
@@ -53,13 +59,6 @@ Time manager:
 
 
 Appli QT pour debugger.
-
-
-
-Ressources Data: 
-- map manager: walkability, buildings
-- regions: buildings, units
-- 
 
 
 #################

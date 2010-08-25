@@ -11,6 +11,7 @@ EViewedUnit::EViewedUnit(Unit* u, unsigned long time)
 
 EViewedUnit::EViewedUnit(const EViewedUnit& evu)
 : unit(evu.unit)
+, type(evu.type)
 , HP(evu.HP)
 , position(evu.position)
 , kills(evu.kills)
@@ -21,6 +22,7 @@ EViewedUnit::EViewedUnit(const EViewedUnit& evu)
 
 void EViewedUnit::update(unsigned long time)
 {
+    type = unit->getType();
     HP = unit->getHitPoints();
     position = unit->getPosition();
     kills = unit->getKillCount();

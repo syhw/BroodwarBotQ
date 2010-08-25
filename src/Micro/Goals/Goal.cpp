@@ -7,20 +7,23 @@
 Goal::~Goal()
 {
 }
-Goal::Goal():
-status(GS_NOT_ATTRIBUTED)
+Goal::Goal()
+: status(GS_NOT_ATTRIBUTED)
+, firstFrame(BWAPI::Broodwar->getFrameCount())
 {
 }
 
-Goal::Goal(UnitsGroup * ug):
-status(GS_IN_PROGRESS),
-unitsGroup(ug)
+Goal::Goal(UnitsGroup * ug)
+: status(GS_IN_PROGRESS)
+, unitsGroup(ug)
+, firstFrame(BWAPI::Broodwar->getFrameCount())
 {
 }
 
-Goal::Goal(UnitsGroup * ug, pSubgoal s):
-status(GS_IN_PROGRESS),
-unitsGroup(ug)
+Goal::Goal(UnitsGroup * ug, pSubgoal s)
+: status(GS_IN_PROGRESS)
+, unitsGroup(ug)
+, firstFrame(BWAPI::Broodwar->getFrameCount())
 {
     addSubgoal(s);
 }
@@ -84,6 +87,9 @@ void Goal::checkAchievement()
 				
 			if(res_and || res_or){
 				this->status= GS_ACHIEVED;
+#ifdef __DEBUG_GABRIEL__
+                BWAPI::Broodwar->printf("\x13 \x04 goal finished in ~ %d seconds", (BWAPI::Broodwar->getFrameCount() - firstFrame)/24);
+#endif
 			}
 	}
 }
@@ -109,4 +115,15 @@ void Goal::setUnitsGroup(UnitsGroup * ug){
 		(*it)->setUnitsGroup(ug);
 	}
 	this->unitsGroup = ug;
+}
+
+
+int Goal::estimateDistance(BWAPI::Position p){
+	
+	for(std::list<pSubgoal>::iterator it = this->subgoals.begin(); it != this->subgoals.end(); ++it){
+		if( (*it)->distanceToRealize(p) > 0){
+			return (*it)->distanceToRealize(p);
+		}
+	}
+	return -1;
 }

@@ -2,16 +2,15 @@
 
 using namespace BWAPI;
 GoalManager::GoalManager(){
-	this->microManager = NULL;
+	this->warManager = NULL;
 	this->regions = NULL;
 }
 
 GoalManager::~GoalManager(){
 }
-
-void GoalManager::setDependencies(MicroManager * micro, Regions * reg){
-	this->microManager = micro;
-	this->regions = reg;
+void GoalManager::setDependencies(){
+	this->warManager = & WarManager::Instance();
+	this->regions = & Regions::Instance();
 }
 
 void GoalManager::insert(UnitsGroup * ug, pGoal g){

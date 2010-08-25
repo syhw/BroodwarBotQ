@@ -21,6 +21,7 @@ struct Vec {
     Vec operator/(double b) const { return Vec(x/b,y/b); }
     Vec operator/=(const double s) { x /= s; y /= s; return *this; }
     bool operator==(const Vec &b) { return (x==b.x && y==b.y); }
+    bool operator!=(const Vec &b) { return (x!=b.x || y!=b.y); }
     Vec mult(const Vec &b) const { return Vec(x*b.x,y*b.y); }
     Vec& normalize() { return (x == 0 && y == 0) ? *this : *this = *this * (1/sqrt(x*x+y*y)); }
     double norm() const { return sqrt(x*x+y*y); } 
@@ -28,6 +29,7 @@ struct Vec {
     BWAPI::Position toPosition() const { return BWAPI::Position( (int)x, (int)y);};
     Vec operator%(Vec&b){return Vec(-y*b.x-x*b.y, x*b.y-y*b.x);}
     BWAPI::Position translate(const BWAPI::Position& p) const { return BWAPI::Position(p.x() + (int)x, p.y() + (int)y); }
+    BWAPI::Position translate(const Vec& v) const { return BWAPI::Position((int)v.x + (int)x, (int)v.y + (int)y); }
     std::ostream& operator <<(std::ostream& os) const { os << x << " " << y; return os; }
 };
 

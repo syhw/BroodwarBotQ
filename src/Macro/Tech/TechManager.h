@@ -8,7 +8,7 @@ class TechManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public C
 	friend class CSingleton<TechManager>;
   public:
 
-	void setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, BuildingPlacer* bp);
+	void setDependencies();
     virtual void onOffer(std::set<BWAPI::Unit*> units);
     virtual void onRevoke(BWAPI::Unit* unit, double bid);
     virtual void update();

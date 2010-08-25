@@ -53,11 +53,11 @@ BOOL APIENTRY DllMain(HANDLE hModule,
     case DLL_PROCESS_DETACH:
 #ifdef BW_QT_DEBUG
         qapplication->quit();        		
-#endif
         // Wait until monitor thread have terminated.
         WaitForMultipleObjects(1, &hThreadArrayMonitor, TRUE, INFINITE);
         // Close all thread handles and free memory allocations.
         CloseHandle(&hThreadArrayMonitor);
+#endif
         break;
     }
     return TRUE;
