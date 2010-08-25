@@ -8,10 +8,9 @@ GoalManager::GoalManager(){
 
 GoalManager::~GoalManager(){
 }
-
-void GoalManager::setDependencies(WarManager * micro, Regions * reg){
-	this->warManager = micro;
-	this->regions = reg;
+void GoalManager::setDependencies(){
+	this->warManager = & WarManager::Instance();
+	this->regions = & Regions::Instance();
 }
 
 void GoalManager::insert(UnitsGroup * ug, pGoal g){

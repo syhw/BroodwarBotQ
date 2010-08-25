@@ -16,8 +16,7 @@ class WorkerManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public
         BWAPI::Unit* newResource;
         int lastFrameSpam;
     };
-	void setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, BaseManager * bm, BuildOrderManager * bom);
-
+	void setDependencies();
     virtual void onOffer(std::set<BWAPI::Unit*> units);
     virtual void onRevoke(BWAPI::Unit* unit, double bid);
     virtual void update();
@@ -34,14 +33,13 @@ class WorkerManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public
     void setAutoBuildPriority(int priority);
 	    
 	std::map<BWAPI::Unit*,WorkerData> workers;
-	    bool autoBuild;
+	bool autoBuild;
   private:
 
 	WorkerManager();
     Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
     BaseManager* baseManager;
     BuildOrderManager* buildOrderManager;
-
     std::map<BWAPI::Unit*, std::set<BWAPI::Unit*> > currentWorkers;
     std::map<BWAPI::Unit*, Base*> resourceBase;
     std::map<BWAPI::Unit*, int> desiredWorkerCount;
@@ -55,7 +53,6 @@ class WorkerManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public
     void updateWorkerAssignments();
     double mineralRate;
     double gasRate;
-
     int autoBuildPriority;
     int optimalWorkerCount;
 };

@@ -12,7 +12,7 @@ class MorphManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public 
         BWAPI::UnitType type;
         bool started;
     };
-	void setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb);
+	void setDependencies();
     virtual void onOffer(std::set<BWAPI::Unit*> units);
     virtual void onRevoke(BWAPI::Unit* unit, double bid);
     virtual void update();

@@ -28,7 +28,6 @@ public:
 	~Formation();
 
     void computeMean();
-
     // TODO should be called on onUnitDestroy for us
 	virtual void computeToPositions(const std::vector<pBayesianUnit>& vUnit);
 };

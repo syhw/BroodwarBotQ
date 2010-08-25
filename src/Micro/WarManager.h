@@ -51,3 +51,4 @@ public:
 	static std::set<BWAPI::Unit*> getEnemies();
 
 };
+

@@ -10,6 +10,7 @@ public:
 	bool isRealized();
 	void tryToRealize();
 	double distanceToRealize();
+	virtual double distanceToRealize(BWAPI::Position);
 protected:
 	bool check();
 	BWAPI::Position pos;

@@ -21,7 +21,8 @@ class Base
   void setRefinery(BWAPI::Unit* unit);
   void setActive(bool active);
   void setActiveGas(bool active);
-
+  BWTA::Chokepoint* chokeToDef; //Choke point to defend in order to defend this base
+  void computeChoke();
 private:
   BWTA::BaseLocation* baseLocation;
   BWAPI::Unit* resourceDepot;

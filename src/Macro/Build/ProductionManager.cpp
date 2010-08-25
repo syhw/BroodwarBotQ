@@ -11,9 +11,9 @@ ProductionManager::ProductionManager()
     startedCount[*i]=0;
   }
 }
-void ProductionManager::setDependencies(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arb, BuildingPlacer * bp){
-	this->arbitrator = arb;
-	this->placer = bp;
+void ProductionManager::setDependencies(){
+	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
+	this->placer = & BuildingPlacer::Instance();
 }
 
 
@@ -87,7 +87,6 @@ bool ProductionManager::canMake(BWAPI::Unit* builder, BWAPI::UnitType type)
 
 void ProductionManager::onOffer(std::set<BWAPI::Unit*> units)
 {
-	
   //go through all the units that are being offered to us
   for(std::set<BWAPI::Unit*>::iterator i=units.begin();i!=units.end();i++)
   {
@@ -186,7 +185,6 @@ void ProductionManager::update()
           if (i->second.unit->getType()==i->second.type.type)
           {
             //we are done!
-			 // BWAPI::Broodwar->printf("here");
             arbitrator->removeBid(this, i->first);
             startedCount[i->second.type.type]--;
             plannedCount[i->second.type.type]--;

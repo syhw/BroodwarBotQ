@@ -10,4 +10,5 @@ class ExploreGoal: public Goal
 public:
 	ExploreGoal(BWTA::Region* region);
 	void achieve();
+
 };

@@ -1,18 +1,20 @@
 #pragma once
 #include <map>
+#include "DefenseManager.h"
 #include <set>
 #include <BWAPI.h>
 #include <Arbitrator.h>
 #include <BWTA.h>
 #include "Base.h"
 #include "CSingleton.h"
+class DefenseManager;
 class BuildOrderManager;
 class BorderManager;
 class BaseManager : public CSingleton<BaseManager>
 {
 	friend class CSingleton<BaseManager>;
-  public:
-  void setDependencies(BuildOrderManager * bom, BorderManager * bm);
+ public:
+  void setDependencies();
   void update();
   void updateRefineries();
   Base* getBase(BWTA::BaseLocation* location);
@@ -29,15 +31,17 @@ class BaseManager : public CSingleton<BaseManager>
   bool isRefineryNeeded();
   void setRefineryBuildPriority(int priority);
   int  getRefineryBuildPriority();
-
-  private:
-	BaseManager();
+  BWTA::BaseLocation* naturalExpand;
+ private:
+  BaseManager();
   void addBase(BWTA::BaseLocation* location);
   void removeBase(BWTA::BaseLocation* location);
   BuildOrderManager* builder;
   BorderManager* borderManager;
+  DefenseManager * defenseManager;
   std::map<BWTA::BaseLocation*,Base*> location2base;
   std::set<Base*> allBases;
   int RefineryNeeded;
   int refineryBuildPriority;
+  void computeNatural();//Set the naturalExpandField
 };

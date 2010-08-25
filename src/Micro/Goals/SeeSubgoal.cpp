@@ -27,3 +27,7 @@ void SeeSubgoal::tryToRealize(){
 double SeeSubgoal::distanceToRealize(){
 	return unitsGroup->getCenter().getDistance(pos); 
 }
+
+double SeeSubgoal::distanceToRealize(BWAPI::Position p){
+	return p.getDistance(pos);
+}

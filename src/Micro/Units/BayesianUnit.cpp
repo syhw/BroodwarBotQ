@@ -141,8 +141,8 @@ void BayesianUnit::computeFlockValues()
         vector<flock_value> tmpv;
         Position tmp = _dirv[i].translate(this->_unitPos);
         for (vector<pBayesianUnit>::const_iterator it = 
-                _unitsGroup->getUnits()->begin(); 
-            it != _unitsGroup->getUnits()->end(); ++it)
+                _unitsGroup->units.begin(); 
+            it != _unitsGroup->units.end(); ++it)
         {
             if ((*it)->unit == this->unit) continue; // we don't flock with ourselves!
 
@@ -641,6 +641,12 @@ void BayesianUnit::updateObj()
         }
     }
 #else
+    /*if (_unitPos.getDistance(target) < WALK_TILES_SIZE/2)
+    {
+        obj = Vec(0, 0);
+    }
+    else if (_unitPos.getDistance(target) >= WALK_TILES_SIZE/2 && _unitPos.getDistance(target) < BWAPI::TILE_SIZE)
+    {*/
     if (_unitPos.getDistance(target) < BWAPI::TILE_SIZE)
     {
         obj = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y());
@@ -1178,18 +1184,25 @@ void BayesianUnit::update()
     //if (unit->isAttacking())
     //    Broodwar->printf("frame %d, damage cooldown %d", Broodwar->getFrameCount(), unit->getType().groundWeapon().damageCooldown());
 
+<<<<<<< HEAD
     if (_mode != MODE_FIGHT_G && _mode != MODE_SCOUT 
         && !_unitsGroup->enemies.empty()
         && unit->getGroundWeaponCooldown() <= Broodwar->getLatency())
+=======
+    if (_mode != MODE_FIGHT_G && !_unitsGroup->enemies.empty())
+>>>>>>> louis
     {
 #ifdef __DEBUG_GABRIEL__
         Broodwar->setLocalSpeed(51);
 #endif
         this->switchMode(MODE_FIGHT_G);
     }
+<<<<<<< HEAD
 
 if (_mode == MODE_FLOCK)
 Broodwar->printf("MODE FLOCK");
+=======
+>>>>>>> louis
 
     switch (_mode)
     {

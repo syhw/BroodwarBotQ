@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="MacroProject"
 	ProjectGUID="{F39C7417-770D-4635-8A47-77BD9CDDCD71}"
 	RootNamespace="MacroProject"
@@ -340,11 +340,7 @@
 					Name="Goals"
 					>
 					<File
-						RelativePath="..\src\Micro\Goals\AttackGoal.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\DefendChokeGoal.cpp"
+						RelativePath="..\src\Micro\Goals\DefendBaseGroundGoal.cpp"
 						>
 					</File>
 					<File
@@ -770,11 +766,7 @@
 					Name="Goals"
 					>
 					<File
-						RelativePath="..\src\Micro\Goals\AttackGoal.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\DefendChokeGoal.h"
+						RelativePath="..\src\Micro\Goals\DefendBaseGroundGoal.h"
 						>
 					</File>
 					<File

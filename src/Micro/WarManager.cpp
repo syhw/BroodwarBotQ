@@ -45,7 +45,8 @@ void WarManager::update()
 	for each (UnitsGroup * ug in this->promptedRemove){
 		this->remove(ug);
 		ug->idle();	//Set target of units to their position so that they are now idling
-		ug->~UnitsGroup();
+		delete *ug; // @merge
+		// @merge ug->~UnitsGroup();
 	}
 	promptedRemove.clear();
 
@@ -90,7 +91,7 @@ void WarManager::onOffer(std::set<BWAPI::Unit*> units)
 
 void WarManager::onRevoke(BWAPI::Unit* unit, double bid)
 {
-	this->onUnitDestroy(unit);
+	// @merge this->onUnitDestroy(unit);
 }
 
 std::string WarManager::getName() const

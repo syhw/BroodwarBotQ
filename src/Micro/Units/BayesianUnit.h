@@ -10,6 +10,7 @@
 #include <map>
 #include <set>
 #include <boost/shared_ptr.hpp>
+
 class BayesianUnit;
 typedef boost::shared_ptr<BayesianUnit> pBayesianUnit;
 
@@ -19,14 +20,14 @@ typedef boost::shared_ptr<BayesianUnit> pBayesianUnit;
 // #define PROBT 1
 
 #define NUMBER_OF_PRIORITY 5
-
+class BayesianUnit;
+typedef boost::shared_ptr<BayesianUnit> pBayesianUnit;
 
 
 // TODO, this class has to be derived to take Flying/Ground/Special Units 
 // (templars, tanks, lurkers, etc.) into account
 
 class UnitsGroup;
-class EUnit;
 
 enum occupation_type {
     OCCUP_NO,
@@ -162,7 +163,6 @@ protected:
     inline void selectDir();
     void drawProbs(std::multimap<double, Vec>& probs, int number=0);
 public:
-    std::map<int, EUnit*> listTargets;
     unit_mode _mode; // TODO : faudra le remettre en protected, c'est juste pour quelques tests
 	void switchMode(unit_mode um);
     int getMaxDimension();
@@ -177,7 +177,7 @@ public:
     void update();
     virtual void attackMove(const BWAPI::Position& p);
 
-    void attackEnemy(BWAPI::Unit* u, BWAPI::Color col = BWAPI::Colors::Red);
+    void attackEnemy(BWAPI::Unit* u, BWAPI::Color col);
     virtual void micro() = 0;
     virtual bool canHit(BWAPI::Unit* enemy) = 0;
     virtual int damagesOn(BWAPI::Unit* enemy) = 0;

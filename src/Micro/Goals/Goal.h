@@ -16,7 +16,8 @@ typedef enum
 	GS_ND_STATUS           = 0,
 	GS_ACHIEVED            = 0,
 	GS_IN_PROGRESS         = 1, //When attributed
-	GS_NOT_ATTRIBUTED      = 2
+	GS_NOT_ATTRIBUTED      = 2,
+	GS_NOT_ENOUGH_UNITS     = 3
 } GoalStatus;
 
 class Goal
@@ -46,7 +47,7 @@ public:
 	//Mutators
 	void addSubgoal(pSubgoal s);
 	void setStatus(GoalStatus s);
-
+	virtual int estimateDistance(BWAPI::Position);
 	//Accessors
 	GoalStatus getStatus() const;
 };

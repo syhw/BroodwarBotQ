@@ -76,9 +76,9 @@ Regions::~Regions()
 
 }
 
-void Regions::setDependencies(TimeManager * tm, MapManager * map){
-	this->timeManager = tm;
-	this->mapManager = map;
+void Regions::setDependencies(){
+	this->timeManager = & TimeManager::Instance();
+	this->mapManager = & MapManager::Instance();
 }
 
 Region* Regions::findRegion(BWAPI::Position p)
@@ -269,14 +269,13 @@ bool Regions::enemyFound() const{
 
 }
 BWTA::Region* Regions::whereIsEnemy() {
-	/*
+	
 	for(std::map<BWTA::Region*, RegionData>::const_iterator it = this->regionsData.begin(); it != regionsData.end(); ++it){
-		for(std::map<Player*, std::vector<UnitData> >::const_iterator it_b = it->second.buildings.begin(); it_b != it->second.buildings.end(); ++it_b){
+		for(std::map<Player*, std::vector<RegionsUnitData> >::const_iterator it_b = it->second.buildings.begin(); it_b != it->second.buildings.end(); ++it_b){
 			if( it_b->first->isEnemy(BWAPI::Broodwar->self()) && !it_b->second.empty())
 				return it->first;
 		}
 	}
-	*/
 	return NULL;
 }
 

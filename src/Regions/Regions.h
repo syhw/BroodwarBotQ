@@ -51,7 +51,7 @@ private:
 	inline BWTA::Region* findRegion(BWAPI::Position p);
 
 public:
-	void setDependencies(TimeManager * tm, MapManager * map);
+	void setDependencies();
 	inline void addUnit(BWAPI::Unit* unit); // Add to the corresponding map (building/unit) in regionData. Refresh it if already present.
 	void removeUnits();
 	void addUnits();

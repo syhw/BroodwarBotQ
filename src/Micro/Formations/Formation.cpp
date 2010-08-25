@@ -44,7 +44,6 @@ void Formation::computeMean()
     }
     mean /= end_positions.size();
 }
-
 // No formations => on one point
 void Formation::computeToPositions(const std::vector<pBayesianUnit>& vUnit)
 {
