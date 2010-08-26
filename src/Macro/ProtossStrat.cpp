@@ -38,9 +38,30 @@ void ProtossStrat::onStart(){
 }
 
 void ProtossStrat::setScoutTime(){
-	BWAPI::Broodwar->printf("%s", BWAPI::Broodwar->mapFileName().c_str());
-	if(BWAPI::Broodwar->mapFileName() == "(2)Astral Balance.scm"){
-		BWAPI::Broodwar->printf(" ok ");
+
+	std::string s = BWAPI::Broodwar->mapFileName();
+
+		BWAPI::Broodwar->printf("%s", s.c_str());
+
+	if(s == "ICCup andromeda 1.0.scx" || s == "ICCup andromeda1.0_ob.scx" ) {
+
+		this->firstScout = 20;
+
+	} else if(s == "ICCup destination 1.1.scx" || s =="ICCup destination 1.1_ob.scx"){
+
+		this->firstScout = 16;
+
+	} else if(s == "iCCup heartbreak ridge1.1.scx" || s == "iCCup heartbreak ridge1.1ob.scx"  ){
+
+		this->firstScout = 16;
+
+	}else if(s == "ICCup python 1.3.scx" || s == "ICCup python 1.3_ob.scm") {
+
+		this->firstScout = 20;
+
+	}else if(s == "ICCup tau cross.scx" || s == "ICCup tau cross_ob.scx" ) {
+
+		this->firstScout = 20;
 	}
 }
 
