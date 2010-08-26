@@ -57,8 +57,9 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 , _iThinkImBlocked(false)
 , _lastTotalHP(unit->getHitPoints() + unit->getShields())
 , _addRange(0)
-, _refreshPathFramerate(Broodwar->getLatency() + 10)
+, _refreshPathFramerate(12)
 , _maxDistWhileRefreshingPath(max(_refreshPathFramerate * _topSpeed, 45.26)) // 45.26 = sqrt(BWAPI::TILE_SIZE^2 + BWAPI::TILE_SIZE^2)
+, _newPath(false)
 , _attackDuration(Broodwar->getLatency())
 , _inPos(Position(0, 0))
 , _fleeing(false)
@@ -519,12 +520,14 @@ DWORD BayesianUnit::LaunchPathfinding()
         // The thread got ownership of the mutex
     case WAIT_OBJECT_0: 
         _btpath = BWTA::getShortestPath(TilePosition(_unitPos), TilePosition(target));
+        _newPath = true;
         ReleaseMutex(_pathMutex);
         break; 
 
         // The thread got ownership of an abandoned mutex
         // The database is in an indeterminate state
     case WAIT_ABANDONED:
+        _newPath = false;
         ReleaseMutex(_pathMutex);
         return -1;
     }
@@ -578,7 +581,7 @@ void BayesianUnit::updateObj()
     }
     else 
     {
-        if (WaitForSingleObject(_pathMutex, 0) == WAIT_OBJECT_0)
+        if (WaitForSingleObject(_pathMutex, 0) == WAIT_OBJECT_0 && _newPath)
         {
             if (_btpath.size())                
             {
@@ -586,14 +589,14 @@ void BayesianUnit::updateObj()
                 for (std::vector<TilePosition>::const_iterator it = _btpath.begin(); it != _btpath.end(); ++it)
                     _ppath.push_back(*it);
             }
-            ReleaseMutex(_pathMutex);
+            _newPath = false;
         }
-        if (!_ppath.size() 
-            && !(Broodwar->getFrameCount() % _refreshPathFramerate))
+        ReleaseMutex(_pathMutex);
+        if (!(Broodwar->getFrameCount() % _refreshPathFramerate))
         {
             //BayesianUnit::StaticLaunchPathfinding(this);
             DWORD threadId;
-            Broodwar->printf("creating a thread");
+            //Broodwar->printf("creating a thread");
             // Create the thread to begin execution on its own.
             HANDLE thread = CreateThread( 
                 NULL,                   // default security attributes
@@ -618,7 +621,6 @@ void BayesianUnit::updateObj()
         }
         for (; count > 0; --count) 
             _ppath.erase(_ppath.begin());
-
 
         if (_ppath.size() > 1)   // _ppath[0] is the current unit position
         {
@@ -832,7 +834,7 @@ void BayesianUnit::testIfBlocked()
 {
     if (!(Broodwar->getFrameCount() % 13))
         _posAtMost13FramesAgo = _unitPos;
-    if (!(Broodwar->getFrameCount() % 17)) // TOCHANGE 23
+    if (!(Broodwar->getFrameCount() % 23))
         _posAtMost23FramesAgo = _unitPos;
     if (!(Broodwar->getFrameCount() % 11))
         _iThinkImBlocked = (_posAtMost13FramesAgo == _unitPos && _posAtMost23FramesAgo == _unitPos) ? true : false;
