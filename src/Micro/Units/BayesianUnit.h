@@ -138,6 +138,7 @@ protected:
 
     inline void updateDirV();
     inline void testIfBlocked();
+    inline void resumeFromBlocked();
     inline void updateRangeEnemies();
     inline void updateTargetEnemy();
     inline void setTargetEnemy(BWAPI::Unit* u);
