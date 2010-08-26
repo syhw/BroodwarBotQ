@@ -50,6 +50,7 @@ public:
 	int timeIdle; // hack to remove soon... evite le conflit avec la reussite d'objectif dans le test UnitsGroup::keepDistance().
 	              // Cette variable sera inutile avec le flocking.
 	              // Ou avec un Timer (TimeManager soon ready !)
+    const std::vector<BWAPI::Position> & getPPath();
 
 	BattleUnit(BWAPI::Unit* unit);
     ~BattleUnit();

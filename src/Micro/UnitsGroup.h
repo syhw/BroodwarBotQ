@@ -54,7 +54,8 @@ private:
 public:
 	pGoal getLastGoal();
 	std::vector<pBayesianUnit> units;
-    std::vector<BWAPI::TilePosition> btpath;
+    //std::vector<BWAPI::TilePosition> btpath;
+    std::vector<BWAPI::Position> ppath;
     std::set<BWAPI::Unit*> enemies;
     UnitDmgBimap unitDamages;
     pBayesianUnit leadingUnit;

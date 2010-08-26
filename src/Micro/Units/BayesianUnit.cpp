@@ -842,11 +842,11 @@ void BayesianUnit::testIfBlocked()
 
 void BayesianUnit::resumeFromBlocked()
 {
-#ifdef __DEBUG_GABRIEL__
-    Broodwar->printf("resuming from blocked");
-#endif
     if ((Broodwar->getFrameCount() - _lastClickFrame) > 24)
     {
+#ifdef __DEBUG_GABRIEL__
+        Broodwar->printf("resuming from blocked");
+#endif
         if (_lastRightClick != target)
         {
             unit->rightClick(target);
@@ -862,7 +862,7 @@ void BayesianUnit::resumeFromBlocked()
             _lastRightClick = tmpp;
         }
         _lastClickFrame = Broodwar->getFrameCount();
-        _iThinkImBlocked = false;
+        //_iThinkImBlocked = false;
     }
 }
 

@@ -66,6 +66,11 @@ void BattleUnit::drawVelocityArrow()
         Colors::White); // 0.1, magic number
 }
 
+const std::vector<BWAPI::Position> & BattleUnit::getPPath()
+{
+    return _ppath;
+}
+
 void BattleUnit::drawPath()
 {
     for (std::vector<WalkTilePosition>::const_iterator it = _path.begin(); 
