@@ -57,7 +57,7 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 , _iThinkImBlocked(false)
 , _lastTotalHP(unit->getHitPoints() + unit->getShields())
 , _addRange(0)
-, _refreshPathFramerate(Broodwar->getLatency() + 4)
+, _refreshPathFramerate(Broodwar->getLatency() + 10)
 , _maxDistWhileRefreshingPath(max(_refreshPathFramerate * _topSpeed, 45.26)) // 45.26 = sqrt(BWAPI::TILE_SIZE^2 + BWAPI::TILE_SIZE^2)
 , _attackDuration(Broodwar->getLatency())
 , _inPos(Position(0, 0))
@@ -512,7 +512,7 @@ DWORD BayesianUnit::LaunchPathfinding()
 {
     DWORD waitResult = WaitForSingleObject( 
         _pathMutex,    // handle to mutex
-        INFINITE);  // no time-out interval
+        100);          // 100 ms time-out interval, < next pathfinding
 
     switch (waitResult) 
     {
@@ -578,10 +578,8 @@ void BayesianUnit::updateObj()
     }
     else 
     {
-        if (WaitForSingleObject(_pathMutex, 0) == WAIT_OBJECT_0
-            && !(Broodwar->getFrameCount() % _refreshPathFramerate))
+        if (WaitForSingleObject(_pathMutex, 0) == WAIT_OBJECT_0)
         {
-            // _btpath = BWTA::getShortestPath(TilePosition(_unitPos), tptarget); // is now threaded
             if (_btpath.size())                
             {
                 _ppath.clear();
@@ -589,8 +587,13 @@ void BayesianUnit::updateObj()
                     _ppath.push_back(*it);
             }
             ReleaseMutex(_pathMutex);
+        }
+        if (!_ppath.size() 
+            && !(Broodwar->getFrameCount() % _refreshPathFramerate))
+        {
+            //BayesianUnit::StaticLaunchPathfinding(this);
             DWORD threadId;
-            //Broodwar->printf("creating a thread");
+            Broodwar->printf("creating a thread");
             // Create the thread to begin execution on its own.
             HANDLE thread = CreateThread( 
                 NULL,                   // default security attributes
@@ -605,18 +608,17 @@ void BayesianUnit::updateObj()
             }
             CloseHandle(thread);
         }
-        else 
+
+        // remove path points we passed
+        unsigned int count = 0;
+        for (unsigned int i = 0; i < _ppath.size(); ++i) 
         {
-            // remove path points we passed
-            unsigned int count = 0;
-            for (unsigned int i = 0; i < _ppath.size(); ++i) 
-            {
-                if (_ppath[i].getDistance(_unitPos) < _maxDistWhileRefreshingPath) //45.26) // sqrt(BWAPI::TILE_SIZE^2 + BWAPI::TILE_SIZE^2)
-                    count = i;
-            }
-            for (; count > 0; --count) 
-                _ppath.erase(_ppath.begin());
+            if (_ppath[i].getDistance(_unitPos) < _maxDistWhileRefreshingPath) //45.26) // sqrt(BWAPI::TILE_SIZE^2 + BWAPI::TILE_SIZE^2)
+                count = i;
         }
+        for (; count > 0; --count) 
+            _ppath.erase(_ppath.begin());
+
 
         if (_ppath.size() > 1)   // _ppath[0] is the current unit position
         {
@@ -695,9 +697,9 @@ void BayesianUnit::updateObj()
 #endif
 
 #ifdef __DEBUG_GABRIEL__
-    //drawBTPath();
+    drawBTPath();
     //drawPath();
-    drawPPath();
+    //drawPPath();
 #endif
 #ifdef __EXACT_OBJ__
     double norm = obj.norm();
@@ -830,12 +832,38 @@ void BayesianUnit::testIfBlocked()
 {
     if (!(Broodwar->getFrameCount() % 13))
         _posAtMost13FramesAgo = _unitPos;
-    if (!(Broodwar->getFrameCount() % 23))
+    if (!(Broodwar->getFrameCount() % 17)) // TOCHANGE 23
         _posAtMost23FramesAgo = _unitPos;
     if (!(Broodwar->getFrameCount() % 11))
         _iThinkImBlocked = (_posAtMost13FramesAgo == _unitPos && _posAtMost23FramesAgo == _unitPos) ? true : false;
     if (!target.isValid())
         target.makeValid();
+}
+
+void BayesianUnit::resumeFromBlocked()
+{
+#ifdef __DEBUG_GABRIEL__
+    Broodwar->printf("resuming from blocked");
+#endif
+    if ((Broodwar->getFrameCount() - _lastClickFrame) > 24)
+    {
+        if (_lastRightClick != target)
+        {
+            unit->rightClick(target);
+            _lastRightClick = target;
+        }
+        else if (_lastRightClick == target)
+        {
+            Vec tmpv = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y()) * 2;
+            Position tmpp = tmpv.translate(_unitPos);
+            if (!tmpp.isValid())
+                tmpp.makeValid();
+            unit->rightClick(tmpp);
+            _lastRightClick = tmpp;
+        }
+        _lastClickFrame = Broodwar->getFrameCount();
+        _iThinkImBlocked = false;
+    }
 }
 
 void BayesianUnit::updateRangeEnemies()
@@ -1092,7 +1120,7 @@ void BayesianUnit::clickDir()
         dir += _unitPos;
         unit->rightClick(dir.toPosition());
         _lastRightClick = dir.toPosition();
-        _lastClickFrame = Broodwar->getFrameCount();
+        ///_lastClickFrame = Broodwar->getFrameCount();
         return;
     }
     //if (dist > 11.32) // sqrt(8^2 + 8^2), one walk tile
@@ -1101,13 +1129,13 @@ void BayesianUnit::clickDir()
         dir += _unitPos;
         unit->rightClick(dir.toPosition());
         _lastRightClick = dir.toPosition();
-        _lastClickFrame = Broodwar->getFrameCount();
+        ///_lastClickFrame = Broodwar->getFrameCount();
     }
     else if (_lastRightClick!=target)
     {
         unit->rightClick(target);
         _lastRightClick = target;
-        _lastClickFrame = Broodwar->getFrameCount();
+        ///_lastClickFrame = Broodwar->getFrameCount();
     } 
     else
     {
@@ -1189,9 +1217,19 @@ void BayesianUnit::update()
         && unit->getGroundWeaponCooldown() <= Broodwar->getLatency())
     {
 #ifdef __DEBUG_GABRIEL__
-        Broodwar->setLocalSpeed(51);
+        //Broodwar->setLocalSpeed(51);
 #endif
         this->switchMode(MODE_FIGHT_G);
+    }
+
+    if (_mode == MODE_SCOUT || _mode == MODE_FLOCK)
+    {
+        testIfBlocked();
+        if (_iThinkImBlocked)
+        {
+            resumeFromBlocked();
+            return;
+        }
     }
 
 //if (_mode == MODE_FLOCK)
@@ -1207,31 +1245,6 @@ void BayesianUnit::update()
             this->switchMode(MODE_INPOS);
             return;
         }
-        testIfBlocked();
-        if (_iThinkImBlocked)
-        {
-#ifdef __DEBUG_GABRIEL__
-            Broodwar->printf("I think I'm blocked!");
-#endif
-            if (_lastRightClick != target && !((Broodwar->getFrameCount() - _lastClickFrame) % 17))
-            {
-                unit->rightClick(target);
-                _lastRightClick = target;
-                _lastClickFrame = Broodwar->getFrameCount();
-                _iThinkImBlocked = false;
-            } else if (_lastRightClick == target && !((Broodwar->getFrameCount() - _lastClickFrame) % 17))
-            {
-                Vec tmpv = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y()) * 2;
-                Position tmpp = tmpv.translate(_unitPos);
-                if (!tmpp.isValid())
-                    tmpp.makeValid();
-                unit->rightClick(tmpp);
-                _lastRightClick = tmpp;
-                _lastClickFrame = Broodwar->getFrameCount();
-                _iThinkImBlocked = false;
-            }
-            return;
-        }
         updateDir();
 #ifdef __DEBUG_GABRIEL__
         //drawObj(0); // green
@@ -1241,16 +1254,6 @@ void BayesianUnit::update()
         break;
 
     case MODE_SCOUT:
-        testIfBlocked();
-        if (_iThinkImBlocked)
-        {
-#ifdef __DEBUG_GABRIEL__
-            Broodwar->printf("I think I'm blocked!");
-#endif
-            unit->rightClick(target);
-            _lastRightClick = target;
-            return;
-        }
         updateDir();
         clickDir();
         break;
