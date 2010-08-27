@@ -837,7 +837,10 @@ void BayesianUnit::testIfBlocked()
     if (!(Broodwar->getFrameCount() % 23))
         _posAtMost23FramesAgo = _unitPos;
     if (!(Broodwar->getFrameCount() % 11))
-        _iThinkImBlocked = (_posAtMost13FramesAgo == _unitPos && _posAtMost23FramesAgo == _unitPos) ? true : false;
+    {
+        if (!(_iThinkImBlocked && Broodwar->getFrameCount() - _lastClickFrame < 12))
+            _iThinkImBlocked = (_posAtMost13FramesAgo == _unitPos && _posAtMost23FramesAgo == _unitPos) ? true : false;    
+    }
     if (!target.isValid())
         target.makeValid();
 }
@@ -864,7 +867,6 @@ void BayesianUnit::resumeFromBlocked()
             _lastRightClick = tmpp;
         }
         _lastClickFrame = Broodwar->getFrameCount();
-        //_iThinkImBlocked = false;
     }
 }
 
@@ -891,6 +893,7 @@ void BayesianUnit::updateTargetEnemy()
     }
     
     // choose new targetEnemy
+    /// Focus fire
     UnitDmgBimap::right_iterator it;
     for (it = _unitsGroup->unitDamages.right.begin();
         it != _unitsGroup->unitDamages.right.end(); ++it)
@@ -905,6 +908,7 @@ void BayesianUnit::updateTargetEnemy()
             return;
         }
     }
+    /// Keep old target if in range
     if (targetEnemy 
         && _unitPos.getDistance(targetEnemy->getPosition())
         < (double)unit->getType().groundWeapon().maxRange() + _addRange)
@@ -912,10 +916,13 @@ void BayesianUnit::updateTargetEnemy()
         setTargetEnemy(targetEnemy);
         return;
     }
+    /// Take a new one in range
     if (_rangeEnemies.size())
         setTargetEnemy(_rangeEnemies.begin()->second);
+    /// No target in range, follow the old one
     else if (targetEnemy)
         setTargetEnemy(targetEnemy);
+    /// Take on randomly TODO/TOCHANGE
     else
         setTargetEnemy(_unitsGroup->unitDamages.left.begin()->first);
 }
