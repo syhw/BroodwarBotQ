@@ -100,6 +100,7 @@ protected:
     int _addRange;
     const int _refreshPathFramerate;
     int _maxDistWhileRefreshingPath;
+    bool _newPath;
     int _attackDuration;
     Position _inPos;
     bool _fleeing;

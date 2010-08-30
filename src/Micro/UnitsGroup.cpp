@@ -194,8 +194,11 @@ void UnitsGroup::update()
             )
             leadingUnit = *it;
     }
-    if (leadingUnit != NULL) // defensive prog
-        btpath = BWTA::getShortestPath(leadingUnit->unit->getPosition(), leadingUnit->target);
+    if (leadingUnit != NULL && leadingUnit->unit->exists()) // defensive prog
+    {
+        //btpath = BWTA::getShortestPath(leadingUnit->unit->getPosition(), leadingUnit->target);
+        ppath = leadingUnit->getPPath();
+    }
 
     this->totalHP = 0;
     double maxRange = -1.0;
