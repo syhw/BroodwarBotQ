@@ -109,6 +109,7 @@ void Goal::setStatus(GoalStatus s) {
 }
 
 
+
 void Goal::setUnitsGroup(UnitsGroup * ug){
 	this->status = GS_IN_PROGRESS;
 	for(std::list<pSubgoal>::iterator it = this->subgoals.begin(); it != subgoals.end(); ++it){

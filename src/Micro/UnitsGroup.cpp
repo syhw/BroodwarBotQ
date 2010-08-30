@@ -278,6 +278,7 @@ void UnitsGroup::setGoals(std::list<pGoal>& goals)
 void UnitsGroup::addGoal(pGoal goal)
 {
     this->goals.push_back(goal);
+	goal->setUnitsGroup(this);
    // if (goals.size() == 1 && !this->units.empty())
    // this->goals.front()->achieve();
 }
@@ -510,4 +511,13 @@ void UnitsGroup::idle(){
 
 pGoal UnitsGroup::getLastGoal(){
 	return this->goals.front();
+}
+
+bool UnitsGroup::isWaiting(){
+
+	if(goals.size() <= 0)
+		//Problematic situation
+		return true;
+
+	return goals.size() == 1 && (*goals.front()).getStatus() == GS_ACHIEVED ;
 }

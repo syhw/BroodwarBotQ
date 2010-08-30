@@ -66,7 +66,7 @@ void WarManager::update()
 	{
         if ((*it)->size() > 2 && (*it)->emptyGoals())
             sendGroupToAttack(*it);
-        (*it)->update();
+	        (*it)->update();
 	}
 }
 

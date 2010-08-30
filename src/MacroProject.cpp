@@ -219,6 +219,7 @@ void BattleBroodAI::onFrame()
 	this->enhancedUI->update();
 	this->borderManager->update();
 	objManager->onFrame();
+	this->scoutManager->update();
 	this->mapManager->onFrame();
 	this->defenseManager->update();
 

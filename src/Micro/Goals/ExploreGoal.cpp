@@ -57,20 +57,12 @@ void ExploreGoal::achieve(){
 	checkAchievement();
 	// !!! Accomplish the subgoals in order
 	if(this->status!=GS_ACHIEVED){
-		pSubgoal selected;
-		double max = 0;
-		
+	
 		for(std::list<pSubgoal>::iterator it = subgoals.begin(); it != subgoals.end(); ++it){
 			if (!((*it)->isRealized())){
-				if( (*it)->distanceToRealize()> max){
-					selected = (*it);
-					max = (*it)->distanceToRealize();
-				}
+				(*it)->tryToRealize();
 			}
 		}
-		
-		if(selected != NULL)
-			selected->tryToRealize();
 	}
 
 

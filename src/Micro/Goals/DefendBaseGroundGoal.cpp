@@ -39,14 +39,11 @@ void DefendBaseGroundGoal::checkAchievement(){
 		if(!this->enoughUnits() && this->unitsGroup->size() < 4){
 			this->status = GS_NOT_ENOUGH_UNITS;
 		}else{
-			BWAPI::Broodwar->printf("ok enough");
 			this->status = GS_ACHIEVED;
 		}
 	}
 
 	//Create appropriate goal of formation in the chokepoint and accomplish it
-
-
 
 }
 	
