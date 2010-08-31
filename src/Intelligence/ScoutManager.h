@@ -21,14 +21,14 @@ class GoalManager;
 
 class GoalManager;
 
-class ScoutManager : public Arbitrator::Controller<BWAPI::Unit*,double>, public CSingleton<ScoutManager>, public BaseObject
+class ScoutManager :  public CSingleton<ScoutManager>, public Arbitrator::Controller<BWAPI::Unit*,double>
 {
 	friend class CSingleton<ScoutManager>;
 
 public:
 	void setDependencies();
 	virtual void update();
-	virtual void onOffer(std::set<BWAPI::Unit*> units);
+	void onOffer(std::set<BWAPI::Unit*> units);
     virtual void onRevoke(BWAPI::Unit* unit, double bid);
 	virtual std::string getName() const;
 	// Goals // Just ideas, not yet implemented
@@ -42,12 +42,8 @@ public:
 	void onUnitCreate(BWAPI::Unit* unit);//New 
 	void onUnitShow(BWAPI::Unit* unit);
 	void findEnemy();//New
+	void onUnitDestroy(BWAPI::Unit* unit);
 
-#ifdef BW_QT_DEBUG
-	// Qt interface
-	virtual QWidget* createWidget(QWidget* parent) const;
-	virtual void refreshWidget(QWidget* widget) const;
-#endif
 private:
 
 	ScoutManager();
@@ -60,6 +56,6 @@ private:
 	Regions* regions;
 	std::list<pGoal> awaitingGoals;
 	bool exploringEnemy;
-	std::map<pGoal,UnitsGroup *> attributedGoals;
+	std::list<UnitsGroup *> myUnitsGroups;
 };
 #endif 

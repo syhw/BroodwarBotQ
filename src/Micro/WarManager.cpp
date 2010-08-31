@@ -41,11 +41,12 @@ void WarManager::onStart(){
 }
 void WarManager::update()
 {
+
 	//Suppress the list prompted to suppress 
-	for each (UnitsGroup * ug in this->promptedRemove){
-		this->remove(ug);
-		ug->idle();	//Set target of units to their position so that they are now idling
-		delete ug; // @merge
+	for(std::list<UnitsGroup *>::iterator ug = this->promptedRemove.begin() ; ug != this->promptedRemove.end(); ++ug){
+		this->remove(*ug);
+		(*ug)->idle();	//Set target of units to their position so that they are now idling
+		delete (*ug); // @merge
 		// @merge ug->~UnitsGroup();
 	}
 	promptedRemove.clear();
@@ -66,7 +67,7 @@ void WarManager::update()
 	{
         if ((*it)->size() > 2 && (*it)->emptyGoals())
             sendGroupToAttack(*it);
-        (*it)->update();
+	        (*it)->update();
 	}
 }
 
@@ -113,17 +114,13 @@ void WarManager::onUnitCreate(BWAPI::Unit* unit)
 
 void WarManager::onUnitDestroy(BWAPI::Unit* unit)
 {
-	for (std::list<UnitsGroup*>::iterator it = unitsGroups.begin(); it != unitsGroups.end();)
+	for (std::list<UnitsGroup*>::iterator it = unitsGroups.begin(); it != unitsGroups.end(); ++it)
 	{
 		(*it)->giveUpControl(unit);
-		if( (*it)->emptyUnits())
+		if( (*it)->emptyUnits() )
 		{
-			UnitsGroup* ug = *it;
-			it = unitsGroups.erase( it);
-			delete ug;
+			this->promptRemove(*it);
 		}
-		else
-			it++;
 	}
 }
 

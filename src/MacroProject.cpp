@@ -219,6 +219,7 @@ void BattleBroodAI::onFrame()
 	this->enhancedUI->update();
 	this->borderManager->update();
 	objManager->onFrame();
+	this->scoutManager->update();
 	this->mapManager->onFrame();
 	this->defenseManager->update();
 
@@ -522,6 +523,7 @@ void BattleBroodAI::onUnitDestroy(BWAPI::Unit* unit)
 	this->informationManager->onUnitDestroy(unit);
 	this->defenseManager->onRemoveUnit(unit);
 	this->arbitrator->onRemoveObject(unit);
+	this->scoutManager->onUnitDestroy(unit);
 }
 
 void BattleBroodAI::onUnitMorph(BWAPI::Unit* unit)

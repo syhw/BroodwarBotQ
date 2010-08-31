@@ -47,11 +47,12 @@ class UnitsGroup
 private:
 	int totalHP;
 	int totalPower;
-
+	std::list<pGoal> goals;
     
-	std::list<pGoal> goals; // list of goals to accomplish
+
     void displayTargets();  // debug purpose
 public:
+	bool isWaiting(); //Return if the 1st goal is accomplished && no other goals
 	pGoal getLastGoal();
 	std::vector<pBayesianUnit> units;
     //std::vector<BWAPI::TilePosition> btpath;

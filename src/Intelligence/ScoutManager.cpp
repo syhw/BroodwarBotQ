@@ -4,7 +4,7 @@
 
 using namespace BWAPI;
 ScoutManager::ScoutManager( )
-: BaseObject("ScoutManager"),
+:
 exploringEnemy(false)
 {
 	regions = NULL;
@@ -26,35 +26,44 @@ void ScoutManager::update()
 {
 	
 	if(regions->enemyFound() && ! exploringEnemy ){
-		BWAPI::Broodwar->printf("Exploring the Region");
+		
 		exploringEnemy = true;
 		this->awaitingGoals.push_back(pGoal(new ExploreGoal(regions->whereIsEnemy())));
+	}
+
+	std::set<UnitsGroup *> toTrash;
+	//Free units that need to be freed and add goals to other
+	for(std::list<UnitsGroup *>::iterator it = this->myUnitsGroups.begin(); it != this->myUnitsGroups.end(); ++it ){
 		
+		if((*it)->isWaiting()){
+
+			//If no new goal available release the ug : 
+			if(this->awaitingGoals.size() <= 0){
+				for(std::vector<pBayesianUnit>::iterator u = (*it)->units.begin(); u != (*it)->units.end(); ++u){
+					this->arbitrator->removeBid(this, (*u)->unit);
+				}
+				this->warManager->promptRemove(*it);
+				toTrash.insert(*it);
+			} else {
+			//New goal available : assign it to the ug
+				(*it)->addGoal(this->awaitingGoals.front());
+				this->awaitingGoals.pop_front();
+			}
+		}
+	}
+
+	if(this->awaitingGoals.size() > 0){
+		//ask units :
 		for(std::set<BWAPI::Unit *>::const_iterator it = BWAPI::Broodwar->self()->getUnits().begin(); it != BWAPI::Broodwar->self()->getUnits().end(); ++it){
-		
 			if( (*it)->getType().isWorker() || (*it)->getType() == BWAPI::UnitTypes::Protoss_Observer ){
 				this->arbitrator->setBid(this, (*it),90);
 			}
-		
 		}
-		
 	}
-
-	//Free units that need to be freed
-	for(std::map<pGoal, UnitsGroup *>::iterator it = this->attributedGoals.begin(); it != this->attributedGoals.end(); ++it ){
-		
-		if(it->first->getStatus() == GS_ACHIEVED){
-
-			for(std::vector<pBayesianUnit>::iterator u = it->second->units.begin(); u != it->second->units.end(); ++u){
-				this->arbitrator->setBid(this, (*u)->unit, 0);
-			}
-
-			this->warManager->promptRemove(it->second);
-			this->attributedGoals.erase(it);
-			
-		}
-		
+	for(std::set<UnitsGroup *>::iterator trash = toTrash.begin(); trash != toTrash.end(); ++trash){
+		this->myUnitsGroups.remove(*trash);
 	}
+	toTrash.empty();
 
 }
 
@@ -107,22 +116,23 @@ void ScoutManager::onUnitCreate(BWAPI::Unit* unit){
 void ScoutManager::onOffer(std::set<BWAPI::Unit*> units){
 
 	std::vector<pGoal> goalsDone;
-
 	std::set<BWAPI::Unit*> remainingUnits = units;//Does it copy the set ?
 
-	//find the best unit for each goal
-	//Obs are always the best
-	BWAPI::Unit * bestUnit;
-	int dist= 999999999; 
-	int test;
 
-	for(std::list<pGoal>::const_iterator goals = this->awaitingGoals.begin(); goals != this->awaitingGoals.end(); ++goals){
-		
+	//Else grab a new unit
+	//Obs are always the best
+	BWAPI::Unit * bestUnit = NULL;
+	int dist= 999999999;
+	int test = 0;
+	UnitsGroup * giveMeTheGoal = NULL;
+
+	for(std::list<pGoal>::iterator goals = this->awaitingGoals.begin(); goals != this->awaitingGoals.end(); ++goals){
+	//find the best unit for each goal
 		dist = 999999999;
 		bestUnit = NULL;
 
 		for(std::set<BWAPI::Unit *>::iterator units = remainingUnits.begin(); units != remainingUnits.end(); ++units ){
-			
+					
 			if(bestUnit == NULL){
 				bestUnit = (*units);
 			}
@@ -131,25 +141,24 @@ void ScoutManager::onOffer(std::set<BWAPI::Unit*> units){
 				bestUnit = (*units);
 				dist = test;
 			}
-
 			if((*units)->getType() == BWAPI::UnitTypes::Protoss_Observer){
 				bestUnit = (*units);
 				break;
 			}
 		}
-
-	this->arbitrator->accept(this, bestUnit, 90);
-	UnitsGroup * ug = new UnitsGroup();
-	ug->takeControl(bestUnit);
-	remainingUnits.erase(bestUnit);
-
-	(*goals)->setUnitsGroup(ug);
-	ug->addGoal((*goals));
-	this->attributedGoals.insert(std::make_pair((*goals),ug));
+		this->arbitrator->accept(this, bestUnit, 90);
+		giveMeTheGoal = new UnitsGroup();
+		this->myUnitsGroups.push_back(giveMeTheGoal);
+		giveMeTheGoal->takeControl(bestUnit);
+		remainingUnits.erase(bestUnit);
 	
-	warManager->unitsGroups.push_back(ug);
-	ug->switchMode(MODE_SCOUT);
-	goalsDone.push_back((*goals));
+		//We have a unitsGroup
+		(*goals)->setUnitsGroup(giveMeTheGoal);
+		giveMeTheGoal->addGoal((*goals));
+	
+		warManager->unitsGroups.push_back(giveMeTheGoal);
+		giveMeTheGoal->switchMode(MODE_SCOUT);
+		goalsDone.push_back((*goals));
 	}
 
 	for(std::set<BWAPI::Unit *>::iterator it = remainingUnits.begin(); it != remainingUnits.end(); ++it){
@@ -179,7 +188,6 @@ void ScoutManager::findEnemy(){
 		}
 	}
 
-	//findUnitsGroup(goal);
 }
 
 
@@ -187,21 +195,21 @@ void ScoutManager::onUnitShow(BWAPI::Unit* unit){
 
 }
 
+void ScoutManager::onUnitDestroy(BWAPI::Unit* unit){
+	//Find if a ug is concerned
+	for(std::list<UnitsGroup *>::iterator it = myUnitsGroups.begin(); it != myUnitsGroups.end(); ++it){
+		if( (*it)->emptyUnits() ){
+			this->myUnitsGroups.remove( (*it) );
+			break;
+		}
+	}
+
+}
 
 UnitsGroup* ScoutManager::findUnitsGroup(pGoal goal){
 
 }
 
 
-#ifdef BW_QT_DEBUG
-QWidget* ScoutManager::createWidget(QWidget* parent) const
-{
-	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
-}
 
-void ScoutManager::refreshWidget(QWidget* widget) const
-{
-// TODO update your widget after having defined it in the previous method :)
-}
-#endif
 
