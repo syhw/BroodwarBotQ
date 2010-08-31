@@ -26,12 +26,12 @@ void ProtossStrat::onStart(){
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Probe,88);
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Cybernetics_Core,86);
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Probe,84);
-	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Gateway,82);
+	this->buildOrderManager->build(2,BWAPI::UnitTypes::Protoss_Gateway,82);
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Probe,80);
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Dragoon,78);
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Pylon,76);
 	this->buildOrderManager->upgrade(1,BWAPI::UpgradeTypes::Singularity_Charge, 74);
-	this->buildOrderManager->build(40,BWAPI::UnitTypes::Protoss_Dragoon, 20);
+	this->buildOrderManager->buildAdditional(10,BWAPI::UnitTypes::Protoss_Dragoon, 20);
 
 	setScoutTime();
 	//this->buildOrderManager->enableDependencyResolver();
