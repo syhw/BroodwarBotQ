@@ -128,6 +128,11 @@ void WarManager::display()
 
 void WarManager::sendGroupToAttack( UnitsGroup* ug)
 {
+	if(Regions::Instance().enemyFound()){
+		ug->addGoal(pGoal(new AttackGoal(ug, Regions::Instance().whereIsEnemy()->getCenter())));
+	}
+
+	/*
     Broodwar->printf("sending a group to attack");
 	// Get the nearest enemy position
 	bool found = false;
@@ -174,7 +179,7 @@ void WarManager::sendGroupToAttack( UnitsGroup* ug)
     }
     ug->addGoal(pGoal(new AttackGoal(ug, nearestEnemyLocation)));
 
-	//Broodwar->printf( "Let's fight !!");
+	//Broodwar->printf( "Let's fight !!");*/
 }
 
 void WarManager::sendGroupToDefense( UnitsGroup* ug)
