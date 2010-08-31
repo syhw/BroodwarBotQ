@@ -42,7 +42,7 @@ public:
 	void onUnitCreate(BWAPI::Unit* unit);//New 
 	void onUnitShow(BWAPI::Unit* unit);
 	void findEnemy();//New
-
+	void onUnitDestroy(BWAPI::Unit* unit);
 
 private:
 

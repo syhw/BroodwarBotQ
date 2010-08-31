@@ -26,7 +26,7 @@ void ScoutManager::update()
 {
 	
 	if(regions->enemyFound() && ! exploringEnemy ){
-		BWAPI::Broodwar->printf("Exploring the Region");
+		
 		exploringEnemy = true;
 		this->awaitingGoals.push_back(pGoal(new ExploreGoal(regions->whereIsEnemy())));
 	}
@@ -195,6 +195,16 @@ void ScoutManager::onUnitShow(BWAPI::Unit* unit){
 
 }
 
+void ScoutManager::onUnitDestroy(BWAPI::Unit* unit){
+	//Find if a ug is concerned
+	for(std::list<UnitsGroup *>::iterator it = myUnitsGroups.begin(); it != myUnitsGroups.end(); ++it){
+		if( (*it)->emptyUnits() ){
+			this->myUnitsGroups.remove( (*it) );
+			break;
+		}
+	}
+
+}
 
 UnitsGroup* ScoutManager::findUnitsGroup(pGoal goal){
 

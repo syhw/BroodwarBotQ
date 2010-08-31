@@ -523,6 +523,7 @@ void BattleBroodAI::onUnitDestroy(BWAPI::Unit* unit)
 	this->informationManager->onUnitDestroy(unit);
 	this->defenseManager->onRemoveUnit(unit);
 	this->arbitrator->onRemoveObject(unit);
+	this->scoutManager->onUnitDestroy(unit);
 }
 
 void BattleBroodAI::onUnitMorph(BWAPI::Unit* unit)
