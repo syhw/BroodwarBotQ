@@ -79,7 +79,11 @@ void WarManager::onOffer(std::set<BWAPI::Unit*> units)
 		if (!(*u)->getType().isWorker() && !(*u)->getType().isBuilding())
 		{
 			arbitrator->accept(this, *u);
-			unitsGroups.front()->takeControl(*u);
+            if (unitsGroups.empty()) // because each UnitsGroup gets destroyed when it becomes empty
+            {
+                unitsGroups.push_back(new UnitsGroup());
+            }
+            unitsGroups.front()->takeControl(*u);
 			//Broodwar->printf("New %s added to the micro manager", (*u)->getType().getName().c_str());
 		}
 		else
