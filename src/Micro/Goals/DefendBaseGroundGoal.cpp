@@ -10,9 +10,15 @@ Goal(ug)
 {
     this->choke = b->chokeToDef;
     if(choke != NULL){
-        double aa = this->choke->getSides().first.x() - this->choke->getSides().second.x();
-        double bb = this->choke->getSides().first.y() - this->choke->getSides().second.y();  
-        this->addSubgoal(pSubgoal(new FormationSubgoal(SL_AND,pFormation(new LineFormation(this->choke->getCenter(), Vec(bb/aa,1).normalize())))));
+        double deltaX = this->choke->getSides().first.x() - this->choke->getSides().second.x();
+        double deltaY = this->choke->getSides().first.y() - this->choke->getSides().second.y();
+        double tmp = 1.0;
+        if (!deltaX)
+        {
+            deltaX = 1.0;
+            tmp = 0.0;
+        }
+        this->addSubgoal(pSubgoal(new FormationSubgoal(SL_AND,pFormation(new LineFormation(this->choke->getCenter(), Vec(deltaY/deltaX, tmp).normalize())))));
     } else {
         addSubgoal(pSubgoal(new FormationSubgoal(SL_AND,pFormation(new SquareFormation(b->getBaseLocation()->getPosition(),Vec(0,0))))));
 
