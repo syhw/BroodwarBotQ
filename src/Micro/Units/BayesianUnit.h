@@ -43,7 +43,8 @@ enum unit_mode {
     MODE_FLOCKFORM, // flock in formation
     MODE_FIGHT_G,   // ground
     MODE_FIGHT_A,    // air
-    MODE_SCOUT
+    MODE_SCOUT,
+    MODE_MOVE
 }; 
 
 enum flock_value {
@@ -123,6 +124,7 @@ protected:
     std::vector<double> _flockProb; // TODO decide if static, perhaps unit dependant
     std::vector<double> _damageProb; // TODO decide if static, perhaps unit dependant
     std::vector<double> _repulseProb;
+    std::vector<double> _heightProb;
     UnitsGroup* _unitsGroup;
     std::multimap<double, BWAPI::Unit*> _rangeEnemies;
     std::map<occupation_type, double> _defaultProb;
