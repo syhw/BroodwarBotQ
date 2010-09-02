@@ -1,13 +1,17 @@
 #include "CorsairUnit.h"
 
-BWAPI::UnitType CorsairUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes::Protoss_High_Templar,
-                                                                BWAPI::UnitTypes::Protoss_Dragoon,
-                                                                BWAPI::UnitTypes::Protoss_Reaver,
-                                                                BWAPI::UnitTypes::Protoss_Zealot,
-                                                                BWAPI::UnitTypes::Protoss_Probe};
+std::set<BWAPI::UnitType> CorsairUnit::setUnitsPrio;
 
-CorsairUnit::CorsairUnit(BWAPI::Unit* u, UnitsGroup* ug):FlyingUnit(u, ug)
+CorsairUnit::CorsairUnit(BWAPI::Unit* u, UnitsGroup* ug)
+: FlyingUnit(u, ug)
 {
+    if (setUnitsPrio.empty())
+    {
+        setUnitsPrio.insert(BWAPI::UnitTypes::Protoss_Corsair);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Wraith);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Zerg_Mutalisk);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Zerg_Scourge);
+    }
 }
 
 CorsairUnit::~CorsairUnit()
@@ -41,7 +45,7 @@ int CorsairUnit::getTimeToAttack()
     return 0;
 }
 
-BWAPI::UnitType* CorsairUnit::getListPriorite()
+std::set<BWAPI::UnitType> CorsairUnit::getUnitsPrio()
 {
-    return CorsairUnit::listPriorite;
+    return CorsairUnit::setUnitsPrio;
 }

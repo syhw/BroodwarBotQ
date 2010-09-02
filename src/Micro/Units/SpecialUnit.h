@@ -13,5 +13,5 @@ class SpecialUnit : public BayesianUnit
         virtual int damagesOn(BWAPI::Unit* enemy);
         virtual int getTimeToAttack() = 0;
         virtual bool withinRange(BWAPI::Unit* enemy);
-        virtual BWAPI::UnitType* getListPriorite() = 0;
+        virtual std::set<BWAPI::UnitType> getUnitsPrio() = 0;
 };

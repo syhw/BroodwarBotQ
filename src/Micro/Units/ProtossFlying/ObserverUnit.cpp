@@ -38,7 +38,7 @@ int ObserverUnit::getTimeToAttack()
     return 0;
 }
 
-BWAPI::UnitType* ObserverUnit::getListPriorite()
+std::set<BWAPI::UnitType> ObserverUnit::getUnitsPrio()
 {
-    return ObserverUnit::listPriorite;
+    return std::set<BWAPI::UnitType>();
 }

@@ -151,8 +151,8 @@ protected:
     void updateDir();
     void drawDir();
     inline void clickDir();
-    inline void flee();
-    inline void fightMove();
+    void flee();
+    void fightMove();
     void drawArrow(Vec& v);
     inline void updateAttractors();
     void drawAttractors();
@@ -168,8 +168,8 @@ protected:
     virtual int addRangeGround();
     virtual int addRangeAir();
     void drawProbs(std::multimap<double, Vec>& probs, int number=0);
+    unit_mode _mode;
 public:
-    unit_mode _mode; // TODO : faudra le remettre en protected, c'est juste pour quelques tests
 	void switchMode(unit_mode um);
     int getMaxDimension();
     Vec dir, obj; // dir=current direction, obj=pathfinder's direction
@@ -190,5 +190,5 @@ public:
     virtual int damagesOn(BWAPI::Unit* enemy) = 0;
     virtual int getTimeToAttack() = 0;
     virtual bool withinRange(BWAPI::Unit* enemy) = 0;
-    virtual BWAPI::UnitType* getListPriorite() = 0;
+    virtual std::set<BWAPI::UnitType> getUnitsPrio() = 0;
 };

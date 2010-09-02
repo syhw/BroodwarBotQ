@@ -7,11 +7,7 @@ using namespace BWAPI;
 
 int DragoonUnit::addRange;
 
-BWAPI::UnitType DragoonUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes::Protoss_High_Templar,
-                                                                BWAPI::UnitTypes::Protoss_Dragoon,
-                                                                BWAPI::UnitTypes::Protoss_Reaver,
-                                                                BWAPI::UnitTypes::Protoss_Zealot,
-                                                                BWAPI::UnitTypes::Protoss_Probe};
+std::set<BWAPI::UnitType> DragoonUnit::setUnitsPrio;
 
 DragoonUnit::DragoonUnit(BWAPI::Unit* u, UnitsGroup* ug)
 :GroundUnit(u, ug)
@@ -21,6 +17,20 @@ DragoonUnit::DragoonUnit(BWAPI::Unit* u, UnitsGroup* ug)
     else
         addRange = 0;
     _attackDuration += 8; // not static for the moment TODO
+
+    if (setUnitsPrio.empty())
+    {
+        setUnitsPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Protoss_Arbiter);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Protoss_Dark_Archon);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Protoss_Carrier);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Vulture_Spider_Mine);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Science_Vessel);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Zerg_Lurker);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Zerg_Defiler);
+    }
 }
 
 DragoonUnit::~DragoonUnit()
@@ -62,13 +72,14 @@ void DragoonUnit::micro()
             {
                 updateRangeEnemies();
                 updateTargetEnemy();
-                unit->rightClick(targetEnemy);
+                if (targetEnemy) 
+                    unit->rightClick(targetEnemy);
                 //unit->attackUnit(targetEnemy); // rightClick seems better b/c attackUnit sometimes stuck unit...
                 _lastAttackOrder = Broodwar->getFrameCount();
             }
             else if (_fleeing || _lastTotalHP - (unit->getShields() + unit->getHitPoints()) > 0)
             {
-                ///flee();
+                flee();
             }
             else if (!unit->isMoving() && targetEnemy != NULL)
             {
@@ -107,7 +118,7 @@ int DragoonUnit::getTimeToAttack()
     return 8;
 }
 
-BWAPI::UnitType* DragoonUnit::getListPriorite()
+std::set<BWAPI::UnitType> DragoonUnit::getUnitsPrio()
 {
-    return DragoonUnit::listPriorite;
+    return DragoonUnit::setUnitsPrio;
 }

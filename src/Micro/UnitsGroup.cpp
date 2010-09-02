@@ -180,8 +180,9 @@ void UnitsGroup::displayTargets()
 
 void UnitsGroup::update()
 {
-    clock_t start;
-    start = clock();
+#ifdef __DEBUG_GABRIEL__
+    clock_t start = clock();
+#endif
 	if (units.empty()){
 		this->accomplishGoal();
 		return;
@@ -228,9 +229,13 @@ void UnitsGroup::update()
 #ifdef __DEBUG_NICOLAS__
     displayTargets();
 #endif
+
+#ifdef __DEBUG_GABRIEL__
     clock_t finish = clock();
     double duration = (double)(finish - start) / CLOCKS_PER_SEC;
-    Broodwar->printf( "%2.5f seconds\n", duration); 
+    if (duration > 0.041) 
+        Broodwar->printf( "%2.5f seconds\n", duration);
+#endif
 }
 
 void UnitsGroup::attackMove(int x, int y)

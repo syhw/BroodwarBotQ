@@ -1,12 +1,7 @@
 #include "ShuttleUnit.h"
 
-BWAPI::UnitType ShuttleUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes::Protoss_High_Templar,
-                                                                BWAPI::UnitTypes::Protoss_Dragoon,
-                                                                BWAPI::UnitTypes::Protoss_Reaver,
-                                                                BWAPI::UnitTypes::Protoss_Zealot,
-                                                                BWAPI::UnitTypes::Protoss_Probe};
-
-ShuttleUnit::ShuttleUnit(BWAPI::Unit* u, UnitsGroup* ug):FlyingUnit(u, ug)
+ShuttleUnit::ShuttleUnit(BWAPI::Unit* u, UnitsGroup* ug)
+: FlyingUnit(u, ug)
 {
 }
 
@@ -41,4 +36,9 @@ int ShuttleUnit::getTimeToAttack()
 BWAPI::UnitType* ShuttleUnit::getListPriorite()
 {
     return ShuttleUnit::listPriorite;
+}
+
+std::set<BWAPI::UnitType> ShuttleUnit::getUnitsPrio()
+{
+    return std::set<BWAPI::UnitType>();
 }

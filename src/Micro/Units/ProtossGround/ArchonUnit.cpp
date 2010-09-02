@@ -1,13 +1,21 @@
 #include "ArchonUnit.h"
 
-BWAPI::UnitType ArchonUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes::Protoss_High_Templar,
-                                                                BWAPI::UnitTypes::Protoss_Dragoon,
-                                                                BWAPI::UnitTypes::Protoss_Reaver,
-                                                                BWAPI::UnitTypes::Protoss_Zealot,
-                                                                BWAPI::UnitTypes::Protoss_Probe};
+std::set<BWAPI::UnitType> ArchonUnit::setUnitsPrio;
 
-ArchonUnit::ArchonUnit(BWAPI::Unit* u, UnitsGroup* ug):GroundUnit(u, ug)
+ArchonUnit::ArchonUnit(BWAPI::Unit* u, UnitsGroup* ug)
+: GroundUnit(u, ug)
 {
+    if (setUnitsPrio.empty())
+    {
+        setUnitsPrio.insert(BWAPI::UnitTypes::Protoss_Zealot);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Marine);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Firebat);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Medic);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Ghost);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Zerg_Zergling);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Zerg_Mutalisk);
+    }
 }
 
 ArchonUnit::~ArchonUnit()
@@ -41,7 +49,7 @@ int ArchonUnit::getTimeToAttack()
     return 0;
 }
 
-BWAPI::UnitType* ArchonUnit::getListPriorite()
+std::set<BWAPI::UnitType> ArchonUnit::getUnitsPrio()
 {
-    return ArchonUnit::listPriorite;
+    return ArchonUnit::setUnitsPrio;
 }

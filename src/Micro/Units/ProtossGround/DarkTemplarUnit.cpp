@@ -1,13 +1,13 @@
 #include "DarkTemplarUnit.h"
 
-BWAPI::UnitType DarkTemplarUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes::Protoss_High_Templar,
-                                                                BWAPI::UnitTypes::Protoss_Dragoon,
-                                                                BWAPI::UnitTypes::Protoss_Reaver,
-                                                                BWAPI::UnitTypes::Protoss_Zealot,
-                                                                BWAPI::UnitTypes::Protoss_Probe};
+std::set<BWAPI::UnitType> DarkTemplarUnit::setUnitsPrio;
 
-DarkTemplarUnit::DarkTemplarUnit(BWAPI::Unit* u, UnitsGroup* ug):GroundUnit(u, ug)
+DarkTemplarUnit::DarkTemplarUnit(BWAPI::Unit* u, UnitsGroup* ug)
+: GroundUnit(u, ug)
 {
+    if (setUnitsPrio.empty())
+    {
+    }
 }
 
 DarkTemplarUnit::~DarkTemplarUnit()
@@ -44,4 +44,9 @@ int DarkTemplarUnit::getTimeToAttack()
 BWAPI::UnitType* DarkTemplarUnit::getListPriorite()
 {
     return DarkTemplarUnit::listPriorite;
+}
+
+std::set<BWAPI::UnitType> DarkTemplarUnit::getUnitsPrio()
+{
+    return DarkTemplarUnit::setUnitsPrio;
 }

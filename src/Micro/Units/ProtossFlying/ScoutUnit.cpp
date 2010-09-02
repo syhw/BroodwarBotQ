@@ -1,13 +1,23 @@
 #include "ScoutUnit.h"
 
-BWAPI::UnitType ScoutUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes::Protoss_High_Templar,
-                                                                BWAPI::UnitTypes::Protoss_Dragoon,
-                                                                BWAPI::UnitTypes::Protoss_Reaver,
-                                                                BWAPI::UnitTypes::Protoss_Zealot,
-                                                                BWAPI::UnitTypes::Protoss_Probe};
+std::set<BWAPI::UnitType> ScoutUnit::setUnitsPrio;
 
-ScoutUnit::ScoutUnit(BWAPI::Unit* u, UnitsGroup* ug):FlyingUnit(u, ug)
+ScoutUnit::ScoutUnit(BWAPI::Unit* u, UnitsGroup* ug)
+: FlyingUnit(u, ug)
 {
+    if (setUnitsPrio.empty())
+    {
+        setUnitsPrio.insert(BWAPI::UnitTypes::Protoss_Corsair);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Protoss_Scout);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Protoss_Carrier);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Wraith);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Valkyrie);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Science_Vessel);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Battlecruiser);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Zerg_Mutalisk);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Zerg_Devourer);
+        setUnitsPrio.insert(BWAPI::UnitTypes::Zerg_Scourge);
+    }
 }
 
 ScoutUnit::~ScoutUnit()
@@ -41,7 +51,7 @@ int ScoutUnit::getTimeToAttack()
     return 0;
 }
 
-BWAPI::UnitType* ScoutUnit::getListPriorite()
+std::set<BWAPI::UnitType> ScoutUnit::getUnitsPrio()
 {
-    return ScoutUnit::listPriorite;
+    return ScoutUnit::setUnitsPrio;
 }
