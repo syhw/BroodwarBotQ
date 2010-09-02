@@ -2,6 +2,7 @@
 #include <BWAPI.h>
 #include "CSingleton.h"
 #include "EUnitsFilter.h"
+#include "ETechEstimator.h"
 #include <vector>
 #include "Vec.h"
 
@@ -18,6 +19,7 @@ class MapManager: public CSingleton<MapManager>
 
 private:
     EUnitsFilter* _eUnitsFilter;
+    ETechEstimator* _eTechEstimator;
     std::map<BWAPI::Unit*, BWAPI::Position> _trackedUnits;
     MapManager();
     ~MapManager();

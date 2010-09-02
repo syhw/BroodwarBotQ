@@ -180,6 +180,8 @@ void UnitsGroup::displayTargets()
 
 void UnitsGroup::update()
 {
+    clock_t start;
+    start = clock();
 	if (units.empty()){
 		this->accomplishGoal();
 		return;
@@ -209,7 +211,7 @@ void UnitsGroup::update()
         this->totalPower += (*it)->unit->getType().groundWeapon().damageAmount();
         double tmp_max = max(max((*it)->unit->getType().groundWeapon().maxRange(), (*it)->unit->getType().airWeapon().maxRange()), 
             (*it)->unit->getType().sightRange()); // TODO: upgrades
-        if (tmp_max > maxRange) 
+        if (tmp_max > maxRange)
             maxRange = tmp_max;
     }
 
@@ -217,11 +219,18 @@ void UnitsGroup::update()
     
     enemies = std::set<Unit*>(nearbyEnemyUnits(center, maxRadius + maxRange + 46)); // > 45.26 == sqrt(32^2+32^2)
     Broodwar->drawCircleMap(center.x(), center.y(), maxRadius + maxRange, Colors::Yellow);
-	accomplishGoal();
+	if (!enemies.empty())
+        defaultTargetEnemy = *(enemies.begin()); // TODO CHANGE THAT FOR A PRIORITY
+    else 
+        defaultTargetEnemy = NULL;
+    accomplishGoal();
 
 #ifdef __DEBUG_NICOLAS__
     displayTargets();
 #endif
+    clock_t finish = clock();
+    double duration = (double)(finish - start) / CLOCKS_PER_SEC;
+    Broodwar->printf( "%2.5f seconds\n", duration); 
 }
 
 void UnitsGroup::attackMove(int x, int y)

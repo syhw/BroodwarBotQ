@@ -21,6 +21,10 @@ void ReaverUnit::micro()
 #endif
 }
 
+void ReaverUnit::check()
+{
+}
+
 bool ReaverUnit::canHit(BWAPI::Unit* enemy)
 {
 #ifdef __NON_IMPLEMENTE__

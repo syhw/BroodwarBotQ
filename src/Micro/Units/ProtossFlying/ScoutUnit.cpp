@@ -21,6 +21,10 @@ void ScoutUnit::micro()
 #endif
 }
 
+void ScoutUnit::check()
+{
+}
+
 bool ScoutUnit::canHit(BWAPI::Unit* enemy)
 {
 #ifdef __NON_IMPLEMENTE__

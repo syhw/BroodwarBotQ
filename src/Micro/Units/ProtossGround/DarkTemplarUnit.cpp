@@ -21,6 +21,10 @@ void DarkTemplarUnit::micro()
 #endif
 }
 
+void DarkTemplarUnit::check()
+{
+}
+
 bool DarkTemplarUnit::canHit(BWAPI::Unit* enemy)
 {
 #ifdef __NON_IMPLEMENTE__

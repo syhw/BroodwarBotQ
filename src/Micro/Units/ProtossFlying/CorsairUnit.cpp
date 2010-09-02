@@ -21,6 +21,10 @@ void CorsairUnit::micro()
 #endif
 }
 
+void CorsairUnit::check()
+{
+}
+
 bool CorsairUnit::canHit(BWAPI::Unit* enemy)
 {
 #ifdef __NON_IMPLEMENTE__

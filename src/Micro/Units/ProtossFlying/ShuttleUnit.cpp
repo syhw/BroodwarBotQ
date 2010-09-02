@@ -21,6 +21,10 @@ void ShuttleUnit::micro()
 #endif
 }
 
+void ShuttleUnit::check()
+{
+}
+
 bool ShuttleUnit::canHit(BWAPI::Unit* enemy)
 {
     return false;

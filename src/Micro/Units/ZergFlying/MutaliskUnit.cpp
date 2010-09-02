@@ -21,6 +21,10 @@ void MutaliskUnit::micro()
 #endif
 }
 
+void MutaliskUnit::check()
+{
+}
+
 bool MutaliskUnit::canHit(BWAPI::Unit* enemy)
 {
 #ifdef __NON_IMPLEMENTE__

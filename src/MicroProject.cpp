@@ -18,6 +18,7 @@ void MicroAIModule::onStart()
 	BWTA::readMap();
 	BWTA::analyze();
     this->eUnitsFilter = & EUnitsFilter::Instance();
+    this->eTechEstimator = & ETechEstimator::Instance();
     this->mapManager = & MapManager::Instance();
 	this->objectManager = & ObjectManager::Instance();
     this->regions = & Regions::Instance();

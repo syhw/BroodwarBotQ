@@ -21,6 +21,10 @@ void ArchonUnit::micro()
 #endif
 }
 
+void ArchonUnit::check()
+{
+}
+
 bool ArchonUnit::canHit(BWAPI::Unit* enemy)
 {
 #ifdef __NON_IMPLEMENTE__

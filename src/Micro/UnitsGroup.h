@@ -60,6 +60,7 @@ public:
     std::set<BWAPI::Unit*> enemies;
     UnitDmgBimap unitDamages;
     pBayesianUnit leadingUnit;
+    BWAPI::Unit* defaultTargetEnemy;
 	
 	UnitsGroup();
 	virtual ~UnitsGroup();

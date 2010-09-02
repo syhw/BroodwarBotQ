@@ -55,6 +55,7 @@ MapManager::MapManager()
         }
     }
     _eUnitsFilter = NULL;
+    _eTechEstimator = NULL;
 }
 
 MapManager::~MapManager()
@@ -75,6 +76,7 @@ MapManager::~MapManager()
 void MapManager::setDependencies()
 {
     _eUnitsFilter = & EUnitsFilter::Instance();
+    _eTechEstimator = & ETechEstimator::Instance();
 }
 
 void MapManager::modifyBuildings(Unit* u, bool b)
@@ -196,6 +198,11 @@ void MapManager::removeDmg(UnitType ut, Position p)
 
 void MapManager::addDmg(UnitType ut, Position p)
 {
+    //for (std::set<UpgradeType>::const_iterator it = ut.upgrades().begin();
+    //    it != ut.upgrades().end(); ++it)
+    //{
+    //    Broodwar->printf("upgrade type: %s, ennemy has: %d", it->getName().c_str(), Broodwar->enemy()->getUpgradeLevel(*it));
+    //}
     if (p.x() == 0 && p.y() == 0)
         Broodwar->printf("0,0 : %s", ut.getName().c_str());
     if (ut.groundWeapon() != BWAPI::WeaponTypes::None)
@@ -242,6 +249,7 @@ void MapManager::onFrame()
     {
         if (it->first->isVisible() 
             && it->first->exists()
+            && !it->first->getType().isWorker() // TODO/TOCHANGE
             && _trackedUnits[it->first] != it->first->getPosition())
         {
             // update EUnitsFilter

@@ -10,6 +10,7 @@ public:
     CarrierUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~CarrierUnit();
     virtual void micro();
+    virtual void check();
     virtual bool canHit(BWAPI::Unit* enemy);
     virtual int getTimeToAttack();
     virtual BWAPI::UnitType* getListPriorite();

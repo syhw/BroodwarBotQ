@@ -21,6 +21,10 @@ void ProbeUnit::micro()
 #endif
 }
 
+void ProbeUnit::check()
+{
+}
+
 bool ProbeUnit::canHit(BWAPI::Unit* enemy)
 {
 #ifdef __NON_IMPLEMENTE__

@@ -21,6 +21,10 @@ void ScourgeUnit::micro()
 #endif
 }
 
+void ScourgeUnit::check()
+{
+}
+
 bool ScourgeUnit::canHit(BWAPI::Unit* enemy)
 {
 #ifdef __NON_IMPLEMENTE__

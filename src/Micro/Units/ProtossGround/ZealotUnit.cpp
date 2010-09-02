@@ -59,6 +59,10 @@ void ZealotUnit::micro()
     */
 }
 
+void ZealotUnit::check()
+{
+}
+
 bool ZealotUnit::canHit(BWAPI::Unit* enemy)
 {
     return enemy->isVisible() && !enemy->getType().isFlyer() && (enemy->getDistance(unit) > 0);

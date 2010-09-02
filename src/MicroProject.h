@@ -5,6 +5,7 @@
 #include "Defines.h"
 #include "Formations.h"
 #include "EUnitsFilter.h"
+#include "ETechEstimator.h"
 #include "MapManager.h"
 #include "ObjectManager.h"
 #include "Regions.h"
@@ -22,6 +23,7 @@ class MicroAIModule : public BWAPI::AIModule
 public:	    
     UnitsGroup* mm;
     EUnitsFilter* eUnitsFilter;
+    ETechEstimator* eTechEstimator;
     MapManager* mapManager;
     ObjectManager* objectManager;
     Regions* regions;

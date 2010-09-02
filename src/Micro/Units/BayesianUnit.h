@@ -98,7 +98,6 @@ protected:
     BWAPI::Position _lastRightClick, _posAtMost13FramesAgo, _posAtMost23FramesAgo;
     bool _iThinkImBlocked;
     int _lastTotalHP;
-    int _addRange;
     const int _refreshPathFramerate;
     int _maxDistWhileRefreshingPath;
     bool _newPath;
@@ -142,8 +141,8 @@ protected:
     inline void updateDirV();
     inline void testIfBlocked();
     inline void resumeFromBlocked();
-    inline void updateRangeEnemies();
-    inline void updateTargetEnemy();
+    void updateRangeEnemies();
+    void updateTargetEnemy();
     inline void setTargetEnemy(BWAPI::Unit* u);
     inline int computeDmg(BWAPI::Unit* u);
     void drawDirV();
@@ -153,6 +152,7 @@ protected:
     void drawDir();
     inline void clickDir();
     inline void flee();
+    inline void fightMove();
     void drawArrow(Vec& v);
     inline void updateAttractors();
     void drawAttractors();
@@ -164,7 +164,9 @@ protected:
     // range enemies
     inline double computeProb(unsigned int i);
     inline void computeProbs();
-    inline void selectDir();
+    inline void selectDir(const Vec& criterium);
+    virtual int addRangeGround();
+    virtual int addRangeAir();
     void drawProbs(std::multimap<double, Vec>& probs, int number=0);
 public:
     unit_mode _mode; // TODO : faudra le remettre en protected, c'est juste pour quelques tests
@@ -183,6 +185,7 @@ public:
 
     void attackEnemy(BWAPI::Unit* u, BWAPI::Color col);
     virtual void micro() = 0;
+    virtual void check() = 0;
     virtual bool canHit(BWAPI::Unit* enemy) = 0;
     virtual int damagesOn(BWAPI::Unit* enemy) = 0;
     virtual int getTimeToAttack() = 0;

@@ -21,6 +21,10 @@ void CarrierUnit::micro()
 #endif
 }
 
+void CarrierUnit::check()
+{
+}
+
 bool CarrierUnit::canHit(BWAPI::Unit* enemy)
 {
 #ifdef __NON_IMPLEMENTE__

@@ -21,6 +21,10 @@ void ArbiterUnit::micro()
 #endif
 }
 
+void ArbiterUnit::check()
+{
+}
+
 bool ArbiterUnit::canHit(BWAPI::Unit* enemy)
 {
 #ifdef __NON_IMPLEMENTE__

@@ -21,6 +21,10 @@ void ObserverUnit::micro()
 #endif
 }
 
+void ObserverUnit::check()
+{
+}
+
 bool ObserverUnit::canHit(BWAPI::Unit* enemy)
 {
 #ifdef __NON_IMPLEMENTE__
