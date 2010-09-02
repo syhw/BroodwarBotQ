@@ -55,7 +55,6 @@ MapManager::MapManager()
         }
     }
     _eUnitsFilter = NULL;
-    _eTechEstimator = NULL;
 }
 
 MapManager::~MapManager()
@@ -76,7 +75,6 @@ MapManager::~MapManager()
 void MapManager::setDependencies()
 {
     _eUnitsFilter = & EUnitsFilter::Instance();
-    _eTechEstimator = & ETechEstimator::Instance();
 }
 
 void MapManager::modifyBuildings(Unit* u, bool b)
@@ -122,7 +120,7 @@ void MapManager::removeBuilding(Unit* u)
 void MapManager::modifyDamages(int* tab, Position p, int minRadius, int maxRadius, int damages)
 {
     // TODO optimize
-    int tmpMaxRadius = maxRadius + 32; // TOCHANGE 32
+    int tmpMaxRadius = maxRadius; /// + 32; // TOCHANGE 32
     //Broodwar->printf("modify minRadius: %d, maxRadius %d, Position(%d, %d)", minRadius, maxRadius, p.x(), p.y());
     int lowerX = (p.x() - tmpMaxRadius) > 0 ? p.x() - tmpMaxRadius : 0;
     int higherX = (p.x() + tmpMaxRadius) < _width ? p.x() + tmpMaxRadius : _pix_width;
@@ -143,7 +141,7 @@ void MapManager::modifyDamages(int* tab, Position p, int minRadius, int maxRadiu
 
 void MapManager::updateDamagesGrad(Vec* grad, int* tab, Position p, int minRadius, int maxRadius)
 {
-    int tmpMaxRadius = maxRadius + 32 + 32; // TOCHANGE 32+32
+    int tmpMaxRadius = maxRadius + 32 + 46; // 32 b/c it is a gradient, 46 for enemy unit movement
     int tmpMinRadius = max(0, minRadius - 32);
     int lowerX = (p.x() - tmpMaxRadius) > 0 ? p.x() - tmpMaxRadius : 0;
     int higherX = (p.x() + tmpMaxRadius) < _width ? p.x() + tmpMaxRadius : _pix_width;
@@ -180,41 +178,66 @@ void MapManager::updateDamagesGrad(Vec* grad, int* tab, Position p, int minRadiu
 
 void MapManager::removeDmg(UnitType ut, Position p)
 {
-    if (p.x() == 0 && p.y() == 0)
-        Broodwar->printf("0,0 : %s", ut.getName().c_str());
     if (ut.groundWeapon() != BWAPI::WeaponTypes::None)
     {
-        modifyDamages(this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange(), 
+        int addRange = additionalRangeGround(ut);
+        modifyDamages(this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange() + addRange, 
             - ut.groundWeapon().damageAmount() * ut.maxGroundHits());
-        updateDamagesGrad(this->groundDamagesGrad, this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange());
+        updateDamagesGrad(this->groundDamagesGrad, this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange() + addRange);
     }
     if (ut.airWeapon() != BWAPI::WeaponTypes::None)
     {
-        modifyDamages(this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange(), 
+        int addRange = additionalRangeAir(ut);
+        modifyDamages(this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange() + addRange, 
             - ut.airWeapon().damageAmount() * ut.maxAirHits());
-        updateDamagesGrad(this->airDamagesGrad, this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange());
+        updateDamagesGrad(this->airDamagesGrad, this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange() + addRange);
     }
 }
 
 void MapManager::addDmg(UnitType ut, Position p)
-{
-    //for (std::set<UpgradeType>::const_iterator it = ut.upgrades().begin();
-    //    it != ut.upgrades().end(); ++it)
-    //{
-    //    Broodwar->printf("upgrade type: %s, ennemy has: %d", it->getName().c_str(), Broodwar->enemy()->getUpgradeLevel(*it));
-    //}
-    if (p.x() == 0 && p.y() == 0)
-        Broodwar->printf("0,0 : %s", ut.getName().c_str());
+{ 
     if (ut.groundWeapon() != BWAPI::WeaponTypes::None)
     {
-        modifyDamages(this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange(), 
+        int addRange = additionalRangeGround(ut);
+        modifyDamages(this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange() + addRange, 
             ut.groundWeapon().damageAmount() * ut.maxGroundHits());
+        //updateDamagesGrad(this->groundDamagesGrad, this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange() + addRange);
     }
     if (ut.airWeapon() != BWAPI::WeaponTypes::None)
     {
-        modifyDamages(this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange(), 
+        int addRange = additionalRangeAir(ut);
+        modifyDamages(this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange() + addRange, 
             ut.airWeapon().damageAmount() * ut.maxAirHits());
+        //updateDamagesGrad(this->airDamagesGrad, this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange() + addRange);
     }
+}
+
+int MapManager::additionalRangeGround(UnitType ut)
+{
+    // we consider that the upgrades are always researched/up
+    if (ut == UnitTypes::Protoss_Dragoon)
+        return 64;
+    else if (ut == UnitTypes::Terran_Marine)
+        return 32;
+    else if (ut == UnitTypes::Zerg_Hydralisk)
+        return 32;
+    else 
+        return 0;
+}
+
+int MapManager::additionalRangeAir(UnitType ut)
+{
+    // we consider that the upgrades are always researched/up
+    if (ut == UnitTypes::Protoss_Dragoon)
+        return 64;
+    else if (ut == UnitTypes::Terran_Marine)
+        return 32;
+    else if (ut == UnitTypes::Terran_Goliath)
+        return 96;
+    else if (ut == UnitTypes::Zerg_Hydralisk)
+        return 32;
+    else 
+        return 0;
 }
 
 void MapManager::onUnitCreate(Unit* u)
@@ -255,8 +278,8 @@ void MapManager::onFrame()
             // update EUnitsFilter
             _eUnitsFilter->update(it->first);
             // update the map
-            removeDmg(it->first->getType(), _trackedUnits[it->first]);
             addDmg(it->first->getType(), it->first->getPosition());
+            removeDmg(it->first->getType(), _trackedUnits[it->first]);
             _trackedUnits[it->first] = it->first->getPosition();
         }
     }

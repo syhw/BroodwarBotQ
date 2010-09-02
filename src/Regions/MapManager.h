@@ -2,7 +2,6 @@
 #include <BWAPI.h>
 #include "CSingleton.h"
 #include "EUnitsFilter.h"
-#include "ETechEstimator.h"
 #include <vector>
 #include "Vec.h"
 
@@ -19,7 +18,6 @@ class MapManager: public CSingleton<MapManager>
 
 private:
     EUnitsFilter* _eUnitsFilter;
-    ETechEstimator* _eTechEstimator;
     std::map<BWAPI::Unit*, BWAPI::Position> _trackedUnits;
     MapManager();
     ~MapManager();
@@ -34,6 +32,8 @@ private:
     inline void updateDamagesGrad(Vec* grad, int* tab, Position p, int minRadius, int maxRadius);
     inline void removeDmg(BWAPI::UnitType ut, BWAPI::Position p);
     inline void addDmg(BWAPI::UnitType ut, BWAPI::Position p);
+    inline int additionalRangeGround(BWAPI::UnitType ut);
+    inline int additionalRangeAir(BWAPI::UnitType ut);
 public:
     bool* walkability;          // walk tiles
     bool* lowResWalkability;    // low res => building tiles
