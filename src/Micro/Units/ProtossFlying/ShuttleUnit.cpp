@@ -33,12 +33,7 @@ int ShuttleUnit::getTimeToAttack()
     return 0;
 }
 
-BWAPI::UnitType* ShuttleUnit::getListPriorite()
-{
-    return ShuttleUnit::listPriorite;
-}
-
-std::set<BWAPI::UnitType> ShuttleUnit::getUnitsPrio()
+std::set<BWAPI::UnitType> ShuttleUnit::getSetPrio()
 {
     return std::set<BWAPI::UnitType>();
 }

@@ -1,13 +1,21 @@
 #include "ArbiterUnit.h"
 
-BWAPI::UnitType ArbiterUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes::Protoss_High_Templar,
-                                                                BWAPI::UnitTypes::Protoss_Dragoon,
-                                                                BWAPI::UnitTypes::Protoss_Reaver,
-                                                                BWAPI::UnitTypes::Protoss_Zealot,
-                                                                BWAPI::UnitTypes::Protoss_Probe};
+std::set<BWAPI::UnitType> ArbiterUnit::setPrio;
 
-ArbiterUnit::ArbiterUnit(BWAPI::Unit* u, UnitsGroup* ug):SpecialUnit(u, ug)
+ArbiterUnit::ArbiterUnit(BWAPI::Unit* u, UnitsGroup* ug)
+: SpecialUnit(u, ug)
 {
+    if (setPrio.empty())
+    {
+        setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Dragoon);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Scout);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Wraith);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Vulture_Spider_Mine);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Hydralisk);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Defiler);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Mutalisk);
+    }
 }
 
 ArbiterUnit::~ArbiterUnit()
@@ -41,7 +49,7 @@ int ArbiterUnit::getTimeToAttack()
     return 0;
 }
 
-BWAPI::UnitType* ArbiterUnit::getListPriorite()
+std::set<BWAPI::UnitType> ArbiterUnit::getSetPrio()
 {
-    return ArbiterUnit::listPriorite;
+    return ArbiterUnit::setPrio;
 }

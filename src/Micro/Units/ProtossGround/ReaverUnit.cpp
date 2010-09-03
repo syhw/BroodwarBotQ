@@ -1,13 +1,15 @@
 #include "ReaverUnit.h"
 
-BWAPI::UnitType ReaverUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes::Protoss_High_Templar,
-                                                                BWAPI::UnitTypes::Protoss_Dragoon,
-                                                                BWAPI::UnitTypes::Protoss_Reaver,
-                                                                BWAPI::UnitTypes::Protoss_Zealot,
-                                                                BWAPI::UnitTypes::Protoss_Probe};
+std::set<BWAPI::UnitType> ReaverUnit::setPrio;
 
-ReaverUnit::ReaverUnit(BWAPI::Unit* u, UnitsGroup* ug):GroundUnit(u, ug)
+ReaverUnit::ReaverUnit(BWAPI::Unit* u, UnitsGroup* ug)
+: GroundUnit(u, ug)
 {
+    if (setPrio.empty())
+    {
+        setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Defiler);
+    }
 }
 
 ReaverUnit::~ReaverUnit()
@@ -41,7 +43,7 @@ int ReaverUnit::getTimeToAttack()
     return 0;
 }
 
-BWAPI::UnitType* ReaverUnit::getListPriorite()
+std::set<BWAPI::UnitType> ReaverUnit::getSetPrio()
 {
-    return ReaverUnit::listPriorite;
+    return ReaverUnit::setPrio;
 }

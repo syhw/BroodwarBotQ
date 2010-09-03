@@ -1,22 +1,22 @@
 #include "ScoutUnit.h"
 
-std::set<BWAPI::UnitType> ScoutUnit::setUnitsPrio;
+std::set<BWAPI::UnitType> ScoutUnit::setPrio;
 
 ScoutUnit::ScoutUnit(BWAPI::Unit* u, UnitsGroup* ug)
 : FlyingUnit(u, ug)
 {
-    if (setUnitsPrio.empty())
+    if (setPrio.empty())
     {
-        setUnitsPrio.insert(BWAPI::UnitTypes::Protoss_Corsair);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Protoss_Scout);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Protoss_Carrier);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Wraith);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Valkyrie);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Science_Vessel);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Battlecruiser);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Zerg_Mutalisk);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Zerg_Devourer);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Zerg_Scourge);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Corsair);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Scout);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Carrier);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Wraith);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Valkyrie);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Science_Vessel);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Battlecruiser);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Scourge);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Mutalisk);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Devourer);
     }
 }
 
@@ -51,7 +51,7 @@ int ScoutUnit::getTimeToAttack()
     return 0;
 }
 
-std::set<BWAPI::UnitType> ScoutUnit::getUnitsPrio()
+std::set<BWAPI::UnitType> ScoutUnit::getSetPrio()
 {
-    return ScoutUnit::setUnitsPrio;
+    return ScoutUnit::setPrio;
 }

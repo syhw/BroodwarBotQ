@@ -1,12 +1,7 @@
 #include "DarkArchonUnit.h"
 
-BWAPI::UnitType DarkArchonUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes::Protoss_High_Templar,
-                                                                BWAPI::UnitTypes::Protoss_Dragoon,
-                                                                BWAPI::UnitTypes::Protoss_Reaver,
-                                                                BWAPI::UnitTypes::Protoss_Zealot,
-                                                                BWAPI::UnitTypes::Protoss_Probe};
-
-DarkArchonUnit::DarkArchonUnit(BWAPI::Unit* u, UnitsGroup* ug):SpecialUnit(u, ug)
+DarkArchonUnit::DarkArchonUnit(BWAPI::Unit* u, UnitsGroup* ug)
+: SpecialUnit(u, ug)
 {
 }
 
@@ -41,7 +36,7 @@ int DarkArchonUnit::getTimeToAttack()
     return 0;
 }
 
-BWAPI::UnitType* DarkArchonUnit::getListPriorite()
+std::set<BWAPI::UnitType> DarkArchonUnit::getSetPrio()
 {
-    return DarkArchonUnit::listPriorite;
+    return std::set<BWAPI::UnitType>();
 }

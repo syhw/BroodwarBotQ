@@ -1,12 +1,6 @@
 #include "HighTemplarUnit.h"
 #include <UnitsGroup.h>
 
-BWAPI::UnitType HighTemplarUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes::Protoss_High_Templar,
-                                                                BWAPI::UnitTypes::Protoss_Dragoon,
-                                                                BWAPI::UnitTypes::Protoss_Reaver,
-                                                                BWAPI::UnitTypes::Protoss_Zealot,
-                                                                BWAPI::UnitTypes::Protoss_Probe};
-
 HighTemplarUnit::HighTemplarUnit(BWAPI::Unit* u, UnitsGroup* ug):SpecialUnit(u, ug)
 {
 }
@@ -15,32 +9,66 @@ HighTemplarUnit::~HighTemplarUnit()
 {
 }
 
+std::pair<BWAPI::Position, int> HighTemplarUnit::bestStormPos()
+{
+    std::set<Position> possiblePos;
+    for (std::multimap<double, BWAPI::Unit*>::const_iterator it = _rangeEnemies.begin();
+        it != _rangeEnemies.end(); ++it)
+    {
+        Position tmpPos = it->second->getPosition();
+        possiblePos.insert(tmpPos);
+        possiblePos.insert(Position(tmpPos.x() - 32, tmpPos.y()));
+        possiblePos.insert(Position(tmpPos.x() + 32, tmpPos.y()));
+        possiblePos.insert(Position(tmpPos.x(), tmpPos.y() - 32));
+        possiblePos.insert(Position(tmpPos.x(), tmpPos.y() + 32));
+        possiblePos.insert(Position(tmpPos.x() - 32, tmpPos.y() - 32));
+        possiblePos.insert(Position(tmpPos.x() + 32, tmpPos.y() + 32));
+        possiblePos.insert(Position(tmpPos.x() + 32, tmpPos.y() - 32));
+        possiblePos.insert(Position(tmpPos.x() - 32, tmpPos.y() + 32));
+    }
+    Position bestPos;
+    int max = -1000000;
+    for (std::set<Position>::const_iterator it = possiblePos.begin();
+        it != possiblePos.end(); ++it)
+    {
+        int tmp = 0;
+        for (std::vector<pBayesianUnit>::const_iterator uit = _unitsGroup->units.begin();
+            uit != _unitsGroup->units.end(); ++uit)
+        {
+            if ((*uit)->unit->getDistance(*it) < 32.0+16.0+5.0)
+                --tmp;
+        }
+        for (std::set<BWAPI::Unit*>::const_iterator eit = _unitsGroup->enemies.begin();
+            eit != _unitsGroup->enemies.end(); ++eit)
+        {
+            if ((*eit)->getDistance(*it) < 32.0+16.0+5.0)
+                ++tmp;
+        }
+        if (tmp > max)
+        {
+            max = tmp;
+            bestPos = *it;
+        }
+    }
+    return std::pair<Position, int>(bestPos, max);
+}
+
 void HighTemplarUnit::micro()
 {
-    if (_unitsGroup->enemies.empty())
-    {
-        if (_unitsGroup->size() < 23)
-            this->switchMode(MODE_FLOCK);
-        else 
-            this->switchMode(MODE_MOVE);
-        return;
-    }
     if (this->unit->getEnergy() >= 75)
     {
         updateRangeEnemies();
-        updateTargetEnemy();
-        unit->useTech(BWAPI::TechTypes::Psionic_Storm, targetEnemy->getPosition());
+        std::pair<Position, int> p = bestStormPos();
+        if (p.second > 2)
+            unit->useTech(BWAPI::TechTypes::Psionic_Storm, p.first);
     }
-    else if (_fleeing || _lastTotalHP - (unit->getShields() + unit->getHitPoints()) > 0)
+    else if (_fleeing || this->unit->getEnergy() < 74)
     {
-        ///flee();
+        flee();
     }
-    else if (!unit->isMoving() && targetEnemy != NULL)
+    else
     {
-        ///fightMove();
-        //switchMode(MODE_INPOS); // TODO
-        //updateDir();
-        //clickDir();
+        fightMove();
     }
 }
 
@@ -64,7 +92,7 @@ int HighTemplarUnit::getTimeToAttack()
     return 0;
 }
 
-BWAPI::UnitType* HighTemplarUnit::getListPriorite()
+std::set<BWAPI::UnitType> HighTemplarUnit::getSetPrio()
 {
-    return HighTemplarUnit::listPriorite;
+    return std::set<BWAPI::UnitType>();
 }

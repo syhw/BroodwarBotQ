@@ -6,12 +6,11 @@
 class ObserverUnit : public FlyingUnit
 {
 public:
-    static BWAPI::UnitType listPriorite[NUMBER_OF_PRIORITY];
     ObserverUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~ObserverUnit();
     virtual void micro();
     virtual void check();
     virtual bool canHit(BWAPI::Unit* enemy);
     virtual int getTimeToAttack();
-    virtual std::set<BWAPI::UnitType> getUnitsPrio();
+    virtual std::set<BWAPI::UnitType> getSetPrio();
 };

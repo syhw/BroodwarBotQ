@@ -6,12 +6,13 @@
 class HighTemplarUnit : public SpecialUnit
 {
 public:
-    static BWAPI::UnitType listPriorite[NUMBER_OF_PRIORITY];
+    static BWAPI::UnitType setPriorite[NUMBER_OF_PRIORITY];
     HighTemplarUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~HighTemplarUnit();
+    std::pair<BWAPI::Position, int> bestStormPos();
     virtual void micro();
     virtual void check();
     virtual bool canHit(BWAPI::Unit* enemy);
     virtual int getTimeToAttack();
-    virtual BWAPI::UnitType* getListPriorite();
+    virtual std::set<BWAPI::UnitType> getSetPrio();
 };

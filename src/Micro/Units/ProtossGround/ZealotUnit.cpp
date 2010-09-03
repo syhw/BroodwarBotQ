@@ -5,14 +5,17 @@
 using namespace std;
 using namespace BWAPI;
 
-BWAPI::UnitType ZealotUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes::Protoss_High_Templar,
-                                                                BWAPI::UnitTypes::Protoss_Zealot,
-                                                                BWAPI::UnitTypes::Protoss_Dragoon,
-                                                                BWAPI::UnitTypes::Protoss_Reaver,
-                                                                BWAPI::UnitTypes::Protoss_Probe};
+std::set<BWAPI::UnitType> ZealotUnit::setPrio;
 
-ZealotUnit::ZealotUnit(BWAPI::Unit* u, UnitsGroup* ug):GroundUnit(u, ug)
+ZealotUnit::ZealotUnit(BWAPI::Unit* u, UnitsGroup* ug)
+: GroundUnit(u, ug)
 {
+    if (setPrio.empty())
+    {
+        setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Firebat);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Zergling);
+    }
 }
 
 ZealotUnit::~ZealotUnit()
@@ -76,7 +79,7 @@ int ZealotUnit::getTimeToAttack()
     return 0;
 }
 
-BWAPI::UnitType* ZealotUnit::getListPriorite()
+std::set<BWAPI::UnitType> ZealotUnit::getSetPrio()
 {
-    return ZealotUnit::listPriorite;
+    return ZealotUnit::setPrio;
 }

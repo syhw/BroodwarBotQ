@@ -1,20 +1,20 @@
 #include "ArchonUnit.h"
 
-std::set<BWAPI::UnitType> ArchonUnit::setUnitsPrio;
+std::set<BWAPI::UnitType> ArchonUnit::setPrio;
 
 ArchonUnit::ArchonUnit(BWAPI::Unit* u, UnitsGroup* ug)
 : GroundUnit(u, ug)
 {
-    if (setUnitsPrio.empty())
+    if (setPrio.empty())
     {
-        setUnitsPrio.insert(BWAPI::UnitTypes::Protoss_Zealot);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Marine);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Firebat);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Medic);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Ghost);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Zerg_Zergling);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Zerg_Mutalisk);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Mutalisk);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Zergling);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Zealot);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Firebat);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Marine);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Medic);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Ghost);
     }
 }
 
@@ -49,7 +49,7 @@ int ArchonUnit::getTimeToAttack()
     return 0;
 }
 
-std::set<BWAPI::UnitType> ArchonUnit::getUnitsPrio()
+std::set<BWAPI::UnitType> ArchonUnit::getSetPrio()
 {
-    return ArchonUnit::setUnitsPrio;
+    return ArchonUnit::setPrio;
 }

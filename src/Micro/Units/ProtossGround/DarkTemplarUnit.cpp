@@ -1,12 +1,18 @@
 #include "DarkTemplarUnit.h"
 
-std::set<BWAPI::UnitType> DarkTemplarUnit::setUnitsPrio;
+std::set<BWAPI::UnitType> DarkTemplarUnit::setPrio;
 
 DarkTemplarUnit::DarkTemplarUnit(BWAPI::Unit* u, UnitsGroup* ug)
 : GroundUnit(u, ug)
 {
-    if (setUnitsPrio.empty())
+    if (setPrio.empty())
     {
+        setPrio.insert(BWAPI::UnitTypes::Terran_Missile_Turret);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Spore_Colony);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Defiler);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode);
     }
 }
 
@@ -41,12 +47,7 @@ int DarkTemplarUnit::getTimeToAttack()
     return 0;
 }
 
-BWAPI::UnitType* DarkTemplarUnit::getListPriorite()
+std::set<BWAPI::UnitType> DarkTemplarUnit::getSetPrio()
 {
-    return DarkTemplarUnit::listPriorite;
-}
-
-std::set<BWAPI::UnitType> DarkTemplarUnit::getUnitsPrio()
-{
-    return DarkTemplarUnit::setUnitsPrio;
+    return DarkTemplarUnit::setPrio;
 }

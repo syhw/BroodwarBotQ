@@ -1,16 +1,16 @@
 #include "CorsairUnit.h"
 
-std::set<BWAPI::UnitType> CorsairUnit::setUnitsPrio;
+std::set<BWAPI::UnitType> CorsairUnit::setPrio;
 
 CorsairUnit::CorsairUnit(BWAPI::Unit* u, UnitsGroup* ug)
 : FlyingUnit(u, ug)
 {
-    if (setUnitsPrio.empty())
+    if (setPrio.empty())
     {
-        setUnitsPrio.insert(BWAPI::UnitTypes::Protoss_Corsair);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Wraith);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Zerg_Mutalisk);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Zerg_Scourge);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Corsair);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Wraith);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Scourge);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Mutalisk);
     }
 }
 
@@ -45,7 +45,7 @@ int CorsairUnit::getTimeToAttack()
     return 0;
 }
 
-std::set<BWAPI::UnitType> CorsairUnit::getUnitsPrio()
+std::set<BWAPI::UnitType> CorsairUnit::getSetPrio()
 {
-    return CorsairUnit::setUnitsPrio;
+    return CorsairUnit::setPrio;
 }

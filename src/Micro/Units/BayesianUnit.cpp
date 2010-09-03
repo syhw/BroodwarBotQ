@@ -35,7 +35,7 @@ using namespace BWAPI;
 #define _PROB_NO_WALL_MOVE 0.9999999
 #define _PROB_NO_BUILDING_MOVE 0.99999
 #define _PROB_GO_OBJ 0.9
-#define _PROB_GO_NOT_VISIBLE 0.4
+///#define _PROB_GO_NOT_VISIBLE 0.4
 
 BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 : BattleUnit(u)
@@ -484,10 +484,10 @@ double BayesianUnit::computeProb(unsigned int i)
     // DAMAGE MAP INFLUENCE
     val *= _damageProb[_damageValues[i]];
 
-    if (!Broodwar->isVisible(tmpTilePos))
-        val *= _PROB_GO_NOT_VISIBLE;
-    else
-        val *= 1.0 - _PROB_GO_NOT_VISIBLE;
+    ///if (!Broodwar->isVisible(tmpTilePos))
+    ///    val *= _PROB_GO_NOT_VISIBLE;
+    ///else
+    ///    val *= 1.0 - _PROB_GO_NOT_VISIBLE;
     //Broodwar->printf("val is %d \n", val);
     return val;
 }
@@ -935,12 +935,18 @@ void BayesianUnit::updateTargetEnemy()
     }
     
     // choose new targetEnemy
-    /// Choose highest priority target
+    /// Choose a priority target in the ones in range in focus fire order
     UnitDmgBimap::right_iterator it;
     for (it = _unitsGroup->unitDamages.right.begin();
         it != _unitsGroup->unitDamages.right.end(); ++it)
     {
-        if (it->second->isBuilding())
+        if (it->second->getType().isBuilding() 
+            && it->second->getType() != BWAPI::UnitTypes::Protoss_Pylon
+            && it->second->getType() != BWAPI::UnitTypes::Protoss_Photon_Cannon
+            && it->second->getType() != BWAPI::UnitTypes::Terran_Bunker
+            && it->second->getType() != BWAPI::UnitTypes::Terran_Missile_Turret
+            && it->second->getType() != BWAPI::UnitTypes::Zerg_Sunken_Colony
+            && it->second->getType() != BWAPI::UnitTypes::Zerg_Spore_Colony)
             continue;
         if (it->second->getType() == BWAPI::UnitTypes::Protoss_High_Templar && it->second->getEnergy() < 60)
             continue;
@@ -956,8 +962,9 @@ void BayesianUnit::updateTargetEnemy()
             continue;
         if (it->second->getType() == BWAPI::UnitTypes::Zerg_Queen && it->second->getEnergy() < 60)
             continue;
-        
-        if (it->first.dmg < it->second->getHitPoints() + it->second->getShields()
+
+        if (getSetPrio().count(it->second->getType())
+            && it->first.dmg < it->second->getHitPoints() + it->second->getShields()
             && (
             (!it->second->getType().isFlyer() && _unitPos.getDistance(it->second->getPosition())
             < (double)unit->getType().groundWeapon().maxRange() + addRangeGround()) 
@@ -969,13 +976,31 @@ void BayesianUnit::updateTargetEnemy()
             return;
         }
     }
-    /// Focus fire
+    /// Focus fire || achieve dying units
     for (it = _unitsGroup->unitDamages.right.begin();
         it != _unitsGroup->unitDamages.right.end(); ++it)
     {
-        if (it->first.dmg == 0) // iterate on the interesting part only
-            break;
+        if (it->second->getType().isBuilding() 
+            && it->second->getType() != BWAPI::UnitTypes::Protoss_Pylon
+            && it->second->getType() != BWAPI::UnitTypes::Protoss_Photon_Cannon
+            && it->second->getType() != BWAPI::UnitTypes::Terran_Bunker
+            && it->second->getType() != BWAPI::UnitTypes::Terran_Missile_Turret
+            && it->second->getType() != BWAPI::UnitTypes::Zerg_Sunken_Colony
+            && it->second->getType() != BWAPI::UnitTypes::Zerg_Spore_Colony)
+            continue;
         if (it->first.dmg < it->second->getHitPoints() + it->second->getShields()
+            && (
+            (!it->second->getType().isFlyer() && _unitPos.getDistance(it->second->getPosition())
+            < (double)unit->getType().groundWeapon().maxRange() + addRangeGround()) 
+            || (it->second->getType().isFlyer() && _unitPos.getDistance(it->second->getPosition())
+            < (double)unit->getType().groundWeapon().maxRange() + addRangeAir())
+            ))
+        {
+            setTargetEnemy(it->second);
+            return;
+        }
+        if (it->first.dmg == 0 
+            && (computeDmg(it->second) >= (it->second->getHitPoints() + it->second->getShields()))
             && (
             (!it->second->getType().isFlyer() && _unitPos.getDistance(it->second->getPosition())
             < (double)unit->getType().groundWeapon().maxRange() + addRangeGround()) 
@@ -1395,6 +1420,14 @@ void BayesianUnit::update()
         break;
 
     case MODE_FIGHT_G:
+        if (_unitsGroup->enemies.empty())
+        {
+            if (_unitsGroup->size() < 23)
+                this->switchMode(MODE_FLOCK);
+            else 
+                this->switchMode(MODE_MOVE);
+            return;
+        }
         micro();
         break;
 

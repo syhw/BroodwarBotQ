@@ -7,7 +7,7 @@ using namespace BWAPI;
 
 int DragoonUnit::addRange;
 
-std::set<BWAPI::UnitType> DragoonUnit::setUnitsPrio;
+std::set<BWAPI::UnitType> DragoonUnit::setPrio;
 
 DragoonUnit::DragoonUnit(BWAPI::Unit* u, UnitsGroup* ug)
 :GroundUnit(u, ug)
@@ -18,18 +18,18 @@ DragoonUnit::DragoonUnit(BWAPI::Unit* u, UnitsGroup* ug)
         addRange = 0;
     _attackDuration += 8; // not static for the moment TODO
 
-    if (setUnitsPrio.empty())
+    if (setPrio.empty())
     {
-        setUnitsPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Protoss_Arbiter);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Protoss_Dark_Archon);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Protoss_Carrier);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Vulture_Spider_Mine);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Science_Vessel);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Zerg_Lurker);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Zerg_Defiler);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Vulture_Spider_Mine);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Lurker);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Observer);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Dark_Archon);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Carrier);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Science_Vessel);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Defiler);
     }
 }
 
@@ -49,14 +49,6 @@ int DragoonUnit::addRangeAir()
 
 void DragoonUnit::micro()
 {
-    if (_unitsGroup->enemies.empty())
-    {
-        if (_unitsGroup->size() < 23)
-            this->switchMode(MODE_FLOCK);
-        else 
-            this->switchMode(MODE_MOVE);
-        return;
-    }
     if (targetEnemy != NULL && !(targetEnemy->exists()))
     {
         updateRangeEnemies();
@@ -118,7 +110,7 @@ int DragoonUnit::getTimeToAttack()
     return 8;
 }
 
-std::set<BWAPI::UnitType> DragoonUnit::getUnitsPrio()
+std::set<BWAPI::UnitType> DragoonUnit::getSetPrio()
 {
-    return DragoonUnit::setUnitsPrio;
+    return DragoonUnit::setPrio;
 }

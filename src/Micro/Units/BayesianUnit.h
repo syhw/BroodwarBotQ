@@ -190,5 +190,5 @@ public:
     virtual int damagesOn(BWAPI::Unit* enemy) = 0;
     virtual int getTimeToAttack() = 0;
     virtual bool withinRange(BWAPI::Unit* enemy) = 0;
-    virtual std::set<BWAPI::UnitType> getUnitsPrio() = 0;
+    virtual std::set<BWAPI::UnitType> getSetPrio() = 0;
 };

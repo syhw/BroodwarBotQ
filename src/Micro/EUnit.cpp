@@ -41,7 +41,7 @@ int EUnit::getPrio(pBayesianUnit u)
     int hpAfter = m_hp - m_damageTaken;
     val += hpAfter/u->damagesOn(m_self);
     
-    BWAPI::UnitType* tab = u->getListPriorite();
+    BWAPI::UnitType* tab = u->getSetPriorite();
     for (unsigned int i = 0; i < NUMBER_OF_PRIORITY; i++)
         if (tab[i] == m_self->getType())
             val += i;

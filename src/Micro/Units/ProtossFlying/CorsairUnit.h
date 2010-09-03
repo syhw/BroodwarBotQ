@@ -6,7 +6,7 @@
 class CorsairUnit : public FlyingUnit
 {
 protected:
-    static std::set<BWAPI::UnitType> setUnitsPrio;
+    static std::set<BWAPI::UnitType> setPrio;
 public:
     CorsairUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~CorsairUnit();
@@ -14,5 +14,5 @@ public:
     virtual void check();
     virtual bool canHit(BWAPI::Unit* enemy);
     virtual int getTimeToAttack();
-    virtual std::set<BWAPI::UnitType> getUnitsPrio();
+    virtual std::set<BWAPI::UnitType> getSetPrio();
 };

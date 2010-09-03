@@ -1,11 +1,5 @@
 #include "ProbeUnit.h"
 
-BWAPI::UnitType ProbeUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes::Protoss_High_Templar,
-                                                                BWAPI::UnitTypes::Protoss_Dragoon,
-                                                                BWAPI::UnitTypes::Protoss_Reaver,
-                                                                BWAPI::UnitTypes::Protoss_Zealot,
-                                                                BWAPI::UnitTypes::Protoss_Probe};
-
 ProbeUnit::ProbeUnit(BWAPI::Unit* u, UnitsGroup* ug):GroundUnit(u, ug)
 {
 }
@@ -41,7 +35,7 @@ int ProbeUnit::getTimeToAttack()
     return 0;
 }
 
-BWAPI::UnitType* ProbeUnit::getListPriorite()
+std::set<BWAPI::UnitType> ProbeUnit::getSetPrio()
 {
-    return ProbeUnit::listPriorite;
+    return std::set<BWAPI::UnitType>();
 }

@@ -1,30 +1,30 @@
 #include "CarrierUnit.h"
 
-std::set<BWAPI::UnitType> CarrierUnit::setUnitsPrio;
+std::set<BWAPI::UnitType> CarrierUnit::setPrio;
 
 CarrierUnit::CarrierUnit(BWAPI::Unit* u, UnitsGroup* ug)
 : FlyingUnit(u, ug)
 {
-    if (setUnitsPrio.empty())
+    if (setPrio.empty())
     {
-        setUnitsPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Protoss_Corsair);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Protoss_Scout);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Protoss_Dragoon);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Protoss_Archon);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Protoss_Carrier);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Marine);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Ghost);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Wraith);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Valkyrie);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Science_Vessel);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Battlecruiser);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Terran_Goliath);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Zerg_Hydralisk);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Zerg_Mutalisk);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Zerg_Devourer);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Zerg_Scourge);
-        setUnitsPrio.insert(BWAPI::UnitTypes::Zerg_Defiler);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Corsair);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Scout);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Dragoon);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Archon);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Carrier);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Marine);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Ghost);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Wraith);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Valkyrie);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Science_Vessel);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Battlecruiser);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Goliath);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Hydralisk);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Mutalisk);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Devourer);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Scourge);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Defiler);
     }
 }
 
@@ -59,7 +59,7 @@ int CarrierUnit::getTimeToAttack()
     return 0;
 }
 
-std::set<BWAPI::UnitType> CarrierUnit::getUnitsPrio()
+std::set<BWAPI::UnitType> CarrierUnit::getSetPrio()
 {
-    return CarrierUnit::setUnitsPrio;
+    return CarrierUnit::setPrio;
 }
