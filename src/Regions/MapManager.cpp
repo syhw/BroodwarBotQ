@@ -1,4 +1,5 @@
 #pragma once
+#include <Defines.h>
 #include "MapManager.h"
 #include "UnitGroupManager.h"
 #include <stdio.h>
@@ -194,6 +195,15 @@ void MapManager::removeDmg(UnitType ut, Position p)
     }
 }
 
+void MapManager::removeDmg(BulletType bt, Position p)
+{
+    if (bt == BWAPI::BulletTypes::Psionic_Storm)
+    {
+        modifyDamages(this->groundDamages, p, 0, 63, -50);
+        modifyDamages(this->airDamages, p, 0, 63, -50);
+    }
+}
+
 void MapManager::addDmg(UnitType ut, Position p)
 { 
     if (ut.groundWeapon() != BWAPI::WeaponTypes::None)
@@ -209,6 +219,15 @@ void MapManager::addDmg(UnitType ut, Position p)
         modifyDamages(this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange() + addRange, 
             ut.airWeapon().damageAmount() * ut.maxAirHits());
         //updateDamagesGrad(this->airDamagesGrad, this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange() + addRange);
+    }
+}
+
+void MapManager::addDmg(BulletType bt, Position p)
+{
+    if (bt == BWAPI::BulletTypes::Psionic_Storm)
+    {
+        modifyDamages(this->groundDamages, p, 0, 63, 50);
+        modifyDamages(this->airDamages, p, 0, 63, 50);
     }
 }
 
@@ -264,31 +283,10 @@ void MapManager::onUnitHide(Unit* u)
 
 void MapManager::onFrame()
 {
+#ifdef __DEBUG_GABRIEL__
+    clock_t start = clock();
+#endif
     // check/update the damage maps. BEWARE: hidden units are not removed in presence of doubt!
-        clock_t start = clock();
-    std::map<BWAPI::Unit*, EViewedUnit> tmp = _eUnitsFilter->getViewedUnits();
-    //std::map<BWAPI::Unit*, EViewedUnit> tmp = _eUnitsFilter->_eViewedUnits;
-    for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = tmp.begin();
-        it != tmp.end(); ++it)
-    {
-        if (it->first->isVisible() 
-            && it->first->exists()
-            && !it->first->getType().isWorker() // TODO/TOCHANGE
-            && _trackedUnits[it->first] != it->first->getPosition())
-        {
-            // update EUnitsFilter
-            _eUnitsFilter->update(it->first);
-            // update the map
-            addDmg(it->first->getType(), it->first->getPosition());
-            removeDmg(it->first->getType(), _trackedUnits[it->first]);
-            _trackedUnits[it->first] = it->first->getPosition();
-        }
-    }
-        clock_t end = clock();
-        if (end - start > 0.00000001)
-            Broodwar->printf("copying: %2.7f", (double)(end - start));
-        start = clock();
-
     for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = _eUnitsFilter->getViewedUnits().begin();
         it != _eUnitsFilter->getViewedUnits().end(); ++it)
     {
@@ -306,30 +304,38 @@ void MapManager::onFrame()
         }
     }
 
-        end = clock();
-        if (end - start > 0.00000001)
-            Broodwar->printf("accessing: %2.7f", (double)(end - start));
-
-    std::set<BWAPI::Bullet*> tmpBullets = Broodwar->getBullets();
-    for (std::set<Bullet*>::const_iterator it = tmpBullets.begin();
-        it != tmpBullets.end(); ++it)
-    {
-        if ((*it)->getType() == BWAPI::BulletTypes::Psionic_Storm && (*it)->exists())
-        {
-            _trackedBullets.push_back(*it);
-        }
-    }
-
     for (std::set<Bullet*>::const_iterator it = Broodwar->getBullets().begin();
         it != Broodwar->getBullets().end(); ++it)
     {
-        if ((*it)->getType() == BWAPI::BulletTypes::Psionic_Storm && (*it)->exists())
+        if ((*it)->getType() == BWAPI::BulletTypes::Psionic_Storm)
         {
-            _trackedBullets.push_back(*it);
+            if ((*it)->exists() && !_trackedStorms.count(*it))
+            {
+                _trackedStorms.insert(std::make_pair<Bullet*, Position>(*it, (*it)->getPosition()));
+                addDmg(BWAPI::BulletTypes::Psionic_Storm, (*it)->getPosition());                
+            }
+
         }
     }
+    for (std::map<Bullet*, Position>::iterator it = _trackedStorms.begin();
+        it != _trackedStorms.end(); )
+    {
+        if (!it->first->exists())
+        {
+            removeDmg(BWAPI::BulletTypes::Psionic_Storm, it->second);
+            std::map<Bullet*, Position>::iterator tmp = it;
+            ++it;
+            _trackedStorms.erase(tmp->first);
+        }
+        else
+            ++it;
+    }
 
-
+#ifdef __DEBUG_GABRIEL__
+    clock_t end = clock();
+    if ((double)(end - start) > 0.1)
+        Broodwar->printf("MapManager::onFrame() took: %f", (double)(end-start));
+#endif
     this->drawGroundDamagesGrad();
     this->drawGroundDamages();
 }

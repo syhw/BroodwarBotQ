@@ -19,7 +19,7 @@ class MapManager: public CSingleton<MapManager>
 private:
     EUnitsFilter* _eUnitsFilter;
     std::map<BWAPI::Unit*, BWAPI::Position> _trackedUnits;
-    std::list<BWAPI::Bullet*> _trackedBullets;
+    std::map<BWAPI::Bullet*, BWAPI::Position> _trackedStorms;
     MapManager();
     ~MapManager();
     int _width;
@@ -32,7 +32,9 @@ private:
     inline void modifyDamages(int* tab, Position p, int minRadius, int maxRadius, int damages);
     inline void updateDamagesGrad(Vec* grad, int* tab, Position p, int minRadius, int maxRadius);
     inline void removeDmg(BWAPI::UnitType ut, BWAPI::Position p);
+    inline void removeDmg(BWAPI::BulletType bt, BWAPI::Position p);
     inline void addDmg(BWAPI::UnitType ut, BWAPI::Position p);
+    inline void addDmg(BWAPI::BulletType bt, BWAPI::Position p);
     inline int additionalRangeGround(BWAPI::UnitType ut);
     inline int additionalRangeAir(BWAPI::UnitType ut);
 public:
