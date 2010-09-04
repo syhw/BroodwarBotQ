@@ -195,13 +195,12 @@ void MapManager::removeDmg(UnitType ut, Position p)
     }
 }
 
-void MapManager::removeDmg(BulletType bt, Position p)
+void MapManager::removeDmgStorm(Position p)
 {
-    if (bt == BWAPI::BulletTypes::Psionic_Storm)
-    {
-        modifyDamages(this->groundDamages, p, 0, 63, -50);
-        modifyDamages(this->airDamages, p, 0, 63, -50);
-    }
+    modifyDamages(this->groundDamages, p, 0, 63, -50);
+    modifyDamages(this->airDamages, p, 0, 63, -50);
+    updateDamagesGrad(this->groundDamagesGrad, this->groundDamages, p, 0, 63);
+    updateDamagesGrad(this->airDamagesGrad, this->airDamages, p, 0, 63);
 }
 
 void MapManager::addDmg(UnitType ut, Position p)
@@ -222,13 +221,10 @@ void MapManager::addDmg(UnitType ut, Position p)
     }
 }
 
-void MapManager::addDmg(BulletType bt, Position p)
+void MapManager::addDmgStorm(Position p)
 {
-    if (bt == BWAPI::BulletTypes::Psionic_Storm)
-    {
-        modifyDamages(this->groundDamages, p, 0, 63, 50);
-        modifyDamages(this->airDamages, p, 0, 63, 50);
-    }
+    modifyDamages(this->groundDamages, p, 0, 63, 50);
+    modifyDamages(this->airDamages, p, 0, 63, 50);
 }
 
 int MapManager::additionalRangeGround(UnitType ut)
@@ -312,7 +308,7 @@ void MapManager::onFrame()
             if ((*it)->exists() && !_trackedStorms.count(*it))
             {
                 _trackedStorms.insert(std::make_pair<Bullet*, Position>(*it, (*it)->getPosition()));
-                addDmg(BWAPI::BulletTypes::Psionic_Storm, (*it)->getPosition());                
+                addDmgStorm((*it)->getPosition());                
             }
 
         }
@@ -322,7 +318,7 @@ void MapManager::onFrame()
     {
         if (!it->first->exists())
         {
-            removeDmg(BWAPI::BulletTypes::Psionic_Storm, it->second);
+            removeDmgStorm(it->second);
             std::map<Bullet*, Position>::iterator tmp = it;
             ++it;
             _trackedStorms.erase(tmp->first);
