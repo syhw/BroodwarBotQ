@@ -201,16 +201,16 @@ void MapManager::removeDmg(UnitType ut, Position p)
     if (ut.groundWeapon() != BWAPI::WeaponTypes::None)
     {
         int addRange = additionalRangeGround(ut);
-        modifyDamages(this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange() + addRange, 
+        modifyDamages(this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange() + addRange + ut.dimensionRight() + ut.dimensionLeft(), 
             - ut.groundWeapon().damageAmount() * ut.maxGroundHits());
-        updateDamagesGrad(this->groundDamagesGrad, this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange() + addRange);
+        updateDamagesGrad(this->groundDamagesGrad, this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange() + addRange + ut.dimensionRight() + ut.dimensionLeft());
     }
     if (ut.airWeapon() != BWAPI::WeaponTypes::None)
     {
         int addRange = additionalRangeAir(ut);
-        modifyDamages(this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange() + addRange, 
+        modifyDamages(this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange() + addRange + ut.dimensionRight() + ut.dimensionLeft(), 
             - ut.airWeapon().damageAmount() * ut.maxAirHits());
-        updateDamagesGrad(this->airDamagesGrad, this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange() + addRange);
+        updateDamagesGrad(this->airDamagesGrad, this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange() + addRange + ut.dimensionRight() + ut.dimensionLeft());
     }
 }
 
@@ -227,14 +227,14 @@ void MapManager::addDmg(UnitType ut, Position p)
     if (ut.groundWeapon() != BWAPI::WeaponTypes::None)
     {
         int addRange = additionalRangeGround(ut);
-        modifyDamages(this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange() + addRange, 
+        modifyDamages(this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange() + addRange + ut.dimensionRight() + ut.dimensionLeft(), 
             ut.groundWeapon().damageAmount() * ut.maxGroundHits());
         //updateDamagesGrad(this->groundDamagesGrad, this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange() + addRange);
     }
     if (ut.airWeapon() != BWAPI::WeaponTypes::None)
     {
         int addRange = additionalRangeAir(ut);
-        modifyDamages(this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange() + addRange, 
+        modifyDamages(this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange() + addRange + ut.dimensionRight() + ut.dimensionLeft(), 
             ut.airWeapon().damageAmount() * ut.maxAirHits());
         //updateDamagesGrad(this->airDamagesGrad, this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange() + addRange);
     }
@@ -486,7 +486,15 @@ void MapManager::onFrame()
             //Broodwar->printf("Creating a thread");
             stormPos = _stormPosBuf;
             _alliedUnitsPosBuf = _ourUnits;
-            _enemyUnitsPosBuf = _trackedUnits;
+            // _enemyUnitsPosBuf = _trackedUnits;
+            // TODO do better, like update a _trackedUnitsNoBuildings them memcopy (copy constructor)
+            _enemyUnitsPosBuf.clear();
+            for (std::map<Unit*, Position>::const_iterator it = _trackedUnits.begin();
+                it != _trackedUnits.end(); ++it)
+            {
+                if (!(it->first->getType().isBuilding()))
+                    _enemyUnitsPosBuf.insert(std::make_pair<Unit*, Position>(it->first, it->second));
+            }
             _dontReStorm.clear();
             for (std::map<Bullet*, Position>::const_iterator it = _trackedStorms.begin();
                 it != _trackedStorms.end(); ++it)
