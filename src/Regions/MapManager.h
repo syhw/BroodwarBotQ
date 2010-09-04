@@ -26,10 +26,10 @@ private:
     std::map<BWAPI::Bullet*, BWAPI::Position> _trackedStorms;
     HANDLE _stormPosMutex;
     std::map<Position, int> _stormPosBuf;
+    std::set<BWAPI::Position> _dontReStorm;
     std::multimap<double, BWAPI::Unit*> _rangeEnemiesBuf;
     std::map<BWAPI::Unit*, BWAPI::Position> _alliedUnitsPosBuf;
     std::map<BWAPI::Unit*, BWAPI::Position> _enemyUnitsPosBuf;
-    std::map<BWAPI::Bullet*, BWAPI::Position> _trackedStormsBuf;
     static DWORD WINAPI StaticLaunchUpdateStormPos(void* obj);
     DWORD LaunchUpdateStormPos();
     inline void updateStormPos();
@@ -73,13 +73,14 @@ public:
     const std::map<BWAPI::Unit*, BWAPI::Position> & getOurUnits();
     const std::map<BWAPI::Unit*, BWAPI::Position> & getTrackedUnits();
     const std::map<BWAPI::Bullet*, BWAPI::Position> & getTrackedStorms();
-    void drawBuildings();   // debug
-    void drawBuildingsStrict();   // debug
-    void drawWalkability(); // debug
-    void drawLowResWalkability(); // debug
-    void drawLowResBuildings(); // debug
-    void drawGroundDamages(); // debug
-    void drawAirDamages(); // debug
-    void drawGroundDamagesGrad(); // debug
-    void drawAirDamagesGrad(); // debug
+    void drawBuildings();           // debug
+    void drawBuildingsStrict();     // debug
+    void drawWalkability();         // debug
+    void drawLowResWalkability();   // debug
+    void drawLowResBuildings();     // debug
+    void drawGroundDamages();       // debug
+    void drawAirDamages();          // debug
+    void drawGroundDamagesGrad();   // debug
+    void drawAirDamagesGrad();      // debug
+    void drawBestStorms();          // debug
 };

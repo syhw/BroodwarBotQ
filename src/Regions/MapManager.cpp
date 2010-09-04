@@ -356,46 +356,38 @@ void MapManager::updateStormPos()
             possiblePos.insert(Position(tmpPos.x() - 32, tmpPos.y() + 32));
         }
     }
-    if (possiblePos.empty())
-        Broodwar->printf("Possible Pos EMPTY");
-    if (_alliedUnitsPosBuf.empty())
-        Broodwar->printf("allied Pos EMPTY");
-    if (_enemyUnitsPosBuf.empty())
-        Broodwar->printf("enemy Pos EMPTY");
+    //std::map<int, Position> storms;
     for (std::set<Position>::const_iterator it = possiblePos.begin();
         it != possiblePos.end(); ++it)
     {
+        if (_dontReStorm.count(*it))
+            continue;
         int tmp = 0;
         for (std::map<BWAPI::Unit*, BWAPI::Position>::const_iterator uit = _alliedUnitsPosBuf.begin();
             uit != _alliedUnitsPosBuf.end(); ++uit)
         {
-            //if ((*uit)->unit->getDistance(*it) < 32.0+16.0+5.0) // TO CHANGE TOCHANGE 5.0 to account for the diag
-            //    --tmp;
             Vec dist(it->x() - uit->second.x(), it->y() - uit->second.y());
-            if (dist.norm() < 32.0 + 16.0 + 5.0)
+            if (dist.norm() < 32.0 + 16.0 + 15.0) // TODO TOCHANGE 5.0 
                 tmp -= 2;
         }
         for (std::map<BWAPI::Unit*, BWAPI::Position>::const_iterator eit = _enemyUnitsPosBuf.begin();
             eit != _enemyUnitsPosBuf.end(); ++eit)
         {
             Vec dist(it->x() - eit->second.x(), it->y() - eit->second.y());
-            if (dist.norm() < 32.0 + 16.0 + 5.0)
+            if (dist.norm() < 32.0 + 16.0 + 5.0) // TODO TOCHANGE 5.0
                 ++tmp;
-            //if (dist.norm() < 32.0 + 16.0 + 5.0)
-            //    Broodwar->printf("Distance to storm %f", dist.norm());
-            //if ((*eit)->getDistance(*it) < 32.0+16.0+5.0) // TO CHANGE TOCHANGE 5.0 to account for the diag
-            //    ++tmp;
-            //if (!((*eit)->isVisible())) // Lurkers and other sneakers
-            //    ++tmp;
         }
         if (tmp > 0)
         {
-            Broodwar->printf("inserting storm score: %d at (%d, %d)", tmp, it->x(), it->y());
+            //storms.insert(std::make_pair<int, Position>(tmp, *it));
             _stormPosBuf.insert(std::make_pair<Position, int>(*it, tmp));
         }
     }
-    //if (_stormPosBuf.empty())
-    //    Broodwar->printf("storm pos buf EMPTY");
+    //for (std::map<int, Position>::const_reverse_iterator it = storms.rbegin();
+    //    it != storms.rend(); ++it)
+    //{
+    //    _stormPosBuf.insert(std::make_pair<Position, int>(*it, tmp));
+    //}
     return;
 }
 
@@ -410,7 +402,6 @@ void MapManager::onFrame()
     {
         _ourUnits[it->first] = it->first->getPosition();
     }
-    Broodwar->printf("Our units size %d", _ourUnits.size());
 
     // check/update the damage maps. BEWARE: hidden units are not removed in presence of doubt!
     for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = _eUnitsFilter->getViewedUnits().begin();
@@ -459,23 +450,27 @@ void MapManager::onFrame()
     // update the possible storms positions
     if (WaitForSingleObject(_stormPosMutex, 0) == WAIT_OBJECT_0) // cannot enter when the thread is running
     {
-        //Broodwar->drawBoxMap(_bestStormPos.first.x() - 48, _bestStormPos.first.x() + 48,
-        //    _bestStormPos.first.y() - 48, _bestStormPos.first.y() + 48, BWAPI::Colors::Purple);
         //Broodwar->printf("Creating a thread");
         stormPos = _stormPosBuf;
         _alliedUnitsPosBuf = _ourUnits;
         _enemyUnitsPosBuf = _trackedUnits;
-        _trackedStormsBuf = _trackedStorms;
-        updateStormPos();
-        /*DWORD threadId;
+        _dontReStorm.clear();
+        for (std::map<Bullet*, Position>::const_iterator it = _trackedStorms.begin();
+            it != _trackedStorms.end(); ++it)
+        {
+            if (it->first->exists() && it->first->getRemoveTimer() > 60)
+                _dontReStorm.insert(it->second);
+        }
+        //updateStormPos();
+        DWORD threadId;
         HANDLE thread = CreateThread( 
-        NULL,                   // default security attributes
-        0,                      // use default stack size  
-        &MapManager::StaticUpdateStormPos,      // thread function name
-        (void*) this,                   // argument to thread function 
-        0,                      // use default creation flags 
-        &threadId);             // returns the thread identifier 
-        CloseHandle(thread);*/
+            NULL,                   // default security attributes
+            0,                      // use default stack size  
+            &MapManager::StaticLaunchUpdateStormPos,      // thread function name
+            (void*) this,                   // argument to thread function 
+            0,                      // use default creation flags 
+            &threadId);             // returns the thread identifier 
+        CloseHandle(thread);
     }
     ReleaseMutex(_stormPosMutex);
 
@@ -486,6 +481,7 @@ void MapManager::onFrame()
 #endif
     this->drawGroundDamagesGrad();
     this->drawGroundDamages();
+    this->drawBestStorms();
 }
 
 const std::map<BWAPI::Unit*, BWAPI::Position>& MapManager::getOurUnits()
@@ -656,4 +652,13 @@ void MapManager::drawAirDamagesGrad()
                 Broodwar->drawLineMap(tmpPos.x(), tmpPos.y(), tmp.translate(tmpPos).x(), tmp.translate(tmpPos).y(), Colors::Red);
             }
         }
+}
+
+void MapManager::drawBestStorms()
+{
+    for (std::map<Position, int>::const_iterator it = stormPos.begin();
+        it != stormPos.end(); ++it)
+    {
+        Broodwar->drawBoxMap(it->first.x() - 48, it->first.y() - 48, it->first.x() + 48, it->first.y() + 48, BWAPI::Colors::Purple);
+    }
 }
