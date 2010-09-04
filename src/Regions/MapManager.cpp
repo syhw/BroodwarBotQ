@@ -452,7 +452,16 @@ void MapManager::onFrame()
                 _trackedStorms.insert(std::make_pair<Bullet*, Position>(*it, (*it)->getPosition()));
                 addDmgStorm((*it)->getPosition());                
             }
+        }
+        else if ((*it)->getType() == BWAPI::BulletTypes::Subterranean_Spines)
+        {
 
+        }
+        else if ((*it)->getType() == BWAPI::BulletTypes::Plague_Cloud)
+        {
+        }
+        else if ((*it)->getType() == BWAPI::BulletTypes::Invisible)
+        {
         }
     }
     for (std::map<Bullet*, Position>::iterator it = _trackedStorms.begin();

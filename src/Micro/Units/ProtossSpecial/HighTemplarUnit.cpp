@@ -28,7 +28,7 @@ void HighTemplarUnit::micro()
                 bestStormPos = it->first;
             }
         }
-        if (bestScore > 0)
+        if (bestScore > 1 || (_unitsGroup->enemies.size() == 1 && bestScore == 1)) // TOCHANGE bestScore > 1 => > 2 ??
         {
             unit->useTech(BWAPI::TechTypes::Psionic_Storm, bestStormPos);
             _mapManager->stormPos.erase(bestStormPos);
