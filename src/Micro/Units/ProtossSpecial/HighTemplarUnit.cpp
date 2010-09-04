@@ -11,20 +11,33 @@ HighTemplarUnit::~HighTemplarUnit()
 
 std::pair<BWAPI::Position, int> HighTemplarUnit::bestStormPos()
 {
+    updateRangeEnemies();
+    std::set<Unit*> stormableUnits;
     std::set<Position> possiblePos;
     for (std::multimap<double, BWAPI::Unit*>::const_iterator it = _rangeEnemies.begin();
         it != _rangeEnemies.end(); ++it)
     {
-        Position tmpPos = it->second->getPosition();
-        possiblePos.insert(tmpPos);
-        possiblePos.insert(Position(tmpPos.x() - 32, tmpPos.y()));
-        possiblePos.insert(Position(tmpPos.x() + 32, tmpPos.y()));
-        possiblePos.insert(Position(tmpPos.x(), tmpPos.y() - 32));
-        possiblePos.insert(Position(tmpPos.x(), tmpPos.y() + 32));
-        possiblePos.insert(Position(tmpPos.x() - 32, tmpPos.y() - 32));
-        possiblePos.insert(Position(tmpPos.x() + 32, tmpPos.y() + 32));
-        possiblePos.insert(Position(tmpPos.x() + 32, tmpPos.y() - 32));
-        possiblePos.insert(Position(tmpPos.x() - 32, tmpPos.y() + 32));
+        if (it->first < 415.0) // TOCHANGE 415, sup approx of 9(storm range)x46(diag tile)
+            stormableUnits.insert(it->second);
+    }
+    for (std::set<Unit*>::const_iterator it = stormableUnits.begin();
+        it != stormableUnits.end(); ++it)
+    {
+        Position tmpPos = (*it)->getPosition();
+        if (stormableUnits.size() > 16) // TOCHANGE 16 units
+            possiblePos.insert(tmpPos);
+        else
+        {
+            possiblePos.insert(tmpPos);
+            possiblePos.insert(Position(tmpPos.x() - 32, tmpPos.y()));
+            possiblePos.insert(Position(tmpPos.x() + 32, tmpPos.y()));
+            possiblePos.insert(Position(tmpPos.x(), tmpPos.y() - 32));
+            possiblePos.insert(Position(tmpPos.x(), tmpPos.y() + 32));
+            possiblePos.insert(Position(tmpPos.x() - 32, tmpPos.y() - 32));
+            possiblePos.insert(Position(tmpPos.x() + 32, tmpPos.y() + 32));
+            possiblePos.insert(Position(tmpPos.x() + 32, tmpPos.y() - 32));
+            possiblePos.insert(Position(tmpPos.x() - 32, tmpPos.y() + 32));
+        }
     }
     Position bestPos;
     int max = -1000000;
@@ -35,13 +48,15 @@ std::pair<BWAPI::Position, int> HighTemplarUnit::bestStormPos()
         for (std::vector<pBayesianUnit>::const_iterator uit = _unitsGroup->units.begin();
             uit != _unitsGroup->units.end(); ++uit)
         {
-            if ((*uit)->unit->getDistance(*it) < 32.0+16.0+5.0)
+            if ((*uit)->unit->getDistance(*it) < 32.0+16.0+5.0) // TO CHANGE TOCHANGE 5.0 to account for the diag
                 --tmp;
         }
         for (std::set<BWAPI::Unit*>::const_iterator eit = _unitsGroup->enemies.begin();
             eit != _unitsGroup->enemies.end(); ++eit)
         {
-            if ((*eit)->getDistance(*it) < 32.0+16.0+5.0)
+            if ((*eit)->getDistance(*it) < 32.0+16.0+5.0) // TO CHANGE TOCHANGE 5.0 to account for the diag
+                ++tmp;
+            if (!((*eit)->isVisible())) // Lurkers and other sneakers
                 ++tmp;
         }
         if (tmp > max)
@@ -57,9 +72,8 @@ void HighTemplarUnit::micro()
 {
     if (this->unit->getEnergy() >= 75)
     {
-        updateRangeEnemies();
         std::pair<Position, int> p = bestStormPos();
-        if (p.second > 2)
+        if (p.second > 1)
             unit->useTech(BWAPI::TechTypes::Psionic_Storm, p.first);
     }
     else if (_fleeing || this->unit->getEnergy() < 74)

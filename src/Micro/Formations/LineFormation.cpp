@@ -55,6 +55,7 @@ void LineFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
         else
         {
             ++_lines;
+
             //computeToPositions(vUnits);
             topos.makeValid();
             end_positions.push_back(topos);

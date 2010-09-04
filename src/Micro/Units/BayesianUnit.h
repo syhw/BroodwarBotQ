@@ -95,6 +95,7 @@ protected:
     int _lastAttackOrder;
     int _lastClickFrame;
     double _maxDiag;
+    int _maxWeaponsRange;
     BWAPI::Position _lastRightClick, _posAtMost13FramesAgo, _posAtMost23FramesAgo;
     bool _iThinkImBlocked;
     int _lastTotalHP;
@@ -145,6 +146,7 @@ protected:
     void updateTargetEnemy();
     inline void setTargetEnemy(BWAPI::Unit* u);
     inline int computeDmg(BWAPI::Unit* u);
+    bool inRange(BWAPI::Unit* u);
     void drawDirV();
     void updateObj();
     void drawObj(int number=0);
@@ -167,6 +169,7 @@ protected:
     inline void selectDir(const Vec& criterium);
     virtual int addRangeGround();
     virtual int addRangeAir();
+    void attackEnemyUnit(BWAPI::Unit* u);
     void drawProbs(std::multimap<double, Vec>& probs, int number=0);
     unit_mode _mode;
 public:

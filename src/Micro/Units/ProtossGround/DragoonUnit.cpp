@@ -53,8 +53,7 @@ void DragoonUnit::micro()
     {
         updateRangeEnemies();
         updateTargetEnemy();
-        unit->rightClick(targetEnemy);
-        _lastAttackOrder = Broodwar->getFrameCount();
+        attackEnemyUnit(targetEnemy);
     }
     else
     {
@@ -64,18 +63,15 @@ void DragoonUnit::micro()
             {
                 updateRangeEnemies();
                 updateTargetEnemy();
-                if (targetEnemy) 
-                    unit->rightClick(targetEnemy);
-                //unit->attackUnit(targetEnemy); // rightClick seems better b/c attackUnit sometimes stuck unit...
-                _lastAttackOrder = Broodwar->getFrameCount();
+                attackEnemyUnit(targetEnemy);
             }
             else if (_fleeing || _lastTotalHP - (unit->getShields() + unit->getHitPoints()) > 0)
             {
-                flee();
+                //flee();
             }
             else if (!unit->isMoving() && targetEnemy != NULL)
             {
-                ///fightMove();
+                //fightMove();
                 //switchMode(MODE_INPOS); // TODO
                 //updateDir();
                 //clickDir();

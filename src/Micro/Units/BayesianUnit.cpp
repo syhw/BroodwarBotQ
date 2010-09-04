@@ -12,7 +12,7 @@
 
 //#define __OUR_PATHFINDER__
 #define __EXACT_OBJ__
-
+#define __NOT_IN_RANGE_BY__ 46.0
 
 using namespace std;
 using namespace BWAPI;
@@ -51,6 +51,7 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 , _maxDimension(max(_slarge, _sheight))
 , _minDimension(min(_slarge, _sheight))
 , _maxDiag(sqrt((double)(_slarge*_slarge + _sheight*_sheight)))
+, _maxWeaponsRange(max(unit->getType().groundWeapon().maxRange(), unit->getType().airWeapon().maxRange()))
 , _lastRightClick(unit->getPosition())
 , _lastAttackOrder(0)
 , _lastClickFrame(0)
@@ -423,19 +424,20 @@ double BayesianUnit::computeProb(unsigned int i)
         }
     }
 
+    if (_mode == MODE_INPOS)
+    {
+        double prob_obj = _PROB_GO_OBJ;
+        if (_dirv[i] != obj)
+        {
+            Position tmp = _dirv[i].translate(_unitPos);
+            Position tmp_obj = obj.translate(_unitPos);
+            double mult = (1.0 / (tmp.getDistance(tmp_obj)/11.32) < 1.0) ? (1.0 / (tmp.getDistance(tmp_obj)/11.32)) : 1.0;
+            val *= mult;
+        }
+    }
+
     if (_mode != MODE_FLOCK)
     {
-        if (_mode != MODE_FIGHT_G)
-        {
-            double prob_obj = _PROB_GO_OBJ;
-            if (_dirv[i] != obj)
-            {
-                Position tmp = _dirv[i].translate(_unitPos);
-                Position tmp_obj = obj.translate(_unitPos);
-                double mult = (1.0 / (tmp.getDistance(tmp_obj)/11.32) < 1.0) ? (1.0 / (tmp.getDistance(tmp_obj)/11.32)) : 1.0;
-                val *= mult;
-            }
-        }
         val *= _repulseProb[_repulseValues[i]];
 
         int height = Broodwar->getGroundHeight(tmpTilePos);
@@ -490,6 +492,21 @@ double BayesianUnit::computeProb(unsigned int i)
     ///    val *= 1.0 - _PROB_GO_NOT_VISIBLE;
     //Broodwar->printf("val is %d \n", val);
     return val;
+}
+
+void BayesianUnit::attackEnemyUnit(Unit* u)
+{
+    if (targetEnemy && targetEnemy->isVisible())
+        unit->rightClick(u);
+    if (inRange(u)) 
+    {
+        _lastAttackOrder = Broodwar->getFrameCount();
+    }
+    else if (Broodwar->getFrameCount() - _lastClickFrame > 5)
+    {
+        _lastClickFrame = Broodwar->getFrameCount();
+    }
+    //unit->attackUnit(targetEnemy); // rightClick seems better b/c attackUnit sometimes stuck unit...
 }
 
 void BayesianUnit::drawProbs(multimap<double, Vec>& probs, int number)
@@ -924,8 +941,8 @@ void BayesianUnit::updateRangeEnemies()
 
 void BayesianUnit::updateTargetEnemy()
 {
-    // clear old damage
-    if (_unitsGroup->unitDamages.left.count(targetEnemy))
+    // ===== clear old damage =====
+    if (targetEnemy != NULL && _unitsGroup->unitDamages.left.count(targetEnemy))
     {
         UnitDmgBimap::left_iterator it = _unitsGroup->unitDamages.left.find(targetEnemy);
         int tmp_dmg = it->second.dmg - computeDmg(targetEnemy);
@@ -934,12 +951,14 @@ void BayesianUnit::updateTargetEnemy()
         _unitsGroup->unitDamages.insert(UnitDmg(tmp_unit, Dmg(tmp_dmg, tmp_unit)));
     }
     
-    // choose new targetEnemy
+    // ===== choose new targetEnemy =====
     /// Choose a priority target in the ones in range in focus fire order
     UnitDmgBimap::right_iterator it;
     for (it = _unitsGroup->unitDamages.right.begin();
         it != _unitsGroup->unitDamages.right.end(); ++it)
     {
+        if (!it->second->isVisible())
+            continue;
         if (it->second->getType().isBuilding() 
             && it->second->getType() != BWAPI::UnitTypes::Protoss_Pylon
             && it->second->getType() != BWAPI::UnitTypes::Protoss_Photon_Cannon
@@ -965,21 +984,18 @@ void BayesianUnit::updateTargetEnemy()
 
         if (getSetPrio().count(it->second->getType())
             && it->first.dmg < it->second->getHitPoints() + it->second->getShields()
-            && (
-            (!it->second->getType().isFlyer() && _unitPos.getDistance(it->second->getPosition())
-            < (double)unit->getType().groundWeapon().maxRange() + addRangeGround()) 
-            || (it->second->getType().isFlyer() && _unitPos.getDistance(it->second->getPosition())
-            < (double)unit->getType().groundWeapon().maxRange() + addRangeAir())
-            ))
+            && inRange(it->second))
         {
             setTargetEnemy(it->second);
             return;
         }
     }
-    /// Focus fire || achieve dying units
+    /// Focus fire in range || achieve dying units in range
     for (it = _unitsGroup->unitDamages.right.begin();
         it != _unitsGroup->unitDamages.right.end(); ++it)
     {
+        if (!it->second->isVisible())
+            continue;
         if (it->second->getType().isBuilding() 
             && it->second->getType() != BWAPI::UnitTypes::Protoss_Pylon
             && it->second->getType() != BWAPI::UnitTypes::Protoss_Photon_Cannon
@@ -988,54 +1004,100 @@ void BayesianUnit::updateTargetEnemy()
             && it->second->getType() != BWAPI::UnitTypes::Zerg_Sunken_Colony
             && it->second->getType() != BWAPI::UnitTypes::Zerg_Spore_Colony)
             continue;
+        // focus
         if (it->first.dmg < it->second->getHitPoints() + it->second->getShields()
-            && (
-            (!it->second->getType().isFlyer() && _unitPos.getDistance(it->second->getPosition())
-            < (double)unit->getType().groundWeapon().maxRange() + addRangeGround()) 
-            || (it->second->getType().isFlyer() && _unitPos.getDistance(it->second->getPosition())
-            < (double)unit->getType().groundWeapon().maxRange() + addRangeAir())
-            ))
+            && inRange(it->second))
         {
             setTargetEnemy(it->second);
             return;
         }
+        // achieve
         if (it->first.dmg == 0 
             && (computeDmg(it->second) >= (it->second->getHitPoints() + it->second->getShields()))
-            && (
-            (!it->second->getType().isFlyer() && _unitPos.getDistance(it->second->getPosition())
-            < (double)unit->getType().groundWeapon().maxRange() + addRangeGround()) 
-            || (it->second->getType().isFlyer() && _unitPos.getDistance(it->second->getPosition())
-            < (double)unit->getType().groundWeapon().maxRange() + addRangeAir())
-            ))
+            && inRange(it->second))
         {
             setTargetEnemy(it->second);
             return;
         }
     }
     /// Keep old target if in range
-    if (targetEnemy 
-        && (
-        (!targetEnemy->getType().isFlyer() && _unitPos.getDistance(targetEnemy->getPosition())
-        < (double)unit->getType().groundWeapon().maxRange() + addRangeGround())
-        || (targetEnemy->getType().isFlyer() && _unitPos.getDistance(targetEnemy->getPosition())
-        < (double)unit->getType().airWeapon().maxRange() + addRangeAir())
-        ))
+    if (targetEnemy && targetEnemy->isVisible()
+        && inRange(targetEnemy))
     {
         setTargetEnemy(targetEnemy);
         return;
     }
-    /// Take a new one in range
+    /// Take a new one
     if (_rangeEnemies.size())
-        setTargetEnemy(_rangeEnemies.begin()->second);
-    /// No target in range, follow the old one
-    else if (targetEnemy)
-        setTargetEnemy(targetEnemy);
+    {
+        std::multimap<double, BWAPI::Unit*>::const_iterator stopPrio = _rangeEnemies.begin();
+        std::multimap<double, BWAPI::Unit*>::const_iterator stop = _rangeEnemies.begin();
+        /// In range or almost and in the priority set
+        for (std::multimap<double, BWAPI::Unit*>::const_iterator it = _rangeEnemies.begin();
+            it != _rangeEnemies.end(); ++it)
+        {
+            stopPrio = it;
+            if (_unitPos.getDistance(it->second->getPosition()) > _maxWeaponsRange + __NOT_IN_RANGE_BY__)
+                break;
+            if (it->second->exists() && it->second->isVisible()
+                && getSetPrio().count(it->second->getType())
+                && (
+                (!(it->second->getType().isFlyer()) && unit->getType().groundWeapon() != BWAPI::WeaponTypes::None &&
+                _unitPos.getDistance(it->second->getPosition()) < (double)unit->getType().groundWeapon().maxRange() + addRangeGround() + __NOT_IN_RANGE_BY__) 
+                || (it->second->getType().isFlyer() && unit->getType().airWeapon() != BWAPI::WeaponTypes::None &&
+                _unitPos.getDistance(it->second->getPosition()) < (double)unit->getType().airWeapon().maxRange() + addRangeAir() + __NOT_IN_RANGE_BY__)
+                ))
+            {
+                setTargetEnemy(it->second);
+                return;
+            }
+        }
+        /// In range and not in the priority set
+        for (std::multimap<double, BWAPI::Unit*>::const_iterator it = _rangeEnemies.begin();
+            it != _rangeEnemies.end(); ++it)
+        {
+            stop = it;
+            if (_unitPos.getDistance(it->second->getPosition()) > _maxWeaponsRange)
+                break;
+            // Not in the priority set
+            if (it->second->exists() && it->second->isVisible()
+                && inRange(it->second))
+            {
+                setTargetEnemy(it->second);
+                return;
+            }
+        }
+        /// Not in range and in the priority set
+        for (std::multimap<double, BWAPI::Unit*>::const_iterator it = stopPrio;
+            it != _rangeEnemies.end(); ++it)
+        {
+            if (it->second->exists() && it->second->isVisible()
+                && getSetPrio().count(it->second->getType()))
+            {
+                setTargetEnemy(it->second);
+                return;
+            }
+        }
+        /// Not in range and not in the priority set
+        for (std::multimap<double, BWAPI::Unit*>::const_iterator it = stop;
+            it != _rangeEnemies.end(); ++it)
+        {
+            if (it->second->exists() && it->second->isVisible())
+            {
+                setTargetEnemy(it->second);
+                return;
+            }
+        }
+    }
     /// Take the default target of the UnitGroup
-    else if (_unitsGroup->defaultTargetEnemy != NULL)
+    else if (_unitsGroup->defaultTargetEnemy != NULL && _unitsGroup->defaultTargetEnemy->exists())
         setTargetEnemy(_unitsGroup->defaultTargetEnemy);
-    /// WTF??? 
-    else
-        Broodwar->printf("WTF? Mode fight, no enemy");
+    /// No target in rangeEnemies nor as a default target, follow the old one          // should never happen
+    else if (targetEnemy != NULL && targetEnemy->exists() && targetEnemy->isVisible()) // should never happen
+        setTargetEnemy(targetEnemy);                                                   // should never happen
+    /// WTF???                                                                         // should never happen
+    else                                                                               // should never happen
+        Broodwar->printf("WTF? Mode fight, no enemy");                                 // should never happen
 }
 
 void BayesianUnit::setTargetEnemy(Unit* u)
@@ -1112,6 +1174,14 @@ int BayesianUnit::computeDmg(Unit* u)
                 * unit->getType().maxGroundHits();
         }
     }
+}
+
+bool BayesianUnit::inRange(BWAPI::Unit* u)
+{
+    return (!(u->getType().isFlyer()) && unit->getType().groundWeapon() != BWAPI::WeaponTypes::None &&
+        _unitPos.getDistance(u->getPosition()) < (double)unit->getType().groundWeapon().maxRange() + addRangeGround()
+        || (u->getType().isFlyer() && unit->getType().airWeapon() != BWAPI::WeaponTypes::None &&
+        _unitPos.getDistance(u->getPosition()) < (double)unit->getType().airWeapon().maxRange() + addRangeAir()));
 }
 
 void BayesianUnit::drawDirV()
@@ -1290,10 +1360,7 @@ void BayesianUnit::fightMove()
 {
     if (targetEnemy != NULL 
         && 
-        (targetEnemy->getType().isFlyer() && targetEnemy->getDistance(_unitPos) > unit->getType().airWeapon().maxRange() + addRangeAir())
-        ||
-        (!targetEnemy->getType().isFlyer() && targetEnemy->getDistance(_unitPos) > unit->getType().groundWeapon().maxRange() + addRangeGround())
-        )
+        !inRange(targetEnemy))
     {
         unit->rightClick(targetEnemy);
         return;

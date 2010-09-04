@@ -9,6 +9,7 @@
 #include <Vec.h>
 #include <set>
 #include <boost/bimap/bimap.hpp>
+#include <EUnitsFilter.h>
 
 #define _UNITS_DEBUG 1
 
@@ -48,7 +49,7 @@ private:
 	int totalHP;
 	int totalPower;
 	std::list<pGoal> goals;
-    
+    EUnitsFilter* _eUnitsFilter;
 
     void displayTargets();  // debug purpose
 public:
@@ -98,6 +99,7 @@ public:
     int size() const;
     int getTotalHP() const;
     std::vector<pBayesianUnit>* getUnits();
+    std::set<BWAPI::Unit*> nearbyEnemyUnitsFromFilter(BWAPI::Position p, double radius = 400.0);
 
 #ifdef _UNITS_DEBUG
     void selectedUnits(std::set<pBayesianUnit>& u);
