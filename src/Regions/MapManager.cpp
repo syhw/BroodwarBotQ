@@ -13,6 +13,10 @@ MapManager::MapManager()
 , _pix_height(Broodwar->mapHeight() * 32)
 , _width(Broodwar->mapWidth() * 4)
 , _height(Broodwar->mapHeight() * 4)
+, _stormPosMutex(CreateMutex( 
+        NULL,                  // default security attributes
+        FALSE,                 // initially not owned
+        NULL))                  // unnamed mutex
 {
     walkability = new bool[_width * _height];             // Walk Tiles resolution
     buildings_wt = new bool[_width * _height];
@@ -115,7 +119,7 @@ void MapManager::addBuilding(Unit* u)
 
 void MapManager::addAlliedUnit(Unit* u)
 {
-    if (!(u->getType().isBuilding()))
+    if (!(u->getType().isBuilding()) && !_ourUnits.count(u))
         _ourUnits.insert(std::make_pair<Unit*, Position>(u, u->getPosition()));
 }
 
@@ -271,7 +275,8 @@ int MapManager::additionalRangeAir(UnitType ut)
 void MapManager::onUnitCreate(Unit* u)
 {
     addBuilding(u);
-    addAlliedUnit(u);
+    if (u->getPlayer() == Broodwar->self())
+        addAlliedUnit(u);
 }
 
 void MapManager::onUnitDestroy(Unit* u)
@@ -291,12 +296,107 @@ void MapManager::onUnitDestroy(Unit* u)
 void MapManager::onUnitShow(Unit* u)
 {
     addBuilding(u);
-    addAlliedUnit(u);
+    if (u->getPlayer() == Broodwar->self())
+        addAlliedUnit(u);
 }
 
 void MapManager::onUnitHide(Unit* u)
 {
     addBuilding(u);
+}
+
+DWORD WINAPI MapManager::StaticLaunchUpdateStormPos(void* obj)
+{
+    MapManager* This = (MapManager*) obj;
+    int buf = This->LaunchUpdateStormPos();
+    ExitThread(buf);
+    return buf;
+}
+
+DWORD MapManager::LaunchUpdateStormPos()
+{
+    DWORD waitResult = WaitForSingleObject(
+        _stormPosMutex,
+        100);
+
+    switch (waitResult) 
+    {
+    case WAIT_OBJECT_0: 
+        updateStormPos();
+        ReleaseMutex(_stormPosMutex);
+        break; 
+
+    case WAIT_ABANDONED:
+        ReleaseMutex(_stormPosMutex);
+        return -1;
+    }
+    return 0;
+}
+
+void MapManager::updateStormPos()
+{
+    _stormPosBuf.clear();
+    std::set<Position> possiblePos;
+    for (std::map<BWAPI::Unit*, BWAPI::Position>::const_iterator eit = _enemyUnitsPosBuf.begin();
+        eit != _enemyUnitsPosBuf.end(); ++eit)
+    {
+        Position tmpPos = eit->second;
+        if (possiblePos.size() > 32) // TOCHANGE 32 units
+            possiblePos.insert(tmpPos);
+        else
+        {
+            possiblePos.insert(tmpPos);
+            possiblePos.insert(Position(tmpPos.x() - 32, tmpPos.y()));
+            possiblePos.insert(Position(tmpPos.x() + 32, tmpPos.y()));
+            possiblePos.insert(Position(tmpPos.x(), tmpPos.y() - 32));
+            possiblePos.insert(Position(tmpPos.x(), tmpPos.y() + 32));
+            possiblePos.insert(Position(tmpPos.x() - 32, tmpPos.y() - 32));
+            possiblePos.insert(Position(tmpPos.x() + 32, tmpPos.y() + 32));
+            possiblePos.insert(Position(tmpPos.x() + 32, tmpPos.y() - 32));
+            possiblePos.insert(Position(tmpPos.x() - 32, tmpPos.y() + 32));
+        }
+    }
+    if (possiblePos.empty())
+        Broodwar->printf("Possible Pos EMPTY");
+    if (_alliedUnitsPosBuf.empty())
+        Broodwar->printf("allied Pos EMPTY");
+    if (_enemyUnitsPosBuf.empty())
+        Broodwar->printf("enemy Pos EMPTY");
+    for (std::set<Position>::const_iterator it = possiblePos.begin();
+        it != possiblePos.end(); ++it)
+    {
+        int tmp = 0;
+        for (std::map<BWAPI::Unit*, BWAPI::Position>::const_iterator uit = _alliedUnitsPosBuf.begin();
+            uit != _alliedUnitsPosBuf.end(); ++uit)
+        {
+            //if ((*uit)->unit->getDistance(*it) < 32.0+16.0+5.0) // TO CHANGE TOCHANGE 5.0 to account for the diag
+            //    --tmp;
+            Vec dist(it->x() - uit->second.x(), it->y() - uit->second.y());
+            if (dist.norm() < 32.0 + 16.0 + 5.0)
+                tmp -= 2;
+        }
+        for (std::map<BWAPI::Unit*, BWAPI::Position>::const_iterator eit = _enemyUnitsPosBuf.begin();
+            eit != _enemyUnitsPosBuf.end(); ++eit)
+        {
+            Vec dist(it->x() - eit->second.x(), it->y() - eit->second.y());
+            if (dist.norm() < 32.0 + 16.0 + 5.0)
+                ++tmp;
+            //if (dist.norm() < 32.0 + 16.0 + 5.0)
+            //    Broodwar->printf("Distance to storm %f", dist.norm());
+            //if ((*eit)->getDistance(*it) < 32.0+16.0+5.0) // TO CHANGE TOCHANGE 5.0 to account for the diag
+            //    ++tmp;
+            //if (!((*eit)->isVisible())) // Lurkers and other sneakers
+            //    ++tmp;
+        }
+        if (tmp > 0)
+        {
+            Broodwar->printf("inserting storm score: %d at (%d, %d)", tmp, it->x(), it->y());
+            _stormPosBuf.insert(std::make_pair<Position, int>(*it, tmp));
+        }
+    }
+    //if (_stormPosBuf.empty())
+    //    Broodwar->printf("storm pos buf EMPTY");
+    return;
 }
 
 void MapManager::onFrame()
@@ -310,6 +410,8 @@ void MapManager::onFrame()
     {
         _ourUnits[it->first] = it->first->getPosition();
     }
+    Broodwar->printf("Our units size %d", _ourUnits.size());
+
     // check/update the damage maps. BEWARE: hidden units are not removed in presence of doubt!
     for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = _eUnitsFilter->getViewedUnits().begin();
         it != _eUnitsFilter->getViewedUnits().end(); ++it)
@@ -327,7 +429,6 @@ void MapManager::onFrame()
             _trackedUnits[it->first] = it->first->getPosition();
         }
     }
-
     for (std::set<Bullet*>::const_iterator it = Broodwar->getBullets().begin();
         it != Broodwar->getBullets().end(); ++it)
     {
@@ -354,6 +455,29 @@ void MapManager::onFrame()
         else
             ++it;
     }
+
+    // update the possible storms positions
+    if (WaitForSingleObject(_stormPosMutex, 0) == WAIT_OBJECT_0) // cannot enter when the thread is running
+    {
+        //Broodwar->drawBoxMap(_bestStormPos.first.x() - 48, _bestStormPos.first.x() + 48,
+        //    _bestStormPos.first.y() - 48, _bestStormPos.first.y() + 48, BWAPI::Colors::Purple);
+        //Broodwar->printf("Creating a thread");
+        stormPos = _stormPosBuf;
+        _alliedUnitsPosBuf = _ourUnits;
+        _enemyUnitsPosBuf = _trackedUnits;
+        _trackedStormsBuf = _trackedStorms;
+        updateStormPos();
+        /*DWORD threadId;
+        HANDLE thread = CreateThread( 
+        NULL,                   // default security attributes
+        0,                      // use default stack size  
+        &MapManager::StaticUpdateStormPos,      // thread function name
+        (void*) this,                   // argument to thread function 
+        0,                      // use default creation flags 
+        &threadId);             // returns the thread identifier 
+        CloseHandle(thread);*/
+    }
+    ReleaseMutex(_stormPosMutex);
 
 #ifdef __DEBUG_GABRIEL__
     clock_t end = clock();

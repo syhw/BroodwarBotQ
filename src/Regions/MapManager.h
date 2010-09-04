@@ -5,6 +5,9 @@
 #include <vector>
 #include "Vec.h"
 
+#include <windows.h>
+#include <process.h>
+
 /** From BWAPI's doc:
 * Positions are measured in pixels and are the highest resolution
 * Walk Tiles - each walk tile is an 8x8 square of pixels. These are called walk tiles because walkability data is available at this resolution.
@@ -21,12 +24,21 @@ private:
     std::map<BWAPI::Unit*, BWAPI::Position> _ourUnits;
     std::map<BWAPI::Unit*, BWAPI::Position> _trackedUnits;
     std::map<BWAPI::Bullet*, BWAPI::Position> _trackedStorms;
-    MapManager();
-    ~MapManager();
+    HANDLE _stormPosMutex;
+    std::map<Position, int> _stormPosBuf;
+    std::multimap<double, BWAPI::Unit*> _rangeEnemiesBuf;
+    std::map<BWAPI::Unit*, BWAPI::Position> _alliedUnitsPosBuf;
+    std::map<BWAPI::Unit*, BWAPI::Position> _enemyUnitsPosBuf;
+    std::map<BWAPI::Bullet*, BWAPI::Position> _trackedStormsBuf;
+    static DWORD WINAPI StaticLaunchUpdateStormPos(void* obj);
+    DWORD LaunchUpdateStormPos();
+    inline void updateStormPos();
     int _width;
     int _height;
     int _pix_width;
     int _pix_height;
+    MapManager();
+    ~MapManager();
     inline void modifyBuildings(BWAPI::Unit* u, bool b);
     inline void addBuilding(BWAPI::Unit* u);
     inline void addAlliedUnit(BWAPI::Unit* u);
@@ -40,16 +52,18 @@ private:
     inline void addDmgStorm(BWAPI::Position p);
     inline int additionalRangeGround(BWAPI::UnitType ut);
     inline int additionalRangeAir(BWAPI::UnitType ut);
+
 public:
     bool* walkability;          // walk tiles
     bool* lowResWalkability;    // low res => building tiles
     bool* buildings_wt;         // walk tiles
-    bool* buildings_wt_strict;
+    bool* buildings_wt_strict;  // walk tiles
     bool* buildings;            // low res => building tiless
     int* groundDamages;         // build tiles
     int* airDamages;            // build tiles
-    Vec* groundDamagesGrad;
-    Vec* airDamagesGrad;
+    Vec* groundDamagesGrad;     // build tiles
+    Vec* airDamagesGrad;        // build tiles
+    std::map<Position, int> stormPos;
     void setDependencies();
     void onUnitCreate(BWAPI::Unit* u);
     void onUnitDestroy(BWAPI::Unit* u);
