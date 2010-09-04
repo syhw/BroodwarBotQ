@@ -18,6 +18,7 @@ class MapManager: public CSingleton<MapManager>
 
 private:
     EUnitsFilter* _eUnitsFilter;
+    std::map<BWAPI::Unit*, BWAPI::Position> _ourUnits;
     std::map<BWAPI::Unit*, BWAPI::Position> _trackedUnits;
     std::map<BWAPI::Bullet*, BWAPI::Position> _trackedStorms;
     MapManager();
@@ -28,7 +29,9 @@ private:
     int _pix_height;
     inline void modifyBuildings(BWAPI::Unit* u, bool b);
     inline void addBuilding(BWAPI::Unit* u);
+    inline void addAlliedUnit(BWAPI::Unit* u);
     inline void removeBuilding(BWAPI::Unit* u);
+    inline void removeAlliedUnit(BWAPI::Unit* u);
     inline void modifyDamages(int* tab, Position p, int minRadius, int maxRadius, int damages);
     inline void updateDamagesGrad(Vec* grad, int* tab, Position p, int minRadius, int maxRadius);
     inline void removeDmg(BWAPI::UnitType ut, BWAPI::Position p);
@@ -53,7 +56,9 @@ public:
     void onUnitShow(BWAPI::Unit* u);
     void onUnitHide(BWAPI::Unit* u);
     void onFrame();
-    std::map<BWAPI::Bullet*, BWAPI::Position> getTrackedStorms();
+    const std::map<BWAPI::Unit*, BWAPI::Position> & getOurUnits();
+    const std::map<BWAPI::Unit*, BWAPI::Position> & getTrackedUnits();
+    const std::map<BWAPI::Bullet*, BWAPI::Position> & getTrackedStorms();
     void drawBuildings();   // debug
     void drawBuildingsStrict();   // debug
     void drawWalkability(); // debug

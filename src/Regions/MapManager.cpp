@@ -113,9 +113,21 @@ void MapManager::addBuilding(Unit* u)
     modifyBuildings(u, true);
 }
 
+void MapManager::addAlliedUnit(Unit* u)
+{
+    if (!(u->getType().isBuilding()))
+        _ourUnits.insert(std::make_pair<Unit*, Position>(u, u->getPosition()));
+}
+
 void MapManager::removeBuilding(Unit* u)
 {
     modifyBuildings(u, false);
+}
+
+void MapManager::removeAlliedUnit(Unit* u)
+{
+    if (!(u->getType().isBuilding()))
+        _ourUnits.erase(u);
 }
 
 void MapManager::modifyDamages(int* tab, Position p, int minRadius, int maxRadius, int damages)
@@ -223,7 +235,8 @@ void MapManager::addDmg(UnitType ut, Position p)
 
 void MapManager::addDmgStorm(Position p)
 {
-    modifyDamages(this->groundDamages, p, 0, 63, 50);
+    // storm don't stack, but we make them stack
+    modifyDamages(this->groundDamages, p, 0, 63, 50); 
     modifyDamages(this->airDamages, p, 0, 63, 50);
 }
 
@@ -258,18 +271,27 @@ int MapManager::additionalRangeAir(UnitType ut)
 void MapManager::onUnitCreate(Unit* u)
 {
     addBuilding(u);
+    addAlliedUnit(u);
 }
 
 void MapManager::onUnitDestroy(Unit* u)
 {
     removeBuilding(u);
-    removeDmg(u->getType(), _trackedUnits[u]);
-    _trackedUnits.erase(u);
+    if (u->getPlayer() == Broodwar->enemy())
+    {
+        removeDmg(u->getType(), _trackedUnits[u]);
+        _trackedUnits.erase(u);
+    }
+    else
+    {
+        removeAlliedUnit(u);
+    }
 }
 
 void MapManager::onUnitShow(Unit* u)
 {
     addBuilding(u);
+    addAlliedUnit(u);
 }
 
 void MapManager::onUnitHide(Unit* u)
@@ -282,6 +304,12 @@ void MapManager::onFrame()
 #ifdef __DEBUG_GABRIEL__
     clock_t start = clock();
 #endif
+    // update our units' positions
+    for (std::map<BWAPI::Unit*, BWAPI::Position>::iterator it = _ourUnits.begin();
+        it != _ourUnits.end(); ++it)
+    {
+        _ourUnits[it->first] = it->first->getPosition();
+    }
     // check/update the damage maps. BEWARE: hidden units are not removed in presence of doubt!
     for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = _eUnitsFilter->getViewedUnits().begin();
         it != _eUnitsFilter->getViewedUnits().end(); ++it)
@@ -336,7 +364,17 @@ void MapManager::onFrame()
     this->drawGroundDamages();
 }
 
-std::map<BWAPI::Bullet*, BWAPI::Position> MapManager::getTrackedStorms()
+const std::map<BWAPI::Unit*, BWAPI::Position>& MapManager::getOurUnits()
+{
+    return _ourUnits;
+}
+
+const std::map<BWAPI::Unit*, BWAPI::Position>& MapManager::getTrackedUnits()
+{
+    return _trackedUnits;
+}
+
+const std::map<BWAPI::Bullet*, BWAPI::Position>& MapManager::getTrackedStorms()
 {
     return _trackedStorms;
 }
