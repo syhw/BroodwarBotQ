@@ -336,6 +336,11 @@ void MapManager::onFrame()
     this->drawGroundDamages();
 }
 
+std::map<BWAPI::Bullet*, BWAPI::Position> MapManager::getTrackedStorms()
+{
+    return _trackedStorms;
+}
+
 void MapManager::drawBuildings()
 {
     for (int x = 0; x < _width; ++x)

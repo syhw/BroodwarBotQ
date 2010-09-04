@@ -6,7 +6,6 @@
 class DarkArchonUnit : public SpecialUnit
 {
 public:
-    static BWAPI::UnitType setPriorite[NUMBER_OF_PRIORITY];
     DarkArchonUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~DarkArchonUnit();
     virtual void micro();

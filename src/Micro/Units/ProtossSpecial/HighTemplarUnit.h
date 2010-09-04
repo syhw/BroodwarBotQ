@@ -2,11 +2,13 @@
 
 #include <SpecialUnit.h>
 #include <BWAPI.h>
+#include "MapManager.h"
 
 class HighTemplarUnit : public SpecialUnit
 {
+protected:
+    MapManager* _mapManager;
 public:
-    static BWAPI::UnitType setPriorite[NUMBER_OF_PRIORITY];
     HighTemplarUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~HighTemplarUnit();
     std::pair<BWAPI::Position, int> bestStormPos();

@@ -8,7 +8,6 @@ class ArchonUnit : public GroundUnit
 protected:
     static std::set<BWAPI::UnitType> setPrio;
 public:
-    static BWAPI::UnitType setPriorite[NUMBER_OF_PRIORITY];
     ArchonUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~ArchonUnit();
     virtual void micro();

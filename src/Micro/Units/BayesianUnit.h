@@ -19,11 +19,6 @@ typedef boost::shared_ptr<BayesianUnit> pBayesianUnit;
 
 // #define PROBT 1
 
-#define NUMBER_OF_PRIORITY 5
-class BayesianUnit;
-typedef boost::shared_ptr<BayesianUnit> pBayesianUnit;
-
-
 // TODO, this class has to be derived to take Flying/Ground/Special Units 
 // (templars, tanks, lurkers, etc.) into account
 

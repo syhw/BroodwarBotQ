@@ -1,8 +1,10 @@
 #include "HighTemplarUnit.h"
 #include <UnitsGroup.h>
 
-HighTemplarUnit::HighTemplarUnit(BWAPI::Unit* u, UnitsGroup* ug):SpecialUnit(u, ug)
+HighTemplarUnit::HighTemplarUnit(BWAPI::Unit* u, UnitsGroup* ug)
+: SpecialUnit(u, ug)
 {
+    _mapManager = & MapManager::Instance();
 }
 
 HighTemplarUnit::~HighTemplarUnit()

@@ -8,7 +8,6 @@ class MutaliskUnit : public FlyingUnit
 protected:
     static std::set<BWAPI::UnitType> setPrio;
 public:
-    static BWAPI::UnitType setPriorite[NUMBER_OF_PRIORITY];
     MutaliskUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~MutaliskUnit();
     virtual void micro();

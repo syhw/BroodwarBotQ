@@ -8,7 +8,6 @@ class ScourgeUnit : public FlyingUnit
 protected:
     static std::set<BWAPI::UnitType> setPrio;
 public:
-    static BWAPI::UnitType setPriorite[NUMBER_OF_PRIORITY];
     ScourgeUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~ScourgeUnit();
     virtual void micro();

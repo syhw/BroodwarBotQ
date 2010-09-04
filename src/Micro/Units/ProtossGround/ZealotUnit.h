@@ -8,7 +8,6 @@ class ZealotUnit : public GroundUnit
 protected:
     static std::set<BWAPI::UnitType> setPrio;
 public:
-    static BWAPI::UnitType setPriorite[NUMBER_OF_PRIORITY];
     ZealotUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~ZealotUnit();
     virtual void micro();

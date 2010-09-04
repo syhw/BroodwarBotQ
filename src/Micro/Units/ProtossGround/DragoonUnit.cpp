@@ -67,7 +67,7 @@ void DragoonUnit::micro()
             }
             else if (_fleeing || _lastTotalHP - (unit->getShields() + unit->getHitPoints()) > 0)
             {
-                //flee();
+                flee();
             }
             else if (!unit->isMoving() && targetEnemy != NULL)
             {

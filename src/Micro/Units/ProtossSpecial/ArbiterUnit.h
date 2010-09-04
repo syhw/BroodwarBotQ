@@ -8,7 +8,6 @@ class ArbiterUnit : public SpecialUnit
 protected:
     static std::set<BWAPI::UnitType> setPrio;
 public:
-    static BWAPI::UnitType setPriorite[NUMBER_OF_PRIORITY];
     ArbiterUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~ArbiterUnit();
     virtual void micro();

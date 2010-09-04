@@ -53,6 +53,7 @@ public:
     void onUnitShow(BWAPI::Unit* u);
     void onUnitHide(BWAPI::Unit* u);
     void onFrame();
+    std::map<BWAPI::Bullet*, BWAPI::Position> getTrackedStorms();
     void drawBuildings();   // debug
     void drawBuildingsStrict();   // debug
     void drawWalkability(); // debug
