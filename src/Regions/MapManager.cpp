@@ -469,32 +469,35 @@ void MapManager::onFrame()
             ++it;
     }
 
-    // update the possible storms positions
-    if (WaitForSingleObject(_stormPosMutex, 0) == WAIT_OBJECT_0) // cannot enter when the thread is running
+    if (Broodwar->self()->hasResearched(BWAPI::TechTypes::Psionic_Storm))
     {
-        //Broodwar->printf("Creating a thread");
-        stormPos = _stormPosBuf;
-        _alliedUnitsPosBuf = _ourUnits;
-        _enemyUnitsPosBuf = _trackedUnits;
-        _dontReStorm.clear();
-        for (std::map<Bullet*, Position>::const_iterator it = _trackedStorms.begin();
-            it != _trackedStorms.end(); ++it)
+        // update the possible storms positions
+        if (WaitForSingleObject(_stormPosMutex, 0) == WAIT_OBJECT_0) // cannot enter when the thread is running
         {
-            if (it->first->exists() && it->first->getRemoveTimer() > 48)
-                _dontReStorm.insert(it->second);
+            //Broodwar->printf("Creating a thread");
+            stormPos = _stormPosBuf;
+            _alliedUnitsPosBuf = _ourUnits;
+            _enemyUnitsPosBuf = _trackedUnits;
+            _dontReStorm.clear();
+            for (std::map<Bullet*, Position>::const_iterator it = _trackedStorms.begin();
+                it != _trackedStorms.end(); ++it)
+            {
+                if (it->first->exists() && it->first->getRemoveTimer() > 48)
+                    _dontReStorm.insert(it->second);
+            }
+            //updateStormPos();
+            DWORD threadId;
+            HANDLE thread = CreateThread( 
+                NULL,                   // default security attributes
+                0,                      // use default stack size  
+                &MapManager::StaticLaunchUpdateStormPos,      // thread function name
+                (void*) this,                   // argument to thread function 
+                0,                      // use default creation flags 
+                &threadId);             // returns the thread identifier 
+            CloseHandle(thread);
         }
-        //updateStormPos();
-        DWORD threadId;
-        HANDLE thread = CreateThread( 
-            NULL,                   // default security attributes
-            0,                      // use default stack size  
-            &MapManager::StaticLaunchUpdateStormPos,      // thread function name
-            (void*) this,                   // argument to thread function 
-            0,                      // use default creation flags 
-            &threadId);             // returns the thread identifier 
-        CloseHandle(thread);
+        ReleaseMutex(_stormPosMutex);
     }
-    ReleaseMutex(_stormPosMutex);
 
 #ifdef __DEBUG_GABRIEL__
     clock_t end = clock();
