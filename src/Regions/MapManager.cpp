@@ -6,7 +6,7 @@
 #include <string.h>
 #include <assert.h>
 
-#define __MESH_SIZE__ 32
+#define __MESH_SIZE__ 16 // 32 // 48
 
 using namespace BWAPI;
 
@@ -349,14 +349,26 @@ void MapManager::updateStormPos()
         else
         {
             possiblePos.insert(tmpPos);
-            possiblePos.insert(Position(tmpPos.x() - __MESH_SIZE__, tmpPos.y()));
-            possiblePos.insert(Position(tmpPos.x() + __MESH_SIZE__, tmpPos.y()));
-            possiblePos.insert(Position(tmpPos.x(), tmpPos.y() - __MESH_SIZE__));
-            possiblePos.insert(Position(tmpPos.x(), tmpPos.y() + __MESH_SIZE__));
-            possiblePos.insert(Position(tmpPos.x() - __MESH_SIZE__, tmpPos.y() - __MESH_SIZE__));
-            possiblePos.insert(Position(tmpPos.x() + __MESH_SIZE__, tmpPos.y() + __MESH_SIZE__));
-            possiblePos.insert(Position(tmpPos.x() + __MESH_SIZE__, tmpPos.y() - __MESH_SIZE__));
-            possiblePos.insert(Position(tmpPos.x() - __MESH_SIZE__, tmpPos.y() + __MESH_SIZE__));
+            if (tmpPos.x() >= __MESH_SIZE__)
+            {
+                possiblePos.insert(Position(tmpPos.x() - __MESH_SIZE__, tmpPos.y()));
+                if (tmpPos.y() + __MESH_SIZE__ < _pix_height)
+                    possiblePos.insert(Position(tmpPos.x() - __MESH_SIZE__, tmpPos.y() - __MESH_SIZE__));
+                if (tmpPos.y() >= __MESH_SIZE__)
+                    possiblePos.insert(Position(tmpPos.x() - __MESH_SIZE__, tmpPos.y() + __MESH_SIZE__));
+            }
+            if (tmpPos.x() + __MESH_SIZE__ < _pix_width)
+            {
+                possiblePos.insert(Position(tmpPos.x() + __MESH_SIZE__, tmpPos.y()));
+                if (tmpPos.y() >= __MESH_SIZE__)
+                    possiblePos.insert(Position(tmpPos.x() + __MESH_SIZE__, tmpPos.y() + __MESH_SIZE__));
+                if (tmpPos.y() + __MESH_SIZE__ < _pix_height)
+                    possiblePos.insert(Position(tmpPos.x() + __MESH_SIZE__, tmpPos.y() - __MESH_SIZE__));
+            }
+            if (tmpPos.y() >= __MESH_SIZE__) 
+                possiblePos.insert(Position(tmpPos.x(), tmpPos.y() - __MESH_SIZE__));
+            if (tmpPos.y() + __MESH_SIZE__ < _pix_height)
+                possiblePos.insert(Position(tmpPos.x(), tmpPos.y() + __MESH_SIZE__));   
         }
     }
     std::map<int, Position> storms;
@@ -369,15 +381,16 @@ void MapManager::updateStormPos()
         for (std::map<BWAPI::Unit*, BWAPI::Position>::const_iterator uit = _alliedUnitsPosBuf.begin();
             uit != _alliedUnitsPosBuf.end(); ++uit)
         {
-            Vec dist(it->x() - uit->second.x(), it->y() - uit->second.y());
-            if (dist.norm() < 32.0 + 16.0 + 15.0) // TODO TOCHANGE 5.0 
+            if (uit->second.x() > it->x() - 49 && uit->second.x() < it->x() + 49 // 3 tiles x 32  / 2 = 48
+                && uit->second.y() > it->y() - 49 && uit->second.y() < it->y() + 49)
                 tmp -= 2;
         }
         for (std::map<BWAPI::Unit*, BWAPI::Position>::const_iterator eit = _enemyUnitsPosBuf.begin();
             eit != _enemyUnitsPosBuf.end(); ++eit)
         {
-            Vec dist(it->x() - eit->second.x(), it->y() - eit->second.y());
-            if (dist.norm() < 32.0 + 16.0 + 5.0) // TODO TOCHANGE 5.0
+            // TODO TOCHANGE 40 here, it could be 3 tiles x 32  / 2 = 48 or less (to account for their movement)
+            if (eit->second.x() > it->x() - 40 && eit->second.x() < it->x() + 40
+                && eit->second.y() > it->y() - 40 && eit->second.y() < it->y() + 40)
                 ++tmp;
         }
         if (tmp > 0)
