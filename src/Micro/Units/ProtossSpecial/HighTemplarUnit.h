@@ -8,6 +8,7 @@ class HighTemplarUnit : public SpecialUnit
 {
 protected:
     MapManager* _mapManager;
+    int _lastStormFrame;
 public:
     HighTemplarUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~HighTemplarUnit();

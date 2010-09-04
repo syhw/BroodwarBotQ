@@ -3,6 +3,7 @@
 
 HighTemplarUnit::HighTemplarUnit(BWAPI::Unit* u, UnitsGroup* ug)
 : SpecialUnit(u, ug)
+, _lastStormFrame(0)
 {
     _mapManager = & MapManager::Instance();
 }
@@ -14,7 +15,7 @@ HighTemplarUnit::~HighTemplarUnit()
 
 void HighTemplarUnit::micro()
 {
-    if (this->unit->getEnergy() >= 75)
+    if (this->unit->getEnergy() >= 75 && Broodwar->getFrameCount() - _lastStormFrame > Broodwar->getLatency() + 3)
     {   
         Position bestStormPos;
         int bestScore = -1;
@@ -31,6 +32,7 @@ void HighTemplarUnit::micro()
         {
             unit->useTech(BWAPI::TechTypes::Psionic_Storm, bestStormPos);
             _mapManager->stormPos.erase(bestStormPos);
+            _lastStormFrame = Broodwar->getFrameCount();
         }
     }
     else if (_fleeing || this->unit->getEnergy() < 74)

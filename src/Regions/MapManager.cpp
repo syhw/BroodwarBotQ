@@ -6,6 +6,8 @@
 #include <string.h>
 #include <assert.h>
 
+#define __MESH_SIZE__ 32
+
 using namespace BWAPI;
 
 MapManager::MapManager()
@@ -75,6 +77,7 @@ MapManager::~MapManager()
     delete [] airDamages;
     delete [] groundDamagesGrad;
     delete [] airDamagesGrad;
+    CloseHandle(_stormPosMutex);
 }
 
 void MapManager::setDependencies()
@@ -346,17 +349,17 @@ void MapManager::updateStormPos()
         else
         {
             possiblePos.insert(tmpPos);
-            possiblePos.insert(Position(tmpPos.x() - 32, tmpPos.y()));
-            possiblePos.insert(Position(tmpPos.x() + 32, tmpPos.y()));
-            possiblePos.insert(Position(tmpPos.x(), tmpPos.y() - 32));
-            possiblePos.insert(Position(tmpPos.x(), tmpPos.y() + 32));
-            possiblePos.insert(Position(tmpPos.x() - 32, tmpPos.y() - 32));
-            possiblePos.insert(Position(tmpPos.x() + 32, tmpPos.y() + 32));
-            possiblePos.insert(Position(tmpPos.x() + 32, tmpPos.y() - 32));
-            possiblePos.insert(Position(tmpPos.x() - 32, tmpPos.y() + 32));
+            possiblePos.insert(Position(tmpPos.x() - __MESH_SIZE__, tmpPos.y()));
+            possiblePos.insert(Position(tmpPos.x() + __MESH_SIZE__, tmpPos.y()));
+            possiblePos.insert(Position(tmpPos.x(), tmpPos.y() - __MESH_SIZE__));
+            possiblePos.insert(Position(tmpPos.x(), tmpPos.y() + __MESH_SIZE__));
+            possiblePos.insert(Position(tmpPos.x() - __MESH_SIZE__, tmpPos.y() - __MESH_SIZE__));
+            possiblePos.insert(Position(tmpPos.x() + __MESH_SIZE__, tmpPos.y() + __MESH_SIZE__));
+            possiblePos.insert(Position(tmpPos.x() + __MESH_SIZE__, tmpPos.y() - __MESH_SIZE__));
+            possiblePos.insert(Position(tmpPos.x() - __MESH_SIZE__, tmpPos.y() + __MESH_SIZE__));
         }
     }
-    //std::map<int, Position> storms;
+    std::map<int, Position> storms;
     for (std::set<Position>::const_iterator it = possiblePos.begin();
         it != possiblePos.end(); ++it)
     {
@@ -379,15 +382,21 @@ void MapManager::updateStormPos()
         }
         if (tmp > 0)
         {
-            //storms.insert(std::make_pair<int, Position>(tmp, *it));
-            _stormPosBuf.insert(std::make_pair<Position, int>(*it, tmp));
+            storms.insert(std::make_pair<int, Position>(tmp, *it));
+            //_stormPosBuf.insert(std::make_pair<Position, int>(*it, tmp));
         }
     }
-    //for (std::map<int, Position>::const_reverse_iterator it = storms.rbegin();
-    //    it != storms.rend(); ++it)
-    //{
-    //    _stormPosBuf.insert(std::make_pair<Position, int>(*it, tmp));
-    //}
+    std::set<std::pair<int, int> > covered;
+    for (std::map<int, Position>::const_reverse_iterator it = storms.rbegin();
+        it != storms.rend(); ++it)
+    {
+        std::pair<int, int> tmp(it->second.x() / (2*__MESH_SIZE__), it->second.y() / (2*__MESH_SIZE__));
+        if (!covered.count(tmp))
+        {
+            _stormPosBuf.insert(std::make_pair<Position, int>(it->second, it->first));
+            covered.insert(tmp);
+        }
+    }
     return;
 }
 
@@ -414,7 +423,7 @@ void MapManager::onFrame()
         {
             // update EUnitsFilter
             _eUnitsFilter->update(it->first);
-            // update the map
+            // update MapManager (ourselves)
             addDmg(it->first->getType(), it->first->getPosition());
             removeDmg(it->first->getType(), _trackedUnits[it->first]);
             _trackedUnits[it->first] = it->first->getPosition();
@@ -458,7 +467,7 @@ void MapManager::onFrame()
         for (std::map<Bullet*, Position>::const_iterator it = _trackedStorms.begin();
             it != _trackedStorms.end(); ++it)
         {
-            if (it->first->exists() && it->first->getRemoveTimer() > 60)
+            if (it->first->exists() && it->first->getRemoveTimer() > 48)
                 _dontReStorm.insert(it->second);
         }
         //updateStormPos();
