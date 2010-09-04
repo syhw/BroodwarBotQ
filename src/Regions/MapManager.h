@@ -19,6 +19,7 @@ class MapManager: public CSingleton<MapManager>
 private:
     EUnitsFilter* _eUnitsFilter;
     std::map<BWAPI::Unit*, BWAPI::Position> _trackedUnits;
+    std::list<BWAPI::Bullet*> _trackedBullets;
     MapManager();
     ~MapManager();
     int _width;

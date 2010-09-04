@@ -265,6 +265,7 @@ void MapManager::onUnitHide(Unit* u)
 void MapManager::onFrame()
 {
     // check/update the damage maps. BEWARE: hidden units are not removed in presence of doubt!
+        clock_t start = clock();
     std::map<BWAPI::Unit*, EViewedUnit> tmp = _eUnitsFilter->getViewedUnits();
     //std::map<BWAPI::Unit*, EViewedUnit> tmp = _eUnitsFilter->_eViewedUnits;
     for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = tmp.begin();
@@ -283,6 +284,51 @@ void MapManager::onFrame()
             _trackedUnits[it->first] = it->first->getPosition();
         }
     }
+        clock_t end = clock();
+        if (end - start > 0.00000001)
+            Broodwar->printf("copying: %2.7f", (double)(end - start));
+        start = clock();
+
+    for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = _eUnitsFilter->getViewedUnits().begin();
+        it != _eUnitsFilter->getViewedUnits().end(); ++it)
+    {
+        if (it->first->isVisible() 
+            && it->first->exists()
+            && !it->first->getType().isWorker() // TODO/TOCHANGE
+            && _trackedUnits[it->first] != it->first->getPosition())
+        {
+            // update EUnitsFilter
+            _eUnitsFilter->update(it->first);
+            // update the map
+            addDmg(it->first->getType(), it->first->getPosition());
+            removeDmg(it->first->getType(), _trackedUnits[it->first]);
+            _trackedUnits[it->first] = it->first->getPosition();
+        }
+    }
+
+        end = clock();
+        if (end - start > 0.00000001)
+            Broodwar->printf("accessing: %2.7f", (double)(end - start));
+
+    std::set<BWAPI::Bullet*> tmpBullets = Broodwar->getBullets();
+    for (std::set<Bullet*>::const_iterator it = tmpBullets.begin();
+        it != tmpBullets.end(); ++it)
+    {
+        if ((*it)->getType() == BWAPI::BulletTypes::Psionic_Storm && (*it)->exists())
+        {
+            _trackedBullets.push_back(*it);
+        }
+    }
+
+    for (std::set<Bullet*>::const_iterator it = Broodwar->getBullets().begin();
+        it != Broodwar->getBullets().end(); ++it)
+    {
+        if ((*it)->getType() == BWAPI::BulletTypes::Psionic_Storm && (*it)->exists())
+        {
+            _trackedBullets.push_back(*it);
+        }
+    }
+
 
     this->drawGroundDamagesGrad();
     this->drawGroundDamages();
