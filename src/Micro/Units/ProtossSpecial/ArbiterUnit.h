@@ -1,9 +1,9 @@
 #pragma once
 
-#include <SpecialUnit.h>
+#include <FlyingUnit.h>
 #include <BWAPI.h>
 
-class ArbiterUnit : public SpecialUnit
+class ArbiterUnit : public FlyingUnit
 {
 protected:
     static std::set<BWAPI::UnitType> setPrio;
@@ -12,7 +12,6 @@ public:
     ~ArbiterUnit();
     virtual void micro();
     virtual void check();
-    virtual bool canHit(BWAPI::Unit* enemy);
-    virtual int getTimeToAttack();
+    virtual int getAttackDuration();
     virtual std::set<BWAPI::UnitType> getSetPrio();
 };

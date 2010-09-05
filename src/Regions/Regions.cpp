@@ -257,7 +257,8 @@ void Regions::display() const
 }
 
 
-bool Regions::enemyFound() const{
+bool Regions::enemyFound() const
+{
 	for(std::map<BWTA::Region*, RegionData>::const_iterator it = this->regionsData.begin(); it != regionsData.end(); ++it){
 	
 		for(std::map<Player*, std::vector<RegionsUnitData> >::const_iterator it_b = it->second.buildings.begin(); it_b != it->second.buildings.end(); ++it_b){
@@ -268,6 +269,7 @@ bool Regions::enemyFound() const{
 	return false;
 
 }
+
 BWTA::Region* Regions::whereIsEnemy() {
 	
 	for(std::map<BWTA::Region*, RegionData>::const_iterator it = this->regionsData.begin(); it != regionsData.end(); ++it){
@@ -278,7 +280,6 @@ BWTA::Region* Regions::whereIsEnemy() {
 	}
 	return NULL;
 }
-
 
 #ifdef BW_QT_DEBUG
 QWidget* Regions::createWidget(QWidget* parent) const

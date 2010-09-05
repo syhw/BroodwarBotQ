@@ -60,8 +60,4 @@ public:
     virtual void onUnitDestroy(BWAPI::Unit* u);
     virtual void onUnitShow(BWAPI::Unit* u);
     virtual void onUnitHide(BWAPI::Unit* u);
-
-    BWAPI::Unit* findClosestEnemy(std::set<BWAPI::Unit*> &enemies); // Function to remove ?
-    virtual int damagesOn(BWAPI::Unit* enemy) = 0;
-    virtual bool withinRange(BWAPI::Unit* enemy) = 0;
 };

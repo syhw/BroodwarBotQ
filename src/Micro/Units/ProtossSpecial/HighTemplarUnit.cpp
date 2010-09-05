@@ -15,7 +15,7 @@ HighTemplarUnit::~HighTemplarUnit()
 
 void HighTemplarUnit::micro()
 {
-    if (this->unit->getEnergy() >= 75 && Broodwar->getFrameCount() - _lastStormFrame > Broodwar->getLatency() + 3)
+    if (this->unit->getEnergy() >= 75 && Broodwar->getFrameCount() - _lastStormFrame > Broodwar->getLatency() + getAttackDuration())
     {   
         Position bestStormPos;
         int bestScore = -1;
@@ -48,22 +48,6 @@ void HighTemplarUnit::micro()
 
 void HighTemplarUnit::check()
 {
-}
-
-bool HighTemplarUnit::canHit(BWAPI::Unit* enemy)
-{
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("HighTemplarUnit::canHit non implémenté !");
-#endif
-    return false;
-}
-
-int HighTemplarUnit::getTimeToAttack()
-{
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("HighTemplarUnit::getTimeToAttack non implémenté !");
-#endif
-    return 0;
 }
 
 std::set<BWAPI::UnitType> HighTemplarUnit::getSetPrio()

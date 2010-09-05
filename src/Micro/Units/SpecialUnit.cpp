@@ -8,12 +8,7 @@ SpecialUnit::~SpecialUnit()
 {
 }
 
-int SpecialUnit::damagesOn(BWAPI::Unit* enemy)
+int SpecialUnit::getAttackDuration()
 {
-    return 0;
-}
-
-bool SpecialUnit::withinRange(BWAPI::Unit* enemy)
-{
-    return unit->getDistance(enemy) < 1.0; // to be confirmed
+    return 3; // TOCHANGE TODO
 }

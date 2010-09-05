@@ -20,20 +20,9 @@ void DarkArchonUnit::check()
 {
 }
 
-bool DarkArchonUnit::canHit(BWAPI::Unit* enemy)
+int DarkArchonUnit::getAttackDuration()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("DarkArchonUnit::canHit non implémenté !");
-#endif
-    return false;
-}
-
-int DarkArchonUnit::getTimeToAttack()
-{
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("DarkArchonUnit::getTimeToAttack non implémenté !");
-#endif
-    return 0;
+    return 3;
 }
 
 std::set<BWAPI::UnitType> DarkArchonUnit::getSetPrio()

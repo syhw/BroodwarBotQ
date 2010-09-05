@@ -28,15 +28,7 @@ void ScourgeUnit::check()
 {
 }
 
-bool ScourgeUnit::canHit(BWAPI::Unit* enemy)
-{
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("ScourgeUnit::canHit non implémenté !");
-#endif
-    return false;
-}
-
-int ScourgeUnit::getTimeToAttack()
+int ScourgeUnit::getAttackDuration()
 {
     return 0;
 }

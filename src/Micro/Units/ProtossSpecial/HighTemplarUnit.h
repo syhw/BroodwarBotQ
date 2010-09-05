@@ -15,7 +15,5 @@ public:
     std::pair<BWAPI::Position, int> bestStormPos();
     virtual void micro();
     virtual void check();
-    virtual bool canHit(BWAPI::Unit* enemy);
-    virtual int getTimeToAttack();
     virtual std::set<BWAPI::UnitType> getSetPrio();
 };

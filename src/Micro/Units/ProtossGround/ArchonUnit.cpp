@@ -33,20 +33,9 @@ void ArchonUnit::check()
 {
 }
 
-bool ArchonUnit::canHit(BWAPI::Unit* enemy)
+int ArchonUnit::getAttackDuration()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("ArchonUnit::canHit non implémenté !");
-#endif
-    return false;
-}
-
-int ArchonUnit::getTimeToAttack()
-{
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("ArchonUnit::getTimeToAttack non implémenté !");
-#endif
-    return 0;
+    return 3;
 }
 
 std::set<BWAPI::UnitType> ArchonUnit::getSetPrio()

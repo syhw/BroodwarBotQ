@@ -438,23 +438,3 @@ void BattleUnit::onUnitShow(Unit* u)
 void BattleUnit::onUnitHide(Unit* u)
 {
 }
-
-BWAPI::Unit* BattleUnit::findClosestEnemy(std::set<Unit*> &enemies)
-{
-    Unit* closest_enemy = NULL;
-    for each(Unit* enemy in enemies)
-    {
-        if (closest_enemy)
-        {
-            if (unit->getDistance(closest_enemy) > unit->getDistance(enemy) && enemy->isVisible())
-            {
-                closest_enemy = enemy;
-            }
-        }
-        else if (enemy->isVisible())
-        {
-            closest_enemy = enemy;
-        }
-    }
-    return closest_enemy;
-}

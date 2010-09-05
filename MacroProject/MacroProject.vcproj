@@ -283,10 +283,6 @@
 						Name="ProtossSpecial"
 						>
 						<File
-							RelativePath="..\src\Micro\Units\ProtossSpecial\ArbiterUnit.cpp"
-							>
-						</File>
-						<File
 							RelativePath="..\src\Micro\Units\ProtossSpecial\DarkArchonUnit.cpp"
 							>
 						</File>
@@ -298,6 +294,10 @@
 					<Filter
 						Name="ProtossFlying"
 						>
+						<File
+							RelativePath="..\src\Micro\Units\ProtossSpecial\ArbiterUnit.cpp"
+							>
+						</File>
 						<File
 							RelativePath="..\src\Micro\Units\ProtossFlying\CarrierUnit.cpp"
 							>
@@ -709,10 +709,6 @@
 						Name="ProtossSpecial"
 						>
 						<File
-							RelativePath="..\src\Micro\Units\ProtossSpecial\ArbiterUnit.h"
-							>
-						</File>
-						<File
 							RelativePath="..\src\Micro\Units\ProtossSpecial\DarkArchonUnit.h"
 							>
 						</File>
@@ -724,6 +720,10 @@
 					<Filter
 						Name="ProtossFlying"
 						>
+						<File
+							RelativePath="..\src\Micro\Units\ProtossSpecial\ArbiterUnit.h"
+							>
+						</File>
 						<File
 							RelativePath="..\src\Micro\Units\ProtossFlying\CarrierUnit.h"
 							>

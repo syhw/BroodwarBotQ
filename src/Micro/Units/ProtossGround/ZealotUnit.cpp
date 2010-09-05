@@ -24,58 +24,33 @@ ZealotUnit::~ZealotUnit()
 
 void ZealotUnit::micro()
 {
-   /* 
-    std::set<Unit*> enemies;
-    std::set<Unit*> enemies_in_range;
-    int damagesTaken = 0;
-
-    fillEnemies(enemies, damagesTaken);
-
-    double maxRangeZealot = unit->getType().groundWeapon().maxRange();
-    double maxRangeZealotEnemy = 0.0;
-    for each(Unit* enemy in enemies)
+    if (unit->isStartingAttack() || unit->isAttacking())
+        return;
+    if (Broodwar->getFrameCount() - _lastAttackOrder > getAttackDuration())
     {
-        if (maxRangeZealotEnemy == 0.0)
-            maxRangeZealotEnemy = enemy->getType().groundWeapon().maxRange();
-
-        if (unit->getDistance(enemy) < maxRangeZealot) 
-            enemies_in_range.insert(enemy);
+        if (unit->getGroundWeaponCooldown() == 0)
+        {
+            updateRangeEnemies();
+            updateTargetEnemy();
+            attackEnemyUnit(targetEnemy);
+        }
+        else if (_fleeing || _lastTotalHP - (unit->getShields() + unit->getHitPoints()) > 0)
+        {
+            //flee();
+        }
+        else if (!unit->isMoving() && targetEnemy != NULL)
+        {
+            //fightMove();
+        }
     }
-
-    Unit* weakestenemy = UnitsGroup::findWeakestEnemy(enemies_in_range);
-
-    if (weakestenemy)
-        attackEnemy(weakestenemy, Colors::Red);
-    else
-    {
-        Unit* closest_enemy = findClosestEnemy(enemies);
-        if (closest_enemy)
-            attackEnemy(closest_enemy, Colors::Yellow);
-#ifdef __DEBUG_NICOLAS__
-        else
-            BWAPI::Broodwar->drawLineMap(unit->getPosition().x(),      unit->getPosition().y(),
-                                  unit->getTargetPosition().x(),unit->getTargetPosition().y(),
-                                  Colors::White);
-#endif
-    }
-    enemies_in_range.clear();
-    */
 }
 
 void ZealotUnit::check()
 {
 }
 
-bool ZealotUnit::canHit(BWAPI::Unit* enemy)
+int ZealotUnit::getAttackDuration()
 {
-    return enemy->isVisible() && !enemy->getType().isFlyer() && (enemy->getDistance(unit) > 0);
-}
-
-int ZealotUnit::getTimeToAttack()
-{
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("ZealotUnit::getTimeToAttack non implémenté !");
-#endif 
     return 0;
 }
 

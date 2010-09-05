@@ -6,17 +6,18 @@ using namespace std;
 using namespace BWAPI;
 
 int DragoonUnit::addRange;
+int DragoonUnit::attackDuration;
 
 std::set<BWAPI::UnitType> DragoonUnit::setPrio;
 
 DragoonUnit::DragoonUnit(BWAPI::Unit* u, UnitsGroup* ug)
-:GroundUnit(u, ug)
+: GroundUnit(u, ug)
 {
     if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Singularity_Charge))
         addRange = 64;
     else
         addRange = 0;
-    _attackDuration += 8; // not static for the moment TODO
+    attackDuration = Broodwar->getLatency() + 8;
 
     if (setPrio.empty())
     {
@@ -57,7 +58,7 @@ void DragoonUnit::micro()
     }
     else
     {
-        if (Broodwar->getFrameCount() - _lastAttackOrder > _attackDuration)
+        if (Broodwar->getFrameCount() - _lastAttackOrder > getAttackDuration())
         {
             if (unit->getGroundWeaponCooldown() == 0)
             {
@@ -86,24 +87,14 @@ void DragoonUnit::check()
         addRange = 64;
 }
 
-bool DragoonUnit::canHit(Unit* enemy)
-{
-    return enemy->isVisible();
-}
-
-bool DragoonUnit::withinRange(Unit* enemy)
-{
-    return DragoonUnit::getMaxRange() > enemy->getDistance(unit)-enemy->getType().dimensionRight();
-}
-
 double DragoonUnit::getMaxRange()
 {
     return BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Singularity_Charge) == 1 ? 192.0 : 128.0;
 }
 
-int DragoonUnit::getTimeToAttack()
+int DragoonUnit::getAttackDuration()
 {
-    return 8;
+    return attackDuration;
 }
 
 std::set<BWAPI::UnitType> DragoonUnit::getSetPrio()

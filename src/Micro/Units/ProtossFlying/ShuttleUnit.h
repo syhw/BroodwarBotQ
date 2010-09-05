@@ -10,7 +10,6 @@ public:
     ~ShuttleUnit();
     virtual void micro();
     virtual void check();
-    virtual bool canHit(BWAPI::Unit* enemy);
-    virtual int getTimeToAttack();
+    virtual int getAttackDuration();
     virtual std::set<BWAPI::UnitType> getSetPrio();
 };

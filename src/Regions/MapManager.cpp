@@ -403,13 +403,14 @@ void MapManager::updateStormPos()
         }
         if (tmp > 0)
         {
-            storms.insert(std::make_pair<int, Position>(tmp, *it));
+            //storms.insert(std::make_pair<int, Position>(tmp, *it));
+            _stormPosBuf.insert(std::make_pair<Position, int>(*it, tmp));
         }
     }
     // Filter the positions for the storms by descending order + non-overlapings
     // We do not permit overlapping at all (using __STORM_SIZE__ instead of __COVER_SIZE__) 
     // because next computation will arrange for that (overlapping)
-    std::set<std::pair<int, int> > covered = _dontReStorm;
+    /*std::set<std::pair<int, int> > covered = _dontReStorm;
     for (std::map<int, Position>::const_reverse_iterator it = storms.rbegin();
         it != storms.rend(); ++it)
     {
@@ -419,7 +420,7 @@ void MapManager::updateStormPos()
             _stormPosBuf.insert(std::make_pair<Position, int>(it->second, it->first));
             covered.insert(tmp);
         }
-    }
+    }*/
     return;
 }
 
@@ -528,7 +529,7 @@ void MapManager::onFrame()
                 std::pair<int, int> tmp(it->first.x() / (__STORM_SIZE__), it->first.y() / (__STORM_SIZE__));
                 _dontReStorm.insert(tmp);
             }
-            //updateStormPos();
+            // this thread is doing updateStormPos();
             DWORD threadId;
             HANDLE thread = CreateThread( 
                 NULL,                   // default security attributes
@@ -729,5 +730,8 @@ void MapManager::drawBestStorms()
         it != stormPos.end(); ++it)
     {
         Broodwar->drawBoxMap(it->first.x() - 48, it->first.y() - 48, it->first.x() + 48, it->first.y() + 48, BWAPI::Colors::Purple);
+        char score[5];
+        sprintf_s(score, "%d", it->second);
+        Broodwar->drawTextMap(it->first.x() + 46, it->first.y() + 46, score);
     }
 }

@@ -43,19 +43,8 @@ void CarrierUnit::check()
 {
 }
 
-bool CarrierUnit::canHit(BWAPI::Unit* enemy)
+int CarrierUnit::getAttackDuration()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("CarrierUnit::canHit non implémenté !");
-#endif
-    return false;
-}
-
-int CarrierUnit::getTimeToAttack()
-{
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("CarrierUnit::getTimeToAttack non implémenté !");
-#endif
     return 0;
 }
 

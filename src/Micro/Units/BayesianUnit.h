@@ -97,7 +97,6 @@ protected:
     const int _refreshPathFramerate;
     int _maxDistWhileRefreshingPath;
     bool _newPath;
-    int _attackDuration;
     Position _inPos;
     bool _fleeing;
     //std::multimap<BWAPI::Position, attractor_type> _prox;
@@ -140,7 +139,7 @@ protected:
     void updateRangeEnemies();
     void updateTargetEnemy();
     inline void setTargetEnemy(BWAPI::Unit* u);
-    inline int computeDmg(BWAPI::Unit* u);
+    int computeDmg(BWAPI::Unit* u);
     bool inRange(BWAPI::Unit* u);
     void drawDirV();
     void updateObj();
@@ -184,9 +183,6 @@ public:
     void attackEnemy(BWAPI::Unit* u, BWAPI::Color col);
     virtual void micro() = 0;
     virtual void check() = 0;
-    virtual bool canHit(BWAPI::Unit* enemy) = 0;
-    virtual int damagesOn(BWAPI::Unit* enemy) = 0;
-    virtual int getTimeToAttack() = 0;
-    virtual bool withinRange(BWAPI::Unit* enemy) = 0;
+    virtual int getAttackDuration() = 0;
     virtual std::set<BWAPI::UnitType> getSetPrio() = 0;
 };

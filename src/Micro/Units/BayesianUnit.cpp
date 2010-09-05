@@ -62,7 +62,6 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 , _refreshPathFramerate(12)
 , _maxDistWhileRefreshingPath(max(_refreshPathFramerate * _topSpeed, 45.26)) // 45.26 = sqrt(BWAPI::TILE_SIZE^2 + BWAPI::TILE_SIZE^2)
 , _newPath(false)
-, _attackDuration(Broodwar->getLatency())
 , _inPos(Position(0, 0))
 , _fleeing(false)
 {
@@ -1117,13 +1116,13 @@ void BayesianUnit::setTargetEnemy(Unit* u)
 int BayesianUnit::computeDmg(Unit* u)
 {
     // TODO complete: armors, upgrades, shields, spells (matrix...)
-
+    Broodwar->printf("attack upgrade %d", Broodwar->enemy()->getUpgradeLevel(BWAPI::UpgradeTypes::Protoss_Ground_Weapons));
     if (u->getType().isFlyer())
     {
         if (u->getShields() 
-            >= (unit->getType().airWeapon().damageAmount() /* - shield armor */) * unit->getType().maxAirHits())
+            >= (unit->getType().airWeapon().damageAmount() /* - shield upgrade lvl */) * unit->getType().maxAirHits())
         {
-            return (unit->getType().airWeapon().damageAmount() /* - shield armor */)
+            return (unit->getType().airWeapon().damageAmount() /* - shield upgrade lvl */)
                 * unit->getType().maxAirHits();
         }
         else
@@ -1149,9 +1148,9 @@ int BayesianUnit::computeDmg(Unit* u)
     else
     {        
         if (u->getShields() 
-            >= (unit->getType().groundWeapon().damageAmount() /* - shield armor */) * unit->getType().maxGroundHits())
+            >= (unit->getType().groundWeapon().damageAmount() /* - shield upgrade lvl */) * unit->getType().maxGroundHits())
         {
-            return (unit->getType().groundWeapon().damageAmount() /* - shield armor */)
+            return (unit->getType().groundWeapon().damageAmount() /* - shield upgrade lvl */)
                 * unit->getType().maxGroundHits();
         }
         else
@@ -1499,7 +1498,7 @@ void BayesianUnit::update()
         break;
 
     case MODE_MOVE:
-        if ((Broodwar->getFrameCount() - _lastClickFrame) > _attackDuration)
+        if ((Broodwar->getFrameCount() - _lastClickFrame) > getAttackDuration())
         {
             unit->rightClick(target);
             _lastRightClick = target;

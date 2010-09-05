@@ -3,7 +3,7 @@
 std::set<BWAPI::UnitType> ArbiterUnit::setPrio;
 
 ArbiterUnit::ArbiterUnit(BWAPI::Unit* u, UnitsGroup* ug)
-: SpecialUnit(u, ug)
+: FlyingUnit(u, ug)
 {
     if (setPrio.empty())
     {
@@ -33,19 +33,8 @@ void ArbiterUnit::check()
 {
 }
 
-bool ArbiterUnit::canHit(BWAPI::Unit* enemy)
+int ArbiterUnit::getAttackDuration()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("ArbiterUnit::canHit non implémenté !");
-#endif
-    return false;
-}
-
-int ArbiterUnit::getTimeToAttack()
-{
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("ArbiterUnit::getTimeToAttack non implémenté !");
-#endif
     return 0;
 }
 

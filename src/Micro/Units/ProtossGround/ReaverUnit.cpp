@@ -27,20 +27,9 @@ void ReaverUnit::check()
 {
 }
 
-bool ReaverUnit::canHit(BWAPI::Unit* enemy)
+int ReaverUnit::getAttackDuration()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("ReaverUnit::canHit non implémenté !");
-#endif
-    return false;
-}
-
-int ReaverUnit::getTimeToAttack()
-{
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("ReaverUnit::getTimeToAttack non implémenté !");
-#endif
-    return 0;
+    return 3;
 }
 
 std::set<BWAPI::UnitType> ReaverUnit::getSetPrio()

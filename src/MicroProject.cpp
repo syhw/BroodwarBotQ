@@ -116,24 +116,6 @@ void MicroAIModule::onFrame()
     sprintf_s(mousePos, "%d, %d", Broodwar->getScreenPosition().x()+Broodwar->getMousePosition().x(), Broodwar->getScreenPosition().y()+Broodwar->getMousePosition().y());
     Broodwar->drawTextMouse(12, 0, mousePos);
 #endif
-	/*if (Broodwar->getFrameCount()%300==0)
-	{
-	//Every 300 frames we will print some basic unit stats
-	showStats();
-	}
-
-	//we will visualize the chokepoints with red lines
-	for(std::set<BWTA::Region*>::const_iterator r=BWTA::getRegions().begin();r!=BWTA::getRegions().end();r++)
-	{
-	for(std::set<BWTA::Chokepoint*>::const_iterator c=(*r)->getChokepoints().begin();c!=(*r)->getChokepoints().end();c++)
-	{
-	Position point1=(*c)->getSides().first;
-	Position point2=(*c)->getSides().second;
-	Broodwar->drawLine(CoordinateType::Map,point1.x(),point1.y(),point2.x(),point2.y(),Colors::Red);
-	}
-	}*/
-
-	//if (mm != NULL) mm->display();
 
     //we will iterate through all the regions and draw the polygon outline of it in green.
 	for(std::set<BWTA::Region*>::const_iterator r=BWTA::getRegions().begin();r!=BWTA::getRegions().end();r++)
@@ -146,8 +128,6 @@ void MicroAIModule::onFrame()
 			Broodwar->drawLine(CoordinateType::Map,point1.x(),point1.y(),point2.x(),point2.y(),Colors::Green);
 		}
 	}
-    //mapManager->drawBuildings();
-    //mapManager->drawWalkability();
     mapManager->onFrame();
 }
 

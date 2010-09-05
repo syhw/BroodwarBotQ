@@ -20,16 +20,8 @@ void ShuttleUnit::check()
 {
 }
 
-bool ShuttleUnit::canHit(BWAPI::Unit* enemy)
+int ShuttleUnit::getAttackDuration()
 {
-    return false;
-}
-
-int ShuttleUnit::getTimeToAttack()
-{
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("ShuttleUnit::getTimeToAttack non implémenté !");
-#endif
     return 0;
 }
 

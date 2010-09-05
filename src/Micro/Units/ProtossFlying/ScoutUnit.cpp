@@ -35,19 +35,8 @@ void ScoutUnit::check()
 {
 }
 
-bool ScoutUnit::canHit(BWAPI::Unit* enemy)
+int ScoutUnit::getAttackDuration()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("ScoutUnit::canHit non implémenté !");
-#endif
-    return false;
-}
-
-int ScoutUnit::getTimeToAttack()
-{
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("ScoutUnit::getTimeToAttack non implémenté !");
-#endif
     return 0;
 }
 
