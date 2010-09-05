@@ -13,16 +13,11 @@ struct EViewedUnit
     BWAPI::UnitType type;
     int HP;
     BWAPI::Position position;
-    int kills;
-    unsigned long lastSeen;
+    unsigned int lastSeen;
     Vec velocity;
     EViewedUnit() { }
-    EViewedUnit(BWAPI::Unit* u, unsigned long time);
+    EViewedUnit(BWAPI::Unit* u, unsigned int time);
     EViewedUnit(const EViewedUnit& evu);
-    void update(unsigned long time);
+    void update(unsigned int time);
     ~EViewedUnit() { }
-    //std::ostream& operator <<(std::ostream& os) const;
-    const std::istream& operator >>(const std::istream& is) const;
 };
-
-std::ostream& operator <<(std::ostream& os, const EViewedUnit& evu);

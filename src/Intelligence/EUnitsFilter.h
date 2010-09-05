@@ -29,8 +29,10 @@ public:
     bool empty();//
     void bwOutput();
     virtual void update();
+#ifdef BW_QT_DEBUG
     virtual QWidget* createWidget(QWidget* parent) const;
     virtual void refreshWidget(QWidget* widget) const;
+#endif
 private:
     EUnitsFilter();
     ~EUnitsFilter() { }

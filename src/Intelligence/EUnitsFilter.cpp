@@ -16,9 +16,9 @@ void EUnitsFilter::update(Unit* u)
     if (u->getPlayer() == Broodwar->self()) return;
     if (u->getPlayer()->isNeutral()) return;
     if (_eViewedUnits.count(u))
-        _eViewedUnits[u].update(timeManager->getElapsedTime());
+        _eViewedUnits[u].update(Broodwar->getFrameCount());
     else 
-        _eViewedUnits[u] = EViewedUnit(u, timeManager->getElapsedTime());
+        _eViewedUnits[u] = EViewedUnit(u, Broodwar->getFrameCount());
 }
 
 void EUnitsFilter::onUnitDestroy(Unit* u)
@@ -47,6 +47,29 @@ void EUnitsFilter::onUnitRenegade(Unit* u)
 {
     update(u);
 }
+
+void EUnitsFilter::update()
+{
+}
+
+const std::map<BWAPI::Unit*, EViewedUnit>& EUnitsFilter::getViewedUnits()
+{
+    return _eViewedUnits;
+}
+
+bool EUnitsFilter::empty()
+{
+    return _eViewedUnits.empty();
+}
+
+void EUnitsFilter::bwOutput()
+{
+    for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = _eViewedUnits.begin(); 
+        it != _eViewedUnits.end(); ++it)
+        Broodwar->printf("Unit: %i", it->first);
+}
+
+#ifdef BW_QT_DEBUG
 
 QWidget* EUnitsFilter::createWidget(QWidget* parent) const
 {
@@ -83,28 +106,8 @@ QWidget* EUnitsFilter::createWidget(QWidget* parent) const
 		return qw;
 }
 
-void EUnitsFilter::update()
-{
-}
-
-const std::map<BWAPI::Unit*, EViewedUnit>& EUnitsFilter::getViewedUnits()
-{
-    return _eViewedUnits;
-}
-
-bool EUnitsFilter::empty()
-{
-    return _eViewedUnits.empty();
-}
-
-void EUnitsFilter::bwOutput()
-{
-    for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = _eViewedUnits.begin(); 
-        it != _eViewedUnits.end(); ++it)
-        Broodwar->printf("Unit: %i", it->first);
-}
-
 void EUnitsFilter::refreshWidget(QWidget* /*widget*/) const
 {
 }
 
+#endif

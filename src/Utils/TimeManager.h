@@ -54,7 +54,6 @@ public:
     const std::list<TimeManaged*>& getManaged() const;
 
 	// TimeManager
-    unsigned long getElapsedTime() const;
     static VOID CALLBACK suspendAll( // static for the purpose of TIMERPROC C function call
         HWND hwnd,        // handle to window for timer messages 
         UINT message,     // WM_TIMER message 

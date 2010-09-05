@@ -28,8 +28,9 @@ void HighTemplarUnit::micro()
                 bestStormPos = it->first;
             }
         }
-        if (bestScore > 1 || (_unitsGroup->enemies.size() == 1 && bestScore == 1)) // TOCHANGE bestScore > 1 => > 2 ??
+        if (bestScore > 3 || (_unitsGroup->enemies.size() == 1 && bestScore == 3)) // TOCHANGE bestScore > 1 => > 2 ??
         {
+            Broodwar->printf("enemies size : %d", _unitsGroup->enemies.size());
             unit->useTech(BWAPI::TechTypes::Psionic_Storm, bestStormPos);
             _mapManager->stormPos.erase(bestStormPos);
             _lastStormFrame = Broodwar->getFrameCount();
@@ -41,7 +42,7 @@ void HighTemplarUnit::micro()
     }
     else
     {
-        fightMove();
+        //fightMove();
     }
 }
 

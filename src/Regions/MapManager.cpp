@@ -6,7 +6,7 @@
 #include <string.h>
 #include <assert.h>
 
-#define __MESH_SIZE__ 24 // 16 // 24 // 32 // 48
+#define __MESH_SIZE__ 32 // 16 // 24 // 32 // 48
 #define __STORM_SIZE__ 96
 #define __COVER_SIZE__ __STORM_SIZE__/1.5
 
@@ -258,6 +258,8 @@ int MapManager::additionalRangeGround(UnitType ut)
         return 32;
     else if (ut == UnitTypes::Zerg_Hydralisk)
         return 32;
+    else if (ut == UnitTypes::Terran_Vulture_Spider_Mine)
+        return 64;
     else 
         return 0;
 }
@@ -341,6 +343,7 @@ DWORD MapManager::LaunchUpdateStormPos()
 void MapManager::updateStormPos()
 {
     _stormPosBuf.clear();
+    // Construct different possible positions for the storms, shifting by __MESH_SIZE__
     std::set<Position> possiblePos;
     for (std::map<BWAPI::Unit*, BWAPI::Position>::const_iterator eit = _enemyUnitsPosBuf.begin();
         eit != _enemyUnitsPosBuf.end(); ++eit)
@@ -371,17 +374,9 @@ void MapManager::updateStormPos()
                 possiblePos.insert(Position(tmpPos.x(), tmpPos.y() - __MESH_SIZE__));
             if (tmpPos.y() + __MESH_SIZE__ < _pix_height)
                 possiblePos.insert(Position(tmpPos.x(), tmpPos.y() + __MESH_SIZE__));
-
-            if (tmpPos.x() >= 2*__MESH_SIZE__)
-                possiblePos.insert(Position(tmpPos.x() - 2*__MESH_SIZE__, tmpPos.y()));
-            if (tmpPos.x() + 2*__MESH_SIZE__ < _pix_width)
-                possiblePos.insert(Position(tmpPos.x() + 2*__MESH_SIZE__, tmpPos.y()));
-            if (tmpPos.y() >= 2*__MESH_SIZE__) 
-                possiblePos.insert(Position(tmpPos.x(), tmpPos.y() - 2*__MESH_SIZE__));
-            if (tmpPos.y() + 2*__MESH_SIZE__ < _pix_height)
-                possiblePos.insert(Position(tmpPos.x(), tmpPos.y() + 2*__MESH_SIZE__));  
         }
     }
+    // Score the possible possitions for the storms
     std::map<int, Position> storms;
     for (std::set<Position>::const_iterator it = possiblePos.begin();
         it != possiblePos.end(); ++it)
@@ -401,22 +396,24 @@ void MapManager::updateStormPos()
             if (eit->second.x() > it->x() - 40 && eit->second.x() < it->x() + 40
                 && eit->second.y() > it->y() - 40 && eit->second.y() < it->y() + 40)
                 tmp += 2;
-            // TODO TOCHANGE 12 here, to center, it could be 1 tiles x 32 / 2 = 16 or less
-            if (eit->second.x() > it->x() - 12 && eit->second.x() < it->x() + 12
-                && eit->second.y() > it->y() - 12 && eit->second.y() < it->y() + 12)
+            // TODO TOCHANGE 16 here, to center, it could be 1 tiles x 32 / 2 = 16 or less
+            if (eit->second.x() > it->x() - 15 && eit->second.x() < it->x() + 15
+                && eit->second.y() > it->y() - 15 && eit->second.y() < it->y() + 15)
                 ++tmp;
         }
         if (tmp > 0)
         {
             storms.insert(std::make_pair<int, Position>(tmp, *it));
-            //_stormPosBuf.insert(std::make_pair<Position, int>(*it, tmp));
         }
     }
+    // Filter the positions for the storms by descending order + non-overlapings
+    // We do not permit overlapping at all (using __STORM_SIZE__ instead of __COVER_SIZE__) 
+    // because next computation will arrange for that (overlapping)
     std::set<std::pair<int, int> > covered = _dontReStorm;
     for (std::map<int, Position>::const_reverse_iterator it = storms.rbegin();
         it != storms.rend(); ++it)
     {
-        std::pair<int, int> tmp(it->second.x() / (__COVER_SIZE__), it->second.y() / (__COVER_SIZE__));
+        std::pair<int, int> tmp(it->second.x() / (__STORM_SIZE__), it->second.y() / (__STORM_SIZE__));
         if (!covered.count(tmp))
         {
             _stormPosBuf.insert(std::make_pair<Position, int>(it->second, it->first));
@@ -444,17 +441,21 @@ void MapManager::onFrame()
     {
         if (it->first->isVisible() 
             && it->first->exists()
-            && !it->first->getType().isWorker() // TODO/TOCHANGE
+            && (!it->first->getType().isWorker() 
+                || (it->first->getType().isWorker() 
+                    && (it->first->isGatheringMinerals() || it->first->isGatheringGas())))
             && _trackedUnits[it->first] != it->first->getPosition())
         {
             // update EUnitsFilter
             _eUnitsFilter->update(it->first);
             // update MapManager (ourselves)
+            // TODO work on Lurkers burrowing
             addDmg(it->first->getType(), it->first->getPosition());
             removeDmg(it->first->getType(), _trackedUnits[it->first]);
             _trackedUnits[it->first] = it->first->getPosition();
         }
     }
+    // Iterate of all the Bullets to extract the interesting ones
     for (std::set<Bullet*>::const_iterator it = Broodwar->getBullets().begin();
         it != Broodwar->getBullets().end(); ++it)
     {
@@ -468,15 +469,15 @@ void MapManager::onFrame()
         }
         else if ((*it)->getType() == BWAPI::BulletTypes::Subterranean_Spines)
         {
-
+            // TODO
         }
         else if ((*it)->getType() == BWAPI::BulletTypes::Invisible)
         {
+            // TODO
         }
-        //else if ((*it)->getType() == BWAPI::BulletTypes::Plague_Cloud)
-        //{
-        //}
     }
+    // Updating the damages maps with storms 
+    // (overlapping => more damage, that's false but easy AND handy b/c of durations)
     for (std::map<Bullet*, Position>::iterator it = _trackedStorms.begin();
         it != _trackedStorms.end(); )
     {
@@ -509,7 +510,7 @@ void MapManager::onFrame()
                     _enemyUnitsPosBuf.insert(std::make_pair<Unit*, Position>(it->first, it->second));
             }
             _dontReStorm.clear();
-            // Don't restorm where there are already existing storms
+            // Don't restorm where there are already existing storms, lasting more than 48 frames
             for (std::map<Bullet*, Position>::const_iterator it = _trackedStorms.begin();
                 it != _trackedStorms.end(); ++it)
             {
@@ -520,10 +521,11 @@ void MapManager::onFrame()
                 }
             }
             // Hack to balance the fact that a storm takes a few frames to be launched/effective (appear in the Bullets)
+            // Worst case: we lose "one round" (a little more than one frame) of bests storms
             for (std::map<Position, int>::const_iterator it = stormPos.begin();
                 it != stormPos.end(); ++it)
             {
-                std::pair<int, int> tmp(it->first.x() / (__COVER_SIZE__), it->first.y() / (__COVER_SIZE__));
+                std::pair<int, int> tmp(it->first.x() / (__STORM_SIZE__), it->first.y() / (__STORM_SIZE__));
                 _dontReStorm.insert(tmp);
             }
             //updateStormPos();
@@ -542,8 +544,9 @@ void MapManager::onFrame()
 
 #ifdef __DEBUG_GABRIEL__
     clock_t end = clock();
-    if ((double)(end - start) > 0.1)
-        Broodwar->printf("MapManager::onFrame() took: %f", (double)(end-start));
+    double duration = (double)(end - start) / CLOCKS_PER_SEC;
+    if (duration > 0.040) 
+        Broodwar->printf("MapManager::onFrame() took: %2.5f seconds\n", duration);
 #endif
     this->drawGroundDamagesGrad();
     this->drawGroundDamages();

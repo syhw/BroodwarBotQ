@@ -234,8 +234,8 @@ void UnitsGroup::update()
 #ifdef __DEBUG_GABRIEL__
     clock_t finish = clock();
     double duration = (double)(finish - start) / CLOCKS_PER_SEC;
-    if (duration > 0.041) 
-        Broodwar->printf( "%2.5f seconds\n", duration);
+    if (duration > 0.040) 
+        Broodwar->printf( "UnitsGroup::update() took %2.5f seconds\n", duration);
 #endif
 }
 

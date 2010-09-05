@@ -50,11 +50,6 @@ const std::list<TimeManaged*>& TimeManager::getManaged() const
     return _managed;
 }
 
-unsigned long TimeManager::getElapsedTime() const
-{
-	return frameCount;
-}
-
 VOID CALLBACK TimeManager::suspendAll(
                              HWND hwnd,        // handle to window for timer messages 
                              UINT message,     // WM_TIMER message 
