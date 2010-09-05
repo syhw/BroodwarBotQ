@@ -66,9 +66,8 @@ void HighTemplarUnit::micro()
         // or there is only one enemy unit around us and we can storm it without collateral damages
         if (bestScore > 3 || (_unitsGroup->enemies.size() == 1 && bestScore == 3))
         {
-           
             unit->useTech(BWAPI::TechTypes::Psionic_Storm, bestStormPos);
-            Broodwar->printf("Frame %d, pos (%d, %d)", Broodwar->getFrameCount(), bestStormPos.x(), bestStormPos.y());
+            Broodwar->printf("Frame %d, pos (%d, %d), stormPos size: %d", Broodwar->getFrameCount(), bestStormPos.x(), bestStormPos.y(), _mapManager->stormPos.size());
             // remove the storm that we just fired
             _mapManager->stormPos.erase(bestStormPos);
             // remove the >= 4/9 (buildtiles) overlaping storms yet present in stormPos

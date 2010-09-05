@@ -423,17 +423,30 @@ void MapManager::updateStormPos()
         }
     }
     // Filter the positions for the storms by descending order + eliminate some overlapings
-    // We cannot prevent all overlapping, as we use __STORM_SIZE__ grain instead of a finer grid
-    // Next computation will arrange for that (making overlapping possible / rough discretization)
-    std::set<std::pair<int, int> > covered = _dontReStorm;
+    std::set<Position> covered = _dontReStorm; // could have made a set<TilePosition>
     for (std::set<std::pair<int, Position> >::const_reverse_iterator it = storms.rbegin();
         it != storms.rend(); ++it)
     {
-        std::pair<int, int> tmp(it->second.x() / (__STORM_SIZE__), it->second.y() / (__STORM_SIZE__));
-        if (!covered.count(tmp))
+        bool found_coverage = false;
+        for (std::set<Position>::const_iterator cov = covered.begin();
+            cov != covered.end(); ++cov)
+        {
+            if ((*cov) == it->second)
+            {
+                found_coverage = true;
+                break;
+            }
+            Vec dist(cov->x() - it->second.x(), cov->y() - it->second.y());
+            if (dist.norm() < 148.0)
+            {
+                found_coverage = true;
+                break;
+            }
+        }
+        if (!found_coverage)
         {
             _stormPosBuf.insert(std::make_pair<Position, int>(it->second, it->first));
-            covered.insert(tmp);
+            covered.insert(it->second);
         }
     }
     return;
@@ -508,7 +521,6 @@ void MapManager::onFrame()
         // update the possible storms positions
         if (WaitForSingleObject(_stormPosMutex, 0) == WAIT_OBJECT_0) //&& (Broodwar->getFrameCount() - _lastStormPosUpdate > 6 || Broodwar->getFrameCount() == 1)) // cannot enter when the thread is running
         {
-            Broodwar->printf("MAPMANAGER frame: %d", Broodwar->getFrameCount());
             stormPos = _stormPosBuf;
             _enemyUnitsPosBuf = HighTemplarUnit::stormableUnits;
             if (!_enemyUnitsPosBuf.empty())
@@ -520,23 +532,14 @@ void MapManager::onFrame()
                     it != _trackedStorms.end(); ++it)
                 {
                     if (it->first->exists() && it->first->getRemoveTimer() > 48)
-                    {
-                        std::pair<int, int> tmp(it->second.x() / (__STORM_SIZE__), it->second.y() / (__STORM_SIZE__));
-                        _dontReStorm.insert(tmp);
-                    }
+                        _dontReStorm.insert(it->second);
                 }
                 _invisibleUnitsBuf = _eUnitsFilter->getInvisibleUnits();
                 // Hack to balance the fact that a storm takes a few frames to be launched/effective (appear in the Bullets)
                 // Worst case: we lose "one round" (a little more than one frame) of bests storms
                 for (std::map<Position, int>::const_iterator it = _stormPosBuf.begin();
                     it != _stormPosBuf.end(); ++it)
-                {
-                    if (!stormPos.count(it->first))
-                    {
-                        std::pair<int, int> tmp(it->first.x() / (__STORM_SIZE__), it->first.y() / (__STORM_SIZE__));
-                        _dontReStorm.insert(tmp);
-                    }
-                }
+                    _dontReStorm.insert(it->first);
                 _lastStormPosUpdate = Broodwar->getFrameCount();
                 // this thread is doing updateStormPos();
                 DWORD threadId;
@@ -565,7 +568,7 @@ void MapManager::onFrame()
 #endif
     this->drawGroundDamagesGrad();
     this->drawGroundDamages();
-    this->drawBestStorms();
+    //this->drawBestStorms();
 }
 
 const std::map<BWAPI::Unit*, BWAPI::Position>& MapManager::getOurUnits()
