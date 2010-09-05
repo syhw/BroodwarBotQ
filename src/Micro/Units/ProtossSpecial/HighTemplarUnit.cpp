@@ -16,6 +16,7 @@ HighTemplarUnit::~HighTemplarUnit()
 
 void HighTemplarUnit::micro()
 {
+    // Updating the map of stormable units
     if (lastStormableUnitsUpdateFrame != Broodwar->getFrameCount())
     {
         stormableUnits.clear();
@@ -30,6 +31,7 @@ void HighTemplarUnit::micro()
             stormableUnits.insert(std::make_pair<Unit*, Position>(*it, (*it)->getPosition()));
     }
 
+    // Try and storm if it has any advantage, otherwise flee or don't stuck
     if (this->unit->getEnergy() >= 75 && Broodwar->getFrameCount() - _lastStormFrame > Broodwar->getLatency() + getAttackDuration())
     {   
         Position bestStormPos;
@@ -43,7 +45,9 @@ void HighTemplarUnit::micro()
                 bestStormPos = it->first;
             }
         }
-        if (bestScore > 3 || (_unitsGroup->enemies.size() == 1 && bestScore == 3)) // TOCHANGE bestScore > 1 => > 2 ??
+        // Storm only if it damages at least 2 units, or at least 1 invisible unit,
+        // or there is only one enemy unit around us and we can storm it without collateral damages
+        if (bestScore > 3 || (_unitsGroup->enemies.size() == 1 && bestScore == 3))
         {
             //Broodwar->printf("enemies size : %d", _unitsGroup->enemies.size());
             unit->useTech(BWAPI::TechTypes::Psionic_Storm, bestStormPos);
@@ -71,7 +75,7 @@ void HighTemplarUnit::micro()
     }
     else
     {
-        //fightMove();
+        fightMove();
     }
 }
 
