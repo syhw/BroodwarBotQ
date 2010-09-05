@@ -27,7 +27,7 @@ private:
     std::map<BWAPI::Bullet*, BWAPI::Position> _trackedStorms;
     HANDLE _stormPosMutex;
     std::map<Position, int> _stormPosBuf;
-    std::set<Position> _dontReStorm;
+    std::set<TilePosition> _dontReStorm;
     std::multimap<double, BWAPI::Unit*> _rangeEnemiesBuf;
     std::map<BWAPI::Unit*, BWAPI::Position> _alliedUnitsPosBuf;
     std::map<BWAPI::Unit*, BWAPI::Position> _enemyUnitsPosBuf;

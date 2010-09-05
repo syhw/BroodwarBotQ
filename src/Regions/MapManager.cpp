@@ -423,27 +423,12 @@ void MapManager::updateStormPos()
         }
     }
     // Filter the positions for the storms by descending order + eliminate some overlapings
-    std::set<Position> covered = _dontReStorm; // could have made a set<TilePosition>
+    std::set<TilePosition> covered = _dontReStorm; // could have made a set<TilePosition>
     for (std::set<std::pair<int, Position> >::const_reverse_iterator it = storms.rbegin();
         it != storms.rend(); ++it)
     {
-        bool found_coverage = false;
-        for (std::set<Position>::const_iterator cov = covered.begin();
-            cov != covered.end(); ++cov)
-        {
-            if ((*cov) == it->second)
-            {
-                found_coverage = true;
-                break;
-            }
-            Vec dist(cov->x() - it->second.x(), cov->y() - it->second.y());
-            if (dist.norm() < 148.0)
-            {
-                found_coverage = true;
-                break;
-            }
-        }
-        if (!found_coverage)
+        TilePosition tmp(it->second);
+        if (!_dontReStorm.count(tmp))
         {
             _stormPosBuf.insert(std::make_pair<Position, int>(it->second, it->first));
             covered.insert(it->second);
