@@ -10,5 +10,5 @@ SpecialUnit::~SpecialUnit()
 
 int SpecialUnit::getAttackDuration()
 {
-    return 3; // TOCHANGE TODO
+    return 1; // TOCHANGE TODO
 }

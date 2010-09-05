@@ -18,6 +18,7 @@
 class MapManager: public CSingleton<MapManager>
 {
     friend class CSingleton<MapManager>;
+    int _lastStormPosUpdate;
 
 private:
     EUnitsFilter* _eUnitsFilter;
@@ -30,6 +31,7 @@ private:
     std::multimap<double, BWAPI::Unit*> _rangeEnemiesBuf;
     std::map<BWAPI::Unit*, BWAPI::Position> _alliedUnitsPosBuf;
     std::map<BWAPI::Unit*, BWAPI::Position> _enemyUnitsPosBuf;
+    std::map<BWAPI::Unit*, std::pair<BWAPI::UnitType, BWAPI::Position> > _invisibleUnitsBuf;
     static DWORD WINAPI StaticLaunchUpdateStormPos(void* obj);
     DWORD LaunchUpdateStormPos();
     inline void updateStormPos();

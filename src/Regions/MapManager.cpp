@@ -23,6 +23,7 @@ MapManager::MapManager()
         NULL,                  // default security attributes
         FALSE,                 // initially not owned
         NULL))                  // unnamed mutex
+, _lastStormPosUpdate(0)
 {
     walkability = new bool[_width * _height];             // Walk Tiles resolution
     buildings_wt = new bool[_width * _height];
@@ -398,10 +399,18 @@ void MapManager::updateStormPos()
             if (eit->second.x() > it->x() - 40 && eit->second.x() < it->x() + 40
                 && eit->second.y() > it->y() - 40 && eit->second.y() < it->y() + 40)
                 tmp += 2;
-            // TODO TOCHANGE 16 here, to center, it could be 1 tiles x 32 / 2 = 16 or less
+            // TODO TOCHANGE 8 here, to center, it could be 1 tiles x 32 / 2 = 16 or less
             if (eit->second.x() > it->x() - 8 && eit->second.x() < it->x() + 8
                 && eit->second.y() > it->y() - 8 && eit->second.y() < it->y() + 8)
                 ++tmp;
+        }
+        for (std::map<BWAPI::Unit*, std::pair<BWAPI::UnitType, BWAPI::Position> >::const_iterator iit = _invisibleUnitsBuf.begin();
+            iit != _invisibleUnitsBuf.end(); ++ iit)
+        {
+            if (iit->second.first != UnitTypes::Protoss_Observer && iit->second.first != UnitTypes::Zerg_Zergling
+                && iit->second.second.x() > it->x() - (__STORM_SIZE__ / 2 + 1) && iit->second.second.x() < it->x() + (__STORM_SIZE__ / 2 + 1)
+                && iit->second.second.y() > it->y() - (__STORM_SIZE__ / 2 + 1) && iit->second.second.y() < it->y() + (__STORM_SIZE__ / 2 + 1))
+                ++tmp;            
         }
         if (tmp > 0)
         {
@@ -441,17 +450,16 @@ void MapManager::onFrame()
     for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = _eUnitsFilter->getViewedUnits().begin();
         it != _eUnitsFilter->getViewedUnits().end(); ++it)
     {
-        if (it->first->isVisible() 
-            && it->first->exists()
-            && (!it->first->getType().isWorker() 
-                || (it->first->getType().isWorker() 
-                    && (it->first->isGatheringMinerals() || it->first->isGatheringGas())))
-            && _trackedUnits[it->first] != it->first->getPosition())
+        if (it->first->exists()
+            && it->first->isVisible() 
+            && (!it->first->getType().isWorker()
+            || (it->first->getType().isWorker()
+            && (it->first->isGatheringMinerals() || it->first->isGatheringGas())))
+            && (_trackedUnits[it->first] != it->first->getPosition() || !(it->first->isDetected()))) // it moved or is invisible
         {
             // update EUnitsFilter
             _eUnitsFilter->update(it->first);
             // update MapManager (ourselves)
-            // TODO work on Lurkers burrowing
             addDmg(it->first->getType(), it->first->getPosition());
             removeDmg(it->first->getType(), _trackedUnits[it->first]);
             _trackedUnits[it->first] = it->first->getPosition();
@@ -468,14 +476,6 @@ void MapManager::onFrame()
                 _trackedStorms.insert(std::make_pair<Bullet*, Position>(*it, (*it)->getPosition()));
                 addDmgStorm((*it)->getPosition());                
             }
-        }
-        else if ((*it)->getType() == BWAPI::BulletTypes::Subterranean_Spines)
-        {
-            // TODO
-        }
-        else if ((*it)->getType() == BWAPI::BulletTypes::Invisible)
-        {
-            // TODO
         }
     }
     // Updating the damages maps with storms 
@@ -497,7 +497,7 @@ void MapManager::onFrame()
     if (Broodwar->self()->hasResearched(BWAPI::TechTypes::Psionic_Storm))
     {
         // update the possible storms positions
-        if (WaitForSingleObject(_stormPosMutex, 0) == WAIT_OBJECT_0) // cannot enter when the thread is running
+        if (WaitForSingleObject(_stormPosMutex, 0) == WAIT_OBJECT_0) //&& (Broodwar->getFrameCount() - _lastStormPosUpdate > 12 || Broodwar->getFrameCount() == 1)) // cannot enter when the thread is running
         {
             //Broodwar->printf("Creating a thread");
             stormPos = _stormPosBuf;
@@ -516,15 +516,19 @@ void MapManager::onFrame()
                         _dontReStorm.insert(tmp);
                     }
                 }
-                Broodwar->printf("STORMPOS SIZE : %d", stormPos.size());
+                _invisibleUnitsBuf = _eUnitsFilter->getInvisibleUnits();
                 // Hack to balance the fact that a storm takes a few frames to be launched/effective (appear in the Bullets)
                 // Worst case: we lose "one round" (a little more than one frame) of bests storms
-                /*for (std::map<Position, int>::const_iterator it = stormPos.begin();
-                it != stormPos.end(); ++it)
+                for (std::map<Position, int>::const_iterator it = _stormPosBuf.begin();
+                    it != _stormPosBuf.end(); ++it)
                 {
-                std::pair<int, int> tmp(it->first.x() / (__STORM_SIZE__), it->first.y() / (__STORM_SIZE__));
-                _dontReStorm.insert(tmp);
-                }*/
+                    if (!stormPos.count(it->first))
+                    {
+                        std::pair<int, int> tmp(it->first.x() / (__STORM_SIZE__), it->first.y() / (__STORM_SIZE__));
+                        _dontReStorm.insert(tmp);
+                    }
+                }
+                _lastStormPosUpdate = Broodwar->getFrameCount();
                 // this thread is doing updateStormPos();
                 DWORD threadId;
                 HANDLE thread = CreateThread( 

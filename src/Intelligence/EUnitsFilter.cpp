@@ -19,6 +19,8 @@ void EUnitsFilter::update(Unit* u)
         _eViewedUnits[u].update(Broodwar->getFrameCount());
     else 
         _eViewedUnits[u] = EViewedUnit(u, Broodwar->getFrameCount());
+    if (!(u->isDetected()) || u->isCloaked() || u->isBurrowed())
+        _invisibleUnits[u] = std::make_pair<UnitType, Position>(u->getType(), u->getPosition());
 }
 
 void EUnitsFilter::onUnitDestroy(Unit* u)
@@ -26,6 +28,7 @@ void EUnitsFilter::onUnitDestroy(Unit* u)
     if (u->getPlayer() == Broodwar->self()) return;
     if (u->getPlayer()->isNeutral()) return;
     _eViewedUnits.erase(u);
+    _invisibleUnits.erase(u);
 }
 
 void EUnitsFilter::onUnitMorph(Unit* u)
@@ -55,6 +58,11 @@ void EUnitsFilter::update()
 const std::map<BWAPI::Unit*, EViewedUnit>& EUnitsFilter::getViewedUnits()
 {
     return _eViewedUnits;
+}
+
+const std::map<Unit*, std::pair<UnitType, Position> >& EUnitsFilter::getInvisibleUnits()
+{
+    return _invisibleUnits;
 }
 
 bool EUnitsFilter::empty()

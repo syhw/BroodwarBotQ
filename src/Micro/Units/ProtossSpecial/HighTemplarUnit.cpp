@@ -31,25 +31,41 @@ void HighTemplarUnit::micro()
             stormableUnits.insert(std::make_pair<Unit*, Position>(*it, (*it)->getPosition()));
     }
 
+    int elapsed = Broodwar->getFrameCount() - _lastStormFrame;
     // Try and storm if it has any advantage, otherwise flee or don't stuck
-    if (this->unit->getEnergy() >= 75 && Broodwar->getFrameCount() - _lastStormFrame > Broodwar->getLatency() + getAttackDuration())
+    if (this->unit->getEnergy() >= 75 && elapsed > Broodwar->getLatency() + getAttackDuration())
     {   
         Position bestStormPos;
         int bestScore = -1;
-        for (std::map<Position, int>::const_iterator it = _mapManager->stormPos.begin();
-            it != _mapManager->stormPos.end(); ++it)
+        if (elapsed > 128)
         {
-            if (it->second > bestScore && _unitPos.getDistance(it->first) < 415.0)
+            for (std::map<Position, int>::const_iterator it = _mapManager->stormPos.begin();
+                it != _mapManager->stormPos.end(); ++it)
             {
-                bestScore = it->second;
-                bestStormPos = it->first;
+                if (it->second > bestScore && _unitPos.getDistance(it->first) < 288.0 )//&& (elapsed > 96 || _lastStormPos.getDistance(it->first) > 46))
+                {
+                    bestScore = it->second;
+                    bestStormPos = it->first;
+                }
+            }
+        } 
+        else
+        {
+            for (std::map<Position, int>::const_reverse_iterator it = _mapManager->stormPos.rbegin();
+                it != _mapManager->stormPos.rend(); ++it)
+            {
+                if (it->second > bestScore && _unitPos.getDistance(it->first) < 288.0 )//&& (elapsed > 96 || _lastStormPos.getDistance(it->first) > 46))
+                {
+                    bestScore = it->second;
+                    bestStormPos = it->first;
+                }
             }
         }
         // Storm only if it damages at least 2 units, or at least 1 invisible unit,
         // or there is only one enemy unit around us and we can storm it without collateral damages
         if (bestScore > 3 || (_unitsGroup->enemies.size() == 1 && bestScore == 3))
         {
-            //Broodwar->printf("enemies size : %d", _unitsGroup->enemies.size());
+            Broodwar->printf("enemies size : %d", _unitsGroup->enemies.size());
             unit->useTech(BWAPI::TechTypes::Psionic_Storm, bestStormPos);
             // remove the storm that we just fired
             _mapManager->stormPos.erase(bestStormPos);
@@ -71,11 +87,11 @@ void HighTemplarUnit::micro()
     }
     else if (_fleeing || this->unit->getEnergy() < 74)
     {
-        flee();
+        //flee();
     }
     else
     {
-        fightMove();
+        //fightMove();
     }
 }
 
