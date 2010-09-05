@@ -5,12 +5,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include "HighTemplarUnit.h"
 
 #define __MESH_SIZE__ 32 // 16 // 24 // 32 // 48
 #define __STORM_SIZE__ 96
-#define __COVER_SIZE__ __STORM_SIZE__/1.5
 
 using namespace BWAPI;
+
+std::map<BWAPI::Unit*, BWAPI::Position> HighTemplarUnit::stormableUnits;
 
 MapManager::MapManager()
 : _pix_width(Broodwar->mapWidth() * 32)
@@ -377,7 +379,7 @@ void MapManager::updateStormPos()
         }
     }
     // Score the possible possitions for the storms
-    std::map<int, Position> storms;
+    std::set<std::pair<int, Position> > storms;
     for (std::set<Position>::const_iterator it = possiblePos.begin();
         it != possiblePos.end(); ++it)
     {
@@ -397,21 +399,20 @@ void MapManager::updateStormPos()
                 && eit->second.y() > it->y() - 40 && eit->second.y() < it->y() + 40)
                 tmp += 2;
             // TODO TOCHANGE 16 here, to center, it could be 1 tiles x 32 / 2 = 16 or less
-            if (eit->second.x() > it->x() - 15 && eit->second.x() < it->x() + 15
-                && eit->second.y() > it->y() - 15 && eit->second.y() < it->y() + 15)
+            if (eit->second.x() > it->x() - 8 && eit->second.x() < it->x() + 8
+                && eit->second.y() > it->y() - 8 && eit->second.y() < it->y() + 8)
                 ++tmp;
         }
         if (tmp > 0)
         {
-            //storms.insert(std::make_pair<int, Position>(tmp, *it));
-            _stormPosBuf.insert(std::make_pair<Position, int>(*it, tmp));
+            storms.insert(std::make_pair<int, Position>(tmp, *it));
         }
     }
-    // Filter the positions for the storms by descending order + non-overlapings
-    // We do not permit overlapping at all (using __STORM_SIZE__ instead of __COVER_SIZE__) 
-    // because next computation will arrange for that (overlapping)
-    /*std::set<std::pair<int, int> > covered = _dontReStorm;
-    for (std::map<int, Position>::const_reverse_iterator it = storms.rbegin();
+    // Filter the positions for the storms by descending order + eliminate some overlapings
+    // We cannot prevent all overlapping, as we use __STORM_SIZE__ grain instead of a finer grid
+    // Next computation will arrange for that (making overlapping possible / rough discretization)
+    std::set<std::pair<int, int> > covered = _dontReStorm;
+    for (std::set<std::pair<int, Position> >::const_reverse_iterator it = storms.rbegin();
         it != storms.rend(); ++it)
     {
         std::pair<int, int> tmp(it->second.x() / (__STORM_SIZE__), it->second.y() / (__STORM_SIZE__));
@@ -420,7 +421,7 @@ void MapManager::updateStormPos()
             _stormPosBuf.insert(std::make_pair<Position, int>(it->second, it->first));
             covered.insert(tmp);
         }
-    }*/
+    }
     return;
 }
 
@@ -500,45 +501,41 @@ void MapManager::onFrame()
         {
             //Broodwar->printf("Creating a thread");
             stormPos = _stormPosBuf;
-            _alliedUnitsPosBuf = _ourUnits;
-            // _enemyUnitsPosBuf = _trackedUnits;
-            // TODO do better, like update a _trackedUnitsNoBuildings them memcopy (copy constructor)
-            _enemyUnitsPosBuf.clear();
-            for (std::map<Unit*, Position>::const_iterator it = _trackedUnits.begin();
-                it != _trackedUnits.end(); ++it)
+            _enemyUnitsPosBuf = HighTemplarUnit::stormableUnits;
+            if (!_enemyUnitsPosBuf.empty())
             {
-                if (!(it->first->getType().isBuilding()))
-                    _enemyUnitsPosBuf.insert(std::make_pair<Unit*, Position>(it->first, it->second));
-            }
-            _dontReStorm.clear();
-            // Don't restorm where there are already existing storms, lasting more than 48 frames
-            for (std::map<Bullet*, Position>::const_iterator it = _trackedStorms.begin();
-                it != _trackedStorms.end(); ++it)
-            {
-                if (it->first->exists() && it->first->getRemoveTimer() > 48)
+                _alliedUnitsPosBuf = _ourUnits;
+                _dontReStorm.clear();
+                // Don't restorm where there are already existing storms, lasting more than 48 frames
+                for (std::map<Bullet*, Position>::const_iterator it = _trackedStorms.begin();
+                    it != _trackedStorms.end(); ++it)
                 {
-                    std::pair<int, int> tmp(it->second.x() / (__COVER_SIZE__), it->second.y() / (__COVER_SIZE__));
-                    _dontReStorm.insert(tmp);
+                    if (it->first->exists() && it->first->getRemoveTimer() > 48)
+                    {
+                        std::pair<int, int> tmp(it->second.x() / (__STORM_SIZE__), it->second.y() / (__STORM_SIZE__));
+                        _dontReStorm.insert(tmp);
+                    }
                 }
-            }
-            // Hack to balance the fact that a storm takes a few frames to be launched/effective (appear in the Bullets)
-            // Worst case: we lose "one round" (a little more than one frame) of bests storms
-            for (std::map<Position, int>::const_iterator it = stormPos.begin();
+                Broodwar->printf("STORMPOS SIZE : %d", stormPos.size());
+                // Hack to balance the fact that a storm takes a few frames to be launched/effective (appear in the Bullets)
+                // Worst case: we lose "one round" (a little more than one frame) of bests storms
+                /*for (std::map<Position, int>::const_iterator it = stormPos.begin();
                 it != stormPos.end(); ++it)
-            {
+                {
                 std::pair<int, int> tmp(it->first.x() / (__STORM_SIZE__), it->first.y() / (__STORM_SIZE__));
                 _dontReStorm.insert(tmp);
+                }*/
+                // this thread is doing updateStormPos();
+                DWORD threadId;
+                HANDLE thread = CreateThread( 
+                    NULL,                   // default security attributes
+                    0,                      // use default stack size  
+                    &MapManager::StaticLaunchUpdateStormPos,      // thread function name
+                    (void*) this,                   // argument to thread function 
+                    0,                      // use default creation flags 
+                    &threadId);             // returns the thread identifier 
+                CloseHandle(thread);
             }
-            // this thread is doing updateStormPos();
-            DWORD threadId;
-            HANDLE thread = CreateThread( 
-                NULL,                   // default security attributes
-                0,                      // use default stack size  
-                &MapManager::StaticLaunchUpdateStormPos,      // thread function name
-                (void*) this,                   // argument to thread function 
-                0,                      // use default creation flags 
-                &threadId);             // returns the thread identifier 
-            CloseHandle(thread);
         }
         ReleaseMutex(_stormPosMutex);
     }

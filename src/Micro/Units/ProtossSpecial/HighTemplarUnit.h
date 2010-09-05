@@ -9,6 +9,7 @@ class HighTemplarUnit : public SpecialUnit
 protected:
     MapManager* _mapManager;
     int _lastStormFrame;
+    static int lastStormableUnitsUpdateFrame;
 public:
     HighTemplarUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~HighTemplarUnit();
@@ -16,4 +17,5 @@ public:
     virtual void micro();
     virtual void check();
     virtual std::set<BWAPI::UnitType> getSetPrio();
+    static std::map<BWAPI::Unit*, BWAPI::Position> stormableUnits;
 };

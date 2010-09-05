@@ -42,7 +42,7 @@ void MicroAIModule::onStart()
 		} 
         else 
         {
-            if ((*i)->getPlayer() != Broodwar->self() || (*i)->getType() == UnitTypes::Protoss_Archon)
+            if ((*i)->getPlayer() != Broodwar->self() || (*i)->getType() == UnitTypes::Protoss_Archon || (*i)->getType() == UnitTypes::Protoss_Observer)
                 continue;
             else
                 mm->takeControl(*i);
