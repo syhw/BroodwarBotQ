@@ -23,6 +23,13 @@ void EUnitsFilter::update(Unit* u)
         _invisibleUnits[u] = std::make_pair<UnitType, Position>(u->getType(), u->getPosition());
 }
 
+void EUnitsFilter::filter(Unit* u)
+{
+    if (_eViewedUnits[u].type.isBuilding()) return; // we consider that buildings don't move
+    if (Broodwar->getFrameCount() - _eViewedUnits[u].lastSeen > 7200) // 5 minutes
+        _eViewedUnits.erase(u);
+}
+
 void EUnitsFilter::onUnitDestroy(Unit* u)
 {
     if (u->getPlayer() == Broodwar->self()) return;

@@ -16,6 +16,7 @@ HighTemplarUnit::~HighTemplarUnit()
 
 void HighTemplarUnit::micro()
 {
+    //Broodwar->printf("enemies size : %d", _unitsGroup->enemies.size());
     // Updating the map of stormable units
     if (lastStormableUnitsUpdateFrame != Broodwar->getFrameCount())
     {
@@ -33,7 +34,7 @@ void HighTemplarUnit::micro()
 
     int elapsed = Broodwar->getFrameCount() - _lastStormFrame;
     // Try and storm if it has any advantage, otherwise flee or don't stuck
-    if (this->unit->getEnergy() >= 75 && elapsed > Broodwar->getLatency() + getAttackDuration())
+    if (this->unit->getEnergy() > 75 && elapsed > Broodwar->getLatency() + getAttackDuration())
     {   
         Position bestStormPos;
         int bestScore = -1;
@@ -42,7 +43,7 @@ void HighTemplarUnit::micro()
             for (std::map<Position, int>::const_iterator it = _mapManager->stormPos.begin();
                 it != _mapManager->stormPos.end(); ++it)
             {
-                if (it->second > bestScore && _unitPos.getDistance(it->first) < 288.0 )//&& (elapsed > 96 || _lastStormPos.getDistance(it->first) > 46))
+                if (it->second > bestScore && _unitPos.getDistance(it->first) < 288.0 && (elapsed > 64 || _lastStormPos.getDistance(it->first) > 46))
                 {
                     bestScore = it->second;
                     bestStormPos = it->first;
@@ -54,7 +55,7 @@ void HighTemplarUnit::micro()
             for (std::map<Position, int>::const_reverse_iterator it = _mapManager->stormPos.rbegin();
                 it != _mapManager->stormPos.rend(); ++it)
             {
-                if (it->second > bestScore && _unitPos.getDistance(it->first) < 288.0 )//&& (elapsed > 96 || _lastStormPos.getDistance(it->first) > 46))
+                if (it->second > bestScore && _unitPos.getDistance(it->first) < 288.0 && (elapsed > 64 || _lastStormPos.getDistance(it->first) > 46))
                 {
                     bestScore = it->second;
                     bestStormPos = it->first;
@@ -65,8 +66,9 @@ void HighTemplarUnit::micro()
         // or there is only one enemy unit around us and we can storm it without collateral damages
         if (bestScore > 3 || (_unitsGroup->enemies.size() == 1 && bestScore == 3))
         {
-            Broodwar->printf("enemies size : %d", _unitsGroup->enemies.size());
+           
             unit->useTech(BWAPI::TechTypes::Psionic_Storm, bestStormPos);
+            Broodwar->printf("Frame %d, pos (%d, %d)", Broodwar->getFrameCount(), bestStormPos.x(), bestStormPos.y());
             // remove the storm that we just fired
             _mapManager->stormPos.erase(bestStormPos);
             // remove the >= 4/9 (buildtiles) overlaping storms yet present in stormPos
@@ -83,9 +85,10 @@ void HighTemplarUnit::micro()
                     ++it;
             }
             _lastStormFrame = Broodwar->getFrameCount();
+            _lastStormPos = bestStormPos;
         }
     }
-    else if (_fleeing || this->unit->getEnergy() < 74)
+    else if (_fleeing || this->unit->getEnergy() <= 75)
     {
         //flee();
     }

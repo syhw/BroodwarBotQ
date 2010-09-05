@@ -65,6 +65,11 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 , _inPos(Position(0, 0))
 , _fleeing(false)
 {
+    if (_pathMutex == NULL) 
+    {
+        Broodwar->printf("CreateMutex error: %d\n", GetLastError());
+        return;
+    }
     updateDirV();
     mapManager = & MapManager::Instance();
     switchMode(_mode);
@@ -665,7 +670,7 @@ void BayesianUnit::updateObj()
                 &threadId);             // returns the thread identifier 
             if (thread == NULL) 
             {
-                // leave?
+                Broodwar->printf("(pathfinding) error creating thread");
             }
             CloseHandle(thread);
         }

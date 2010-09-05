@@ -25,6 +25,11 @@ MapManager::MapManager()
         NULL))                  // unnamed mutex
 , _lastStormPosUpdate(0)
 {
+    if (_stormPosMutex == NULL) 
+    {
+        Broodwar->printf("CreateMutex error: %d\n", GetLastError());
+        return;
+    }
     walkability = new bool[_width * _height];             // Walk Tiles resolution
     buildings_wt = new bool[_width * _height];
     buildings_wt_strict = new bool[_width * _height];
@@ -455,7 +460,7 @@ void MapManager::onFrame()
             && (!it->first->getType().isWorker()
             || (it->first->getType().isWorker()
             && (it->first->isGatheringMinerals() || it->first->isGatheringGas())))
-            && (_trackedUnits[it->first] != it->first->getPosition() || !(it->first->isDetected()))) // it moved or is invisible
+            && (_trackedUnits[it->first] != it->first->getPosition())) // || !(it->first->isDetected()))) // it moved or is invisible
         {
             // update EUnitsFilter
             _eUnitsFilter->update(it->first);
@@ -463,6 +468,10 @@ void MapManager::onFrame()
             addDmg(it->first->getType(), it->first->getPosition());
             removeDmg(it->first->getType(), _trackedUnits[it->first]);
             _trackedUnits[it->first] = it->first->getPosition();
+        }
+        if (!(it->first->isVisible()))
+        {
+            _eUnitsFilter->filter(it->first);
         }
     }
     // Iterate of all the Bullets to extract the interesting ones
@@ -497,9 +506,9 @@ void MapManager::onFrame()
     if (Broodwar->self()->hasResearched(BWAPI::TechTypes::Psionic_Storm))
     {
         // update the possible storms positions
-        if (WaitForSingleObject(_stormPosMutex, 0) == WAIT_OBJECT_0) //&& (Broodwar->getFrameCount() - _lastStormPosUpdate > 12 || Broodwar->getFrameCount() == 1)) // cannot enter when the thread is running
+        if (WaitForSingleObject(_stormPosMutex, 0) == WAIT_OBJECT_0) //&& (Broodwar->getFrameCount() - _lastStormPosUpdate > 6 || Broodwar->getFrameCount() == 1)) // cannot enter when the thread is running
         {
-            //Broodwar->printf("Creating a thread");
+            Broodwar->printf("MAPMANAGER frame: %d", Broodwar->getFrameCount());
             stormPos = _stormPosBuf;
             _enemyUnitsPosBuf = HighTemplarUnit::stormableUnits;
             if (!_enemyUnitsPosBuf.empty())
@@ -538,6 +547,10 @@ void MapManager::onFrame()
                     (void*) this,                   // argument to thread function 
                     0,                      // use default creation flags 
                     &threadId);             // returns the thread identifier 
+                if (thread == NULL)
+                {
+                    Broodwar->printf("(mapmanager) error creating thread");
+                }
                 CloseHandle(thread);
             }
         }

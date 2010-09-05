@@ -10,6 +10,7 @@
 #include <utility>
 #include "Data.h"
 
+// This class works closely tied to MapManager (see MapManager::onFrame())
 class EUnitsFilter : public CSingleton<EUnitsFilter>, public BaseObject
 {
     friend class CSingleton<EUnitsFilter>;
@@ -20,6 +21,7 @@ public:
     //std::map<BWAPI::Unit*, EViewedUnit> _eViewedUnits;
 
     void update(BWAPI::Unit* u);
+    void filter(BWAPI::Unit* u);
     void onUnitDestroy(BWAPI::Unit* u);
     void onUnitMorph(BWAPI::Unit* u);
     void onUnitShow(BWAPI::Unit* u);

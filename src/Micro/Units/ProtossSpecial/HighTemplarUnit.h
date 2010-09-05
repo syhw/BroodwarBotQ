@@ -9,6 +9,7 @@ class HighTemplarUnit : public SpecialUnit
 protected:
     MapManager* _mapManager;
     int _lastStormFrame;
+    BWAPI::Position _lastStormPos;
     static int lastStormableUnitsUpdateFrame;
 public:
     HighTemplarUnit(BWAPI::Unit* u, UnitsGroup* ug);
