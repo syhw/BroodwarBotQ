@@ -6,7 +6,9 @@
 #include <string.h>
 #include <assert.h>
 
-#define __MESH_SIZE__ 16 // 32 // 48
+#define __MESH_SIZE__ 24 // 16 // 24 // 32 // 48
+#define __STORM_SIZE__ 96
+#define __COVER_SIZE__ __STORM_SIZE__/1.5
 
 using namespace BWAPI;
 
@@ -368,22 +370,29 @@ void MapManager::updateStormPos()
             if (tmpPos.y() >= __MESH_SIZE__) 
                 possiblePos.insert(Position(tmpPos.x(), tmpPos.y() - __MESH_SIZE__));
             if (tmpPos.y() + __MESH_SIZE__ < _pix_height)
-                possiblePos.insert(Position(tmpPos.x(), tmpPos.y() + __MESH_SIZE__));   
+                possiblePos.insert(Position(tmpPos.x(), tmpPos.y() + __MESH_SIZE__));
+
+            if (tmpPos.x() >= 2*__MESH_SIZE__)
+                possiblePos.insert(Position(tmpPos.x() - 2*__MESH_SIZE__, tmpPos.y()));
+            if (tmpPos.x() + 2*__MESH_SIZE__ < _pix_width)
+                possiblePos.insert(Position(tmpPos.x() + 2*__MESH_SIZE__, tmpPos.y()));
+            if (tmpPos.y() >= 2*__MESH_SIZE__) 
+                possiblePos.insert(Position(tmpPos.x(), tmpPos.y() - 2*__MESH_SIZE__));
+            if (tmpPos.y() + 2*__MESH_SIZE__ < _pix_height)
+                possiblePos.insert(Position(tmpPos.x(), tmpPos.y() + 2*__MESH_SIZE__));  
         }
     }
     std::map<int, Position> storms;
     for (std::set<Position>::const_iterator it = possiblePos.begin();
         it != possiblePos.end(); ++it)
     {
-        if (_dontReStorm.count(*it))
-            continue;
         int tmp = 0;
         for (std::map<BWAPI::Unit*, BWAPI::Position>::const_iterator uit = _alliedUnitsPosBuf.begin();
             uit != _alliedUnitsPosBuf.end(); ++uit)
         {
-            if (uit->second.x() > it->x() - 49 && uit->second.x() < it->x() + 49 // 3 tiles x 32  / 2 = 48
-                && uit->second.y() > it->y() - 49 && uit->second.y() < it->y() + 49)
-                tmp -= 2;
+            if (uit->second.x() > it->x() - (__STORM_SIZE__ / 2 + 1) && uit->second.x() < it->x() + (__STORM_SIZE__ / 2 + 1)
+                && uit->second.y() > it->y() - (__STORM_SIZE__ / 2 + 1) && uit->second.y() < it->y() + (__STORM_SIZE__ / 2 + 1))
+                tmp -= 4;
         }
         for (std::map<BWAPI::Unit*, BWAPI::Position>::const_iterator eit = _enemyUnitsPosBuf.begin();
             eit != _enemyUnitsPosBuf.end(); ++eit)
@@ -391,6 +400,10 @@ void MapManager::updateStormPos()
             // TODO TOCHANGE 40 here, it could be 3 tiles x 32  / 2 = 48 or less (to account for their movement)
             if (eit->second.x() > it->x() - 40 && eit->second.x() < it->x() + 40
                 && eit->second.y() > it->y() - 40 && eit->second.y() < it->y() + 40)
+                tmp += 2;
+            // TODO TOCHANGE 12 here, to center, it could be 1 tiles x 32 / 2 = 16 or less
+            if (eit->second.x() > it->x() - 12 && eit->second.x() < it->x() + 12
+                && eit->second.y() > it->y() - 12 && eit->second.y() < it->y() + 12)
                 ++tmp;
         }
         if (tmp > 0)
@@ -399,11 +412,11 @@ void MapManager::updateStormPos()
             //_stormPosBuf.insert(std::make_pair<Position, int>(*it, tmp));
         }
     }
-    std::set<std::pair<int, int> > covered;
+    std::set<std::pair<int, int> > covered = _dontReStorm;
     for (std::map<int, Position>::const_reverse_iterator it = storms.rbegin();
         it != storms.rend(); ++it)
     {
-        std::pair<int, int> tmp(it->second.x() / (2*__MESH_SIZE__), it->second.y() / (2*__MESH_SIZE__));
+        std::pair<int, int> tmp(it->second.x() / (__COVER_SIZE__), it->second.y() / (__COVER_SIZE__));
         if (!covered.count(tmp))
         {
             _stormPosBuf.insert(std::make_pair<Position, int>(it->second, it->first));
@@ -457,12 +470,12 @@ void MapManager::onFrame()
         {
 
         }
-        else if ((*it)->getType() == BWAPI::BulletTypes::Plague_Cloud)
-        {
-        }
         else if ((*it)->getType() == BWAPI::BulletTypes::Invisible)
         {
         }
+        //else if ((*it)->getType() == BWAPI::BulletTypes::Plague_Cloud)
+        //{
+        //}
     }
     for (std::map<Bullet*, Position>::iterator it = _trackedStorms.begin();
         it != _trackedStorms.end(); )
@@ -496,11 +509,22 @@ void MapManager::onFrame()
                     _enemyUnitsPosBuf.insert(std::make_pair<Unit*, Position>(it->first, it->second));
             }
             _dontReStorm.clear();
+            // Don't restorm where there are already existing storms
             for (std::map<Bullet*, Position>::const_iterator it = _trackedStorms.begin();
                 it != _trackedStorms.end(); ++it)
             {
                 if (it->first->exists() && it->first->getRemoveTimer() > 48)
-                    _dontReStorm.insert(it->second);
+                {
+                    std::pair<int, int> tmp(it->second.x() / (__COVER_SIZE__), it->second.y() / (__COVER_SIZE__));
+                    _dontReStorm.insert(tmp);
+                }
+            }
+            // Hack to balance the fact that a storm takes a few frames to be launched/effective (appear in the Bullets)
+            for (std::map<Position, int>::const_iterator it = stormPos.begin();
+                it != stormPos.end(); ++it)
+            {
+                std::pair<int, int> tmp(it->first.x() / (__COVER_SIZE__), it->first.y() / (__COVER_SIZE__));
+                _dontReStorm.insert(tmp);
             }
             //updateStormPos();
             DWORD threadId;
