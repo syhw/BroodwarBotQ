@@ -157,12 +157,14 @@ void DefenseManager::onRemoveUnit(BWAPI::Unit* unit)
 
 void DefenseManager::update()
 {
+	/*
 	this->checkDefenses();
 
 //update unitsgroups depending of the defenseManager
 	for(std::map<Base *, UnitsGroup *>::iterator it = this->groundDefenders.begin(); it != this->groundDefenders.end(); ++it){
 		it->second->update();
 	}
+	*/
 }
 
 void DefenseManager::addBase(Base * b){
