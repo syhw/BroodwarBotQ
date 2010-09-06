@@ -590,8 +590,7 @@ void MapManager::onFrame()
                 }
                 _dontReStormBuf = _dontReStorm;
                 // this thread is doing updateStormPos();
-                updateStormPos();
-                /*DWORD threadId;
+                DWORD threadId;
                 HANDLE thread = CreateThread( 
                     NULL,                   // default security attributes
                     0,                      // use default stack size  
@@ -603,7 +602,7 @@ void MapManager::onFrame()
                 {
                     Broodwar->printf("(mapmanager) error creating thread");
                 }
-                CloseHandle(thread);*/
+                CloseHandle(thread);
             }
         }
         ReleaseMutex(_stormPosMutex);
