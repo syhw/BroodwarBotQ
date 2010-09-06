@@ -13,6 +13,9 @@ void ProtossStrat::eRush(){
 	this->buildOrderManager->build(2,BWAPI::UnitTypes::Protoss_Gateway,94);
 	this->buildOrderManager->build(5,BWAPI::UnitTypes::Protoss_Zealot,92);
 	this->buildOrderManager->build(2,BWAPI::UnitTypes::Protoss_Pylon,93);
+	if(this->workerManager->autoBuild){
+		this->workerManager->disableAutoBuild();
+	}
 }
 
 void ProtossStrat::onStart(){
@@ -31,10 +34,15 @@ void ProtossStrat::onStart(){
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Dragoon,78);
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Pylon,76);
 	this->buildOrderManager->upgrade(1,BWAPI::UpgradeTypes::Singularity_Charge, 74);
-	this->buildOrderManager->buildAdditional(10,BWAPI::UnitTypes::Protoss_Dragoon, 20);
+	this->buildOrderManager->buildAdditional(6,BWAPI::UnitTypes::Protoss_Dragoon, 35);
+
+	if(!this->workerManager->autoBuild){
+		this->workerManager->enableAutoBuild();
+	}
 
 	setScoutTime();
-	//this->buildOrderManager->enableDependencyResolver();
+	this->buildOrderManager->enableDependencyResolver();
+	this->buildOrderManager->build(40,BWAPI::UnitTypes::Protoss_Interceptor, 30);
 }
 
 void ProtossStrat::setScoutTime(){
@@ -68,23 +76,16 @@ void ProtossStrat::setScoutTime(){
 void ProtossStrat::update(){
 
 	this->createProdBuildings();
-	if(this->buildManager->getCompletedCount(BWAPI::UnitTypes::Protoss_Dragoon)>=4){
-		if(!this->workerManager->autoBuild){
-			BWAPI::Broodwar->printf("Auto building probes");
-			this->workerManager->enableAutoBuild();
-		}
-	}
 
-/*
-//This must be uncommented if we want the bot to expand. Yet expanding twice is not possible for the moment.
 	if(this->shouldExpand() && !expanding ){
 		this->expanding = true;
-		BWAPI::Broodwar->printf("Expanding at the nearest location");
-		this->baseManager->expand(this->naturalExpand,80);
+		if(this->baseManager->getBase(this->baseManager->naturalExpand) == NULL){
+			this->baseManager->expand(this->baseManager->naturalExpand,80);
+		} else {
+			this->baseManager->expand(80);
+		}
 	}
-	BWAPI::Broodwar->drawCircleMap(naturalExpand->getPosition().x(),naturalExpand->getPosition().y(),20,BWAPI::Colors::Green, true);
-	*/
-
+	
 }
 
 void ProtossStrat::buildGeyser()
@@ -122,7 +123,7 @@ void ProtossStrat::buildGates()
 		}
 	if( allGatesFull && !underConstruction[UnitTypes::Protoss_Gateway])
 	{
-		this->buildOrderManager->buildAdditional(1,UnitTypes::Protoss_Gateway,20);
+		this->buildOrderManager->buildAdditional(1,UnitTypes::Protoss_Gateway,40);
 		underConstruction[UnitTypes::Protoss_Gateway] = true;
 	}
 }

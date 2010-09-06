@@ -524,3 +524,13 @@ bool UnitsGroup::isWaiting(){
 
 	return goals.size() == 1 && (*goals.front()).getStatus() == GS_ACHIEVED ;
 }
+
+double UnitsGroup::totalDistToCenter(){
+	double res = 0;
+	for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it ){
+		res += getDistance((*it)->unit);
+		
+	}
+	return res;
+
+}

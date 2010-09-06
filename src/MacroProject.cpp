@@ -440,7 +440,7 @@ void BattleBroodAI::onUnitDiscover(BWAPI::Unit* unit){
   this->informationManager->onUnitDiscover(unit);
   this->unitGroupManager->onUnitDiscover(unit);
   if(unit->getPlayer() != BWAPI::Broodwar->self()){
-	  this->macroManager->eRush();
+	 // this->macroManager->eRush();
   }
 
 }

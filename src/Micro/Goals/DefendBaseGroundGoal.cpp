@@ -20,7 +20,7 @@ Goal(ug)
         }
         this->addSubgoal(pSubgoal(new FormationSubgoal(SL_AND,pFormation(new LineFormation(this->choke->getCenter(), Vec(deltaY/deltaX, tmp).normalize())))));
     } else {
-        addSubgoal(pSubgoal(new FormationSubgoal(SL_AND,pFormation(new SquareFormation(b->getBaseLocation()->getPosition(),Vec(0,0))))));
+        addSubgoal(pSubgoal(new FormationSubgoal(SL_AND,pFormation(new SquareFormation(b->getBaseLocation()->getPosition(),Vec(0,1))))));
 
     }
 }
@@ -42,7 +42,7 @@ void DefendBaseGroundGoal::checkAchievement(){
 	if(this->unitsGroup == NULL){
 		//Strange...But must be avoided
 	}else{
-		if(!this->enoughUnits() && this->unitsGroup->size() < 4){
+		if(!this->enoughUnits() && this->unitsGroup->size() < 3){
 			this->status = GS_NOT_ENOUGH_UNITS;
 		}else{
 			this->status = GS_ACHIEVED;
@@ -67,6 +67,6 @@ bool DefendBaseGroundGoal::enoughUnits(){
 		}
 		return true;
 	}else{
-		return true;
+		return false;
 	}
 }

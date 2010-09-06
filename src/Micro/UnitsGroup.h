@@ -105,5 +105,6 @@ public:
 	void accomplishGoal();
 	void switchMode(unit_mode um);
 	void idle();
+	double totalDistToCenter();
 };
 
