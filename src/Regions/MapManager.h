@@ -24,7 +24,6 @@ class MapManager: public CSingleton<MapManager>
     std::map<BWAPI::Unit*, BWAPI::Position> _ourUnits;
     std::map<BWAPI::Unit*, BWAPI::Position> _trackedUnits;
     std::map<BWAPI::Bullet*, BWAPI::Position> _trackedStorms;
-    std::map<BWAPI::Unit*, BWAPI::Position> _trackedMines; // hack to handle the case where a mine is destroyed by a storm while we don't see it, we should see it (as there is an explosion) and have onUnitDestroy called, then we could remove all these taggued // hack lines
     HANDLE _stormPosMutex;
     int _lastStormUpdateFrame;
     std::map<Position, int> _stormPosBuf;
