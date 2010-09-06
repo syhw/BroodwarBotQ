@@ -9,7 +9,7 @@
 
 #define __MESH_SIZE__ 32 // 16 // 24 // 32 // 48
 #define __STORM_SIZE__ 96
-#define __COVER_SIZE__ 96
+#define __COVER_SIZE__ 90
 
 using namespace BWAPI;
 
@@ -24,7 +24,6 @@ MapManager::MapManager()
         NULL,                  // default security attributes
         FALSE,                 // initially not owned
         NULL))                  // unnamed mutex
-, _lastStormUpdateFrame(0)
 {
     if (_stormPosMutex == NULL) 
     {
@@ -549,9 +548,15 @@ void MapManager::onFrame()
     if (Broodwar->self()->hasResearched(BWAPI::TechTypes::Psionic_Storm))
     {
         // update the possible storms positions
-        if (WaitForSingleObject(_stormPosMutex, 0) == WAIT_OBJECT_0 && Broodwar->getFrameCount() - _lastStormUpdateFrame > 1) // cannot enter when the thread is running
+        if (WaitForSingleObject(_stormPosMutex, 0) == WAIT_OBJECT_0) // cannot enter when the thread is running
         {
             stormPos = _stormPosBuf;
+            for (std::map<Position, int>::const_iterator it = _dontReStorm.begin();
+                it != _dontReStorm.end(); ++it)
+            {
+                if (stormPos.count(it->first))
+                    stormPos.erase(it->first);
+            }
             _enemyUnitsPosBuf = HighTemplarUnit::stormableUnits;
             if (!_enemyUnitsPosBuf.empty())
             {
@@ -584,7 +589,6 @@ void MapManager::onFrame()
                         ++it;
                 }
                 _dontReStormBuf = _dontReStorm;
-                _lastStormUpdateFrame = Broodwar->getFrameCount();
                 // this thread is doing updateStormPos();
                 updateStormPos();
                 /*DWORD threadId;
