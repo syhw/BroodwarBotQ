@@ -936,10 +936,10 @@ void BayesianUnit::resumeFromBlocked()
 void BayesianUnit::updateRangeEnemies()
 {
     _rangeEnemies.clear();
-    for (std::set<Unit*>::const_iterator it = _unitsGroup->enemies.begin(); 
+    for (std::map<Unit*, Position>::const_iterator it = _unitsGroup->enemies.begin(); 
         it != _unitsGroup->enemies.end(); ++it)
     {
-        _rangeEnemies.insert(std::make_pair<double, Unit*>(_unitPos.getDistance((*it)->getPosition()), *it));
+        _rangeEnemies.insert(std::make_pair<double, Unit*>(_unitPos.getDistance(it->second), it->first));
     }
 }
 

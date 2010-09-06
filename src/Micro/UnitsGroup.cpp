@@ -219,10 +219,10 @@ void UnitsGroup::update()
     updateCenter();
     
     //enemies = std::set<Unit*>(nearbyEnemyUnits(center, maxRadius + maxRange + 46)); // > 45.26 == sqrt(32^2+32^2)
-    enemies = nearbyEnemyUnitsFromFilter(center, maxRadius + maxRange + 46); // possibly hidden
+    updateNearbyEnemyUnitsFromFilter(center, maxRadius + maxRange + 46); // possibly hidden
     Broodwar->drawCircleMap(center.x(), center.y(), maxRadius + maxRange, Colors::Yellow);
 	if (!enemies.empty())
-        defaultTargetEnemy = *(enemies.begin()); // TODO CHANGE THAT FOR A PRIORITY
+        defaultTargetEnemy = enemies.begin()->first; // TODO CHANGE THAT FOR A PRIORITY
     else 
         defaultTargetEnemy = NULL;
     accomplishGoal();
@@ -414,17 +414,16 @@ std::vector<pBayesianUnit>* UnitsGroup::getUnits()
     return &units;
 }
 
-std::set<BWAPI::Unit*> UnitsGroup::nearbyEnemyUnitsFromFilter(BWAPI::Position p, double radius)
+void UnitsGroup::updateNearbyEnemyUnitsFromFilter(BWAPI::Position p, double radius)
 {
+    enemies.clear();
     // have units that have been seek like units on cliffs or lurkers before burrowing (for instance)
-    std::set<BWAPI::Unit*> ret;
     for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = _eUnitsFilter->getViewedUnits().begin();
         it != _eUnitsFilter->getViewedUnits().end(); ++it)
     {
-        if (it->first->getDistance(p) <= radius)
-            ret.insert(it->first);
+        if (it->second.position.getDistance(p) <= radius)
+            enemies.insert(std::make_pair<Unit*, Position>(it->first, it->second.position));
     }
-    return ret;
 }
 
 const BayesianUnit& UnitsGroup::operator[](int i)

@@ -9,7 +9,6 @@
 
 #define __MESH_SIZE__ 32 // 16 // 24 // 32 // 48
 #define __STORM_SIZE__ 96
-#define __COVER_SIZE__ 90
 
 using namespace BWAPI;
 
@@ -440,8 +439,6 @@ void MapManager::updateStormPos()
         }
     }
     // Filter the positions for the storms by descending order + eliminate some overlapings
-    // We cannot prevent all overlapping, as we use __STORM_SIZE__ grain instead of a finer grid
-    // Next computation will arrange for that (making overlapping possible / rough discretization)
     std::set<Position> covered;
     for (std::set<std::pair<int, Position> >::const_reverse_iterator it = storms.rbegin();
         it != storms.rend(); ++it)

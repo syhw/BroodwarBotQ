@@ -16,20 +16,20 @@ HighTemplarUnit::~HighTemplarUnit()
 
 void HighTemplarUnit::micro()
 {
-    //Broodwar->printf("enemies size : %d", _unitsGroup->enemies.size());
+    Broodwar->printf("enemies size : %d", _unitsGroup->enemies.size());
     // Updating the map of stormable units
     if (lastStormableUnitsUpdateFrame != Broodwar->getFrameCount())
     {
         stormableUnits.clear();
         lastStormableUnitsUpdateFrame = Broodwar->getFrameCount();
     }
-    for (std::set<Unit*>::const_iterator it = _unitsGroup->enemies.begin();
+    for (std::map<Unit*, Position>::const_iterator it = _unitsGroup->enemies.begin();
         it != _unitsGroup->enemies.end(); ++it)
     {
-        if ((*it)->getType().isBuilding())
+        if (it->first->isVisible() && it->first->getType().isBuilding())
             continue;
-        if (!stormableUnits.count(*it))
-            stormableUnits.insert(std::make_pair<Unit*, Position>(*it, (*it)->getPosition()));
+        if (!stormableUnits.count(it->first))
+            stormableUnits.insert(*it);
     }
 
     int elapsed = Broodwar->getFrameCount() - _lastStormFrame;

@@ -50,7 +50,7 @@ private:
 	int totalPower;
 	std::list<pGoal> goals;
     EUnitsFilter* _eUnitsFilter;
-
+    inline void updateNearbyEnemyUnitsFromFilter(BWAPI::Position p, double radius = 400.0);
     void displayTargets();  // debug purpose
 public:
 	bool isWaiting(); //Return if the 1st goal is accomplished && no other goals
@@ -58,7 +58,7 @@ public:
 	std::vector<pBayesianUnit> units;
     //std::vector<BWAPI::TilePosition> btpath;
     std::vector<BWAPI::Position> ppath;
-    std::set<BWAPI::Unit*> enemies;
+    std::map<BWAPI::Unit*, BWAPI::Position> enemies;
     UnitDmgBimap unitDamages;
     pBayesianUnit leadingUnit;
     BWAPI::Unit* defaultTargetEnemy;
@@ -99,7 +99,6 @@ public:
     int size() const;
     int getTotalHP() const;
     std::vector<pBayesianUnit>* getUnits();
-    std::set<BWAPI::Unit*> nearbyEnemyUnitsFromFilter(BWAPI::Position p, double radius = 400.0);
 
 #ifdef _UNITS_DEBUG
     void selectedUnits(std::set<pBayesianUnit>& u);
