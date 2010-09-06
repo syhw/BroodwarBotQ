@@ -24,7 +24,7 @@ MapManager::MapManager()
         NULL,                  // default security attributes
         FALSE,                 // initially not owned
         NULL))                  // unnamed mutex
-, _lastStormPosUpdate(0)
+, _lastStormUpdateFrame(0)
 {
     if (_stormPosMutex == NULL) 
     {
@@ -426,17 +426,60 @@ void MapManager::updateStormPos()
     // Filter the positions for the storms by descending order + eliminate some overlapings
     // We cannot prevent all overlapping, as we use __STORM_SIZE__ grain instead of a finer grid
     // Next computation will arrange for that (making overlapping possible / rough discretization)
+    std::set<Position> covered;
     for (std::set<std::pair<int, Position> >::const_reverse_iterator it = storms.rbegin();
         it != storms.rend(); ++it)
     {
-        std::pair<int, int> tmp(it->second.x() / (__COVER_SIZE__), it->second.y() / (__COVER_SIZE__));
-        if (!(_dontReStorm.count(tmp)) && !(_justStormed.count(tmp)))
+        bool foundCoverage = false;
+        for (std::set<Position>::const_iterator i = covered.begin();
+            i != covered.end(); ++i)
+        {
+            if (it->second.x() > i->x() - (__STORM_SIZE__ / 2 + 1) && it->second.x() < i->x() + (__STORM_SIZE__ / 2 + 1)
+                && it->second.y() > i->y() - (__STORM_SIZE__ / 2 + 1) && it->second.y() < i->y() + (__STORM_SIZE__ / 2 + 1))
+            {
+                foundCoverage = true;
+                break;
+            }
+        }
+        for (std::map<Position, int>::const_iterator i = _dontReStormBuf.begin();
+            i != _dontReStormBuf.end(); ++i)
+        {
+            if (it->second.x() > i->first.x() - (__STORM_SIZE__ / 2 + 1) && it->second.x() < i->first.x() + (__STORM_SIZE__ / 2 + 1)
+                && it->second.y() > i->first.y() - (__STORM_SIZE__ / 2 + 1) && it->second.y() < i->first.y() + (__STORM_SIZE__ / 2 + 1))
+            {
+                foundCoverage = true;
+                break;
+            }
+        }
+        if (!foundCoverage)
         {
             _stormPosBuf.insert(std::make_pair<Position, int>(it->second, it->first));
-            _dontReStorm.insert(tmp);
+            covered.insert(it->second);
         }
     }
     return;
+}
+
+void MapManager::justStormed(Position p)
+{
+    stormPos.erase(p);
+    // remove the >= 4/9 (buildtiles) overlaping storms yet present in stormPos
+    for (std::map<Position, int>::iterator it = stormPos.begin();
+        it != stormPos.end(); )
+    {
+        if (it->first.getDistance(p) < 46.0)
+        {
+            std::map<Position, int>::iterator tmp = it;
+            ++it;
+            stormPos.erase(tmp);
+        }
+        else
+            ++it;
+    }
+    if (_dontReStorm.count(p))
+        _dontReStorm[p] = 0;
+    else
+        _dontReStorm.insert(std::make_pair<Position, int>(p, 0));
 }
 
 void MapManager::onFrame()
@@ -506,60 +549,45 @@ void MapManager::onFrame()
     if (Broodwar->self()->hasResearched(BWAPI::TechTypes::Psionic_Storm))
     {
         // update the possible storms positions
-        if (WaitForSingleObject(_stormPosMutex, 0) == WAIT_OBJECT_0 && Broodwar->getFrameCount() - _lastStormPosUpdate > 2) // cannot enter when the thread is running
+        if (WaitForSingleObject(_stormPosMutex, 0) == WAIT_OBJECT_0 && Broodwar->getFrameCount() - _lastStormUpdateFrame > 1) // cannot enter when the thread is running
         {
             stormPos = _stormPosBuf;
-            _lastStormPosUpdate = Broodwar->getFrameCount();
             _enemyUnitsPosBuf = HighTemplarUnit::stormableUnits;
             if (!_enemyUnitsPosBuf.empty())
             {
                 _alliedUnitsPosBuf = _ourUnits;
-                _dontReStorm.clear();
+                _invisibleUnitsBuf = _eUnitsFilter->getInvisibleUnits();
                 // Don't restorm where there are already existing storms, lasting more than 48 frames
                 for (std::map<Bullet*, Position>::const_iterator it = _trackedStorms.begin();
                     it != _trackedStorms.end(); ++it)
                 {
-                    if (it->first->exists() && it->first->getRemoveTimer() > 0)// 48)
+                    if (it->first->exists() && it->first->getRemoveTimer() > 0) // TODO TOCHANGE 47
                     {
-                        std::pair<int, int> tmp(it->second.x() / (__COVER_SIZE__), it->second.y() / (__COVER_SIZE__));
-                        _dontReStorm.insert(tmp);
-                    }
-                }
-                _invisibleUnitsBuf = _eUnitsFilter->getInvisibleUnits();
-                // Hack to balance the fact that a storm takes a few frames to be launched/effective (appear in the Bullets)
-                // Worst case: we lose "one round" (a little more than one frame) of bests storms
-                for (std::map<Position, int>::const_iterator it = _stormPosBuf.begin();
-                    it != _stormPosBuf.end(); ++it)
-                {
-                    if (!stormPos.count(it->first))
-                    {
-                        std::pair<int, int> tmp(it->first.x() / (__COVER_SIZE__), it->first.y() / (__COVER_SIZE__));
-                        if (_justStormed.count(tmp))
-                            _justStormed[tmp] = 0;
+                        if (_dontReStorm.count(it->second))
+                            _dontReStorm[it->second] = 72 - it->first->getRemoveTimer();
                         else
-                            _justStormed.insert(std::make_pair<std::pair<int, int>, int>(tmp, 0));
+                            _dontReStorm.insert(std::make_pair<Position, int>(it->second, 72 - it->first->getRemoveTimer()));
                     }
                 }
-                for (std::map<std::pair<int, int>, int>::iterator it = _justStormed.begin();
-                    it != _justStormed.end(); ++it)
+                // decay the "dont re storm" positions
+                for (std::map<Position, int>::iterator it = _dontReStorm.begin();
+                    it != _dontReStorm.end();)
                 {
-                    ++_justStormed[it->first];
+                    ++_dontReStorm[it->first];
                     if (it->second > 72)
                     {
-                        std::map<std::pair<int, int>, int>::iterator tmp = it;
+                        std::map<Position, int>::iterator tmp = it;
                         ++it;
-                        _justStormed.erase(tmp);
+                        _dontReStorm.erase(tmp);
                     }
+                    else
+                        ++it;
                 }
-                for (std::set<std::pair<int, int> >::const_iterator ii = _dontReStorm.begin();
-                    ii != _dontReStorm.end(); ++ii)
-                {
-                    Broodwar->drawBoxMap(ii->first*__COVER_SIZE__ - __COVER_SIZE__/2, ii->second*__COVER_SIZE__ - __COVER_SIZE__/2, ii->first*__COVER_SIZE__ + __COVER_SIZE__/2, ii->second*__COVER_SIZE__ + __COVER_SIZE__/2, Colors::Cyan);
-                }
-
-                _lastStormPosUpdate = Broodwar->getFrameCount();
+                _dontReStormBuf = _dontReStorm;
+                _lastStormUpdateFrame = Broodwar->getFrameCount();
                 // this thread is doing updateStormPos();
-                DWORD threadId;
+                updateStormPos();
+                /*DWORD threadId;
                 HANDLE thread = CreateThread( 
                     NULL,                   // default security attributes
                     0,                      // use default stack size  
@@ -571,7 +599,7 @@ void MapManager::onFrame()
                 {
                     Broodwar->printf("(mapmanager) error creating thread");
                 }
-                CloseHandle(thread);
+                CloseHandle(thread);*/
             }
         }
         ReleaseMutex(_stormPosMutex);

@@ -23,10 +23,10 @@ class MapManager: public CSingleton<MapManager>
     std::map<BWAPI::Unit*, BWAPI::Position> _trackedUnits;
     std::map<BWAPI::Bullet*, BWAPI::Position> _trackedStorms;
     HANDLE _stormPosMutex;
-    int _lastStormPosUpdate;
+    int _lastStormUpdateFrame;
     std::map<Position, int> _stormPosBuf;
-    std::set<std::pair<int, int> > _dontReStorm;
-    std::map<std::pair<int, int>, int> _justStormed;
+    std::map<Position, int> _dontReStorm;
+    std::map<Position, int> _dontReStormBuf;
     std::multimap<double, BWAPI::Unit*> _rangeEnemiesBuf;
     std::map<BWAPI::Unit*, BWAPI::Position> _alliedUnitsPosBuf;
     std::map<BWAPI::Unit*, BWAPI::Position> _enemyUnitsPosBuf;
@@ -70,6 +70,7 @@ public:
     void onUnitDestroy(BWAPI::Unit* u);
     void onUnitShow(BWAPI::Unit* u);
     void onUnitHide(BWAPI::Unit* u);
+    void justStormed(BWAPI::Position p);
     void onFrame();
     const std::map<BWAPI::Unit*, BWAPI::Position> & getOurUnits();
     const std::map<BWAPI::Unit*, BWAPI::Position> & getTrackedUnits();

@@ -69,21 +69,8 @@ void HighTemplarUnit::micro()
            
             unit->useTech(BWAPI::TechTypes::Psionic_Storm, bestStormPos);
             Broodwar->printf("Frame %d, pos (%d, %d), stormPos size %d", Broodwar->getFrameCount(), bestStormPos.x(), bestStormPos.y(), _mapManager->stormPos.size());
-            // remove the storm that we just fired
-            _mapManager->stormPos.erase(bestStormPos);
-            // remove the >= 4/9 (buildtiles) overlaping storms yet present in stormPos
-            for (std::map<Position, int>::iterator it = _mapManager->stormPos.begin();
-                it != _mapManager->stormPos.end(); )
-            {
-                if (it->first.getDistance(bestStormPos) < 46.0)
-                {
-                    std::map<Position, int>::iterator tmp = it;
-                    ++it;
-                    _mapManager->stormPos.erase(tmp);
-                }
-                else
-                    ++it;
-            }
+            // tell the MapManager that we just stormed here
+            _mapManager->justStormed(bestStormPos);
             _lastStormFrame = Broodwar->getFrameCount();
             _lastStormPos = bestStormPos;
         }
