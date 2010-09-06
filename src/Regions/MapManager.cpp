@@ -560,7 +560,6 @@ void MapManager::onFrame()
     // Updating the damages maps with storms 
     // (overlapping => more damage, that's false but easy AND handy b/c of durations)
     std::list<Bullet*> stormsToDelete;
-    std::list<Unit*> minesToDelete;
     for (std::map<Bullet*, Position>::iterator it = _trackedStorms.begin();
         it != _trackedStorms.end(); ++it)
     {
@@ -568,20 +567,19 @@ void MapManager::onFrame()
         {
             removeDmgStorm(it->second);
             for (std::map<Unit*, Position>::iterator i = _trackedMines.begin();     // hack with _trackedMines, see .h
-                i != _trackedMines.end(); ++i)                                         // hack with _trackedMines, see .h
+                i != _trackedMines.end(); )                                         // hack with _trackedMines, see .h
             {
                 if (i->second.x() > it->second.x() - (__STORM_SIZE__ / 2 + 1) && i->second.x() < it->second.x() + (__STORM_SIZE__ / 2 + 1)        // hack with _trackedMines, see .h
                     && i->second.y() > it->second.y() - (__STORM_SIZE__ / 2 + 1) && i->second.y() < it->second.y() + (__STORM_SIZE__ / 2 + 1))    // hack with _trackedMines, see .h
                 {
                     removeDmg(UnitTypes::Terran_Vulture_Spider_Mine, i->second);    // hack with _trackedMines, see .h
                     _eUnitsFilter->onUnitDestroy(i->first);                         // hack with _trackedMines, see .h
-                    //std::map<Unit*, Position>::iterator tmp = i;                    // hack with _trackedMines, see .h
-                    //++i;                                                            // hack with _trackedMines, see .h
-                    //_trackedMines.erase(tmp);                                       // hack with _trackedMines, see .h
-                    minesToDelete.push_back(i->first);
+                    std::map<Unit*, Position>::iterator tmp = i;                    // hack with _trackedMines, see .h
+                    ++i;                                                            // hack with _trackedMines, see .h
+                    _trackedMines.erase(tmp);                                       // hack with _trackedMines, see .h
                 }
-                //else
-                    //++i;
+                else
+                    ++i;
             }
             stormsToDelete.push_back(it->first);
         }
@@ -590,11 +588,6 @@ void MapManager::onFrame()
         it != stormsToDelete.end(); ++it)
     {
         _trackedStorms.erase(*it);
-    }
-    for (std::list<Unit*>::const_iterator it = minesToDelete.begin();
-        it != minesToDelete.end(); ++it)
-    {
-        _trackedMines.erase(*it);
     }
 
     if (Broodwar->self()->hasResearched(BWAPI::TechTypes::Psionic_Storm))
