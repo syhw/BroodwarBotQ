@@ -15,17 +15,32 @@ void EUnitsFilter::update(Unit* u)
 {
     if (u->getPlayer() == Broodwar->self()) return;
     if (u->getPlayer()->isNeutral()) return;
+    if (u->getType() == BWAPI::UnitTypes::Zerg_Larva 
+        || u->getType() == BWAPI::UnitTypes::Zerg_Egg
+        //|| u->getType() == BWAPI::UnitTypes::Zerg_Lurker_Egg
+        || u->getType() == BWAPI::UnitTypes::Protoss_Interceptor
+        || u->getType() == BWAPI::UnitTypes::Terran_Nuclear_Missile)
+        return;
     if (_eViewedUnits.count(u))
-        _eViewedUnits[u].update(timeManager->getElapsedTime());
+        _eViewedUnits[u].update(Broodwar->getFrameCount());
     else 
-        _eViewedUnits[u] = EViewedUnit(u, timeManager->getElapsedTime());
+        _eViewedUnits[u] = EViewedUnit(u, Broodwar->getFrameCount());
+    if (!(u->isDetected()) || u->isCloaked() || u->isBurrowed())
+        _invisibleUnits[u] = std::make_pair<UnitType, Position>(u->getType(), u->getPosition());
+}
+
+void EUnitsFilter::filter(Unit* u)
+{
+    if (_eViewedUnits[u].type.isBuilding()) return; // we consider that buildings don't move
+    if (Broodwar->getFrameCount() - _eViewedUnits[u].lastSeen > 7200) // 5 minutes
+        _eViewedUnits.erase(u);
 }
 
 void EUnitsFilter::onUnitDestroy(Unit* u)
 {
-    if (u->getPlayer() == Broodwar->self()) return;
-    if (u->getPlayer()->isNeutral()) return;
+    if (u->isVisible() && u->getPlayer() != Broodwar->enemy()) return;
     _eViewedUnits.erase(u);
+    _invisibleUnits.erase(u);
 }
 
 void EUnitsFilter::onUnitMorph(Unit* u)
@@ -47,6 +62,34 @@ void EUnitsFilter::onUnitRenegade(Unit* u)
 {
     update(u);
 }
+
+void EUnitsFilter::update()
+{
+}
+
+const std::map<BWAPI::Unit*, EViewedUnit>& EUnitsFilter::getViewedUnits()
+{
+    return _eViewedUnits;
+}
+
+const std::map<Unit*, std::pair<UnitType, Position> >& EUnitsFilter::getInvisibleUnits()
+{
+    return _invisibleUnits;
+}
+
+bool EUnitsFilter::empty()
+{
+    return _eViewedUnits.empty();
+}
+
+void EUnitsFilter::bwOutput()
+{
+    for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = _eViewedUnits.begin(); 
+        it != _eViewedUnits.end(); ++it)
+        Broodwar->printf("Unit: %i", it->first);
+}
+
+#ifdef BW_QT_DEBUG
 
 QWidget* EUnitsFilter::createWidget(QWidget* parent) const
 {
@@ -83,28 +126,8 @@ QWidget* EUnitsFilter::createWidget(QWidget* parent) const
 		return qw;
 }
 
-void EUnitsFilter::update()
-{
-}
-
-const std::map<BWAPI::Unit*, EViewedUnit>& EUnitsFilter::getViewedUnits()
-{
-    return _eViewedUnits;
-}
-
-bool EUnitsFilter::empty()
-{
-    return _eViewedUnits.empty();
-}
-
-void EUnitsFilter::bwOutput()
-{
-    for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = _eViewedUnits.begin(); 
-        it != _eViewedUnits.end(); ++it)
-        Broodwar->printf("Unit: %i", it->first);
-}
-
 void EUnitsFilter::refreshWidget(QWidget* /*widget*/) const
 {
 }
 
+#endif

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="MacroProject"
 	ProjectGUID="{F39C7417-770D-4635-8A47-77BD9CDDCD71}"
 	RootNamespace="MacroProject"
@@ -240,10 +240,6 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\Micro\EUnit.cpp"
-						>
-					</File>
-					<File
 						RelativePath="..\src\Micro\Units\FlyingUnit.cpp"
 						>
 					</File>
@@ -287,10 +283,6 @@
 						Name="ProtossSpecial"
 						>
 						<File
-							RelativePath="..\src\Micro\Units\ProtossSpecial\ArbiterUnit.cpp"
-							>
-						</File>
-						<File
 							RelativePath="..\src\Micro\Units\ProtossSpecial\DarkArchonUnit.cpp"
 							>
 						</File>
@@ -302,6 +294,10 @@
 					<Filter
 						Name="ProtossFlying"
 						>
+						<File
+							RelativePath="..\src\Micro\Units\ProtossSpecial\ArbiterUnit.cpp"
+							>
+						</File>
 						<File
 							RelativePath="..\src\Micro\Units\ProtossFlying\CarrierUnit.cpp"
 							>
@@ -319,7 +315,7 @@
 							>
 						</File>
 						<File
-							RelativePath="..\src\Micro\Units\ProtossFlying\ShutttleUnit.cpp"
+							RelativePath="..\src\Micro\Units\ProtossFlying\ShuttleUnit.cpp"
 							>
 						</File>
 					</Filter>
@@ -670,10 +666,6 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\Micro\EUnit.h"
-						>
-					</File>
-					<File
 						RelativePath="..\src\Micro\Units\FlyingUnit.h"
 						>
 					</File>
@@ -717,10 +709,6 @@
 						Name="ProtossSpecial"
 						>
 						<File
-							RelativePath="..\src\Micro\Units\ProtossSpecial\ArbiterUnit.h"
-							>
-						</File>
-						<File
 							RelativePath="..\src\Micro\Units\ProtossSpecial\DarkArchonUnit.h"
 							>
 						</File>
@@ -732,6 +720,10 @@
 					<Filter
 						Name="ProtossFlying"
 						>
+						<File
+							RelativePath="..\src\Micro\Units\ProtossSpecial\ArbiterUnit.h"
+							>
+						</File>
 						<File
 							RelativePath="..\src\Micro\Units\ProtossFlying\CarrierUnit.h"
 							>

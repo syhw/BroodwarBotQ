@@ -5,104 +5,92 @@
 using namespace std;
 using namespace BWAPI;
 
-BWAPI::UnitType DragoonUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes::Protoss_High_Templar,
-                                                                BWAPI::UnitTypes::Protoss_Dragoon,
-                                                                BWAPI::UnitTypes::Protoss_Reaver,
-                                                                BWAPI::UnitTypes::Protoss_Zealot,
-                                                                BWAPI::UnitTypes::Protoss_Probe};
+int DragoonUnit::addRange;
+int DragoonUnit::attackDuration;
 
-DragoonUnit::DragoonUnit(BWAPI::Unit* u, UnitsGroup* ug):GroundUnit(u, ug)
+std::set<BWAPI::UnitType> DragoonUnit::setPrio;
+
+DragoonUnit::DragoonUnit(BWAPI::Unit* u, UnitsGroup* ug)
+: GroundUnit(u, ug)
 {
+    if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Singularity_Charge))
+        addRange = 64;
+    else
+        addRange = 0;
+    attackDuration = Broodwar->getLatency() + 8;
+
+    if (setPrio.empty())
+    {
+        setPrio.insert(BWAPI::UnitTypes::Terran_Vulture_Spider_Mine);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Lurker);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Observer);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Dark_Archon);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Carrier);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Science_Vessel);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Defiler);
+    }
 }
 
 DragoonUnit::~DragoonUnit()
 {
 }
 
-//Need some improvements, but it works.
-void DragoonUnit::micro()
+int DragoonUnit::addRangeGround()
 {
-    /*
-    std::set<Unit*> enemies;
-    int damagesTaken = 0;
-
-    std::set<Unit*> enemies_in_range;
-    double maxRangeGoon = 0.0;
-    double maxRangeGoonEnemy = 0.0;
-
-    Unit* weakestenemy = UnitsGroup::findWeakestEnemy(enemies_in_range);
-  
-    if (weakestenemy)
-        attackEnemy(weakestenemy, Colors::Red);
-    else
-    {
-        Unit* closest_enemy = findClosestEnemy(enemies);
-        if (closest_enemy)
-            attackEnemy(closest_enemy, Colors::Yellow);
-#ifdef __DEBUG_NICOLAS__
-        else
-            BWAPI::Broodwar->drawLineMap(unit->getPosition().x(),      unit->getPosition().y(),
-                                  unit->getTargetPosition().x(),unit->getTargetPosition().y(),
-                                  Colors::White);
-#endif
-    }
-    enemies_in_range.clear();
-    dragoonIA(enemies, maxRangeGoonEnemy);
-    */
+    return addRange;
 }
 
-void DragoonUnit::dragoonIA(std::set<Unit*> enemies, double maxRangeGoonEnemy)
+int DragoonUnit::addRangeAir()
 {
-    for each(Unit* enemy in enemies)
+    return addRange;
+}
+
+bool DragoonUnit::decideToFlee()
+{
+    // TODO complete conditions
+    return (_lastTotalHP - (unit->getShields() + unit->getHitPoints()) > 13);
+}
+
+void DragoonUnit::micro()
+{
+    if (targetEnemy != NULL && !(targetEnemy->exists()))
     {
-        if (enemy->getOrderTarget() != NULL && (enemy->isStartingAttack() || enemy->isAttacking()) ) 
+        updateRangeEnemies();
+        updateTargetEnemy();
+        attackEnemyUnit(targetEnemy);
+    }
+    else
+    {
+        if (Broodwar->getFrameCount() - _lastAttackOrder > getAttackDuration())
         {
-            Unit* myUnit = enemy->getOrderTarget();
-            if (myUnit->getPlayer() == BWAPI::Broodwar->self() && !myUnit->isMoving()) 
+            if (unit->getGroundWeaponCooldown() == 0)
             {
-                Vec dep(myUnit->getPosition().x() - enemy->getPosition().x(), myUnit->getPosition().y() - enemy->getPosition().y()); 
-                dep = dep.normalize();
-                Position newPos = Position(myUnit->getPosition().x(), myUnit->getPosition().y());;
-                double distanceFromEnemy = dep.norm();
-                double calc = (maxRangeGoonEnemy + 30 - enemy->getDistance(newPos))/distanceFromEnemy;
-                newPos += Position(static_cast<int>(dep.x * calc), static_cast<int>(dep.y * calc));
-                bool test = true;
-                for each (Unit* uunit in BWAPI::Broodwar->unitsOnTile(newPos.x(), newPos.y()))
-                {
-                    if (uunit != myUnit)
-                    {
-                        test = false;
-                        break;
-                    }
-                    double actualLife = myUnit->getHitPoints() + myUnit->getShields();
-                    double totalLife = myUnit->getType().maxHitPoints() + myUnit->getType().maxShields();
-                    double probaFuite = 0.2 + 0.8*(1-(distanceFromEnemy/maxRangeGoonEnemy));
-                    
-                    probaFuite = (actualLife/_unitsGroup->getTotalHP() < 0.1 ? 0 : probaFuite);
-                    if (test && (actualLife/totalLife) < probaFuite) 
-                    {
-                        myUnit->rightClick(newPos); // à changer
-#ifdef __DEBUG_NICOLAS__
-                        int ux = myUnit->getPosition().x(); int uy = myUnit->getPosition().y();
-                        int ex = myUnit->getTargetPosition().x(); int ey = myUnit->getTargetPosition().y();
-                        BWAPI::Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Blue);
-#endif
-                        break;
-                    }
-                }
+                updateRangeEnemies();
+                updateTargetEnemy();
+                attackEnemyUnit(targetEnemy);
+            }
+            else if (_fleeing || decideToFlee())
+            {
+                flee();
+            }
+            else if (!unit->isMoving() && targetEnemy != NULL)
+            {
+                //fightMove();
+                //switchMode(MODE_INPOS); // TODO
+                //updateDir();
+                //clickDir();
             }
         }
     }
 }
 
-bool DragoonUnit::canHit(Unit* enemy)
+void DragoonUnit::check()
 {
-    return enemy->isVisible();
-}
-
-bool DragoonUnit::withinRange(Unit* enemy)
-{
-    return DragoonUnit::getMaxRange() > enemy->getDistance(unit)-enemy->getType().dimensionRight();
+    if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Singularity_Charge))
+        addRange = 64;
 }
 
 double DragoonUnit::getMaxRange()
@@ -110,12 +98,12 @@ double DragoonUnit::getMaxRange()
     return BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Singularity_Charge) == 1 ? 192.0 : 128.0;
 }
 
-int DragoonUnit::getTimeToAttack()
+int DragoonUnit::getAttackDuration()
 {
-    return 8;
+    return attackDuration;
 }
 
-BWAPI::UnitType* DragoonUnit::getListPriorite()
+std::set<BWAPI::UnitType> DragoonUnit::getSetPrio()
 {
-    return DragoonUnit::listPriorite;
+    return DragoonUnit::setPrio;
 }

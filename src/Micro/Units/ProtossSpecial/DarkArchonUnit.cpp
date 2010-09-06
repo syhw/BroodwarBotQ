@@ -1,12 +1,7 @@
 #include "DarkArchonUnit.h"
 
-BWAPI::UnitType DarkArchonUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes::Protoss_High_Templar,
-                                                                BWAPI::UnitTypes::Protoss_Dragoon,
-                                                                BWAPI::UnitTypes::Protoss_Reaver,
-                                                                BWAPI::UnitTypes::Protoss_Zealot,
-                                                                BWAPI::UnitTypes::Protoss_Probe};
-
-DarkArchonUnit::DarkArchonUnit(BWAPI::Unit* u, UnitsGroup* ug):SpecialUnit(u, ug)
+DarkArchonUnit::DarkArchonUnit(BWAPI::Unit* u, UnitsGroup* ug)
+: SpecialUnit(u, ug)
 {
 }
 
@@ -21,23 +16,16 @@ void DarkArchonUnit::micro()
 #endif
 }
 
-bool DarkArchonUnit::canHit(BWAPI::Unit* enemy)
+void DarkArchonUnit::check()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("DarkArchonUnit::canHit non implémenté !");
-#endif
-    return false;
 }
 
-int DarkArchonUnit::getTimeToAttack()
+int DarkArchonUnit::getAttackDuration()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("DarkArchonUnit::getTimeToAttack non implémenté !");
-#endif
-    return 0;
+    return 3;
 }
 
-BWAPI::UnitType* DarkArchonUnit::getListPriorite()
+std::set<BWAPI::UnitType> DarkArchonUnit::getSetPrio()
 {
-    return DarkArchonUnit::listPriorite;
+    return std::set<BWAPI::UnitType>();
 }

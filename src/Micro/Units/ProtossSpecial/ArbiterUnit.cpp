@@ -1,13 +1,21 @@
 #include "ArbiterUnit.h"
 
-BWAPI::UnitType ArbiterUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes::Protoss_High_Templar,
-                                                                BWAPI::UnitTypes::Protoss_Dragoon,
-                                                                BWAPI::UnitTypes::Protoss_Reaver,
-                                                                BWAPI::UnitTypes::Protoss_Zealot,
-                                                                BWAPI::UnitTypes::Protoss_Probe};
+std::set<BWAPI::UnitType> ArbiterUnit::setPrio;
 
-ArbiterUnit::ArbiterUnit(BWAPI::Unit* u, UnitsGroup* ug):SpecialUnit(u, ug)
+ArbiterUnit::ArbiterUnit(BWAPI::Unit* u, UnitsGroup* ug)
+: FlyingUnit(u, ug)
 {
+    if (setPrio.empty())
+    {
+        setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Dragoon);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Scout);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Wraith);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Vulture_Spider_Mine);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Hydralisk);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Defiler);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Mutalisk);
+    }
 }
 
 ArbiterUnit::~ArbiterUnit()
@@ -21,23 +29,16 @@ void ArbiterUnit::micro()
 #endif
 }
 
-bool ArbiterUnit::canHit(BWAPI::Unit* enemy)
+void ArbiterUnit::check()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("ArbiterUnit::canHit non implémenté !");
-#endif
-    return false;
 }
 
-int ArbiterUnit::getTimeToAttack()
+int ArbiterUnit::getAttackDuration()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("ArbiterUnit::getTimeToAttack non implémenté !");
-#endif
     return 0;
 }
 
-BWAPI::UnitType* ArbiterUnit::getListPriorite()
+std::set<BWAPI::UnitType> ArbiterUnit::getSetPrio()
 {
-    return ArbiterUnit::listPriorite;
+    return ArbiterUnit::setPrio;
 }

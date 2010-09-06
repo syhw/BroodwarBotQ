@@ -41,7 +41,7 @@ void EEcoEstimator::setDependencies(){
 void EEcoEstimator::update()
 {
 	//uses 300 as build time for worker
-	if ((timeManager->getElapsedTime()%300)==299) {
+    if ((Broodwar->getFrameCount()%300)==299) {
 			theo_workers++;
 			mWorkers=theo_workers-gWorkers;
 			//Broodwar->printf("Patch_Owned : %d, Number of workers: %d, m_per_mn: %d",patch_owned, theo_workers, m_per_mn());

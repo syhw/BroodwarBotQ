@@ -226,10 +226,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Micro\EUnit.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Micro\Units\FlyingUnit.cpp"
 					>
 				</File>
@@ -253,6 +249,10 @@
 					Name="ProtossFlying"
 					>
 					<File
+						RelativePath="..\src\Micro\Units\ProtossSpecial\ArbiterUnit.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\src\Micro\Units\ProtossFlying\CarrierUnit.cpp"
 						>
 					</File>
@@ -269,7 +269,7 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\Micro\Units\ProtossFlying\ShutttleUnit.cpp"
+						RelativePath="..\src\Micro\Units\ProtossFlying\ShuttleUnit.cpp"
 						>
 					</File>
 				</Filter>
@@ -304,10 +304,6 @@
 				<Filter
 					Name="ProtossSpecial"
 					>
-					<File
-						RelativePath="..\src\Micro\Units\ProtossSpecial\ArbiterUnit.cpp"
-						>
-					</File>
 					<File
 						RelativePath="..\src\Micro\Units\ProtossSpecial\DarkArchonUnit.cpp"
 						>
@@ -426,6 +422,10 @@
 				Name="Intelligence"
 				>
 				<File
+					RelativePath="..\src\Intelligence\ETechEstimator.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Intelligence\EUnitsFilter.cpp"
 					>
 				</File>
@@ -500,10 +500,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Micro\EUnit.h"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Micro\Units\FlyingUnit.h"
 					>
 				</File>
@@ -526,6 +522,10 @@
 				<Filter
 					Name="ProtossFlying"
 					>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossSpecial\ArbiterUnit.h"
+						>
+					</File>
 					<File
 						RelativePath="..\src\Micro\Units\ProtossFlying\CarrierUnit.h"
 						>
@@ -550,10 +550,6 @@
 				<Filter
 					Name="ProtossSpecial"
 					>
-					<File
-						RelativePath="..\src\Micro\Units\ProtossSpecial\ArbiterUnit.h"
-						>
-					</File>
 					<File
 						RelativePath="..\src\Micro\Units\ProtossSpecial\DarkArchonUnit.h"
 						>
@@ -723,6 +719,10 @@
 			<Filter
 				Name="Intelligence"
 				>
+				<File
+					RelativePath="..\src\Intelligence\ETechEstimator.h"
+					>
+				</File>
 				<File
 					RelativePath="..\src\Intelligence\EUnitsFilter.h"
 					>

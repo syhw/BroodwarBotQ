@@ -5,12 +5,13 @@
 
 class ArchonUnit : public GroundUnit
 {
+protected:
+    static std::set<BWAPI::UnitType> setPrio;
 public:
-    static BWAPI::UnitType listPriorite[NUMBER_OF_PRIORITY];
     ArchonUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~ArchonUnit();
     virtual void micro();
-    virtual bool canHit(BWAPI::Unit* enemy);
-    virtual int getTimeToAttack();
-    virtual BWAPI::UnitType* getListPriorite();
+    virtual void check();
+    virtual int getAttackDuration();
+    virtual std::set<BWAPI::UnitType> getSetPrio();
 };

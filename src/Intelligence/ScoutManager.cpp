@@ -24,7 +24,7 @@ void ScoutManager::setDependencies(){
 void ScoutManager::update()
 {
 	
-	if(regions->enemyFound() && ! exploringEnemy ){
+	if (regions->enemyFound() && !exploringEnemy) {
 		
 		exploringEnemy = true;
 		this->awaitingGoals.push_back(pGoal(new ExploreGoal(regions->whereIsEnemy())));

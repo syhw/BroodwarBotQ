@@ -13,11 +13,12 @@ void MicroAIModule::onStart()
 	// Enable some cheat flags
     //Broodwar->printf("ON START !!\n");
     Broodwar->enableFlag(Flag::UserInput);
-    Broodwar->setLocalSpeed(0);
+    //Broodwar->setLocalSpeed(0);
 	//Broodwar->enableFlag(Flag::CompleteMapInformation);
 	BWTA::readMap();
 	BWTA::analyze();
     this->eUnitsFilter = & EUnitsFilter::Instance();
+    this->eTechEstimator = & ETechEstimator::Instance();
     this->mapManager = & MapManager::Instance();
 	this->objectManager = & ObjectManager::Instance();
     this->regions = & Regions::Instance();
@@ -41,7 +42,7 @@ void MicroAIModule::onStart()
 		} 
         else 
         {
-            if ((*i)->getPlayer() != Broodwar->self() || (*i)->getType() == UnitTypes::Protoss_Archon)
+            if ((*i)->getPlayer() != Broodwar->self() || (*i)->getType() == UnitTypes::Protoss_Archon || (*i)->getType() == UnitTypes::Protoss_Observer)
                 continue;
             else
                 mm->takeControl(*i);
@@ -61,11 +62,11 @@ void MicroAIModule::onStart()
     int sign = mp.x() < Broodwar->mapWidth()/2*32 ? 1 : -1;
 
     /* LINE IN THE MIDDLE (+/- 64 pixs) */   
-    /*pFormation tmp_form = pFormation(new LineFormation(
+    pFormation tmp_form = pFormation(new LineFormation(
         Position(Broodwar->mapWidth()/2*32 + sign*64,(Broodwar->mapHeight()/2 + 4)*32), Vec(1,0)));
     pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
     pGoal tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
-    goals.push_back(tmp_goal);*/
+    goals.push_back(tmp_goal);
 
     /* SQUARE IN THE MIDDLE */
     /*pFormation tmp_form = pFormation(new SquareFormation(
@@ -76,12 +77,12 @@ void MicroAIModule::onStart()
     
     
     /* ARC IN THE MIDDLE (+/- 256 pixs) */
-    pFormation tmp_form = pFormation(new ArcFormation(
+    /*pFormation tmp_form = pFormation(new ArcFormation(
         Position(Broodwar->mapWidth()/2*32 + sign*256,(Broodwar->mapHeight()/2 + 4)*32), 
         Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
     pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
     pGoal tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
-    goals.push_back(tmp_goal);
+    goals.push_back(tmp_goal);*/
 
     /* SQUARE ON THE OTHER SIDE */
     /*tmp_form = pFormation(new SquareFormation(
@@ -115,24 +116,6 @@ void MicroAIModule::onFrame()
     sprintf_s(mousePos, "%d, %d", Broodwar->getScreenPosition().x()+Broodwar->getMousePosition().x(), Broodwar->getScreenPosition().y()+Broodwar->getMousePosition().y());
     Broodwar->drawTextMouse(12, 0, mousePos);
 #endif
-	/*if (Broodwar->getFrameCount()%300==0)
-	{
-	//Every 300 frames we will print some basic unit stats
-	showStats();
-	}
-
-	//we will visualize the chokepoints with red lines
-	for(std::set<BWTA::Region*>::const_iterator r=BWTA::getRegions().begin();r!=BWTA::getRegions().end();r++)
-	{
-	for(std::set<BWTA::Chokepoint*>::const_iterator c=(*r)->getChokepoints().begin();c!=(*r)->getChokepoints().end();c++)
-	{
-	Position point1=(*c)->getSides().first;
-	Position point2=(*c)->getSides().second;
-	Broodwar->drawLine(CoordinateType::Map,point1.x(),point1.y(),point2.x(),point2.y(),Colors::Red);
-	}
-	}*/
-
-	//if (mm != NULL) mm->display();
 
     //we will iterate through all the regions and draw the polygon outline of it in green.
 	for(std::set<BWTA::Region*>::const_iterator r=BWTA::getRegions().begin();r!=BWTA::getRegions().end();r++)
@@ -145,9 +128,10 @@ void MicroAIModule::onFrame()
 			Broodwar->drawLine(CoordinateType::Map,point1.x(),point1.y(),point2.x(),point2.y(),Colors::Green);
 		}
 	}
-    //mapManager->drawBuildings();
-    //mapManager->drawWalkability();
     mapManager->onFrame();
+    //Broodwar->printf("weapons ground upgrade level %d", Broodwar->enemy()->getUpgradeLevel(UpgradeTypes::Protoss_Ground_Weapons));
+    //Broodwar->printf("weapons ground upgrade level %d", eUnitsFilter->getViewedUnits().begin()->first->getUpgradeLevel(UpgradeTypes::Protoss_Ground_Weapons));
+    //Broodwar->printf("%s", Broodwar->getLastError().toString().c_str());
 }
 
 MicroAIModule::~MicroAIModule()
@@ -254,6 +238,7 @@ void MicroAIModule::onUnitShow(Unit* unit)
     unitGroupManager->onUnitDiscover(unit);
     mm->onUnitShow(unit);
 }
+
 void MicroAIModule::onUnitHide(Unit* unit)
 {
     eUnitsFilter->onUnitHide(unit);

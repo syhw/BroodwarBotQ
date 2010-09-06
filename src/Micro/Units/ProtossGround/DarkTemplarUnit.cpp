@@ -1,13 +1,19 @@
 #include "DarkTemplarUnit.h"
 
-BWAPI::UnitType DarkTemplarUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes::Protoss_High_Templar,
-                                                                BWAPI::UnitTypes::Protoss_Dragoon,
-                                                                BWAPI::UnitTypes::Protoss_Reaver,
-                                                                BWAPI::UnitTypes::Protoss_Zealot,
-                                                                BWAPI::UnitTypes::Protoss_Probe};
+std::set<BWAPI::UnitType> DarkTemplarUnit::setPrio;
 
-DarkTemplarUnit::DarkTemplarUnit(BWAPI::Unit* u, UnitsGroup* ug):GroundUnit(u, ug)
+DarkTemplarUnit::DarkTemplarUnit(BWAPI::Unit* u, UnitsGroup* ug)
+: GroundUnit(u, ug)
 {
+    if (setPrio.empty())
+    {
+        setPrio.insert(BWAPI::UnitTypes::Terran_Missile_Turret);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Spore_Colony);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Defiler);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode);
+    }
 }
 
 DarkTemplarUnit::~DarkTemplarUnit()
@@ -21,23 +27,16 @@ void DarkTemplarUnit::micro()
 #endif
 }
 
-bool DarkTemplarUnit::canHit(BWAPI::Unit* enemy)
+void DarkTemplarUnit::check()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("DarkTemplarUnit::canHit non implémenté !");
-#endif
-    return false;
 }
 
-int DarkTemplarUnit::getTimeToAttack()
+int DarkTemplarUnit::getAttackDuration()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("DarkTemplarUnit::getTimeToAttack non implémenté !");
-#endif
     return 0;
 }
 
-BWAPI::UnitType* DarkTemplarUnit::getListPriorite()
+std::set<BWAPI::UnitType> DarkTemplarUnit::getSetPrio()
 {
-    return DarkTemplarUnit::listPriorite;
+    return DarkTemplarUnit::setPrio;
 }

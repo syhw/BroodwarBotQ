@@ -26,7 +26,6 @@ void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnit
         if ((*it)->getMaxDimension() > maxDim)
             maxDim = (*it)->getMaxDimension();
     }
-    Broodwar->printf("max dim : %d", maxDim);
 	unsigned int sizeSide = (unsigned int)sqrt((double)vUnit.size());
 	Vec corner = center - Position( (int)(sizeSide/2.0 * (space + maxDim)), (int)(sizeSide/2.0 * (space + maxDim)));
 	for( unsigned int i = 0; i < vUnit.size(); i++)

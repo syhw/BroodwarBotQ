@@ -1,13 +1,13 @@
 #include "HighTemplarUnit.h"
+#include <UnitsGroup.h>
 
-BWAPI::UnitType HighTemplarUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes::Protoss_High_Templar,
-                                                                BWAPI::UnitTypes::Protoss_Dragoon,
-                                                                BWAPI::UnitTypes::Protoss_Reaver,
-                                                                BWAPI::UnitTypes::Protoss_Zealot,
-                                                                BWAPI::UnitTypes::Protoss_Probe};
+int HighTemplarUnit::lastStormableUnitsUpdateFrame;
 
-HighTemplarUnit::HighTemplarUnit(BWAPI::Unit* u, UnitsGroup* ug):SpecialUnit(u, ug)
+HighTemplarUnit::HighTemplarUnit(BWAPI::Unit* u, UnitsGroup* ug)
+: SpecialUnit(u, ug)
+, _lastStormFrame(0)
 {
+    _mapManager = & MapManager::Instance();
 }
 
 HighTemplarUnit::~HighTemplarUnit()
@@ -16,28 +16,78 @@ HighTemplarUnit::~HighTemplarUnit()
 
 void HighTemplarUnit::micro()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("HighTemplarUnit::micro non implémenté !");
-#endif
+    // Updating the map of stormable units
+    if (lastStormableUnitsUpdateFrame != Broodwar->getFrameCount())
+    {
+        stormableUnits.clear();
+        lastStormableUnitsUpdateFrame = Broodwar->getFrameCount();
+    }
+    for (std::map<Unit*, Position>::const_iterator it = _unitsGroup->enemies.begin();
+        it != _unitsGroup->enemies.end(); ++it)
+    {
+        if (it->first->isVisible() && it->first->getType().isBuilding())
+            continue;
+        if (!stormableUnits.count(it->first))
+            stormableUnits.insert(*it);
+    }
+
+    int elapsed = Broodwar->getFrameCount() - _lastStormFrame;
+    // Try and storm if it has any advantage, otherwise flee or don't stuck
+    if (this->unit->getEnergy() > 75 && elapsed > Broodwar->getLatency() + getAttackDuration())
+    {   
+        Position bestStormPos;
+        int bestScore = -1;
+        if (elapsed > 128)
+        {
+            for (std::map<Position, int>::const_iterator it = _mapManager->stormPos.begin();
+                it != _mapManager->stormPos.end(); ++it)
+            {
+                if (it->second > bestScore && _unitPos.getDistance(it->first) < 288.0 && (elapsed > 64 || _lastStormPos.getDistance(it->first) > 46))
+                {
+                    bestScore = it->second;
+                    bestStormPos = it->first;
+                }
+            }
+        } 
+        else
+        {
+            for (std::map<Position, int>::const_reverse_iterator it = _mapManager->stormPos.rbegin();
+                it != _mapManager->stormPos.rend(); ++it)
+            {
+                if (it->second > bestScore && _unitPos.getDistance(it->first) < 288.0 && (elapsed > 64 || _lastStormPos.getDistance(it->first) > 46))
+                {
+                    bestScore = it->second;
+                    bestStormPos = it->first;
+                }
+            }
+        }
+        // Storm only if it damages at least 2 units, or at least 1 invisible unit,
+        // or there is only one enemy unit around us and we can storm it without collateral damages
+        if (bestScore > 3 || (_unitsGroup->enemies.size() == 1 && bestScore == 3))
+        {       
+            unit->useTech(BWAPI::TechTypes::Psionic_Storm, bestStormPos);
+            Broodwar->printf("Frame %d, pos (%d, %d), stormPos size %d", Broodwar->getFrameCount(), bestStormPos.x(), bestStormPos.y(), _mapManager->stormPos.size());
+            // tell the MapManager that we just stormed here
+            _mapManager->justStormed(bestStormPos);
+            _lastStormFrame = Broodwar->getFrameCount();
+            _lastStormPos = bestStormPos;
+        }
+    }
+    else if (_fleeing || this->unit->getEnergy() <= 75)
+    {
+        //flee();
+    }
+    else
+    {
+        //fightMove();
+    }
 }
 
-bool HighTemplarUnit::canHit(BWAPI::Unit* enemy)
+void HighTemplarUnit::check()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("HighTemplarUnit::canHit non implémenté !");
-#endif
-    return false;
 }
 
-int HighTemplarUnit::getTimeToAttack()
+std::set<BWAPI::UnitType> HighTemplarUnit::getSetPrio()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("HighTemplarUnit::getTimeToAttack non implémenté !");
-#endif
-    return 0;
-}
-
-BWAPI::UnitType* HighTemplarUnit::getListPriorite()
-{
-    return HighTemplarUnit::listPriorite;
+    return std::set<BWAPI::UnitType>();
 }

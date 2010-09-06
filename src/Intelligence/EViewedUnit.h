@@ -6,23 +6,20 @@
 
 struct EViewedUnit
 {
+#ifdef BW_QT_DEBUG
     friend std::ostream& operator <<(std::ostream&, const EViewedUnit&);
+#endif
 
     // TODO add probability to be in each of the regions.
     BWAPI::Unit* unit;
     BWAPI::UnitType type;
     int HP;
     BWAPI::Position position;
-    int kills;
-    unsigned long lastSeen;
+    unsigned int lastSeen;
     Vec velocity;
     EViewedUnit() { }
-    EViewedUnit(BWAPI::Unit* u, unsigned long time);
+    EViewedUnit(BWAPI::Unit* u, unsigned int time);
     EViewedUnit(const EViewedUnit& evu);
-    void update(unsigned long time);
+    void update(unsigned int time);
     ~EViewedUnit() { }
-    //std::ostream& operator <<(std::ostream& os) const;
-    const std::istream& operator >>(const std::istream& is) const;
 };
-
-std::ostream& operator <<(std::ostream& os, const EViewedUnit& evu);

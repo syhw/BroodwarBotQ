@@ -1,13 +1,31 @@
 #include "CarrierUnit.h"
 
-BWAPI::UnitType CarrierUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes::Protoss_High_Templar,
-                                                                BWAPI::UnitTypes::Protoss_Dragoon,
-                                                                BWAPI::UnitTypes::Protoss_Reaver,
-                                                                BWAPI::UnitTypes::Protoss_Zealot,
-                                                                BWAPI::UnitTypes::Protoss_Probe};
+std::set<BWAPI::UnitType> CarrierUnit::setPrio;
 
-CarrierUnit::CarrierUnit(BWAPI::Unit* u, UnitsGroup* ug):FlyingUnit(u, ug)
+CarrierUnit::CarrierUnit(BWAPI::Unit* u, UnitsGroup* ug)
+: FlyingUnit(u, ug)
 {
+    if (setPrio.empty())
+    {
+        setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Corsair);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Scout);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Dragoon);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Archon);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Carrier);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Marine);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Ghost);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Wraith);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Valkyrie);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Science_Vessel);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Battlecruiser);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Goliath);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Hydralisk);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Mutalisk);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Devourer);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Scourge);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Defiler);
+    }
 }
 
 CarrierUnit::~CarrierUnit()
@@ -21,23 +39,16 @@ void CarrierUnit::micro()
 #endif
 }
 
-bool CarrierUnit::canHit(BWAPI::Unit* enemy)
+void CarrierUnit::check()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("CarrierUnit::canHit non implémenté !");
-#endif
-    return false;
 }
 
-int CarrierUnit::getTimeToAttack()
+int CarrierUnit::getAttackDuration()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("CarrierUnit::getTimeToAttack non implémenté !");
-#endif
     return 0;
 }
 
-BWAPI::UnitType* CarrierUnit::getListPriorite()
+std::set<BWAPI::UnitType> CarrierUnit::getSetPrio()
 {
-    return CarrierUnit::listPriorite;
+    return CarrierUnit::setPrio;
 }

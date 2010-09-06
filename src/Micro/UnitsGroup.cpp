@@ -31,7 +31,7 @@ using namespace BWAPI;
 
 UnitsGroup::UnitsGroup()
 {
-
+    _eUnitsFilter = & EUnitsFilter::Instance();
 }
 
 UnitsGroup::~UnitsGroup()
@@ -180,6 +180,9 @@ void UnitsGroup::displayTargets()
 
 void UnitsGroup::update()
 {
+#ifdef __DEBUG_GABRIEL__
+    clock_t start = clock();
+#endif
 	if (units.empty()){
 		this->accomplishGoal();
 		return;
@@ -209,18 +212,30 @@ void UnitsGroup::update()
         this->totalPower += (*it)->unit->getType().groundWeapon().damageAmount();
         double tmp_max = max(max((*it)->unit->getType().groundWeapon().maxRange(), (*it)->unit->getType().airWeapon().maxRange()), 
             (*it)->unit->getType().sightRange()); // TODO: upgrades
-        if (tmp_max > maxRange) 
+        if (tmp_max > maxRange)
             maxRange = tmp_max;
     }
 
     updateCenter();
     
-    enemies = std::set<Unit*>(nearbyEnemyUnits(center, maxRadius + maxRange + 46)); // > 45.26 == sqrt(32^2+32^2)
+    //enemies = std::set<Unit*>(nearbyEnemyUnits(center, maxRadius + maxRange + 46)); // > 45.26 == sqrt(32^2+32^2)
+    updateNearbyEnemyUnitsFromFilter(center, maxRadius + maxRange + 46); // possibly hidden
     Broodwar->drawCircleMap(center.x(), center.y(), maxRadius + maxRange, Colors::Yellow);
-	accomplishGoal();
+	if (!enemies.empty())
+        defaultTargetEnemy = enemies.begin()->first; // TODO CHANGE THAT FOR A PRIORITY
+    else 
+        defaultTargetEnemy = NULL;
+    accomplishGoal();
 
 #ifdef __DEBUG_NICOLAS__
     displayTargets();
+#endif
+
+#ifdef __DEBUG_GABRIEL__
+    clock_t finish = clock();
+    double duration = (double)(finish - start) / CLOCKS_PER_SEC;
+    if (duration > 0.040) 
+        Broodwar->printf( "UnitsGroup::update() took %2.5f seconds\n", duration);
 #endif
 }
 
@@ -308,7 +323,7 @@ void UnitsGroup::onUnitShow(Unit* u)
 {
     for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
         (*it)->onUnitShow(u);
-    if (!u->getType().isBuilding())
+    if (u->getPlayer() == Broodwar->enemy()) //(!u->getType().isBuilding())
         unitDamages.insert(UnitDmg(u, Dmg(0, u)));
 }
 
@@ -397,6 +412,18 @@ int UnitsGroup::getTotalHP() const
 std::vector<pBayesianUnit>* UnitsGroup::getUnits()
 {
     return &units;
+}
+
+void UnitsGroup::updateNearbyEnemyUnitsFromFilter(BWAPI::Position p, double radius)
+{
+    enemies.clear();
+    // have units that have been seek like units on cliffs or lurkers before burrowing (for instance)
+    for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = _eUnitsFilter->getViewedUnits().begin();
+        it != _eUnitsFilter->getViewedUnits().end(); ++it)
+    {
+        if (it->second.position.getDistance(p) <= radius)
+            enemies.insert(std::make_pair<Unit*, Position>(it->first, it->second.position));
+    }
 }
 
 const BayesianUnit& UnitsGroup::operator[](int i)

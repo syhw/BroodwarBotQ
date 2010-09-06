@@ -1,11 +1,5 @@
 #include "ObserverUnit.h"
 
-BWAPI::UnitType ObserverUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes::Protoss_High_Templar,
-                                                                BWAPI::UnitTypes::Protoss_Dragoon,
-                                                                BWAPI::UnitTypes::Protoss_Reaver,
-                                                                BWAPI::UnitTypes::Protoss_Zealot,
-                                                                BWAPI::UnitTypes::Protoss_Probe};
-
 ObserverUnit::ObserverUnit(BWAPI::Unit* u, UnitsGroup* ug):FlyingUnit(u, ug)
 {
 }
@@ -21,20 +15,16 @@ void ObserverUnit::micro()
 #endif
 }
 
-bool ObserverUnit::canHit(BWAPI::Unit* enemy)
+void ObserverUnit::check()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("ObserverUnit::canHit non implémenté !");
-#endif
-    return false;
 }
 
-int ObserverUnit::getTimeToAttack()
+int ObserverUnit::getAttackDuration()
 {
     return 0;
 }
 
-BWAPI::UnitType* ObserverUnit::getListPriorite()
+std::set<BWAPI::UnitType> ObserverUnit::getSetPrio()
 {
-    return ObserverUnit::listPriorite;
+    return std::set<BWAPI::UnitType>();
 }

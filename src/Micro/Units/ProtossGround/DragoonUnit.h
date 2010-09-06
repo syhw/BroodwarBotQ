@@ -6,15 +6,18 @@
 class DragoonUnit : public GroundUnit
 {
 protected:
-    void dragoonIA(std::set<BWAPI::Unit*> enemies, double maxRangeGoonEnemy);
+    static std::set<BWAPI::UnitType> setPrio;
+    static int addRange;
+    static int attackDuration;
+    inline bool decideToFlee();
 public:
-    static BWAPI::UnitType listPriorite[NUMBER_OF_PRIORITY];
     DragoonUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~DragoonUnit();
+    virtual int addRangeGround();
+    virtual int addRangeAir();
     virtual void micro();
-    virtual bool canHit(BWAPI::Unit* enemy);
+    virtual void check();
     static double getMaxRange();
-    virtual bool withinRange(BWAPI::Unit* enemy);
-    virtual int getTimeToAttack();
-    virtual BWAPI::UnitType* getListPriorite();
+    virtual int getAttackDuration();
+    virtual std::set<BWAPI::UnitType> getSetPrio();
 };

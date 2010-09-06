@@ -73,6 +73,8 @@ const std::vector<BWAPI::Position> & BattleUnit::getPPath()
 
 void BattleUnit::drawPath()
 {
+    if (_path.empty())
+        return;
     for (std::vector<WalkTilePosition>::const_iterator it = _path.begin(); 
         it != _path.end(); ++it)
     {
@@ -83,6 +85,8 @@ void BattleUnit::drawPath()
 
 void BattleUnit::drawBTPath()
 {
+    if (_btpath.empty())
+        return;
     for (std::vector<TilePosition>::const_iterator it = _btpath.begin(); 
         it != _btpath.end(); ++it)
     {
@@ -93,6 +97,8 @@ void BattleUnit::drawBTPath()
 
 void BattleUnit::drawPPath()
 {
+    if (_ppath.empty())
+        return;
     for (std::vector<Position>::const_iterator it = _ppath.begin(); 
         it != _ppath.end(); ++it)
     {
@@ -431,24 +437,4 @@ void BattleUnit::onUnitShow(Unit* u)
 
 void BattleUnit::onUnitHide(Unit* u)
 {
-}
-
-BWAPI::Unit* BattleUnit::findClosestEnemy(std::set<Unit*> &enemies)
-{
-    Unit* closest_enemy = NULL;
-    for each(Unit* enemy in enemies)
-    {
-        if (closest_enemy)
-        {
-            if (unit->getDistance(closest_enemy) > unit->getDistance(enemy) && enemy->isVisible())
-            {
-                closest_enemy = enemy;
-            }
-        }
-        else if (enemy->isVisible())
-        {
-            closest_enemy = enemy;
-        }
-    }
-    return closest_enemy;
 }

@@ -1,13 +1,17 @@
 #include "CorsairUnit.h"
 
-BWAPI::UnitType CorsairUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes::Protoss_High_Templar,
-                                                                BWAPI::UnitTypes::Protoss_Dragoon,
-                                                                BWAPI::UnitTypes::Protoss_Reaver,
-                                                                BWAPI::UnitTypes::Protoss_Zealot,
-                                                                BWAPI::UnitTypes::Protoss_Probe};
+std::set<BWAPI::UnitType> CorsairUnit::setPrio;
 
-CorsairUnit::CorsairUnit(BWAPI::Unit* u, UnitsGroup* ug):FlyingUnit(u, ug)
+CorsairUnit::CorsairUnit(BWAPI::Unit* u, UnitsGroup* ug)
+: FlyingUnit(u, ug)
 {
+    if (setPrio.empty())
+    {
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Corsair);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Wraith);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Scourge);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Mutalisk);
+    }
 }
 
 CorsairUnit::~CorsairUnit()
@@ -21,23 +25,16 @@ void CorsairUnit::micro()
 #endif
 }
 
-bool CorsairUnit::canHit(BWAPI::Unit* enemy)
+void CorsairUnit::check()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("CorsairUnit::canHit non implémenté !");
-#endif
-    return false;
 }
 
-int CorsairUnit::getTimeToAttack()
+int CorsairUnit::getAttackDuration()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("CorsairUnit::getTimeToAttack non implémenté !");
-#endif
     return 0;
 }
 
-BWAPI::UnitType* CorsairUnit::getListPriorite()
+std::set<BWAPI::UnitType> CorsairUnit::getSetPrio()
 {
-    return CorsairUnit::listPriorite;
+    return CorsairUnit::setPrio;
 }

@@ -3,6 +3,7 @@
 
 class LineFormation: public Formation
 {
+    int _lines;
 public:
 	LineFormation(const LineFormation& f);
 	LineFormation(const Vec& center, const Vec& direction = Vec(0,0));

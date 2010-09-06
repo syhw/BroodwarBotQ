@@ -1,13 +1,21 @@
 #include "ArchonUnit.h"
 
-BWAPI::UnitType ArchonUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes::Protoss_High_Templar,
-                                                                BWAPI::UnitTypes::Protoss_Dragoon,
-                                                                BWAPI::UnitTypes::Protoss_Reaver,
-                                                                BWAPI::UnitTypes::Protoss_Zealot,
-                                                                BWAPI::UnitTypes::Protoss_Probe};
+std::set<BWAPI::UnitType> ArchonUnit::setPrio;
 
-ArchonUnit::ArchonUnit(BWAPI::Unit* u, UnitsGroup* ug):GroundUnit(u, ug)
+ArchonUnit::ArchonUnit(BWAPI::Unit* u, UnitsGroup* ug)
+: GroundUnit(u, ug)
 {
+    if (setPrio.empty())
+    {
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Mutalisk);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Zergling);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Zealot);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Firebat);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Marine);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Medic);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Ghost);
+    }
 }
 
 ArchonUnit::~ArchonUnit()
@@ -21,23 +29,16 @@ void ArchonUnit::micro()
 #endif
 }
 
-bool ArchonUnit::canHit(BWAPI::Unit* enemy)
+void ArchonUnit::check()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("ArchonUnit::canHit non implémenté !");
-#endif
-    return false;
 }
 
-int ArchonUnit::getTimeToAttack()
+int ArchonUnit::getAttackDuration()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("ArchonUnit::getTimeToAttack non implémenté !");
-#endif
-    return 0;
+    return 3;
 }
 
-BWAPI::UnitType* ArchonUnit::getListPriorite()
+std::set<BWAPI::UnitType> ArchonUnit::getSetPrio()
 {
-    return ArchonUnit::listPriorite;
+    return ArchonUnit::setPrio;
 }

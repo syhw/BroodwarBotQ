@@ -2,15 +2,21 @@
 
 #include <SpecialUnit.h>
 #include <BWAPI.h>
+#include "MapManager.h"
 
 class HighTemplarUnit : public SpecialUnit
 {
+protected:
+    MapManager* _mapManager;
+    int _lastStormFrame;
+    BWAPI::Position _lastStormPos;
+    static int lastStormableUnitsUpdateFrame;
 public:
-    static BWAPI::UnitType listPriorite[NUMBER_OF_PRIORITY];
     HighTemplarUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~HighTemplarUnit();
+    std::pair<BWAPI::Position, int> bestStormPos();
     virtual void micro();
-    virtual bool canHit(BWAPI::Unit* enemy);
-    virtual int getTimeToAttack();
-    virtual BWAPI::UnitType* getListPriorite();
+    virtual void check();
+    virtual std::set<BWAPI::UnitType> getSetPrio();
+    static std::map<BWAPI::Unit*, BWAPI::Position> stormableUnits;
 };

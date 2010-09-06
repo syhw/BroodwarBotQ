@@ -10,27 +10,33 @@
 #include <utility>
 #include "Data.h"
 
+// This class works closely tied to MapManager (see MapManager::onFrame())
 class EUnitsFilter : public CSingleton<EUnitsFilter>, public BaseObject
 {
     friend class CSingleton<EUnitsFilter>;
     TimeManager* timeManager;
     std::map<BWAPI::Unit*, EViewedUnit> _eViewedUnits;
+    std::map<BWAPI::Unit*, std::pair<BWAPI::UnitType, BWAPI::Position> > _invisibleUnits;
 public:
     //std::map<BWAPI::Unit*, EViewedUnit> _eViewedUnits;
 
     void update(BWAPI::Unit* u);
+    void filter(BWAPI::Unit* u);
     void onUnitDestroy(BWAPI::Unit* u);
     void onUnitMorph(BWAPI::Unit* u);
     void onUnitShow(BWAPI::Unit* u);
     void onUnitHide(BWAPI::Unit* u);
     void onUnitRenegade(BWAPI::Unit* u);
 
-    const std::map<BWAPI::Unit*, EViewedUnit>& getViewedUnits();//
-    bool empty();//
+    const std::map<BWAPI::Unit*, EViewedUnit>& getViewedUnits();
+    const std::map<BWAPI::Unit*, std::pair<BWAPI::UnitType, BWAPI::Position> >& getInvisibleUnits();
+    bool empty();
     void bwOutput();
     virtual void update();
+#ifdef BW_QT_DEBUG
     virtual QWidget* createWidget(QWidget* parent) const;
     virtual void refreshWidget(QWidget* widget) const;
+#endif
 private:
     EUnitsFilter();
     ~EUnitsFilter() { }

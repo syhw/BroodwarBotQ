@@ -1,13 +1,23 @@
 #include "ScoutUnit.h"
 
-BWAPI::UnitType ScoutUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes::Protoss_High_Templar,
-                                                                BWAPI::UnitTypes::Protoss_Dragoon,
-                                                                BWAPI::UnitTypes::Protoss_Reaver,
-                                                                BWAPI::UnitTypes::Protoss_Zealot,
-                                                                BWAPI::UnitTypes::Protoss_Probe};
+std::set<BWAPI::UnitType> ScoutUnit::setPrio;
 
-ScoutUnit::ScoutUnit(BWAPI::Unit* u, UnitsGroup* ug):FlyingUnit(u, ug)
+ScoutUnit::ScoutUnit(BWAPI::Unit* u, UnitsGroup* ug)
+: FlyingUnit(u, ug)
 {
+    if (setPrio.empty())
+    {
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Corsair);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Scout);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Carrier);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Wraith);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Valkyrie);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Science_Vessel);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Battlecruiser);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Scourge);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Mutalisk);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Devourer);
+    }
 }
 
 ScoutUnit::~ScoutUnit()
@@ -21,23 +31,16 @@ void ScoutUnit::micro()
 #endif
 }
 
-bool ScoutUnit::canHit(BWAPI::Unit* enemy)
+void ScoutUnit::check()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("ScoutUnit::canHit non implémenté !");
-#endif
-    return false;
 }
 
-int ScoutUnit::getTimeToAttack()
+int ScoutUnit::getAttackDuration()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("ScoutUnit::getTimeToAttack non implémenté !");
-#endif
     return 0;
 }
 
-BWAPI::UnitType* ScoutUnit::getListPriorite()
+std::set<BWAPI::UnitType> ScoutUnit::getSetPrio()
 {
-    return ScoutUnit::listPriorite;
+    return ScoutUnit::setPrio;
 }

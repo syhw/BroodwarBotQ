@@ -5,14 +5,17 @@
 using namespace std;
 using namespace BWAPI;
 
-BWAPI::UnitType ZealotUnit::listPriorite[NUMBER_OF_PRIORITY] = {BWAPI::UnitTypes::Protoss_High_Templar,
-                                                                BWAPI::UnitTypes::Protoss_Zealot,
-                                                                BWAPI::UnitTypes::Protoss_Dragoon,
-                                                                BWAPI::UnitTypes::Protoss_Reaver,
-                                                                BWAPI::UnitTypes::Protoss_Probe};
+std::set<BWAPI::UnitType> ZealotUnit::setPrio;
 
-ZealotUnit::ZealotUnit(BWAPI::Unit* u, UnitsGroup* ug):GroundUnit(u, ug)
+ZealotUnit::ZealotUnit(BWAPI::Unit* u, UnitsGroup* ug)
+: GroundUnit(u, ug)
 {
+    if (setPrio.empty())
+    {
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Zealot);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Firebat);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Zergling);
+    }
 }
 
 ZealotUnit::~ZealotUnit()
@@ -21,58 +24,43 @@ ZealotUnit::~ZealotUnit()
 
 void ZealotUnit::micro()
 {
-   /* 
-    std::set<Unit*> enemies;
-    std::set<Unit*> enemies_in_range;
-    int damagesTaken = 0;
-
-    fillEnemies(enemies, damagesTaken);
-
-    double maxRangeZealot = unit->getType().groundWeapon().maxRange();
-    double maxRangeZealotEnemy = 0.0;
-    for each(Unit* enemy in enemies)
+    if (unit->isStartingAttack() || unit->isAttacking())
+        return;
+    int hpDiff = _lastTotalHP - (unit->getShields() + unit->getHitPoints());
+    if (Broodwar->getFrameCount() - _lastAttackOrder > Broodwar->getLatency() + getAttackDuration())
     {
-        if (maxRangeZealotEnemy == 0.0)
-            maxRangeZealotEnemy = enemy->getType().groundWeapon().maxRange();
-
-        if (unit->getDistance(enemy) < maxRangeZealot) 
-            enemies_in_range.insert(enemy);
+        if (unit->getGroundWeaponCooldown() == 0)
+        {
+            updateRangeEnemies();
+            updateTargetEnemy();
+            attackEnemyUnit(targetEnemy);
+        }
+        else if (_fleeing || hpDiff > 27 || (unit->getShields() == 0 && hpDiff > 13))
+        {
+            flee();
+        }
+        else if (!unit->isMoving() && targetEnemy != NULL)
+        {
+            //fightMove();
+        }
     }
-
-    Unit* weakestenemy = UnitsGroup::findWeakestEnemy(enemies_in_range);
-
-    if (weakestenemy)
-        attackEnemy(weakestenemy, Colors::Red);
-    else
-    {
-        Unit* closest_enemy = findClosestEnemy(enemies);
-        if (closest_enemy)
-            attackEnemy(closest_enemy, Colors::Yellow);
-#ifdef __DEBUG_NICOLAS__
-        else
-            BWAPI::Broodwar->drawLineMap(unit->getPosition().x(),      unit->getPosition().y(),
-                                  unit->getTargetPosition().x(),unit->getTargetPosition().y(),
-                                  Colors::White);
-#endif
-    }
-    enemies_in_range.clear();
-    */
 }
 
-bool ZealotUnit::canHit(BWAPI::Unit* enemy)
+void ZealotUnit::check()
 {
-    return enemy->isVisible() && !enemy->getType().isFlyer() && (enemy->getDistance(unit) > 0);
+    if (unit->getUpgradeLevel(UpgradeTypes::Leg_Enhancements) && !setPrio.count(UnitTypes::Terran_Siege_Tank_Siege_Mode))
+    {
+        setPrio.insert(UnitTypes::Terran_Siege_Tank_Siege_Mode);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
+    }
 }
 
-int ZealotUnit::getTimeToAttack()
+int ZealotUnit::getAttackDuration()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("ZealotUnit::getTimeToAttack non implémenté !");
-#endif 
     return 0;
 }
 
-BWAPI::UnitType* ZealotUnit::getListPriorite()
+std::set<BWAPI::UnitType> ZealotUnit::getSetPrio()
 {
-    return ZealotUnit::listPriorite;
+    return ZealotUnit::setPrio;
 }
