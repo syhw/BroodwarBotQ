@@ -9,6 +9,7 @@
 
 #define __MESH_SIZE__ 32 // 16 // 24 // 32 // 48
 #define __STORM_SIZE__ 96
+#define __COVER_SIZE__ 96
 
 using namespace BWAPI;
 
@@ -425,15 +426,14 @@ void MapManager::updateStormPos()
     // Filter the positions for the storms by descending order + eliminate some overlapings
     // We cannot prevent all overlapping, as we use __STORM_SIZE__ grain instead of a finer grid
     // Next computation will arrange for that (making overlapping possible / rough discretization)
-    std::set<std::pair<int, int> > covered = _dontReStorm;
     for (std::set<std::pair<int, Position> >::const_reverse_iterator it = storms.rbegin();
         it != storms.rend(); ++it)
     {
-        std::pair<int, int> tmp(it->second.x() / (__STORM_SIZE__), it->second.y() / (__STORM_SIZE__));
-        if (!covered.count(tmp))
+        std::pair<int, int> tmp(it->second.x() / (__COVER_SIZE__), it->second.y() / (__COVER_SIZE__));
+        if (!(_dontReStorm.count(tmp)) && !(_justStormed.count(tmp)))
         {
             _stormPosBuf.insert(std::make_pair<Position, int>(it->second, it->first));
-            covered.insert(tmp);
+            _dontReStorm.insert(tmp);
         }
     }
     return;
@@ -506,10 +506,10 @@ void MapManager::onFrame()
     if (Broodwar->self()->hasResearched(BWAPI::TechTypes::Psionic_Storm))
     {
         // update the possible storms positions
-        if (WaitForSingleObject(_stormPosMutex, 0) == WAIT_OBJECT_0) //&& (Broodwar->getFrameCount() - _lastStormPosUpdate > 6 || Broodwar->getFrameCount() == 1)) // cannot enter when the thread is running
+        if (WaitForSingleObject(_stormPosMutex, 0) == WAIT_OBJECT_0 && Broodwar->getFrameCount() - _lastStormPosUpdate > 2) // cannot enter when the thread is running
         {
-            Broodwar->printf("MAPMANAGER frame: %d", Broodwar->getFrameCount());
             stormPos = _stormPosBuf;
+            _lastStormPosUpdate = Broodwar->getFrameCount();
             _enemyUnitsPosBuf = HighTemplarUnit::stormableUnits;
             if (!_enemyUnitsPosBuf.empty())
             {
@@ -519,9 +519,9 @@ void MapManager::onFrame()
                 for (std::map<Bullet*, Position>::const_iterator it = _trackedStorms.begin();
                     it != _trackedStorms.end(); ++it)
                 {
-                    if (it->first->exists() && it->first->getRemoveTimer() > 48)
+                    if (it->first->exists() && it->first->getRemoveTimer() > 0)// 48)
                     {
-                        std::pair<int, int> tmp(it->second.x() / (__STORM_SIZE__), it->second.y() / (__STORM_SIZE__));
+                        std::pair<int, int> tmp(it->second.x() / (__COVER_SIZE__), it->second.y() / (__COVER_SIZE__));
                         _dontReStorm.insert(tmp);
                     }
                 }
@@ -533,10 +533,30 @@ void MapManager::onFrame()
                 {
                     if (!stormPos.count(it->first))
                     {
-                        std::pair<int, int> tmp(it->first.x() / (__STORM_SIZE__), it->first.y() / (__STORM_SIZE__));
-                        _dontReStorm.insert(tmp);
+                        std::pair<int, int> tmp(it->first.x() / (__COVER_SIZE__), it->first.y() / (__COVER_SIZE__));
+                        if (_justStormed.count(tmp))
+                            _justStormed[tmp] = 0;
+                        else
+                            _justStormed.insert(std::make_pair<std::pair<int, int>, int>(tmp, 0));
                     }
                 }
+                for (std::map<std::pair<int, int>, int>::iterator it = _justStormed.begin();
+                    it != _justStormed.end(); ++it)
+                {
+                    ++_justStormed[it->first];
+                    if (it->second > 72)
+                    {
+                        std::map<std::pair<int, int>, int>::iterator tmp = it;
+                        ++it;
+                        _justStormed.erase(tmp);
+                    }
+                }
+                for (std::set<std::pair<int, int> >::const_iterator ii = _dontReStorm.begin();
+                    ii != _dontReStorm.end(); ++ii)
+                {
+                    Broodwar->drawBoxMap(ii->first*__COVER_SIZE__ - __COVER_SIZE__/2, ii->second*__COVER_SIZE__ - __COVER_SIZE__/2, ii->first*__COVER_SIZE__ + __COVER_SIZE__/2, ii->second*__COVER_SIZE__ + __COVER_SIZE__/2, Colors::Cyan);
+                }
+
                 _lastStormPosUpdate = Broodwar->getFrameCount();
                 // this thread is doing updateStormPos();
                 DWORD threadId;

@@ -18,16 +18,15 @@
 class MapManager: public CSingleton<MapManager>
 {
     friend class CSingleton<MapManager>;
-    int _lastStormPosUpdate;
-
-private:
     EUnitsFilter* _eUnitsFilter;
     std::map<BWAPI::Unit*, BWAPI::Position> _ourUnits;
     std::map<BWAPI::Unit*, BWAPI::Position> _trackedUnits;
     std::map<BWAPI::Bullet*, BWAPI::Position> _trackedStorms;
     HANDLE _stormPosMutex;
+    int _lastStormPosUpdate;
     std::map<Position, int> _stormPosBuf;
     std::set<std::pair<int, int> > _dontReStorm;
+    std::map<std::pair<int, int>, int> _justStormed;
     std::multimap<double, BWAPI::Unit*> _rangeEnemiesBuf;
     std::map<BWAPI::Unit*, BWAPI::Position> _alliedUnitsPosBuf;
     std::map<BWAPI::Unit*, BWAPI::Position> _enemyUnitsPosBuf;
