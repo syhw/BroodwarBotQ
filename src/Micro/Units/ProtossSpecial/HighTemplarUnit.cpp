@@ -16,7 +16,6 @@ HighTemplarUnit::~HighTemplarUnit()
 
 void HighTemplarUnit::micro()
 {
-    Broodwar->printf("enemies size : %d", _unitsGroup->enemies.size());
     // Updating the map of stormable units
     if (lastStormableUnitsUpdateFrame != Broodwar->getFrameCount())
     {
@@ -65,8 +64,7 @@ void HighTemplarUnit::micro()
         // Storm only if it damages at least 2 units, or at least 1 invisible unit,
         // or there is only one enemy unit around us and we can storm it without collateral damages
         if (bestScore > 3 || (_unitsGroup->enemies.size() == 1 && bestScore == 3))
-        {
-           
+        {       
             unit->useTech(BWAPI::TechTypes::Psionic_Storm, bestStormPos);
             Broodwar->printf("Frame %d, pos (%d, %d), stormPos size %d", Broodwar->getFrameCount(), bestStormPos.x(), bestStormPos.y(), _mapManager->stormPos.size());
             // tell the MapManager that we just stormed here

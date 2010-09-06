@@ -15,6 +15,12 @@ void EUnitsFilter::update(Unit* u)
 {
     if (u->getPlayer() == Broodwar->self()) return;
     if (u->getPlayer()->isNeutral()) return;
+    if (u->getType() == BWAPI::UnitTypes::Zerg_Larva 
+        || u->getType() == BWAPI::UnitTypes::Zerg_Egg
+        //|| u->getType() == BWAPI::UnitTypes::Zerg_Lurker_Egg
+        || u->getType() == BWAPI::UnitTypes::Protoss_Interceptor
+        || u->getType() == BWAPI::UnitTypes::Terran_Nuclear_Missile)
+        return;
     if (_eViewedUnits.count(u))
         _eViewedUnits[u].update(Broodwar->getFrameCount());
     else 
@@ -32,8 +38,7 @@ void EUnitsFilter::filter(Unit* u)
 
 void EUnitsFilter::onUnitDestroy(Unit* u)
 {
-    if (u->getPlayer() == Broodwar->self()) return;
-    if (u->getPlayer()->isNeutral()) return;
+    if (u->isVisible() && u->getPlayer() != Broodwar->enemy()) return;
     _eViewedUnits.erase(u);
     _invisibleUnits.erase(u);
 }

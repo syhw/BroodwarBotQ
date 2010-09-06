@@ -13,6 +13,7 @@
 //#define __OUR_PATHFINDER__
 #define __EXACT_OBJ__
 #define __NOT_IN_RANGE_BY__ 46.0
+#define __MAX_SIZE_FOR_FLOCKING__ 22
 
 using namespace std;
 using namespace BWAPI;
@@ -283,7 +284,7 @@ void BayesianUnit::straightLine(vector<Position>& ppath,
             ppath.push_back(p_current);
         }
     } 
-    else // TODO: Test it, untested (bad bad bad)
+    else
     {
         while (p_current.getDistance(p_end) > 31) // 31 for BuildTile Resolution
         {
@@ -975,10 +976,6 @@ void BayesianUnit::updateTargetEnemy()
             continue;
         if (it->second->getType() == BWAPI::UnitTypes::Protoss_Dark_Archon && it->second->getEnergy() < 80)
             continue;
-        //if (it->second->getType() == BWAPI::UnitTypes::Protoss_Arbiter && it->second->getEnergy() < 75)
-        //    continue;
-        //if (it->second->getType() == BWAPI::UnitTypes::Terran_Ghost && it->second->getEnergy() < 80)
-        //    continue;
         if (it->second->getType() == BWAPI::UnitTypes::Terran_Science_Vessel && it->second->getEnergy() < 70)
             continue;
         if (it->second->getType() == BWAPI::UnitTypes::Zerg_Defiler && it->second->getEnergy() < 60)
@@ -1035,21 +1032,20 @@ void BayesianUnit::updateTargetEnemy()
     if (_rangeEnemies.size())
     {
         std::multimap<double, BWAPI::Unit*>::const_iterator stopPrio = _rangeEnemies.begin();
-        std::multimap<double, BWAPI::Unit*>::const_iterator stop = _rangeEnemies.begin();
         /// In range or almost and in the priority set
         for (std::multimap<double, BWAPI::Unit*>::const_iterator it = _rangeEnemies.begin();
             it != _rangeEnemies.end(); ++it)
         {
             stopPrio = it;
-            if (_unitPos.getDistance(it->second->getPosition()) > _maxWeaponsRange + __NOT_IN_RANGE_BY__)
+            if (_unitPos.getDistance(it->second->getPosition()) > _maxWeaponsRange)// + __NOT_IN_RANGE_BY__)
                 break;
             if (it->second->exists() && it->second->isVisible()
                 && getSetPrio().count(it->second->getType())
                 && (
                 (!(it->second->getType().isFlyer()) && unit->getType().groundWeapon() != BWAPI::WeaponTypes::None &&
-                _unitPos.getDistance(it->second->getPosition()) < (double)unit->getType().groundWeapon().maxRange() + addRangeGround() + __NOT_IN_RANGE_BY__) 
+                _unitPos.getDistance(it->second->getPosition()) < (double)unit->getType().groundWeapon().maxRange() + addRangeGround())// + __NOT_IN_RANGE_BY__) 
                 || (it->second->getType().isFlyer() && unit->getType().airWeapon() != BWAPI::WeaponTypes::None &&
-                _unitPos.getDistance(it->second->getPosition()) < (double)unit->getType().airWeapon().maxRange() + addRangeAir() + __NOT_IN_RANGE_BY__)
+                _unitPos.getDistance(it->second->getPosition()) < (double)unit->getType().airWeapon().maxRange() + addRangeAir())// + __NOT_IN_RANGE_BY__)
                 ))
             {
                 setTargetEnemy(it->second);
@@ -1060,7 +1056,24 @@ void BayesianUnit::updateTargetEnemy()
         for (std::multimap<double, BWAPI::Unit*>::const_iterator it = _rangeEnemies.begin();
             it != _rangeEnemies.end(); ++it)
         {
-            stop = it;
+            if (it->second->getType() == BWAPI::UnitTypes::Protoss_High_Templar && it->second->getEnergy() < 60)
+                continue;
+            if (it->second->getType() == BWAPI::UnitTypes::Protoss_Dark_Archon && it->second->getEnergy() < 80)
+                continue;
+            if (it->second->getType() == BWAPI::UnitTypes::Terran_Science_Vessel && it->second->getEnergy() < 70)
+                continue;
+            if (it->second->getType() == BWAPI::UnitTypes::Zerg_Defiler && it->second->getEnergy() < 60)
+                continue;
+            if (it->second->getType() == BWAPI::UnitTypes::Zerg_Queen && it->second->getEnergy() < 60)
+                continue;
+            if (it->second->getType().isBuilding() 
+                && it->second->getType() != BWAPI::UnitTypes::Protoss_Pylon
+                && it->second->getType() != BWAPI::UnitTypes::Protoss_Photon_Cannon
+                && it->second->getType() != BWAPI::UnitTypes::Terran_Bunker
+                && it->second->getType() != BWAPI::UnitTypes::Terran_Missile_Turret
+                && it->second->getType() != BWAPI::UnitTypes::Zerg_Sunken_Colony
+                && it->second->getType() != BWAPI::UnitTypes::Zerg_Spore_Colony)
+                continue;
             if (_unitPos.getDistance(it->second->getPosition()) > _maxWeaponsRange)
                 break;
             // Not in the priority set
@@ -1082,8 +1095,8 @@ void BayesianUnit::updateTargetEnemy()
                 return;
             }
         }
-        /// Not in range and not in the priority set
-        for (std::multimap<double, BWAPI::Unit*>::const_iterator it = stop;
+        /// Not in range and not in the priority set OR building
+        for (std::multimap<double, BWAPI::Unit*>::const_iterator it = _rangeEnemies.begin();
             it != _rangeEnemies.end(); ++it)
         {
             if (it->second->exists() && it->second->isVisible())
@@ -1121,7 +1134,6 @@ void BayesianUnit::setTargetEnemy(Unit* u)
 int BayesianUnit::computeDmg(Unit* u)
 {
     // TODO complete: armors, upgrades, shields, spells (matrix...)
-    //Broodwar->printf("attack upgrade %d", Broodwar->enemy()->getUpgradeLevel(BWAPI::UpgradeTypes::Protoss_Ground_Weapons));
     if (u->getType().isFlyer())
     {
         if (u->getShields() 
@@ -1363,10 +1375,9 @@ void BayesianUnit::flee()
 void BayesianUnit::fightMove()
 {
     if (targetEnemy != NULL 
-        && 
-        !inRange(targetEnemy))
+        && !inRange(targetEnemy))
     {
-        unit->rightClick(targetEnemy);
+        unit->rightClick(targetEnemy); // TODO replace that
         return;
     } 
 
@@ -1424,27 +1435,28 @@ void BayesianUnit::onUnitHide(Unit* u)
 void BayesianUnit::update()
 {
     if (!unit->exists()) return;
-    check();
     _unitPos = unit->getPosition();
-    //if (unit->isAttacking())
-    //    Broodwar->printf("frame %d, damage cooldown %d", Broodwar->getFrameCount(), unit->getType().groundWeapon().damageCooldown());
-
-    if (_mode == MODE_FLOCK && this->_unitsGroup->size() > 21)
+    if (_mode == MODE_FLOCK && this->_unitsGroup->size() > __MAX_SIZE_FOR_FLOCKING__)
     {
         switchMode(MODE_MOVE);
     }
+
+    /// check() for all inherited classes
+    check();
+
+    //Broodwar->printf("attack upgrade %d", Broodwar->enemy()->getUpgradeLevel(BWAPI::UpgradeTypes::Protoss_Ground_Weapons)); 
+    //if (unit->isAttacking())
+    //    Broodwar->printf("frame %d, damage cooldown %d", Broodwar->getFrameCount(), unit->getType().groundWeapon().damageCooldown());
 
     if (_mode != MODE_FIGHT_G && _mode != MODE_SCOUT 
         && !_unitsGroup->enemies.empty()
         && unit->getGroundWeaponCooldown() <= Broodwar->getLatency())
     {
-#ifdef __DEBUG_GABRIEL__
-        //Broodwar->setLocalSpeed(51);
-#endif
         this->switchMode(MODE_FIGHT_G);
     }
 
-    if (_mode == MODE_SCOUT || _mode == MODE_FLOCK)
+    // failsafe: resume from blocking when moving
+    if (_mode != MODE_FIGHT_G && _mode != MODE_FIGHT_A)
     {
         testIfBlocked();
         if (_iThinkImBlocked)
@@ -1453,11 +1465,6 @@ void BayesianUnit::update()
             return;
         }
     }
-
-//if (_mode == MODE_FLOCK)
-//Broodwar->printf("MODE FLOCK");
-    //if (_mode == MODE_SCOUT)
-    //    Broodwar->printf("MODE SCOUT");
 
     switch (_mode)
     {
@@ -1468,10 +1475,6 @@ void BayesianUnit::update()
             return;
         }
         updateDir();
-#ifdef __DEBUG_GABRIEL__
-        //drawObj(0); // green
-        //drawDir(); // red
-#endif
         clickDir();
         break;
 
@@ -1481,7 +1484,7 @@ void BayesianUnit::update()
         break;
 
     case MODE_INPOS:       
-        if (_unitPos.getDistance(target) > 96) // OCHANGE should be sqrt(96^2+96^2)
+        if (_unitPos.getDistance(target) > 96) // TOCHANGE should be sqrt(96^2+96^2)
         {
             this->switchMode(MODE_FLOCK);
             return;
@@ -1493,7 +1496,7 @@ void BayesianUnit::update()
     case MODE_FIGHT_G:
         if (_unitsGroup->enemies.empty())
         {
-            if (_unitsGroup->size() < 23)
+            if (_unitsGroup->size() <= __MAX_SIZE_FOR_FLOCKING__)
                 this->switchMode(MODE_FLOCK);
             else 
                 this->switchMode(MODE_MOVE);
@@ -1503,7 +1506,8 @@ void BayesianUnit::update()
         break;
 
     case MODE_MOVE:
-        if ((Broodwar->getFrameCount() - _lastClickFrame) > getAttackDuration())
+        if ((Broodwar->getFrameCount() - _lastClickFrame) > 2 
+            && (Broodwar->getFrameCount() - _lastClickFrame) > getAttackDuration())
         {
             unit->rightClick(target);
             _lastRightClick = target;

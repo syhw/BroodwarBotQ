@@ -9,6 +9,16 @@ ReaverUnit::ReaverUnit(BWAPI::Unit* u, UnitsGroup* ug)
     {
         setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
         setPrio.insert(BWAPI::UnitTypes::Zerg_Defiler);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Dragoon);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Reaver);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Goliath);
+        setPrio.insert(BWAPI::UnitTypes::Terran_SCV);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Drone);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Probe);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Hydralisk);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Lurker);
     }
 }
 
@@ -18,18 +28,36 @@ ReaverUnit::~ReaverUnit()
 
 void ReaverUnit::micro()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("ReaverUnit::micro non implémenté !");
-#endif
+    if (unit->getScarabCount() && (Broodwar->getFrameCount() - _lastAttackOrder) > (Broodwar->getLatency() + getAttackDuration()))
+    {
+        updateRangeEnemies();
+        updateTargetEnemy();
+        unit->attackUnit(targetEnemy);
+        _lastAttackOrder = Broodwar->getFrameCount();
+    }
 }
 
 void ReaverUnit::check()
 {
+    if (unit->getScarabCount() == 0)
+    {
+        unit->train(UnitTypes::Protoss_Scarab);
+        unit->train(UnitTypes::Protoss_Scarab);
+        unit->train(UnitTypes::Protoss_Scarab);
+        unit->train(UnitTypes::Protoss_Scarab);
+    }
+    if (unit->getScarabCount() < 4 && !(unit->isTraining()))
+        unit->train(UnitTypes::Protoss_Scarab);
+}
+
+bool ReaverUnit::inRange(BWAPI::Unit* u)
+{
+    return (_unitPos.getDistance(u->getPosition()) <= (double)8*32);
 }
 
 int ReaverUnit::getAttackDuration()
 {
-    return 3;
+    return 60;
 }
 
 std::set<BWAPI::UnitType> ReaverUnit::getSetPrio()

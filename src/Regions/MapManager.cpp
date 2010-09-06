@@ -317,6 +317,8 @@ void MapManager::onUnitDestroy(Unit* u)
     {
         removeDmg(u->getType(), _trackedUnits[u]);
         _trackedUnits.erase(u);
+        if (u->getType() == UnitTypes::Terran_Vulture_Spider_Mine)  // hack, see.h
+            _trackedMines.erase(u);                                 // hack, see.h
     }
     else
     {
@@ -514,10 +516,7 @@ void MapManager::onFrame()
         if (_trackedUnits.count(it->first))
         {
             if (it->first->exists()
-                && it->first->isVisible() 
-                && (!it->first->getType().isWorker()
-                || (it->first->getType().isWorker()
-                && (it->first->isGatheringMinerals() || it->first->isGatheringGas())))
+                && it->first->isVisible()
                 && (_trackedUnits[it->first] != it->first->getPosition())) // it moved
             {
                 // update EUnitsFilter
@@ -531,16 +530,15 @@ void MapManager::onFrame()
         else
         {
             if (it->first->exists()
-                && it->first->isVisible() 
-                && (!it->first->getType().isWorker()
-                || (it->first->getType().isWorker()
-                && (it->first->isGatheringMinerals() || it->first->isGatheringGas()))))
+                && it->first->isVisible())
             {
                 // add it to MapManager (ourselves)
                 addDmg(it->first->getType(), it->first->getPosition());
                 _trackedUnits.insert(std::make_pair<Unit*, Position>(it->first, it->first->getPosition()));
             }
         }
+        if (it->second.type == UnitTypes::Terran_Vulture_Spider_Mine)                               // hack with _trackedMines, see .h
+            _trackedMines.insert(std::make_pair<Unit*, Position>(it->first, it->second.position));  // hack with _trackedMines, see .h
         if (!(it->first->isVisible()))
         {
             _eUnitsFilter->filter(it->first);
@@ -555,24 +553,48 @@ void MapManager::onFrame()
             if ((*it)->exists() && !_trackedStorms.count(*it))
             {
                 _trackedStorms.insert(std::make_pair<Bullet*, Position>(*it, (*it)->getPosition()));
-                addDmgStorm((*it)->getPosition());                
+                addDmgStorm((*it)->getPosition());
             }
         }
     }
     // Updating the damages maps with storms 
     // (overlapping => more damage, that's false but easy AND handy b/c of durations)
+    std::list<Bullet*> stormsToDelete;
+    std::list<Unit*> minesToDelete;
     for (std::map<Bullet*, Position>::iterator it = _trackedStorms.begin();
-        it != _trackedStorms.end(); )
+        it != _trackedStorms.end(); ++it)
     {
         if (!it->first->exists())
         {
             removeDmgStorm(it->second);
-            std::map<Bullet*, Position>::iterator tmp = it;
-            ++it;
-            _trackedStorms.erase(tmp->first);
+            for (std::map<Unit*, Position>::iterator i = _trackedMines.begin();     // hack with _trackedMines, see .h
+                i != _trackedMines.end(); ++i)                                         // hack with _trackedMines, see .h
+            {
+                if (i->second.x() > it->second.x() - (__STORM_SIZE__ / 2 + 1) && i->second.x() < it->second.x() + (__STORM_SIZE__ / 2 + 1)        // hack with _trackedMines, see .h
+                    && i->second.y() > it->second.y() - (__STORM_SIZE__ / 2 + 1) && i->second.y() < it->second.y() + (__STORM_SIZE__ / 2 + 1))    // hack with _trackedMines, see .h
+                {
+                    removeDmg(UnitTypes::Terran_Vulture_Spider_Mine, i->second);    // hack with _trackedMines, see .h
+                    _eUnitsFilter->onUnitDestroy(i->first);                         // hack with _trackedMines, see .h
+                    //std::map<Unit*, Position>::iterator tmp = i;                    // hack with _trackedMines, see .h
+                    //++i;                                                            // hack with _trackedMines, see .h
+                    //_trackedMines.erase(tmp);                                       // hack with _trackedMines, see .h
+                    minesToDelete.push_back(i->first);
+                }
+                //else
+                    //++i;
+            }
+            stormsToDelete.push_back(it->first);
         }
-        else
-            ++it;
+    }
+    for (std::list<Bullet*>::const_iterator it = stormsToDelete.begin();
+        it != stormsToDelete.end(); ++it)
+    {
+        _trackedStorms.erase(*it);
+    }
+    for (std::list<Unit*>::const_iterator it = minesToDelete.begin();
+        it != minesToDelete.end(); ++it)
+    {
+        _trackedMines.erase(*it);
     }
 
     if (Broodwar->self()->hasResearched(BWAPI::TechTypes::Psionic_Storm))
@@ -603,6 +625,9 @@ void MapManager::onFrame()
 
             /// Prepare for the next update of _stormPosBuf thread
             _enemyUnitsPosBuf = HighTemplarUnit::stormableUnits;
+            if (_enemyUnitsPosBuf.size())
+                Broodwar->printf("got something");
+            Broodwar->printf("last error %s", Broodwar->getLastError().toString().c_str());
             if (!_enemyUnitsPosBuf.empty())
             {
                 _alliedUnitsPosBuf = _ourUnits;

@@ -14,7 +14,9 @@
 * Build Tiles - each build tile is a 4x4 square of walk tiles, or a 32x32 square of pixels. These are called build tiles because buildability data is available at this resolution. 
 */
 
-// TODO problem when we lift a terran building (we should call onUnitDestroy)
+// TODO improve storms with units movements (interpolate)
+// TODO improve storms by scoring on UnitTypes
+// TOCHECK perhaps problem when we lift a terran building (we should call onUnitDestroy)
 class MapManager: public CSingleton<MapManager>
 {
     friend class CSingleton<MapManager>;
@@ -22,6 +24,7 @@ class MapManager: public CSingleton<MapManager>
     std::map<BWAPI::Unit*, BWAPI::Position> _ourUnits;
     std::map<BWAPI::Unit*, BWAPI::Position> _trackedUnits;
     std::map<BWAPI::Bullet*, BWAPI::Position> _trackedStorms;
+    std::map<BWAPI::Unit*, BWAPI::Position> _trackedMines; // hack to handle the case where a mine is destroyed by a storm while we don't see it, we should see it (as there is an explosion) and have onUnitDestroy called, then we could remove all these taggued // hack lines
     HANDLE _stormPosMutex;
     int _lastStormUpdateFrame;
     std::map<Position, int> _stormPosBuf;

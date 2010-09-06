@@ -37,7 +37,7 @@ enum unit_mode {
     MODE_FLOCK,
     MODE_FLOCKFORM, // flock in formation
     MODE_FIGHT_G,   // ground
-    MODE_FIGHT_A,    // air
+    MODE_FIGHT_A,   // air
     MODE_SCOUT,
     MODE_MOVE
 }; 

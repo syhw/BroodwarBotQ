@@ -12,7 +12,7 @@ ZealotUnit::ZealotUnit(BWAPI::Unit* u, UnitsGroup* ug)
 {
     if (setPrio.empty())
     {
-        setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Zealot);
         setPrio.insert(BWAPI::UnitTypes::Terran_Firebat);
         setPrio.insert(BWAPI::UnitTypes::Zerg_Zergling);
     }
@@ -26,7 +26,8 @@ void ZealotUnit::micro()
 {
     if (unit->isStartingAttack() || unit->isAttacking())
         return;
-    if (Broodwar->getFrameCount() - _lastAttackOrder > getAttackDuration())
+    int hpDiff = _lastTotalHP - (unit->getShields() + unit->getHitPoints());
+    if (Broodwar->getFrameCount() - _lastAttackOrder > Broodwar->getLatency() + getAttackDuration())
     {
         if (unit->getGroundWeaponCooldown() == 0)
         {
@@ -34,9 +35,9 @@ void ZealotUnit::micro()
             updateTargetEnemy();
             attackEnemyUnit(targetEnemy);
         }
-        else if (_fleeing || _lastTotalHP - (unit->getShields() + unit->getHitPoints()) > 0)
+        else if (_fleeing || hpDiff > 27 || (unit->getShields() == 0 && hpDiff > 13))
         {
-            //flee();
+            flee();
         }
         else if (!unit->isMoving() && targetEnemy != NULL)
         {
@@ -47,6 +48,11 @@ void ZealotUnit::micro()
 
 void ZealotUnit::check()
 {
+    if (unit->getUpgradeLevel(UpgradeTypes::Leg_Enhancements) && !setPrio.count(UnitTypes::Terran_Siege_Tank_Siege_Mode))
+    {
+        setPrio.insert(UnitTypes::Terran_Siege_Tank_Siege_Mode);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
+    }
 }
 
 int ZealotUnit::getAttackDuration()

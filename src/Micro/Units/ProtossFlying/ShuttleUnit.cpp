@@ -11,9 +11,6 @@ ShuttleUnit::~ShuttleUnit()
 
 void ShuttleUnit::micro()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("ShuttleUnit::micro non implémenté !");
-#endif
 }
 
 void ShuttleUnit::check()

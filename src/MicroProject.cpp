@@ -129,6 +129,9 @@ void MicroAIModule::onFrame()
 		}
 	}
     mapManager->onFrame();
+    //Broodwar->printf("weapons ground upgrade level %d", Broodwar->enemy()->getUpgradeLevel(UpgradeTypes::Protoss_Ground_Weapons));
+    //Broodwar->printf("weapons ground upgrade level %d", eUnitsFilter->getViewedUnits().begin()->first->getUpgradeLevel(UpgradeTypes::Protoss_Ground_Weapons));
+    //Broodwar->printf("%s", Broodwar->getLastError().toString().c_str());
 }
 
 MicroAIModule::~MicroAIModule()
@@ -235,6 +238,7 @@ void MicroAIModule::onUnitShow(Unit* unit)
     unitGroupManager->onUnitDiscover(unit);
     mm->onUnitShow(unit);
 }
+
 void MicroAIModule::onUnitHide(Unit* unit)
 {
     eUnitsFilter->onUnitHide(unit);

@@ -12,6 +12,7 @@ public:
     ~ReaverUnit();
     virtual void micro();
     virtual void check();
+    virtual bool inRange(BWAPI::Unit* u);
     virtual int getAttackDuration();
     virtual std::set<BWAPI::UnitType> getSetPrio();
 };

@@ -48,6 +48,12 @@ int DragoonUnit::addRangeAir()
     return addRange;
 }
 
+bool DragoonUnit::decideToFlee()
+{
+    // TODO complete conditions
+    return (_lastTotalHP - (unit->getShields() + unit->getHitPoints()) > 13);
+}
+
 void DragoonUnit::micro()
 {
     if (targetEnemy != NULL && !(targetEnemy->exists()))
@@ -66,7 +72,7 @@ void DragoonUnit::micro()
                 updateTargetEnemy();
                 attackEnemyUnit(targetEnemy);
             }
-            else if (_fleeing || _lastTotalHP - (unit->getShields() + unit->getHitPoints()) > 0)
+            else if (_fleeing || decideToFlee())
             {
                 flee();
             }
