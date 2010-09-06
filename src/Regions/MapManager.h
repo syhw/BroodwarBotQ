@@ -23,6 +23,7 @@ class MapManager: public CSingleton<MapManager>
     std::map<BWAPI::Unit*, BWAPI::Position> _trackedUnits;
     std::map<BWAPI::Bullet*, BWAPI::Position> _trackedStorms;
     HANDLE _stormPosMutex;
+    int _lastStormUpdateFrame;
     std::map<Position, int> _stormPosBuf;
     std::map<Position, int> _dontReStorm;
     std::map<Position, int> _dontReStormBuf;
@@ -49,6 +50,7 @@ class MapManager: public CSingleton<MapManager>
     inline void removeDmg(BWAPI::UnitType ut, BWAPI::Position p);
     inline void removeDmgStorm(BWAPI::Position p);
     inline void addDmg(BWAPI::UnitType ut, BWAPI::Position p);
+    inline void addDmgWithoutGrad(BWAPI::UnitType ut, BWAPI::Position p);
     inline void addDmgStorm(BWAPI::Position p);
     inline int additionalRangeGround(BWAPI::UnitType ut);
     inline int additionalRangeAir(BWAPI::UnitType ut);

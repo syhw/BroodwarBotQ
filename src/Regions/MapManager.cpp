@@ -24,6 +24,7 @@ MapManager::MapManager()
         NULL,                  // default security attributes
         FALSE,                 // initially not owned
         NULL))                  // unnamed mutex
+, _lastStormUpdateFrame(0)
 {
     if (_stormPosMutex == NULL) 
     {
@@ -239,14 +240,30 @@ void MapManager::addDmg(UnitType ut, Position p)
         int addRange = additionalRangeGround(ut);
         modifyDamages(this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange() + addRange + ut.dimensionRight() + ut.dimensionLeft(), 
             ut.groundWeapon().damageAmount() * ut.maxGroundHits());
-        //updateDamagesGrad(this->groundDamagesGrad, this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange() + addRange);
+        updateDamagesGrad(this->groundDamagesGrad, this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange() + addRange);
     }
     if (ut.airWeapon() != BWAPI::WeaponTypes::None)
     {
         int addRange = additionalRangeAir(ut);
         modifyDamages(this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange() + addRange + ut.dimensionRight() + ut.dimensionLeft(), 
             ut.airWeapon().damageAmount() * ut.maxAirHits());
-        //updateDamagesGrad(this->airDamagesGrad, this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange() + addRange);
+        updateDamagesGrad(this->airDamagesGrad, this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange() + addRange);
+    }
+}
+
+void MapManager::addDmgWithoutGrad(UnitType ut, Position p)
+{ 
+    if (ut.groundWeapon() != BWAPI::WeaponTypes::None)
+    {
+        int addRange = additionalRangeGround(ut);
+        modifyDamages(this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange() + addRange + ut.dimensionRight() + ut.dimensionLeft(), 
+            ut.groundWeapon().damageAmount() * ut.maxGroundHits());
+    }
+    if (ut.airWeapon() != BWAPI::WeaponTypes::None)
+    {
+        int addRange = additionalRangeAir(ut);
+        modifyDamages(this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange() + addRange + ut.dimensionRight() + ut.dimensionLeft(), 
+            ut.airWeapon().damageAmount() * ut.maxAirHits());
     }
 }
 
@@ -497,19 +514,35 @@ void MapManager::onFrame()
     for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = _eUnitsFilter->getViewedUnits().begin();
         it != _eUnitsFilter->getViewedUnits().end(); ++it)
     {
-        if (it->first->exists()
-            && it->first->isVisible() 
-            && (!it->first->getType().isWorker()
-            || (it->first->getType().isWorker()
-            && (it->first->isGatheringMinerals() || it->first->isGatheringGas())))
-            && (_trackedUnits[it->first] != it->first->getPosition())) // || !(it->first->isDetected()))) // it moved or is invisible
+        if (_trackedUnits.count(it->first))
         {
-            // update EUnitsFilter
-            _eUnitsFilter->update(it->first);
-            // update MapManager (ourselves)
-            addDmg(it->first->getType(), it->first->getPosition());
-            removeDmg(it->first->getType(), _trackedUnits[it->first]);
-            _trackedUnits[it->first] = it->first->getPosition();
+            if (it->first->exists()
+                && it->first->isVisible() 
+                && (!it->first->getType().isWorker()
+                || (it->first->getType().isWorker()
+                && (it->first->isGatheringMinerals() || it->first->isGatheringGas())))
+                && (_trackedUnits[it->first] != it->first->getPosition())) // it moved
+            {
+                // update EUnitsFilter
+                _eUnitsFilter->update(it->first);
+                // update MapManager (ourselves)
+                addDmgWithoutGrad(it->first->getType(), it->first->getPosition());
+                removeDmg(it->first->getType(), _trackedUnits[it->first]);
+                _trackedUnits[it->first] = it->first->getPosition();
+            }
+        }
+        else
+        {
+            if (it->first->exists()
+                && it->first->isVisible() 
+                && (!it->first->getType().isWorker()
+                || (it->first->getType().isWorker()
+                && (it->first->isGatheringMinerals() || it->first->isGatheringGas()))))
+            {
+                // add it to MapManager (ourselves)
+                addDmg(it->first->getType(), it->first->getPosition());
+                _trackedUnits.insert(std::make_pair<Unit*, Position>(it->first, it->first->getPosition()));
+            }
         }
         if (!(it->first->isVisible()))
         {
@@ -550,13 +583,28 @@ void MapManager::onFrame()
         // update the possible storms positions
         if (WaitForSingleObject(_stormPosMutex, 0) == WAIT_OBJECT_0) // cannot enter when the thread is running
         {
+            /// Update stormPos
             stormPos = _stormPosBuf;
-            for (std::map<Position, int>::const_iterator it = _dontReStorm.begin();
-                it != _dontReStorm.end(); ++it)
+            int lastUpdateDiff = Broodwar->getFrameCount() - _lastStormUpdateFrame;
+            // decay the "dont re storm" positions + erase
+            for (std::map<Position, int>::iterator it = _dontReStorm.begin();
+                it != _dontReStorm.end();)
             {
                 if (stormPos.count(it->first))
                     stormPos.erase(it->first);
+                _dontReStorm[it->first] = _dontReStorm[it->first] + lastUpdateDiff;
+                if (it->second > 72)
+                {
+                    std::map<Position, int>::iterator tmp = it;
+                    ++it;
+                    _dontReStorm.erase(tmp);
+                }
+                else
+                    ++it;
             }
+            _lastStormUpdateFrame = Broodwar->getFrameCount();
+
+            /// Prepare for the next update of _stormPosBuf thread
             _enemyUnitsPosBuf = HighTemplarUnit::stormableUnits;
             if (!_enemyUnitsPosBuf.empty())
             {
@@ -573,20 +621,6 @@ void MapManager::onFrame()
                         else
                             _dontReStorm.insert(std::make_pair<Position, int>(it->second, 72 - it->first->getRemoveTimer()));
                     }
-                }
-                // decay the "dont re storm" positions
-                for (std::map<Position, int>::iterator it = _dontReStorm.begin();
-                    it != _dontReStorm.end();)
-                {
-                    ++_dontReStorm[it->first];
-                    if (it->second > 72)
-                    {
-                        std::map<Position, int>::iterator tmp = it;
-                        ++it;
-                        _dontReStorm.erase(tmp);
-                    }
-                    else
-                        ++it;
                 }
                 _dontReStormBuf = _dontReStorm;
                 // this thread is doing updateStormPos();

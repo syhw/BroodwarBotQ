@@ -21,9 +21,11 @@ EViewedUnit::EViewedUnit(const EViewedUnit& evu)
 
 void EViewedUnit::update(unsigned int time)
 {
+    lastSeen = time;
+    if (position == BWAPI::Positions::Unknown || position == BWAPI::Positions::None || position == BWAPI::Positions::Invalid)
+        return;
     type = unit->getType();
     HP = unit->getHitPoints();
     position = unit->getPosition();
-    lastSeen = time;
     velocity = Vec(unit->getVelocityX(), unit->getVelocityY());
 }

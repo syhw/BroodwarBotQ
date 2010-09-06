@@ -1121,7 +1121,7 @@ void BayesianUnit::setTargetEnemy(Unit* u)
 int BayesianUnit::computeDmg(Unit* u)
 {
     // TODO complete: armors, upgrades, shields, spells (matrix...)
-    Broodwar->printf("attack upgrade %d", Broodwar->enemy()->getUpgradeLevel(BWAPI::UpgradeTypes::Protoss_Ground_Weapons));
+    //Broodwar->printf("attack upgrade %d", Broodwar->enemy()->getUpgradeLevel(BWAPI::UpgradeTypes::Protoss_Ground_Weapons));
     if (u->getType().isFlyer())
     {
         if (u->getShields() 
