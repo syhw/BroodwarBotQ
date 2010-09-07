@@ -50,6 +50,7 @@ private:
 	int totalPower;
 	std::list<pGoal> goals;
     EUnitsFilter* _eUnitsFilter;
+    std::set<BWAPI::Unit*> _mergersHT;
     inline void updateNearbyEnemyUnitsFromFilter(BWAPI::Position p, double radius = 400.0);
     void displayTargets();  // debug purpose
 public:
@@ -99,6 +100,9 @@ public:
     int size() const;
     int getTotalHP() const;
     std::vector<pBayesianUnit>* getUnits();
+
+    inline void templarMergingStuff();
+    void signalMerge(BWAPI::Unit* u);
 
 #ifdef _UNITS_DEBUG
     void selectedUnits(std::set<pBayesianUnit>& u);

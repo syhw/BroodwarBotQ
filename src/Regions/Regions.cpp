@@ -179,9 +179,9 @@ void Regions::removeUnits()
     for (map<Region*, RegionData>::iterator itRD = regionsData.begin(); itRD != regionsData.end(); ++itRD)
 	{
         // buildings
-		for (map<Player*, vector<RegionsUnitData> >::iterator itBuild = itRD->second.buildings.begin(); itBuild != itRD->second.buildings.end();)
+		for (map<Player*, vector<RegionsUnitData> >::iterator itBuild = itRD->second.buildings.begin(); itBuild != itRD->second.buildings.end(); )
 		{
-			for (vector<RegionsUnitData>::iterator itBD = itBuild->second.begin(); itBD != itBuild->second.end();)
+			for (vector<RegionsUnitData>::iterator itBD = itBuild->second.begin(); itBD != itBuild->second.end(); )
 			{
 				if (Broodwar->isVisible(itBD->position.x()/32, itBD->position.y()/32))
                 {
@@ -207,9 +207,9 @@ void Regions::removeUnits()
 				++itBuild;
 		}
         // units
-        for (map<Player*, vector<RegionsUnitData> >::iterator itUnit = itRD->second.units.begin(); itUnit != itRD->second.units.end();)
+        for (map<Player*, vector<RegionsUnitData> >::iterator itUnit = itRD->second.units.begin(); itUnit != itRD->second.units.end(); )
 		{
-			for (vector<RegionsUnitData>::iterator itUD = itUnit->second.begin(); itUD != itUnit->second.end();)
+			for (vector<RegionsUnitData>::iterator itUD = itUnit->second.begin(); itUD != itUnit->second.end(); )
 			{
 				if (Broodwar->isVisible(itUD->position.x()/32, itUD->position.y()/32) && !itUD->unit->exists())
 					itUD = itUnit->second.erase(itUD);

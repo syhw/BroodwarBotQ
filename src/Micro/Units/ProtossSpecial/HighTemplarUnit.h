@@ -11,6 +11,7 @@ protected:
     int _lastStormFrame;
     BWAPI::Position _lastStormPos;
     static int lastStormableUnitsUpdateFrame;
+    int _mergingFrame;
 public:
     HighTemplarUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~HighTemplarUnit();

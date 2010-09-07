@@ -6,6 +6,7 @@ int HighTemplarUnit::lastStormableUnitsUpdateFrame;
 HighTemplarUnit::HighTemplarUnit(BWAPI::Unit* u, UnitsGroup* ug)
 : SpecialUnit(u, ug)
 , _lastStormFrame(0)
+, _mergingFrame(0)
 {
     _mapManager = & MapManager::Instance();
 }
@@ -16,6 +17,19 @@ HighTemplarUnit::~HighTemplarUnit()
 
 void HighTemplarUnit::micro()
 {
+    if (_mergingFrame != 0)
+    {
+        if (Broodwar->getFrameCount() - _mergingFrame < 80)
+            return;
+    }
+    int elapsed = Broodwar->getFrameCount() - _lastStormFrame;
+    if ((unit->getEnergy() < 15 || (unit->getEnergy() < 74 && unit->getHitPoints() < 10)) && elapsed > Broodwar->getLatency() + getAttackDuration())
+    {
+        _unitsGroup->signalMerge(unit);
+        _mergingFrame = Broodwar->getFrameCount();
+        return;
+    }
+
     // Updating the map of stormable units
     if (lastStormableUnitsUpdateFrame != Broodwar->getFrameCount())
     {
@@ -31,7 +45,6 @@ void HighTemplarUnit::micro()
             stormableUnits.insert(*it);
     }
 
-    int elapsed = Broodwar->getFrameCount() - _lastStormFrame;
     // Try and storm if it has any advantage, otherwise flee or don't stuck
     if (this->unit->getEnergy() > 75 && elapsed > Broodwar->getLatency() + getAttackDuration())
     {   

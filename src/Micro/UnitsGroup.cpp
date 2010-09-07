@@ -187,7 +187,6 @@ void UnitsGroup::update()
 		this->accomplishGoal();
 		return;
 	}
-
     leadingUnit = units.front();
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     { 
@@ -237,6 +236,7 @@ void UnitsGroup::update()
     if (duration > 0.040) 
         Broodwar->printf( "UnitsGroup::update() took %2.5f seconds\n", duration);
 #endif
+    templarMergingStuff();
 }
 
 void UnitsGroup::attackMove(int x, int y)
@@ -550,4 +550,46 @@ bool UnitsGroup::isWaiting(){
 		return true;
 
 	return goals.size() == 1 && (*goals.front()).getStatus() == GS_ACHIEVED ;
+}
+
+void UnitsGroup::signalMerge(Unit* u)
+{
+    if (u->getType() == UnitTypes::Protoss_High_Templar)
+    {
+        _mergersHT.insert(u);
+    }
+}
+
+void UnitsGroup::templarMergingStuff()
+{
+    if (_mergersHT.size() < 2)
+        return;
+    Unit* tomerge = NULL;
+    Unit* closer = NULL;
+    double distance = 1000000.0;
+    // stupid, suboptimal, heuristic
+    for (std::set<Unit*>::iterator it = _mergersHT.begin();
+        it != _mergersHT.end(); )
+    {
+        if (!(*it)->exists())
+        {
+            _mergersHT.erase(it++);
+            continue;
+        }
+        else if (!tomerge)
+            tomerge = *it;
+        else
+        {
+            double tmp = (*it)->getDistance(tomerge);
+            if (tmp < distance)
+            {
+                closer = *it;
+                distance = tmp;
+            }
+        }
+        ++it;
+    }
+    tomerge->useTech(TechTypes::Archon_Warp, closer);
+    _mergersHT.erase(tomerge);
+    _mergersHT.erase(closer);
 }

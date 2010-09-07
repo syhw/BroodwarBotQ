@@ -483,9 +483,7 @@ void MapManager::justStormed(Position p)
     {
         if (it->first.getDistance(p) < 46.0)
         {
-            std::map<Position, int>::iterator tmp = it;
-            ++it;
-            stormPos.erase(tmp);
+            stormPos.erase(it++);
         }
         else
             ++it;
@@ -562,9 +560,7 @@ void MapManager::onFrame()
         if (!it->first->exists())
         {
             removeDmgStorm(it->second);
-            std::map<Bullet*, Position>::iterator tmp = it;
-            ++it;
-            _trackedStorms.erase(tmp->first);
+            _trackedStorms.erase(it++);
         }
         else
             ++it;
@@ -580,16 +576,14 @@ void MapManager::onFrame()
             int lastUpdateDiff = Broodwar->getFrameCount() - _lastStormUpdateFrame;
             // decay the "dont re storm" positions + erase
             for (std::map<Position, int>::iterator it = _dontReStorm.begin();
-                it != _dontReStorm.end();)
+                it != _dontReStorm.end(); )
             {
                 if (stormPos.count(it->first))
                     stormPos.erase(it->first);
                 _dontReStorm[it->first] = _dontReStorm[it->first] + lastUpdateDiff;
                 if (it->second > 72)
                 {
-                    std::map<Position, int>::iterator tmp = it;
-                    ++it;
-                    _dontReStorm.erase(tmp);
+                    _dontReStorm.erase(it++);
                 }
                 else
                     ++it;
