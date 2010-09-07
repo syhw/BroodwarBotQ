@@ -22,7 +22,7 @@ EViewedUnit::EViewedUnit(const EViewedUnit& evu)
 void EViewedUnit::update(unsigned int time)
 {
     lastSeen = time;
-    if (position == BWAPI::Positions::Unknown || position == BWAPI::Positions::None || position == BWAPI::Positions::Invalid)
+    if (unit->getPosition() == BWAPI::Positions::Unknown || unit->getPosition() == BWAPI::Positions::None || unit->getPosition() == BWAPI::Positions::Invalid)
         return;
     type = unit->getType();
     HP = unit->getHitPoints();

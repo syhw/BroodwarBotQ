@@ -19,19 +19,30 @@ void EUnitsFilter::update(Unit* u)
         || u->getType() == BWAPI::UnitTypes::Zerg_Egg
         //|| u->getType() == BWAPI::UnitTypes::Zerg_Lurker_Egg
         || u->getType() == BWAPI::UnitTypes::Protoss_Interceptor
-        || u->getType() == BWAPI::UnitTypes::Terran_Nuclear_Missile)
+        || u->getType() == BWAPI::UnitTypes::Terran_Nuclear_Missile
+        || u->getType() == UnitTypes::None
+        || u->getType() == UnitTypes::Unknown)
         return;
     if (_eViewedUnits.count(u))
         _eViewedUnits[u].update(Broodwar->getFrameCount());
     else 
         _eViewedUnits[u] = EViewedUnit(u, Broodwar->getFrameCount());
-    if (!(u->isDetected()) || u->isCloaked() || u->isBurrowed())
+    if ((!(u->isDetected()) || u->isCloaked() || u->isBurrowed()) && Broodwar->isVisible(_eViewedUnits[u].position))
+    {
         _invisibleUnits[u] = std::make_pair<UnitType, Position>(u->getType(), u->getPosition());
+        Broodwar->printf("Type %s", _eViewedUnits[u].type.getName().c_str());
+    }
 }
 
 void EUnitsFilter::filter(Unit* u)
 {
-    if (_eViewedUnits[u].type.isBuilding()) return; // we consider that buildings don't move
+    // we filter only invisible units
+    if (_eViewedUnits[u].type.isBuilding()) return; // we consider that buildings don't move behind the scenes
+    if (_invisibleUnits.count(u) && Broodwar->getFrameCount() - _eViewedUnits[u].lastSeen > 216) // 9 secondes
+    {
+        _invisibleUnits.erase(u);
+        return;
+    }
     if (Broodwar->getFrameCount() - _eViewedUnits[u].lastSeen > 7200) // 5 minutes
         _eViewedUnits.erase(u);
 }
@@ -70,6 +81,11 @@ void EUnitsFilter::update()
 const std::map<BWAPI::Unit*, EViewedUnit>& EUnitsFilter::getViewedUnits()
 {
     return _eViewedUnits;
+}
+
+EViewedUnit EUnitsFilter::getViewedUnit(Unit* u)
+{
+    return _eViewedUnits[u];
 }
 
 const std::map<Unit*, std::pair<UnitType, Position> >& EUnitsFilter::getInvisibleUnits()

@@ -51,7 +51,7 @@ int DragoonUnit::addRangeAir()
 bool DragoonUnit::decideToFlee()
 {
     // TODO complete conditions
-    return (_lastTotalHP - (unit->getShields() + unit->getHitPoints()) > 13);
+    return (_lastTotalHP - (unit->getShields() + unit->getHitPoints()) > 13 || (!unit->getShields() && (_lastTotalHP - unit->getHitPoints() > 1)));
 }
 
 void DragoonUnit::micro()

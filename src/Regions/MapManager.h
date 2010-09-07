@@ -16,6 +16,7 @@
 
 // TODO improve storms with units movements (interpolate)
 // TODO improve storms by scoring on UnitTypes
+// TODO improve the damage map by considering DPS
 // TOCHECK perhaps problem when we lift a terran building (we should call onUnitDestroy)
 class MapManager: public CSingleton<MapManager>
 {

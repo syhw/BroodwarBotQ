@@ -323,8 +323,8 @@ void UnitsGroup::onUnitShow(Unit* u)
 {
     for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
         (*it)->onUnitShow(u);
-    if (u->getPlayer() == Broodwar->enemy()) //(!u->getType().isBuilding())
-        unitDamages.insert(UnitDmg(u, Dmg(0, u)));
+    if (u->getPlayer() == Broodwar->enemy() && u->isDetected()) //(!u->getType().isBuilding())
+        unitDamages.insert(UnitDmg(u, Dmg(0, u, u->getHitPoints() + u->getShields())));
 }
 
 void UnitsGroup::onUnitHide(Unit* u)

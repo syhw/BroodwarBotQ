@@ -539,6 +539,19 @@ void MapManager::onFrame()
             _eUnitsFilter->filter(it->first);
         }
     }
+    for (std::map<Unit*, Position>::iterator it = _trackedUnits.begin();
+       it != _trackedUnits.end(); )
+    {
+        if (!it->first->isVisible() && !(_eUnitsFilter->getInvisibleUnits().count(it->first)))
+        {
+            Broodwar->printf("removing a %s", _eUnitsFilter->getViewedUnit(it->first).type.getName().c_str());
+            removeDmg(_eUnitsFilter->getViewedUnit(it->first).type, _trackedUnits[it->first]);
+            _trackedUnits.erase(it++);
+        }
+        else
+            ++it;
+    }
+
     // Iterate of all the Bullets to extract the interesting ones
     for (std::set<Bullet*>::const_iterator it = Broodwar->getBullets().begin();
         it != Broodwar->getBullets().end(); ++it)
@@ -628,6 +641,10 @@ void MapManager::onFrame()
                     Broodwar->printf("(mapmanager) error creating thread");
                 }
                 CloseHandle(thread);
+            }
+            else
+            {
+                _stormPosBuf.clear();
             }
         }
         ReleaseMutex(_stormPosMutex);

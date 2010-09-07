@@ -12,7 +12,7 @@
 
 //#define __OUR_PATHFINDER__
 #define __EXACT_OBJ__
-#define __NOT_IN_RANGE_BY__ 46.0
+#define __NOT_IN_RANGE_BY__ 128.1
 #define __MAX_SIZE_FOR_FLOCKING__ 22
 
 using namespace std;
@@ -953,7 +953,8 @@ void BayesianUnit::updateTargetEnemy()
         int tmp_dmg = it->second.dmg - computeDmg(targetEnemy);
         Unit* tmp_unit = it->first;
         _unitsGroup->unitDamages.left.erase(it);
-        _unitsGroup->unitDamages.insert(UnitDmg(tmp_unit, Dmg(tmp_dmg, tmp_unit)));
+        _unitsGroup->unitDamages.insert(UnitDmg(tmp_unit, Dmg(tmp_dmg, tmp_unit, 
+            (targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected() ? tmp_unit->getHitPoints() + tmp_unit->getShields() : 0))));
     }
     
     // ===== choose new targetEnemy =====
@@ -964,26 +965,27 @@ void BayesianUnit::updateTargetEnemy()
     {
         if (!it->second->isVisible())
             continue;
-        if (it->second->getType().isBuilding() 
-            && it->second->getType() != BWAPI::UnitTypes::Protoss_Pylon
-            && it->second->getType() != BWAPI::UnitTypes::Protoss_Photon_Cannon
-            && it->second->getType() != BWAPI::UnitTypes::Terran_Bunker
-            && it->second->getType() != BWAPI::UnitTypes::Terran_Missile_Turret
-            && it->second->getType() != BWAPI::UnitTypes::Zerg_Sunken_Colony
-            && it->second->getType() != BWAPI::UnitTypes::Zerg_Spore_Colony)
+        UnitType testType = it->second->getType();
+        if (testType.isBuilding() 
+            && testType != BWAPI::UnitTypes::Protoss_Pylon
+            && testType != BWAPI::UnitTypes::Protoss_Photon_Cannon
+            && testType != BWAPI::UnitTypes::Terran_Bunker
+            && testType != BWAPI::UnitTypes::Terran_Missile_Turret
+            && testType != BWAPI::UnitTypes::Zerg_Sunken_Colony
+            && testType != BWAPI::UnitTypes::Zerg_Spore_Colony)
             continue;
-        if (it->second->getType() == BWAPI::UnitTypes::Protoss_High_Templar && it->second->getEnergy() < 60)
+        if (testType == BWAPI::UnitTypes::Protoss_High_Templar && it->second->getEnergy() < 60)
             continue;
-        if (it->second->getType() == BWAPI::UnitTypes::Protoss_Dark_Archon && it->second->getEnergy() < 80)
+        if (testType == BWAPI::UnitTypes::Protoss_Dark_Archon && it->second->getEnergy() < 80)
             continue;
-        if (it->second->getType() == BWAPI::UnitTypes::Terran_Science_Vessel && it->second->getEnergy() < 70)
+        if (testType == BWAPI::UnitTypes::Terran_Science_Vessel && it->second->getEnergy() < 70)
             continue;
-        if (it->second->getType() == BWAPI::UnitTypes::Zerg_Defiler && it->second->getEnergy() < 60)
+        if (testType == BWAPI::UnitTypes::Zerg_Defiler && it->second->getEnergy() < 60)
             continue;
-        if (it->second->getType() == BWAPI::UnitTypes::Zerg_Queen && it->second->getEnergy() < 60)
+        if (testType == BWAPI::UnitTypes::Zerg_Queen && it->second->getEnergy() < 60)
             continue;
 
-        if (getSetPrio().count(it->second->getType())
+        if (getSetPrio().count(testType)
             && it->first.dmg < it->second->getHitPoints() + it->second->getShields()
             && inRange(it->second))
         {
@@ -991,19 +993,22 @@ void BayesianUnit::updateTargetEnemy()
             return;
         }
     }
-    /// Focus fire in range || achieve dying units in range
+    /// Focus fire in range
     for (it = _unitsGroup->unitDamages.right.begin();
         it != _unitsGroup->unitDamages.right.end(); ++it)
     {
         if (!it->second->isVisible())
             continue;
-        if (it->second->getType().isBuilding() 
-            && it->second->getType() != BWAPI::UnitTypes::Protoss_Pylon
-            && it->second->getType() != BWAPI::UnitTypes::Protoss_Photon_Cannon
-            && it->second->getType() != BWAPI::UnitTypes::Terran_Bunker
-            && it->second->getType() != BWAPI::UnitTypes::Terran_Missile_Turret
-            && it->second->getType() != BWAPI::UnitTypes::Zerg_Sunken_Colony
-            && it->second->getType() != BWAPI::UnitTypes::Zerg_Spore_Colony)
+        UnitType testType = it->second->getType();
+        if (testType.isBuilding() 
+            && testType != BWAPI::UnitTypes::Protoss_Pylon
+            && testType != BWAPI::UnitTypes::Protoss_Photon_Cannon
+            && testType != BWAPI::UnitTypes::Terran_Bunker
+            && testType != BWAPI::UnitTypes::Terran_Missile_Turret
+            && testType != BWAPI::UnitTypes::Zerg_Sunken_Colony
+            && testType != BWAPI::UnitTypes::Zerg_Spore_Colony)
+            continue;
+        if (testType != BWAPI::UnitTypes::Protoss_Interceptor)
             continue;
         // focus
         if (it->first.dmg < it->second->getHitPoints() + it->second->getShields()
@@ -1012,22 +1017,14 @@ void BayesianUnit::updateTargetEnemy()
             setTargetEnemy(it->second);
             return;
         }
-        // achieve
-        if (it->first.dmg == 0 
-            && (computeDmg(it->second) >= (it->second->getHitPoints() + it->second->getShields()))
-            && inRange(it->second))
-        {
-            setTargetEnemy(it->second);
-            return;
-        }
     }
     /// Keep old target if in range
-    if (targetEnemy && targetEnemy->isVisible()
+    /*if (targetEnemy && targetEnemy->isVisible()
         && inRange(targetEnemy))
     {
         setTargetEnemy(targetEnemy);
         return;
-    }
+    }*/
     /// Take a new one
     if (_rangeEnemies.size())
     {
@@ -1039,12 +1036,31 @@ void BayesianUnit::updateTargetEnemy()
             stopPrio = it;
             if (_unitPos.getDistance(it->second->getPosition()) > _maxWeaponsRange)// + __NOT_IN_RANGE_BY__)
                 break;
+            UnitType testType = it->second->getType();
+            if (testType == BWAPI::UnitTypes::Protoss_High_Templar && it->second->getEnergy() < 60)
+                continue;
+            if (testType == BWAPI::UnitTypes::Protoss_Dark_Archon && it->second->getEnergy() < 80)
+                continue;
+            if (testType == BWAPI::UnitTypes::Terran_Science_Vessel && it->second->getEnergy() < 70)
+                continue;
+            if (testType == BWAPI::UnitTypes::Zerg_Defiler && it->second->getEnergy() < 60)
+                continue;
+            if (testType == BWAPI::UnitTypes::Zerg_Queen && it->second->getEnergy() < 60)
+                continue;
+            if (testType.isBuilding() 
+                && testType != BWAPI::UnitTypes::Protoss_Pylon
+                && testType != BWAPI::UnitTypes::Protoss_Photon_Cannon
+                && testType != BWAPI::UnitTypes::Terran_Bunker
+                && testType != BWAPI::UnitTypes::Terran_Missile_Turret
+                && testType != BWAPI::UnitTypes::Zerg_Sunken_Colony
+                && testType != BWAPI::UnitTypes::Zerg_Spore_Colony)
+                continue;
             if (it->second->exists() && it->second->isVisible()
-                && getSetPrio().count(it->second->getType())
+                && getSetPrio().count(testType)
                 && (
-                (!(it->second->getType().isFlyer()) && unit->getType().groundWeapon() != BWAPI::WeaponTypes::None &&
+                (!(testType.isFlyer()) && unit->getType().groundWeapon() != BWAPI::WeaponTypes::None &&
                 _unitPos.getDistance(it->second->getPosition()) < (double)unit->getType().groundWeapon().maxRange() + addRangeGround())// + __NOT_IN_RANGE_BY__) 
-                || (it->second->getType().isFlyer() && unit->getType().airWeapon() != BWAPI::WeaponTypes::None &&
+                || (testType.isFlyer() && unit->getType().airWeapon() != BWAPI::WeaponTypes::None &&
                 _unitPos.getDistance(it->second->getPosition()) < (double)unit->getType().airWeapon().maxRange() + addRangeAir())// + __NOT_IN_RANGE_BY__)
                 ))
             {
@@ -1056,26 +1072,29 @@ void BayesianUnit::updateTargetEnemy()
         for (std::multimap<double, BWAPI::Unit*>::const_iterator it = _rangeEnemies.begin();
             it != _rangeEnemies.end(); ++it)
         {
-            if (it->second->getType() == BWAPI::UnitTypes::Protoss_High_Templar && it->second->getEnergy() < 60)
-                continue;
-            if (it->second->getType() == BWAPI::UnitTypes::Protoss_Dark_Archon && it->second->getEnergy() < 80)
-                continue;
-            if (it->second->getType() == BWAPI::UnitTypes::Terran_Science_Vessel && it->second->getEnergy() < 70)
-                continue;
-            if (it->second->getType() == BWAPI::UnitTypes::Zerg_Defiler && it->second->getEnergy() < 60)
-                continue;
-            if (it->second->getType() == BWAPI::UnitTypes::Zerg_Queen && it->second->getEnergy() < 60)
-                continue;
-            if (it->second->getType().isBuilding() 
-                && it->second->getType() != BWAPI::UnitTypes::Protoss_Pylon
-                && it->second->getType() != BWAPI::UnitTypes::Protoss_Photon_Cannon
-                && it->second->getType() != BWAPI::UnitTypes::Terran_Bunker
-                && it->second->getType() != BWAPI::UnitTypes::Terran_Missile_Turret
-                && it->second->getType() != BWAPI::UnitTypes::Zerg_Sunken_Colony
-                && it->second->getType() != BWAPI::UnitTypes::Zerg_Spore_Colony)
-                continue;
             if (_unitPos.getDistance(it->second->getPosition()) > _maxWeaponsRange)
                 break;
+            UnitType testType = it->second->getType();
+            if (testType == BWAPI::UnitTypes::Protoss_High_Templar && it->second->getEnergy() < 60)
+                continue;
+            if (testType == BWAPI::UnitTypes::Protoss_Dark_Archon && it->second->getEnergy() < 80)
+                continue;
+            if (testType == BWAPI::UnitTypes::Terran_Science_Vessel && it->second->getEnergy() < 70)
+                continue;
+            if (testType == BWAPI::UnitTypes::Zerg_Defiler && it->second->getEnergy() < 60)
+                continue;
+            if (testType == BWAPI::UnitTypes::Zerg_Queen && it->second->getEnergy() < 60)
+                continue;
+            if (testType.isBuilding() 
+                && testType != BWAPI::UnitTypes::Protoss_Pylon
+                && testType != BWAPI::UnitTypes::Protoss_Photon_Cannon
+                && testType != BWAPI::UnitTypes::Terran_Bunker
+                && testType != BWAPI::UnitTypes::Terran_Missile_Turret
+                && testType != BWAPI::UnitTypes::Zerg_Sunken_Colony
+                && testType != BWAPI::UnitTypes::Zerg_Spore_Colony)
+                continue;
+            if (testType != BWAPI::UnitTypes::Protoss_Interceptor)
+                continue;
             // Not in the priority set
             if (it->second->exists() && it->second->isVisible()
                 && inRange(it->second))
@@ -1084,18 +1103,44 @@ void BayesianUnit::updateTargetEnemy()
                 return;
             }
         }
-        /// Not in range and in the priority set
+        /// Not in range and the first one, priority to the priority set // TODO change for rings priority/not around the out of range
         for (std::multimap<double, BWAPI::Unit*>::const_iterator it = stopPrio;
             it != _rangeEnemies.end(); ++it)
         {
+            if (_unitPos.getDistance(it->second->getPosition()) > _maxWeaponsRange)
+                break;
+            UnitType testType = it->second->getType();
+            if (testType == BWAPI::UnitTypes::Protoss_High_Templar && it->second->getEnergy() < 60)
+                continue;
+            if (testType == BWAPI::UnitTypes::Protoss_Dark_Archon && it->second->getEnergy() < 80)
+                continue;
+            if (testType == BWAPI::UnitTypes::Terran_Science_Vessel && it->second->getEnergy() < 70)
+                continue;
+            if (testType == BWAPI::UnitTypes::Zerg_Defiler && it->second->getEnergy() < 60)
+                continue;
+            if (testType == BWAPI::UnitTypes::Zerg_Queen && it->second->getEnergy() < 60)
+                continue;
+            if (testType.isBuilding() 
+                && testType != BWAPI::UnitTypes::Protoss_Pylon
+                && testType != BWAPI::UnitTypes::Protoss_Photon_Cannon
+                && testType != BWAPI::UnitTypes::Terran_Bunker
+                && testType != BWAPI::UnitTypes::Terran_Missile_Turret
+                && testType != BWAPI::UnitTypes::Zerg_Sunken_Colony
+                && testType != BWAPI::UnitTypes::Zerg_Spore_Colony)
+                continue;
             if (it->second->exists() && it->second->isVisible()
-                && getSetPrio().count(it->second->getType()))
+                && getSetPrio().count(testType))
+            {
+                setTargetEnemy(it->second);
+                return;
+            }
+            if (it->second->exists() && it->second->isVisible())
             {
                 setTargetEnemy(it->second);
                 return;
             }
         }
-        /// Not in range and not in the priority set OR building
+        /// Anywhere and not particularly in the priority set OR not defense building
         for (std::multimap<double, BWAPI::Unit*>::const_iterator it = _rangeEnemies.begin();
             it != _rangeEnemies.end(); ++it)
         {
@@ -1120,15 +1165,17 @@ void BayesianUnit::updateTargetEnemy()
 void BayesianUnit::setTargetEnemy(Unit* u)
 {
     targetEnemy = u;
-    if (_unitsGroup->unitDamages.left.count(u))
+    if (targetEnemy != NULL && _unitsGroup->unitDamages.left.count(u))
     { /// <=> _unitsGroup->unitDamages.left[u] += computeDmg(u);
         UnitDmgBimap::left_iterator it = _unitsGroup->unitDamages.left.find(u);
         int tmp_dmg = it->second.dmg + computeDmg(u);
         _unitsGroup->unitDamages.left.erase(it);
-        _unitsGroup->unitDamages.insert(UnitDmg(u, Dmg(tmp_dmg, u)));
+        _unitsGroup->unitDamages.insert(UnitDmg(u, Dmg(tmp_dmg, u, 
+            (u->exists() && u->isVisible() && u->isDetected() ? u->getHitPoints() + u->getShields() : 0))));
     }
     else
-        _unitsGroup->unitDamages.insert(UnitDmg(u, Dmg(computeDmg(u), u)));
+        _unitsGroup->unitDamages.insert(UnitDmg(u, Dmg(computeDmg(u), u, 
+        (u->exists() && u->isVisible() && u->isDetected() ? u->getHitPoints() + u->getShields() : 0))));
 }
 
 int BayesianUnit::computeDmg(Unit* u)

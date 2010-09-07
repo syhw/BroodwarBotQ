@@ -34,6 +34,10 @@ void ReaverUnit::micro()
         updateTargetEnemy();
         unit->attackUnit(targetEnemy);
         _lastAttackOrder = Broodwar->getFrameCount();
+    } else if (!(Broodwar->getFrameCount() % 5))
+    {
+        updateRangeEnemies();
+        updateTargetEnemy();
     }
 }
 
@@ -41,7 +45,6 @@ void ReaverUnit::check()
 {
     if (unit->getScarabCount() == 0)
     {
-        unit->train(UnitTypes::Protoss_Scarab);
         unit->train(UnitTypes::Protoss_Scarab);
         unit->train(UnitTypes::Protoss_Scarab);
         unit->train(UnitTypes::Protoss_Scarab);

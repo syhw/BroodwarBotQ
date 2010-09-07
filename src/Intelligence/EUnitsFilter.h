@@ -29,6 +29,7 @@ public:
     void onUnitRenegade(BWAPI::Unit* u);
 
     const std::map<BWAPI::Unit*, EViewedUnit>& getViewedUnits();
+    EViewedUnit getViewedUnit(BWAPI::Unit* u);
     const std::map<BWAPI::Unit*, std::pair<BWAPI::UnitType, BWAPI::Position> >& getInvisibleUnits();
     bool empty();
     void bwOutput();

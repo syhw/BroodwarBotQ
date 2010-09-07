@@ -15,17 +15,21 @@
 
 struct Dmg
 {
-    Dmg(int d, BWAPI::Unit* u) 
+    Dmg(int d, BWAPI::Unit* u, int h) 
         : dmg(d)
         , unit(u)
+        , hp(h)
     { }
     Dmg(const Dmg& d)
         : dmg(d.dmg)
         , unit(d.unit)
+        , hp(d.hp)
     { }
     int dmg;
+    int hp;
     BWAPI::Unit* unit;
-    bool operator<(const Dmg& d) const { return this->dmg > d.dmg || (this->dmg == d.dmg && this->unit < d.unit); }
+    bool operator<(const Dmg& d) const { return ((this->hp - this->dmg) < (d.hp + d.dmg) || (this->hp + this->dmg == d.hp + d.dmg) && this->unit < d.unit); }
+    //bool operator<(const Dmg& d) const { return (this->dmg > d.dmg || this->dmg == d.dmg && this->unit < d.unit); }
     Dmg operator-=(int i) { this->dmg -= i; return *this; }
     Dmg operator+=(int i) { this->dmg += i; return *this; }
 };
