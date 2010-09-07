@@ -1481,7 +1481,7 @@ void BayesianUnit::onUnitHide(Unit* u)
 
 void BayesianUnit::update()
 {
-    if (!unit->exists()) return;
+    if (!unit || !unit->exists()) return;
     _unitPos = unit->getPosition();
     if (_mode == MODE_FLOCK && this->_unitsGroup->size() > __MAX_SIZE_FOR_FLOCKING__)
     {

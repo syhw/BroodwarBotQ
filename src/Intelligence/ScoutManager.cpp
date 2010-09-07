@@ -1,41 +1,40 @@
 #include <BWTA.h>
-#include <ScoutManager.h>
 #include "Defines.h"
+#include "ScoutManager.h"
 
 using namespace BWAPI;
-ScoutManager::ScoutManager( )
-:
-exploringEnemy(false)
+
+ScoutManager::ScoutManager()
+: exploringEnemy(false)
+, enemyFound(false)
 {
-	regions = NULL;
 	warManager = NULL;
 }
 
-ScoutManager::~ScoutManager( )
+ScoutManager::~ScoutManager()
 {
 }
 
-void ScoutManager::setDependencies(){
-	this->regions = & Regions::Instance();
+void ScoutManager::setDependencies()
+{
 	this->warManager = & WarManager::Instance();
 	this->arbitrator = &  Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
 }
 
 void ScoutManager::update()
 {
-	
-	if (regions->enemyFound() && !exploringEnemy) {
-		
+    if (enemyFound && !exploringEnemy) 
+    {
 		exploringEnemy = true;
-		this->awaitingGoals.push_back(pGoal(new ExploreGoal(regions->whereIsEnemy())));
+		this->awaitingGoals.push_back(pGoal(new ExploreGoal(BWTA::getRegion(enemyStartLocation))));
 	}
 
 	std::set<UnitsGroup *> toTrash;
 	//Free units that need to be freed and add goals to other
 	for(std::list<UnitsGroup *>::iterator it = this->myUnitsGroups.begin(); it != this->myUnitsGroups.end(); ++it ){
 		
-		if((*it)->isWaiting()){
-
+		if((*it)->isWaiting())
+        {
 			//If no new goal available release the ug : 
 			if(this->awaitingGoals.size() <= 0){
 				for(std::vector<pBayesianUnit>::iterator u = (*it)->units.begin(); u != (*it)->units.end(); ++u){
@@ -109,11 +108,10 @@ void ScoutManager::onUnitCreate(BWAPI::Unit* unit){
 
 }
 
-void ScoutManager::onOffer(std::set<BWAPI::Unit*> units){
-
+void ScoutManager::onOffer(std::set<BWAPI::Unit*> units)
+{
 	std::vector<pGoal> goalsDone;
 	std::set<BWAPI::Unit*> remainingUnits = units;//Does it copy the set ?
-
 
 	//Else grab a new unit
 	//Obs are always the best
@@ -122,22 +120,27 @@ void ScoutManager::onOffer(std::set<BWAPI::Unit*> units){
 	int test = 0;
 	UnitsGroup * giveMeTheGoal = NULL;
 
-	for(std::list<pGoal>::iterator goals = this->awaitingGoals.begin(); goals != this->awaitingGoals.end(); ++goals){
+	for (std::list<pGoal>::iterator goals = this->awaitingGoals.begin(); goals != this->awaitingGoals.end(); ++goals)
+    {
 	//find the best unit for each goal
 		dist = 999999999;
 		bestUnit = NULL;
 
-		for(std::set<BWAPI::Unit *>::iterator units = remainingUnits.begin(); units != remainingUnits.end(); ++units ){
+		for (std::set<BWAPI::Unit *>::iterator units = remainingUnits.begin(); units != remainingUnits.end(); ++units)
+        {
 					
-			if(bestUnit == NULL){
+			if (bestUnit == NULL)
+            {
 				bestUnit = (*units);
 			}
 			test = (*goals)->estimateDistance((*units)->getPosition());
-			if( test < dist ){
+			if (test < dist)
+            {
 				bestUnit = (*units);
 				dist = test;
 			}
-			if((*units)->getType() == BWAPI::UnitTypes::Protoss_Observer){
+			if ((*units)->getType() == BWAPI::UnitTypes::Protoss_Observer)
+            {
 				bestUnit = (*units);
 				break;
 			}
@@ -172,34 +175,77 @@ void ScoutManager::onRevoke(BWAPI::Unit* unit, double bid){
 
 }
 
-void ScoutManager::findEnemy(){
-
+void ScoutManager::findEnemy()
+{
 	this->awaitingGoals.push_back(pGoal(new FindEnemyGoal()));
 	//Set bid on all units that can scout for this goal
 
-	for(std::set<BWAPI::Unit *>::const_iterator it = BWAPI::Broodwar->self()->getUnits().begin(); it != BWAPI::Broodwar->self()->getUnits().end(); ++it){
-		
-		if( (*it)->getType().isWorker() || (*it)->getType() == BWAPI::UnitTypes::Protoss_Observer ){
+	for (std::set<BWAPI::Unit *>::const_iterator it = BWAPI::Broodwar->self()->getUnits().begin(); it != BWAPI::Broodwar->self()->getUnits().end(); ++it)
+    {	
+		if ((*it)->getType().isWorker() || (*it)->getType() == BWAPI::UnitTypes::Protoss_Observer)
+        {
 			this->arbitrator->setBid(this, (*it),90);
 		}
 	}
-
 }
 
 
-void ScoutManager::onUnitShow(BWAPI::Unit* unit){
-
+void ScoutManager::onUnitShow(BWAPI::Unit* unit)
+{
+    if (unit->getPlayer() != Broodwar->enemy())
+        return;
+    if (unit->getType() == UnitTypes::Protoss_Nexus 
+        || unit->getType() == UnitTypes::Terran_Command_Center 
+        || unit->getType() == UnitTypes::Zerg_Hatchery
+        || unit->getType() == UnitTypes::Zerg_Lair
+        || unit->getType() == UnitTypes::Zerg_Hive)
+    {
+        if (!enemyFound)
+        {
+            for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getStartLocations().begin(); // fuck BaseLocation that we can't build from a (Tile)Position
+                it != BWTA::getStartLocations().end(); ++it)
+            {
+                if ((*it)->getTilePosition() == unit->getTilePosition())
+                {
+                    enemyFound = true;
+                    enemyStartLocation = unit->getTilePosition();
+                    return;
+                }
+            }
+            if (Broodwar->getFrameCount() > 4320) // 4 minutes
+            {
+                enemyFound = true;
+                enemyStartLocation = unit->getTilePosition();
+            }
+        } 
+        else
+        {
+            enemyExpandLocations.insert(unit->getTilePosition());
+        }
+    }
 }
 
-void ScoutManager::onUnitDestroy(BWAPI::Unit* unit){
+void ScoutManager::onUnitDestroy(BWAPI::Unit* unit)
+{
 	//Find if a ug is concerned
-	for(std::list<UnitsGroup *>::iterator it = myUnitsGroups.begin(); it != myUnitsGroups.end(); ++it){
-		if( (*it)->emptyUnits() ){
-			this->myUnitsGroups.remove( (*it) );
+	for(std::list<UnitsGroup *>::iterator it = myUnitsGroups.begin(); it != myUnitsGroups.end(); ++it)
+    {
+		if ((*it)->emptyUnits())
+        {
+			this->myUnitsGroups.remove((*it));
 			break;
 		}
-	}
-
+    }
+    if (unit->getPlayer() != Broodwar->enemy())
+        return;
+    if (unit->getType() == UnitTypes::Protoss_Nexus 
+        || unit->getType() == UnitTypes::Terran_Command_Center 
+        || unit->getType() == UnitTypes::Zerg_Hatchery
+        || unit->getType() == UnitTypes::Zerg_Lair
+        || unit->getType() == UnitTypes::Zerg_Hive)
+    {
+        enemyExpandLocations.erase(unit->getTilePosition());
+    }
 }
 
 

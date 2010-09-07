@@ -18,7 +18,7 @@ Goal(ug)
             deltaX = 1.0;
             tmp = 0.0;
         }
-        this->addSubgoal(pSubgoal(new FormationSubgoal(SL_AND,pFormation(new LineFormation(this->choke->getCenter(), Vec(deltaY/deltaX, tmp).normalize())))));
+        addSubgoal(pSubgoal(new FormationSubgoal(SL_AND,pFormation(new LineFormation(this->choke->getCenter(), Vec(deltaY/deltaX, tmp).normalize())))));
     } else {
         addSubgoal(pSubgoal(new FormationSubgoal(SL_AND,pFormation(new SquareFormation(b->getBaseLocation()->getPosition(),Vec(0,1))))));
 
@@ -33,7 +33,7 @@ void DefendBaseGroundGoal::achieve(){
 	this->checkAchievement();
 	if(this->status != GS_ACHIEVED){
 		//If they are not inPos make them move
-		(*this->subgoals.begin())->tryToRealize();
+		(*(subgoals.begin()))->tryToRealize();
 	}
 }
 

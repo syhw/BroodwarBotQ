@@ -1,50 +1,69 @@
 #include "FindEnemyGoal.h"
 #include "float.h"
 
-FindEnemyGoal::FindEnemyGoal(){
+FindEnemyGoal::FindEnemyGoal()
+{
 	scoutManager = & ScoutManager::Instance();
 	warManager = & WarManager::Instance();
-	pSubgoal sb;
 
 	//Scout the different possible bases
 	BWTA::BaseLocation * myStartLocation = BWTA::getStartLocation(BWAPI::Broodwar->self());
 	std::set<BWTA::BaseLocation*> path = BWTA::getStartLocations();
+    if (Broodwar->getFrameCount() > 4320) // 4 minutes, in case of CC lift
+        path = BWTA::getBaseLocations();
 		
-	for(std::set<BWTA::BaseLocation*>::iterator p=path.begin();p!=path.end();p++){
-		if( (*p) != myStartLocation){
-			sb=pSubgoal(new SeeSubgoal(SL_AND, (*p)->getPosition()));
-			addSubgoal(sb);
+	for (std::set<BWTA::BaseLocation*>::iterator p=path.begin(); p!=path.end(); p++)
+    {
+		if ((*p) != myStartLocation)
+        {
+			addSubgoal(pSubgoal(new SeeSubgoal(SL_AND, (*p)->getPosition())));
 		}
 	}
-	sb=pSubgoal(new FindSubgoal(SL_OR));
-	addSubgoal(sb);
+	addSubgoal(pSubgoal(new FindSubgoal(SL_OR)));
 }
 
-void FindEnemyGoal::achieve(){
-	if(this->status != GS_NOT_ATTRIBUTED){
+void FindEnemyGoal::achieve()
+{
+	if (this->status != GS_NOT_ATTRIBUTED)
+    {
 		checkAchievement();
 			
-		if(this->status!=GS_ACHIEVED){
+		if (this->status != GS_ACHIEVED)
+        {
 			double test;
 			pSubgoal selected;
 			double min = DBL_MAX;
 			
-			for(std::list<pSubgoal>::iterator it = subgoals.begin(); it != subgoals.end(); ++it){
-				if (!(*it)->isRealized()){
+			for (std::list<pSubgoal>::iterator it = subgoals.begin(); it != subgoals.end(); ++it)
+            {
+				if (!(*it)->isRealized())
+                {
 					test = (*it)->distanceToRealize();
-					if ( test >= 0 && test < min ){
+					if (test >= 0 && test < min)
+                    {
 						min = test;
 						selected = (*it);
 					}
 				}
 			}
-			if(min > 0 && min < DBL_MAX){
+			if (min > 0 && min < DBL_MAX)
+            {
 				selected->tryToRealize();
-
-			}else{
+			} else {
 				//TODO
-				BWAPI::Broodwar->printf("Tell Louis this situation happened");
+				BWAPI::Broodwar->printf("(FindEnemyGoal) Tell Louis this situation happened");
 			}
 		}
+        else
+        {
+            for (std::list<pSubgoal>::iterator it = subgoals.begin();
+                it != subgoals.end(); ++it)
+            {
+                if ((*it)->getLogic() == SL_OR && (*it)->isRealized())
+                {
+
+                }
+            }
+        }
 	}
 }

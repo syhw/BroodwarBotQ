@@ -1,23 +1,31 @@
 #include "Subgoal.h"	
 using namespace BWAPI;
 
-Subgoal::Subgoal(SubgoalLogic l) :
-logic(l)
+Subgoal::Subgoal(SubgoalLogic l)
+: logic(l)
 {
 }
 
-
-Subgoal::~Subgoal(){
+Subgoal::Subgoal(const Subgoal& sg) 
+: logic(sg.logic)
+{
 }
 
-SubgoalLogic Subgoal::getLogic() const {
+Subgoal::~Subgoal()
+{
+}
+
+SubgoalLogic Subgoal::getLogic() const
+{
 	return this->logic;
 }
 
-void Subgoal::setUnitsGroup( UnitsGroup * ug){
-unitsGroup = ug;
+void Subgoal::setUnitsGroup( UnitsGroup * ug)
+{
+    unitsGroup = ug;
 }
 
-double Subgoal::distanceToRealize(BWAPI::Position){
+double Subgoal::distanceToRealize(BWAPI::Position)
+{
 	return this->distanceToRealize();
 }

@@ -51,6 +51,7 @@ public:
 	              // Cette variable sera inutile avec le flocking.
 	              // Ou avec un Timer (TimeManager soon ready !)
     const std::vector<BWAPI::Position> & getPPath();
+    BWAPI::Position BattleUnit::getPPath(unsigned int n);
 
 	BattleUnit(BWAPI::Unit* unit);
     ~BattleUnit();

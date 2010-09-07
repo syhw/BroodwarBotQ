@@ -59,12 +59,11 @@ void ExploreGoal::achieve(){
 	if(this->status!=GS_ACHIEVED){
 	
 		for(std::list<pSubgoal>::iterator it = subgoals.begin(); it != subgoals.end(); ++it){
-			if (!((*it)->isRealized())){
+			if (!((*it)->isRealized()))
+            {
 				(*it)->tryToRealize();
 			}
 		}
 	}
-
-
 }
 
