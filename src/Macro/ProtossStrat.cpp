@@ -11,11 +11,20 @@ ProtossStrat::~ProtossStrat()
 
 void ProtossStrat::eRush(){
 	this->buildOrderManager->build(2,BWAPI::UnitTypes::Protoss_Gateway,94);
-	this->buildOrderManager->build(5,BWAPI::UnitTypes::Protoss_Zealot,92);
+	this->buildOrderManager->build(3,BWAPI::UnitTypes::Protoss_Zealot,92);
 	this->buildOrderManager->build(2,BWAPI::UnitTypes::Protoss_Pylon,93);
+	if(this->workerManager->autoBuild){
+		this->workerManager->disableAutoBuild();
+	}
 }
 
 void ProtossStrat::onStart(){
+	int i = 0;
+
+	for(i=0; i< 12; i++){
+		this->needed[i] = 0;
+		this->priority[i] = 0;
+	}
 	MacroManager::onStart();
 	this->buildOrderManager->buildAdditional(4,BWAPI::UnitTypes::Protoss_Probe,100);
 	this->buildOrderManager->build(1,BWAPI::UnitTypes::Protoss_Pylon,98);
@@ -28,13 +37,17 @@ void ProtossStrat::onStart(){
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Probe,84);
 	this->buildOrderManager->build(2,BWAPI::UnitTypes::Protoss_Gateway,82);
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Probe,80);
-	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Dragoon,78);
+	this->priority[Dragoon] = 78;
+	this->needed[Dragoon] = 1;
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Pylon,76);
 	this->buildOrderManager->upgrade(1,BWAPI::UpgradeTypes::Singularity_Charge, 74);
-	this->buildOrderManager->buildAdditional(10,BWAPI::UnitTypes::Protoss_Dragoon, 20);
+
+	if(!this->workerManager->autoBuild){
+		this->workerManager->enableAutoBuild();
+	}
 
 	setScoutTime();
-	//this->buildOrderManager->enableDependencyResolver();
+	this->buildOrderManager->enableDependencyResolver();
 }
 
 void ProtossStrat::setScoutTime(){
@@ -68,22 +81,45 @@ void ProtossStrat::setScoutTime(){
 void ProtossStrat::update(){
 
 	this->createProdBuildings();
-	if(this->buildManager->getCompletedCount(BWAPI::UnitTypes::Protoss_Dragoon)>=4){
-		if(!this->workerManager->autoBuild){
-			BWAPI::Broodwar->printf("Auto building probes");
-			this->workerManager->enableAutoBuild();
-		}
-	}
 
-/*
-//This must be uncommented if we want the bot to expand. Yet expanding twice is not possible for the moment.
 	if(this->shouldExpand() && !expanding ){
 		this->expanding = true;
-		BWAPI::Broodwar->printf("Expanding at the nearest location");
-		this->baseManager->expand(this->naturalExpand,80);
+		if(this->baseManager->getBase(this->baseManager->naturalExpand) == NULL){
+			this->baseManager->expand(this->baseManager->naturalExpand,80);
+		} else {
+			this->baseManager->expand(80);
+		}
 	}
-	BWAPI::Broodwar->drawCircleMap(naturalExpand->getPosition().x(),naturalExpand->getPosition().y(),20,BWAPI::Colors::Green, true);
-	*/
+	
+	this->buildUnits();
+	
+	
+	this->buildOrderManager->build(this->needed[Arbiter],BWAPI::UnitTypes::Protoss_Arbiter,this->priority[Arbiter]);
+	this->buildOrderManager->build(this->needed[Archon],BWAPI::UnitTypes::Protoss_Archon,this->priority[Archon]);
+	this->buildOrderManager->build(this->needed[Carrier],BWAPI::UnitTypes::Protoss_Carrier,this->priority[Carrier]);
+	this->buildOrderManager->build(this->needed[Corsair],BWAPI::UnitTypes::Protoss_Corsair,this->priority[Corsair]);
+	this->buildOrderManager->build(this->needed[Dark_Archon],BWAPI::UnitTypes::Protoss_Dark_Archon,this->priority[Dark_Archon]);
+	this->buildOrderManager->build(this->needed[Dark_Templar],BWAPI::UnitTypes::Protoss_Dark_Templar,this->priority[Dark_Templar]);
+	this->buildOrderManager->build(this->needed[Dragoon],BWAPI::UnitTypes::Protoss_Dragoon,this->priority[Dragoon]);
+	this->buildOrderManager->build(this->needed[High_Templar],BWAPI::UnitTypes::Protoss_High_Templar,this->priority[High_Templar]);
+	this->buildOrderManager->build(this->needed[Observer],BWAPI::UnitTypes::Protoss_Observer,this->priority[Observer]);
+	this->buildOrderManager->build(this->needed[Reaver],BWAPI::UnitTypes::Protoss_Reaver,this->priority[Reaver]);
+	this->buildOrderManager->build(this->needed[Scout],BWAPI::UnitTypes::Protoss_Scout,this->priority[Scout]);
+	this->buildOrderManager->build(this->needed[Shuttle],BWAPI::UnitTypes::Protoss_Shuttle,this->priority[Shuttle]);
+	this->buildOrderManager->build(this->needed[Zealot],BWAPI::UnitTypes::Protoss_Zealot,this->priority[Zealot]);
+	
+
+}
+
+void ProtossStrat::buildUnits(){
+	this->needed[Dragoon] = 100;
+	this->priority[Dragoon] = 40;
+	if(this->baseManager->getActiveBases().size() > 1){
+		this->needed[High_Templar] = 100;
+		this->priority[High_Templar] = 40;
+		this->needed[Zealot] = 50; 
+		this->priority[Zealot] = 41;
+	}
 
 }
 
@@ -122,7 +158,7 @@ void ProtossStrat::buildGates()
 		}
 	if( allGatesFull && !underConstruction[UnitTypes::Protoss_Gateway])
 	{
-		this->buildOrderManager->buildAdditional(1,UnitTypes::Protoss_Gateway,20);
+		this->buildOrderManager->buildAdditional(1,UnitTypes::Protoss_Gateway,80);
 		underConstruction[UnitTypes::Protoss_Gateway] = true;
 	}
 }
@@ -168,14 +204,9 @@ void ProtossStrat::buildDefenses()
 	*/
 }
 
-void ProtossStrat::initWantedUnits()
-{
-	wantedUnits[UnitTypes::Protoss_Zealot].plannedType = TYPE_NUMBER;
-	wantedUnits[UnitTypes::Protoss_Zealot].plannedValue = 1;
-	wantedUnits[UnitTypes::Protoss_Dragoon].plannedType = TYPE_RATIO;
-	wantedUnits[UnitTypes::Protoss_Dragoon].plannedValue = 1;
-	wantedUnits[UnitTypes::Protoss_High_Templar].plannedType = TYPE_NUMBER;
-	wantedUnits[UnitTypes::Protoss_High_Templar].plannedValue = 5;
-	wantedUnits[UnitTypes::Protoss_Observer].plannedType = TYPE_NUMBER;
-	wantedUnits[UnitTypes::Protoss_Observer].plannedValue = 2;
+
+void ProtossStrat::produceUnits(){
+
+
+
 }

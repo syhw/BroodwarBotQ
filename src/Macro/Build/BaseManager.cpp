@@ -305,11 +305,11 @@ void BaseManager::computeNatural(){
 	BWTA::BaseLocation * minBase;
 	std::set<BWTA::BaseLocation * > allBaseLocations = BWTA::getBaseLocations();
 	BWTA::BaseLocation * myBaseLocation = BWTA::getStartLocation(BWAPI::Broodwar->self());
-	
+
 	for(std::set<BWTA::BaseLocation *>::iterator it = allBaseLocations.begin(); it != allBaseLocations.end(); ++it){
 		if( (*it) !=  myBaseLocation && !(*it)->isMineralOnly() ){
 			//not our main
-			test = (*it)->getPosition().getDistance(myBaseLocation->getPosition());
+			test = (*it)->getPosition().getDistance((*myBaseLocation->getRegion()->getChokepoints().begin())->getCenter());
 			if(test < minDist){
 				minDist = test;
 				minBase = (*it);

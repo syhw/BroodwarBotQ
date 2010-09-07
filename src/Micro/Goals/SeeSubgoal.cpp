@@ -9,11 +9,7 @@ pos(pos)
 
 
 bool SeeSubgoal::isRealized(){
-	if(achieved)
-		return true;
-	else
-		achieved=check();
-		return achieved;
+	return check();
 }
 
 bool SeeSubgoal::check(){

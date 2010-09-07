@@ -9,7 +9,6 @@ exploringEnemy(false)
 {
 	regions = NULL;
 	warManager = NULL;
-	to_remove = false;
 }
 
 ScoutManager::~ScoutManager( )
@@ -107,10 +106,7 @@ void ScoutManager::checkEmptyXP()
 ////////////////////////////NEW SECTION
 
 void ScoutManager::onUnitCreate(BWAPI::Unit* unit){
-	//if(BWAPI::Broodwar->self()->supplyUsed() == 10 && unit->getType().isWorker() && !regions->enemyFound()){
-	//	findEnemy();
-		//exploreRegion( (*BWTA::getRegions().begin()));
-	//}
+
 }
 
 void ScoutManager::onOffer(std::set<BWAPI::Unit*> units){
@@ -206,9 +202,6 @@ void ScoutManager::onUnitDestroy(BWAPI::Unit* unit){
 
 }
 
-UnitsGroup* ScoutManager::findUnitsGroup(pGoal goal){
-
-}
 
 
 

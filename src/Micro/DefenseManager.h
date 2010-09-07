@@ -23,7 +23,7 @@ public:
   void addBase(Base * b); 
 private:
 	void checkGroundDefense(Base * b, bool toDef);//Check if the right amonts of units is defending 
-	//and if the goal is accomplished
+	//and if the goal of defense is accomplished
 
 
   DefenseManager();

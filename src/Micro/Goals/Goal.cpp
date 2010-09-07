@@ -46,6 +46,7 @@ void Goal::achieve()
 						selected = (*it);
 					}
 				}
+
 			}
 			if(min > 0 && min < DBL_MAX){
 				selected->tryToRealize();
@@ -68,23 +69,29 @@ void Goal::checkAchievement()
 		//some subgoals
 			bool res_and=true;
 			bool res_or=false;
-			
-			for each (pSubgoal p in subgoals){
+
+			for(std::list<pSubgoal>::iterator p = subgoals.begin(); p != subgoals.end();){
 				
-				if(p->getLogic() == SL_AND){
+				if((*p)->getLogic() == SL_AND){
 					//AND case 
-					if(!p->isRealized()){
+					if(!(*p)->isRealized()){
 						res_and=false;
+						++p;
+					} else {
+						std::list<pSubgoal>::iterator tmpit = p;
+						++p;
+						subgoals.erase(tmpit);
 					}
 
 				} else {
 					//OR case
-					if(p->isRealized()){
+					if((*p)->isRealized()){
 					res_or = true;
 					}
+					++p;
 				}
 			}
-				
+
 			if(res_and || res_or){
 				this->status= GS_ACHIEVED;
 #ifdef __DEBUG_GABRIEL__
