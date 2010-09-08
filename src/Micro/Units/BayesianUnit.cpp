@@ -824,7 +824,7 @@ void BayesianUnit::updateDirV()
             Position tmp = v.translate(p);
             if (tmp.x() <= 32*Broodwar->mapWidth() && tmp.y() <= 32*Broodwar->mapHeight()       // in the map and
                 && tmp.x() >= 0 && tmp.y() >= 0 
-                && (unit->getType().isFlyer() || Broodwar->isWalkable(tmp.x()/8, tmp.y()/8)))   // walkable (statically)
+                && (unit->getType().isFlyer() || _mode == MODE_SCOUT || Broodwar->isWalkable(tmp.x()/8, tmp.y()/8)))   // walkable (statically)
             {
                 _dirv.push_back(v);
             }
@@ -1396,7 +1396,9 @@ void BayesianUnit::clickScout()
     Vec tmpdir = dir;
     tmpdir.normalize();
     if (currentdir.dot(tmpdir) < 0.75)
+    {
         clickDir();
+    }
     else if (Broodwar->getFrameCount() - _lastMoveFrame > 23)
     {
         unit->rightClick(target);
