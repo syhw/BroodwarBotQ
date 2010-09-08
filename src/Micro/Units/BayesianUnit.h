@@ -74,6 +74,7 @@ protected:
     bool _newPath;
     Position _inPos;
     bool _fleeing;
+    int _fleeingDmg;
     //std::multimap<BWAPI::Position, attractor_type> _prox;
     std::vector<occupation_type> _occupation;
     // dirv[attractor] = direction relative to an attractor
