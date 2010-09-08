@@ -57,7 +57,6 @@ bool DragoonUnit::decideToFlee()
 
 void DragoonUnit::micro()
 {
-    _fleeing = decideToFlee();
     if (Broodwar->getFrameCount() - _lastAttackFrame <= getAttackDuration()) // not interrupting attack
         return;
     if (unit->getGroundWeaponCooldown() == 0)
@@ -71,13 +70,13 @@ void DragoonUnit::micro()
     {
         ; // do nothing
     }
-    else if (_fleeing)
+    else if (_fleeing || decideToFlee())
     {
-        //flee();
+        flee();
     }
     else
     {
-        //fightMove();
+        fightMove();
     }
 }
 

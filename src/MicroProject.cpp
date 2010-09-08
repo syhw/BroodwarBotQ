@@ -29,6 +29,11 @@ void MicroAIModule::onStart()
 
 	mm = new UnitsGroup();
 
+    std::string mapName = Broodwar->mapPathName();
+    Broodwar->sendText("map name %s", mapName.c_str());
+    mapName = mapName.substr(mapName.find_last_of("\\") + 1, mapName.length() - mapName.find_last_of("\\") - 1);
+    Broodwar->sendText("map name: %s", mapName.c_str());
+
 	// Vec center;
 	std::set<Unit*> allUnits = Broodwar->getAllUnits();
 
@@ -100,10 +105,6 @@ void MicroAIModule::onStart()
     tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
     goals.push_back(tmp_goal);*/
     
-    std::string mapName = Broodwar->mapPathName();
-    Broodwar->sendText("map name %s", mapName.c_str());
-    mapName = mapName.substr(mapName.find_last_of("\\") + 1, mapName.length() - mapName.find_last_of("\\") - 1);
-    Broodwar->sendText("map name: %s", mapName.c_str());
     if (mapName == std::string("muta.scm") || mapName == std::string("mutaCOMPUTER.scm"))
     {
         tmp_form = pFormation(new ArcFormation(

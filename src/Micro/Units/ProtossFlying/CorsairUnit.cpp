@@ -51,7 +51,6 @@ void CorsairUnit::micro()
         _lastRightClick = whereFlee.toPosition();
         return;
     }
-    _fleeing = decideToFlee();
     if (Broodwar->getFrameCount() - _lastAttackFrame <= getAttackDuration()) // not interrupting attack
         return;
     if (unit->getGroundWeaponCooldown() == 0)
@@ -59,7 +58,7 @@ void CorsairUnit::micro()
         updateTargetEnemy();
         attackEnemyUnit(targetEnemy);
     }
-    else if (_fleeing)
+    else if (_fleeing || decideToFlee())
     {
         flee();
     }

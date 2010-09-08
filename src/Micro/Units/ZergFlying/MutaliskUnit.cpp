@@ -49,7 +49,6 @@ void MutaliskUnit::micro()
         _lastRightClick = whereFlee.toPosition();
         return;
     }
-    _fleeing = decideToFlee();
     if (Broodwar->getFrameCount() - _lastAttackFrame <= getAttackDuration()) // not interrupting attack
         return;
 
@@ -58,7 +57,7 @@ void MutaliskUnit::micro()
         updateTargetEnemy();
         attackEnemyUnit(targetEnemy);
     }
-    else if (_fleeing)
+    else if (_fleeing || decideToFlee())
     {
         flee();
     }

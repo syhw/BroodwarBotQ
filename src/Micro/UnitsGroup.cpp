@@ -222,12 +222,11 @@ void UnitsGroup::update()
 
     updateCenter();
     
-    //enemies = std::set<Unit*>(nearbyEnemyUnits(center, maxRadius + maxRange + 46)); // > 45.26 == sqrt(32^2+32^2)
-    clock_t s = clock();
-    updateNearbyEnemyUnitsFromFilter(center, maxRadius + maxRange + 46); // possibly hidden
-    clock_t f = clock();
-    double dur = (double)(f - s) / CLOCKS_PER_SEC;
-    Broodwar->printf( "UnitsGroup::update() took %2.5f seconds\n", dur); 
+    //clock_t s = clock();
+    updateNearbyEnemyUnitsFromFilter(center, maxRadius + maxRange + 46); // possibly hidden units, could be taken from onUnitsShow/View asynchronously
+    //clock_t f = clock();
+    //double dur = (double)(f - s) / CLOCKS_PER_SEC;
+    //Broodwar->printf( "UnitsGroup::update() took %2.5f seconds\n", dur); 
     Broodwar->drawCircleMap(center.x(), center.y(), maxRadius + maxRange, Colors::Yellow);
     if (!enemies.empty())
         defaultTargetEnemy = enemies.begin()->first; // TODO CHANGE THAT FOR A PRIORITY

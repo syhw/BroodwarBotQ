@@ -1331,7 +1331,7 @@ void BayesianUnit::updateDir()
     // compute the probability to go in each dirv(ector)
     computeProbs();
 #ifdef __DEBUG_GABRIEL__
-    //drawProbs(_dirvProb, _unitsGroup->size()); // DRAWPROBS
+    drawProbs(_dirvProb, _unitsGroup->size()); // DRAWPROBS
 #endif
 
     // select the most probable, most in the direction of obj if equally probables
@@ -1408,6 +1408,12 @@ void BayesianUnit::clickTarget()
 
 void BayesianUnit::flee()
 {
+    if (!this->mapManager->groundDamages[_unitPos.x()/32 + _unitPos.y()/32*Broodwar->mapWidth()])
+    {
+        //unit->stop();
+        _fleeing = false;
+        return;
+    }
     _fleeing = true;
     //Vec dmgGrad = this->mapManager->groundDamagesGrad[_unitPos.x()/32 + _unitPos.y()/32*Broodwar->mapWidth()];
     //if (dmgGrad.norm() >= _fleeingDmg) // we can have a direction to flee in
@@ -1415,8 +1421,6 @@ void BayesianUnit::flee()
         updateDir();
         clickDir();
     //}
-    if (!this->mapManager->groundDamages[_unitPos.x()/32 + _unitPos.y()/32*Broodwar->mapWidth()])
-        _fleeing = false;
 }
 
 void BayesianUnit::fightMove()
@@ -1432,7 +1436,7 @@ void BayesianUnit::fightMove()
         _lastMoveFrame = Broodwar->getFrameCount();
         return;
     } 
-    /// Or go towards ou out-of-range target
+    /// Or go towards out-of-range target
     if (oorTargetEnemy != NULL
         && !inRange(oorTargetEnemy)
         && Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency() + 2)
