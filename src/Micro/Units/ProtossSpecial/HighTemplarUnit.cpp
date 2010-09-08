@@ -79,7 +79,7 @@ void HighTemplarUnit::micro()
         if (bestScore > 3 || (_unitsGroup->enemies.size() == 1 && bestScore == 3))
         {       
             unit->useTech(BWAPI::TechTypes::Psionic_Storm, bestStormPos);
-            Broodwar->printf("Frame %d, pos (%d, %d), stormPos size %d", Broodwar->getFrameCount(), bestStormPos.x(), bestStormPos.y(), _mapManager->stormPos.size());
+            //Broodwar->printf("Frame %d, pos (%d, %d), stormPos size %d", Broodwar->getFrameCount(), bestStormPos.x(), bestStormPos.y(), _mapManager->stormPos.size());
             // tell the MapManager that we just stormed here
             _mapManager->justStormed(bestStormPos);
             _lastStormFrame = Broodwar->getFrameCount();

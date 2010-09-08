@@ -531,7 +531,7 @@ void MapManager::onFrame()
         else
         {
             if (it->first->exists()
-                && it->first->isVisible())
+                && it->first->isVisible()) // SEGFAULT
             {
                 // add it to MapManager (ourselves)
                 addDmg(it->first->getType(), it->first->getPosition());
@@ -548,7 +548,7 @@ void MapManager::onFrame()
     {
         if (!it->first->isVisible() && !(_eUnitsFilter->getInvisibleUnits().count(it->first)))
         {
-            Broodwar->printf("removing a %s", _eUnitsFilter->getViewedUnit(it->first).type.getName().c_str());
+            //Broodwar->printf("removing a %s", _eUnitsFilter->getViewedUnit(it->first).type.getName().c_str());
             removeDmg(_eUnitsFilter->getViewedUnit(it->first).type, _trackedUnits[it->first]);
             _trackedUnits.erase(it++);
         }
@@ -660,11 +660,11 @@ void MapManager::onFrame()
     if (duration > 0.040) 
         Broodwar->printf("MapManager::onFrame() took: %2.5f seconds\n", duration);
 #endif
-    this->drawGroundDamagesGrad();
-    this->drawGroundDamages();
-    this->drawAirDamagesGrad();
-    this->drawAirDamages();
-    this->drawBestStorms();
+    //this->drawGroundDamagesGrad(); DRAW
+    //this->drawGroundDamages();
+    //this->drawAirDamagesGrad();
+    //this->drawAirDamages();
+    //this->drawBestStorms();
 }
 
 const std::map<BWAPI::Unit*, BWAPI::Position>& MapManager::getOurUnits()

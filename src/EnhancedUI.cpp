@@ -79,9 +79,9 @@ void EnhancedUI::drawProgress() const
   UnitGroup producing = SelectAll()(isTraining);
   for each (Unit* c in producing)
   {
-    if (c->getRemainingTrainTime() > .0)
+    if (c->getRemainingTrainTime() > .0 && c->getTrainingQueue().front().buildTime()) // anti SEGFAULT
     {
-      double progress = 1.0 - (static_cast<double>(c->getRemainingTrainTime()) / c->getTrainingQueue().front().buildTime());
+      double progress = 1.0 - (static_cast<double>(c->getRemainingTrainTime()) / c->getTrainingQueue().front().buildTime()); // SEGFAULT
       drawProgressBar(c->getPosition(), progress, BWAPI::Colors::Green);
     }
   }

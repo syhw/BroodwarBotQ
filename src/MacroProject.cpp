@@ -90,7 +90,6 @@ void BattleBroodAI::onStart()
 	// Speed up the game to the maximum
     Broodwar->setLocalSpeed(0);
 
-	
 	this->showManagerAssignments=false;
 
 	if (Broodwar->isReplay())

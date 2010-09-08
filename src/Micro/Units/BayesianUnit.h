@@ -121,6 +121,7 @@ protected:
     void drawDir();
     inline void clickDir();
     inline void clickScout();
+    inline void clickTarget();
     void flee();
     void fightMove();
     void drawArrow(Vec& v);

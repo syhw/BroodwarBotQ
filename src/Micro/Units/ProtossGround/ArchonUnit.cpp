@@ -15,6 +15,7 @@ ArchonUnit::ArchonUnit(BWAPI::Unit* u, UnitsGroup* ug)
         setPrio.insert(BWAPI::UnitTypes::Terran_Marine);
         setPrio.insert(BWAPI::UnitTypes::Terran_Medic);
         setPrio.insert(BWAPI::UnitTypes::Terran_Ghost);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Wraith);
     }
 }
 

@@ -27,6 +27,8 @@ void AttackGoal::achieve()
 
 void AttackGoal::createMidSubgoal()
 {
+    if (!this->unitsGroup->ppath.size())
+        return;
 	int cpt = 0;
 	int stop = this->unitsGroup->ppath.size() / 2;
 	BWAPI::Position pos;

@@ -15,6 +15,7 @@ class EUnitsFilter : public CSingleton<EUnitsFilter>, public BaseObject
 {
     friend class CSingleton<EUnitsFilter>;
     TimeManager* timeManager;
+    std::set<BWAPI::UnitType> _interestingTypes;
     std::map<BWAPI::Unit*, EViewedUnit> _eViewedUnits;
     std::map<BWAPI::Unit*, std::pair<BWAPI::UnitType, BWAPI::Position> > _invisibleUnits;
 public:

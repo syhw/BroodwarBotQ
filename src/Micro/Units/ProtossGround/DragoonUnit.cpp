@@ -17,7 +17,7 @@ DragoonUnit::DragoonUnit(BWAPI::Unit* u, UnitsGroup* ug)
         addRange = 64;
     else
         addRange = 0;
-    attackDuration = Broodwar->getLatency() + 8;
+    attackDuration = Broodwar->getLatency() + 9;
 
     if (setPrio.empty())
     {
@@ -58,34 +58,26 @@ bool DragoonUnit::decideToFlee()
 void DragoonUnit::micro()
 {
     _fleeing = decideToFlee();
-    if (Broodwar->getFrameCount() - _lastAttackFrame <= getAttackDuration())
+    if (Broodwar->getFrameCount() - _lastAttackFrame <= getAttackDuration()) // not interrupting attack
         return;
-    if (targetEnemy != NULL && !(targetEnemy->exists()))
+    if (unit->getGroundWeaponCooldown() == 0)
     {
+        //Broodwar->printf("last attack: %d frames ago", Broodwar->getFrameCount() - _lastClickFrame);
         updateRangeEnemies();
         updateTargetEnemy();
         attackEnemyUnit(targetEnemy);
     }
+    else if (unit->getGroundWeaponCooldown() < Broodwar->getLatency())
+    {
+        ; // do nothing
+    }
+    else if (_fleeing)
+    {
+        //flee();
+    }
     else
     {
-        if (unit->getGroundWeaponCooldown() == Broodwar->getLatency() )
-        {
-            updateRangeEnemies();
-            updateTargetEnemy();
-            attackEnemyUnit(targetEnemy);
-        }
-        else if (unit->getGroundWeaponCooldown() < Broodwar->getLatency() - 1)
-        {
-            ; // do nothing
-        }
-        else if (_fleeing)
-        {
-            flee();
-        }
-        else if (!unit->isMoving() && oorTargetEnemy != NULL)
-        {
-            fightMove();
-        }
+        //fightMove();
     }
 }
 

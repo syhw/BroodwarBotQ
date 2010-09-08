@@ -124,7 +124,7 @@ void WarManager::onUnitDestroy(BWAPI::Unit* unit)
 
 void WarManager::display()
 {
-	for( std::list<UnitsGroup*>::iterator it = unitsGroups.begin(); it != unitsGroups.end(); it++)
+	for( std::list<UnitsGroup*>::iterator it = unitsGroups.begin(); it != unitsGroups.end(); it++) // SEGFAULT
 		(*it)->display();
 }
 

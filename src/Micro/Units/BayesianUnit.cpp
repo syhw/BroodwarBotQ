@@ -195,19 +195,13 @@ void BayesianUnit::switchMode(unit_mode um)
             //unit->holdPosition();
             break;
         case MODE_SCOUT:
-            unit->rightClick(target);
-            _lastRightClick = target;
-            _lastClickFrame = Broodwar->getFrameCount();
-            _lastMoveFrame = Broodwar->getFrameCount();
+            clickTarget();
 #ifdef __DEBUG_GABRIEL__
             Broodwar->printf("Switch SCOUT!");
 #endif
             break;
         case MODE_MOVE:
-            unit->rightClick(target);
-            _lastRightClick = target;
-            _lastClickFrame = Broodwar->getFrameCount();
-            _lastMoveFrame = Broodwar->getFrameCount();
+            clickTarget();
 #ifdef __DEBUG_GABRIEL__
             Broodwar->printf("Switch MOVE!");
 #endif
@@ -378,7 +372,7 @@ double BayesianUnit::computeProb(unsigned int i)
         }
     }
 
-    if (_mode == MODE_INPOS || _mode == MODE_FIGHT_G)
+    if (_mode == MODE_INPOS || _mode == MODE_FIGHT_G || _mode == MODE_FIGHT_A)
     {
         val *= _repulseProb[_repulseValues[i]]; /// Repulsion of the other units incoming towards us
     }
@@ -445,6 +439,8 @@ double BayesianUnit::computeProb(unsigned int i)
 
 void BayesianUnit::attackEnemyUnit(Unit* u)
 {
+    if (Broodwar->getFrameCount() - _lastClickFrame <= Broodwar->getLatency())
+        return;
     if (targetEnemy && targetEnemy->isVisible())
     {
         unit->rightClick(u);
@@ -1335,7 +1331,7 @@ void BayesianUnit::updateDir()
     // compute the probability to go in each dirv(ector)
     computeProbs();
 #ifdef __DEBUG_GABRIEL__
-    drawProbs(_dirvProb, _unitsGroup->size()); // DRAWPROBS
+    //drawProbs(_dirvProb, _unitsGroup->size()); // DRAWPROBS
 #endif
 
     // select the most probable, most in the direction of obj if equally probables
@@ -1378,10 +1374,7 @@ void BayesianUnit::clickDir()
     }
     else if (_lastRightClick != target)
     {
-        unit->rightClick(target);
-        _lastRightClick = target;
-        _lastClickFrame = Broodwar->getFrameCount();
-        _lastMoveFrame = Broodwar->getFrameCount();
+        clickTarget();
     } 
     else
     {
@@ -1395,16 +1388,22 @@ void BayesianUnit::clickScout()
     currentdir.normalize();
     Vec tmpdir = dir;
     tmpdir.normalize();
-    if (currentdir.dot(tmpdir) < 0.75)
+    if (currentdir.dot(tmpdir) < 0.75) // divergence
     {
         clickDir();
     }
     else if (Broodwar->getFrameCount() - _lastMoveFrame > 23)
     {
-        unit->rightClick(target);
-        _lastRightClick = target;
-        _lastMoveFrame = Broodwar->getFrameCount();
+        clickTarget();
     }
+}
+
+void BayesianUnit::clickTarget()
+{
+    unit->rightClick(target);
+    _lastRightClick = target;
+    _lastClickFrame = Broodwar->getFrameCount();
+    _lastMoveFrame = Broodwar->getFrameCount();
 }
 
 void BayesianUnit::flee()
@@ -1422,6 +1421,7 @@ void BayesianUnit::flee()
 
 void BayesianUnit::fightMove()
 {
+    /// Go towards our target
     if (targetEnemy != NULL 
         && !inRange(targetEnemy)
         && Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency() + 2)
@@ -1432,6 +1432,7 @@ void BayesianUnit::fightMove()
         _lastMoveFrame = Broodwar->getFrameCount();
         return;
     } 
+    /// Or go towards ou out-of-range target
     if (oorTargetEnemy != NULL
         && !inRange(oorTargetEnemy)
         && Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency() + 2)
@@ -1442,32 +1443,7 @@ void BayesianUnit::fightMove()
         _lastMoveFrame = Broodwar->getFrameCount();
         return;
     }
-
-    /*updateDirV();
-    updateAttractors();
-
-    int currentHeight = Broodwar->getGroundHeight(TilePosition(_unitPos));
-    int maxHeight = currentHeight;
-    unsigned int ind_max;
-    for(unsigned int i = 0; i < _dirv.size(); ++i)
-    { 
-        TilePosition tmpTilePos = TilePosition(_dirv[i].translate(_unitPos));
-        int tmpHeight = Broodwar->getGroundHeight(tmpTilePos);
-        if (tmpHeight > maxHeight) // most in the direction of height
-        {
-            maxHeight = tmpHeight;
-            ind_max = i;
-        }
-    }
-    if (currentHeight < maxHeight)
-        obj = _dirv[ind_max];
-    else
-        obj = Vec(0, 0);
-    drawObj();
-
-    computeProbs();
-    selectDir(obj);*/
-
+    /// Or simply move away from our friends or go towards heights
     updateDir();
     clickDir();
 }
@@ -1525,8 +1501,13 @@ void BayesianUnit::update()
     switch (_mode)
     {
     case MODE_SCOUT:
-        updateDir();
-        clickScout();
+        if (_unitsGroup->enemies.empty() && Broodwar->getFrameCount() - _lastClickFrame > 23)
+            clickTarget();
+        else
+        {
+            updateDir();
+            clickScout();
+        }
         break;
 
     case MODE_INPOS:       
@@ -1563,13 +1544,10 @@ void BayesianUnit::update()
             this->switchMode(MODE_INPOS);
             return;
         }
-        if ((Broodwar->getFrameCount() - _lastMoveFrame) > 10
+        if ((Broodwar->getFrameCount() - _lastMoveFrame) > 23
             && (Broodwar->getFrameCount() - _lastClickFrame) > Broodwar->getLatency() + getAttackDuration())
         {
-            unit->rightClick(target);
-            _lastRightClick = target;
-            _lastClickFrame = Broodwar->getFrameCount();
-            _lastMoveFrame = Broodwar->getFrameCount();
+            clickTarget();
         }
         break;
         

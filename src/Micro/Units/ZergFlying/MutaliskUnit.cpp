@@ -12,7 +12,7 @@ MutaliskUnit::MutaliskUnit(BWAPI::Unit* u, UnitsGroup* ug)
         setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
         setPrio.insert(BWAPI::UnitTypes::Zerg_Scourge);
     }
-    _maxDiag = 46; // to space them more (and avoir splash)
+    _maxDiag = 46; // to space them more (and avoid splash)
 }
 
 MutaliskUnit::~MutaliskUnit()
@@ -49,30 +49,22 @@ void MutaliskUnit::micro()
         _lastRightClick = whereFlee.toPosition();
         return;
     }
+    _fleeing = decideToFlee();
+    if (Broodwar->getFrameCount() - _lastAttackFrame <= getAttackDuration()) // not interrupting attack
+        return;
 
-    if (targetEnemy != NULL && !(targetEnemy->exists()))
+    if (unit->getGroundWeaponCooldown() == 0)
     {
         updateTargetEnemy();
         attackEnemyUnit(targetEnemy);
     }
+    else if (_fleeing)
+    {
+        flee();
+    }
     else
     {
-        if (Broodwar->getFrameCount() - _lastAttackFrame > getAttackDuration())
-        {
-            if (unit->getGroundWeaponCooldown() == 0)
-            {
-                updateTargetEnemy();
-                attackEnemyUnit(targetEnemy);
-            }
-            else if (_fleeing || decideToFlee())
-            {
-                flee();
-            }
-            else if (!unit->isMoving() && targetEnemy != NULL)
-            {
-                fightMove();
-            }
-        }
+        fightMove();
     }
 }
 
