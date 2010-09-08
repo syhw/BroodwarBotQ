@@ -4,6 +4,7 @@
 #include "AttackGoal.h"
 #include <stdio.h>
 #include <QtGui/QApplication.h>
+#include <string>
 using namespace BWAPI;
 using namespace std;
 
@@ -13,7 +14,7 @@ void MicroAIModule::onStart()
 	// Enable some cheat flags
     //Broodwar->printf("ON START !!\n");
     Broodwar->enableFlag(Flag::UserInput);
-    //Broodwar->setLocalSpeed(0);
+    Broodwar->setLocalSpeed(0);
 	//Broodwar->enableFlag(Flag::CompleteMapInformation);
 	BWTA::readMap();
 	BWTA::analyze();
@@ -62,11 +63,11 @@ void MicroAIModule::onStart()
     int sign = mp.x() < Broodwar->mapWidth()/2*32 ? 1 : -1;
 
     /* LINE IN THE MIDDLE (+/- 64 pixs) */   
-    pFormation tmp_form = pFormation(new LineFormation(
+    /*pFormation tmp_form = pFormation(new LineFormation(
         Position(Broodwar->mapWidth()/2*32 + sign*64,(Broodwar->mapHeight()/2 + 4)*32), Vec(1,0)));
     pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
     pGoal tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
-    goals.push_back(tmp_goal);
+    goals.push_back(tmp_goal);*/
 
     /* SQUARE IN THE MIDDLE */
     /*pFormation tmp_form = pFormation(new SquareFormation(
@@ -74,15 +75,23 @@ void MicroAIModule::onStart()
     pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
     pGoal tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
     goals.push_back(tmp_goal);*/
-    
-    
+ 
+
     /* ARC IN THE MIDDLE (+/- 256 pixs) */
-    /*pFormation tmp_form = pFormation(new ArcFormation(
-        Position(Broodwar->mapWidth()/2*32 + sign*256,(Broodwar->mapHeight()/2 + 4)*32), 
+    pFormation tmp_form = pFormation(new ArcFormation(
+        Position(Broodwar->mapWidth()/2*32 - sign*256,(Broodwar->mapHeight()/2 + 4)*32), 
         Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
     pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
     pGoal tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
-    goals.push_back(tmp_goal);*/
+    goals.push_back(tmp_goal);
+
+    /* ARC IN THE MIDDLE (+/- 256 pixs) */
+    tmp_form = pFormation(new ArcFormation(
+        Position(Broodwar->mapWidth()/2*32 + sign*256,(Broodwar->mapHeight()/2 + 4)*32), 
+        Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
+    tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
+    tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+    goals.push_back(tmp_goal);
 
     /* SQUARE ON THE OTHER SIDE */
     /*tmp_form = pFormation(new SquareFormation(
@@ -91,9 +100,64 @@ void MicroAIModule::onStart()
     tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
     goals.push_back(tmp_goal);*/
     
-    ///goals.push_back(pGoal(new AttackGoal(mm, 
-    ///    Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32))));
-    
+    std::string mapName = Broodwar->mapPathName();
+    Broodwar->sendText("map name %s", mapName.c_str());
+    mapName = mapName.substr(mapName.find_last_of("\\") + 1, mapName.length() - mapName.find_last_of("\\") - 1);
+    Broodwar->sendText("map name: %s", mapName.c_str());
+    if (mapName == std::string("muta.scm") || mapName == std::string("mutaCOMPUTER.scm"))
+    {
+        tmp_form = pFormation(new ArcFormation(
+            Position(Broodwar->mapWidth()/2*32 + sign*350,(Broodwar->mapHeight()/2 + 4)*32), 
+            Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
+        tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
+        tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+        goals.push_back(tmp_goal);
+        goals.push_back(pGoal(new AttackGoal(mm, 
+            Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32))));
+        goals.push_back(pGoal(new AttackGoal(mm, 
+            Position(Broodwar->mapWidth()*32 - 128, Broodwar->mapHeight()*32 - 128))));
+        goals.push_back(pGoal(new AttackGoal(mm, 
+            Position(Broodwar->mapWidth()*32, 128))));
+        goals.push_back(pGoal(new AttackGoal(mm, 
+            Position(128, Broodwar->mapHeight()*32))));
+        goals.push_back(pGoal(new AttackGoal(mm, 
+            Position(128, 128))));
+        goals.push_back(pGoal(new AttackGoal(mm, 
+            Position(Broodwar->mapWidth()*32 - 128, Broodwar->mapHeight()*32 - 128))));
+        goals.push_back(pGoal(new AttackGoal(mm, 
+            Position(Broodwar->mapWidth()*32, 128))));
+        goals.push_back(pGoal(new AttackGoal(mm, 
+            Position(128, Broodwar->mapHeight()*32))));
+        goals.push_back(pGoal(new AttackGoal(mm, 
+            Position(128, 128))));
+        goals.push_back(pGoal(new AttackGoal(mm, 
+            Position(Broodwar->mapWidth()/2*32, 22*32))));
+        goals.push_back(pGoal(new AttackGoal(mm, 
+            Position(Broodwar->mapWidth()/2*32, 50*32))));
+    }
+    else
+    {
+        tmp_form = pFormation(new ArcFormation(
+            Position(Broodwar->mapWidth()/2*32 + sign*350,(Broodwar->mapHeight()/2 + 4)*32), 
+            Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
+        tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
+        tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+        goals.push_back(tmp_goal);
+        goals.push_back(pGoal(new AttackGoal(mm, 
+            Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32))));
+        tmp_form = pFormation(new LineFormation(
+            Position(Broodwar->mapWidth()/2*32,(Broodwar->mapHeight()/2 + 4)*32), Vec(1,0)));
+        tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
+        tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+        goals.push_back(tmp_goal);
+        goals.push_back(pGoal(new AttackGoal(mm, 
+            Position((Broodwar->mapWidth() - (Broodwar->mapWidth() - mp.x()))*32, (Broodwar->mapHeight()/2 + 4)*32))));
+        goals.push_back(pGoal(new AttackGoal(mm, 
+            Position(Broodwar->mapWidth()/2*32, 22*32))));
+        goals.push_back(pGoal(new AttackGoal(mm, 
+            Position(Broodwar->mapWidth()/2*32, 50*32))));
+    }
+
 	mm->setGoals(goals);
 
 #ifdef BW_QT_DEBUG

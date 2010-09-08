@@ -32,6 +32,7 @@ DragoonUnit::DragoonUnit(BWAPI::Unit* u, UnitsGroup* ug)
         setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode);
         setPrio.insert(BWAPI::UnitTypes::Zerg_Defiler);
     }
+    _fleeingDmg = 14;
 }
 
 DragoonUnit::~DragoonUnit()
@@ -51,11 +52,14 @@ int DragoonUnit::addRangeAir()
 bool DragoonUnit::decideToFlee()
 {
     // TODO complete conditions
-    return (_lastTotalHP - (unit->getShields() + unit->getHitPoints()) > 13 || (!unit->getShields() && (_lastTotalHP - unit->getHitPoints() > 1)));
+    return (_lastTotalHP - (unit->getShields() + unit->getHitPoints()) >= _fleeingDmg || (!unit->getShields() && (_lastTotalHP - unit->getHitPoints() > 4)));
 }
 
 void DragoonUnit::micro()
 {
+    _fleeing = decideToFlee();
+    if (Broodwar->getFrameCount() - _lastAttackFrame <= getAttackDuration())
+        return;
     if (targetEnemy != NULL && !(targetEnemy->exists()))
     {
         updateRangeEnemies();
@@ -64,22 +68,23 @@ void DragoonUnit::micro()
     }
     else
     {
-        if (Broodwar->getFrameCount() - _lastAttackFrame > getAttackDuration())
+        if (unit->getGroundWeaponCooldown() == Broodwar->getLatency() )
         {
-            if (unit->getGroundWeaponCooldown() == 0)
-            {
-                updateRangeEnemies();
-                updateTargetEnemy();
-                attackEnemyUnit(targetEnemy);
-            }
-            else if (_fleeing || decideToFlee())
-            {
-                flee();
-            }
-            else if (!unit->isMoving() && targetEnemy != NULL)
-            {
-                fightMove();
-            }
+            updateRangeEnemies();
+            updateTargetEnemy();
+            attackEnemyUnit(targetEnemy);
+        }
+        else if (unit->getGroundWeaponCooldown() < Broodwar->getLatency() - 1)
+        {
+            ; // do nothing
+        }
+        else if (_fleeing)
+        {
+            flee();
+        }
+        else if (!unit->isMoving() && oorTargetEnemy != NULL)
+        {
+            fightMove();
         }
     }
 }

@@ -12,10 +12,13 @@ ZealotUnit::ZealotUnit(BWAPI::Unit* u, UnitsGroup* ug)
 {
     if (setPrio.empty())
     {
-        setPrio.insert(BWAPI::UnitTypes::Protoss_Zealot);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Firebat);
-        setPrio.insert(BWAPI::UnitTypes::Zerg_Zergling);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Reaver);
+        //setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode);
+        setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode);
+        setPrio.insert(BWAPI::UnitTypes::Zerg_Hydralisk);
     }
+    _fleeingDmg = 12; 
 }
 
 ZealotUnit::~ZealotUnit()
@@ -24,8 +27,6 @@ ZealotUnit::~ZealotUnit()
 
 void ZealotUnit::micro()
 {
-    if (unit->isStartingAttack() || unit->isAttacking())
-        return;
     int hpDiff = _lastTotalHP - (unit->getShields() + unit->getHitPoints());
     if (Broodwar->getFrameCount() - _lastAttackFrame > Broodwar->getLatency() + getAttackDuration())
     {
@@ -35,7 +36,7 @@ void ZealotUnit::micro()
             updateTargetEnemy();
             attackEnemyUnit(targetEnemy);
         }
-        else if (_fleeing || hpDiff > 27 || (unit->getShields() == 0 && hpDiff > 13))
+        else if (_fleeing || hpDiff >= _fleeingDmg || (unit->getShields() == 0 && hpDiff > 5))
         {
             flee();
         }
