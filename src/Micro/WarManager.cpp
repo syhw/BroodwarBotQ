@@ -1,10 +1,10 @@
 #include <WarManager.h>
-#include <Regions.h>
 #include <util.h>
 #include <UnitsGroup.h>
 #include "DefendBaseGroundGoal.h"
 #include "BorderManager.h"
 #include "AttackGoal.h"
+#include "ScoutManager.h"
 
 
 using std::map;
@@ -18,7 +18,6 @@ WarManager::WarManager()
 : BaseObject("WarManager")
 {
 	arbitrator = NULL;
-	regions = NULL;
     unitsGroups.push_front(new UnitsGroup()); // to garbage collect idle units
     informationManager = & InformationManager::Instance();
     home = BWTA::getStartLocation(Broodwar->self());
@@ -32,7 +31,6 @@ WarManager::~WarManager()
 void WarManager::setDependencies()
 {
 	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
-	this->regions = & Regions::Instance();
 }
 
 void WarManager::onStart(){
@@ -132,58 +130,10 @@ void WarManager::display()
 
 void WarManager::sendGroupToAttack( UnitsGroup* ug)
 {
-	if(Regions::Instance().enemyFound()){
-		ug->addGoal(pGoal(new AttackGoal(ug, Regions::Instance().whereIsEnemy()->getCenter())));
-	}
-
-	/*
-    Broodwar->printf("sending a group to attack");
-	// Get the nearest enemy position
-	bool found = false;
-	double minDist = 0xFFFF;
-	Position nearestEnemyLocation;
-	Unit* enemyUnit;
-	for (map<Region*, RegionData>::const_iterator itRegions = regions->regionsData.begin(); itRegions != regions->regionsData.end(); itRegions++)
-	{
-		for (map<Player*, vector<RegionsUnitData> >::const_iterator itBuildings = itRegions->second.buildings.begin(); itBuildings != itRegions->second.buildings.end(); itBuildings++)
-		{
-			if (itBuildings->first->isEnemy(Broodwar->self()))
-			{
-				for (vector<RegionsUnitData>::const_iterator itBD = itBuildings->second.begin(); itBD != itBuildings->second.end(); ++itBD)
-				{
-					double distance = getGroundDistance(ug->getCenter(), itBD->position);
-					if (distance < minDist)
-					{
-						minDist = distance;
-						nearestEnemyLocation = itBD->position;
-						enemyUnit = itBD->unit;
-						found = true;
-					}
-				}
-			}
-		}
-	}
-
-    if (found)
-        return;
-
-    // works only for 1v1 (2 players) maps: 
-    for (std::set<TilePosition>::const_iterator it = Broodwar->getStartLocations().begin();
-        it != Broodwar->getStartLocations().end(); ++it)
+	if (ScoutManager::Instance().enemyFound)
     {
-        if (*it == home->getTilePosition())
-            continue;
-        double distance = getGroundDistance(ug->getCenter(), *it);
-        if (distance < minDist)
-        {
-            minDist = distance;
-            nearestEnemyLocation = *it;
-            found = true;
-        }
-    }
-    ug->addGoal(pGoal(new AttackGoal(ug, nearestEnemyLocation)));
-
-	//Broodwar->printf( "Let's fight !!");*/
+        ug->addGoal(pGoal(new AttackGoal(ug, ScoutManager::Instance().enemyStartLocation)));
+	}
 }
 
 void WarManager::sendGroupToDefense( UnitsGroup* ug)

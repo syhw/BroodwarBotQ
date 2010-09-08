@@ -2,7 +2,6 @@
 #include <CSingleton.h>
 #include <Arbitrator.h>
 #include <BWAPI.h>
-#include <Regions.h>
 #include <BWTA.h>
 #include "Goal.h"
 #include "Subgoal.h"

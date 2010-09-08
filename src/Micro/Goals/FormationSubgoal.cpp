@@ -29,7 +29,6 @@ void FormationSubgoal::tryToRealize()
 double FormationSubgoal::distanceToRealize()
 {
     Position p = Position((int)formation->mean.x, (int)formation->mean.y);
-    Broodwar->printf("distance to realize %f", p.getDistance(unitsGroup->center));
     return p.getDistance(unitsGroup->center);
 }
 

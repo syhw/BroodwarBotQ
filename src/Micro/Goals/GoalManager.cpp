@@ -1,19 +1,21 @@
 #include "GoalManager.h"
 
 using namespace BWAPI;
-GoalManager::GoalManager(){
+GoalManager::GoalManager()
+{
 	this->warManager = NULL;
-	this->regions = NULL;
 }
 
-GoalManager::~GoalManager(){
+GoalManager::~GoalManager()
+{
 }
-void GoalManager::setDependencies(){
+void GoalManager::setDependencies()
+{
 	this->warManager = & WarManager::Instance();
-	this->regions = & Regions::Instance();
 }
 
-void GoalManager::insert(UnitsGroup * ug, pGoal g){
+void GoalManager::insert(UnitsGroup * ug, pGoal g)
+{
 	//Search if the ug is already in
 	std::map<UnitsGroup *, std::list<pGoal> >::iterator it = this->attributedGoals.find(ug);
 	if (it != attributedGoals.end()) {

@@ -45,10 +45,7 @@ ExploreGoal::ExploreGoal(BWTA::Region* region)
 			to_see.remove(selectedPos);
 			size --;
 
-
-			
-		}
-		
+		}		
 	}
 }
 

@@ -64,7 +64,7 @@ void DragoonUnit::micro()
     }
     else
     {
-        if (Broodwar->getFrameCount() - _lastAttackOrder > getAttackDuration())
+        if (Broodwar->getFrameCount() - _lastAttackFrame > getAttackDuration())
         {
             if (unit->getGroundWeaponCooldown() == 0)
             {
@@ -78,10 +78,7 @@ void DragoonUnit::micro()
             }
             else if (!unit->isMoving() && targetEnemy != NULL)
             {
-                //fightMove();
-                //switchMode(MODE_INPOS); // TODO
-                //updateDir();
-                //clickDir();
+                fightMove();
             }
         }
     }

@@ -6,7 +6,6 @@
 #include <BWAPI.h>
 #include "WarManager.h"
 #include "../Formations/Formation.h"
-#include "Regions.h"
 
 //TOCHANGE AT least the class name
 
@@ -16,7 +15,6 @@ class GoalManager : public CSingleton<GoalManager>
 private:
 	WarManager * warManager;
 	std::map<UnitsGroup *, std::list<pGoal> > attributedGoals;
-	Regions * regions;
 	GoalManager();
 	~GoalManager();
 

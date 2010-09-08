@@ -1,7 +1,4 @@
 #pragma once
-#define _CRTDBG_MAP_ALLOC       // anti-memory leaks
-#include <stdlib.h>             // anti-memory leaks
-#include <crtdbg.h>             // anti-memory leaks
 #include <BWAPI.h>
 #include <BWTA.h>
 #include <windows.h>
@@ -21,7 +18,6 @@
 #include "TerranStrat.h"
 #include "ZergStrat.h"
 #include "TimeManager.h"
-#include "Regions.h"
 #include "WarManager.h"
 #include "ObjectManager.h"
 #include "EUnitsFilter.h"
@@ -77,7 +73,6 @@ public:
 	ScoutManager* scoutManager;
 	MapManager* mapManager;
 	WorkerManager* workerManager;
-	Regions* regions;
 	MacroManager* macroManager;
 	WarManager* warManager;
 	EUnitsFilter* eUnitsFilter;

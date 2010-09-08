@@ -1,7 +1,6 @@
 #pragma once
 #include <BWTA.h>
 #include "Goal.h"
-#include "Regions.h"
 #include "Subgoal.h"
 #include "SeeSubgoal.h"
 #include "FindSubgoal.h"

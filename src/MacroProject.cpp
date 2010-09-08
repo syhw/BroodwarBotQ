@@ -64,7 +64,6 @@ BattleBroodAI::~BattleBroodAI()
     BaseManager::Destroy();
     SupplyManager::Destroy();
     WarManager::Destroy();
-    Regions::Destroy();
     MapManager::Destroy();
     EUnitsFilter::Destroy();
     ObjectManager::Destroy();
@@ -136,7 +135,6 @@ void BattleBroodAI::onStart()
 	this->scoutManager = & ScoutManager::Instance();
 	this->mapManager = & MapManager::Instance();
 	this->workerManager = & WorkerManager::Instance();
-	this->regions = & Regions::Instance();
 	this->warManager = & WarManager::Instance();
 	this->eUnitsFilter = & EUnitsFilter::Instance();
 	this->eEcoEstimator = & EEcoEstimator::Instance();
@@ -167,7 +165,6 @@ void BattleBroodAI::onStart()
 	this->upgradeManager->setDependencies();
 	this->scoutManager->setDependencies();
 	this->workerManager->setDependencies();
-	this->regions->setDependencies();
 	this->eEcoEstimator->setDependencies();
 	this->warManager->setDependencies();
 	this->goalManager->setDependencies();
@@ -457,7 +454,6 @@ void BattleBroodAI::onUnitCreate(BWAPI::Unit* unit)
 	//Update Managers
 	this->scoutManager->onUnitCreate(unit);
 	this->mapManager->onUnitCreate(unit);
-	this->regions->onUnitCreate(unit);
 	this->warManager->onUnitCreate(unit);
 	this->macroManager->onUnitCreate(unit);
 
@@ -517,7 +513,6 @@ void BattleBroodAI::onUnitDestroy(BWAPI::Unit* unit)
 	this->workerManager->onRemoveUnit(unit);
     this->macroManager->onUnitDestroy( unit);
     this->warManager->onUnitDestroy(unit);
-    this->regions->onUnitDestroy(unit);
     this->mapManager->onUnitDestroy(unit);
     this->eUnitsFilter->onUnitDestroy(unit);
 	this->informationManager->onUnitDestroy(unit);
@@ -550,7 +545,6 @@ void BattleBroodAI::onUnitShow(BWAPI::Unit* unit)
     //if (!Broodwar->isReplay())
     //	Broodwar->sendText("A %s [%x] has been spotted at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x(),unit->getPosition().y());
 
-    regions->onUnitShow(unit);
     mapManager->onUnitShow(unit);
     eUnitsFilter->update(unit);
 	scoutManager->onUnitShow(unit);
@@ -561,7 +555,6 @@ void BattleBroodAI::onUnitHide(BWAPI::Unit* unit)
     //if (!Broodwar->isReplay())
     //	Broodwar->sendText("A %s [%x] was last seen at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x(),unit->getPosition().y());
 
-    regions->onUnitHide(unit);
     mapManager->onUnitHide(unit);
     eUnitsFilter->update(unit);
 }
@@ -734,6 +727,5 @@ void BattleBroodAI::showForces()
 // This method is called from onFrame() and allow to display graphical debug informations on each component.
 void BattleBroodAI::display()
 {
-    regions->display();
     warManager->display();
 }

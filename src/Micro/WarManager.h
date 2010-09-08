@@ -9,7 +9,6 @@
 #include "InformationManager.h"
 
 class UnitsGroup;
-class Regions;
 class ScoutManager;
 
 class WarManager: public CSingleton<WarManager>, public Arbitrator::Controller<BWAPI::Unit*,double>, public BaseObject
@@ -23,7 +22,6 @@ private:
 	std::list<UnitsGroup *> promptedRemove;
 	bool remove(UnitsGroup* u);
 	Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
-	Regions* regions;
     InformationManager* informationManager;
 public:
 	void setDependencies();
