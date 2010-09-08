@@ -299,6 +299,10 @@ int MapManager::additionalRangeAir(UnitType ut)
         return 96;
     else if (ut == UnitTypes::Zerg_Hydralisk)
         return 32;
+    else if (ut == UnitTypes::Terran_Missile_Turret 
+        || ut == UnitTypes::Zerg_Spore_Colony
+        || ut == UnitTypes::Protoss_Photon_Cannon)
+        return 32;
     else 
         return 0;
 }
@@ -658,6 +662,8 @@ void MapManager::onFrame()
 #endif
     this->drawGroundDamagesGrad();
     this->drawGroundDamages();
+    this->drawAirDamagesGrad();
+    this->drawAirDamages();
     this->drawBestStorms();
 }
 

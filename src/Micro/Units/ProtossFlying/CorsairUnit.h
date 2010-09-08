@@ -7,6 +7,7 @@ class CorsairUnit : public FlyingUnit
 {
 protected:
     static std::set<BWAPI::UnitType> setPrio;
+    inline bool decideToFlee();
 public:
     CorsairUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~CorsairUnit();

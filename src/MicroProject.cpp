@@ -21,9 +21,9 @@ void MicroAIModule::onStart()
     this->eTechEstimator = & ETechEstimator::Instance();
     this->mapManager = & MapManager::Instance();
 	this->objectManager = & ObjectManager::Instance();
-    this->regions = & Regions::Instance();
+    // this->regions = & Regions::Instance();
     this->unitGroupManager = & UnitGroupManager::Instance();
-    this->regions->setDependencies();
+    // this->regions->setDependencies();
     this->mapManager->setDependencies();
 
 	mm = new UnitsGroup();
@@ -37,12 +37,12 @@ void MicroAIModule::onStart()
         if ((*i)->getType().isBuilding())
 		{
 			this->buildings.insert(std::make_pair(*i,(*i)->getType()));
-            regions->onUnitCreate(*i);
+            // regions->onUnitCreate(*i);
             mapManager->onUnitCreate(*i);
 		} 
         else 
         {
-            if ((*i)->getPlayer() != Broodwar->self() || (*i)->getType() == UnitTypes::Protoss_Archon || (*i)->getType() == UnitTypes::Protoss_Observer)
+            if ((*i)->getPlayer() != Broodwar->self() || (*i)->getType() == UnitTypes::Protoss_Archon)// || (*i)->getType() == UnitTypes::Protoss_Observer)
                 continue;
             else
                 mm->takeControl(*i);
@@ -90,8 +90,9 @@ void MicroAIModule::onStart()
     tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
     tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
     goals.push_back(tmp_goal);*/
-    goals.push_back(pGoal(new AttackGoal(mm, 
-        Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32))));
+    
+    ///goals.push_back(pGoal(new AttackGoal(mm, 
+    ///    Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32))));
     
 	mm->setGoals(goals);
 
@@ -109,7 +110,7 @@ void MicroAIModule::onFrame()
     objectManager->onFrame();
 	if (mm != NULL) 
         mm->update();
-    regions->display();
+    // regions->display();
     
 #ifdef BW_POS_MOUSE
     char mousePos[100];
@@ -141,7 +142,7 @@ MicroAIModule::~MicroAIModule()
 #endif
     MapManager::Destroy();
     ObjectManager::Destroy();
-    Regions::Destroy();
+    // regions::Destroy();
     mm->~UnitsGroup();
 }
 
@@ -219,14 +220,14 @@ void MicroAIModule::onSendText(std::string text)
 void MicroAIModule::onUnitCreate(Unit* unit)
 {
     mapManager->onUnitCreate(unit);
-    regions->onUnitCreate(unit);
+    // regions->onUnitCreate(unit);
 }
 
 void MicroAIModule::onUnitDestroy(Unit* unit)
 {
     eUnitsFilter->onUnitDestroy(unit);
     mapManager->onUnitDestroy(unit);
-    regions->onUnitDestroy(unit);
+    // regions->onUnitDestroy(unit);
     mm->onUnitDestroy(unit);
 }
 
@@ -234,7 +235,7 @@ void MicroAIModule::onUnitShow(Unit* unit)
 {
     eUnitsFilter->onUnitShow(unit);
     mapManager->onUnitShow(unit);
-	regions->onUnitShow(unit);
+	// regions->onUnitShow(unit);
     unitGroupManager->onUnitDiscover(unit);
     mm->onUnitShow(unit);
 }
@@ -243,7 +244,7 @@ void MicroAIModule::onUnitHide(Unit* unit)
 {
     eUnitsFilter->onUnitHide(unit);
     mapManager->onUnitHide(unit);
-	regions->onUnitHide(unit);
+	// regions->onUnitHide(unit);
     unitGroupManager->onUnitEvade(unit);
     mm->onUnitHide(unit);
 }

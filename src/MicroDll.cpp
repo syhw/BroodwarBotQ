@@ -17,7 +17,7 @@ bool g_onStartDone = false;
 
 #define BUF_SIZE 255
 
-static HANDLE hThreadArrayMonitor;
+static HANDLE hThreadMonitor;
 
 DWORD WINAPI LaunchMonitor( LPVOID lpParam );
 
@@ -34,7 +34,7 @@ BOOL APIENTRY DllMain(HANDLE hModule,
         BWAPI::BWAPI_init();
 
         // Create the thread to begin execution on its own.
-        hThreadArrayMonitor = CreateThread( 
+        hThreadMonitor = CreateThread( 
             NULL,                   // default security attributes
             0,                      // use default stack size  
             LaunchMonitor,       // thread function name
@@ -44,7 +44,7 @@ BOOL APIENTRY DllMain(HANDLE hModule,
         // Check the return value for success.
         // If CreateThread fails, terminate execution.
         // This will automatically clean up threads and memory. 
-        if (hThreadArrayMonitor == NULL) 
+        if (hThreadMonitor == NULL) 
         {
             ExitProcess(3);
         }
@@ -54,9 +54,9 @@ BOOL APIENTRY DllMain(HANDLE hModule,
 #ifdef BW_QT_DEBUG
         qapplication->quit();        		
         // Wait until monitor thread have terminated.
-        WaitForMultipleObjects(1, &hThreadArrayMonitor, TRUE, INFINITE);
+        //WaitForSingleObject(hThreadMonitor, INFINITE);
         // Close all thread handles and free memory allocations.
-        CloseHandle(&hThreadArrayMonitor);
+        CloseHandle(hThreadMonitor);
 #endif
         break;
     }

@@ -189,10 +189,6 @@
 				RelativePath="..\src\Regions\MapManager.cpp"
 				>
 			</File>
-			<File
-				RelativePath="..\src\Regions\Regions.cpp"
-				>
-			</File>
 			<Filter
 				Name="Micro"
 				>
@@ -601,10 +597,6 @@
 			</File>
 			<File
 				RelativePath="..\src\Regions\MapManager.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\Regions\Regions.h"
 				>
 			</File>
 			<File

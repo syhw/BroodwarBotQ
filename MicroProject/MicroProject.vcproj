@@ -187,10 +187,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\Regions\Regions.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\src\Micro\UnitsGroup.cpp"
 				>
 			</File>
@@ -458,10 +454,6 @@
 			</File>
 			<File
 				RelativePath="..\src\Utils\MinHeap.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\Regions\Regions.h"
 				>
 			</File>
 			<File

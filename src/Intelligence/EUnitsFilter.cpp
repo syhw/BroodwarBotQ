@@ -13,8 +13,8 @@ EUnitsFilter::EUnitsFilter()
 
 void EUnitsFilter::update(Unit* u)
 {
-    if (u->getPlayer() == Broodwar->self()) return;
-    if (u->getPlayer()->isNeutral()) return;
+    if (u->getPlayer() != Broodwar->enemy())
+        return;
     if (u->getType() == BWAPI::UnitTypes::Zerg_Larva 
         || u->getType() == BWAPI::UnitTypes::Zerg_Egg
         //|| u->getType() == BWAPI::UnitTypes::Zerg_Lurker_Egg
@@ -36,14 +36,13 @@ void EUnitsFilter::update(Unit* u)
 
 void EUnitsFilter::filter(Unit* u)
 {
-    // we filter only invisible units
     if (_eViewedUnits[u].type.isBuilding()) return; // we consider that buildings don't move behind the scenes
     if (_invisibleUnits.count(u) && Broodwar->getFrameCount() - _eViewedUnits[u].lastSeen > 216) // 9 secondes
     {
         _invisibleUnits.erase(u);
         return;
     }
-    if (Broodwar->getFrameCount() - _eViewedUnits[u].lastSeen > 7200) // 5 minutes
+    if (Broodwar->getFrameCount() - _eViewedUnits[u].lastSeen > 2880) // 2 minutes
         _eViewedUnits.erase(u);
 }
 

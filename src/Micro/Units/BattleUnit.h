@@ -46,11 +46,13 @@ public:
     unsigned int _tick;
 	BWAPI::Unit* unit;
     BWAPI::Unit* targetEnemy; // public for debug purpose, __USE__ setTargetEnemy(Unit*)
+    BWAPI::Unit* oorTargetEnemy;
 	BWAPI::Position target; // display debug purpose
 	int timeIdle; // hack to remove soon... evite le conflit avec la reussite d'objectif dans le test UnitsGroup::keepDistance().
 	              // Cette variable sera inutile avec le flocking.
 	              // Ou avec un Timer (TimeManager soon ready !)
     const std::vector<BWAPI::Position> & getPPath();
+    BWAPI::Position BattleUnit::getPPath(unsigned int n);
 
 	BattleUnit(BWAPI::Unit* unit);
     ~BattleUnit();

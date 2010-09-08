@@ -1,29 +1,30 @@
-#ifndef SCOUTMANAGER__H
-#define SCOUTMANAGER__H
-
 #pragma once
 #include <CSingleton.h>
 #include <Arbitrator.h>
 #include <BWAPI.h>
-#include <Regions.h>
 #include <BWTA.h>
 #include "Goal.h"
 #include "Subgoal.h"
 #include "FindEnemyGoal.h"
+#include "EUnitsFilter.h"
 #include "SeeSubgoal.h"
 #include "FindSubgoal.h"
 #include "WarManager.h"
 #include "BaseObject.h"
 #include "ExploreGoal.h"
-class GoalManager;
-
-
 
 class GoalManager;
 
 class ScoutManager :  public CSingleton<ScoutManager>, public Arbitrator::Controller<BWAPI::Unit*,double>
 {
 	friend class CSingleton<ScoutManager>;
+	ScoutManager();
+	~ScoutManager();
+	WarManager * warManager;
+	Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
+	std::list<pGoal> awaitingGoals;
+	bool exploringEnemy;
+	std::list<UnitsGroup *> myUnitsGroups;
 
 public:
 	void setDependencies();
@@ -44,17 +45,8 @@ public:
 	void counterBuild();
 	void harassWorkers();
 	void checkEmptyXP();
-
-
-private:
-
-	ScoutManager();
-	~ScoutManager();
-	WarManager * warManager;
-	Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
-	Regions* regions;
-	std::list<pGoal> awaitingGoals;
-	bool exploringEnemy;
-	std::list<UnitsGroup *> myUnitsGroups;
+    TilePosition enemyStartLocation;
+    std::set<TilePosition> enemyExpandLocations;
+    bool enemyFound;
+    std::list<TilePosition>::const_iterator lastScoutedLocation;
 };
-#endif 

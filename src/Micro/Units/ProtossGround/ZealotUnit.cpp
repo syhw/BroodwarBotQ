@@ -27,7 +27,7 @@ void ZealotUnit::micro()
     if (unit->isStartingAttack() || unit->isAttacking())
         return;
     int hpDiff = _lastTotalHP - (unit->getShields() + unit->getHitPoints());
-    if (Broodwar->getFrameCount() - _lastAttackOrder > Broodwar->getLatency() + getAttackDuration())
+    if (Broodwar->getFrameCount() - _lastAttackFrame > Broodwar->getLatency() + getAttackDuration())
     {
         if (unit->getGroundWeaponCooldown() == 0)
         {

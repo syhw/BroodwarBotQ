@@ -34,41 +34,16 @@ enum occupation_type {
 
 enum unit_mode {
     MODE_INPOS,
-    MODE_FLOCK,
-    MODE_FLOCKFORM, // flock in formation
     MODE_FIGHT_G,   // ground
     MODE_FIGHT_A,   // air
     MODE_SCOUT,
     MODE_MOVE
 }; 
 
-enum flock_value {
-    FLOCK_NO,
-    FLOCK_CONTACT,
-    FLOCK_CLOSE,
-    FLOCK_MEDIUM,
-    FLOCK_FAR
-};
-
 enum repulse_value {
     REPULSE_NO,
     REPULSE_LOW,
     REPULSE_HIGH
-};
-
-enum fightG_value { 
-    FIGHTG_NO,
-    FIGHTG_LIGHT,
-    FIGHTG_MEDIUM,
-    FIGHTG_HEAVY,
-    FIGHTG_DEAD
-};
-
-enum dodge_value {
-    DODGE_NO,
-    DODGE_CONTACT,
-    DODGE_CLOSE,
-    DODGE_MEDIUM
 };
 
 enum damage_value {
@@ -84,10 +59,10 @@ protected:
     HANDLE _pathMutex;
     static DWORD WINAPI StaticLaunchPathfinding(void* obj);
     DWORD LaunchPathfinding();
-    bool _ground_unit; // true when unit can move only on the ground
     std::vector<Vec> _dirv;
     int _maxDimension, _minDimension;
-    int _lastAttackOrder;
+    int _lastAttackFrame;
+    int _lastMoveFrame;
     int _lastClickFrame;
     double _maxDiag;
     int _maxWeaponsRange;
@@ -112,10 +87,8 @@ protected:
     ----------------
     This grid because there are only 16 possible directions in Broodwar */
     MapManager* mapManager;
-    std::vector<std::vector<flock_value> > _flockValues; // one vector<flock_value> per unit with which we flock
     std::vector<repulse_value> _repulseValues;
     std::vector<damage_value> _damageValues;
-    std::vector<double> _flockProb; // TODO decide if static, perhaps unit dependant
     std::vector<double> _damageProb; // TODO decide if static, perhaps unit dependant
     std::vector<double> _repulseProb;
     std::vector<double> _heightProb;
@@ -125,7 +98,6 @@ protected:
     std::multimap<double, Vec> _dirvProb;
 
     inline void initDefaultProb();
-    inline void computeFlockValues();
     inline void computeRepulseValues();
     inline void computeDamageValues();
     void straightLine(std::vector<BWAPI::Position>& ppath, 
@@ -147,12 +119,12 @@ protected:
     void updateDir();
     void drawDir();
     inline void clickDir();
+    inline void clickScout();
     void flee();
     void fightMove();
     void drawArrow(Vec& v);
     inline void updateAttractors();
     void drawAttractors();
-    void drawFlockValues();
     void drawRepulseValues();
     void drawOccupation(int number);
     // TODO:
@@ -180,7 +152,6 @@ public:
     void update();
     virtual void attackMove(const BWAPI::Position& p);
 
-    void attackEnemy(BWAPI::Unit* u, BWAPI::Color col);
     virtual void micro() = 0;
     virtual void check() = 0;
     virtual int getAttackDuration() = 0;

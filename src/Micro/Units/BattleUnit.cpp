@@ -71,6 +71,11 @@ const std::vector<BWAPI::Position> & BattleUnit::getPPath()
     return _ppath;
 }
 
+Position BattleUnit::getPPath(unsigned int n)
+{
+    return _ppath[n];
+}
+
 void BattleUnit::drawPath()
 {
     if (_path.empty())

@@ -18,11 +18,40 @@ CorsairUnit::~CorsairUnit()
 {
 }
 
+bool CorsairUnit::decideToFlee()
+{
+    // TODO complete conditions
+    return (_lastTotalHP - (unit->getShields() + unit->getHitPoints()) > 30 || (!unit->getShields() && (_lastTotalHP - unit->getHitPoints() > 20)));
+}
+
 void CorsairUnit::micro()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("CorsairUnit::micro non implémenté !");
-#endif
+    if (targetEnemy != NULL && !(targetEnemy->exists()))
+    {
+        updateRangeEnemies();
+        updateTargetEnemy();
+        attackEnemyUnit(targetEnemy);
+    }
+    else
+    {
+        if (Broodwar->getFrameCount() - _lastAttackFrame > getAttackDuration())
+        {
+            if (unit->getGroundWeaponCooldown() == 0)
+            {
+                updateRangeEnemies();
+                updateTargetEnemy();
+                attackEnemyUnit(targetEnemy);
+            }
+            else if (_fleeing || decideToFlee())
+            {
+                flee();
+            }
+            else if (!unit->isMoving() && targetEnemy != NULL)
+            {
+                fightMove();
+            }
+        }
+    }
 }
 
 void CorsairUnit::check()

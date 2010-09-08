@@ -1,35 +1,32 @@
 #include "FindSubgoal.h"
 #include "Defines.h"
-FindSubgoal::FindSubgoal(SubgoalLogic l) :
-Subgoal(l),
-achieved(false)
+#include "ScoutManager.h"
+
+FindSubgoal::FindSubgoal(SubgoalLogic l)
+: Subgoal(l)
+, achieved(false)
 {
-	regions = & Regions::Instance();
 }
 
-
-bool FindSubgoal::isRealized(){
-	if(achieved)
+bool FindSubgoal::isRealized()
+{
+	if (achieved)
 		return true;
 	else
-		achieved=check();
+		achieved = check();
 		return achieved;
 }
 
-bool FindSubgoal::check(){
-	if (regions->enemyFound()){
-#ifdef __DEBUG_LOUIS__
-		BWAPI::Broodwar->printf("findSubgoal done");
-#endif
-		return true;
-	}
-	return false;
-//	return regions->enemyFound();
+bool FindSubgoal::check()
+{
+    return ScoutManager::Instance().enemyFound; // quick fix
 }
 
-void FindSubgoal::tryToRealize(){
+void FindSubgoal::tryToRealize()
+{
 }
 
-double FindSubgoal::distanceToRealize(){
+double FindSubgoal::distanceToRealize()
+{
 	return -1;
 }
