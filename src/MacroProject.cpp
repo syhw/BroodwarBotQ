@@ -81,7 +81,6 @@ BattleBroodAI::~BattleBroodAI()
 
 void BattleBroodAI::onStart()
 {
-    _CrtDumpMemoryLeaks();      // anti-memory leaks
     //Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
 	// Enable some cheat flags
 	Broodwar->enableFlag(Flag::UserInput);

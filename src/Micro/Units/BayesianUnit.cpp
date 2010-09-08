@@ -170,6 +170,8 @@ void BayesianUnit::computeRepulseValues()
 
 void BayesianUnit::switchMode(unit_mode um)
 {
+    if (_mode == um)
+        return;
     _mode = um;
     switch (um) 
     {
