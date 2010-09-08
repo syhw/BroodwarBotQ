@@ -112,13 +112,19 @@ void ProtossStrat::update(){
 }
 
 void ProtossStrat::buildUnits(){
-	this->needed[Dragoon] = 100;
+
+	//BO with templar goon zealot
+
+
+
+	this->needed[Dragoon] = 5;
 	this->priority[Dragoon] = 40;
 	if(this->baseManager->getActiveBases().size() > 1){
-		this->needed[High_Templar] = 100;
-		this->priority[High_Templar] = 40;
-		this->needed[Zealot] = 50; 
-		this->priority[Zealot] = 41;
+		if(this->buildOrderManager->hasResources(BWAPI::UnitTypes::Protoss_High_Templar)){
+			this->needed[High_Templar]++;
+			this->priority[High_Templar] = 40;
+			BWAPI::Broodwar->printf("one more now : %d", this->needed[High_Templar]);
+		}
 	}
 
 }
@@ -202,11 +208,4 @@ void ProtossStrat::buildDefenses()
 		underConstruction[UnitTypes::Protoss_Photon_Cannon]++;
 	}
 	*/
-}
-
-
-void ProtossStrat::produceUnits(){
-
-
-
 }

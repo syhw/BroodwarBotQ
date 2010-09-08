@@ -90,7 +90,7 @@ void BattleBroodAI::onStart()
 	//Broodwar->enableFlag(Flag::CompleteMapInformation);
 
 	// Speed up the game to the maximum
-    //Broodwar->setLocalSpeed(0);
+    Broodwar->setLocalSpeed(0);
 
 	
 	this->showManagerAssignments=false;

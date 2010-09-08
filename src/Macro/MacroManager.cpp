@@ -60,8 +60,9 @@ void MacroManager::onUnitCreate(BWAPI::Unit* unit)
 		expanding = false;
 
 
-	/*
+	
 	// *******   ProdBuildings   ******** //
+	/*
 	if( unit->getType().isBuilding() && !unit->getType().isResourceDepot())
 	{
 		if( unit->getType().canProduce())
@@ -80,6 +81,7 @@ void MacroManager::onUnitCreate(BWAPI::Unit* unit)
 		}
 	}
 
+	/*
 	// ***********   Units   ************ //
 	if( !unit->getType().isBuilding() && !unit->getType().isWorker() && unit->getPlayer() == Broodwar->self())
 	{
