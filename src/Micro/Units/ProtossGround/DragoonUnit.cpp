@@ -25,10 +25,7 @@ DragoonUnit::DragoonUnit(BWAPI::Unit* u, UnitsGroup* ug)
         setPrio.insert(BWAPI::UnitTypes::Zerg_Lurker);
         setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode);
         setPrio.insert(BWAPI::UnitTypes::Protoss_Observer);
-        setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
-        setPrio.insert(BWAPI::UnitTypes::Protoss_Dark_Archon);
         setPrio.insert(BWAPI::UnitTypes::Protoss_Carrier);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Science_Vessel);
         setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode);
         setPrio.insert(BWAPI::UnitTypes::Zerg_Defiler);
     }

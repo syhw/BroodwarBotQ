@@ -27,19 +27,8 @@ void AttackGoal::achieve()
 
 void AttackGoal::createMidSubgoal()
 {
-    if (!this->unitsGroup->ppath.size())
+    if (unitsGroup->ppath.empty())
         return;
-	int cpt = 0;
-	int stop = this->unitsGroup->ppath.size() / 2;
-	BWAPI::Position pos;
-	for(std::vector<BWAPI::Position>::const_iterator it = this->unitsGroup->leadingUnit->getPPath().begin(); it != this->unitsGroup->leadingUnit->getPPath().end(); ++it)
-    {
-		cpt++;
-		if (cpt == stop)
-        {
-			pos = (*it);
-		}
-	}
 	//Create an intermediate subgoal at half the way of the path of the unitsgroup
-	this->addSubgoal(pSubgoal(new FormationSubgoal(SL_AND,pFormation(new SquareFormation(pos,Vec(1,0))))));
+	this->addSubgoal(pSubgoal(new FormationSubgoal(SL_AND,pFormation(new SquareFormation(unitsGroup->ppath[unitsGroup->ppath.size() / 2])))));
 }

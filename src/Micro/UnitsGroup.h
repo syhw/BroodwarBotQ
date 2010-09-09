@@ -51,17 +51,19 @@ class UnitsGroup
 {
 private:
 	int totalHP;
-	int totalPower;
+    int totalMinPrice;
+    int totalGazPrice;
+    int totalSupply;
 	std::list<pGoal> goals;
     EUnitsFilter* _eUnitsFilter;
     std::set<BWAPI::Unit*> _mergersHT;
     inline void updateNearbyEnemyUnitsFromFilter(BWAPI::Position p, double radius = 400.0);
+    double evaluateForces();
     void displayTargets();  // debug purpose
 public:
 	bool isWaiting(); //Return if the 1st goal is accomplished && no other goals
 	pGoal getLastGoal();
 	std::vector<pBayesianUnit> units;
-    //std::vector<BWAPI::TilePosition> btpath;
     std::vector<BWAPI::Position> ppath;
     std::map<BWAPI::Unit*, BWAPI::Position> enemies;
     UnitDmgBimap unitDamages;

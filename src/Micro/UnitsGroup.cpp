@@ -30,6 +30,11 @@
 using namespace BWAPI;
 
 UnitsGroup::UnitsGroup()
+: defaultTargetEnemy(NULL)
+, totalHP(0)
+, totalMinPrice(0)
+, totalGazPrice(0)
+, totalSupply(0)
 {
     _eUnitsFilter = & EUnitsFilter::Instance();
 }
@@ -183,15 +188,61 @@ void UnitsGroup::displayTargets()
     }
 }
 
+double UnitsGroup::evaluateForces()
+{
+    int theirMinPrice = 0;
+    int theirGazPrice = 0;
+    int theirSupply = 0; // this is double supply: 1 zergling = 1 supply
+    for (std::map<Unit*, Position>::const_iterator it = enemies.begin();
+        it != enemies.end(); ++it)
+    {
+        UnitType ut = _eUnitsFilter->getViewedUnit(it->first).type;
+        if (ut.isBuilding())
+        {
+            // consider ground defenses only because we have only ground atm
+            if (ut == UnitTypes::Protoss_Photon_Cannon)
+            {
+                theirMinPrice += 3*ut.mineralPrice();
+            } else if (ut == UnitTypes::Zerg_Sunken_Colony)
+            {
+                theirMinPrice += 3*(ut.mineralPrice() + 50);
+            } else if (ut == UnitTypes::Protoss_Shield_Battery
+                || ut == UnitTypes::Terran_Bunker)
+            {
+                theirMinPrice += 2*ut.mineralPrice();
+            }
+            continue;
+        }
+        theirMinPrice += ut.mineralPrice();
+        theirGazPrice += ut.gasPrice();
+        theirSupply += ut.supplyRequired();
+        if (ut == UnitTypes::Terran_Siege_Tank_Siege_Mode) // a small boost for sieged tanks
+            theirSupply += ut.supplyRequired();
+        if (_eUnitsFilter->getInvisibleUnits().count(it->first)) // invisibles not detected count double
+        {
+            theirMinPrice += ut.mineralPrice();
+            theirGazPrice += ut.gasPrice();
+            theirSupply += ut.supplyRequired();
+        }
+    }
+    // trying a simple rule: 100 minerals == 4 pop == 75 gaz == 100 pts
+    double ourScore = totalMinPrice + (4/3)*totalGazPrice + 25*totalSupply;
+    double theirScore = theirMinPrice + (4/3)*theirGazPrice + 25*theirSupply;
+    return ourScore/theirScore;
+}
+
 void UnitsGroup::update()
 {
 #ifdef __DEBUG_GABRIEL__
     clock_t start = clock();
 #endif
-	if (units.empty()){
+	if (units.empty())
+    {
 		this->accomplishGoal();
 		return;
 	}
+
+    updateCenter();
     leadingUnit = units.front();
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     { 
@@ -203,36 +254,59 @@ void UnitsGroup::update()
     }
     if (leadingUnit != NULL && leadingUnit->unit->exists()) // defensive prog
     {
-        //btpath = BWTA::getShortestPath(leadingUnit->unit->getPosition(), leadingUnit->target);
-        ppath = leadingUnit->getPPath();
+        leadingUnit->updatePPath();
+        if (!leadingUnit->getPPath().empty())
+            ppath = leadingUnit->getPPath();
     }
 
     this->totalHP = 0;
     double maxRange = -1.0;
-    for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+    for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     {
         (*it)->update(); 
         this->totalHP += (*it)->unit->getHitPoints();
-        this->totalPower += (*it)->unit->getType().groundWeapon().damageAmount();
         double tmp_max = max(max((*it)->unit->getType().groundWeapon().maxRange(), (*it)->unit->getType().airWeapon().maxRange()), 
             (*it)->unit->getType().sightRange()); // TODO: upgrades
         if (tmp_max > maxRange)
             maxRange = tmp_max;
     }
-
-    updateCenter();
     
     //clock_t s = clock();
-    updateNearbyEnemyUnitsFromFilter(center, maxRadius + maxRange + 46); // possibly hidden units, could be taken from onUnitsShow/View asynchronously
+    updateNearbyEnemyUnitsFromFilter(center, maxRadius + maxRange + 46); // possibly hidden units, could be taken from onUnitsShow/View asynchronously for more efficiency
     //clock_t f = clock();
     //double dur = (double)(f - s) / CLOCKS_PER_SEC;
     //Broodwar->printf( "UnitsGroup::update() took %2.5f seconds\n", dur); 
     Broodwar->drawCircleMap(center.x(), center.y(), maxRadius + maxRange, Colors::Yellow);
+    /// We fight, we'll see later for the goals
     if (!enemies.empty())
-        defaultTargetEnemy = enemies.begin()->first; // TODO CHANGE THAT FOR A PRIORITY
-    else 
+    {
+        double force = evaluateForces();
+        if (force < 0.66) // TOCHANGE 0.66
+        {
+            // strategic withdrawal
+            for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+            {
+                (*it)->target = Position(Broodwar->self()->getStartLocation());
+            }
+        }
+        else if (force > 1.5) // TOCHANGE 1.5
+        {
+            // we can be offensive, get our goals done
+            accomplishGoal();
+        }
+        else // stand our ground
+        {
+            for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+            {
+                (*it)->target = (*it)->unit->getPosition();
+            }
+        }
+    }
+    else /// Let's do the goals now 
+    {
         defaultTargetEnemy = NULL;
-    accomplishGoal();
+        accomplishGoal();
+    }
 
 #ifdef __DEBUG_NICOLAS__
     displayTargets();
@@ -321,6 +395,9 @@ void UnitsGroup::onUnitDestroy(Unit* u)
             if ( (*it)->unit == u ) 
             {
                 units.erase(it);
+                totalMinPrice -= u->getType().mineralPrice();
+                totalGazPrice -= u->getType().gasPrice();
+                totalSupply -= u->getType().supplyRequired();
                 return;
             }
     }
@@ -386,6 +463,9 @@ void UnitsGroup::takeControl(Unit* u)
 
     if (tmp != NULL)
         this->units.push_back(tmp);
+    totalMinPrice += u->getType().mineralPrice();
+    totalGazPrice += u->getType().gasPrice();
+    totalSupply += u->getType().supplyRequired();
 	if(this->goals.size()==1){
 		if(this->goals.front()->getStatus()==GS_ACHIEVED){
 			goals.front()->achieve();
@@ -401,6 +481,9 @@ void UnitsGroup::giveUpControl(Unit* u)
             units.erase(it);
             break;
         }
+    totalMinPrice -= u->getType().mineralPrice();
+    totalGazPrice -= u->getType().gasPrice();
+    totalSupply -= u->getType().supplyRequired();
 }
 
 bool UnitsGroup::emptyUnits()

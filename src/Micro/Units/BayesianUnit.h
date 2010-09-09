@@ -74,6 +74,7 @@ protected:
     bool _newPath;
     Position _inPos;
     bool _fleeing;
+    bool _fightMoving;
     int _fleeingDmg;
     //std::multimap<BWAPI::Position, attractor_type> _prox;
     std::vector<occupation_type> _occupation;
@@ -92,7 +93,9 @@ protected:
     std::vector<damage_value> _damageValues;
     std::vector<double> _damageProb; // TODO decide if static, perhaps unit dependant
     std::vector<double> _repulseProb;
+#ifdef __HEIGHTS_ATTRACTION__
     std::vector<double> _heightProb;
+#endif
     UnitsGroup* _unitsGroup;
     std::multimap<double, BWAPI::Unit*> _rangeEnemies;
     std::map<occupation_type, double> _defaultProb;
@@ -143,6 +146,7 @@ protected:
 public:
 	void switchMode(unit_mode um);
     int getMaxDimension();
+    void updatePPath();
     Vec dir, obj; // dir=current direction, obj=pathfinder's direction
     BayesianUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~BayesianUnit();

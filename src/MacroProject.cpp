@@ -6,6 +6,8 @@
 
 using namespace BWAPI;
 
+// TODO TODO TODO: work with accessibility while making it false when onUnitEvade
+
 BattleBroodAI::BattleBroodAI()
 {
 
