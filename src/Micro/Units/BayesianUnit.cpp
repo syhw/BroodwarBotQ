@@ -1548,8 +1548,11 @@ void BayesianUnit::update()
     switch (_mode)
     {
     case MODE_SCOUT:
-        if (_unitsGroup->enemies.empty() && Broodwar->getFrameCount() - _lastClickFrame > 23)
-            clickTarget();
+        if (_unitsGroup->enemies.empty())
+        {
+            if (_lastRightClick != target || Broodwar->getFrameCount() - _lastClickFrame > 47)
+                clickTarget();
+        }
         else
         {
             updateDir();
