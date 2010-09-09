@@ -6,6 +6,7 @@
 #include <string.h>
 #include <assert.h>
 #include "HighTemplarUnit.h"
+#include <BWTA.h>
 
 #define __MESH_SIZE__ 32 // 16 // 24 // 32 // 48
 #define __STORM_SIZE__ 96
@@ -153,9 +154,9 @@ void MapManager::modifyDamages(int* tab, Position p, int minRadius, int maxRadiu
     int tmpMaxRadius = maxRadius; /// + 32; // TOCHANGE 32
     //Broodwar->printf("modify minRadius: %d, maxRadius %d, Position(%d, %d)", minRadius, maxRadius, p.x(), p.y());
     int lowerX = (p.x() - tmpMaxRadius) > 0 ? p.x() - tmpMaxRadius : 0;
-    int higherX = (p.x() + tmpMaxRadius) < _width ? p.x() + tmpMaxRadius : _pix_width;
+    int higherX = (p.x() + tmpMaxRadius) < _pix_width ? p.x() + tmpMaxRadius : _pix_width;
     int lowerY = (p.y() - tmpMaxRadius) > 0 ? p.y() - tmpMaxRadius : 0;
-    int higherY = (p.y() + tmpMaxRadius) < _height ? p.y() + tmpMaxRadius : _pix_height;
+    int higherY = (p.y() + tmpMaxRadius) < _pix_height ? p.y() + tmpMaxRadius : _pix_height;
     assert(higherX > lowerX);
     assert(higherY > lowerY);
     for (int x = lowerX; x <= higherX; x += 32)
@@ -174,9 +175,9 @@ void MapManager::updateDamagesGrad(Vec* grad, int* tab, Position p, int minRadiu
     int tmpMaxRadius = maxRadius + 32 + 46; // 32 b/c it is a gradient, 46 for enemy unit movement
     int tmpMinRadius = max(0, minRadius - 32);
     int lowerX = (p.x() - tmpMaxRadius) > 0 ? p.x() - tmpMaxRadius : 0;
-    int higherX = (p.x() + tmpMaxRadius) < _width ? p.x() + tmpMaxRadius : _pix_width;
+    int higherX = (p.x() + tmpMaxRadius) < _pix_width ? p.x() + tmpMaxRadius : _pix_width;
     int lowerY = (p.y() - tmpMaxRadius) > 0 ? p.y() - tmpMaxRadius : 0;
-    int higherY = (p.y() + tmpMaxRadius) < _height ? p.y() + tmpMaxRadius : _pix_height;
+    int higherY = (p.y() + tmpMaxRadius) < _pix_height ? p.y() + tmpMaxRadius : _pix_height;
     assert(higherX > lowerX);
     assert(higherY > lowerY);
     for (int x = lowerX; x <= higherX; x += 32)
@@ -511,6 +512,7 @@ void MapManager::onFrame()
     }
 
     // check/update the damage maps. BEWARE: hidden units are not removed in presence of doubt!
+    std::list<Unit*> toFilter;
     for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = _eUnitsFilter->getViewedUnits().begin();
         it != _eUnitsFilter->getViewedUnits().end(); ++it)
     {
@@ -523,15 +525,28 @@ void MapManager::onFrame()
                 // update EUnitsFilter
                 _eUnitsFilter->update(it->first);
                 // update MapManager (ourselves)
-                addDmgWithoutGrad(it->first->getType(), it->first->getPosition());
-                removeDmg(it->first->getType(), _trackedUnits[it->first]);
-                _trackedUnits[it->first] = it->first->getPosition();
+                if (it->first->getType().isWorker()
+                    && (it->first->isRepairing() || it->first->isConstructing()
+                    || it->first->isGatheringGas() || it->first->isGatheringMinerals()))
+                {
+                    removeDmg(it->first->getType(), _trackedUnits[it->first]);
+                    _trackedUnits.erase(it->first);
+                }
+                else
+                {
+                    addDmgWithoutGrad(it->first->getType(), it->first->getPosition());
+                    removeDmg(it->first->getType(), _trackedUnits[it->first]);
+                    _trackedUnits[it->first] = it->first->getPosition();
+                }
             }
         }
         else
         {
             if (it->first->exists()
-                && it->first->isVisible()) // SEGFAULT
+                && it->first->isVisible() // SEGFAULT
+                && !(it->first->getType().isWorker()
+                && (it->first->isRepairing() || it->first->isConstructing()
+                || it->first->isGatheringGas() || it->first->isGatheringMinerals())))
             {
                 // add it to MapManager (ourselves)
                 addDmg(it->first->getType(), it->first->getPosition());
@@ -540,7 +555,7 @@ void MapManager::onFrame()
         }
         if (!(it->first->isVisible()))
         {
-            _eUnitsFilter->filter(it->first);
+            toFilter.push_back(it->first);
         }
     }
     for (std::map<Unit*, Position>::iterator it = _trackedUnits.begin();
@@ -554,6 +569,11 @@ void MapManager::onFrame()
         }
         else
             ++it;
+    }
+    for (std::list<Unit*>::const_iterator it = toFilter.begin();
+        it != toFilter.end(); ++it)
+    {
+        _eUnitsFilter->filter(*it);
     }
 
     // Iterate of all the Bullets to extract the interesting ones
@@ -680,6 +700,106 @@ const std::map<BWAPI::Unit*, BWAPI::Position>& MapManager::getTrackedUnits()
 const std::map<BWAPI::Bullet*, BWAPI::Position>& MapManager::getTrackedStorms()
 {
     return _trackedStorms;
+}
+
+Position MapManager::closestWalkabableSameRegionOrConnected(Position p)
+{
+    WalkTilePosition wtp(p);
+    TilePosition tp(p);
+    BWTA::Region* r = BWTA::getRegion(tp);
+    int lowerX = (wtp.x() - 1) > 0 ? wtp.x() - 1 : 0;
+    int higherX = (wtp.x() + 1) < _width ? wtp.x() + 1 : _width;
+    int lowerY = (wtp.y() - 1) > 0 ? wtp.y() - 1 : 0;
+    int higherY = (wtp.y() + 1) < _height ? wtp.y() + 1 : _height;
+    Position saved = Positions::None;
+    for (int x = lowerX; x <= higherX; ++x)
+    {
+        for (int y = lowerY; y <= higherY; ++y)
+        {
+            if (walkability[x + y*_width])
+            {
+                if (BWTA::getRegion(x/4, y/4) == r)
+                    return WalkTilePosition(x, y).getPosition();
+                else if (BWTA::isConnected(TilePosition(x/4, y/4), tp))
+                    saved = WalkTilePosition(x, y).getPosition();
+            }
+        }
+    }
+    if (saved != Positions::None)
+        return saved;
+    // else, quickly (so, approximately, not as exact as in the method name :))
+    lowerX = (wtp.x() - 4) > 0 ? wtp.x() - 4 : 0;
+    higherX = (wtp.x() + 4) < _width ? wtp.x() + 4 : _width;
+    lowerY = (wtp.y() - 4) > 0 ? wtp.y() - 4 : 0;
+    higherY = (wtp.y() + 4) < _height ? wtp.y() + 4 : _height;
+    for (int x = lowerX; x <= higherX; ++x)
+    {
+        for (int y = lowerY; y <= higherY; ++y)
+        {
+            if (walkability[x + y*_width])
+            {
+                if (BWTA::getRegion(x/4, y/4) == r)
+                    return WalkTilePosition(x, y).getPosition();
+                else if (BWTA::isConnected(TilePosition(x/4, y/4), tp))
+                    saved = WalkTilePosition(x, y).getPosition();
+            }
+        }
+    }
+    if (saved != Positions::None)
+        return saved;
+    return Positions::None;
+}
+
+TilePosition MapManager::closestWalkabableSameRegionOrConnected(TilePosition tp)
+{
+    BWTA::Region* r = BWTA::getRegion(tp);
+    int lowerX = (tp.x() - 1) > 0 ? tp.x() - 1 : 0;
+    int higherX = (tp.x() + 1) < Broodwar->mapWidth() ? tp.x() + 1 : Broodwar->mapWidth();
+    int lowerY = (tp.y() - 1) > 0 ? tp.y() - 1 : 0;
+    int higherY = (tp.y() + 1) < Broodwar->mapHeight() ? tp.y() + 1 : Broodwar->mapHeight();
+    TilePosition saved = TilePositions::None;
+    for (int x = lowerX; x <= higherX; ++x)
+    {
+        for (int y = lowerY; y <= higherY; ++y)
+        {
+#ifdef __DEBUG_GABRIEL__
+            //Broodwar->drawBoxMap(x*32 + 2, y*32 + 2, x*32+29, y*32+29, Colors::Red);
+#endif
+            if (lowResWalkability[x + y*Broodwar->mapWidth()])
+            {
+                if (BWTA::getRegion(x, y) == r)
+                    return TilePosition(x, y);
+                else if (BWTA::isConnected(TilePosition(x, y), tp))
+                    saved = TilePosition(x, y);
+            }
+        }
+    }
+    if (saved != TilePositions::None)
+        return saved;
+    // else, quickly (so, approximately, not as exact as in the method name :))
+    lowerX = (tp.x() - 2) > 0 ? tp.x() - 2 : 0;
+    higherX = (tp.x() + 2) < Broodwar->mapWidth() ? tp.x() + 2 : Broodwar->mapWidth();
+    lowerY = (tp.y() - 2) > 0 ? tp.y() - 2 : 0;
+    higherY = (tp.y() + 2) < Broodwar->mapHeight() ? tp.y() + 2 : Broodwar->mapHeight();
+    for (int x = lowerX; x <= higherX; ++x)
+    {
+        for (int y = lowerY; y <= higherY; ++y)
+        {
+#ifdef __DEBUG_GABRIEL__
+            //Broodwar->drawBoxMap(x*32 + 2, y*32 + 2, x*32+29, y*32+29, Colors::Red);
+#endif
+            if (lowResWalkability[x + y*Broodwar->mapWidth()])
+            {
+                if (BWTA::getRegion(x, y) == r)
+                    return TilePosition(x, y);
+                else if (BWTA::isConnected(TilePosition(x, y), tp))
+                    saved = TilePosition(x, y);
+            }
+        }
+    }
+    if (saved != TilePositions::None)
+        return saved;
+    return TilePositions::None;
 }
 
 void MapManager::drawBuildings()

@@ -1,4 +1,5 @@
 #include "SquareFormation.h"
+#include "MapManager.h"
 
 using namespace BWAPI;
 
@@ -31,6 +32,12 @@ void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnit
 	for( unsigned int i = 0; i < vUnit.size(); i++)
     {
         Position topos = (corner + Position( int(i/sizeSide) * (space + maxDim), (i%sizeSide) * (space + maxDim))).toPosition();
+        if (!Broodwar->isWalkable(topos.x()/4, topos.y()/4))
+        {
+            Position tmp = MapManager::Instance().closestWalkabableSameRegionOrConnected(topos);
+            if (tmp != Positions::None)
+                topos = tmp;
+        }
         if (topos.isValid())
             end_positions.push_back(topos);
         else

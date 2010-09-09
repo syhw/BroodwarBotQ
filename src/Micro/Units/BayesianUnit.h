@@ -145,6 +145,7 @@ protected:
     unit_mode _mode;
 public:
 	void switchMode(unit_mode um);
+    unit_mode getMode();
     int getMaxDimension();
     void updatePPath();
     Vec dir, obj; // dir=current direction, obj=pathfinder's direction

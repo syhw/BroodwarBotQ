@@ -215,6 +215,11 @@ void BayesianUnit::switchMode(unit_mode um)
     }
 }
 
+unit_mode BayesianUnit::getMode()
+{
+    return _mode;
+}
+
 int BayesianUnit::getMaxDimension()
 {
     return _maxDimension;
@@ -527,7 +532,17 @@ DWORD BayesianUnit::LaunchPathfinding()
     {
         // The thread got ownership of the mutex
     case WAIT_OBJECT_0: 
-        _btpath = BWTA::getShortestPath(TilePosition(_unitPos), TilePosition(target));
+        if (_mode == MODE_SCOUT)
+        {
+            int* tab;
+            if (unit->getType().isFlyer())
+                tab = mapManager->airDamages;
+            else
+                tab = mapManager->groundDamages;
+            damagesAwarePathFind(_btpath, TilePosition(_unitPos), _tptarget, tab);
+        }
+        else
+            _btpath = BWTA::getShortestPath(TilePosition(_unitPos), _tptarget);
         _newPath = true;
         ReleaseMutex(_pathMutex);
         break; 
@@ -554,10 +569,14 @@ void BayesianUnit::updateObj()
     }
     else if (_mode == MODE_SCOUT)
     {
-        if (unit->isMoving())
+        if (_ppath.empty() && unit->isMoving())
             obj = Vec(unit->getVelocityX(), unit->getVelocityY());
-        else
+        else if (_ppath.empty())
             obj = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y());
+        else if (_ppath.size() > 2)
+            obj = _ppath[2];
+        else if (_ppath.size() > 1)
+            obj = _ppath[1];
     }
     else if (_mode == MODE_FIGHT_G || _mode == MODE_FIGHT_A)
     {
@@ -582,7 +601,6 @@ void BayesianUnit::updateObj()
 
 void BayesianUnit::updatePPath()
 {
-    // if (_mode == MODE_SCOUT) // TODO pathfinder with dmgmap
 #ifndef __OUR_PATHFINDER__
     double targetDistance = _unitPos.getDistance(target);
     Position p;
@@ -614,6 +632,22 @@ void BayesianUnit::updatePPath()
         ReleaseMutex(_pathMutex);
         if (!(Broodwar->getFrameCount() % _refreshPathFramerate))
         {
+            // new, in test
+            _tptarget = TilePosition(target);
+            if (!mapManager->lowResWalkability[_tptarget.x() + _tptarget.y()*Broodwar->mapWidth()])
+            {
+                _tptarget = mapManager->closestWalkabableSameRegionOrConnected(_tptarget);
+                if (_tptarget == TilePositions::None)
+                {
+#ifdef __DEBUG_GABRIEL__ 
+                    //Broodwar->printf("_tptarget == TilePositions::None");
+#endif
+                    if (!unit->isMoving()) // hack to deblock
+                        unit->attackMove(target);
+                    return;
+                }
+            }
+
             //BayesianUnit::StaticLaunchPathfinding(this);
             DWORD threadId;
             //Broodwar->printf("creating a thread");
@@ -1189,9 +1223,9 @@ int BayesianUnit::computeDmg(Unit* u)
             if (unit->getType().airWeapon().damageType() == BWAPI::DamageTypes::Explosive)
             {
                 if (u->getType().size() == BWAPI::UnitSizeTypes::Small)
-                    factor = 0.25;
-                else if (u->getType().size() == BWAPI::UnitSizeTypes::Medium)
                     factor = 0.5;
+                else if (u->getType().size() == BWAPI::UnitSizeTypes::Medium)
+                    factor = 0.75;
             } else if (unit->getType().airWeapon().damageType() == BWAPI::DamageTypes::Concussive)
             {
                 if (u->getType().size() == BWAPI::UnitSizeTypes::Medium)
@@ -1217,9 +1251,9 @@ int BayesianUnit::computeDmg(Unit* u)
             if (unit->getType().groundWeapon().damageType() == BWAPI::DamageTypes::Explosive)
             {
                 if (u->getType().size() == BWAPI::UnitSizeTypes::Small)
-                    factor = 0.25;
-                else if (u->getType().size() == BWAPI::UnitSizeTypes::Medium)
                     factor = 0.5;
+                else if (u->getType().size() == BWAPI::UnitSizeTypes::Medium)
+                    factor = 0.75;
             } else if (unit->getType().groundWeapon().damageType() == BWAPI::DamageTypes::Concussive)
             {
                 if (u->getType().size() == BWAPI::UnitSizeTypes::Medium)
@@ -1413,14 +1447,14 @@ void BayesianUnit::clickScout()
     currentdir.normalize();
     Vec tmpdir = dir;
     tmpdir.normalize();
-    if (currentdir.dot(tmpdir) < 0.75) // divergence
-    {
+    //if (currentdir.dot(tmpdir) < 0.75) // divergence
+    //{
         clickDir();
-    }
-    else if (Broodwar->getFrameCount() - _lastMoveFrame > 23)
-    {
-        clickTarget();
-    }
+    //}
+    //else if (Broodwar->getFrameCount() - _lastMoveFrame > 23)
+    //{
+    //    clickTarget();
+    //}
 }
 
 void BayesianUnit::clickTarget()
@@ -1548,8 +1582,11 @@ void BayesianUnit::update()
     switch (_mode)
     {
     case MODE_SCOUT:
-        if (_unitsGroup->enemies.empty() && Broodwar->getFrameCount() - _lastClickFrame > 23)
-            clickTarget();
+        if (_unitsGroup->enemies.empty())
+        {
+            if (_lastRightClick != target || Broodwar->getFrameCount() - _lastClickFrame > 47)
+                clickTarget();
+        }
         else
         {
             updateDir();

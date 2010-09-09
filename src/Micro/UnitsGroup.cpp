@@ -238,7 +238,7 @@ void UnitsGroup::update()
 #endif
 	if (units.empty())
     {
-		this->accomplishGoal();
+		accomplishGoal();
 		return;
 	}
 
@@ -270,15 +270,22 @@ void UnitsGroup::update()
         if (tmp_max > maxRange)
             maxRange = tmp_max;
     }
-    
+
+    if (units.size() == 1 && (*units.begin())->getMode() == MODE_SCOUT) // quick/dirty fix for scouting / scout goals :(
+    {
+        defaultTargetEnemy = NULL;
+        accomplishGoal();
+        return;
+    }
+
     //clock_t s = clock();
     updateNearbyEnemyUnitsFromFilter(center, maxRadius + maxRange + 46); // possibly hidden units, could be taken from onUnitsShow/View asynchronously for more efficiency
     //clock_t f = clock();
     //double dur = (double)(f - s) / CLOCKS_PER_SEC;
     //Broodwar->printf( "UnitsGroup::update() took %2.5f seconds\n", dur); 
     Broodwar->drawCircleMap(center.x(), center.y(), maxRadius + maxRange, Colors::Yellow);
-    /// We fight, we'll see later for the goals
-    if (!enemies.empty())
+
+    if (!enemies.empty()) /// We fight, we'll see later for the goals
     {
         double force = evaluateForces();
         if (force < 0.66) // TOCHANGE 0.66

@@ -18,6 +18,7 @@ protected:
 #ifdef UNIT_DEBUG
     std::string _unitType;
 #endif
+    BWAPI::TilePosition _tptarget;
     void drawVelocityArrow();
     void drawPath();
     void drawBTPath();
@@ -40,6 +41,8 @@ public:
 	int _sheight, _slarge;
     static void buildingsAwarePathFind(std::vector<BWAPI::TilePosition>& btpath, 
         const BWAPI::TilePosition& start, const BWAPI::TilePosition& end);
+    static void damagesAwarePathFind(std::vector<BWAPI::TilePosition>& btpath, 
+        const BWAPI::TilePosition& start, const BWAPI::TilePosition& end, int* tab);
     static void quickPathFind(std::vector<BWAPI::TilePosition>& btpath, // works only with correct Regions
         const BWAPI::TilePosition& start,                               // often not the case on custom maps
         const BWAPI::TilePosition& end);

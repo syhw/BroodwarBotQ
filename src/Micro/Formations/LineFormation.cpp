@@ -1,4 +1,5 @@
 #include "LineFormation.h"
+#include "MapManager.h"
 
 using namespace BWAPI;
 
@@ -50,6 +51,12 @@ void LineFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
     for(unsigned int i = 0; i < vUnits.size();++i)
     {
         Position topos = (begin + (dir * i * 1.2 * maxLength)).toPosition();
+        if (!Broodwar->isWalkable(topos.x()/4, topos.y()/4))
+        {
+            Position tmp = MapManager::Instance().closestWalkabableSameRegionOrConnected(topos);
+            if (tmp != Positions::None)
+                topos = tmp;
+        }
         if (topos.isValid())
             end_positions.push_back(topos);
         else

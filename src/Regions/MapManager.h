@@ -79,6 +79,8 @@ public:
     const std::map<BWAPI::Unit*, BWAPI::Position> & getOurUnits();
     const std::map<BWAPI::Unit*, BWAPI::Position> & getTrackedUnits();
     const std::map<BWAPI::Bullet*, BWAPI::Position> & getTrackedStorms();
+    BWAPI::Position closestWalkabableSameRegionOrConnected(BWAPI::Position p);
+    BWAPI::TilePosition closestWalkabableSameRegionOrConnected(BWAPI::TilePosition tp);
     void drawBuildings();           // debug
     void drawBuildingsStrict();     // debug
     void drawWalkability();         // debug

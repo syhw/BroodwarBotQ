@@ -1,4 +1,5 @@
 #include "ArcFormation.h"
+#include "MapManager.h"
 
 using namespace BWAPI;
 
@@ -46,6 +47,18 @@ void ArcFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
         tmpv2 *= -1;
         p1 = tmpv.translate(center);
         p2 = tmpv2.translate(center);
+        if (!Broodwar->isWalkable(p1.x()/4, p1.y()/4))
+        {
+            Position tmp = MapManager::Instance().closestWalkabableSameRegionOrConnected(p1);
+            if (tmp != Positions::None)
+                p1 = tmp;
+        }
+        if (!Broodwar->isWalkable(p2.x()/4, p2.y()/4))
+        {
+            Position tmp = MapManager::Instance().closestWalkabableSameRegionOrConnected(p2);
+            if (tmp != Positions::None)
+                p2 = tmp;
+        }
         end_positions.push_back(p1);
         end_positions.push_back(p2);
         mid = (vUnits.size() - 2) / 2;
@@ -55,6 +68,12 @@ void ArcFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
     {
         p1 = Position(center.x, center.y);
         p2 = Position(center.x, center.y);
+        if (!Broodwar->isWalkable(p1.x()/4, p1.y()/4))
+        {
+            Position tmp = MapManager::Instance().closestWalkabableSameRegionOrConnected(p1);
+            if (tmp != Positions::None)
+                p1 = tmp;
+        }
         end_positions.push_back(p1);
         mid = (vUnits.size() - 1) / 2;
         end = vUnits.size() - 1;
@@ -67,6 +86,12 @@ void ArcFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
         tmpv.normalize();
         tmpv *= maxLength;
         p1 = tmpv.translate(p1);
+        if (!Broodwar->isWalkable(p1.x()/4, p1.y()/4))
+        {
+            Position tmp = MapManager::Instance().closestWalkabableSameRegionOrConnected(p1);
+            if (tmp != Positions::None)
+                p1 = tmp;
+        }
         if (p1.isValid())
             end_positions.push_back(p1);
         else
@@ -82,6 +107,12 @@ void ArcFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
         tmpv.normalize();
         tmpv *= -maxLength;
         p2 = tmpv.translate(p2);
+        if (!Broodwar->isWalkable(p2.x()/4, p2.y()/4))
+        {
+            Position tmp = MapManager::Instance().closestWalkabableSameRegionOrConnected(p2);
+            if (tmp != Positions::None)
+                p2 = tmp;
+        }
         if (p2.isValid())
             end_positions.push_back(p2);
         else
