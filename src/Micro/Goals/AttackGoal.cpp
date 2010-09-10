@@ -18,7 +18,7 @@ void AttackGoal::achieve()
 			min = (*it)->distanceToRealize();
 		}
 	}
-	if (min > 1250)
+	if (min > 1337)
     {
 		this->createMidSubgoal();
 	}

@@ -28,7 +28,7 @@ struct Dmg
     int dmg;
     int hp;
     BWAPI::Unit* unit;
-    bool operator<(const Dmg& d) const { return ((this->hp - this->dmg) < (d.hp + d.dmg) || (this->hp + this->dmg == d.hp + d.dmg) && this->unit < d.unit); }
+    bool operator<(const Dmg& d) const { return ((this->hp - this->dmg) < (d.hp - d.dmg) || (this->hp - this->dmg == d.hp - d.dmg) && this->unit < d.unit); }
     //bool operator<(const Dmg& d) const { return (this->dmg > d.dmg || this->dmg == d.dmg && this->unit < d.unit); }
     Dmg operator-=(int i) { this->dmg -= i; return *this; }
     Dmg operator+=(int i) { this->dmg += i; return *this; }
@@ -57,6 +57,7 @@ private:
 	std::list<pGoal> goals;
     EUnitsFilter* _eUnitsFilter;
     std::set<BWAPI::Unit*> _mergersHT;
+    bool _alignFormation;
     inline void updateNearbyEnemyUnitsFromFilter(BWAPI::Position p, double radius = 400.0);
     double evaluateForces();
     void displayTargets();  // debug purpose
@@ -66,6 +67,7 @@ public:
 	std::vector<pBayesianUnit> units;
     std::vector<BWAPI::Position> ppath;
     std::map<BWAPI::Unit*, BWAPI::Position> enemies;
+    BWAPI::Position enemiesCenter;
     UnitDmgBimap unitDamages;
     pBayesianUnit leadingUnit;
     BWAPI::Unit* defaultTargetEnemy;

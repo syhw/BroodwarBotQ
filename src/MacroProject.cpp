@@ -199,6 +199,8 @@ void BattleBroodAI::onFrame()
 {
 	if (Broodwar->isReplay()) return;
     if (!this->analyzed) return;
+    if (Broodwar->getLastError() != BWAPI::Errors::None)
+        Broodwar->printf("LAST ERROR: %s", Broodwar->getLastError().toString().c_str());
 
 #ifdef BW_POS_MOUSE
     char mousePos[100];

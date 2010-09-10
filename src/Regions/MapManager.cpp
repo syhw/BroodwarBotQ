@@ -679,12 +679,12 @@ void MapManager::onFrame()
     double duration = (double)(end - start) / CLOCKS_PER_SEC;
     if (duration > 0.040) 
         Broodwar->printf("MapManager::onFrame() took: %2.5f seconds\n", duration);
-#endif
-    //this->drawGroundDamagesGrad(); DRAW
+    //this->drawGroundDamagesGrad(); // DRAW
     //this->drawGroundDamages();
     //this->drawAirDamagesGrad();
     //this->drawAirDamages();
     //this->drawBestStorms();
+#endif
 }
 
 const std::map<BWAPI::Unit*, BWAPI::Position>& MapManager::getOurUnits()
@@ -704,6 +704,8 @@ const std::map<BWAPI::Bullet*, BWAPI::Position>& MapManager::getTrackedStorms()
 
 Position MapManager::closestWalkabableSameRegionOrConnected(Position p)
 {
+    if (!p.isValid())
+        p.makeValid();
     WalkTilePosition wtp(p);
     TilePosition tp(p);
     BWTA::Region* r = BWTA::getRegion(tp);
@@ -752,6 +754,8 @@ Position MapManager::closestWalkabableSameRegionOrConnected(Position p)
 
 TilePosition MapManager::closestWalkabableSameRegionOrConnected(TilePosition tp)
 {
+    if (!tp.isValid())
+        tp.makeValid();
     BWTA::Region* r = BWTA::getRegion(tp);
     int lowerX = (tp.x() - 1) > 0 ? tp.x() - 1 : 0;
     int higherX = (tp.x() + 1) < Broodwar->mapWidth() ? tp.x() + 1 : Broodwar->mapWidth();

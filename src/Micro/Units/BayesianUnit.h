@@ -117,6 +117,7 @@ protected:
     inline void setTargetEnemy(BWAPI::Unit* u);
     int computeDmg(BWAPI::Unit* u);
     bool inRange(BWAPI::Unit* u);
+    bool outRanges(BWAPI::Unit* u);
     void drawDirV();
     void updateObj();
     void drawObj(int number=0);

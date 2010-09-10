@@ -35,6 +35,8 @@ UnitsGroup::UnitsGroup()
 , totalMinPrice(0)
 , totalGazPrice(0)
 , totalSupply(0)
+, _alignFormation(false)
+, enemiesCenter(Position(0, 0))
 {
     _eUnitsFilter = & EUnitsFilter::Instance();
 }
@@ -246,6 +248,8 @@ void UnitsGroup::update()
     leadingUnit = units.front();
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     { 
+        if ((*it)->unit->getType().isFlyer())
+            continue;
         if (leadingUnit->unit->getType().size() < (*it)->unit->getType().size() 
             || ( leadingUnit->unit->getType().size() == (*it)->unit->getType().size() && 
                  leadingUnit->unit->getDistance(center) > (*it)->unit->getDistance(center) )
@@ -263,7 +267,10 @@ void UnitsGroup::update()
     double maxRange = -1.0;
     for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     {
-        (*it)->update(); 
+        if ((*it)->unit->getType() == UnitTypes::Protoss_Zealot 
+            || (*it)->unit->getType() == UnitTypes::Protoss_Dark_Archon
+            || (*it)->unit->getType() == UnitTypes::Protoss_Archon)
+            _alignFormation = false;
         this->totalHP += (*it)->unit->getHitPoints();
         double tmp_max = max(max((*it)->unit->getType().groundWeapon().maxRange(), (*it)->unit->getType().airWeapon().maxRange()), 
             (*it)->unit->getType().sightRange()); // TODO: upgrades
@@ -279,11 +286,25 @@ void UnitsGroup::update()
     }
 
     //clock_t s = clock();
-    updateNearbyEnemyUnitsFromFilter(center, maxRadius + maxRange + 46); // possibly hidden units, could be taken from onUnitsShow/View asynchronously for more efficiency
+    updateNearbyEnemyUnitsFromFilter(center, maxRadius + maxRange + 92); // possibly hidden units, could be taken from onUnitsShow/View asynchronously for more efficiency
+    // update enemiesCenter
+    if (enemies.size () != 0)
+    {
+        enemiesCenter = Position(0, 0);
+        for (std::map<Unit*, Position>::const_iterator it = enemies.begin();
+            it != enemies.end(); ++it)
+        {
+            enemiesCenter += it->second;
+        }
+        enemiesCenter.x() /= enemies.size();
+        enemiesCenter.y() /= enemies.size();
+        if (!enemiesCenter.isValid())
+            enemiesCenter.makeValid();
+    }
     //clock_t f = clock();
     //double dur = (double)(f - s) / CLOCKS_PER_SEC;
     //Broodwar->printf( "UnitsGroup::update() took %2.5f seconds\n", dur); 
-    Broodwar->drawCircleMap(center.x(), center.y(), maxRadius + maxRange, Colors::Yellow);
+    Broodwar->drawCircleMap(center.x(), center.y(), maxRadius + maxRange + 32, Colors::Yellow);
 
     if (!enemies.empty()) /// We fight, we'll see later for the goals
     {
@@ -325,6 +346,9 @@ void UnitsGroup::update()
     if (duration > 0.040) 
         Broodwar->printf( "UnitsGroup::update() took %2.5f seconds\n", duration);
 #endif
+
+    for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+        (*it)->update();
     templarMergingStuff();
 }
 
@@ -352,25 +376,34 @@ void UnitsGroup::move(BWAPI::Position& p)
 
 void UnitsGroup::formation(pFormation f)
 {
+    if (units.empty())
+        return;
     std::vector<BWAPI::Position> from;
-    std::vector<pBayesianUnit> units;
-    for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); it++)
+    for(std::vector<pBayesianUnit>::iterator it = units.begin(); it != units.end(); it++)
     {
         from.push_back((*it)->unit->getPosition());
     }
 
-    f->computeToPositions(this->units);
+    f->computeToPositions(units);
 
-    const std::vector<BWAPI::Position>& to = f->end_positions;
-
-    std::vector<unsigned int> alignment; // alignment[from_pos] = to_pos 
-    // align(from, to, alignment);// TODO min crossing || fastest
-    // simple_align(from, alignment);
-    mid_based_align(from, to, alignment);
-    for(unsigned int i = 0; i < this->units.size(); i++)
+    if (_alignFormation)
     {
-        (this->units)[i]->target = to[alignment[i]];
-        //(this->units)[i]->attackMove(to[alignment[i]]);
+        const std::vector<BWAPI::Position>& to = f->end_positions;
+        std::vector<unsigned int> alignment; // alignment[from_pos] = to_pos 
+        // align(from, to, alignment);// TODO min crossing || fastest
+        // simple_align(from, alignment);
+        mid_based_align(from, to, alignment);
+        for (unsigned int i = 0; i < units.size(); i++)
+        {
+            units[i]->target = to[alignment[i]];
+        }
+    }
+    else
+    {
+        for (unsigned int i = 0; i < units.size(); i++)
+        {
+            units[i]->target = f->end_positions[i];
+        }
     }
 
 }

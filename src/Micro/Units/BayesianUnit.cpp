@@ -315,14 +315,16 @@ void BayesianUnit::updateAttractors()
         
         if (mapManager->buildings_wt[tmp.x()/8 + (tmp.y()/8)*4*width])
             _occupation.push_back(OCCUP_BUILDING);
-		else if (!mapManager->walkability[hG.x()/8 + (hG.y()/8)*4*width])
+        else if (!mapManager->walkability[tmp.x()/8 + (tmp.y()/8)*4*width])
+            _occupation.push_back(OCCUP_BLOCKING);
+		/*else if (!mapManager->walkability[hG.x()/8 + (hG.y()/8)*4*width]) // TODo
             _occupation.push_back(OCCUP_BLOCKING);
         else if (!mapManager->walkability[bG.x()/8 + (bG.y()/8)*4*width])
             _occupation.push_back(OCCUP_BLOCKING);
         else if (!mapManager->walkability[hD.x()/8 + (hD.y()/8)*4*width])
             _occupation.push_back(OCCUP_BLOCKING);
         else if (!mapManager->walkability[bD.x()/8 + (bD.y()/8)*4*width])
-            _occupation.push_back(OCCUP_BLOCKING);
+            _occupation.push_back(OCCUP_BLOCKING);*/
 
         //else if (0/*TODO TEST SI Y A UNE UNITE QUI BLOQUE en TMP*/)
         //    _occupation.push_back(OCCUP_UNIT);
@@ -452,7 +454,7 @@ void BayesianUnit::attackEnemyUnit(Unit* u)
 {
     if (Broodwar->getFrameCount() - _lastClickFrame <= Broodwar->getLatency())
         return;
-    if (targetEnemy && targetEnemy->isVisible())
+    if (u && u->exists() && u->isVisible() && u->isDetected())
     {
         unit->rightClick(u);
         _lastClickFrame = Broodwar->getFrameCount();
@@ -461,7 +463,6 @@ void BayesianUnit::attackEnemyUnit(Unit* u)
         _lastAttackFrame = Broodwar->getFrameCount();
     else
         _lastMoveFrame = Broodwar->getFrameCount();
-    //unit->attackUnit(targetEnemy); // rightClick seems better b/c attackUnit sometimes stuck unit...
 }
 
 void BayesianUnit::drawProbs(multimap<double, Vec>& probs, int number)
@@ -582,6 +583,10 @@ void BayesianUnit::updateObj()
     {
         if (_fleeing) /// fleeing gradient influence
         {
+            if (unit->getType().size() == UnitSizeTypes::Small) // the damage maps / gradients are BuildTile resolution, too big
+            {
+                obj = Vec(0, 0);
+            }
             if (unit->getType().isFlyer())
                 obj = this->mapManager->airDamagesGrad[_unitPos.x()/32 + _unitPos.y()/32*Broodwar->mapWidth()];
             else
@@ -901,7 +906,7 @@ void BayesianUnit::updateTargetEnemy()
     for (UnitDmgBimap::right_iterator it = _unitsGroup->unitDamages.right.begin();
         it != _unitsGroup->unitDamages.right.end(); ++it)
     {
-        if (!it->second->isVisible())
+        if (!it->second->exists() || !it->second->isVisible())
             continue;
         if (inRange(it->second))
             continue;
@@ -924,13 +929,11 @@ void BayesianUnit::updateTargetEnemy()
             continue;
         if (testType == BWAPI::UnitTypes::Zerg_Queen && it->second->getEnergy() < 60)
             continue;
-
         if (getSetPrio().count(testType)
-            && it->first.dmg < it->second->getHitPoints() + it->second->getShields()
-            && inRange(it->second))
+            && it->first.dmg < it->second->getHitPoints() + it->second->getShields())
         {
             oorTargetEnemy = it->second;
-            return;
+            break;
         }
     }
     if (oorTargetEnemy == NULL || !oorTargetEnemy->exists())
@@ -938,24 +941,12 @@ void BayesianUnit::updateTargetEnemy()
         for (std::multimap<double, BWAPI::Unit*>::const_iterator it = _rangeEnemies.begin();
             it != _rangeEnemies.end(); ++it)
         {
-            if (!it->second->isVisible())
+            if (!it->second->exists() || !it->second->isVisible())
                 continue;
             if (inRange(it->second))
                 continue;
-            if (it->first > 416.0)
-                break;
             UnitType testType = it->second->getType();
-            if (testType == BWAPI::UnitTypes::Protoss_High_Templar && it->second->getEnergy() < 60)
-                continue;
-            if (testType == BWAPI::UnitTypes::Protoss_Dark_Archon && it->second->getEnergy() < 80)
-                continue;
-            if (testType == BWAPI::UnitTypes::Terran_Science_Vessel && it->second->getEnergy() < 70)
-                continue;
-            if (testType == BWAPI::UnitTypes::Zerg_Defiler && it->second->getEnergy() < 60)
-                continue;
-            if (testType == BWAPI::UnitTypes::Zerg_Queen && it->second->getEnergy() < 60)
-                continue;
-            if (testType != BWAPI::UnitTypes::Protoss_Interceptor)
+            if (testType == BWAPI::UnitTypes::Protoss_Interceptor)
                 continue;
             if (testType.isBuilding() 
                 && testType != BWAPI::UnitTypes::Protoss_Pylon
@@ -965,22 +956,24 @@ void BayesianUnit::updateTargetEnemy()
                 && testType != BWAPI::UnitTypes::Zerg_Sunken_Colony
                 && testType != BWAPI::UnitTypes::Zerg_Spore_Colony)
                 continue;
-            if (it->second->exists() && it->second->isVisible()
-                && getSetPrio().count(testType))
+            if (getSetPrio().count(testType))
             {
                 oorTargetEnemy = it->second;
                 break;
             }
         }
     }
- 
-    // ===== clear old damage =====
+
+    if (oorTargetEnemy == NULL || !oorTargetEnemy->exists())
+        Broodwar->printf("OORTARGET NULL");
+
+    // ===== clear old damage or take the last shot =====
     if (targetEnemy != NULL && _unitsGroup->unitDamages.left.count(targetEnemy))
     {
-        UnitDmgBimap::left_iterator it = _unitsGroup->unitDamages.left.find(targetEnemy);
-        int tmp_dmg = it->second.dmg - computeDmg(targetEnemy);
-        Unit* tmp_unit = it->first;
-        _unitsGroup->unitDamages.left.erase(it);
+        UnitDmgBimap::left_iterator unitdmgit = _unitsGroup->unitDamages.left.find(targetEnemy);
+        int tmp_dmg = unitdmgit->second.dmg - computeDmg(targetEnemy);
+        Unit* tmp_unit = unitdmgit->first;
+        _unitsGroup->unitDamages.left.erase(unitdmgit);
         _unitsGroup->unitDamages.insert(UnitDmg(tmp_unit, Dmg(tmp_dmg, tmp_unit, 
             (targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected() ? tmp_unit->getHitPoints() + tmp_unit->getShields() : 0))));
     }
@@ -1036,7 +1029,7 @@ void BayesianUnit::updateTargetEnemy()
             && testType != BWAPI::UnitTypes::Zerg_Sunken_Colony
             && testType != BWAPI::UnitTypes::Zerg_Spore_Colony)
             continue;
-        if (testType != BWAPI::UnitTypes::Protoss_Interceptor)
+        if (testType == BWAPI::UnitTypes::Protoss_Interceptor)
             continue;
         // focus
         if (it->first.dmg < it->second->getHitPoints() + it->second->getShields()
@@ -1121,7 +1114,7 @@ void BayesianUnit::updateTargetEnemy()
                 && testType != BWAPI::UnitTypes::Zerg_Sunken_Colony
                 && testType != BWAPI::UnitTypes::Zerg_Spore_Colony)
                 continue;
-            if (testType != BWAPI::UnitTypes::Protoss_Interceptor)
+            if (testType == BWAPI::UnitTypes::Protoss_Interceptor)
                 continue;
             // Not in the priority set
             if (it->second->exists() && it->second->isVisible()
@@ -1193,7 +1186,7 @@ void BayesianUnit::updateTargetEnemy()
 void BayesianUnit::setTargetEnemy(Unit* u)
 {
     targetEnemy = u;
-    if (targetEnemy != NULL && _unitsGroup->unitDamages.left.count(u))
+    if (u != NULL && _unitsGroup->unitDamages.left.count(u))
     { /// <=> _unitsGroup->unitDamages.left[u] += computeDmg(u);
         UnitDmgBimap::left_iterator it = _unitsGroup->unitDamages.left.find(u);
         int tmp_dmg = it->second.dmg + computeDmg(u);
@@ -1212,9 +1205,9 @@ int BayesianUnit::computeDmg(Unit* u)
     if (u->getType().isFlyer())
     {
         if (u->getShields() 
-            >= (unit->getType().airWeapon().damageAmount() /* - shield upgrade lvl */) * unit->getType().maxAirHits())
+            >= (unit->getType().airWeapon().damageAmount() - 1 /* - shield upgrade lvl */) * unit->getType().maxAirHits())
         {
-            return (unit->getType().airWeapon().damageAmount() /* - shield upgrade lvl */)
+            return (unit->getType().airWeapon().damageAmount() - 1 /* - shield upgrade lvl */)
                 * unit->getType().maxAirHits();
         }
         else
@@ -1278,6 +1271,34 @@ bool BayesianUnit::inRange(BWAPI::Unit* u)
     }
     else
         return false;
+}
+
+bool BayesianUnit::outRanges(BWAPI::Unit* u)
+{
+    UnitType ut = u->getType();
+    int eAddRange = 0;
+    // consider that the enemy has upgrades
+    if (ut == UnitTypes::Protoss_Dragoon)
+        eAddRange = 64;
+    else if (ut == UnitTypes::Terran_Marine)
+        eAddRange = 32;
+    else if (ut == UnitTypes::Zerg_Hydralisk)
+        eAddRange = 32;
+    else if (ut == UnitTypes::Terran_Vulture_Spider_Mine)
+        eAddRange = 64;
+    else if (unit->getType().isFlyer() && ut == UnitTypes::Terran_Goliath)
+        eAddRange = 96;
+    if (!unit->getType().isFlyer())
+        return ((!ut.isFlyer() && unit->getType().groundWeapon() != BWAPI::WeaponTypes::None &&
+        unit->getType().groundWeapon().maxRange() + addRangeGround() > ut.groundWeapon().maxRange() + eAddRange)
+        || (ut.isFlyer() && unit->getType().airWeapon() != BWAPI::WeaponTypes::None &&
+        unit->getType().airWeapon().maxRange() + addRangeAir() > ut.groundWeapon().maxRange() + eAddRange));
+    else
+        return ((!ut.isFlyer() && unit->getType().groundWeapon() != BWAPI::WeaponTypes::None &&
+        unit->getType().groundWeapon().maxRange() + addRangeGround() > ut.airWeapon().maxRange() + eAddRange)
+        || (ut.isFlyer() && unit->getType().airWeapon() != BWAPI::WeaponTypes::None &&
+        unit->getType().airWeapon().maxRange() + addRangeAir() > ut.airWeapon().maxRange() + eAddRange));
+    return false;
 }
 
 void BayesianUnit::drawDirV()
@@ -1390,7 +1411,7 @@ void BayesianUnit::updateDir()
     // compute the probability to go in each dirv(ector)
     computeProbs();
 #ifdef __DEBUG_GABRIEL__
-    drawProbs(_dirvProb, _unitsGroup->size()); // DRAWPROBS
+    //drawProbs(_dirvProb, _unitsGroup->size()); // DRAWPROBS
 #endif
 
     // select the most probable, most in the direction of obj if equally probables
@@ -1407,7 +1428,7 @@ void BayesianUnit::drawDir()
 void BayesianUnit::clickDir()
 {
     double dist = _unitPos.getDistance(target);
-    if (_mode != MODE_INPOS && (dir == Vec(0,0) || dist < 1.1))
+    if ((_mode == MODE_SCOUT || _mode == MODE_MOVE) && (dir == Vec(0,0) || dist < 1.1))
     {
         return;
     } 
@@ -1420,25 +1441,12 @@ void BayesianUnit::clickDir()
         _lastMoveFrame = Broodwar->getFrameCount();
         return;
     }
-    else if (_mode == MODE_INPOS)
-        return;
     //if (dist > 11.32) // sqrt(8^2 + 8^2), one walk tile
-    if (dist > _maxDimension && !_iThinkImBlocked) //45.26) // sqrt(32^2 + 32^2), one build tile
-    {
-        dir += _unitPos;
-        unit->rightClick(dir.toPosition());
-        _lastRightClick = dir.toPosition();
-        _lastClickFrame = Broodwar->getFrameCount();
-        _lastMoveFrame = Broodwar->getFrameCount();
-    }
-    else if (_lastRightClick != target)
-    {
-        clickTarget();
-    } 
-    else
-    {
-        // DO NOTHING
-    }
+    dir += _unitPos;
+    unit->rightClick(dir.toPosition());
+    _lastRightClick = dir.toPosition();
+    _lastClickFrame = Broodwar->getFrameCount();
+    _lastMoveFrame = Broodwar->getFrameCount();
 }
 
 void BayesianUnit::clickScout()
@@ -1474,20 +1482,16 @@ void BayesianUnit::flee()
         return;
     }
     _fleeing = true;
-    //Vec dmgGrad = this->mapManager->groundDamagesGrad[_unitPos.x()/32 + _unitPos.y()/32*Broodwar->mapWidth()];
-    //if (dmgGrad.norm() >= _fleeingDmg) // we can have a direction to flee in
-    //{
-        updateDir();
-        clickDir();
-    //}
+    updateDir();
+    clickDir();
 }
 
 void BayesianUnit::fightMove()
 {
-    /// approach siege tanks
-    if (targetEnemy != NULL && targetEnemy->exists() && targetEnemy->isVisible()
-        && targetEnemy->getType() == UnitTypes::Terran_Siege_Tank_Siege_Mode
-        && targetEnemy->getDistance(_unitPos) > 45.0
+    /// approach siege tanks or approach our targetEnemy if not in range
+    if (targetEnemy != NULL && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected()
+        && ((targetEnemy->getType() == UnitTypes::Terran_Siege_Tank_Siege_Mode 
+        && targetEnemy->getDistance(_unitPos) > 45.0) || !inRange(targetEnemy))
         && (!_fightMoving || Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
     {
         unit->move(targetEnemy->getPosition());
@@ -1499,12 +1503,12 @@ void BayesianUnit::fightMove()
     }
     double dist = target.getDistance(_unitPos);
     /// approach out of range target
-    if (dist <= 192.0 // 6 build tiles TOCHANGE
-        && oorTargetEnemy != NULL && oorTargetEnemy->exists() && oorTargetEnemy->isVisible()
+    if (dist <= 192.0 && // 6 build tiles TOCHANGE
+        oorTargetEnemy != NULL && oorTargetEnemy->exists() && oorTargetEnemy->isVisible() && targetEnemy->isDetected()
         && !inRange(oorTargetEnemy)
         && (!_fightMoving || Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
     {
-        unit->move(oorTargetEnemy->getPosition());
+        unit->rightClick(oorTargetEnemy->getPosition());
         _lastRightClick =  oorTargetEnemy->getPosition();
         _lastClickFrame = Broodwar->getFrameCount();
         _lastMoveFrame = Broodwar->getFrameCount();
@@ -1519,8 +1523,10 @@ void BayesianUnit::fightMove()
         _fightMoving = true;
         return;
     }
-    /// Or simply move away from our friends / towards our target position if we are far from our target (Position)
-    if (!_fightMoving || Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency())
+    /// Or simply move away from our friends and kite if we can
+    if (targetEnemy != NULL && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected()
+        && outRanges(targetEnemy)
+        && (!_fightMoving || Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
     {
         // TODO TO COMPLETE (with a clickTarget() if dist > threshold)
         updateDir();

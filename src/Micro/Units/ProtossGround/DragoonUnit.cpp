@@ -17,7 +17,7 @@ DragoonUnit::DragoonUnit(BWAPI::Unit* u, UnitsGroup* ug)
         addRange = 64;
     else
         addRange = 0;
-    attackDuration = Broodwar->getLatency() + 9;
+    attackDuration = 9;
 
     if (setPrio.empty())
     {
@@ -49,31 +49,51 @@ int DragoonUnit::addRangeAir()
 bool DragoonUnit::decideToFlee()
 {
     // TODO complete conditions
-    return (_lastTotalHP - (unit->getShields() + unit->getHitPoints()) >= _fleeingDmg || (!unit->getShields() && (_lastTotalHP - unit->getHitPoints() > 4)));
+    // TODO integrate over periods of time
+    _fleeingDmg = 4;
+    return (_lastTotalHP - (unit->getShields() + unit->getHitPoints()) >= _fleeingDmg || (!unit->getShields() && (_lastTotalHP - unit->getHitPoints() > 3)));
 }
 
 void DragoonUnit::micro()
 {
-    if (Broodwar->getFrameCount() - _lastAttackFrame <= getAttackDuration()) // not interrupting attack
-        return;
-    if (unit->getGroundWeaponCooldown() == 0)
+#ifdef __DEBUG_GABRIEL__
+    if (unit->isStartingAttack())
     {
-        //Broodwar->printf("last attack: %d frames ago", Broodwar->getFrameCount() - _lastClickFrame);
+        if (Broodwar->getSelectedUnits().count(unit))
+            Broodwar->printf("starting attack at frame: %d", Broodwar->getFrameCount());
+    }
+#endif
+    if (!_fleeing)
+        _fleeing = decideToFlee();
+    int currentFrame = Broodwar->getFrameCount();
+    if (currentFrame - _lastAttackFrame <= getAttackDuration()) // not interrupting attacks
+        return;
+    if (unit->getGroundWeaponCooldown() == Broodwar->getLatency() + 1)
+    {
         updateRangeEnemies();
         updateTargetEnemy();
         attackEnemyUnit(targetEnemy);
     }
-    else if (unit->getGroundWeaponCooldown() < Broodwar->getLatency())
+    else if (unit->getGroundWeaponCooldown() == 0)
+    {
+        updateRangeEnemies();
+        updateTargetEnemy();
+        attackEnemyUnit(targetEnemy);        
+    }
+    else if (unit->getGroundWeaponCooldown() <= Broodwar->getLatency())
     {
         ; // do nothing
     }
-    else if (_fleeing || decideToFlee())
+    else if (unit->getGroundWeaponCooldown() >= Broodwar->getLatency()*2 + 2) // == (Broodwar->getLatency()+1)*2
     {
-        flee();
-    }
-    else
-    {
-        fightMove();
+        if(_fleeing)
+        {
+            //flee();
+        }
+        else
+        {
+            //fightMove();
+        }
     }
 }
 

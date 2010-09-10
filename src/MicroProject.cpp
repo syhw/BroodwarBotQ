@@ -14,7 +14,7 @@ void MicroAIModule::onStart()
 	// Enable some cheat flags
     //Broodwar->printf("ON START !!\n");
     Broodwar->enableFlag(Flag::UserInput);
-    //Broodwar->setLocalSpeed(0);
+    Broodwar->setLocalSpeed(0);
 	//Broodwar->enableFlag(Flag::CompleteMapInformation);
 	BWTA::readMap();
 	BWTA::analyze();
@@ -80,13 +80,37 @@ void MicroAIModule::onStart()
     pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
     pGoal tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
     goals.push_back(tmp_goal);*/
- 
+
     /* ARC IN THE MIDDLE (+/- 256 pixs) */
     pFormation tmp_form = pFormation(new ArcFormation(
         Position(Broodwar->mapWidth()/2*32 - sign*256,(Broodwar->mapHeight()/2 + 4)*32), 
         Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
     pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
     pGoal tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+    goals.push_back(tmp_goal);
+
+    /* ARC IN THE MIDDLE (+/- 128 pixs) */
+    tmp_form = pFormation(new ArcFormation(
+        Position(Broodwar->mapWidth()/2*32 - sign*128,(Broodwar->mapHeight()/2 + 4)*32), 
+        Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
+    tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
+    tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+    goals.push_back(tmp_goal);
+    
+    /* ARC IN THE MIDDLE */
+    tmp_form = pFormation(new ArcFormation(
+        Position(Broodwar->mapWidth()/2*32,(Broodwar->mapHeight()/2 + 4)*32), 
+        Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
+    tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
+    tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+    goals.push_back(tmp_goal);
+
+    /* ARC IN THE MIDDLE (+/- 128 pixs) */
+    tmp_form = pFormation(new ArcFormation(
+        Position(Broodwar->mapWidth()/2*32 + sign*128,(Broodwar->mapHeight()/2 + 4)*32), 
+        Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
+    tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
+    tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
     goals.push_back(tmp_goal);
 
     /* ARC IN THE MIDDLE (+/- 256 pixs) */
@@ -96,6 +120,15 @@ void MicroAIModule::onStart()
     tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
     tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
     goals.push_back(tmp_goal);
+
+    /* ARC IN THE MIDDLE (+/- 312 pixs) */
+    tmp_form = pFormation(new ArcFormation(
+        Position(Broodwar->mapWidth()/2*32 + sign*312,(Broodwar->mapHeight()/2 + 4)*32), 
+        Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
+    tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
+    tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+    goals.push_back(tmp_goal);
+
 
     /* SQUARE ON THE OTHER SIDE */
     /*tmp_form = pFormation(new SquareFormation(
@@ -167,6 +200,8 @@ void MicroAIModule::onStart()
 
 void MicroAIModule::onFrame()
 {
+    if (Broodwar->getLastError() != BWAPI::Errors::None)
+        Broodwar->printf("LAST ERROR: %s", Broodwar->getLastError().toString().c_str());
 #ifdef BW_QT_DEBUG
     if (!*qapp)
         Broodwar->printf("Qt not connected\n");
