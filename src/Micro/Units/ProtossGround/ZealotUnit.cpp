@@ -26,6 +26,14 @@ ZealotUnit::~ZealotUnit()
 {
 }
 
+bool ZealotUnit::decideToFlee()
+{
+    // TODO complete conditions
+    // TODO integrate over periods of time
+    _fleeingDmg = 4;
+    return (_lastTotalHP - (unit->getShields() + unit->getHitPoints()) >= _fleeingDmg || (!unit->getShields() && (_lastTotalHP - unit->getHitPoints() > 3)));
+}
+
 void ZealotUnit::micro()
 {
     if (unit->isStartingAttack())
@@ -34,16 +42,17 @@ void ZealotUnit::micro()
         _lastAttackFrame = Broodwar->getFrameCount();
         return;
     }
+    if (!_fleeing)
+        _fleeing = decideToFlee();
+    int currentFrame = Broodwar->getFrameCount();    
+    if (currentFrame - _lastAttackFrame <= getAttackDuration()) // not interrupting attacks
+        return;
+    if (currentFrame - _lastAttackFrame == getAttackDuration() + 1)
+        clearDamages();
     updateRangeEnemies();
     updateTargetEnemy();
-            if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() && inRange(targetEnemy))
-            attackEnemyUnit(targetEnemy);
-        else if (oorTargetEnemy && oorTargetEnemy->exists() && oorTargetEnemy->isVisible() && oorTargetEnemy->getDistance(_unitPos) < 92.0)
-            attackEnemyUnit(oorTargetEnemy);
-        else if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible())
-            attackEnemyUnit(targetEnemy);
-        else
-            unit->attackMove(_unitsGroup->enemiesCenter);
+
+    /// Dodge storms
     const std::map<Bullet*, Position>& storms = MapManager::Instance().getTrackedStorms();
     for (std::map<Bullet*, Position>::const_iterator it = storms.begin();
         it != storms.end(); ++it)
@@ -58,7 +67,6 @@ void ZealotUnit::micro()
             if (oorTargetEnemy && oorTargetEnemy->exists() && oorTargetEnemy->isVisible())
             {
                 obj = Vec(oorTargetEnemy->getPosition().x() - _unitPos.x(), oorTargetEnemy->getPosition().y() - _unitPos.y());
-                Broodwar->printf("here");
             }
             else if (_unitsGroup->enemiesCenter != Positions::None)
             {
@@ -75,7 +83,7 @@ void ZealotUnit::micro()
             return;
         }
     }
-    if (Broodwar->getFrameCount() - _lastAttackFrame > Broodwar->getLatency()) //&& Broodwar->getFrameCount() - _lastAttackFrame + Broodwar->getLatency() < unit->getType().groundWeapon().damageCooldown())
+    if (Broodwar->getFrameCount() - _lastAttackFrame <= Broodwar->getLatency() + 1) //&& Broodwar->getFrameCount() - _lastAttackFrame + Broodwar->getLatency() < unit->getType().groundWeapon().damageCooldown())
     {
         /// ATTACK
         if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() && inRange(targetEnemy))

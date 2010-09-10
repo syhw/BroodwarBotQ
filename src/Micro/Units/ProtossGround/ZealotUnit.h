@@ -7,6 +7,7 @@ class ZealotUnit : public GroundUnit
 {
 protected:
     static std::set<BWAPI::UnitType> setPrio;
+    bool decideToFlee();
 public:
     ZealotUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~ZealotUnit();

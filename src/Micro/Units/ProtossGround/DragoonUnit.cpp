@@ -34,6 +34,8 @@ DragoonUnit::DragoonUnit(BWAPI::Unit* u, UnitsGroup* ug)
 
 DragoonUnit::~DragoonUnit()
 {
+    if (Broodwar->getFrameCount() - _lastAttackFrame <= getAttackDuration())
+        clearDamages();
 }
 
 int DragoonUnit::addRangeGround()
@@ -68,23 +70,21 @@ void DragoonUnit::micro()
     int currentFrame = Broodwar->getFrameCount();
     if (currentFrame - _lastAttackFrame <= getAttackDuration()) // not interrupting attacks
         return;
-    if (unit->getGroundWeaponCooldown() == Broodwar->getLatency() + 1)
+    if (currentFrame - _lastAttackFrame == getAttackDuration() + 1)
+        clearDamages();
+    //if (currentFrame - _lastAttackFrame == Broodwar->getLatency() + 1)
+    //    clearDamages();
+    if (unit->getGroundWeaponCooldown() <= Broodwar->getLatency() + 1)
     {
         updateRangeEnemies();
         updateTargetEnemy();
         attackEnemyUnit(targetEnemy);
     }
-    else if (unit->getGroundWeaponCooldown() == 0)
-    {
-        updateRangeEnemies();
-        updateTargetEnemy();
-        attackEnemyUnit(targetEnemy);        
-    }
     else if (unit->getGroundWeaponCooldown() <= Broodwar->getLatency())
     {
         ; // do nothing
     }
-    else if (unit->getGroundWeaponCooldown() >= Broodwar->getLatency()*2 + 2) // == (Broodwar->getLatency()+1)*2
+    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatency() + 2) // == (Broodwar->getLatency()+1)*2
     {
         if(_fleeing)
         {

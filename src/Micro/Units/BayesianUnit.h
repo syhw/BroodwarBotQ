@@ -113,6 +113,7 @@ protected:
     inline void testIfBlocked();
     inline void resumeFromBlocked();
     void updateRangeEnemies();
+    void clearDamages();
     void updateTargetEnemy();
     inline void setTargetEnemy(BWAPI::Unit* u);
     int computeDmg(BWAPI::Unit* u);

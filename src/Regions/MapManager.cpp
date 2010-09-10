@@ -679,8 +679,8 @@ void MapManager::onFrame()
     double duration = (double)(end - start) / CLOCKS_PER_SEC;
     if (duration > 0.040) 
         Broodwar->printf("MapManager::onFrame() took: %2.5f seconds\n", duration);
-    //this->drawGroundDamagesGrad(); // DRAW
-    //this->drawGroundDamages();
+    this->drawGroundDamagesGrad(); // DRAW
+    this->drawGroundDamages();
     //this->drawAirDamagesGrad();
     //this->drawAirDamages();
     //this->drawBestStorms();

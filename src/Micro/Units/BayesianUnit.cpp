@@ -67,9 +67,9 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
     initDefaultProb();
 
     _damageProb.push_back(_PROB_NO_DAMAGE_MOVE); //DAMAGE__NO
-    _damageProb.push_back(0.08);                 //DAMAGE_LOW
-    _damageProb.push_back(0.015);                 //DAMAGE_MED
-    _damageProb.push_back(0.005);                 //DAMAGE_HIGH
+    _damageProb.push_back(0.06);                 //DAMAGE_LOW
+    _damageProb.push_back(0.03);                 //DAMAGE_MED
+    _damageProb.push_back(0.01);                 //DAMAGE_HIGH
 
     _repulseProb.push_back(_PROB_NO_REPULSE_MOVE); // REPULSE_NO
     _repulseProb.push_back(0.2);                  // REPULSE_LOW
@@ -412,7 +412,7 @@ double BayesianUnit::computeProb(unsigned int i)
             dmgGrad.normalize();
             dirvtmp.normalize();
             const double tmp = dirvtmp.dot(dmgGrad);
-            val *= (tmp > 0 ? _PROB_GO_OBJ*tmp : 0.01);*/
+            val *= (_PROB_GO_OBJ*tmp > 0.1 ? _PROB_GO_OBJ*tmp : 0.1);*/
             val *= _damageProb[_damageValues[i]];
         }
         else /// wanted target influence
@@ -422,7 +422,7 @@ double BayesianUnit::computeProb(unsigned int i)
             objnorm.normalize();
             dirvtmp.normalize();
             const double tmp = dirvtmp.dot(objnorm);
-            val *= (tmp > 0 ? _PROB_GO_OBJ*tmp : 0.01);
+            val *= (_PROB_GO_OBJ*tmp > 0.1 ? _PROB_GO_OBJ*tmp : 0.1);
         }
     }
 
@@ -900,6 +900,20 @@ void BayesianUnit::updateRangeEnemies()
     }
 }
 
+void BayesianUnit::clearDamages()
+{
+    // ===== clear old damage =====
+    if (targetEnemy != NULL && _unitsGroup->unitDamages.left.count(targetEnemy))
+    {
+        UnitDmgBimap::left_iterator unitdmgit = _unitsGroup->unitDamages.left.find(targetEnemy);
+        int tmp_dmg = unitdmgit->second.dmg - computeDmg(targetEnemy);
+        Unit* tmp_unit = unitdmgit->first;
+        _unitsGroup->unitDamages.left.erase(unitdmgit);
+        _unitsGroup->unitDamages.insert(UnitDmg(tmp_unit, Dmg(tmp_dmg, tmp_unit, 
+            (targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected() ? tmp_unit->getHitPoints() + tmp_unit->getShields() : 0))));
+    }
+}
+
 void BayesianUnit::updateTargetEnemy()
 {
     // ===== update oorTargetEnemy =====
@@ -964,20 +978,6 @@ void BayesianUnit::updateTargetEnemy()
         }
     }
 
-    if (oorTargetEnemy == NULL || !oorTargetEnemy->exists())
-        Broodwar->printf("OORTARGET NULL");
-
-    // ===== clear old damage or take the last shot =====
-    if (targetEnemy != NULL && _unitsGroup->unitDamages.left.count(targetEnemy))
-    {
-        UnitDmgBimap::left_iterator unitdmgit = _unitsGroup->unitDamages.left.find(targetEnemy);
-        int tmp_dmg = unitdmgit->second.dmg - computeDmg(targetEnemy);
-        Unit* tmp_unit = unitdmgit->first;
-        _unitsGroup->unitDamages.left.erase(unitdmgit);
-        _unitsGroup->unitDamages.insert(UnitDmg(tmp_unit, Dmg(tmp_dmg, tmp_unit, 
-            (targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected() ? tmp_unit->getHitPoints() + tmp_unit->getShields() : 0))));
-    }
-    
     // ===== choose new targetEnemy =====
     /// Choose a priority target in the ones in range in focus fire order
     UnitDmgBimap::right_iterator it;
@@ -1343,7 +1343,7 @@ void BayesianUnit::selectDir(const Vec& criterium)
 
         Vec crit = criterium;
         
-        if (_mode == MODE_INPOS && obj == Vec(0, 0))
+        if (_mode == MODE_INPOS && crit == Vec(0, 0))
         {
             // sum on all the possible_directions
             for (multimap<double, Vec>::const_iterator it = possible_dirs.first; it != possible_dirs.second; ++it)
@@ -1352,7 +1352,7 @@ void BayesianUnit::selectDir(const Vec& criterium)
             }
             Vec crit = obj;
         }
-        if ((_mode == MODE_FIGHT_G || _mode == MODE_FIGHT_A) && _fleeing)
+        if ((_mode == MODE_FIGHT_G || _mode == MODE_FIGHT_A) && _fleeing )//&& crit == Vec(0, 0))
         {
             Vec tmp = Vec(0, 0);
             for (multimap<double, Vec>::const_iterator it = possible_dirs.first; it != possible_dirs.second; ++it)
@@ -1416,6 +1416,9 @@ void BayesianUnit::updateDir()
 
     // select the most probable, most in the direction of obj if equally probables
     selectDir(obj);
+#ifdef __DEBUG_GABRIEL__
+    drawDir();
+#endif
 }
 
 void BayesianUnit::drawDir()
@@ -1467,7 +1470,7 @@ void BayesianUnit::clickScout()
 
 void BayesianUnit::clickTarget()
 {
-    unit->rightClick(target);
+    unit->move(target);
     _lastRightClick = target;
     _lastClickFrame = Broodwar->getFrameCount();
     _lastMoveFrame = Broodwar->getFrameCount();
@@ -1495,7 +1498,6 @@ void BayesianUnit::fightMove()
         && (!_fightMoving || Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
     {
         unit->move(targetEnemy->getPosition());
-        _lastRightClick = targetEnemy->getPosition();
         _lastClickFrame = Broodwar->getFrameCount();
         _lastMoveFrame = Broodwar->getFrameCount();
         _fightMoving = true;
@@ -1508,8 +1510,9 @@ void BayesianUnit::fightMove()
         && !inRange(oorTargetEnemy)
         && (!_fightMoving || Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
     {
-        unit->rightClick(oorTargetEnemy->getPosition());
-        _lastRightClick =  oorTargetEnemy->getPosition();
+        //unit->rightClick(oorTargetEnemy->getPosition());
+        //_lastRightClick =  oorTargetEnemy->getPosition();
+        unit->move(oorTargetEnemy->getPosition());
         _lastClickFrame = Broodwar->getFrameCount();
         _lastMoveFrame = Broodwar->getFrameCount();
         _fightMoving = true;
@@ -1525,7 +1528,7 @@ void BayesianUnit::fightMove()
     }
     /// Or simply move away from our friends and kite if we can
     if (targetEnemy != NULL && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected()
-        && outRanges(targetEnemy)
+        && outRanges(targetEnemy) // don't kite it we don't outrange
         && (!_fightMoving || Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
     {
         // TODO TO COMPLETE (with a clickTarget() if dist > threshold)
