@@ -69,6 +69,8 @@ protected:
     BWAPI::Position _lastRightClick, _posAtMost13FramesAgo, _posAtMost23FramesAgo;
     bool _iThinkImBlocked;
     int _lastTotalHP;
+    std::list<int> _HPLosts;
+    int _sumLostHP;
     const int _refreshPathFramerate;
     int _maxDistWhileRefreshingPath;
     bool _newPath;

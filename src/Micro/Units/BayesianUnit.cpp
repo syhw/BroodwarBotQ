@@ -47,6 +47,7 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 , _posAtMost23FramesAgo(unit->getPosition())                                                // and posAtMost23FramesAgo to be equal
 , _iThinkImBlocked(false)
 , _lastTotalHP(unit->getHitPoints() + unit->getShields())
+, _sumLostHP(0)
 , _refreshPathFramerate(12)
 , _maxDistWhileRefreshingPath(max(_refreshPathFramerate * _topSpeed, 45.26)) // 45.26 = sqrt(BWAPI::TILE_SIZE^2 + BWAPI::TILE_SIZE^2)
 , _newPath(false)
@@ -452,8 +453,8 @@ double BayesianUnit::computeProb(unsigned int i)
 
 void BayesianUnit::attackEnemyUnit(Unit* u)
 {
-    if (Broodwar->getFrameCount() - _lastClickFrame <= Broodwar->getLatency())
-        return;
+    //if (Broodwar->getFrameCount() - _lastClickFrame <= Broodwar->getLatency())
+    //    return;
     if (u && u->exists() && u->isVisible() && u->isDetected())
     {
         unit->rightClick(u);
@@ -1340,7 +1341,7 @@ void BayesianUnit::selectDir(const Vec& criterium)
     else
     {
         pair<multimap<double, Vec>::const_iterator, multimap<double, Vec>::const_iterator> possible_dirs = _dirvProb.equal_range(last->first);
-
+        Broodwar->printf("HERE");
         Vec crit = criterium;
         
         if (_mode == MODE_INPOS && crit == Vec(0, 0))
@@ -1352,7 +1353,7 @@ void BayesianUnit::selectDir(const Vec& criterium)
             }
             Vec crit = obj;
         }
-        if ((_mode == MODE_FIGHT_G || _mode == MODE_FIGHT_A) && _fleeing )//&& crit == Vec(0, 0))
+        if ((_mode == MODE_FIGHT_G || _mode == MODE_FIGHT_A) && _fleeing && crit == Vec(0, 0))//&& crit == Vec(0, 0))
         {
             Vec tmp = Vec(0, 0);
             for (multimap<double, Vec>::const_iterator it = possible_dirs.first; it != possible_dirs.second; ++it)

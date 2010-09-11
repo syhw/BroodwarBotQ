@@ -36,6 +36,7 @@ UnitsGroup::UnitsGroup()
 , totalGazPrice(0)
 , totalSupply(0)
 , _alignFormation(false)
+, _hasDetection(0)
 , enemiesCenter(Position(0, 0))
 {
     _eUnitsFilter = & EUnitsFilter::Instance();
@@ -192,6 +193,8 @@ void UnitsGroup::displayTargets()
 
 double UnitsGroup::evaluateForces()
 {
+    return 1.0; // FOR THE MICRO TOURNAMENT
+    bool onlyInvisibles = true;
     int theirMinPrice = 0;
     int theirGazPrice = 0;
     int theirSupply = 0; // this is double supply: 1 zergling = 1 supply
@@ -215,6 +218,11 @@ double UnitsGroup::evaluateForces()
             }
             continue;
         }
+        if (ut != UnitTypes::Zerg_Lurker // complete when !_eUnitsFilter->getInvisibleUnits().count(it->first)
+            || ut != UnitTypes::Protoss_Dark_Templar
+            || ((ut != UnitTypes::Terran_Wraith && ut != UnitTypes::Terran_Ghost) 
+            || (ut == UnitTypes::Terran_Wraith || ut == UnitTypes::Terran_Ghost) && !_eUnitsFilter->getInvisibleUnits().count(it->first)))
+            onlyInvisibles = false;
         theirMinPrice += ut.mineralPrice();
         theirGazPrice += ut.gasPrice();
         theirSupply += ut.supplyRequired();
@@ -230,7 +238,10 @@ double UnitsGroup::evaluateForces()
     // trying a simple rule: 100 minerals == 4 pop == 75 gaz == 100 pts
     double ourScore = totalMinPrice + (4/3)*totalGazPrice + 25*totalSupply;
     double theirScore = theirMinPrice + (4/3)*theirGazPrice + 25*theirSupply;
-    return ourScore/theirScore;
+    if (onlyInvisibles && !_hasDetection)
+        return 0.1;
+    else
+        return ourScore/theirScore;
 }
 
 void UnitsGroup::update()
@@ -431,15 +442,7 @@ void UnitsGroup::onUnitDestroy(Unit* u)
             (*it)->onUnitDestroy(u);
     else
     {
-        for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
-            if ( (*it)->unit == u ) 
-            {
-                units.erase(it);
-                totalMinPrice -= u->getType().mineralPrice();
-                totalGazPrice -= u->getType().gasPrice();
-                totalSupply -= u->getType().supplyRequired();
-                return;
-            }
+        giveUpControl(u);
     }
     unitDamages.left.erase(u);
 }
@@ -503,6 +506,8 @@ void UnitsGroup::takeControl(Unit* u)
 
     if (tmp != NULL)
         this->units.push_back(tmp);
+    if (u->getType() == UnitTypes::Protoss_Observer)
+        _hasDetection = true;
     totalMinPrice += u->getType().mineralPrice();
     totalGazPrice += u->getType().gasPrice();
     totalSupply += u->getType().supplyRequired();
@@ -521,6 +526,16 @@ void UnitsGroup::giveUpControl(Unit* u)
             units.erase(it);
             break;
         }
+    if (u->getType() == UnitTypes::Protoss_Observer)
+    {
+        _hasDetection = false;
+        for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
+            if ((*it)->unit->getType() == UnitTypes::Protoss_Observer)
+            {
+                _hasDetection = true;
+                break;
+            }
+    }
     totalMinPrice -= u->getType().mineralPrice();
     totalGazPrice -= u->getType().gasPrice();
     totalSupply -= u->getType().supplyRequired();

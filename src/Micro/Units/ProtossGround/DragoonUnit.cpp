@@ -12,6 +12,7 @@ std::set<BWAPI::UnitType> DragoonUnit::setPrio;
 
 DragoonUnit::DragoonUnit(BWAPI::Unit* u, UnitsGroup* ug)
 : GroundUnit(u, ug)
+, _startedAttack(-100)
 {
     if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Singularity_Charge))
         addRange = 64;
@@ -29,7 +30,7 @@ DragoonUnit::DragoonUnit(BWAPI::Unit* u, UnitsGroup* ug)
         setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode);
         setPrio.insert(BWAPI::UnitTypes::Zerg_Defiler);
     }
-    _fleeingDmg = 14;
+    _fleeingDmg = 12; // 
 }
 
 DragoonUnit::~DragoonUnit()
@@ -51,9 +52,38 @@ int DragoonUnit::addRangeAir()
 bool DragoonUnit::decideToFlee()
 {
     // TODO complete conditions
-    // TODO integrate over periods of time
-    _fleeingDmg = 4;
-    return (_lastTotalHP - (unit->getShields() + unit->getHitPoints()) >= _fleeingDmg || (!unit->getShields() && (_lastTotalHP - unit->getHitPoints() > 3)));
+    int diff = _lastTotalHP - (unit->getShields() + unit->getHitPoints());
+    _HPLosts.push_back(diff);
+    _sumLostHP += diff;
+    if (_HPLosts.size() > 24)
+    {
+        _sumLostHP -= _HPLosts.front();
+        _HPLosts.pop_front();
+    }
+    if (_sumLostHP > _fleeingDmg)
+        _fleeing = true;
+    return _sumLostHP > _fleeingDmg;
+}
+
+void DragoonUnit::simpleFlee()
+{
+    Vec dirFlee = Vec(0, 0);
+    for (std::map<Unit*, Position>::const_iterator it = _unitsGroup->enemies.begin();
+        it != _unitsGroup->enemies.end(); ++it)
+    {
+        if (it->first && it->first->exists() && it->first->isVisible()
+            && it->first->getTarget() == unit )// && it->first->getType().groundWeapon().maxRange() - it->second.getDistance(_unitPos) < unit->getType().topSpeed()*15)
+        {
+            dirFlee += Vec(_unitPos.x() - it->first->getPosition().x(), _unitPos.y() - it->first->getPosition().y());
+        }
+    }
+    if (dirFlee != Vec(0, 0))
+    dirFlee.normalize();
+    dirFlee *= 64;
+    Position tmp = dirFlee.translate(_unitPos);
+    unit->move(tmp);
+    //dir = dirFlee;
+    //clickDir();
 }
 
 void DragoonUnit::micro()
@@ -62,37 +92,35 @@ void DragoonUnit::micro()
     if (unit->isStartingAttack())
     {
         if (Broodwar->getSelectedUnits().count(unit))
-            Broodwar->printf("starting attack at frame: %d", Broodwar->getFrameCount());
+            Broodwar->printf("starting attack at frame: %d, distance to target %d", Broodwar->getFrameCount(), targetEnemy->getDistance(unit));
     }
 #endif
-    if (!_fleeing)
-        _fleeing = decideToFlee();
+    if (unit->isStartingAttack())
+        _startedAttack = Broodwar->getFrameCount();
+    decideToFlee();
     int currentFrame = Broodwar->getFrameCount();
     if (currentFrame - _lastAttackFrame <= getAttackDuration()) // not interrupting attacks
         return;
     if (currentFrame - _lastAttackFrame == getAttackDuration() + 1)
         clearDamages();
-    //if (currentFrame - _lastAttackFrame == Broodwar->getLatency() + 1)
-    //    clearDamages();
     if (unit->getGroundWeaponCooldown() <= Broodwar->getLatency() + 1)
     {
         updateRangeEnemies();
         updateTargetEnemy();
-        attackEnemyUnit(targetEnemy);
+        if (Broodwar->getFrameCount() - _startedAttack > getAttackDuration())
+            attackEnemyUnit(targetEnemy);
+        //if (unit->getOrderTarget() != targetEnemy)
+        //    attackEnemyUnit(targetEnemy);
     }
-    else if (unit->getGroundWeaponCooldown() <= Broodwar->getLatency())
-    {
-        ; // do nothing
-    }
-    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatency() + 2) // == (Broodwar->getLatency()+1)*2
+    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatency() + 2) // == (Broodwar->getLatency()+1)*2, safety
     {
         if(_fleeing)
         {
-            //flee();
+            simpleFlee();
         }
         else
         {
-            //fightMove();
+            fightMove();
         }
     }
 }
