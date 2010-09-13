@@ -5,6 +5,7 @@
 
 class ObserverUnit : public FlyingUnit
 {
+    EUnitsFilter* _eUnitsFilter;
 public:
     ObserverUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~ObserverUnit();

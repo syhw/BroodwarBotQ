@@ -457,13 +457,18 @@ void BayesianUnit::attackEnemyUnit(Unit* u)
     //    return;
     if (u && u->exists() && u->isVisible() && u->isDetected())
     {
-        unit->rightClick(u);
         _lastClickFrame = Broodwar->getFrameCount();
     }
     if (inRange(u)) 
+    {
+        unit->rightClick(u);
         _lastAttackFrame = Broodwar->getFrameCount();
+    }
     else
+    {
+        unit->move(u->getPosition());
         _lastMoveFrame = Broodwar->getFrameCount();
+    }
 }
 
 void BayesianUnit::drawProbs(multimap<double, Vec>& probs, int number)
@@ -918,6 +923,7 @@ void BayesianUnit::clearDamages()
 void BayesianUnit::updateTargetEnemy()
 {
     // ===== update oorTargetEnemy =====
+    /// take one in our priority set and in focus fire order
     for (UnitDmgBimap::right_iterator it = _unitsGroup->unitDamages.right.begin();
         it != _unitsGroup->unitDamages.right.end(); ++it)
     {
@@ -953,6 +959,7 @@ void BayesianUnit::updateTargetEnemy()
     }
     if (oorTargetEnemy == NULL || !oorTargetEnemy->exists())
     {
+        /// take one in our priority set
         for (std::multimap<double, BWAPI::Unit*>::const_iterator it = _rangeEnemies.begin();
             it != _rangeEnemies.end(); ++it)
         {
@@ -972,6 +979,40 @@ void BayesianUnit::updateTargetEnemy()
                 && testType != BWAPI::UnitTypes::Zerg_Spore_Colony)
                 continue;
             if (getSetPrio().count(testType))
+            {
+                oorTargetEnemy = it->second;
+                break;
+            }
+        }
+    }
+    if (oorTargetEnemy == NULL || !oorTargetEnemy->exists())
+    {
+        /// take the best in focus fire order, not especially out of range
+        for (UnitDmgBimap::right_iterator it = _unitsGroup->unitDamages.right.begin();
+            it != _unitsGroup->unitDamages.right.end(); ++it)
+        {
+            if (!it->second->exists() || !it->second->isVisible())
+                continue;
+            UnitType testType = it->second->getType();
+            if (testType.isBuilding() 
+                && testType != BWAPI::UnitTypes::Protoss_Pylon
+                && testType != BWAPI::UnitTypes::Protoss_Photon_Cannon
+                && testType != BWAPI::UnitTypes::Terran_Bunker
+                && testType != BWAPI::UnitTypes::Terran_Missile_Turret
+                && testType != BWAPI::UnitTypes::Zerg_Sunken_Colony
+                && testType != BWAPI::UnitTypes::Zerg_Spore_Colony)
+                continue;
+            if (testType == BWAPI::UnitTypes::Protoss_High_Templar && it->second->getEnergy() < 60)
+                continue;
+            if (testType == BWAPI::UnitTypes::Protoss_Dark_Archon && it->second->getEnergy() < 80)
+                continue;
+            if (testType == BWAPI::UnitTypes::Terran_Science_Vessel && it->second->getEnergy() < 70)
+                continue;
+            if (testType == BWAPI::UnitTypes::Zerg_Defiler && it->second->getEnergy() < 60)
+                continue;
+            if (testType == BWAPI::UnitTypes::Zerg_Queen && it->second->getEnergy() < 60)
+                continue;
+            if (it->first.dmg < it->second->getHitPoints() + it->second->getShields())
             {
                 oorTargetEnemy = it->second;
                 break;
@@ -1186,6 +1227,8 @@ void BayesianUnit::updateTargetEnemy()
 
 void BayesianUnit::setTargetEnemy(Unit* u)
 {
+    if (oorTargetEnemy == u)
+        oorTargetEnemy = NULL; // not to move in its direction as we are already in range
     targetEnemy = u;
     if (u != NULL && _unitsGroup->unitDamages.left.count(u))
     { /// <=> _unitsGroup->unitDamages.left[u] += computeDmg(u);
@@ -1341,7 +1384,6 @@ void BayesianUnit::selectDir(const Vec& criterium)
     else
     {
         pair<multimap<double, Vec>::const_iterator, multimap<double, Vec>::const_iterator> possible_dirs = _dirvProb.equal_range(last->first);
-        Broodwar->printf("HERE");
         Vec crit = criterium;
         
         if (_mode == MODE_INPOS && crit == Vec(0, 0))
@@ -1536,7 +1578,16 @@ void BayesianUnit::fightMove()
         updateDir();
         clickDir();
         _fightMoving = true;
+        return;
     }
+    /// Or simply move away from our friends
+    /*if (!_fightMoving || Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency())
+    {
+        // TODO TO COMPLETE (with a clickTarget() if dist > threshold)
+        updateDir();
+        clickDir();
+        _fightMoving = true;
+    }*/
 }
 
 void BayesianUnit::drawArrow(Vec& v)

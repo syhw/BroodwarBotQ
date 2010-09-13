@@ -11,7 +11,6 @@ protected:
     static int attackDuration;
     inline bool decideToFlee();
     inline void simpleFlee();
-    int _startedAttack;
 public:
     DragoonUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~DragoonUnit();

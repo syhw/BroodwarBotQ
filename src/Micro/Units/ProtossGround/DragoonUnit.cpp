@@ -12,7 +12,6 @@ std::set<BWAPI::UnitType> DragoonUnit::setPrio;
 
 DragoonUnit::DragoonUnit(BWAPI::Unit* u, UnitsGroup* ug)
 : GroundUnit(u, ug)
-, _startedAttack(-100)
 {
     if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Singularity_Charge))
         addRange = 64;
@@ -30,7 +29,7 @@ DragoonUnit::DragoonUnit(BWAPI::Unit* u, UnitsGroup* ug)
         setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode);
         setPrio.insert(BWAPI::UnitTypes::Zerg_Defiler);
     }
-    _fleeingDmg = 12; // 
+    _fleeingDmg = 22; // 
 }
 
 DragoonUnit::~DragoonUnit()
@@ -62,17 +61,28 @@ bool DragoonUnit::decideToFlee()
     }
     if (_sumLostHP > _fleeingDmg)
         _fleeing = true;
+    else
+        _fleeing = false;
     return _sumLostHP > _fleeingDmg;
 }
 
 void DragoonUnit::simpleFlee()
 {
+    _fightMoving = false;
+    if (!this->mapManager->groundDamages[_unitPos.x()/32 + _unitPos.y()/32*Broodwar->mapWidth()])
+    {
+        _fleeing = false;
+        return;
+    }
+    _fleeing = true;
+    if (Broodwar->getFrameCount() - _lastClickFrame < Broodwar->getLatency())
+        return;
     Vec dirFlee = Vec(0, 0);
     for (std::map<Unit*, Position>::const_iterator it = _unitsGroup->enemies.begin();
         it != _unitsGroup->enemies.end(); ++it)
     {
         if (it->first && it->first->exists() && it->first->isVisible()
-            && it->first->getTarget() == unit )// && it->first->getType().groundWeapon().maxRange() - it->second.getDistance(_unitPos) < unit->getType().topSpeed()*15)
+            && (it->first->getTarget() == unit || it->first->getOrderTarget() == unit))// && it->first->getType().groundWeapon().maxRange() - it->second.getDistance(_unitPos) < unit->getType().topSpeed()*15)
         {
             dirFlee += Vec(_unitPos.x() - it->first->getPosition().x(), _unitPos.y() - it->first->getPosition().y());
         }
@@ -81,6 +91,23 @@ void DragoonUnit::simpleFlee()
     dirFlee.normalize();
     dirFlee *= 64;
     Position tmp = dirFlee.translate(_unitPos);
+    for (std::set<Unit*>::const_iterator it = Broodwar->self()->getUnits().begin();
+        it != Broodwar->self()->getUnits().end(); ++it)
+    {
+        double dist = (*it)->getDistance(tmp);
+        if (dist < 32.0)
+        {
+            if (dist < 16.0)
+            {
+                Vec tmpVec = Vec(tmp.x() - (*it)->getPosition().x(), tmp.y() - (*it)->getPosition().y());
+                tmpVec.normalize();
+                tmpVec *= 16;
+                tmp = tmpVec.translate(tmp);
+            }
+            else
+                tmp = Vec(tmp.x() - (*it)->getPosition().x(), tmp.y() - (*it)->getPosition().y()).translate(tmp);
+        }
+    }
     unit->move(tmp);
     //dir = dirFlee;
     //clickDir();
@@ -92,25 +119,29 @@ void DragoonUnit::micro()
     if (unit->isStartingAttack())
     {
         if (Broodwar->getSelectedUnits().count(unit))
-            Broodwar->printf("starting attack at frame: %d, distance to target %d", Broodwar->getFrameCount(), targetEnemy->getDistance(unit));
+            Broodwar->printf("starting attack at frame: %d, distance to target %f", Broodwar->getFrameCount(), targetEnemy->getDistance(unit));
     }
 #endif
-    if (unit->isStartingAttack())
-        _startedAttack = Broodwar->getFrameCount();
     decideToFlee();
     int currentFrame = Broodwar->getFrameCount();
     if (currentFrame - _lastAttackFrame <= getAttackDuration()) // not interrupting attacks
         return;
     if (currentFrame - _lastAttackFrame == getAttackDuration() + 1)
         clearDamages();
+    /*if (_fleeing)
+    {
+        simpleFlee();
+        return;
+    }*/
     if (unit->getGroundWeaponCooldown() <= Broodwar->getLatency() + 1)
     {
         updateRangeEnemies();
         updateTargetEnemy();
-        if (Broodwar->getFrameCount() - _startedAttack > getAttackDuration())
-            attackEnemyUnit(targetEnemy);
-        //if (unit->getOrderTarget() != targetEnemy)
-        //    attackEnemyUnit(targetEnemy);
+        if (!inRange(targetEnemy))
+        {
+            clearDamages();
+        }
+        attackEnemyUnit(targetEnemy);
     }
     else if (unit->getGroundWeaponCooldown() > Broodwar->getLatency() + 2) // == (Broodwar->getLatency()+1)*2, safety
     {
