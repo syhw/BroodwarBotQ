@@ -35,7 +35,7 @@ UnitsGroup::UnitsGroup()
 , totalMinPrice(0)
 , totalGazPrice(0)
 , totalSupply(0)
-, _alignFormation(false)
+, _alignFormation(true) // TODO TOCHANGE false
 , _hasDetection(0)
 , enemiesCenter(Position(0, 0))
 {
@@ -279,7 +279,6 @@ void UnitsGroup::update()
     for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     {
         if ((*it)->unit->getType() == UnitTypes::Protoss_Zealot 
-            || (*it)->unit->getType() == UnitTypes::Protoss_Dark_Archon
             || (*it)->unit->getType() == UnitTypes::Protoss_Archon)
             _alignFormation = false;
         this->totalHP += (*it)->unit->getHitPoints();
@@ -317,7 +316,7 @@ void UnitsGroup::update()
     //Broodwar->printf( "UnitsGroup::update() took %2.5f seconds\n", dur); 
     Broodwar->drawCircleMap(center.x(), center.y(), maxRadius + maxRange + 32, Colors::Yellow);
 
-    if (!enemies.empty()) /// We fight, we'll see later for the goals
+    if (enemies.size() > 4) //(!enemies.empty()) /// We fight, we'll see later for the goals TODO MICROONLY
     {
         double force = evaluateForces();
         if (force < 0.66) // TOCHANGE 0.66
@@ -432,6 +431,13 @@ void UnitsGroup::addGoal(pGoal goal)
 	goal->setUnitsGroup(this);
    // if (goals.size() == 1 && !this->units.empty())
    // this->goals.front()->achieve();
+}
+
+void UnitsGroup::addGoalFront(pGoal goal)
+{
+    this->goals.push_front(goal);
+    goal->setUnitsGroup(this);
+    goals.front()->achieve();
 }
 
 

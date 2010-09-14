@@ -36,6 +36,8 @@ public:
     MicroAIModule();
 #endif
     ~MicroAIModule();
+    bool enemiesFound;
+    BWAPI::TilePosition eStartLocation;
 	virtual void onEnd(bool isWinner);
 	virtual void onFrame();
 	//virtual void onRemove(BWAPI::Unit* unit);

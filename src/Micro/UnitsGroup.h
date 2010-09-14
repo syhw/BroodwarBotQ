@@ -91,6 +91,7 @@ public:
 	virtual void formation(pFormation f);
 	virtual void setGoals(std::list<pGoal>& goals);
 	virtual void addGoal(pGoal goal);
+    virtual void addGoalFront(pGoal goal);
 	
 	inline void updateCenter();
     virtual BWAPI::Position getCenter() const;

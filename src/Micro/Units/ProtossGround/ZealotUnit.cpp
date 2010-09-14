@@ -24,6 +24,8 @@ ZealotUnit::ZealotUnit(BWAPI::Unit* u, UnitsGroup* ug)
 
 ZealotUnit::~ZealotUnit()
 {
+    if (Broodwar->getFrameCount() - _lastAttackFrame <= getAttackDuration())
+        clearDamages();
 }
 
 bool ZealotUnit::decideToFlee()
@@ -36,12 +38,6 @@ bool ZealotUnit::decideToFlee()
 
 void ZealotUnit::micro()
 {
-    if (unit->isStartingAttack())
-    {
-        //Broodwar->printf("is starting attack: %d, attack freq %d", Broodwar->getFrameCount(), unit->getType().groundWeapon().damageCooldown());
-        _lastAttackFrame = Broodwar->getFrameCount();
-        return;
-    }
     if (!_fleeing)
         _fleeing = decideToFlee();
     int currentFrame = Broodwar->getFrameCount();    
@@ -52,37 +48,41 @@ void ZealotUnit::micro()
     updateRangeEnemies();
     updateTargetEnemy();
 
-    /// Dodge storms
-    const std::map<Bullet*, Position>& storms = MapManager::Instance().getTrackedStorms();
-    for (std::map<Bullet*, Position>::const_iterator it = storms.begin();
-        it != storms.end(); ++it)
-    {
-        if (it->second.getApproxDistance(_unitPos) < 67.8)
-        {
-            // update possible directions vector
-            updateDirV();
-            // update attractions
-            updateAttractors();
-            // update objectives
-            if (oorTargetEnemy && oorTargetEnemy->exists() && oorTargetEnemy->isVisible())
-            {
-                obj = Vec(oorTargetEnemy->getPosition().x() - _unitPos.x(), oorTargetEnemy->getPosition().y() - _unitPos.y());
-            }
-            else if (_unitsGroup->enemiesCenter != Positions::None)
-            {
-                obj = Vec(_unitsGroup->enemiesCenter.x() - _unitPos.x(), _unitsGroup->enemiesCenter.y() - _unitPos.y());
-            }
-            else
-                obj = Vec(0, 0);
+    /// Dodge storm, drag mine, drag scarab
+    if (dodgeStorm() || dragMine() || dragScarab()) 
+        return;
 
-            // compute the probability to go in each dirv(ector)
-            computeProbs();
-            // select the most probable, most in the direction of obj if equally probables
-            selectDir(obj);
-            clickDir();
-            return;
+    if (unit->getGroundWeaponCooldown() <= Broodwar->getLatency() + 1)
+    {
+        if (inRange(targetEnemy))
+            Broodwar->printf("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+        else
+        {
+            Broodwar->printf("%d, %d", unit->getType().groundWeapon().maxRange(), targetEnemy->getDistance(_unitPos));
+        }
+        /// ATTACK
+        if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() && inRange(targetEnemy))
+            attackEnemyUnit(targetEnemy);
+        else if (oorTargetEnemy && oorTargetEnemy->exists() && oorTargetEnemy->isVisible() && oorTargetEnemy->getDistance(_unitPos) < 92.0)
+            attackEnemyUnit(oorTargetEnemy);
+        else if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible())
+            attackEnemyUnit(targetEnemy);
+        else
+            unit->attackMove(_unitsGroup->enemiesCenter);
+    }
+    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatency()*2 + 2) // == (Broodwar->getLatency()+1)*2, safety
+    {
+        if (!dodgeStorm() && !dragScarab() && !dragMine() && _fleeing)
+        {
+            simpleFlee();
+        }
+        else
+        {
+            fightMove();
         }
     }
+    return;
+
     if (Broodwar->getFrameCount() - _lastAttackFrame <= Broodwar->getLatency() + 1) //&& Broodwar->getFrameCount() - _lastAttackFrame + Broodwar->getLatency() < unit->getType().groundWeapon().damageCooldown())
     {
         /// ATTACK

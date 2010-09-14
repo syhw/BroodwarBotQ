@@ -145,6 +145,11 @@ protected:
     virtual int addRangeGround();
     virtual int addRangeAir();
     void attackEnemyUnit(BWAPI::Unit* u);
+    virtual bool decideToFlee(); // sets _fleeing
+    void simpleFlee();
+    bool dodgeStorm();
+    bool dragScarab();
+    bool dragMine();
     void drawProbs(std::multimap<double, Vec>& probs, int number=0);
     unit_mode _mode;
 public:

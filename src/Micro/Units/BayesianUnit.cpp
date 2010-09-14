@@ -453,11 +453,13 @@ double BayesianUnit::computeProb(unsigned int i)
 
 void BayesianUnit::attackEnemyUnit(Unit* u)
 {
-    //if (Broodwar->getFrameCount() - _lastClickFrame <= Broodwar->getLatency())
-    //    return;
     if (u && u->exists() && u->isVisible() && u->isDetected())
     {
         _lastClickFrame = Broodwar->getFrameCount();
+    }
+    else
+    {
+        return;
     }
     if (inRange(u)) 
     {
@@ -466,8 +468,11 @@ void BayesianUnit::attackEnemyUnit(Unit* u)
     }
     else
     {
-        unit->move(u->getPosition());
-        _lastMoveFrame = Broodwar->getFrameCount();
+        if (Broodwar->getFrameCount() - _lastMoveFrame > Broodwar->getLatency())
+        {
+            unit->move(u->getPosition());
+            _lastMoveFrame = Broodwar->getFrameCount();
+        }
     }
 }
 
@@ -1537,7 +1542,7 @@ void BayesianUnit::fightMove()
     /// approach siege tanks or approach our targetEnemy if not in range
     if (targetEnemy != NULL && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected()
         && ((targetEnemy->getType() == UnitTypes::Terran_Siege_Tank_Siege_Mode 
-        && targetEnemy->getDistance(_unitPos) > 45.0) || !inRange(targetEnemy))
+        && targetEnemy->getDistance(_unitPos) > 45.0) || !inRange(targetEnemy) || (_unitsGroup->units.size() > 2 && targetEnemy->getDistance(_unitPos) > 128)) // TODO MICROONLY
         && (!_fightMoving || Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
     {
         unit->move(targetEnemy->getPosition());
@@ -1581,6 +1586,32 @@ void BayesianUnit::fightMove()
         return;
     }
     /// Or simply move away from our friends
+    /*updateDirV();
+    updateAttractors();
+    obj = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y());
+    _dirvProb.clear();
+    for (unsigned int i = 0; i < _dirv.size(); ++i)
+    {
+        double prob = 1.0;
+        prob *= _repulseProb[_repulseValues[i]]; /// Repulsion of the other units incoming towards us
+        if (!(unit->getType().isFlyer()))
+        {
+            if (_occupation[i] == OCCUP_BUILDING) /// NON-WALKABLE (BUILDING) INFLUENCE
+            {	
+                prob *= 1.0-_PROB_NO_BUILDING_MOVE;
+            }
+            else if (_occupation[i] == OCCUP_BLOCKING) /// NON-WALKABLE INFLUENCE
+            {
+                prob *= 1.0-_PROB_NO_WALL_MOVE;
+            }
+            else if (_occupation[i] == OCCUP_UNIT)
+            {
+                prob *= 1.0-_PROB_NO_UNIT_MOVE;
+            }
+        }
+        _dirvProb.insert(make_pair(prob, _dirv[i]));
+    }
+    selectDir(obj);*/
     /*if (!_fightMoving || Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency())
     {
         // TODO TO COMPLETE (with a clickTarget() if dist > threshold)
@@ -1614,6 +1645,137 @@ void BayesianUnit::onUnitHide(Unit* u)
 {
 }
 
+bool BayesianUnit::decideToFlee()
+{
+    // TODO complete conditions
+    int diff = _lastTotalHP - (unit->getShields() + unit->getHitPoints());
+    _HPLosts.push_back(diff);
+    _sumLostHP += diff;
+    if (_HPLosts.size() > 24)
+    {
+        _sumLostHP -= _HPLosts.front();
+        _HPLosts.pop_front();
+    }
+    if (_sumLostHP > _fleeingDmg)
+        _fleeing = true;
+    else
+        _fleeing = false;
+    return _sumLostHP > _fleeingDmg;
+}
+
+void BayesianUnit::simpleFlee()
+{
+    _fightMoving = false;
+    if (!this->mapManager->groundDamages[_unitPos.x()/32 + _unitPos.y()/32*Broodwar->mapWidth()])
+    {
+        _fleeing = false;
+        return;
+    }
+    if ((_unitsGroup->enemies.size() <= 4  || _unitsGroup->units.size() <= 4)&& targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() && !outRanges(targetEnemy)) // TODO MICROONLY
+    {
+        _fleeing = false;
+        return;
+    }
+    _fleeing = true;
+    if (Broodwar->getFrameCount() - _lastClickFrame < Broodwar->getLatency())
+        return;
+    Vec dirFlee = Vec(0, 0);
+    for (std::map<Unit*, Position>::const_iterator it = _unitsGroup->enemies.begin();
+        it != _unitsGroup->enemies.end(); ++it)
+    {
+        if (it->first && it->first->exists() && it->first->isVisible()
+            && (it->first->getTarget() == unit || it->first->getOrderTarget() == unit) && it->first->getType().groundWeapon().maxRange() - it->second.getDistance(_unitPos) < unit->getType().topSpeed()*15)
+        {
+            dirFlee += Vec(_unitPos.x() - it->first->getPosition().x(), _unitPos.y() - it->first->getPosition().y());
+        }
+    }
+    if (dirFlee == Vec(0, 0))
+        return;
+    dirFlee.normalize();
+    //Vec dirFlee64 = dirFlee;
+    dirFlee *= 16; // 32 // 45
+    Position tmp = dirFlee.translate(_unitPos);
+    for (std::set<Unit*>::const_iterator it = Broodwar->self()->getUnits().begin();
+        it != Broodwar->self()->getUnits().end(); ++it)
+    {
+        if ((*it) == unit)
+            continue;
+        if ((*it)->getDistance(tmp) < 16.0)
+            return;
+    }
+    //dirFlee64 *= 64;
+    dirFlee *= 2;
+    tmp = dirFlee.translate(_unitPos);
+    if (!Broodwar->isWalkable(tmp.x()/8, tmp.y()/8)) // TODO to complete
+        return;
+    for (std::set<Unit*>::const_iterator it = Broodwar->self()->getUnits().begin();
+        it != Broodwar->self()->getUnits().end(); ++it)
+    {
+        if ((*it) == unit)
+            continue;
+        double dist = (*it)->getDistance(tmp);
+        if (dist < 32.0)
+        {
+            if (dist < 16.0)
+            {
+                return;
+                /*Vec tmpVec = Vec(tmp.x() - (*it)->getPosition().x(), tmp.y() - (*it)->getPosition().y());
+                tmpVec.normalize();
+                tmpVec *= 16;
+                tmp = tmpVec.translate(tmp);*/
+            }
+            else
+                tmp = Vec(tmp.x() - (*it)->getPosition().x(), tmp.y() - (*it)->getPosition().y()).translate(tmp);
+        }
+    }
+    unit->move(tmp);
+}
+
+bool BayesianUnit::dodgeStorm()
+{
+    const std::map<Bullet*, Position>& storms = MapManager::Instance().getTrackedStorms();
+    for (std::map<Bullet*, Position>::const_iterator it = storms.begin();
+        it != storms.end(); ++it)
+    {
+        if (it->second.getApproxDistance(_unitPos) < 67.8)
+        {
+            // update possible directions vector
+            updateDirV();
+            // update attractions
+            updateAttractors();
+            // update objectives
+            if (oorTargetEnemy && oorTargetEnemy->exists() && oorTargetEnemy->isVisible())
+            {
+                obj = Vec(oorTargetEnemy->getPosition().x() - _unitPos.x(), oorTargetEnemy->getPosition().y() - _unitPos.y());
+            }
+            else if (_unitsGroup->enemiesCenter != Positions::None)
+            {
+                obj = Vec(_unitsGroup->enemiesCenter.x() - _unitPos.x(), _unitsGroup->enemiesCenter.y() - _unitPos.y());
+            }
+            else
+                obj = Vec(0, 0);
+
+            // compute the probability to go in each dirv(ector)
+            computeProbs();
+            // select the most probable, most in the direction of obj if equally probables
+            selectDir(obj);
+            clickDir();
+            return true;
+        }
+    }
+    return false;
+}
+
+bool BayesianUnit::dragMine()
+{
+    return false;
+}
+
+bool BayesianUnit::dragScarab()
+{
+    return false;
+}
+
 void BayesianUnit::update()
 {
     if (!unit || !unit->exists()) return;
@@ -1623,7 +1785,7 @@ void BayesianUnit::update()
     check();
 
     if (_mode != MODE_FIGHT_G && _mode != MODE_SCOUT 
-        && !_unitsGroup->enemies.empty()
+        && _unitsGroup->enemies.size() > 4 // !_unitsGroup->enemies.empty() TODO MICROONLY
         && unit->getGroundWeaponCooldown() <= Broodwar->getLatency())
     {
         this->switchMode(MODE_FIGHT_G);

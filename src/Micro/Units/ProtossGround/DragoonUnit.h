@@ -9,8 +9,7 @@ protected:
     static std::set<BWAPI::UnitType> setPrio;
     static int addRange;
     static int attackDuration;
-    inline bool decideToFlee();
-    inline void simpleFlee();
+    virtual bool decideToFlee();
 public:
     DragoonUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~DragoonUnit();

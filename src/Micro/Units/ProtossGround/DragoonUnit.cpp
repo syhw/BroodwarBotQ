@@ -50,6 +50,8 @@ int DragoonUnit::addRangeAir()
 
 bool DragoonUnit::decideToFlee()
 {
+    if (unit->getShields() < 10)
+        _fleeingDmg = 12;
     // TODO complete conditions
     int diff = _lastTotalHP - (unit->getShields() + unit->getHitPoints());
     _HPLosts.push_back(diff);
@@ -63,54 +65,23 @@ bool DragoonUnit::decideToFlee()
         _fleeing = true;
     else
         _fleeing = false;
-    return _sumLostHP > _fleeingDmg;
-}
-
-void DragoonUnit::simpleFlee()
-{
-    _fightMoving = false;
-    if (!this->mapManager->groundDamages[_unitPos.x()/32 + _unitPos.y()/32*Broodwar->mapWidth()])
+    if (!_fleeing)
     {
-        _fleeing = false;
-        return;
-    }
-    _fleeing = true;
-    if (Broodwar->getFrameCount() - _lastClickFrame < Broodwar->getLatency())
-        return;
-    Vec dirFlee = Vec(0, 0);
-    for (std::map<Unit*, Position>::const_iterator it = _unitsGroup->enemies.begin();
-        it != _unitsGroup->enemies.end(); ++it)
-    {
-        if (it->first && it->first->exists() && it->first->isVisible()
-            && (it->first->getTarget() == unit || it->first->getOrderTarget() == unit))// && it->first->getType().groundWeapon().maxRange() - it->second.getDistance(_unitPos) < unit->getType().topSpeed()*15)
+        int incDmg = 0;
+        for (std::map<Unit*, Position>::const_iterator it = _unitsGroup->enemies.begin();
+            it != _unitsGroup->enemies.end(); ++it)
         {
-            dirFlee += Vec(_unitPos.x() - it->first->getPosition().x(), _unitPos.y() - it->first->getPosition().y());
-        }
-    }
-    if (dirFlee != Vec(0, 0))
-    dirFlee.normalize();
-    dirFlee *= 64;
-    Position tmp = dirFlee.translate(_unitPos);
-    for (std::set<Unit*>::const_iterator it = Broodwar->self()->getUnits().begin();
-        it != Broodwar->self()->getUnits().end(); ++it)
-    {
-        double dist = (*it)->getDistance(tmp);
-        if (dist < 32.0)
-        {
-            if (dist < 16.0)
+            if (it->first && it->first->exists() && it->first->isVisible()
+                && (it->first->getTarget() == unit || it->first->getOrderTarget() == unit))
+                //&& it->first->getType().groundWeapon().maxRange() - it->second.getDistance(_unitPos) < unit->getType().topSpeed()* (unit->getGroundWeaponCooldown() - Broodwar->getLatency()))
             {
-                Vec tmpVec = Vec(tmp.x() - (*it)->getPosition().x(), tmp.y() - (*it)->getPosition().y());
-                tmpVec.normalize();
-                tmpVec *= 16;
-                tmp = tmpVec.translate(tmp);
+                incDmg += it->first->getType().groundWeapon().damageAmount() * it->first->getType().maxGroundHits();
             }
-            else
-                tmp = Vec(tmp.x() - (*it)->getPosition().x(), tmp.y() - (*it)->getPosition().y()).translate(tmp);
         }
+        if (incDmg + _sumLostHP > _fleeingDmg)
+            _fleeing = true;
     }
-    unit->move(tmp);
-    //dir = dirFlee;
-    //clickDir();
+    return _fleeing;
 }
 
 void DragoonUnit::micro()
@@ -128,11 +99,6 @@ void DragoonUnit::micro()
         return;
     if (currentFrame - _lastAttackFrame == getAttackDuration() + 1)
         clearDamages();
-    /*if (_fleeing)
-    {
-        simpleFlee();
-        return;
-    }*/
     if (unit->getGroundWeaponCooldown() <= Broodwar->getLatency() + 1)
     {
         updateRangeEnemies();
@@ -143,9 +109,9 @@ void DragoonUnit::micro()
         }
         attackEnemyUnit(targetEnemy);
     }
-    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatency() + 2) // == (Broodwar->getLatency()+1)*2, safety
+    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatency()*2 + 2) // == (Broodwar->getLatency()+1)*2, safety
     {
-        if(_fleeing)
+        if (!dodgeStorm() && !dragScarab() && !dragMine() && _fleeing)
         {
             simpleFlee();
         }
