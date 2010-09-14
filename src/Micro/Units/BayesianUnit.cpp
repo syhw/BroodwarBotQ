@@ -1785,7 +1785,7 @@ void BayesianUnit::update()
     check();
 
     if (_mode != MODE_FIGHT_G && _mode != MODE_SCOUT 
-        && _unitsGroup->enemies.size() > 4 // !_unitsGroup->enemies.empty() TODO MICROONLY
+        && _unitsGroup->enemies.size() > 5 // !_unitsGroup->enemies.empty() TODO MICROONLY
         && unit->getGroundWeaponCooldown() <= Broodwar->getLatency())
     {
         this->switchMode(MODE_FIGHT_G);

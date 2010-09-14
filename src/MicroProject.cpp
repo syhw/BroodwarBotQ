@@ -216,55 +216,55 @@ void MicroAIModule::onFrame()
     if (!*qapp)
         Broodwar->printf("Qt not connected\n");
 #endif
-    BWAPI::TilePosition mp = Broodwar->self()->getStartLocation();
-    Broodwar->printf("mapHeight/2: %d, eStartLocation.y(): %d, my.y(): %d", Broodwar->mapHeight()/2, eStartLocation.y(), mp.y());
     objectManager->onFrame();
 	if (mm != NULL) 
         mm->update();
     // regions->display();
-    if (!enemiesFound && mm->enemies.size() 
-        && mm->enemiesCenter.getDistance(Position(eStartLocation)) > 128.0)
+    if (!enemiesFound && mm->enemies.size())
     {
         enemiesFound = true;
-        /// stacking goals
-        /* Attack in their direction */
-        pGoal tmp_goal = pGoal(new AttackGoal(mm, mm->enemiesCenter));
-        mm->addGoalFront(tmp_goal);
-        /* ARC in their direction (- 192 pixs) */
-        Vec direction = Vec(mm->center.x() - mm->enemiesCenter.x(), mm->center.y() - mm->enemiesCenter.y());
-        direction.normalize();
-        direction *= 192;
-        Position arcCenter = direction.translate(mm->enemiesCenter);
-        pFormation tmp_form = pFormation(new ArcFormation(
-            arcCenter, mm->enemiesCenter));
-        pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-        tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
-        mm->addGoalFront(tmp_goal);
-        /* ARC in their direction (- 288 pixs) */
-        direction *= 1.5;
-        arcCenter = direction.translate(mm->enemiesCenter);
-        tmp_form = pFormation(new ArcFormation(
-            arcCenter, mm->enemiesCenter));
-        tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-        tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
-        mm->addGoalFront(tmp_goal);
-        /* ARC in their direction (- 360 pixs) */
-        direction *= 1.25;
-        arcCenter = direction.translate(mm->enemiesCenter);
-        tmp_form = pFormation(new ArcFormation(
-            arcCenter, mm->enemiesCenter));
-        tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-        tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
-        mm->addGoalFront(tmp_goal);
-        /* Line far */
-        direction *= 1.25;
-        arcCenter = direction.translate(mm->enemiesCenter);
-        direction *= -1.0;
-        tmp_form = pFormation(new LineFormation(
-            arcCenter, direction));
-        tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-        tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
-        mm->addGoalFront(tmp_goal);
+        if (mm->enemiesCenter.getDistance(Position(eStartLocation)) > 128.0)
+        {
+            /// stacking goals
+            /* Attack in their direction */
+            pGoal tmp_goal = pGoal(new AttackGoal(mm, mm->enemiesCenter));
+            mm->addGoalFront(tmp_goal);
+            /* ARC in their direction (- 192 pixs) */
+            Vec direction = Vec(mm->center.x() - mm->enemiesCenter.x(), mm->center.y() - mm->enemiesCenter.y());
+            direction.normalize();
+            direction *= 192;
+            Position arcCenter = direction.translate(mm->enemiesCenter);
+            pFormation tmp_form = pFormation(new ArcFormation(
+                arcCenter, mm->enemiesCenter));
+            pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
+            tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+            mm->addGoalFront(tmp_goal);
+            /* ARC in their direction (- 288 pixs) */
+            direction *= 1.5;
+            arcCenter = direction.translate(mm->enemiesCenter);
+            tmp_form = pFormation(new ArcFormation(
+                arcCenter, mm->enemiesCenter));
+            tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
+            tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+            mm->addGoalFront(tmp_goal);
+            /* ARC in their direction (- 360 pixs) */
+            direction *= 1.25;
+            arcCenter = direction.translate(mm->enemiesCenter);
+            tmp_form = pFormation(new ArcFormation(
+                arcCenter, mm->enemiesCenter));
+            tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
+            tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+            mm->addGoalFront(tmp_goal);
+            /* Line far */
+            direction *= 1.25;
+            arcCenter = direction.translate(mm->enemiesCenter);
+            direction *= -1.0;
+            tmp_form = pFormation(new LineFormation(
+                arcCenter, direction));
+            tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
+            tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+            mm->addGoalFront(tmp_goal);
+        }
     }
     
 #ifdef BW_POS_MOUSE
