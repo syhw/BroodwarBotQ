@@ -314,9 +314,11 @@ void UnitsGroup::update()
     //clock_t f = clock();
     //double dur = (double)(f - s) / CLOCKS_PER_SEC;
     //Broodwar->printf( "UnitsGroup::update() took %2.5f seconds\n", dur); 
+#ifdef __DEBUG_GABRIEL__
     Broodwar->drawCircleMap(center.x(), center.y(), maxRadius + maxRange + 32, Colors::Yellow);
+#endif
 
-    if (enemies.size() > 5) //(!enemies.empty()) /// We fight, we'll see later for the goals TODO MICROONLY
+    if (!enemies.empty()) /// We fight, we'll see later for the goals 
     {
         double force = evaluateForces();
         if (force < 0.66) // TOCHANGE 0.66

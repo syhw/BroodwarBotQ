@@ -31,7 +31,8 @@ void ObserverUnit::micro()
     }
     if (invisPos != Positions::None)
     {
-        unit->move(targetEnemy->getPosition());
+        Broodwar->printf("HERE");
+        unit->move(invisPos);
         _lastClickFrame = Broodwar->getFrameCount();
         _lastMoveFrame = Broodwar->getFrameCount();
     } 

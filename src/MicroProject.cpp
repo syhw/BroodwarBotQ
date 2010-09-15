@@ -15,8 +15,10 @@ void MicroAIModule::onStart()
 	///Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
 	// Enable some cheat flags
     //Broodwar->printf("ON START !!\n");
+#ifdef __DEBUG_GABRIEL__
     Broodwar->enableFlag(Flag::UserInput);
     Broodwar->setLocalSpeed(0);
+#endif
 	//Broodwar->enableFlag(Flag::CompleteMapInformation);
 	BWTA::readMap();
 	BWTA::analyze();
@@ -32,7 +34,6 @@ void MicroAIModule::onStart()
 	mm = new UnitsGroup();
 
     std::string mapName = Broodwar->mapPathName();
-    Broodwar->sendText("map name %s", mapName.c_str());
     mapName = mapName.substr(mapName.find_last_of("\\") + 1, mapName.length() - mapName.find_last_of("\\") - 1);
     Broodwar->sendText("map name: %s", mapName.c_str());
 
@@ -178,6 +179,34 @@ void MicroAIModule::onStart()
         goals.push_back(pGoal(new AttackGoal(mm, 
             Position(Broodwar->mapWidth()/2*32, 50*32))));
     }
+    else if (mapName == std::string("zealots.scm") || mapName == std::string("zealotsCOMPUTER.scm"))
+    {
+        tmp_form = pFormation(new ArcFormation(
+            Position(Broodwar->mapWidth()/2*32 + sign*350,(Broodwar->mapHeight()/2 + 4)*32), 
+            Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
+        tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
+        tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+        goals.push_back(tmp_goal);
+        tmp_form = pFormation(new ArcFormation(
+            Position(Broodwar->mapWidth()/2*32 + sign*450,(Broodwar->mapHeight()/2 + 4)*32), 
+            Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
+        tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
+        tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+        goals.push_back(tmp_goal);
+        goals.push_back(pGoal(new AttackGoal(mm, 
+            Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32))));
+        tmp_form = pFormation(new LineFormation(
+            Position(Broodwar->mapWidth()/2*32,(Broodwar->mapHeight()/2 + 4)*32), Vec(1,0)));
+        tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
+        tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+        goals.push_back(tmp_goal);
+        goals.push_back(pGoal(new AttackGoal(mm, 
+            Position((Broodwar->mapWidth() - (Broodwar->mapWidth() - mp.x()))*32, (Broodwar->mapHeight()/2 + 4)*32))));
+        goals.push_back(pGoal(new AttackGoal(mm, 
+            Position(Broodwar->mapWidth()/2*32, 22*32))));
+        goals.push_back(pGoal(new AttackGoal(mm, 
+            Position(Broodwar->mapWidth()/2*32, 50*32))));
+    }
     else
     {
         tmp_form = pFormation(new ArcFormation(
@@ -273,6 +302,7 @@ void MicroAIModule::onFrame()
     Broodwar->drawTextMouse(12, 0, mousePos);
 #endif
 
+#ifdef __DEBUG_GABRIEL__
     //we will iterate through all the regions and draw the polygon outline of it in green.
 	for(std::set<BWTA::Region*>::const_iterator r=BWTA::getRegions().begin();r!=BWTA::getRegions().end();r++)
 	{
@@ -284,6 +314,8 @@ void MicroAIModule::onFrame()
 			Broodwar->drawLine(CoordinateType::Map,point1.x(),point1.y(),point2.x(),point2.y(),Colors::Green);
 		}
 	}
+#endif
+
     mapManager->onFrame();
     //Broodwar->printf("weapons ground upgrade level %d", Broodwar->enemy()->getUpgradeLevel(UpgradeTypes::Protoss_Ground_Weapons));
     //Broodwar->printf("weapons ground upgrade level %d", eUnitsFilter->getViewedUnits().begin()->first->getUpgradeLevel(UpgradeTypes::Protoss_Ground_Weapons));

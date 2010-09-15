@@ -10,6 +10,9 @@ ProtossStrat::~ProtossStrat()
 }
 
 void ProtossStrat::eRush(){
+#ifdef __DEBUG_GABRIEL__
+    Broodwar->printf("anti rush ON");
+#endif
 	this->buildOrderManager->build(2,BWAPI::UnitTypes::Protoss_Gateway,94);
 	this->buildOrderManager->build(3,BWAPI::UnitTypes::Protoss_Zealot,92);
 	this->buildOrderManager->build(2,BWAPI::UnitTypes::Protoss_Pylon,93);
@@ -76,6 +79,8 @@ void ProtossStrat::setScoutTime(){
 
 		this->firstScout = 20;
 	}
+    else
+        this->firstScout = 16;
 }
 
 void ProtossStrat::update(){

@@ -41,8 +41,9 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 , _maxDiag(sqrt((double)(_slarge*_slarge + _sheight*_sheight)))
 , _maxWeaponsRange(max(unit->getType().groundWeapon().maxRange(), unit->getType().airWeapon().maxRange()))
 , _lastRightClick(unit->getPosition())
-, _lastAttackFrame(0)
-, _lastClickFrame(0)
+, _lastAttackFrame(-100)
+, _lastClickFrame(-100)
+, _lastMoveFrame(-100)
 , _posAtMost13FramesAgo(Position(unit->getPosition().x() + 1, unit->getPosition().y() + 1)) // we don't want posAtMost13FramesAgo  
 , _posAtMost23FramesAgo(unit->getPosition())                                                // and posAtMost23FramesAgo to be equal
 , _iThinkImBlocked(false)
@@ -1175,8 +1176,6 @@ void BayesianUnit::updateTargetEnemy()
         for (std::multimap<double, BWAPI::Unit*>::const_iterator it = stopPrio;
             it != _rangeEnemies.end(); ++it)
         {
-            if (it->first > _maxWeaponsRange)
-                break;
             UnitType testType = it->second->getType();
             if (testType == BWAPI::UnitTypes::Protoss_High_Templar && it->second->getEnergy() < 60)
                 continue;
@@ -1311,6 +1310,13 @@ int BayesianUnit::computeDmg(Unit* u)
 
 bool BayesianUnit::inRange(BWAPI::Unit* u)
 {
+    if (unit->getType() == UnitTypes::Protoss_Zealot 
+        || unit->getType() == UnitTypes::Protoss_Dark_Templar)
+    {
+        int maxEnemyDiag = max(u->getType().dimensionUp() + u->getType().dimensionDown(), u->getType().dimensionRight() + u->getType().dimensionLeft());
+        maxEnemyDiag *= 1.414;
+        return u->getDistance(_unitPos) < maxEnemyDiag + _maxDiag;
+    }
     if (u != NULL && u->exists() && u->isVisible())
     {
         return (!(u->getType().isFlyer()) && unit->getType().groundWeapon() != BWAPI::WeaponTypes::None &&
@@ -1542,7 +1548,7 @@ void BayesianUnit::fightMove()
     /// approach siege tanks or approach our targetEnemy if not in range
     if (targetEnemy != NULL && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected()
         && ((targetEnemy->getType() == UnitTypes::Terran_Siege_Tank_Siege_Mode 
-        && targetEnemy->getDistance(_unitPos) > 45.0) || !inRange(targetEnemy) || (_unitsGroup->units.size() > 2 && targetEnemy->getDistance(_unitPos) > 128)) // TODO MICROONLY
+        && targetEnemy->getDistance(_unitPos) > 45.0) || !inRange(targetEnemy) || (_unitsGroup->units.size() > 10 && targetEnemy->getDistance(_unitPos) > 128)) // TODO MICROONLY (_unitsGroup->units.size() > 10 && targetEnemy->getDistance(_unitPos) > 128)
         && (!_fightMoving || Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
     {
         unit->move(targetEnemy->getPosition());
@@ -1671,7 +1677,7 @@ void BayesianUnit::simpleFlee()
         _fleeing = false;
         return;
     }
-    if ((_unitsGroup->enemies.size() <= 4  || _unitsGroup->units.size() <= 4)&& targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() && !outRanges(targetEnemy)) // TODO MICROONLY
+    if (_unitsGroup->enemies.size() <= 2 && targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() && !outRanges(targetEnemy)) // TOCHANGE 2
     {
         _fleeing = false;
         return;
@@ -1785,7 +1791,7 @@ void BayesianUnit::update()
     check();
 
     if (_mode != MODE_FIGHT_G && _mode != MODE_SCOUT 
-        && _unitsGroup->enemies.size() > 5 // !_unitsGroup->enemies.empty() TODO MICROONLY
+        && !_unitsGroup->enemies.empty()
         && unit->getGroundWeaponCooldown() <= Broodwar->getLatency())
     {
         this->switchMode(MODE_FIGHT_G);

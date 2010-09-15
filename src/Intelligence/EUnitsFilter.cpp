@@ -176,6 +176,18 @@ EViewedUnit EUnitsFilter::getViewedUnit(Unit* u)
     return _eViewedUnits[u];
 }
 
+int EUnitsFilter::getNumbersType(UnitType ut)
+{
+    int count = 0;
+    for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = _eViewedUnits.begin();
+        it != _eViewedUnits.end(); ++it)
+    {
+        if (it->second.type == ut)
+            ++count;
+    }
+    return count;
+}
+
 const std::map<Unit*, std::pair<UnitType, Position> >& EUnitsFilter::getInvisibleUnits()
 {
     return _invisibleUnits;

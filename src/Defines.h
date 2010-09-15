@@ -4,10 +4,9 @@
 
 //#define __DEBUG_LOUIS__
 #define __DEBUG_GABRIEL__
-#define __DEBUG_NICOLAS__
+//#define __DEBUG_NICOLAS__
 //#define __NON_IMPLEMENTE__
-
-#define BW_POS_MOUSE
+//#define BW_POS_MOUSE
 
 #define WALK_TILES_SIZE 8
 #define BW_QT_DEBUG

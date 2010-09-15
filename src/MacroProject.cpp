@@ -4,14 +4,16 @@
 #include <UnitsGroup.h>
 #include <QtGui/QApplication.h>
 
+#define __POOL_TIME_RUSH__ 130 // seconds, 3 workers + 1 pool + 11 seconds
+#define __BBS_TIME_RUSH__ 230 // seconds, 4 workers + 2 barracks + 18 seconds
+#define __GATES_TIME_RUSH__ 190 // seconds, 4 workers + 2 gateways + 18 seconds
+
 using namespace BWAPI;
 
 // TODO TODO TODO: work with accessibility while making it false when onUnitEvade
 
 BattleBroodAI::BattleBroodAI()
 {
-
-
     std::set<UnitType>& aut = BWAPI::UnitTypes::allUnitTypes();
     for (std::set<UnitType>::iterator wu = aut.begin(); wu != aut.end(); wu++)
         log( "%s requieres %i %s", wu->getName().c_str(), wu->whatBuilds().second, wu->whatBuilds().first.getName().c_str());
@@ -434,21 +436,18 @@ void BattleBroodAI::onFrame()
     //Broodwar->printf("Iterations took %f", (double)(end-start)/CLOCKS_PER_SEC);
 }
 
-void BattleBroodAI::onUnitDiscover(BWAPI::Unit* unit){
-	  if (Broodwar->isReplay()) return;
+void BattleBroodAI::onUnitDiscover(BWAPI::Unit* unit)
+{
+    if (Broodwar->isReplay()) return;
   this->informationManager->onUnitDiscover(unit);
   this->unitGroupManager->onUnitDiscover(unit);
-  if(unit->getPlayer() != BWAPI::Broodwar->self()){
-	 // this->macroManager->eRush();
-  }
-
 }
 
 void BattleBroodAI::onUnitEvade(BWAPI::Unit* unit){
-	  if (Broodwar->isReplay()) return;
-  this->informationManager->onUnitEvade(unit);
-  this->unitGroupManager->onUnitEvade(unit);
-  this->arbitrator->onRemoveObject(unit);
+    if (Broodwar->isReplay()) return;
+    this->informationManager->onUnitEvade(unit);
+    this->unitGroupManager->onUnitEvade(unit);
+    this->arbitrator->onRemoveObject(unit);
 }
 
 void BattleBroodAI::onUnitCreate(BWAPI::Unit* unit)
@@ -549,7 +548,14 @@ void BattleBroodAI::onUnitShow(BWAPI::Unit* unit)
 
     mapManager->onUnitShow(unit);
     eUnitsFilter->update(unit);
-	scoutManager->onUnitShow(unit);
+    scoutManager->onUnitShow(unit);
+    if (unit->getPlayer() == BWAPI::Broodwar->enemy())
+    {
+        if ((unit->getType() == UnitTypes::Zerg_Spawning_Pool && Broodwar->getFrameCount() < __POOL_TIME_RUSH__ && !unit->getRemainingBuildTime())
+            || (unit->getType() == UnitTypes::Protoss_Gateway && Broodwar->getFrameCount() < __GATES_TIME_RUSH__ && !unit->getRemainingBuildTime() && eUnitsFilter->getNumbersType(unit->getType()) > 1)
+            || (unit->getType() == UnitTypes::Terran_Barracks && Broodwar->getFrameCount() < __BBS_TIME_RUSH__ && !unit->getRemainingBuildTime() && eUnitsFilter->getNumbersType(unit->getType()) > 1))
+            this->macroManager->eRush();
+    }
 }
 
 void BattleBroodAI::onUnitHide(BWAPI::Unit* unit)

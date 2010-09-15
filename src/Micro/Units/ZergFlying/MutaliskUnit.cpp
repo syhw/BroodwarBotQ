@@ -17,6 +17,8 @@ MutaliskUnit::MutaliskUnit(BWAPI::Unit* u, UnitsGroup* ug)
 
 MutaliskUnit::~MutaliskUnit()
 {
+    if (Broodwar->getFrameCount() - _lastAttackFrame <= getAttackDuration())
+        clearDamages();
 }
 
 bool MutaliskUnit::decideToFlee()
@@ -62,6 +64,10 @@ void MutaliskUnit::micro()
     if (unit->getAirWeaponCooldown() <= Broodwar->getLatency() + 1)
     {
         updateTargetEnemy();
+        if (!inRange(targetEnemy))
+        {
+            clearDamages();
+        }
         attackEnemyUnit(targetEnemy);
     }
     else if (_fleeing || decideToFlee())

@@ -7,6 +7,7 @@ using namespace std;
 using namespace BWAPI;
 
 std::set<BWAPI::UnitType> ZealotUnit::setPrio;
+std::map<BWAPI::Unit*, int> ZealotUnit::_zealotsOn;
 
 ZealotUnit::ZealotUnit(BWAPI::Unit* u, UnitsGroup* ug)
 : GroundUnit(u, ug)
@@ -19,7 +20,7 @@ ZealotUnit::ZealotUnit(BWAPI::Unit* u, UnitsGroup* ug)
         setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode);
         setPrio.insert(BWAPI::UnitTypes::Zerg_Hydralisk);
     }
-    _fleeingDmg = 14; // storm 
+    _fleeingDmg = 24; // one round of storm = 14
 }
 
 ZealotUnit::~ZealotUnit()
@@ -30,17 +31,221 @@ ZealotUnit::~ZealotUnit()
 
 bool ZealotUnit::decideToFlee()
 {
+    if (unit->getShields() < 10)
+        _fleeingDmg = 12;
     // TODO complete conditions
-    // TODO integrate over periods of time
-    _fleeingDmg = 4;
-    return (_lastTotalHP - (unit->getShields() + unit->getHitPoints()) >= _fleeingDmg || (!unit->getShields() && (_lastTotalHP - unit->getHitPoints() > 3)));
+    int diff = _lastTotalHP - (unit->getShields() + unit->getHitPoints());
+    _HPLosts.push_back(diff);
+    _sumLostHP += diff;
+    if (_HPLosts.size() > 24)
+    {
+        _sumLostHP -= _HPLosts.front();
+        _HPLosts.pop_front();
+    }
+    if (_sumLostHP > _fleeingDmg)
+        _fleeing = true;
+    else
+        _fleeing = false;
+    if (!_fleeing)
+    {
+        int incDmg = 0;
+        for (std::map<Unit*, Position>::const_iterator it = _unitsGroup->enemies.begin();
+            it != _unitsGroup->enemies.end(); ++it)
+        {
+            if (it->first && it->first->exists() && it->first->isVisible()
+                && (it->first->getTarget() == unit || it->first->getOrderTarget() == unit))
+                //&& it->first->getType().groundWeapon().maxRange() - it->second.getDistance(_unitPos) < unit->getType().topSpeed()* (unit->getGroundWeaponCooldown() - Broodwar->getLatency()))
+            {
+                incDmg += it->first->getType().groundWeapon().damageAmount() * it->first->getType().maxGroundHits();
+            }
+        }
+        if (incDmg + _sumLostHP > _fleeingDmg)
+            _fleeing = true;
+    }
+    return _fleeing;
 }
+
+void ZealotUnit::clearDamages()
+{
+    // ===== clear old damage =====
+    if (targetEnemy != NULL && _unitsGroup->unitDamages.left.count(targetEnemy))
+    {
+        if (_zealotsOn.count(targetEnemy))
+        {
+            if (_zealotsOn[targetEnemy] <= 1)
+                _zealotsOn.erase(targetEnemy);
+            else
+                _zealotsOn[targetEnemy] = _zealotsOn[targetEnemy] - 1;
+        }
+
+        UnitDmgBimap::left_iterator unitdmgit = _unitsGroup->unitDamages.left.find(targetEnemy);
+        int tmp_dmg = unitdmgit->second.dmg - computeDmg(targetEnemy);
+        Unit* tmp_unit = unitdmgit->first;
+        _unitsGroup->unitDamages.left.erase(unitdmgit);
+        _unitsGroup->unitDamages.insert(UnitDmg(tmp_unit, Dmg(tmp_dmg, tmp_unit, 
+            (targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected() ? tmp_unit->getHitPoints() + tmp_unit->getShields() : 0))));
+    }
+}
+
+void ZealotUnit::setTargetEnemy(Unit* u)
+{
+    if (oorTargetEnemy == u)
+        oorTargetEnemy = NULL; // not to move in its direction as we are already in range
+
+    if (_zealotsOn.count(u))
+        _zealotsOn[u] = _zealotsOn[u] + 1;
+    else
+        _zealotsOn.insert(std::make_pair<Unit*, int>(u, 1));
+
+    targetEnemy = u;
+    if (u != NULL && _unitsGroup->unitDamages.left.count(u))
+    { /// <=> _unitsGroup->unitDamages.left[u] += computeDmg(u);
+        UnitDmgBimap::left_iterator it = _unitsGroup->unitDamages.left.find(u);
+        int tmp_dmg = it->second.dmg + computeDmg(u);
+        _unitsGroup->unitDamages.left.erase(it);
+        _unitsGroup->unitDamages.insert(UnitDmg(u, Dmg(tmp_dmg, u, 
+            (u->exists() && u->isVisible() && u->isDetected() ? u->getHitPoints() + u->getShields() : 0))));
+    }
+    else
+        _unitsGroup->unitDamages.insert(UnitDmg(u, Dmg(computeDmg(u), u, 
+        (u->exists() && u->isVisible() && u->isDetected() ? u->getHitPoints() + u->getShields() : 0))));
+}
+
+void ZealotUnit::updateTargetEnemy()
+{
+    // ===== update oorTargetEnemy =====
+    /// take one in our priority set and in focus fire order
+    for (UnitDmgBimap::right_iterator it = _unitsGroup->unitDamages.right.begin();
+        it != _unitsGroup->unitDamages.right.end(); ++it)
+    {
+        if (!it->second->exists() || !it->second->isVisible())
+            continue;
+        if (inRange(it->second))
+            continue;
+        UnitType testType = it->second->getType();
+        if (testType.isBuilding() 
+            && testType != BWAPI::UnitTypes::Protoss_Pylon
+            && testType != BWAPI::UnitTypes::Protoss_Photon_Cannon
+            && testType != BWAPI::UnitTypes::Terran_Bunker
+            && testType != BWAPI::UnitTypes::Terran_Missile_Turret
+            && testType != BWAPI::UnitTypes::Zerg_Sunken_Colony
+            && testType != BWAPI::UnitTypes::Zerg_Spore_Colony)
+            continue;
+        if (testType == BWAPI::UnitTypes::Protoss_High_Templar && it->second->getEnergy() < 60)
+            continue;
+        if (testType == BWAPI::UnitTypes::Protoss_Dark_Archon && it->second->getEnergy() < 80)
+            continue;
+        if (testType == BWAPI::UnitTypes::Terran_Science_Vessel && it->second->getEnergy() < 70)
+            continue;
+        if (testType == BWAPI::UnitTypes::Zerg_Defiler && it->second->getEnergy() < 60)
+            continue;
+        if (testType == BWAPI::UnitTypes::Zerg_Queen && it->second->getEnergy() < 60)
+            continue;
+        if (getSetPrio().count(testType)
+            && it->first.dmg < it->second->getHitPoints() + it->second->getShields())
+        {
+            oorTargetEnemy = it->second;
+            break;
+        }
+    }
+    if (oorTargetEnemy == NULL || !oorTargetEnemy->exists())
+    {
+        /// take one in our priority set
+        for (std::multimap<double, BWAPI::Unit*>::const_iterator it = _rangeEnemies.begin();
+            it != _rangeEnemies.end(); ++it)
+        {
+            if (!it->second->exists() || !it->second->isVisible())
+                continue;
+            if (inRange(it->second))
+                continue;
+            UnitType testType = it->second->getType();
+            if (testType == BWAPI::UnitTypes::Protoss_Interceptor)
+                continue;
+            if (testType.isBuilding() 
+                && testType != BWAPI::UnitTypes::Protoss_Pylon
+                && testType != BWAPI::UnitTypes::Protoss_Photon_Cannon
+                && testType != BWAPI::UnitTypes::Terran_Bunker
+                && testType != BWAPI::UnitTypes::Terran_Missile_Turret
+                && testType != BWAPI::UnitTypes::Zerg_Sunken_Colony
+                && testType != BWAPI::UnitTypes::Zerg_Spore_Colony)
+                continue;
+            if (getSetPrio().count(testType))
+            {
+                oorTargetEnemy = it->second;
+                break;
+            }
+        }
+    }
+    if (oorTargetEnemy == NULL || !oorTargetEnemy->exists())
+    {
+        /// take the best in focus fire order, not especially out of range
+        for (UnitDmgBimap::right_iterator it = _unitsGroup->unitDamages.right.begin();
+            it != _unitsGroup->unitDamages.right.end(); ++it)
+        {
+            if (!it->second->exists() || !it->second->isVisible())
+                continue;
+            UnitType testType = it->second->getType();
+            if (testType.isBuilding() 
+                && testType != BWAPI::UnitTypes::Protoss_Pylon
+                && testType != BWAPI::UnitTypes::Protoss_Photon_Cannon
+                && testType != BWAPI::UnitTypes::Terran_Bunker
+                && testType != BWAPI::UnitTypes::Terran_Missile_Turret
+                && testType != BWAPI::UnitTypes::Zerg_Sunken_Colony
+                && testType != BWAPI::UnitTypes::Zerg_Spore_Colony)
+                continue;
+            if (testType == BWAPI::UnitTypes::Protoss_High_Templar && it->second->getEnergy() < 60)
+                continue;
+            if (testType == BWAPI::UnitTypes::Protoss_Dark_Archon && it->second->getEnergy() < 80)
+                continue;
+            if (testType == BWAPI::UnitTypes::Terran_Science_Vessel && it->second->getEnergy() < 70)
+                continue;
+            if (testType == BWAPI::UnitTypes::Zerg_Defiler && it->second->getEnergy() < 60)
+                continue;
+            if (testType == BWAPI::UnitTypes::Zerg_Queen && it->second->getEnergy() < 60)
+                continue;
+            if (it->first.dmg < it->second->getHitPoints() + it->second->getShields())
+            {
+                oorTargetEnemy = it->second;
+                break;
+            }
+        }
+    }
+
+    // ===== choose new targetEnemy =====
+    /// 2 zealots by target
+    for (std::multimap<double, Unit*>::const_iterator it = _rangeEnemies.begin();
+        it != _rangeEnemies.end(); ++it)
+    {
+        if (_zealotsOn[it->second] > 1)
+            continue;
+        setTargetEnemy(it->second);
+        return;
+    }
+    for (std::multimap<double, Unit*>::const_iterator it = _rangeEnemies.begin();
+        it != _rangeEnemies.end(); ++it)
+    {
+        setTargetEnemy(it->second);
+        return;
+    }
+
+    /// Take the default target of the UnitGroup
+    if (_unitsGroup->defaultTargetEnemy != NULL && _unitsGroup->defaultTargetEnemy->exists())
+        setTargetEnemy(_unitsGroup->defaultTargetEnemy);
+    /// No target in rangeEnemies nor as a default target, follow the old one          // should never happen
+    else if (targetEnemy != NULL && targetEnemy->exists() && targetEnemy->isVisible()) // should never happen
+        setTargetEnemy(targetEnemy);                                                   // should never happen
+    /// WTF???                                                                         // should never happen
+    else                                                                               // should never happen
+        Broodwar->printf("WTF? Mode fight, no enemy");                                 // should never happen
+}
+
 
 void ZealotUnit::micro()
 {
-    if (!_fleeing)
-        _fleeing = decideToFlee();
-    int currentFrame = Broodwar->getFrameCount();    
+    decideToFlee();
+    int currentFrame = Broodwar->getFrameCount();
+    if (unit->isStartingAttack())
+        _lastAttackFrame = currentFrame;
     if (currentFrame - _lastAttackFrame <= getAttackDuration()) // not interrupting attacks
         return;
     if (currentFrame - _lastAttackFrame == getAttackDuration() + 1)
@@ -54,21 +259,26 @@ void ZealotUnit::micro()
 
     if (unit->getGroundWeaponCooldown() <= Broodwar->getLatency() + 1)
     {
-        if (inRange(targetEnemy))
-            Broodwar->printf("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-        else
+        if (!inRange(targetEnemy))
         {
-            Broodwar->printf("%d, %d", unit->getType().groundWeapon().maxRange(), targetEnemy->getDistance(_unitPos));
+            clearDamages();
         }
         /// ATTACK
         if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() && inRange(targetEnemy))
             attackEnemyUnit(targetEnemy);
-        else if (oorTargetEnemy && oorTargetEnemy->exists() && oorTargetEnemy->isVisible() && oorTargetEnemy->getDistance(_unitPos) < 92.0)
+        else if (oorTargetEnemy && oorTargetEnemy->exists() && oorTargetEnemy->isVisible() && oorTargetEnemy->getDistance(_unitPos) < 92.0) // TOCHANGE 92
             attackEnemyUnit(oorTargetEnemy);
         else if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible())
             attackEnemyUnit(targetEnemy);
         else
-            unit->attackMove(_unitsGroup->enemiesCenter);
+        {
+            if (currentFrame - _lastClickFrame > Broodwar->getLatency())
+            {
+                unit->attackMove(_unitsGroup->enemiesCenter);
+                _lastMoveFrame = Broodwar->getFrameCount();
+                _lastClickFrame = Broodwar->getFrameCount();
+            }
+        }
     }
     else if (unit->getGroundWeaponCooldown() > Broodwar->getLatency()*2 + 2) // == (Broodwar->getLatency()+1)*2, safety
     {
@@ -83,7 +293,7 @@ void ZealotUnit::micro()
     }
     return;
 
-    if (Broodwar->getFrameCount() - _lastAttackFrame <= Broodwar->getLatency() + 1) //&& Broodwar->getFrameCount() - _lastAttackFrame + Broodwar->getLatency() < unit->getType().groundWeapon().damageCooldown())
+    /*if (Broodwar->getFrameCount() - _lastAttackFrame <= Broodwar->getLatency() + 1) //&& Broodwar->getFrameCount() - _lastAttackFrame + Broodwar->getLatency() < unit->getType().groundWeapon().damageCooldown())
     {
         /// ATTACK
         if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() && inRange(targetEnemy))
@@ -94,7 +304,7 @@ void ZealotUnit::micro()
             attackEnemyUnit(targetEnemy);
         else
             unit->attackMove(_unitsGroup->enemiesCenter);
-    }
+    }*/
     /*
     int hpDiff = _lastTotalHP - (unit->getShields() + unit->getHitPoints()) + 1; // +1 for regen shield
     if (Broodwar->getFrameCount() - _lastAttackFrame > Broodwar->getLatency() + getAttackDuration())
