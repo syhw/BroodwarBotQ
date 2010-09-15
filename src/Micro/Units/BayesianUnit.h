@@ -152,6 +152,8 @@ protected:
     bool dragMine();
     void drawProbs(std::multimap<double, Vec>& probs, int number=0);
     unit_mode _mode;
+    std::set<Unit*> _targetingMe;
+    void updateTargetingMe();
 public:
 	void switchMode(unit_mode um);
     unit_mode getMode();

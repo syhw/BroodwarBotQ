@@ -86,7 +86,7 @@ void HighTemplarUnit::micro()
             _lastStormPos = bestStormPos;
         }
     }
-    else if (_fleeing || this->unit->getEnergy() < 74)
+    else if (!dodgeStorm() || _fleeing || this->unit->getEnergy() < 74)
     {
         flee();
     }

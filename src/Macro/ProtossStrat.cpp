@@ -120,13 +120,15 @@ void ProtossStrat::buildUnits(){
 
 
 
-	this->needed[Dragoon] = 5;
-	this->priority[Dragoon] = 40;
+	this->needed[Dragoon] = 24;
+	this->priority[Dragoon] = 39;
+    this->needed[Zealot] = 12;
+    this->priority[Zealot] = 38;
 	if(this->baseManager->getActiveBases().size() > 1){
 		if(this->buildOrderManager->hasResources(BWAPI::UnitTypes::Protoss_High_Templar)){
 			this->needed[High_Templar]++;
 			this->priority[High_Templar] = 40;
-			BWAPI::Broodwar->printf("one more now : %d", this->needed[High_Templar]);
+			//BWAPI::Broodwar->printf("one more now : %d", this->needed[High_Templar]); //////////////
 		}
 	}
 
@@ -211,4 +213,9 @@ void ProtossStrat::buildDefenses()
 		underConstruction[UnitTypes::Protoss_Photon_Cannon]++;
 	}
 	*/
+}
+
+void ProtossStrat::someAir()
+{
+    return;
 }

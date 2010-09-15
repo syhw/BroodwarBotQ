@@ -68,15 +68,11 @@ bool DragoonUnit::decideToFlee()
     if (!_fleeing)
     {
         int incDmg = 0;
-        for (std::map<Unit*, Position>::const_iterator it = _unitsGroup->enemies.begin();
-            it != _unitsGroup->enemies.end(); ++it)
+        for (std::set<Unit*>::const_iterator it = _targetingMe.begin();
+            it != _targetingMe.end(); ++it)
         {
-            if (it->first && it->first->exists() && it->first->isVisible()
-                && (it->first->getTarget() == unit || it->first->getOrderTarget() == unit))
-                //&& it->first->getType().groundWeapon().maxRange() - it->second.getDistance(_unitPos) < unit->getType().topSpeed()* (unit->getGroundWeaponCooldown() - Broodwar->getLatency()))
-            {
-                incDmg += it->first->getType().groundWeapon().damageAmount() * it->first->getType().maxGroundHits();
-            }
+            if ((*it)->getDistance(_unitPos) <= (*it)->getType().groundWeapon().maxRange() + 32)
+                incDmg += (*it)->getType().groundWeapon().damageAmount() * (*it)->getType().maxGroundHits();
         }
         if (incDmg + _sumLostHP > _fleeingDmg)
             _fleeing = true;
@@ -93,6 +89,7 @@ void DragoonUnit::micro()
             Broodwar->printf("starting attack at frame: %d, distance to target %f", Broodwar->getFrameCount(), targetEnemy->getDistance(unit));
     }
 #endif
+    updateTargetingMe();
     decideToFlee();
     int currentFrame = Broodwar->getFrameCount();
     if (currentFrame - _lastAttackFrame <= getAttackDuration()) // not interrupting attacks

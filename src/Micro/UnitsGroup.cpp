@@ -29,6 +29,8 @@
 
 using namespace BWAPI;
 
+#define __MAX_DISTANCE_TO_GROUP__ 512
+
 UnitsGroup::UnitsGroup()
 : defaultTargetEnemy(NULL)
 , totalHP(0)
@@ -254,6 +256,15 @@ void UnitsGroup::update()
 		accomplishGoal();
 		return;
 	}
+    for (std::list<pBayesianUnit>::iterator it = arrivingUnits.begin();
+        it != arrivingUnits.end(); ++it)
+    {
+        if ((*it)->unit->getPosition().getDistance(center) < __MAX_DISTANCE_TO_GROUP__)
+        {
+            units.push_back(*it);
+            arrivingUnits.erase(it++);
+        }
+    }
 
     updateCenter();
     leadingUnit = units.front();
@@ -512,18 +523,27 @@ void UnitsGroup::takeControl(Unit* u)
     else
         Broodwar->printf("Cette race n'est pas correctement gérée par l'IA pour le moment !");
 
-    if (tmp != NULL)
-        this->units.push_back(tmp);
+    if (u->getDistance(center) < __MAX_DISTANCE_TO_GROUP__)
+    {
+        if (tmp != NULL)
+            this->units.push_back(tmp);
+    }
+    else
+    {
+        u->move(center);
+        if (tmp != NULL)
+            this->arrivingUnits.push_back(tmp);
+    }
     if (u->getType() == UnitTypes::Protoss_Observer)
         _hasDetection = true;
     totalMinPrice += u->getType().mineralPrice();
     totalGazPrice += u->getType().gasPrice();
     totalSupply += u->getType().supplyRequired();
-	if(this->goals.size()==1){
+	/*if(this->goals.size()==1){
 		if(this->goals.front()->getStatus()==GS_ACHIEVED){
 			goals.front()->achieve();
 		}
-	}
+	}*/
 }
 
 void UnitsGroup::giveUpControl(Unit* u)

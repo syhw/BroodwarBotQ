@@ -35,6 +35,7 @@ public:
 	virtual void createProdBuildings();
 	virtual void createTechBuildings();
 	virtual void buildDefenses();
+    virtual void someAir();
 	void setScoutTime();
 	void buildGates();
 	void eRush(); // To call on detection of a rush

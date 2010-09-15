@@ -1673,12 +1673,12 @@ bool BayesianUnit::decideToFlee()
 void BayesianUnit::simpleFlee()
 {
     _fightMoving = false;
-    if (!this->mapManager->groundDamages[_unitPos.x()/32 + _unitPos.y()/32*Broodwar->mapWidth()])
+    /*if (!this->mapManager->groundDamages[_unitPos.x()/32 + _unitPos.y()/32*Broodwar->mapWidth()])
     {
         _fleeing = false;
         return;
-    }
-    if (_unitsGroup->enemies.size() <= 2 && targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() && !outRanges(targetEnemy)) // TOCHANGE 2
+    }*/
+    if (_unitsGroup->enemies.size() <= 1 && targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() && !outRanges(targetEnemy)) // TOCHANGE 1
     {
         _fleeing = false;
         return;
@@ -1773,13 +1773,40 @@ bool BayesianUnit::dodgeStorm()
     return false;
 }
 
+void BayesianUnit::updateTargetingMe()
+{
+    _targetingMe.clear();
+    for (std::map<Unit*, Position>::const_iterator it = _unitsGroup->enemies.begin();
+        it != _unitsGroup->enemies.end(); ++it)
+    {
+        if (it->first && it->first->exists() && it->first->isVisible()
+            && (it->first->getTarget() == unit || it->first->getOrderTarget() == unit))
+            _targetingMe.insert(it->first);
+    }
+}
+
 bool BayesianUnit::dragMine()
 {
+    if (Broodwar->enemy()->getRace() != Races::Terran)
+        return false;
+    for (std::map<Unit*, Position>::const_iterator it = _unitsGroup->enemies.begin();
+        it != _unitsGroup->enemies.end(); ++it)
+    {
+        if (it->first && it->first->exists() && it->first->isVisible() 
+            && it->first->getType() == UnitTypes::Terran_Vulture_Spider_Mine && (it->first->getTarget() == unit || it->first->getOrderTarget() == unit))
+        {
+            Vec dirOut = Vec(_unitPos.x() - _unitsGroup->center.x(), _unitPos.y() - _unitsGroup->center.y());
+            unit->move(dirOut.translate(_unitPos));
+            return true;
+        }
+    }
     return false;
 }
 
 bool BayesianUnit::dragScarab()
 {
+    if (Broodwar->enemy()->getRace() != Races::Protoss)
+        return false;
     return false;
 }
 
@@ -1791,7 +1818,7 @@ void BayesianUnit::update()
     /// check() for all inherited classes
     check();
 
-    if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy.getDistance(_unitPos) > 512) // 16buildtiles*32
+    if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->getDistance(_unitPos) > 512) // 16buildtiles*32
         switchMode(MODE_MOVE);
     if (_mode != MODE_FIGHT_G && _mode != MODE_SCOUT 
         && !_unitsGroup->enemies.empty()

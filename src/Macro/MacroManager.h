@@ -69,6 +69,7 @@ public:
 	void expand();
 	virtual void buildDefenses();
 	virtual void initWantedUnits();
+    virtual void someAir();
 
 	int remainingTrainingPlace( UnitType type);
 	bool canTrainUnits( UnitType unitType, int remainingPlaces);

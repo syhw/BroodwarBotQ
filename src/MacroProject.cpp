@@ -555,7 +555,7 @@ void BattleBroodAI::onUnitShow(BWAPI::Unit* unit)
             || (unit->getType() == UnitTypes::Protoss_Gateway && Broodwar->getFrameCount() < __GATES_TIME_RUSH__ && !unit->getRemainingBuildTime() && eUnitsFilter->getNumbersType(unit->getType()) > 1)
             || (unit->getType() == UnitTypes::Terran_Barracks && Broodwar->getFrameCount() < __BBS_TIME_RUSH__ && !unit->getRemainingBuildTime() && eUnitsFilter->getNumbersType(unit->getType()) > 1))
             this->macroManager->eRush();
-        if ((unit->getType() == UnitTypes::Zerg_Spire) || (unit->getType() == UnitTypes::Terran_Control_Tower) || (unit->getType == UnitTypes::Protoss_Stargate))
+        if ((unit->getType() == UnitTypes::Zerg_Spire) || (unit->getType() == UnitTypes::Terran_Control_Tower) || (unit->getType() == UnitTypes::Protoss_Stargate))
             this->macroManager->someAir();
     }
 }

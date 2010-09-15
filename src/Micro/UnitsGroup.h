@@ -66,6 +66,7 @@ public:
 	bool isWaiting(); //Return if the 1st goal is accomplished && no other goals
 	pGoal getLastGoal();
 	std::vector<pBayesianUnit> units;
+    std::list<pBayesianUnit> arrivingUnits;
     std::vector<BWAPI::Position> ppath;
     std::map<BWAPI::Unit*, BWAPI::Position> enemies;
     BWAPI::Position enemiesCenter;

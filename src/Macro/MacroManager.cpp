@@ -253,6 +253,10 @@ void MacroManager::initWantedUnits()
 {
 }
 
+void MacroManager::someAir()
+{
+}
+
 int MacroManager::remainingTrainingPlace( UnitType type)
 {
 	unsigned int remainingPlaces = 0;
