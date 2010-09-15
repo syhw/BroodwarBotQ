@@ -191,7 +191,6 @@ void BayesianUnit::switchMode(unit_mode um)
 #ifdef __DEBUG_GABRIEL__
             Broodwar->printf("Switch FIGHT_G!");
 #endif
-            Broodwar->setLocalSpeed(51);
             //unit->holdPosition();
             break;
         case MODE_FIGHT_A:
@@ -201,13 +200,15 @@ void BayesianUnit::switchMode(unit_mode um)
             //unit->holdPosition();
             break;
         case MODE_SCOUT:
-            clickTarget();
+            if (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency())
+                clickTarget();
 #ifdef __DEBUG_GABRIEL__
             Broodwar->printf("Switch SCOUT!");
 #endif
             break;
         case MODE_MOVE:
-            clickTarget();
+            if (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency())
+                clickTarget();
 #ifdef __DEBUG_GABRIEL__
             Broodwar->printf("Switch MOVE!");
 #endif
@@ -1790,6 +1791,8 @@ void BayesianUnit::update()
     /// check() for all inherited classes
     check();
 
+    if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy.getDistance(_unitPos) > 512) // 16buildtiles*32
+        switchMode(MODE_MOVE);
     if (_mode != MODE_FIGHT_G && _mode != MODE_SCOUT 
         && !_unitsGroup->enemies.empty()
         && unit->getGroundWeaponCooldown() <= Broodwar->getLatency())

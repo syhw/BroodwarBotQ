@@ -79,8 +79,6 @@ void ProtossStrat::setScoutTime(){
 
 		this->firstScout = 20;
 	}
-    else
-        this->firstScout = 16;
 }
 
 void ProtossStrat::update(){
