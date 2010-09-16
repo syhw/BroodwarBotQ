@@ -71,9 +71,9 @@ BattleBroodAI::~BattleBroodAI()
     MapManager::Destroy();
     EUnitsFilter::Destroy();
     ObjectManager::Destroy();
-	EEcoEstimator::Destroy();
-	GoalManager::Destroy();
-	
+    EEcoEstimator::Destroy();
+    GoalManager::Destroy();
+
 
     if( Broodwar->self()->getRace() == Races::Protoss)
         ProtossStrat::Destroy();
@@ -86,67 +86,67 @@ BattleBroodAI::~BattleBroodAI()
 void BattleBroodAI::onStart()
 {
     //Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
-	// Enable some cheat flags
-	Broodwar->enableFlag(Flag::UserInput);
-	// Uncomment to enable complete map information
-	//Broodwar->enableFlag(Flag::CompleteMapInformation);
+    // Enable some cheat flags
+    Broodwar->enableFlag(Flag::UserInput);
+    // Uncomment to enable complete map information
+    //Broodwar->enableFlag(Flag::CompleteMapInformation);
 
-	// Speed up the game to the maximum
+    // Speed up the game to the maximum
     Broodwar->setLocalSpeed(0);
 
-	this->showManagerAssignments=false;
+    this->showManagerAssignments=false;
 
-	if (Broodwar->isReplay())
-	{
-	//	Broodwar->printf("The following players are in this replay:");
-		for(std::set<Player*>::iterator p=Broodwar->getPlayers().begin();p!=Broodwar->getPlayers().end();p++)
-		{
-			if (!(*p)->getUnits().empty() && !(*p)->isNeutral())
-			{
-			//	Broodwar->printf("%s, playing as a %s",(*p)->getName().c_str(),(*p)->getRace().getName().c_str());
-			}
-		}
-		return;
-	}
+    if (Broodwar->isReplay())
+    {
+        //	Broodwar->printf("The following players are in this replay:");
+        for(std::set<Player*>::iterator p=Broodwar->getPlayers().begin();p!=Broodwar->getPlayers().end();p++)
+        {
+            if (!(*p)->getUnits().empty() && !(*p)->isNeutral())
+            {
+                //	Broodwar->printf("%s, playing as a %s",(*p)->getName().c_str(),(*p)->getRace().getName().c_str());
+            }
+        }
+        return;
+    }
 
-	// Enable some cheat flags
-	//Broodwar->enableFlag(Flag::UserInput);
-	//Broodwar->enableFlag(Flag::CompleteMapInformation);
-	BWTA::readMap();
-	BWTA::analyze();
-	this->analyzed=true;
+    // Enable some cheat flags
+    //Broodwar->enableFlag(Flag::UserInput);
+    //Broodwar->enableFlag(Flag::CompleteMapInformation);
+    BWTA::readMap();
+    BWTA::analyze();
+    this->analyzed=true;
 
     this->objManager = & ObjectManager::Instance();
-	//Managers
-	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
-	this->baseManager = &BaseManager::Instance();
-	this->borderManager = & BorderManager::Instance();
-	this->buildingPlacer = & BuildingPlacer::Instance();
-	this->buildManager = & BuildManager::Instance();
-	//Depends of BuildManager : {
-	this->constructionManager = & ConstructionManager::Instance();
-	this->morphManager = & MorphManager::Instance();
-	this->productionManager = & ProductionManager::Instance();
-	// }
-	this->buildOrderManager = & BuildOrderManager::Instance();
-	this->supplyManager = & SupplyManager::Instance();
-	this->techManager = & TechManager::Instance();
-	this->upgradeManager = & UpgradeManager::Instance();
-	this->unitGroupManager = & UnitGroupManager::Instance();
-	this->informationManager = & InformationManager::Instance();
-	this->scoutManager = & ScoutManager::Instance();
-	this->mapManager = & MapManager::Instance();
-	this->workerManager = & WorkerManager::Instance();
-	this->warManager = & WarManager::Instance();
-	this->eUnitsFilter = & EUnitsFilter::Instance();
-	this->eEcoEstimator = & EEcoEstimator::Instance();
-	this->eTechEstimator = & ETechEstimator::Instance();
-	this->timeManager = & TimeManager::Instance();
+    //Managers
+    this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
+    this->baseManager = &BaseManager::Instance();
+    this->borderManager = & BorderManager::Instance();
+    this->buildingPlacer = & BuildingPlacer::Instance();
+    this->buildManager = & BuildManager::Instance();
+    //Depends of BuildManager : {
+    this->constructionManager = & ConstructionManager::Instance();
+    this->morphManager = & MorphManager::Instance();
+    this->productionManager = & ProductionManager::Instance();
+    // }
+    this->buildOrderManager = & BuildOrderManager::Instance();
+    this->supplyManager = & SupplyManager::Instance();
+    this->techManager = & TechManager::Instance();
+    this->upgradeManager = & UpgradeManager::Instance();
+    this->unitGroupManager = & UnitGroupManager::Instance();
+    this->informationManager = & InformationManager::Instance();
+    this->scoutManager = & ScoutManager::Instance();
+    this->mapManager = & MapManager::Instance();
+    this->workerManager = & WorkerManager::Instance();
+    this->warManager = & WarManager::Instance();
+    this->eUnitsFilter = & EUnitsFilter::Instance();
+    this->eEcoEstimator = & EEcoEstimator::Instance();
+    this->eTechEstimator = & ETechEstimator::Instance();
+    this->timeManager = & TimeManager::Instance();
     this->goalManager = & GoalManager::Instance();
 #ifdef __DEBUG_LOUIS__
     this->enhancedUI = & EnhancedUI::Instance();
 #endif
-	this->defenseManager = & DefenseManager::Instance();
+    this->defenseManager = & DefenseManager::Instance();
     if( Broodwar->self()->getRace() == Races::Protoss)
         this->macroManager = & ProtossStrat::Instance();
     else if( Broodwar->self()->getRace() == Races::Terran)
@@ -154,41 +154,41 @@ void BattleBroodAI::onStart()
     else if( Broodwar->self()->getRace() == Races::Zerg)
         this->macroManager = & ZergStrat::Instance();
 
-	//Set dependencies
+    //Set dependencies
 
 
-	this->baseManager->setDependencies();
-	this->borderManager->setDependencies();
-	this->buildManager->setDependencies();
-	this->constructionManager->setDependencies();
-	this->morphManager->setDependencies();
-	this->productionManager->setDependencies();
-	this->buildOrderManager->setDependencies();
-	this->supplyManager->setDependencies();
-	this->techManager->setDependencies();
-	this->upgradeManager->setDependencies();
-	this->scoutManager->setDependencies();
-	this->workerManager->setDependencies();
-	this->eEcoEstimator->setDependencies();
-	this->warManager->setDependencies();
-	this->goalManager->setDependencies();
-	this->macroManager->setDependencies();
-	this->defenseManager->setDependencies();
-	this->mapManager->setDependencies(); // added @merge
+    this->baseManager->setDependencies();
+    this->borderManager->setDependencies();
+    this->buildManager->setDependencies();
+    this->constructionManager->setDependencies();
+    this->morphManager->setDependencies();
+    this->productionManager->setDependencies();
+    this->buildOrderManager->setDependencies();
+    this->supplyManager->setDependencies();
+    this->techManager->setDependencies();
+    this->upgradeManager->setDependencies();
+    this->scoutManager->setDependencies();
+    this->workerManager->setDependencies();
+    this->eEcoEstimator->setDependencies();
+    this->warManager->setDependencies();
+    this->goalManager->setDependencies();
+    this->macroManager->setDependencies();
+    this->defenseManager->setDependencies();
+    this->mapManager->setDependencies(); // added @merge
 
-	//Broodwar->printf("The match up is %s v %s",
+    //Broodwar->printf("The match up is %s v %s",
 
     Broodwar->self()->getRace().getName().c_str();
     Broodwar->enemy()->getRace().getName().c_str();
 
-	this->baseManager->update();
+    this->baseManager->update();
 #ifdef BW_QT_DEBUG
-		g_onStartDone = true;
+    g_onStartDone = true;
 #endif
 
-	//Call on start functions
-	this->macroManager->onStart();
-	this->warManager->onStart();
+    //Call on start functions
+    this->macroManager->onStart();
+    this->warManager->onStart();
 }
 
 void BattleBroodAI::onEnd(bool isWinner)
@@ -201,7 +201,7 @@ void BattleBroodAI::onEnd(bool isWinner)
 
 void BattleBroodAI::onFrame()
 {
-	if (Broodwar->isReplay()) return;
+    if (Broodwar->isReplay()) return;
     if (!this->analyzed) return;
     if (Broodwar->getLastError() != BWAPI::Errors::None)
         Broodwar->printf("LAST ERROR: %s", Broodwar->getLastError().toString().c_str());
@@ -211,48 +211,48 @@ void BattleBroodAI::onFrame()
     sprintf_s(mousePos, "%d, %d", Broodwar->getMousePosition().x(), Broodwar->getMousePosition().y());
     Broodwar->drawTextMouse(12, 0, mousePos);
 #endif
-	this->buildManager->update();
-	this->buildOrderManager->update();
-	this->baseManager->update();
-	this->workerManager->update();
-	this->techManager->update();
-	this->upgradeManager->update();
-	this->supplyManager->update();
+    this->buildManager->update();
+    this->buildOrderManager->update();
+    this->baseManager->update();
+    this->workerManager->update();
+    this->techManager->update();
+    this->upgradeManager->update();
+    this->supplyManager->update();
     this->macroManager->update(); // @merge
 #ifdef __DEBUG_LOUIS__
     this->enhancedUI->update();
 #endif
-	this->borderManager->update();
-	objManager->onFrame();
-	this->scoutManager->update();
-	this->mapManager->onFrame();
-	this->defenseManager->update();
+    this->borderManager->update();
+    objManager->onFrame();
+    //TOURNAMENT3this->scoutManager->update();
+    this->mapManager->onFrame();
+    this->defenseManager->update();
 
-	this->arbitrator->update();
+    this->arbitrator->update();
 
-  std::set<Unit*> units=Broodwar->self()->getUnits();
-  if (this->showManagerAssignments)
-  {
-    for(std::set<Unit*>::iterator i=units.begin();i!=units.end();i++)
+    std::set<Unit*> units=Broodwar->self()->getUnits();
+    if (this->showManagerAssignments)
     {
-      if (this->arbitrator->hasBid(*i))
-      {
-        int x=(*i)->getPosition().x();
-        int y=(*i)->getPosition().y();
-        std::list< std::pair< Arbitrator::Controller<BWAPI::Unit*,double>*, double> > bids=this->arbitrator->getAllBidders(*i);
-        int y_off=0;
-        bool first = false;
-        const char activeColor = '\x07', inactiveColor = '\x16';
-        char color = activeColor;
-        for(std::list< std::pair< Arbitrator::Controller<BWAPI::Unit*,double>*, double> >::iterator j=bids.begin();j!=bids.end();j++)
+        for(std::set<Unit*>::iterator i=units.begin();i!=units.end();i++)
         {
-          Broodwar->drawTextMap(x,y+y_off,"%c%s: %d",color,j->first->getShortName().c_str(),(int)j->second);
-          y_off+=15;
-          color = inactiveColor;
+            if (this->arbitrator->hasBid(*i))
+            {
+                int x=(*i)->getPosition().x();
+                int y=(*i)->getPosition().y();
+                std::list< std::pair< Arbitrator::Controller<BWAPI::Unit*,double>*, double> > bids=this->arbitrator->getAllBidders(*i);
+                int y_off=0;
+                bool first = false;
+                const char activeColor = '\x07', inactiveColor = '\x16';
+                char color = activeColor;
+                for(std::list< std::pair< Arbitrator::Controller<BWAPI::Unit*,double>*, double> >::iterator j=bids.begin();j!=bids.end();j++)
+                {
+                    Broodwar->drawTextMap(x,y+y_off,"%c%s: %d",color,j->first->getShortName().c_str(),(int)j->second);
+                    y_off+=15;
+                    color = inactiveColor;
+                }
+            }
         }
-      }
     }
-  }
 
     /*
     for(std::set<Unit*>::iterator i=units.begin();i!=units.end();i++)
@@ -435,7 +435,9 @@ void BattleBroodAI::onFrame()
     }*/
     // log("OUT BBAI::onFrame()");
 
+#ifdef __DEBUG_GABRIEL__
     display();
+#endif
     //clock_t end = clock();
     //Broodwar->printf("Iterations took %f", (double)(end-start)/CLOCKS_PER_SEC);
 }
@@ -443,8 +445,8 @@ void BattleBroodAI::onFrame()
 void BattleBroodAI::onUnitDiscover(BWAPI::Unit* unit)
 {
     if (Broodwar->isReplay()) return;
-  this->informationManager->onUnitDiscover(unit);
-  this->unitGroupManager->onUnitDiscover(unit);
+    this->informationManager->onUnitDiscover(unit);
+    this->unitGroupManager->onUnitDiscover(unit);
 }
 
 void BattleBroodAI::onUnitEvade(BWAPI::Unit* unit){
@@ -456,53 +458,53 @@ void BattleBroodAI::onUnitEvade(BWAPI::Unit* unit){
 
 void BattleBroodAI::onUnitCreate(BWAPI::Unit* unit)
 {
-	//Update Managers
-	this->scoutManager->onUnitCreate(unit);
-	this->mapManager->onUnitCreate(unit);
-	this->warManager->onUnitCreate(unit);
-	this->macroManager->onUnitCreate(unit);
+    //Update Managers
+    //TOURNAMENT3this->scoutManager->onUnitCreate(unit);
+    this->mapManager->onUnitCreate(unit);
+    this->warManager->onUnitCreate(unit);
+    this->macroManager->onUnitCreate(unit);
 
-	/*
+    /*
     if (!Broodwar->isReplay())
     {
-        //Broodwar->sendText("A %s [%x] has been created at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x(),unit->getPosition().y());
-        if(unit->getType().isWorker())
-        {
-            //Broodwar->printf("New worker created.");
-            Unit* closestMineral=NULL;
-            for(std::set<Unit*>::iterator m=Broodwar->getMinerals().begin();m!=Broodwar->getMinerals().end();m++)
-            {
-                if (closestMineral==NULL || unit->getDistance(*m)<unit->getDistance(closestMineral))
-                    closestMineral=*m;
-            }
-            if (closestMineral!=NULL)
-            {
-                unit->rightClick(closestMineral);	
-                //Broodwar->printf("A mineral has been found.");
-            }
-            //else 
-            //	Broodwar->printf("No mineral found.");
-        }
-        else
-        {
-            //Broodwar->printf("Unknown unit type.");
-        }
+    //Broodwar->sendText("A %s [%x] has been created at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x(),unit->getPosition().y());
+    if(unit->getType().isWorker())
+    {
+    //Broodwar->printf("New worker created.");
+    Unit* closestMineral=NULL;
+    for(std::set<Unit*>::iterator m=Broodwar->getMinerals().begin();m!=Broodwar->getMinerals().end();m++)
+    {
+    if (closestMineral==NULL || unit->getDistance(*m)<unit->getDistance(closestMineral))
+    closestMineral=*m;
+    }
+    if (closestMineral!=NULL)
+    {
+    unit->rightClick(closestMineral);	
+    //Broodwar->printf("A mineral has been found.");
+    }
+    //else 
+    //	Broodwar->printf("No mineral found.");
+    }
+    else
+    {
+    //Broodwar->printf("Unknown unit type.");
+    }
     }
     else
     {*/
-        /*if we are in a replay, then we will print out the build order
-        (just of the buildings, not the units).*/
-       /* if (unit->getType().isBuilding() && unit->getPlayer()->isNeutral()==false)
-        {
-            //Broodwar->printf("Building created.");
-            int seconds=Broodwar->getFrameCount()/24;
-            int minutes=seconds/60;
-            seconds%=60;
-            //Broodwar->sendText("%.2d:%.2d: %s creates a %s",minutes,seconds,unit->getPlayer()->getName().c_str(),unit->getType().getName().c_str());
-        }
+    /*if we are in a replay, then we will print out the build order
+    (just of the buildings, not the units).*/
+    /* if (unit->getType().isBuilding() && unit->getPlayer()->isNeutral()==false)
+    {
+    //Broodwar->printf("Building created.");
+    int seconds=Broodwar->getFrameCount()/24;
+    int minutes=seconds/60;
+    seconds%=60;
+    //Broodwar->sendText("%.2d:%.2d: %s creates a %s",minutes,seconds,unit->getPlayer()->getName().c_str(),unit->getType().getName().c_str());
+    }
     }
     // log("OUT BBAI::onUnitCreate()");
-	*/
+    */
 }
 
 
@@ -511,37 +513,37 @@ void BattleBroodAI::onUnitDestroy(BWAPI::Unit* unit)
     //if (!Broodwar->isReplay())
     //	Broodwar->sendText("A %s [%x] has been destroyed at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x(),unit->getPosition().y());
 
-	this->buildManager->onRemoveUnit(unit);
-	this->baseManager->onRemoveUnit(unit);
-	this->techManager->onRemoveUnit(unit);
-	this->upgradeManager->onRemoveUnit(unit);
-	this->workerManager->onRemoveUnit(unit);
+    this->buildManager->onRemoveUnit(unit);
+    this->baseManager->onRemoveUnit(unit);
+    this->techManager->onRemoveUnit(unit);
+    this->upgradeManager->onRemoveUnit(unit);
+    this->workerManager->onRemoveUnit(unit);
     this->macroManager->onUnitDestroy( unit);
     this->warManager->onUnitDestroy(unit);
     this->mapManager->onUnitDestroy(unit);
     this->eUnitsFilter->onUnitDestroy(unit);
-	this->informationManager->onUnitDestroy(unit);
-	this->defenseManager->onRemoveUnit(unit);
-	this->arbitrator->onRemoveObject(unit);
-	this->scoutManager->onUnitDestroy(unit);
+    this->informationManager->onUnitDestroy(unit);
+    this->defenseManager->onRemoveUnit(unit);
+    this->arbitrator->onRemoveObject(unit);
+    //TOURNAMENT3this->scoutManager->onUnitDestroy(unit);
 }
 
 void BattleBroodAI::onUnitMorph(BWAPI::Unit* unit)
 {
-	//if (!Broodwar->isReplay())
-	//	Broodwar->sendText("A %s [%x] has been morphed at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x(),unit->getPosition().y());
-	//else
-	{
-		/*if we are in a replay, then we will print out the build order
-		(just of the buildings, not the units).*/
-		if (unit->getType().isBuilding() && unit->getPlayer()->isNeutral()==false)
-		{
-			int seconds=Broodwar->getFrameCount()/24;
-			int minutes=seconds/60;
-			seconds%=60;
-			//Broodwar->sendText("%.2d:%.2d: %s morphs a %s",minutes,seconds,unit->getPlayer()->getName().c_str(),unit->getType().getName().c_str());
-		}
-	}
+    //if (!Broodwar->isReplay())
+    //	Broodwar->sendText("A %s [%x] has been morphed at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x(),unit->getPosition().y());
+    //else
+    {
+        /*if we are in a replay, then we will print out the build order
+        (just of the buildings, not the units).*/
+        if (unit->getType().isBuilding() && unit->getPlayer()->isNeutral()==false)
+        {
+            int seconds=Broodwar->getFrameCount()/24;
+            int minutes=seconds/60;
+            seconds%=60;
+            //Broodwar->sendText("%.2d:%.2d: %s morphs a %s",minutes,seconds,unit->getPlayer()->getName().c_str(),unit->getType().getName().c_str());
+        }
+    }
     eUnitsFilter->update(unit);
 }
 
@@ -552,7 +554,7 @@ void BattleBroodAI::onUnitShow(BWAPI::Unit* unit)
 
     mapManager->onUnitShow(unit);
     eUnitsFilter->update(unit);
-    scoutManager->onUnitShow(unit);
+    //TOURNAMENT3scoutManager->onUnitShow(unit);
     if (unit->getPlayer() == BWAPI::Broodwar->enemy())
     {
         if ((unit->getType() == UnitTypes::Zerg_Spawning_Pool && Broodwar->getFrameCount() < __POOL_TIME_RUSH__ && !unit->getRemainingBuildTime())
@@ -561,6 +563,11 @@ void BattleBroodAI::onUnitShow(BWAPI::Unit* unit)
             this->macroManager->eRush();
         if ((unit->getType() == UnitTypes::Zerg_Spire) || (unit->getType() == UnitTypes::Terran_Control_Tower) || (unit->getType() == UnitTypes::Protoss_Stargate))
             this->macroManager->someAir();
+    }
+    if (!unit->isDetected())
+    {
+        this->macroManager->needed[Observer] = 4;
+        this->macroManager->priority[Observer] = 90;
     }
 }
 
@@ -575,9 +582,9 @@ void BattleBroodAI::onUnitHide(BWAPI::Unit* unit)
 
 void BattleBroodAI::onUnitRenegade(BWAPI::Unit* unit)
 {
-	//if (!Broodwar->isReplay())
-	//	Broodwar->sendText("A %s [%x] is now owned by %s",unit->getType().getName().c_str(),unit,unit->getPlayer()->getName().c_str());
-	this->unitGroupManager->onUnitRenegade(unit);
+    //if (!Broodwar->isReplay())
+    //	Broodwar->sendText("A %s [%x] is now owned by %s",unit->getType().getName().c_str(),unit,unit->getPlayer()->getName().c_str());
+    this->unitGroupManager->onUnitRenegade(unit);
     eUnitsFilter->update(unit);
 }
 
@@ -611,7 +618,7 @@ void BattleBroodAI::onSendText(std::string text)
     {
         if (analyzed == false)
         {
-           // Broodwar->printf("Analyzing map... this may take a minute");
+            // Broodwar->printf("Analyzing map... this may take a minute");
             CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)AnalyzeThread, NULL, 0, NULL);
         }
         return;
@@ -620,10 +627,10 @@ void BattleBroodAI::onSendText(std::string text)
     {
         int x = 0;
         if (text[9] != ' ')
-           Broodwar->printf("Usage: /setspeed SPEEDVALUE");
+            Broodwar->printf("Usage: /setspeed SPEEDVALUE");
         std::string xx = text.substr(10);
         x = atoi(xx.c_str());
-      //  Broodwar->printf("Set Speed %i", x);
+        //  Broodwar->printf("Set Speed %i", x);
         Broodwar->setLocalSpeed(x);
     }
     else if (text=="/target")
@@ -635,13 +642,13 @@ void BattleBroodAI::onSendText(std::string text)
             set<pBayesianUnit> tmp;
             (*it)->selectedUnits(tmp);
             if (tmp.size() == 0)
-            //    Broodwar->printf("No selected units");
-            for (std::set<pBayesianUnit>::const_iterator i = tmp.begin(); i != tmp.end(); ++i)
-            {
-              //  Broodwar->printf("Target de l'unité : (%i, %i)", (*i)->target.x(), (*i)->target.y());
-                Position pos(Broodwar->getScreenPosition() + Broodwar->getMousePosition());
-               // Broodwar->printf("Curseur : (%i, %i)", pos.x(), pos.y());
-            }
+                //    Broodwar->printf("No selected units");
+                for (std::set<pBayesianUnit>::const_iterator i = tmp.begin(); i != tmp.end(); ++i)
+                {
+                    //  Broodwar->printf("Target de l'unité : (%i, %i)", (*i)->target.x(), (*i)->target.y());
+                    Position pos(Broodwar->getScreenPosition() + Broodwar->getMousePosition());
+                    // Broodwar->printf("Curseur : (%i, %i)", pos.x(), pos.y());
+                }
         }
     }
 
@@ -721,7 +728,7 @@ void BattleBroodAI::showPlayers()
     std::set<Player*> players=Broodwar->getPlayers();
     for(std::set<Player*>::iterator i=players.begin();i!=players.end();i++)
     {
-     //   Broodwar->printf("Player [%d]: %s is in force: %s",(*i)->getID(),(*i)->getName().c_str(), (*i)->getForce()->getName().c_str());
+        //   Broodwar->printf("Player [%d]: %s is in force: %s",(*i)->getID(),(*i)->getName().c_str(), (*i)->getForce()->getName().c_str());
     }
 }
 void BattleBroodAI::showForces()
@@ -730,10 +737,10 @@ void BattleBroodAI::showForces()
     for(std::set<Force*>::iterator i=forces.begin();i!=forces.end();i++)
     {
         std::set<Player*> players=(*i)->getPlayers();
-      //  Broodwar->printf("Force %s has the following players:",(*i)->getName().c_str());
+        //  Broodwar->printf("Force %s has the following players:",(*i)->getName().c_str());
         for(std::set<Player*>::iterator j=players.begin();j!=players.end();j++)
         {
-      //      Broodwar->printf("  - Player [%d]: %s",(*j)->getID(),(*j)->getName().c_str());
+            //      Broodwar->printf("  - Player [%d]: %s",(*j)->getID(),(*j)->getName().c_str());
         }
     }
 }

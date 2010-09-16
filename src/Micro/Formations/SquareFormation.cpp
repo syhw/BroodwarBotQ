@@ -15,8 +15,8 @@ SquareFormation::SquareFormation(const Position& p, const Vec& direction)
 
 void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
 {
-    BWTA::Region* r = BWTA::getRegion(center.toPosition()); /// DEBUG DEBUG DEBUG
-    center = Vec(r->getCenter().x(), r->getCenter().y());
+    BWTA::Region* r = BWTA::getRegion(center.toPosition()); /// DEBUG HACK DEBUG
+    center = Vec(r->getCenter().x(), r->getCenter().y());   /// DEBUG HACK DEBUG
 	end_positions.clear();
     if (vUnits.size() == 1)
     {

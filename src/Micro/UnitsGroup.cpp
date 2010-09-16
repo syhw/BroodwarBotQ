@@ -251,22 +251,46 @@ void UnitsGroup::update()
 #ifdef __DEBUG_GABRIEL__
     clock_t start = clock();
 #endif
+    if (this == NULL)
+        return;
 	if (units.empty())
     {
 		accomplishGoal();
 		return;
     }
-    for (std::list<pBayesianUnit>::iterator it = arrivingUnits.begin();
-        it != arrivingUnits.end(); ++it)
+    if (units.size() == 1 && (*units.begin())->getMode() == MODE_SCOUT) // quick/dirty fix for scouting / scout goals :(
     {
-        if ((*it)->unit->getPosition().getDistance(center) < __MAX_DISTANCE_TO_GROUP__)
+        defaultTargetEnemy = NULL;
+        accomplishGoal();
+        return;
+    }
+    /*if (!arrivingUnits.empty())
+    {
+        if (units.size() <= 2)
         {
-            units.push_back(*it);
-            arrivingUnits.erase(it++);
+            for (std::list<pBayesianUnit>::iterator it = arrivingUnits.begin();
+                it != arrivingUnits.end(); ++it)
+            {
+                units.push_back(*it);
+                arrivingUnits.erase(it++);
+            }
         }
         else
-            (*it)->update();
-    }
+        {
+            for (std::list<pBayesianUnit>::iterator it = arrivingUnits.begin();
+                it != arrivingUnits.end(); )
+            {
+                if ((*it)->unit->getPosition().getDistance(center) < __MAX_DISTANCE_TO_GROUP__)
+                {
+                    units.push_back(*it);
+                    goals.front()->achieve();
+                    arrivingUnits.erase(it++);
+                }
+                else
+                    (*it++)->update();
+            }
+        }
+    }*/
 
     updateCenter();
     leadingUnit = units.front();
@@ -301,13 +325,6 @@ void UnitsGroup::update()
             maxRange = tmp_max;
     }
 
-    if (units.size() == 1 && (*units.begin())->getMode() == MODE_SCOUT) // quick/dirty fix for scouting / scout goals :(
-    {
-        defaultTargetEnemy = NULL;
-        accomplishGoal();
-        return;
-    }
-
     //clock_t s = clock();
     updateNearbyEnemyUnitsFromFilter(center, maxRadius + maxRange + 92); // possibly hidden units, could be taken from onUnitsShow/View asynchronously for more efficiency
     // update enemiesCenter
@@ -334,7 +351,7 @@ void UnitsGroup::update()
     if (!enemies.empty()) /// We fight, we'll see later for the goals 
     {
         double force = evaluateForces();
-        if (force < 0.66) // TOCHANGE 0.66
+        if (force < 0.75) // TOCHANGE 0.75
         {
             // strategic withdrawal
             for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
@@ -525,17 +542,17 @@ void UnitsGroup::takeControl(Unit* u)
     else
         Broodwar->printf("Cette race n'est pas correctement gérée par l'IA pour le moment !");
 
-    if (u->getDistance(center) < __MAX_DISTANCE_TO_GROUP__ || !units.size())
+    //if (u->getDistance(center) < __MAX_DISTANCE_TO_GROUP__ || !units.size())
     {
         if (tmp != NULL)
             this->units.push_back(tmp);
     }
-    else
+    /*else
     {
-        u->move(center);
+        u->attackMove(center);
         if (tmp != NULL)
             this->arrivingUnits.push_back(tmp);
-    }
+    }*/
     if (u->getType() == UnitTypes::Protoss_Observer)
         _hasDetection = true;
     totalMinPrice += u->getType().mineralPrice();

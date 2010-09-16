@@ -56,6 +56,8 @@ public:
 	virtual void onStart();
 	std::string getName() const;
 	virtual void eRush();
+	int priority[13];
+	int needed[13];
 
 	void onUnitDestroy(BWAPI::Unit* unit);
 	virtual void update();

@@ -23,7 +23,7 @@ void HighTemplarUnit::micro()
             return;
     }
     int elapsed = Broodwar->getFrameCount() - _lastStormFrame;
-    if ((unit->getEnergy() < 15 /* TODO */ || (unit->getEnergy() < 74 && unit->getHitPoints() < 15)) && elapsed > Broodwar->getLatency() + getAttackDuration())
+    if ((unit->getEnergy() < 20 /* TODO */ || (unit->getEnergy() < 74 && unit->getHitPoints() < 20) || (unit->getEnergy() < 50 && unit->getHitPoints() < 30)) && elapsed > Broodwar->getLatency() + getAttackDuration())
     {
         _unitsGroup->signalMerge(unit);
         _mergingFrame = Broodwar->getFrameCount();

@@ -39,6 +39,14 @@ void WarManager::onStart(){
 }
 void WarManager::update()
 {
+    /*if (!ScoutManager::Instance().enemyFound && Broodwar->getFrameCount() > 4320)
+    {
+        for (std::list<UnitsGroup*>::iterator it = unitsGroups.begin();
+            it != unitsGroups.end(); ++it)
+        {
+            pGoal goal = pGoal(new AttackGoal(*it, Scout
+        }
+    }*/
 
 	//Suppress the list prompted to suppress 
 	for(std::list<UnitsGroup *>::iterator ug = this->promptedRemove.begin() ; ug != this->promptedRemove.end(); ++ug){
@@ -63,7 +71,7 @@ void WarManager::update()
 	if (unitsGroups.empty()) return;
 	for (std::list<UnitsGroup*>::iterator it = unitsGroups.begin(); it != unitsGroups.end(); it++)
 	{
-        if ((*it)->size() > 2 && (*it)->emptyGoals())
+        if ((*it)->size() > 2 )//&& (*it)->emptyGoals())
             sendGroupToAttack(*it);
 	        (*it)->update();
 	}

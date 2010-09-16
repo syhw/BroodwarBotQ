@@ -39,8 +39,6 @@ public:
 	void setScoutTime();
 	void buildGates();
 	void eRush(); // To call on detection of a rush
-	int priority[13];
-	int needed[13];
 	void buildUnits();
 
 };

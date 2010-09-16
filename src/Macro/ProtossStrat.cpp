@@ -117,21 +117,53 @@ void ProtossStrat::update(){
 void ProtossStrat::buildUnits(){
 
 	//BO with templar goon zealot
-
-
-
-	this->needed[Dragoon] = 24;
-	this->priority[Dragoon] = 39;
-    this->needed[Zealot] = 12;
+	this->needed[Dragoon] = 150;
+	this->priority[Dragoon] = 40;
+    this->needed[Zealot] = 150;
     this->priority[Zealot] = 38;
-	if(this->baseManager->getActiveBases().size() > 1){
+	if (this->baseManager->getActiveBases().size() > 1)
+    {
+        if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Protoss_Ground_Weapons) < 3)
+        {
+            this->buildOrderManager->upgrade(3, UpgradeTypes::Protoss_Ground_Weapons, 90);
+            this->buildOrderManager->upgrade(3, UpgradeTypes::Protoss_Ground_Armor, 90);
+            this->buildOrderManager->upgrade(3, UpgradeTypes::Protoss_Plasma_Shields, 90);
+        }
+        this->buildOrderManager->build(3*this->baseManager->getActiveBases().size(), BWAPI::UnitTypes::Protoss_Gateway, 80);
+        /*if (!Broodwar->self()->hasResearched(TechTypes::Psionic_Storm))
+            this->buildOrderManager->research(TechTypes::Psionic_Storm, 70);
+		if(this->buildOrderManager->hasResources(BWAPI::UnitTypes::Protoss_High_Templar)){
+			this->needed[High_Templar]++;
+			this->priority[High_Templar] = 40;
+		}*/
+	}
+
+/*
+	//BO with templar goon zealot
+	this->needed[Dragoon]++;
+	this->priority[Dragoon] = 40;
+    this->needed[Zealot] = 12; // 24
+    this->priority[Zealot] = 38; // 40
+    //if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Protoss_Ground_Weapons) < 3)
+    //    this->buildOrderManager->upgrade(3, UpgradeTypes::Protoss_Ground_Weapons, 70);
+	if(this->baseManager->getActiveBases().size() > 1)
+    {
+        /*if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Protoss_Ground_Weapons) < 1)
+            this->buildOrderManager->upgrade(1, UpgradeTypes::Protoss_Ground_Weapons, 70);
+        if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Protoss_Ground_Armor) < 1)
+            this->buildOrderManager->upgrade(1, UpgradeTypes::Protoss_Ground_Armor, 69);
+        for (std::set<Base*>::const_iterator it = this->baseManager->getActiveBases().begin();
+            it != baseManager->getActiveBases().end(); ++it)
+        {
+            this->buildOrderManager->build(2, UnitTypes::Protoss_Photon_Cannon, 60, (*it)->getBaseLocation()->getTilePosition());
+        }
+        if (!Broodwar->self()->hasResearched(TechTypes::Psionic_Storm))
+            this->buildOrderManager->research(TechTypes::Psionic_Storm, 70);
 		if(this->buildOrderManager->hasResources(BWAPI::UnitTypes::Protoss_High_Templar)){
 			this->needed[High_Templar]++;
 			this->priority[High_Templar] = 40;
 			//BWAPI::Broodwar->printf("one more now : %d", this->needed[High_Templar]); //////////////
-		}
-	}
-
+*/
 }
 
 void ProtossStrat::buildGeyser()
@@ -170,7 +202,7 @@ void ProtossStrat::buildGates()
                 break;
             }
     }
-    if( allGatesFull && !underConstruction[UnitTypes::Protoss_Gateway])
+    if (allGatesFull && !underConstruction[UnitTypes::Protoss_Gateway])
 	{
 		this->buildOrderManager->buildAdditional(1,UnitTypes::Protoss_Gateway,80);
 		underConstruction[UnitTypes::Protoss_Gateway] = true;

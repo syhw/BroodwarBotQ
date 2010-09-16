@@ -195,9 +195,10 @@ void BaseManager::expand(BWTA::BaseLocation* location, int priority)
   if(!(location->isMineralOnly()))  
   {
     this->RefineryNeeded+=1;
+    ///this->builder->buildAdditional(2, UnitTypes::Protoss_Photon_Cannon, 70, location->getTilePosition()); // it makes no pylon to support so build them far away
 
     if (!(this->hasRefinery(location)))
-      this->builder->buildAdditional(1,BWAPI::Broodwar->self()->getRace().getRefinery(),priority,location->getTilePosition());
+      this->builder->buildAdditional(1,BWAPI::Broodwar->self()->getRace().getRefinery(),priority-1,location->getTilePosition()); /// PRIORITY-1 TOCHANGE
   }
 }
 

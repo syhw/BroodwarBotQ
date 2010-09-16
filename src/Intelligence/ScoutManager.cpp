@@ -19,6 +19,13 @@ void ScoutManager::setDependencies()
 {
 	this->warManager = & WarManager::Instance();
 	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
+    //// HACK for 2 players map:
+    for (std::set<TilePosition>::const_iterator it = Broodwar->getStartLocations().begin();
+        it != Broodwar->getStartLocations().end(); ++it)
+    {
+        if (*it != Broodwar->self()->getStartLocation())
+            this->enemyStartLocation = *it;
+    }
 }
 
 void ScoutManager::update()
@@ -122,7 +129,7 @@ void ScoutManager::onOffer(std::set<BWAPI::Unit*> units)
 	for (std::list<pGoal>::iterator goals = this->awaitingGoals.begin(); goals != this->awaitingGoals.end(); ++goals)
     {
 	//find the best unit for each goal
-		dist = 999999999;
+		dist = 99999999;
 		bestUnit = NULL;
 
 		for (std::set<BWAPI::Unit *>::iterator units = remainingUnits.begin(); units != remainingUnits.end(); ++units)
@@ -148,6 +155,7 @@ void ScoutManager::onOffer(std::set<BWAPI::Unit*> units)
 		giveMeTheGoal = new UnitsGroup();
 		this->myUnitsGroups.push_back(giveMeTheGoal);
 		giveMeTheGoal->takeControl(bestUnit);
+        bestUnit->move(Position(Broodwar->mapWidth()*16, Broodwar->mapHeight()*16));
 		remainingUnits.erase(bestUnit);
 	
 		//We have a unitsGroup

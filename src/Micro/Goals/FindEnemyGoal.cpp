@@ -51,8 +51,8 @@ void FindEnemyGoal::achieve()
             {
 				selected->tryToRealize();
 			} else {
-				//TODO
-				BWAPI::Broodwar->printf("(FindEnemyGoal) Tell Louis this situation happened");
+				// TODO
+                // Problem if here
 			}
 		}
         else

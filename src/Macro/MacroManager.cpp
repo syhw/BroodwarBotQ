@@ -11,7 +11,7 @@ MacroManager::MacroManager()
 : BaseObject("MacroManager")
 , expanding(0)
 , scouting(false)
-, firstScout(10)
+, firstScout(15)
 {
 	this->buildOrderManager = NULL;
 	this->productionManager = NULL;
