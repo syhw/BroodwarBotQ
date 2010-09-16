@@ -255,7 +255,7 @@ void UnitsGroup::update()
     {
 		accomplishGoal();
 		return;
-	}
+    }
     for (std::list<pBayesianUnit>::iterator it = arrivingUnits.begin();
         it != arrivingUnits.end(); ++it)
     {
@@ -264,6 +264,8 @@ void UnitsGroup::update()
             units.push_back(*it);
             arrivingUnits.erase(it++);
         }
+        else
+            (*it)->update();
     }
 
     updateCenter();
@@ -523,7 +525,7 @@ void UnitsGroup::takeControl(Unit* u)
     else
         Broodwar->printf("Cette race n'est pas correctement gérée par l'IA pour le moment !");
 
-    if (u->getDistance(center) < __MAX_DISTANCE_TO_GROUP__)
+    if (u->getDistance(center) < __MAX_DISTANCE_TO_GROUP__ || !units.size())
     {
         if (tmp != NULL)
             this->units.push_back(tmp);

@@ -10,9 +10,11 @@ ProbeUnit::~ProbeUnit()
 
 void ProbeUnit::micro()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("ProbeUnit::micro non implémenté !");
-#endif
+    if (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency())
+    {
+        _lastClickFrame = Broodwar->getFrameCount();
+        unit->attackMove(target);
+    }
 }
 
 void ProbeUnit::check()

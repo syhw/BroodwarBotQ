@@ -160,14 +160,17 @@ void ProtossStrat::buildGates()
 {
 	
 	bool allGatesFull = true;
-	const list<Unit*>& buildings = prodBuildings[UnitTypes::Protoss_Gateway];
-	for( list<Unit*>::const_iterator it = buildings.begin(); it != buildings.end(); it++)
-		if(!(*it)->isCompleted() || !(*it)->isTraining())
-		{
-			allGatesFull = false;
-			break;
-		}
-	if( allGatesFull && !underConstruction[UnitTypes::Protoss_Gateway])
+    if (prodBuildings.count(UnitTypes::Protoss_Gateway))
+    {
+        const list<Unit*>& buildings = prodBuildings[UnitTypes::Protoss_Gateway];
+        for( list<Unit*>::const_iterator it = buildings.begin(); it != buildings.end(); it++)
+            if(!(*it)->isCompleted() || !(*it)->isTraining())
+            {
+                allGatesFull = false;
+                break;
+            }
+    }
+    if( allGatesFull && !underConstruction[UnitTypes::Protoss_Gateway])
 	{
 		this->buildOrderManager->buildAdditional(1,UnitTypes::Protoss_Gateway,80);
 		underConstruction[UnitTypes::Protoss_Gateway] = true;

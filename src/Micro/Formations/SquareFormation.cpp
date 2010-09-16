@@ -1,5 +1,6 @@
 #include "SquareFormation.h"
 #include "MapManager.h"
+#include <BWTA.h>
 
 using namespace BWAPI;
 
@@ -14,6 +15,8 @@ SquareFormation::SquareFormation(const Position& p, const Vec& direction)
 
 void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
 {
+    BWTA::Region* r = BWTA::getRegion(center.toPosition()); /// DEBUG DEBUG DEBUG
+    center = Vec(r->getCenter().x(), r->getCenter().y());
 	end_positions.clear();
     if (vUnits.size() == 1)
     {

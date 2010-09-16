@@ -18,7 +18,7 @@ ScoutManager::~ScoutManager()
 void ScoutManager::setDependencies()
 {
 	this->warManager = & WarManager::Instance();
-	this->arbitrator = &  Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
+	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
 }
 
 void ScoutManager::update()
@@ -54,7 +54,7 @@ void ScoutManager::update()
 		//ask units :
 		for(std::set<BWAPI::Unit *>::const_iterator it = BWAPI::Broodwar->self()->getUnits().begin(); it != BWAPI::Broodwar->self()->getUnits().end(); ++it){
 			if( (*it)->getType().isWorker() || (*it)->getType() == BWAPI::UnitTypes::Protoss_Observer ){
-				this->arbitrator->setBid(this, (*it),90);
+				this->arbitrator->setBid(this, (*it),92);
 			}
 		}
 	}
@@ -62,7 +62,6 @@ void ScoutManager::update()
 		this->myUnitsGroups.remove(*trash);
 	}
 	toTrash.empty();
-
 }
 
 std::string ScoutManager::getName() const
@@ -111,7 +110,7 @@ void ScoutManager::onUnitCreate(BWAPI::Unit* unit){
 void ScoutManager::onOffer(std::set<BWAPI::Unit*> units)
 {
 	std::vector<pGoal> goalsDone;
-	std::set<BWAPI::Unit*> remainingUnits = units;//Does it copy the set ?
+	std::set<BWAPI::Unit*> remainingUnits = units;
 
 	//Else grab a new unit
 	//Obs are always the best
@@ -145,7 +144,7 @@ void ScoutManager::onOffer(std::set<BWAPI::Unit*> units)
 				break;
 			}
 		}
-		this->arbitrator->accept(this, bestUnit, 90);
+		this->arbitrator->accept(this, bestUnit, 92);
 		giveMeTheGoal = new UnitsGroup();
 		this->myUnitsGroups.push_back(giveMeTheGoal);
 		giveMeTheGoal->takeControl(bestUnit);
@@ -184,7 +183,7 @@ void ScoutManager::findEnemy()
     {	
 		if ((*it)->getType().isWorker() || (*it)->getType() == BWAPI::UnitTypes::Protoss_Observer)
         {
-			this->arbitrator->setBid(this, (*it),90);
+			this->arbitrator->setBid(this, (*it),92);
 		}
 	}
 }

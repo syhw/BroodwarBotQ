@@ -16,6 +16,7 @@ FindEnemyGoal::FindEnemyGoal()
     {
 		if ((*p) != myStartLocation)
         {
+            Position debug = (*p)->getPosition();
 			addSubgoal(pSubgoal(new SeeSubgoal(SL_AND, (*p)->getPosition())));
 		}
 	}

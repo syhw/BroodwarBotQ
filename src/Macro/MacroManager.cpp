@@ -49,7 +49,9 @@ void MacroManager::eRush(){
 void MacroManager::onUnitCreate(BWAPI::Unit* unit)
 {
 	
-	if(unit->getType().isBuilding() && scouting == false && BWAPI::Broodwar->self()->supplyUsed() >= firstScout){
+    if(unit->getType().isBuilding() && scouting == false && BWAPI::Broodwar->self()->supplyUsed() >= firstScout)
+    //if (scouting == false)
+    {
 		this->scouting = true;
 		ScoutManager::Instance().findEnemy();
 	}

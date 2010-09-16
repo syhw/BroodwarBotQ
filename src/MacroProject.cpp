@@ -142,8 +142,10 @@ void BattleBroodAI::onStart()
 	this->eEcoEstimator = & EEcoEstimator::Instance();
 	this->eTechEstimator = & ETechEstimator::Instance();
 	this->timeManager = & TimeManager::Instance();
-	this->goalManager = & GoalManager::Instance();
-	this->enhancedUI = & EnhancedUI::Instance();
+    this->goalManager = & GoalManager::Instance();
+#ifdef __DEBUG_LOUIS__
+    this->enhancedUI = & EnhancedUI::Instance();
+#endif
 	this->defenseManager = & DefenseManager::Instance();
     if( Broodwar->self()->getRace() == Races::Protoss)
         this->macroManager = & ProtossStrat::Instance();
@@ -217,7 +219,9 @@ void BattleBroodAI::onFrame()
 	this->upgradeManager->update();
 	this->supplyManager->update();
     this->macroManager->update(); // @merge
-	this->enhancedUI->update();
+#ifdef __DEBUG_LOUIS__
+    this->enhancedUI->update();
+#endif
 	this->borderManager->update();
 	objManager->onFrame();
 	this->scoutManager->update();

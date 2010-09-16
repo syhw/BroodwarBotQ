@@ -32,8 +32,10 @@
 #include "ConstructionManager.h"
 #include "MorphManager.h"
 #include "ProductionManager.h"
-#include "EnhancedUI.h"
 #include "DefenseManager.h"
+#ifdef __DEBUG_LOUIS__
+#include "EnhancedUI.h"
+#endif
 
 class BattleBroodAI;
 extern BattleBroodAI* broodAI;
@@ -79,8 +81,10 @@ public:
 	EEcoEstimator* eEcoEstimator;
 	ETechEstimator* eTechEstimator;
 	TimeManager* timeManager;
-	GoalManager* goalManager;
-	EnhancedUI * enhancedUI;
+    GoalManager* goalManager;
+#ifdef __DEBUG_LOUIS__
+    EnhancedUI * enhancedUI;
+#endif
 	DefenseManager * defenseManager;
     ObjectManager* objManager;
 	bool showManagerAssignments;
