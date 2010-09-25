@@ -31,6 +31,7 @@ void ScoutManager::setDependencies()
 
 void ScoutManager::update()
 {
+    return; // TOURNAMENT3 TODO REMOVE
     if (enemyFound && !exploringEnemy) 
     {
 		exploringEnemy = true;

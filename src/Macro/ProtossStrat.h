@@ -7,6 +7,7 @@ class ProtossStrat: public MacroManager, public CSingleton<ProtossStrat>
 {
     friend class CSingleton<ProtossStrat>;
 private:
+    bool _launchUpgrades;
     typedef enum
     {
         Arbiter,

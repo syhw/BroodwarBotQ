@@ -244,7 +244,7 @@ void WorkerManager::update()
       else
         gasRate+=8/180.0;
     }
-    
+
     //switch current resource to newResource when appropiate
     if (u->second.resource == NULL || (i->getTarget() != NULL && !i->getTarget()->getType().isResourceDepot()))
       u->second.resource = u->second.newResource;

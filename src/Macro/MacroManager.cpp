@@ -300,13 +300,12 @@ bool MacroManager::canCreateDefenseBuildings( UnitType techBuilding, UnitType bu
 
 bool MacroManager::shouldExpand()
 {
-	
 	// Expand if all the bases are fully functionnal
 	unsigned int nbRessources = 0;
 	const std::set<Base*>& bases = baseManager->getAllBases();
 	for( std::set<Base*>::const_iterator it = bases.begin(); it != bases.end(); it++)
 	{
-		nbRessources += 2 * (*it)->getMinerals().size() + 3 * (*it)->getGeysers().size();
+		nbRessources += (int)(2 * (*it)->getMinerals().size()) + 3 * (*it)->getGeysers().size(); // TOCHANGE 2 for 2.5
 	}
 	return workerManager->workers.size() >= nbRessources;
 }

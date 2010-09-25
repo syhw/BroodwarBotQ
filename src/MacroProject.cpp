@@ -89,12 +89,14 @@ void BattleBroodAI::onStart()
 {
     //Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
     // Enable some cheat flags
+//#ifdef __DEBUG__
     Broodwar->enableFlag(Flag::UserInput);
+    Broodwar->setLocalSpeed(0);
+//#endif
     // Uncomment to enable complete map information
     //Broodwar->enableFlag(Flag::CompleteMapInformation);
 
     // Speed up the game to the maximum
-    Broodwar->setLocalSpeed(0);
 
     this->showManagerAssignments=false;
 
