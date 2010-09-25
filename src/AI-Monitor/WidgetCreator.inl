@@ -1,3 +1,4 @@
+#ifdef BW_QT_DEBUG
 #include "WidgetCreator.h"
 #include <QtGui/QTableWidget>
 #include <QtGui/QStandardItemModel>
@@ -44,3 +45,4 @@ QWidget* WidgetCreator<std::map<Key, Value> >::create(
     return widget;
 }    
 
+#endif

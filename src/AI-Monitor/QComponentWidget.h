@@ -1,3 +1,4 @@
+#ifdef BW_QT_DEBUG
 #pragma once
 #include "Defines.h"
 #include "BaseObject.h"
@@ -24,3 +25,4 @@ protected:
 	QTextEdit* textEdit_sout;
 	QTextEdit* textEdit_serr;
 };
+#endif

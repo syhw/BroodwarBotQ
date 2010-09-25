@@ -11,7 +11,7 @@ AttackGoal::AttackGoal(UnitsGroup* ug, BWAPI::Position p)
 void AttackGoal::achieve()
 {
 	//See if we need an intermediate subgoal : 
-	int	min = 99999999;
+	double min = 99999999.9;
 	for(std::list<pSubgoal>::iterator it = subgoals.begin(); it != subgoals.end(); ++it){
 		if ((*it)->distanceToRealize() > 0 && (*it)->distanceToRealize() < min)
         {

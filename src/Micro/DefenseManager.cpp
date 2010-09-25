@@ -59,7 +59,7 @@ void DefenseManager::checkDefenses(){
 void DefenseManager::checkGroundDefense(Base * b, bool toDef){
 
 	//Find the unitsGroup that must defend this base against ground attack
-#ifdef __DEBUG__LOUIS__
+#ifdef __DEBUG___
 	assert(this->groundDefenders.count(b) == 1);
 #endif
 	UnitsGroup * ug = (*this->groundDefenders.find(b)).second;
@@ -168,11 +168,11 @@ void DefenseManager::update()
 }
 
 void DefenseManager::addBase(Base * b){
-#ifdef __DEBUG_LOUIS__
+#ifdef __DEBUG__
 	BWAPI::Broodwar->printf("Appel à addBase");
 #endif
 	UnitsGroup * ug = new UnitsGroup();
-#ifdef __DEBUG__LOUIS__
+#ifdef __DEBUG___
 	assert(this->groundDefenders.count(b) == 0);//We must not have already the groundDefenders for this base
 #endif
 	Goal * g = new DefendBaseGroundGoal(ug,b);

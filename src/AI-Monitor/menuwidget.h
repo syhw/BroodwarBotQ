@@ -1,3 +1,4 @@
+#ifdef BW_QT_DEBUG
 #ifndef MENUWIDGET_H
 #define MENUWIDGET_H
 
@@ -25,3 +26,4 @@ public:
 };
 
 #endif // MENUWIDGET_H
+#endif

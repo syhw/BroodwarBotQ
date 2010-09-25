@@ -1,3 +1,4 @@
+#ifdef BW_QT_DEBUG
 /********************************************************************************
 ** Form generated from reading UI file 'menuwidget.ui'
 **
@@ -166,3 +167,4 @@ namespace Ui {
 QT_END_NAMESPACE
 
 #endif // UI_MENUWIDGET_H
+#endif

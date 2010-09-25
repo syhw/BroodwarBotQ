@@ -95,7 +95,7 @@ void Goal::checkAchievement()
         if(res_and || res_or)
         {
             this->status= GS_ACHIEVED;
-#ifdef __DEBUG_GABRIEL__
+#ifdef __DEBUG__
             BWAPI::Broodwar->printf("\x13 \x04 goal finished in ~ %d seconds", (BWAPI::Broodwar->getFrameCount() - firstFrame)/24);
 #endif
         }
@@ -141,7 +141,7 @@ int Goal::estimateDistance(BWAPI::Position p)
     {
 		if ((*it)->distanceToRealize(p) > 0)
         {
-			return (*it)->distanceToRealize(p);
+			return (int)(*it)->distanceToRealize(p);
 		}
 	}
 	return -1;

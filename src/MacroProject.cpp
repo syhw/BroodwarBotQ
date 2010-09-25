@@ -2,7 +2,9 @@
 #include <Util.h>
 #include <time.h>
 #include <UnitsGroup.h>
+#ifdef BW_QT_DEBUG
 #include <QtGui/QApplication.h>
+#endif
 
 #define __POOL_TIME_RUSH__ 130 // seconds, 3 workers + 1 pool + 11 seconds
 #define __BBS_TIME_RUSH__ 230 // seconds, 4 workers + 2 barracks + 18 seconds
@@ -143,7 +145,7 @@ void BattleBroodAI::onStart()
     this->eTechEstimator = & ETechEstimator::Instance();
     this->timeManager = & TimeManager::Instance();
     this->goalManager = & GoalManager::Instance();
-#ifdef __DEBUG_LOUIS__
+#ifdef __DEBUG__
     this->enhancedUI = & EnhancedUI::Instance();
 #endif
     this->defenseManager = & DefenseManager::Instance();
@@ -203,8 +205,10 @@ void BattleBroodAI::onFrame()
 {
     if (Broodwar->isReplay()) return;
     if (!this->analyzed) return;
+#ifdef __DEBUG__
     if (Broodwar->getLastError() != BWAPI::Errors::None)
         Broodwar->printf("LAST ERROR: %s", Broodwar->getLastError().toString().c_str());
+#endif
 
 #ifdef BW_POS_MOUSE
     char mousePos[100];
@@ -219,7 +223,7 @@ void BattleBroodAI::onFrame()
     this->upgradeManager->update();
     this->supplyManager->update();
     this->macroManager->update(); // @merge
-#ifdef __DEBUG_LOUIS__
+#ifdef __DEBUG__
     this->enhancedUI->update();
 #endif
     this->borderManager->update();
@@ -254,188 +258,7 @@ void BattleBroodAI::onFrame()
         }
     }
 
-    /*
-    for(std::set<Unit*>::iterator i=units.begin();i!=units.end();i++)
-    {
-    int x=(*i)->getPosition().x();
-    int y=(*i)->getPosition().y();
-    Broodwar->drawCircle(CoordinateType::Map,x,y,(*i)->getType().airWeapon()->maxRange(),Colors::Blue,false);
-    Broodwar->drawCircle(CoordinateType::Map,x,y,(*i)->getType().groundWeapon()->maxRange(),Colors::Green,false);
-    }
-    */
-
-    //we will iterate through all the base locations, and draw their outlines.
-    for(std::set<BWTA::BaseLocation*>::const_iterator i=BWTA::getBaseLocations().begin();i!=BWTA::getBaseLocations().end();i++)
-    {
-        TilePosition p=(*i)->getTilePosition();
-        Position c=(*i)->getPosition();
-
-        //draw outline of center location
-        Broodwar->drawBox(CoordinateType::Map,p.x()*32,p.y()*32,p.x()*32+4*32,p.y()*32+3*32,Colors::Blue,false);
-
-        //draw a circle at each mineral patch
-        for(std::set<BWAPI::Unit*>::const_iterator j=(*i)->getMinerals().begin();j!=(*i)->getMinerals().end();j++)
-        {
-            Position q=(*j)->getPosition();
-            Broodwar->drawCircle(CoordinateType::Map,q.x(),q.y(),30,Colors::Cyan,false);
-        }
-
-        //draw the outlines of vespene geysers
-        for(std::set<BWAPI::Unit*>::const_iterator j=(*i)->getGeysers().begin();j!=(*i)->getGeysers().end();j++)
-        {
-            TilePosition q=(*j)->getTilePosition();
-            Broodwar->drawBox(CoordinateType::Map,q.x()*32,q.y()*32,q.x()*32+4*32,q.y()*32+2*32,Colors::Orange,false);
-        }
-
-        //if this is an island expansion, draw a yellow circle around the base location
-        if ((*i)->isIsland())
-        {
-            Broodwar->drawCircle(CoordinateType::Map,c.x(),c.y(),80,Colors::Yellow,false);
-        }
-    }
-
-    //we will iterate through all the regions and draw the polygon outline of it in green.
-    for(std::set<BWTA::Region*>::const_iterator r=BWTA::getRegions().begin();r!=BWTA::getRegions().end();r++)
-    {
-        BWTA::Polygon p=(*r)->getPolygon();
-        for(int j=0;j<(int)p.size();j++)
-        {
-            Position point1=p[j];
-            Position point2=p[(j+1) % p.size()];
-            Broodwar->drawLine(CoordinateType::Map,point1.x(),point1.y(),point2.x(),point2.y(),Colors::Green);
-        }
-    }
-
-    //we will visualize the chokepoints with red lines
-    for(std::set<BWTA::Region*>::const_iterator r=BWTA::getRegions().begin();r!=BWTA::getRegions().end();r++)
-    {
-        for(std::set<BWTA::Chokepoint*>::const_iterator c=(*r)->getChokepoints().begin();c!=(*r)->getChokepoints().end();c++)
-        {
-            Position point1=(*c)->getSides().first;
-            Position point2=(*c)->getSides().second;
-            Broodwar->drawLine(CoordinateType::Map,point1.x(),point1.y(),point2.x(),point2.y(),Colors::Red);
-        }
-    }
-
-
-    /* // Old AI: to merge !
-    if (show_visibility_data)
-    {
-    for(int x=0;x<Broodwar->mapWidth();x++)
-    {
-    for(int y=0;y<Broodwar->mapHeight();y++)
-    {
-    if (Broodwar->isExplored(x,y))
-    {
-    if (Broodwar->isVisible(x,y))
-    Broodwar->drawDotMap(x*32+16,y*32+16,Colors::Green);
-    else
-    Broodwar->drawDotMap(x*32+16,y*32+16,Colors::Blue);
-    }
-    else
-    Broodwar->drawDotMap(x*32+16,y*32+16,Colors::Red);
-    }
-    }
-    }
-
-    trainDrones();
-
-    if (Broodwar->isReplay())
-    return;
-
-    drawStats();
-    if (analyzed && Broodwar->getFrameCount()%30==0)
-    {
-    //order one of our workers to guard our chokepoint.
-    for(std::set<Unit*>::const_iterator i=Broodwar->self()->getUnits().begin();i!=Broodwar->self()->getUnits().end();i++)
-    {
-    if ((*i)->getType().isWorker())
-    {
-    //get the chokepoints linked to our home region
-    std::set<BWTA::Chokepoint*> chokepoints= home->getChokepoints();
-    double min_length=10000;
-    BWTA::Chokepoint* choke=NULL;
-
-    //iterate through all chokepoints and look for the one with the smallest gap (least width)
-    for(std::set<BWTA::Chokepoint*>::iterator c=chokepoints.begin();c!=chokepoints.end();c++)
-    {
-    double length=(*c)->getWidth();
-    if (length<min_length || choke==NULL)
-    {
-    min_length=length;
-    choke=*c;
-    }
-    }
-
-    //order the worker to move to the center of the gap
-    (*i)->rightClick(choke->getCenter());
-    break;
-    }
-    }
-    }
-    if (analyzed)
-    {
-    //we will iterate through all the base locations, and draw their outlines.
-    for(std::set<BWTA::BaseLocation*>::const_iterator i=BWTA::getBaseLocations().begin();i!=BWTA::getBaseLocations().end();i++)
-    {
-    TilePosition p=(*i)->getTilePosition();
-    Position c=(*i)->getPosition();
-
-    //draw outline of center location
-    Broodwar->drawBox(CoordinateType::Map,p.x()*32,p.y()*32,p.x()*32+4*32,p.y()*32+3*32,Colors::Blue,false);
-
-    //draw a circle at each mineral patch
-    for(std::set<BWAPI::Unit*>::const_iterator j=(*i)->getStaticMinerals().begin();j!=(*i)->getStaticMinerals().end();j++)
-    {
-    Position q=(*j)->getInitialPosition();
-    Broodwar->drawCircle(CoordinateType::Map,q.x(),q.y(),30,Colors::Cyan,false);
-    }
-
-    //draw the outlines of vespene geysers
-    for(std::set<BWAPI::Unit*>::const_iterator j=(*i)->getGeysers().begin();j!=(*i)->getGeysers().end();j++)
-    {
-    TilePosition q=(*j)->getInitialTilePosition();
-    Broodwar->drawBox(CoordinateType::Map,q.x()*32,q.y()*32,q.x()*32+4*32,q.y()*32+2*32,Colors::Orange,false);
-    }
-
-    //if this is an island expansion, draw a yellow circle around the base location
-    if ((*i)->isIsland())
-    {
-    Broodwar->drawCircle(CoordinateType::Map,c.x(),c.y(),80,Colors::Yellow,false);
-    }
-    }
-
-    //we will iterate through all the regions and draw the polygon outline of it in green.
-    for(std::set<BWTA::Region*>::const_iterator r=BWTA::getRegions().begin();r!=BWTA::getRegions().end();r++)
-    {
-    BWTA::Polygon p=(*r)->getPolygon();
-    for(int j=0;j<(int)p.size();j++)
-    {
-    Position point1=p[j];
-    Position point2=p[(j+1) % p.size()];
-    Broodwar->drawLine(CoordinateType::Map,point1.x(),point1.y(),point2.x(),point2.y(),Colors::Green);
-    }
-    }
-
-    //we will visualize the chokepoints with red lines
-    for(std::set<BWTA::Region*>::const_iterator r=BWTA::getRegions().begin();r!=BWTA::getRegions().end();r++)
-    {
-    for(std::set<BWTA::Chokepoint*>::const_iterator c=(*r)->getChokepoints().begin();c!=(*r)->getChokepoints().end();c++)
-    {
-    Position point1=(*c)->getSides().first;
-    Position point2=(*c)->getSides().second;
-    Broodwar->drawLine(CoordinateType::Map,point1.x(),point1.y(),point2.x(),point2.y(),Colors::Red);
-    }
-    }
-    }
-    if (analysis_just_finished)
-    {
-    Broodwar->printf("Finished analyzing map.");
-    analysis_just_finished=false;
-    }*/
-    // log("OUT BBAI::onFrame()");
-
-#ifdef __DEBUG_GABRIEL__
+#ifdef __DEBUG__
     display();
 #endif
     //clock_t end = clock();

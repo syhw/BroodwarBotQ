@@ -1,3 +1,4 @@
+#ifdef BW_QT_DEBUG
 #pragma once
 #include <QtGui/QMainWindow>
 #include <QtGui/QSplitter>
@@ -32,3 +33,4 @@ public:
     MiniMap* miniMap;
     ObjectManager* objManager;
 };
+#endif

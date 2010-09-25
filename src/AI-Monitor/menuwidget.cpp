@@ -1,3 +1,4 @@
+#ifdef BW_QT_DEBUG
 #include "menuwidget.h"
 #include "ui_menuwidget.h"
 #include <BWAPI.h>
@@ -80,3 +81,4 @@ void MenuWidget::draw()
 {
     ui->retranslateUi(this);
 }
+#endif

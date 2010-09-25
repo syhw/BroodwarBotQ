@@ -20,7 +20,7 @@ void ArcFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
         return;
     if (vUnits.size() == 1)
     {
-        end_positions.push_back(Position(center.x, center.y));
+        end_positions.push_back(Position((int)center.x, (int)center.y));
         return;
     }
     int maxLength = 0;
@@ -67,8 +67,8 @@ void ArcFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
     }
     else 
     {
-        p1 = Position(center.x, center.y);
-        p2 = Position(center.x, center.y);
+        p1 = Position((int)center.x, (int)center.y);
+        p2 = Position((int)center.x, (int)center.y);
         if (!vUnits[0]->unit->getType().isFlyer() && !Broodwar->isWalkable(p1.x()/8, p1.y()/8))
         {
             Position tmp = MapManager::Instance().closestWalkabableSameRegionOrConnected(p1);

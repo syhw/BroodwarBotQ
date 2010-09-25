@@ -1,3 +1,4 @@
+#ifdef BW_QT_DEBUG
 #include "Mainwindow.h"
 #include "ui_Mainwindow.h"
 #include "ui_menuwidget.h"
@@ -80,3 +81,4 @@ void MainWindow::componentDoubleClicked(QModelIndex index)
     QComponentWidget* component = new QComponentWidget(baseObj);
     component->exec();
 }
+#endif

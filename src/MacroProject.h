@@ -33,7 +33,7 @@
 #include "MorphManager.h"
 #include "ProductionManager.h"
 #include "DefenseManager.h"
-#ifdef __DEBUG_LOUIS__
+#ifdef __DEBUG__
 #include "EnhancedUI.h"
 #endif
 
@@ -82,7 +82,7 @@ public:
 	ETechEstimator* eTechEstimator;
 	TimeManager* timeManager;
     GoalManager* goalManager;
-#ifdef __DEBUG_LOUIS__
+#ifdef __DEBUG__
     EnhancedUI * enhancedUI;
 #endif
 	DefenseManager * defenseManager;

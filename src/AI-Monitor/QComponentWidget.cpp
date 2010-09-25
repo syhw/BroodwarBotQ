@@ -1,3 +1,4 @@
+#ifdef BW_QT_DEBUG
 #include "QComponentWidget.h"
 #include "Data.inl"
 
@@ -60,3 +61,4 @@ void QComponentWidget::refreshWidget()
     textEdit_serr->setText(QString(baseObj->getErrors().c_str()));
 #endif
 }
+#endif

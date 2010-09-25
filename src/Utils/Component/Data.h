@@ -3,9 +3,11 @@
 #include "BaseData.h"
 #include <iostream>
 #include <string>
+#ifdef BW_QT_DEBUG
 #include <QtGui/QHBoxLayout>
 #include <QtGui/QLabel>
 #include <QtGui/QLineEdit>
+#endif
 
 class BaseObject;
 
@@ -20,7 +22,9 @@ public:
 	void endEdit();
 
 	const std::string& getName() const;
+#ifdef BW_QT_DEBUG
     QWidget* createWidget(QWidget* parent);
+#endif
 
 	std::ostream& operator <<(std::ostream& os) const;
 	std::istream& operator >>(const std::istream& is) const;

@@ -1,8 +1,10 @@
 #include <map>
-#include "WidgetCreator.h"
 #include "Data.h"
 #include "BaseObject.h"
+#ifdef BW_QT_DEBUG
+#include "WidgetCreator.h"
 #include "WidgetCreator.inl"
+#endif
 
 template<typename T>
 Data<T>::Data(T defaultValue, std::string name, BaseObject* parent)
@@ -94,8 +96,10 @@ std::istream& Data<T>::operator >>(const std::istream& is) const
 	return is;
 }
 
+#ifdef BW_QT_DEBUG
 template< typename T>
 QWidget* Data<T>::createWidget(QWidget* parent)
 {
     return WidgetCreator<T>::create(this, parent);
 }
+#endif

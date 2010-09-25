@@ -4,9 +4,11 @@
 #include <iostream>
 #include "CustomOStream.h"
 #include "Defines.h"
+#ifdef BW_QT_DEBUG
 #include <QtGui/QWidget>
 #include <QtGui/QMessageBox>
 #include "RefreshWidgetEmiter.h"
+#endif
 #include "time.h"
 #include "BWAPI.h"
 

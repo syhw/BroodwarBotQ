@@ -4,7 +4,9 @@
 #include <stdio.h>
 #include <tchar.h>
 #include <BWAPI.h>
+#ifdef BW_QT_DEBUG
 #include <QtGui/QApplication>
+#endif
 #include "MacroProject.h"
 #include "Mainwindow.h"
 #include "Defines.h"
@@ -20,7 +22,6 @@ bool g_onStartDone = false;
 #define BUF_SIZE 255
 
 static HANDLE  hThreadArrayMonitor;
-
 DWORD WINAPI LaunchMonitor( LPVOID lpParam );
 
 

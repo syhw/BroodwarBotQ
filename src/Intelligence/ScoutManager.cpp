@@ -26,6 +26,7 @@ void ScoutManager::setDependencies()
         if (*it != Broodwar->self()->getStartLocation())
             this->enemyStartLocation = *it;
     }
+    enemyFound = true;
 }
 
 void ScoutManager::update()

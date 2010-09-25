@@ -2,9 +2,7 @@
 
 //our defines
 
-//#define __DEBUG_LOUIS__
-//#define __DEBUG_GABRIEL__
-//#define __DEBUG_NICOLAS__
+//#define __DEBUG__
 //#define __NON_IMPLEMENTE__
 //#define BW_POS_MOUSE
 

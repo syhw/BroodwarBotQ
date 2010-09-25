@@ -1,3 +1,4 @@
+#ifdef BW_QT_DEBUG
 /****************************************************************************
 ** Meta object code from reading C++ file 'RefreshWidgetEmiter.h'
 **
@@ -83,3 +84,4 @@ void RefreshWidgetEmiter::refreshWidget()
     QMetaObject::activate(this, &staticMetaObject, 0, 0);
 }
 QT_END_MOC_NAMESPACE
+#endif

@@ -15,7 +15,7 @@ void MicroAIModule::onStart()
 	///Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
 	// Enable some cheat flags
     //Broodwar->printf("ON START !!\n");
-#ifdef __DEBUG_GABRIEL__
+#ifdef __DEBUG__
     Broodwar->enableFlag(Flag::UserInput);
     Broodwar->setLocalSpeed(0);
 #endif
@@ -302,7 +302,7 @@ void MicroAIModule::onFrame()
     Broodwar->drawTextMouse(12, 0, mousePos);
 #endif
 
-#ifdef __DEBUG_GABRIEL__
+#ifdef __DEBUG__
     //we will iterate through all the regions and draw the polygon outline of it in green.
 	for(std::set<BWTA::Region*>::const_iterator r=BWTA::getRegions().begin();r!=BWTA::getRegions().end();r++)
 	{

@@ -50,7 +50,7 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 , _lastTotalHP(unit->getHitPoints() + unit->getShields())
 , _sumLostHP(0)
 , _refreshPathFramerate(12)
-, _maxDistWhileRefreshingPath(max(_refreshPathFramerate * _topSpeed, 45.26)) // 45.26 = sqrt(BWAPI::TILE_SIZE^2 + BWAPI::TILE_SIZE^2)
+, _maxDistWhileRefreshingPath((int)max(_refreshPathFramerate * _topSpeed, 45.26)) // 45.26 = sqrt(BWAPI::TILE_SIZE^2 + BWAPI::TILE_SIZE^2)
 , _newPath(false)
 , _inPos(Position(0, 0))
 , _fleeing(false)
@@ -182,19 +182,19 @@ void BayesianUnit::switchMode(unit_mode um)
     switch (um) 
     {
         case MODE_INPOS:
-#ifdef __DEBUG_GABRIEL__
+#ifdef __DEBUG__
             Broodwar->printf("Switch INPOS!");
 #endif
             _inPos = _unitPos;
             break;
         case MODE_FIGHT_G:
-#ifdef __DEBUG_GABRIEL__
+#ifdef __DEBUG__
             Broodwar->printf("Switch FIGHT_G!");
 #endif
             //unit->holdPosition();
             break;
         case MODE_FIGHT_A:
-#ifdef __DEBUG_GABRIEL__
+#ifdef __DEBUG__
             Broodwar->printf("Switch FIGHT_A!");
 #endif
             //unit->holdPosition();
@@ -202,14 +202,14 @@ void BayesianUnit::switchMode(unit_mode um)
         case MODE_SCOUT:
             if (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency())
                 clickTarget();
-#ifdef __DEBUG_GABRIEL__
+#ifdef __DEBUG__
             Broodwar->printf("Switch SCOUT!");
 #endif
             break;
         case MODE_MOVE:
             if (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency())
                 clickTarget();
-#ifdef __DEBUG_GABRIEL__
+#ifdef __DEBUG__
             Broodwar->printf("Switch MOVE!");
 #endif
             break;
@@ -657,7 +657,7 @@ void BayesianUnit::updatePPath()
                 _tptarget = mapManager->closestWalkabableSameRegionOrConnected(_tptarget);
                 if (_tptarget == TilePositions::None)
                 {
-#ifdef __DEBUG_GABRIEL__ 
+#ifdef __DEBUG__ 
                     //Broodwar->printf("_tptarget == TilePositions::None");
 #endif
                     if (!unit->isMoving()) // hack to deblock
@@ -748,7 +748,7 @@ void BayesianUnit::updatePPath()
 
 #endif
 
-#ifdef __DEBUG_GABRIEL__
+#ifdef __DEBUG__
     //drawBTPath();
     //drawPath();
     //drawPPath();
@@ -881,7 +881,7 @@ void BayesianUnit::resumeFromBlocked()
 {
     if ((Broodwar->getFrameCount() - _lastClickFrame) > 24)
     {
-#ifdef __DEBUG_GABRIEL__
+#ifdef __DEBUG__
         //Broodwar->printf("resuming from blocked");
 #endif
         if (_lastRightClick != target)
@@ -1275,7 +1275,7 @@ int BayesianUnit::computeDmg(Unit* u)
                 else if (u->getType().size() == BWAPI::UnitSizeTypes::Large)
                     factor = 0.5;
             }
-            return (unit->getType().airWeapon().damageAmount() * factor - u->getType().armor())
+            return (int)(unit->getType().airWeapon().damageAmount() * factor - u->getType().armor())
                 * unit->getType().maxAirHits();
         }
     }
@@ -1303,7 +1303,7 @@ int BayesianUnit::computeDmg(Unit* u)
                 else if (u->getType().size() == BWAPI::UnitSizeTypes::Large)
                     factor = 0.5;
             }
-            return (unit->getType().groundWeapon().damageAmount() * factor - u->getType().armor())
+            return (int)(unit->getType().groundWeapon().damageAmount() * factor - u->getType().armor())
                 * unit->getType().maxGroundHits();
         }
     }
@@ -1314,7 +1314,7 @@ bool BayesianUnit::inRange(BWAPI::Unit* u)
     if (unit->getType() == UnitTypes::Protoss_Zealot 
         || unit->getType() == UnitTypes::Protoss_Dark_Templar)
     {
-        int maxEnemyDiag = max(u->getType().dimensionUp() + u->getType().dimensionDown(), u->getType().dimensionRight() + u->getType().dimensionLeft());
+        double maxEnemyDiag = max(u->getType().dimensionUp() + u->getType().dimensionDown(), u->getType().dimensionRight() + u->getType().dimensionLeft());
         maxEnemyDiag *= 1.414;
         return u->getDistance(_unitPos) < maxEnemyDiag + _maxDiag;
     }
@@ -1465,13 +1465,13 @@ void BayesianUnit::updateDir()
    
     // compute the probability to go in each dirv(ector)
     computeProbs();
-#ifdef __DEBUG_GABRIEL__
+#ifdef __DEBUG__
     //drawProbs(_dirvProb, _unitsGroup->size()); // DRAWPROBS
 #endif
 
     // select the most probable, most in the direction of obj if equally probables
     selectDir(obj);
-#ifdef __DEBUG_GABRIEL__
+#ifdef __DEBUG__
     drawDir();
 #endif
 }
@@ -1898,7 +1898,7 @@ void BayesianUnit::update()
         break;
     }
 
-#ifdef __DEBUG_GABRIEL__
+#ifdef __DEBUG__
     drawTarget();
 #endif
     _lastTotalHP = unit->getShields() + unit->getHitPoints();

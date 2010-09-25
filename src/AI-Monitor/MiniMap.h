@@ -1,3 +1,4 @@
+#ifdef BW_QT_DEBUG
 #ifndef MINIMAP_H
 #define MINIMAP_H
 
@@ -32,3 +33,4 @@ private:
 };
 
 #endif // MINIMAP_H
+#endif

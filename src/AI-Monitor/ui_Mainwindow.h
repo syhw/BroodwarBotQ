@@ -1,3 +1,4 @@
+#ifdef BW_QT_DEBUG
 /********************************************************************************
 ** Form generated from reading UI file 'Mainwindow.ui'
 **
@@ -70,3 +71,4 @@ namespace Ui {
 QT_END_NAMESPACE
 
 #endif // UI_MAINWINDOW_H
+#endif

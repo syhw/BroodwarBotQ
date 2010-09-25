@@ -26,11 +26,13 @@ MapManager::MapManager()
         NULL))                  // unnamed mutex
 , _lastStormUpdateFrame(0)
 {
+#ifdef __DEBUG__
     if (_stormPosMutex == NULL) 
     {
         Broodwar->printf("CreateMutex error: %d\n", GetLastError());
         return;
     }
+#endif
     walkability = new bool[_width * _height];             // Walk Tiles resolution
     buildings_wt = new bool[_width * _height];
     buildings_wt_strict = new bool[_width * _height];
@@ -77,7 +79,7 @@ MapManager::MapManager()
 
 MapManager::~MapManager()
 {
-#ifdef __DEBUG_GABRIEL__
+#ifdef __DEBUG__
     Broodwar->printf("MapManager destructor");
 #endif
     delete [] walkability;
@@ -501,7 +503,7 @@ void MapManager::justStormed(Position p)
 
 void MapManager::onFrame()
 {
-#ifdef __DEBUG_GABRIEL__
+#ifdef __DEBUG__
     clock_t start = clock();
 #endif
     // update our units' positions
@@ -633,7 +635,7 @@ void MapManager::onFrame()
             {
                 _alliedUnitsPosBuf = _ourUnits;
                 _invisibleUnitsBuf = _eUnitsFilter->getInvisibleUnits();
-#ifdef __DEBUG_GABRIEL__
+#ifdef __DEBUG__
                 for (std::map<Unit*, std::pair<UnitType, Position> >::const_iterator ii = _invisibleUnitsBuf.begin();
                     ii != _invisibleUnitsBuf.end(); ++ii)
                     Broodwar->drawCircleMap(ii->second.second.x(), ii->second.second.y(), 12, Colors::Red, true);
@@ -674,7 +676,7 @@ void MapManager::onFrame()
         ReleaseMutex(_stormPosMutex);
     }
 
-#ifdef __DEBUG_GABRIEL__
+#ifdef __DEBUG__
     clock_t end = clock();
     double duration = (double)(end - start) / CLOCKS_PER_SEC;
     if (duration > 0.040) 
@@ -766,7 +768,7 @@ TilePosition MapManager::closestWalkabableSameRegionOrConnected(TilePosition tp)
     {
         for (int y = lowerY; y <= higherY; ++y)
         {
-#ifdef __DEBUG_GABRIEL__
+#ifdef __DEBUG__
             //Broodwar->drawBoxMap(x*32 + 2, y*32 + 2, x*32+29, y*32+29, Colors::Red);
 #endif
             if (lowResWalkability[x + y*Broodwar->mapWidth()])
@@ -789,7 +791,7 @@ TilePosition MapManager::closestWalkabableSameRegionOrConnected(TilePosition tp)
     {
         for (int y = lowerY; y <= higherY; ++y)
         {
-#ifdef __DEBUG_GABRIEL__
+#ifdef __DEBUG__
             //Broodwar->drawBoxMap(x*32 + 2, y*32 + 2, x*32+29, y*32+29, Colors::Red);
 #endif
             if (lowResWalkability[x + y*Broodwar->mapWidth()])

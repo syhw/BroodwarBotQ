@@ -10,7 +10,7 @@ ProtossStrat::~ProtossStrat()
 }
 
 void ProtossStrat::eRush(){
-#ifdef __DEBUG_GABRIEL__
+#ifdef __DEBUG__
     Broodwar->printf("anti rush ON");
 #endif
 	this->buildOrderManager->build(2,BWAPI::UnitTypes::Protoss_Gateway,94);
@@ -40,8 +40,7 @@ void ProtossStrat::onStart(){
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Probe,84);
 	this->buildOrderManager->build(2,BWAPI::UnitTypes::Protoss_Gateway,82);
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Probe,80);
-	this->priority[Dragoon] = 78;
-	this->needed[Dragoon] = 1;
+    this->buildOrderManager->buildAdditional(1, BWAPI::UnitTypes::Protoss_Dragoon, 78);
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Pylon,76);
 	this->buildOrderManager->upgrade(1,BWAPI::UpgradeTypes::Singularity_Charge, 74);
 
@@ -87,15 +86,16 @@ void ProtossStrat::update(){
 
 	if(this->shouldExpand() && !expanding ){
 		this->expanding = true;
-		if(this->baseManager->getBase(this->baseManager->naturalExpand) == NULL){
+		if (this->baseManager->getBase(this->baseManager->naturalExpand) == NULL){
 			this->baseManager->expand(this->baseManager->naturalExpand,80);
-		} else {
+		} 
+        else 
+        {
 			this->baseManager->expand(80);
 		}
 	}
 	
-	this->buildUnits();
-	
+	this->buildUnits();	
 	
 	this->buildOrderManager->build(this->needed[Arbiter],BWAPI::UnitTypes::Protoss_Arbiter,this->priority[Arbiter]);
 	this->buildOrderManager->build(this->needed[Archon],BWAPI::UnitTypes::Protoss_Archon,this->priority[Archon]);
@@ -117,19 +117,19 @@ void ProtossStrat::update(){
 void ProtossStrat::buildUnits(){
 
 	//BO with templar goon zealot
-	this->needed[Dragoon] = 150;
+	this->needed[Dragoon] = 500;
 	this->priority[Dragoon] = 40;
-    this->needed[Zealot] = 150;
-    this->priority[Zealot] = 38;
+    this->needed[Zealot] = 500;
+    this->priority[Zealot] = 39;
 	if (this->baseManager->getActiveBases().size() > 1)
     {
         if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Protoss_Ground_Weapons) < 3)
         {
-            this->buildOrderManager->upgrade(3, UpgradeTypes::Protoss_Ground_Weapons, 90);
-            this->buildOrderManager->upgrade(3, UpgradeTypes::Protoss_Ground_Armor, 90);
-            this->buildOrderManager->upgrade(3, UpgradeTypes::Protoss_Plasma_Shields, 90);
+            this->buildOrderManager->upgrade(3, UpgradeTypes::Protoss_Ground_Weapons, 40);
+            this->buildOrderManager->upgrade(3, UpgradeTypes::Protoss_Ground_Armor, 40);
+            this->buildOrderManager->upgrade(3, UpgradeTypes::Protoss_Plasma_Shields, 40);
         }
-        this->buildOrderManager->build(3*this->baseManager->getActiveBases().size(), BWAPI::UnitTypes::Protoss_Gateway, 80);
+        this->buildOrderManager->build(4*this->baseManager->getActiveBases().size(), BWAPI::UnitTypes::Protoss_Gateway, 40);
         /*if (!Broodwar->self()->hasResearched(TechTypes::Psionic_Storm))
             this->buildOrderManager->research(TechTypes::Psionic_Storm, 70);
 		if(this->buildOrderManager->hasResources(BWAPI::UnitTypes::Protoss_High_Templar)){

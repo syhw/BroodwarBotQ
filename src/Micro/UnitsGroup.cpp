@@ -248,7 +248,7 @@ double UnitsGroup::evaluateForces()
 
 void UnitsGroup::update()
 {
-#ifdef __DEBUG_GABRIEL__
+#ifdef __DEBUG__
     clock_t start = clock();
 #endif
     if (this == NULL)
@@ -344,7 +344,7 @@ void UnitsGroup::update()
     //clock_t f = clock();
     //double dur = (double)(f - s) / CLOCKS_PER_SEC;
     //Broodwar->printf( "UnitsGroup::update() took %2.5f seconds\n", dur); 
-#ifdef __DEBUG_GABRIEL__
+#ifdef __DEBUG__
     Broodwar->drawCircleMap(center.x(), center.y(), maxRadius + maxRange + 32, Colors::Yellow);
 #endif
 
@@ -378,11 +378,11 @@ void UnitsGroup::update()
         accomplishGoal();
     }
 
-#ifdef __DEBUG_NICOLAS__
+#ifdef __DEBUG__
     displayTargets();
 #endif
 
-#ifdef __DEBUG_GABRIEL__
+#ifdef __DEBUG__
     clock_t finish = clock();
     double duration = (double)(finish - start) / CLOCKS_PER_SEC;
     if (duration > 0.040) 

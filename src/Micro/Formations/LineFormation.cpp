@@ -26,7 +26,7 @@ void LineFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
     end_positions.clear();
     if (vUnits.size() == 1)
     {
-        end_positions.push_back(Position(center.x, center.y));
+        end_positions.push_back(Position((int)center.x, (int)center.y));
         return;
     }
     int maxLength = 0;

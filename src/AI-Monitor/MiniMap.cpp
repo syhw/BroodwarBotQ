@@ -1,3 +1,4 @@
+#ifdef BW_QT_DEBUG
 #include "MiniMap.h"
 #include <QtGui/QImage>
 #include <math.h>
@@ -113,3 +114,4 @@ void MiniMap::restoreGLState()
     glPopMatrix();
     glPopAttrib();
 }
+#endif

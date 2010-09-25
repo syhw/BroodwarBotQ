@@ -119,7 +119,7 @@ void EUnitsFilter::update(Unit* u)
     if ((!(u->isDetected()) || u->isCloaked() || u->isBurrowed()) && Broodwar->isVisible(_eViewedUnits[u].position))
     {
         _invisibleUnits[u] = std::make_pair<UnitType, Position>(u->getType(), u->getPosition());
-#ifdef __DEBUG_GABRIEL__
+#ifdef __DEBUG__
         Broodwar->printf("Type %s", _eViewedUnits[u].type.getName().c_str());
 #endif
     }
