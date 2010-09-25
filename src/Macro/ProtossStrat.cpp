@@ -9,22 +9,25 @@ ProtossStrat::~ProtossStrat()
 {
 }
 
-void ProtossStrat::eRush(){
+void ProtossStrat::eRush()
+{
 #ifdef __DEBUG__
     Broodwar->printf("anti rush ON");
 #endif
 	this->buildOrderManager->build(2,BWAPI::UnitTypes::Protoss_Gateway,94);
 	this->buildOrderManager->build(3,BWAPI::UnitTypes::Protoss_Zealot,92);
 	this->buildOrderManager->build(2,BWAPI::UnitTypes::Protoss_Pylon,93);
-	if(this->workerManager->autoBuild){
+	if (this->workerManager->autoBuild)
+    {
 		this->workerManager->disableAutoBuild();
 	}
 }
 
-void ProtossStrat::onStart(){
+void ProtossStrat::onStart()
+{
 	int i = 0;
-
-	for(i=0; i< 12; i++){
+	for (i=0; i< 12; i++)
+    {
 		this->needed[i] = 0;
 		this->priority[i] = 0;
 	}
@@ -43,45 +46,39 @@ void ProtossStrat::onStart(){
     this->buildOrderManager->buildAdditional(1, BWAPI::UnitTypes::Protoss_Dragoon, 78);
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Pylon,76);
 	this->buildOrderManager->upgrade(1,BWAPI::UpgradeTypes::Singularity_Charge, 74);
-
-	if(!this->workerManager->autoBuild){
+	if (!this->workerManager->autoBuild)
+    {
 		this->workerManager->enableAutoBuild();
 	}
-
 	setScoutTime();
 	this->buildOrderManager->enableDependencyResolver();
 }
 
-void ProtossStrat::setScoutTime(){
-
+void ProtossStrat::setScoutTime()
+{
 	std::string s = BWAPI::Broodwar->mapFileName();
-
-		BWAPI::Broodwar->printf("%s", s.c_str());
-
-	if(s == "ICCup andromeda 1.0.scx" || s == "ICCup andromeda1.0_ob.scx" ) {
-
+    BWAPI::Broodwar->printf("%s", s.c_str());
+	if (s == "ICCup andromeda 1.0.scx" || s == "ICCup andromeda1.0_ob.scx")
+    {
 		this->firstScout = 20;
 
-	} else if(s == "ICCup destination 1.1.scx" || s =="ICCup destination 1.1_ob.scx"){
-
+	} else if (s == "ICCup destination 1.1.scx" || s =="ICCup destination 1.1_ob.scx")
+    {
 		this->firstScout = 16;
-
-	} else if(s == "iCCup heartbreak ridge1.1.scx" || s == "iCCup heartbreak ridge1.1ob.scx"  ){
-
+	} else if (s == "iCCup heartbreak ridge1.1.scx" || s == "iCCup heartbreak ridge1.1ob.scx" )
+    {
 		this->firstScout = 16;
-
-	}else if(s == "ICCup python 1.3.scx" || s == "ICCup python 1.3_ob.scm") {
-
+	} else if (s == "ICCup python 1.3.scx" || s == "ICCup python 1.3_ob.scm")
+    {
 		this->firstScout = 20;
-
-	}else if(s == "ICCup tau cross.scx" || s == "ICCup tau cross_ob.scx" ) {
-
+	} else if (s == "ICCup tau cross.scx" || s == "ICCup tau cross_ob.scx")
+    {
 		this->firstScout = 20;
 	}
 }
 
-void ProtossStrat::update(){
-
+void ProtossStrat::update()
+{
 	this->createProdBuildings();
 
 	if(this->shouldExpand() && !expanding ){
@@ -110,12 +107,10 @@ void ProtossStrat::update(){
 	this->buildOrderManager->build(this->needed[Scout],BWAPI::UnitTypes::Protoss_Scout,this->priority[Scout]);
 	this->buildOrderManager->build(this->needed[Shuttle],BWAPI::UnitTypes::Protoss_Shuttle,this->priority[Shuttle]);
 	this->buildOrderManager->build(this->needed[Zealot],BWAPI::UnitTypes::Protoss_Zealot,this->priority[Zealot]);
-	
-
 }
 
-void ProtossStrat::buildUnits(){
-
+void ProtossStrat::buildUnits()
+{
 	//BO with templar goon zealot
 	this->needed[Dragoon] = 500;
 	this->priority[Dragoon] = 40;
@@ -195,8 +190,8 @@ void ProtossStrat::buildGates()
     if (prodBuildings.count(UnitTypes::Protoss_Gateway))
     {
         const list<Unit*>& buildings = prodBuildings[UnitTypes::Protoss_Gateway];
-        for( list<Unit*>::const_iterator it = buildings.begin(); it != buildings.end(); it++)
-            if(!(*it)->isCompleted() || !(*it)->isTraining())
+        for (list<Unit*>::const_iterator it = buildings.begin(); it != buildings.end(); it++)
+            if (!(*it)->isCompleted() || !(*it)->isTraining())
             {
                 allGatesFull = false;
                 break;
@@ -218,10 +213,10 @@ void ProtossStrat::createTechBuildings()
 		techBuildings.insert( UnitTypes::Protoss_Forge);
 	}
 	*/
-	if( canCreateTechBuildings( UnitTypes::Protoss_Cybernetics_Core, UnitTypes::Protoss_Gateway, 2))
+	if (canCreateTechBuildings( UnitTypes::Protoss_Cybernetics_Core, UnitTypes::Protoss_Gateway, 2))
 	{
 		this->buildOrderManager->buildAdditional(1,UnitTypes::Protoss_Cybernetics_Core,70);
-		techBuildings.insert( UnitTypes::Protoss_Cybernetics_Core);
+		techBuildings.insert(UnitTypes::Protoss_Cybernetics_Core);
 	}
 	/*
 	if( canCreateTechBuildings( UnitTypes::Protoss_Citadel_of_Adun, UnitTypes::Protoss_Cybernetics_Core, 1))
