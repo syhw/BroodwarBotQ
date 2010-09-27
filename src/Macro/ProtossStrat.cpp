@@ -4,6 +4,7 @@
 ProtossStrat::ProtossStrat()
 : MacroManager()
 , _launchUpgrades(false)
+, _activeBases(0)
 {
 	//Broodwar->printf("Protoss Macro Manager is used.");
 }
@@ -43,12 +44,13 @@ void ProtossStrat::onStart()
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Assimilator,90);
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Probe,88);
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Cybernetics_Core,86);
-	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Probe,84);
-	this->buildOrderManager->build(2,BWAPI::UnitTypes::Protoss_Gateway,82);
+	//this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Probe,84);
+    this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Dragoon,82); /////////////
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Probe,80);
-    this->buildOrderManager->buildAdditional(1, BWAPI::UnitTypes::Protoss_Dragoon, 78);
+    this->buildOrderManager->buildAdditional(2, BWAPI::UnitTypes::Protoss_Dragoon, 78);
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Pylon,76);
 	this->buildOrderManager->upgrade(1,BWAPI::UpgradeTypes::Singularity_Charge, 74);
+    this->buildOrderManager->buildAdditional(2,BWAPI::UnitTypes::Protoss_Gateway,73);
     this->buildOrderManager->build(6,BWAPI::UnitTypes::Protoss_Dragoon,72);
 	if (!this->workerManager->autoBuild)
     {
@@ -89,6 +91,25 @@ void ProtossStrat::update()
         {
             this->workerManager->enableAutoBuild();
         }
+
+        if (Broodwar->self()->gas() >= 600)
+        {
+            this->workerManager->setWorkersPerGas(1); // TODO TOCHANGE TOURNAMENT3
+        } 
+        else if (Broodwar->self()->gas() >= 400)
+        {
+            this->workerManager->setWorkersPerGas(2); // TODO TOCHANGE TOURNAMENT3
+        }
+        else
+        {
+            this->workerManager->setWorkersPerGas(3);
+        }
+    } else
+    {
+        if (Broodwar->self()->gas() >= 170)
+        {
+            this->workerManager->setWorkersPerGas(2); // TODO TOCHANGE TOURNAMENT3
+        } 
     }
 
 	this->createProdBuildings();
@@ -98,11 +119,11 @@ void ProtossStrat::update()
 		this->expanding = true;
 		if (this->baseManager->getBase(this->baseManager->naturalExpand) == NULL)
         {
-			this->baseManager->expand(this->baseManager->naturalExpand,70);
+			this->baseManager->expand(this->baseManager->naturalExpand,80);
 		} 
         else 
         {
-			this->baseManager->expand(70);
+			this->baseManager->expand(80);
 		}
 	}
 	
@@ -113,7 +134,7 @@ void ProtossStrat::update()
         this->buildOrderManager->build(this->needed[Dragoon],BWAPI::UnitTypes::Protoss_Dragoon,this->priority[Dragoon]);
         if (Broodwar->self()->gas() < 50 && this->productionManager->getPlannedCount(UnitTypes::Protoss_Zealot) < 8)
             this->buildOrderManager->build(this->needed[Zealot],BWAPI::UnitTypes::Protoss_Zealot,this->priority[Zealot]);
-        this->buildOrderManager->build(this->needed[Arbiter],BWAPI::UnitTypes::Protoss_Arbiter,this->priority[Arbiter]);
+        /*this->buildOrderManager->build(this->needed[Arbiter],BWAPI::UnitTypes::Protoss_Arbiter,this->priority[Arbiter]);
         this->buildOrderManager->build(this->needed[Archon],BWAPI::UnitTypes::Protoss_Archon,this->priority[Archon]);
         this->buildOrderManager->build(this->needed[Carrier],BWAPI::UnitTypes::Protoss_Carrier,this->priority[Carrier]);
         this->buildOrderManager->build(this->needed[Corsair],BWAPI::UnitTypes::Protoss_Corsair,this->priority[Corsair]);
@@ -123,15 +144,18 @@ void ProtossStrat::update()
         this->buildOrderManager->build(this->needed[Observer],BWAPI::UnitTypes::Protoss_Observer,this->priority[Observer]);
         this->buildOrderManager->build(this->needed[Reaver],BWAPI::UnitTypes::Protoss_Reaver,this->priority[Reaver]);
         this->buildOrderManager->build(this->needed[Scout],BWAPI::UnitTypes::Protoss_Scout,this->priority[Scout]);
-        this->buildOrderManager->build(this->needed[Shuttle],BWAPI::UnitTypes::Protoss_Shuttle,this->priority[Shuttle]);
+        this->buildOrderManager->build(this->needed[Shuttle],BWAPI::UnitTypes::Protoss_Shuttle,this->priority[Shuttle]);*/
     }
     if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Singularity_Charge))
     {
-        if (Broodwar->self()->gas() >= 50 && Broodwar->self()->minerals() >= 125 && this->productionManager->getPlannedCount(UnitTypes::Protoss_Dragoon) < (int)(4*this->baseManager->getActiveBases().size()))
+        if (Broodwar->self()->gas() >= 50 && Broodwar->self()->minerals() >= 125) // && this->productionManager->getPlannedCount(UnitTypes::Protoss_Dragoon) < (int)(4*this->baseManager->getActiveBases().size()))
         {
-            this->productionManager->train(UnitTypes::Protoss_Dragoon);
+            if (this->buildOrderManager->getPlannedCount(UnitTypes::Protoss_Dragoon < 96))
+                this->buildOrderManager->buildAdditional(1, UnitTypes::Protoss_Dragoon, 40);
+            //this->productionManager->train(UnitTypes::Protoss_Dragoon);
         }
     }
+    _activeBases = this->baseManager->getActiveBases().size();
 }
 
 void ProtossStrat::buildUnits()
@@ -150,7 +174,6 @@ void ProtossStrat::buildUnits()
             this->buildOrderManager->upgrade(3, UpgradeTypes::Protoss_Ground_Armor, 43);
             this->buildOrderManager->upgrade(3, UpgradeTypes::Protoss_Plasma_Shields, 43);
         }
-        this->buildOrderManager->build(4*this->baseManager->getActiveBases().size(), BWAPI::UnitTypes::Protoss_Gateway, 40);
         /*if (!Broodwar->self()->hasResearched(TechTypes::Psionic_Storm))
             this->buildOrderManager->research(TechTypes::Psionic_Storm, 70);
 		if(this->buildOrderManager->hasResources(BWAPI::UnitTypes::Protoss_High_Templar)){
@@ -213,6 +236,8 @@ void ProtossStrat::buildGates()
 {	
     if (!prodBuildings.count(UnitTypes::Protoss_Gateway))
         return;
+    if (_activeBases - this->baseManager->getActiveBases().size() != 0)
+        this->buildOrderManager->build(4*this->baseManager->getActiveBases().size(), BWAPI::UnitTypes::Protoss_Gateway, 40);
     bool allGatesFull = true;
     const list<Unit*>& buildings = prodBuildings[UnitTypes::Protoss_Gateway];
     for (list<Unit*>::const_iterator it = buildings.begin(); it != buildings.end(); it++)

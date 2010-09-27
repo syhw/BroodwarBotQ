@@ -23,11 +23,68 @@ ArchonUnit::~ArchonUnit()
 {
 }
 
+bool ArchonUnit::decideToFlee()
+{
+    if (unit->getShields() < 10)
+        _fleeingDmg = 12;
+    // TODO complete conditions
+    int diff = _lastTotalHP - (unit->getShields() + unit->getHitPoints());
+    _HPLosts.push_back(diff);
+    _sumLostHP += diff;
+    if (_HPLosts.size() > 24)
+    {
+        _sumLostHP -= _HPLosts.front();
+        _HPLosts.pop_front();
+    }
+    if (_sumLostHP > _fleeingDmg)
+        _fleeing = true;
+    else
+        _fleeing = false;
+    if (!_fleeing)
+    {
+        int incDmg = 0;
+        for (std::set<Unit*>::const_iterator it = _targetingMe.begin();
+            it != _targetingMe.end(); ++it)
+        {
+            if ((*it)->getDistance(_unitPos) <= (*it)->getType().groundWeapon().maxRange() + 32)
+                incDmg += (*it)->getType().groundWeapon().damageAmount() * (*it)->getType().maxGroundHits();
+        }
+        if (incDmg + _sumLostHP > _fleeingDmg)
+            _fleeing = true;
+    }
+    return _fleeing;
+}
+
 void ArchonUnit::micro()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("ArchonUnit::micro non implémenté !");
-#endif
+    updateTargetingMe();
+    decideToFlee();
+    int currentFrame = Broodwar->getFrameCount();
+    if (currentFrame - _lastAttackFrame <= getAttackDuration()) // not interrupting attacks
+        return;
+    if (currentFrame - _lastAttackFrame == getAttackDuration() + 1)
+        clearDamages();
+    if (unit->getGroundWeaponCooldown() <= Broodwar->getLatency() + 1)
+    {
+        updateRangeEnemies();
+        updateTargetEnemy();
+        if (!inRange(targetEnemy))
+        {
+            clearDamages();
+        }
+        attackEnemyUnit(targetEnemy);
+    }
+    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatency()*2 + 2) // == (Broodwar->getLatency()+1)*2, safety
+    {
+        if (!dodgeStorm() && !dragScarab() && !dragMine() && _fleeing)
+        {
+            simpleFlee();
+        }
+        else
+        {
+            fightMove();
+        }
+    }
 }
 
 void ArchonUnit::check()

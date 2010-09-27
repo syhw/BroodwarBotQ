@@ -167,7 +167,7 @@ void ConstructionManager::update()
 
       BWAPI::Unit* u = b->builderUnit;
       BWAPI::Unit* s = b->buildingUnit;
-      if (s!=NULL && s->isCompleted()) //if the building exists and is completed
+      if (s!=NULL && (s->isCompleted()))// || (s->isConstructing() && s->getType().getRace() == BWAPI::Races::Protoss))) //if the building exists and is completed
       {
         startedCount[b->type]--;
         plannedCount[b->type]--;

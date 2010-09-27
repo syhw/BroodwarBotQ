@@ -7,6 +7,7 @@ class ScoutUnit : public FlyingUnit
 {
 protected:
     static std::set<BWAPI::UnitType> setPrio;
+    inline bool decideToFlee();
 public:
     ScoutUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~ScoutUnit();

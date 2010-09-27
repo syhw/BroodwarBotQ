@@ -7,6 +7,7 @@ class ArchonUnit : public GroundUnit
 {
 protected:
     static std::set<BWAPI::UnitType> setPrio;
+    virtual bool decideToFlee();
 public:
     ArchonUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~ArchonUnit();

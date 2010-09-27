@@ -24,11 +24,51 @@ ScoutUnit::~ScoutUnit()
 {
 }
 
+bool ScoutUnit::decideToFlee()
+{
+    // TODO complete conditions
+    return (_lastTotalHP - (unit->getShields() + unit->getHitPoints()) > 30 || (!unit->getShields() && (_lastTotalHP - unit->getHitPoints() > 20)));
+}
+
 void ScoutUnit::micro()
 {
-#ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("ScoutUnit::micro non implémenté !");
-#endif
+    updateRangeEnemies();
+    Vec whereFlee = Vec(0, 0);
+    for (std::multimap<double, Unit*>::const_iterator it = _rangeEnemies.begin();
+        it != _rangeEnemies.end(); ++it)
+    {
+        if (it->second->isVisible() && it->second->getType() == UnitTypes::Zerg_Scourge && it->second->getTarget() == unit)
+        {
+            if (it->first > 20) // TOCHANGE
+                whereFlee += Vec(it->second->getVelocityX(), it->second->getVelocityY());
+        }
+    }
+    if (whereFlee != Vec(0, 0))
+    {
+        whereFlee.normalize();
+        whereFlee *= _maxDimension;
+        whereFlee.translate(_unitPos);
+        unit->rightClick(whereFlee.toPosition());
+        _lastClickFrame = Broodwar->getFrameCount();
+        _lastMoveFrame = Broodwar->getFrameCount();
+        _lastRightClick = whereFlee.toPosition();
+        return;
+    }
+    if (Broodwar->getFrameCount() - _lastAttackFrame <= getAttackDuration()) // not interrupting attack
+        return;
+    if (unit->getGroundWeaponCooldown() == 0)
+    {
+        updateTargetEnemy();
+        attackEnemyUnit(targetEnemy);
+    }
+    else if (_fleeing || decideToFlee())
+    {
+        flee();
+    }
+    else
+    {
+        fightMove();
+    }
 }
 
 void ScoutUnit::check()
@@ -37,7 +77,7 @@ void ScoutUnit::check()
 
 int ScoutUnit::getAttackDuration()
 {
-    return 0;
+    return 1;
 }
 
 std::set<BWAPI::UnitType> ScoutUnit::getSetPrio()
