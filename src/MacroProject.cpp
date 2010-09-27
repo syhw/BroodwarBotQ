@@ -230,7 +230,7 @@ void BattleBroodAI::onFrame()
 #endif
     this->borderManager->update();
     objManager->onFrame();
-    //TOURNAMENT3this->scoutManager->update();
+    this->scoutManager->update();
     this->mapManager->onFrame();
     this->defenseManager->update();
 
@@ -284,7 +284,7 @@ void BattleBroodAI::onUnitEvade(BWAPI::Unit* unit){
 void BattleBroodAI::onUnitCreate(BWAPI::Unit* unit)
 {
     //Update Managers
-    //TOURNAMENT3this->scoutManager->onUnitCreate(unit);
+    this->scoutManager->onUnitCreate(unit);
     this->mapManager->onUnitCreate(unit);
     this->warManager->onUnitCreate(unit);
     this->macroManager->onUnitCreate(unit);
@@ -350,7 +350,7 @@ void BattleBroodAI::onUnitDestroy(BWAPI::Unit* unit)
     this->informationManager->onUnitDestroy(unit);
     this->defenseManager->onRemoveUnit(unit);
     this->arbitrator->onRemoveObject(unit);
-    //TOURNAMENT3this->scoutManager->onUnitDestroy(unit);
+    this->scoutManager->onUnitDestroy(unit);
 }
 
 void BattleBroodAI::onUnitMorph(BWAPI::Unit* unit)
@@ -379,7 +379,7 @@ void BattleBroodAI::onUnitShow(BWAPI::Unit* unit)
 
     mapManager->onUnitShow(unit);
     eUnitsFilter->update(unit);
-    //TOURNAMENT3scoutManager->onUnitShow(unit);
+    scoutManager->onUnitShow(unit);
     if (unit->getPlayer() == BWAPI::Broodwar->enemy())
     {
         if ((unit->getType() == UnitTypes::Zerg_Spawning_Pool && Broodwar->getFrameCount() < __POOL_TIME_RUSH__ && !unit->getRemainingBuildTime())
