@@ -36,7 +36,9 @@ void CorsairUnit::micro()
     {
         if (it->second->isVisible() && it->second->getType() == UnitTypes::Zerg_Scourge && it->second->getTarget() == unit)
         {
-            if (it->first > 20) // TOCHANGE
+            if (it->first > ((unit->getType().acceleration() + Broodwar->getLatency()) * UnitTypes::Zerg_Scourge.topSpeed() // what the scourge may run during my acceleration time + lag
+                - unit->getType().acceleration() * (unit->getType().topSpeed()/2.1) // what I may run during my acceleration time
+                + _maxDimension/2 - UnitTypes::Zerg_Scourge.dimensionUp() + 0.1))// difference of both sizes
                 whereFlee += Vec(it->second->getVelocityX(), it->second->getVelocityY());
         }
     }
@@ -53,7 +55,7 @@ void CorsairUnit::micro()
     }
     if (Broodwar->getFrameCount() - _lastAttackFrame <= getAttackDuration()) // not interrupting attack
         return;
-    if (unit->getGroundWeaponCooldown() == 0)
+    if (unit->getAirWeaponCooldown() <= Broodwar->getLatency() + 1)
     {
         updateTargetEnemy();
         attackEnemyUnit(targetEnemy);
@@ -74,7 +76,7 @@ void CorsairUnit::check()
 
 int CorsairUnit::getAttackDuration()
 {
-    return 1;
+    return Broodwar->getLatency();
 }
 
 std::set<BWAPI::UnitType> CorsairUnit::getSetPrio()

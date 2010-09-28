@@ -90,6 +90,11 @@ BayesianUnit::~BayesianUnit()
     CloseHandle(_pathMutex);
 }
 
+UnitType BayesianUnit::getType()
+{
+    return unit->getType();
+}
+
 void BayesianUnit::initDefaultProb()
 {
     _defaultProb.insert(make_pair(OCCUP_UNIT, _PROB_NO_UNIT_MOVE));           // P(allied_unit_in_this_case=false | we_go_in_this_case=true)
@@ -1531,6 +1536,14 @@ void BayesianUnit::clickTarget()
     _lastMoveFrame = Broodwar->getFrameCount();
 }
 
+void BayesianUnit::move(BWAPI::Position p)
+{
+    unit->move(p);
+    _lastRightClick = p;
+    _lastClickFrame = Broodwar->getFrameCount();
+    _lastMoveFrame = Broodwar->getFrameCount();
+}
+
 void BayesianUnit::flee()
 {
     _fightMoving = false;
@@ -1544,7 +1557,7 @@ void BayesianUnit::flee()
     clickDir();
 }
 
-void BayesianUnit::fightMove()
+int BayesianUnit::fightMove()
 {
     /// approach siege tanks or approach our targetEnemy if not in range
     if (targetEnemy != NULL && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected()
@@ -1556,7 +1569,7 @@ void BayesianUnit::fightMove()
         _lastClickFrame = Broodwar->getFrameCount();
         _lastMoveFrame = Broodwar->getFrameCount();
         _fightMoving = true;
-        return;
+        return 1;
     }
     double dist = target.getDistance(_unitPos);
     /// approach out of range target
@@ -1571,7 +1584,7 @@ void BayesianUnit::fightMove()
         _lastClickFrame = Broodwar->getFrameCount();
         _lastMoveFrame = Broodwar->getFrameCount();
         _fightMoving = true;
-        return;
+        return 2;
     }
     /// move towards target
     if (dist > 192.0
@@ -1579,7 +1592,7 @@ void BayesianUnit::fightMove()
     {
         clickTarget();
         _fightMoving = true;
-        return;
+        return 3;
     }
     /// Or simply move away from our friends and kite if we can
     if (targetEnemy != NULL && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected()
@@ -1590,8 +1603,9 @@ void BayesianUnit::fightMove()
         updateDir();
         clickDir();
         _fightMoving = true;
-        return;
+        return 4;
     }
+    return 0;
     /// Or simply move away from our friends
     /*updateDirV();
     updateAttractors();

@@ -17,7 +17,7 @@ void MicroAIModule::onStart()
     //Broodwar->printf("ON START !!\n");
 #ifdef __DEBUG__
     Broodwar->enableFlag(Flag::UserInput);
-    Broodwar->setLocalSpeed(0);
+    //Broodwar->setLocalSpeed(0);
 #endif
 	//Broodwar->enableFlag(Flag::CompleteMapInformation);
 	BWTA::readMap();
@@ -51,7 +51,7 @@ void MicroAIModule::onStart()
 		} 
         else 
         {
-            if ((*i)->getPlayer() != Broodwar->self() || (*i)->getType() == UnitTypes::Protoss_Archon)
+            if ((*i)->getPlayer() != Broodwar->self())
                 continue;
             else
                 mm->takeControl(*i);
@@ -91,6 +91,10 @@ void MicroAIModule::onStart()
     pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
     pGoal tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
     goals.push_back(tmp_goal);*/
+
+    /* BALL IN THE MIDDLE (+/- 256 pixs) */
+    goals.push_back(pGoal(new AttackGoal(mm, 
+        Position(Broodwar->mapWidth()/2*32 - sign*256, (Broodwar->mapHeight()/2 + 4)*32))));
 
     /* ARC IN THE MIDDLE (+/- 256 pixs) */
     pFormation tmp_form = pFormation(new ArcFormation(

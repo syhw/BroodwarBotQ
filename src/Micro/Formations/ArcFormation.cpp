@@ -15,9 +15,11 @@ ArcFormation::ArcFormation(const Position& onCircle, const Position& circleCente
 
 void ArcFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
 {
-	end_positions.clear();
+    if (end_positions.size() == vUnits.size())
+        return;
     if (!vUnits.size())
         return;
+    end_positions.clear();
     if (vUnits.size() == 1)
     {
         end_positions.push_back(Position((int)center.x, (int)center.y));

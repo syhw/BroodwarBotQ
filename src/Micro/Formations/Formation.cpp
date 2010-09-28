@@ -17,6 +17,7 @@ Formation::Formation(const Vec& center, const Vec& direction)
 , mean(center)
 , space(30)
 {
+    end_positions.clear();
 }
 
 Formation::Formation(const Position& p, const Vec& direction)
@@ -25,6 +26,7 @@ Formation::Formation(const Position& p, const Vec& direction)
 , mean(p.x(), p.y())
 , space(30)
 {
+    end_positions.clear();
 }
 
 Formation::~Formation()
@@ -44,6 +46,7 @@ void Formation::computeMean()
     }
     mean /= end_positions.size();
 }
+
 // No formations => on one point
 void Formation::computeToPositions(const std::vector<pBayesianUnit>& vUnit)
 {

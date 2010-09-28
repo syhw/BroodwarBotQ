@@ -130,7 +130,7 @@ protected:
     inline void clickScout();
     inline void clickTarget();
     void flee();
-    void fightMove();
+    int fightMove();
     void drawArrow(Vec& v);
     inline void updateAttractors();
     void drawAttractors();
@@ -155,6 +155,7 @@ protected:
     std::set<Unit*> _targetingMe;
     void updateTargetingMe();
 public:
+    void move(BWAPI::Position p); // debug purposes
 	void switchMode(unit_mode um);
     unit_mode getMode();
     int getMaxDimension();
@@ -162,6 +163,7 @@ public:
     Vec dir, obj; // dir=current direction, obj=pathfinder's direction
     BayesianUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~BayesianUnit();
+    BWAPI::UnitType getType();
 
     virtual void onUnitDestroy(BWAPI::Unit* u);
     virtual void onUnitShow(BWAPI::Unit* u);

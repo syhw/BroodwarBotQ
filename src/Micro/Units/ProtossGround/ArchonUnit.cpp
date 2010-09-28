@@ -93,7 +93,7 @@ void ArchonUnit::check()
 
 int ArchonUnit::getAttackDuration()
 {
-    return 3;
+    return 3+Broodwar->getLatency();
 }
 
 std::set<BWAPI::UnitType> ArchonUnit::getSetPrio()

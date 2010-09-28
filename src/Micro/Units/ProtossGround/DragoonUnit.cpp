@@ -26,6 +26,8 @@ DragoonUnit::DragoonUnit(BWAPI::Unit* u, UnitsGroup* ug)
         setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode);
         setPrio.insert(BWAPI::UnitTypes::Protoss_Observer);
         setPrio.insert(BWAPI::UnitTypes::Protoss_Carrier);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Archon);
+        setPrio.insert(BWAPI::UnitTypes::Protoss_Reaver);
         setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode);
         setPrio.insert(BWAPI::UnitTypes::Zerg_Defiler);
     }
@@ -114,7 +116,11 @@ void DragoonUnit::micro()
         }
         else
         {
-            fightMove();
+            if (!fightMove())
+            {
+                if (currentFrame - _lastClickFrame > Broodwar->getLatency())
+                    move(_unitsGroup->enemiesCenter);
+            }
         }
     }
 }

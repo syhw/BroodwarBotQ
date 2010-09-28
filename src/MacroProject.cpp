@@ -288,48 +288,6 @@ void BattleBroodAI::onUnitCreate(BWAPI::Unit* unit)
     this->mapManager->onUnitCreate(unit);
     this->warManager->onUnitCreate(unit);
     this->macroManager->onUnitCreate(unit);
-
-    /*
-    if (!Broodwar->isReplay())
-    {
-    //Broodwar->sendText("A %s [%x] has been created at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x(),unit->getPosition().y());
-    if(unit->getType().isWorker())
-    {
-    //Broodwar->printf("New worker created.");
-    Unit* closestMineral=NULL;
-    for(std::set<Unit*>::iterator m=Broodwar->getMinerals().begin();m!=Broodwar->getMinerals().end();m++)
-    {
-    if (closestMineral==NULL || unit->getDistance(*m)<unit->getDistance(closestMineral))
-    closestMineral=*m;
-    }
-    if (closestMineral!=NULL)
-    {
-    unit->rightClick(closestMineral);	
-    //Broodwar->printf("A mineral has been found.");
-    }
-    //else 
-    //	Broodwar->printf("No mineral found.");
-    }
-    else
-    {
-    //Broodwar->printf("Unknown unit type.");
-    }
-    }
-    else
-    {*/
-    /*if we are in a replay, then we will print out the build order
-    (just of the buildings, not the units).*/
-    /* if (unit->getType().isBuilding() && unit->getPlayer()->isNeutral()==false)
-    {
-    //Broodwar->printf("Building created.");
-    int seconds=Broodwar->getFrameCount()/24;
-    int minutes=seconds/60;
-    seconds%=60;
-    //Broodwar->sendText("%.2d:%.2d: %s creates a %s",minutes,seconds,unit->getPlayer()->getName().c_str(),unit->getType().getName().c_str());
-    }
-    }
-    // log("OUT BBAI::onUnitCreate()");
-    */
 }
 
 
@@ -355,28 +313,11 @@ void BattleBroodAI::onUnitDestroy(BWAPI::Unit* unit)
 
 void BattleBroodAI::onUnitMorph(BWAPI::Unit* unit)
 {
-    //if (!Broodwar->isReplay())
-    //	Broodwar->sendText("A %s [%x] has been morphed at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x(),unit->getPosition().y());
-    //else
-    {
-        /*if we are in a replay, then we will print out the build order
-        (just of the buildings, not the units).*/
-        if (unit->getType().isBuilding() && unit->getPlayer()->isNeutral()==false)
-        {
-            int seconds=Broodwar->getFrameCount()/24;
-            int minutes=seconds/60;
-            seconds%=60;
-            //Broodwar->sendText("%.2d:%.2d: %s morphs a %s",minutes,seconds,unit->getPlayer()->getName().c_str(),unit->getType().getName().c_str());
-        }
-    }
     eUnitsFilter->update(unit);
 }
 
 void BattleBroodAI::onUnitShow(BWAPI::Unit* unit)
 {
-    //if (!Broodwar->isReplay())
-    //	Broodwar->sendText("A %s [%x] has been spotted at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x(),unit->getPosition().y());
-
     mapManager->onUnitShow(unit);
     eUnitsFilter->update(unit);
     scoutManager->onUnitShow(unit);
@@ -398,17 +339,12 @@ void BattleBroodAI::onUnitShow(BWAPI::Unit* unit)
 
 void BattleBroodAI::onUnitHide(BWAPI::Unit* unit)
 {
-    //if (!Broodwar->isReplay())
-    //	Broodwar->sendText("A %s [%x] was last seen at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x(),unit->getPosition().y());
-
     mapManager->onUnitHide(unit);
     eUnitsFilter->update(unit);
 }
 
 void BattleBroodAI::onUnitRenegade(BWAPI::Unit* unit)
 {
-    //if (!Broodwar->isReplay())
-    //	Broodwar->sendText("A %s [%x] is now owned by %s",unit->getType().getName().c_str(),unit,unit->getPlayer()->getName().c_str());
     this->unitGroupManager->onUnitRenegade(unit);
     eUnitsFilter->update(unit);
 }

@@ -313,17 +313,22 @@ void UnitsGroup::update()
 
     this->totalHP = 0;
     double maxRange = -1.0;
+    bool contactUnits = false;
     for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     {
         if ((*it)->unit->getType() == UnitTypes::Protoss_Zealot 
             || (*it)->unit->getType() == UnitTypes::Protoss_Archon)
-            _alignFormation = false;
+            contactUnits = true;
         this->totalHP += (*it)->unit->getHitPoints();
         double tmp_max = max(max((*it)->unit->getType().groundWeapon().maxRange(), (*it)->unit->getType().airWeapon().maxRange()), 
             (*it)->unit->getType().sightRange()); // TODO: upgrades
         if (tmp_max > maxRange)
             maxRange = tmp_max;
     }
+    if (contactUnits)
+        _alignFormation = false;
+    else
+        _alignFormation = true;
 
     //clock_t s = clock();
     updateNearbyEnemyUnitsFromFilter(center, maxRadius + maxRange + 92); // possibly hidden units, could be taken from onUnitsShow/View asynchronously for more efficiency
@@ -345,7 +350,7 @@ void UnitsGroup::update()
     //double dur = (double)(f - s) / CLOCKS_PER_SEC;
     //Broodwar->printf( "UnitsGroup::update() took %2.5f seconds\n", dur); 
 #ifdef __DEBUG__
-    Broodwar->drawCircleMap(center.x(), center.y(), maxRadius + maxRange + 32, Colors::Yellow);
+    Broodwar->drawCircleMap((int)center.x(), (int)center.y(), maxRadius + maxRange + 32, Colors::Yellow);
 #endif
 
     if (!enemies.empty()) /// We fight, we'll see later for the goals 

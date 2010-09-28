@@ -20,7 +20,7 @@ ZealotUnit::ZealotUnit(BWAPI::Unit* u, UnitsGroup* ug)
         setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode);
         setPrio.insert(BWAPI::UnitTypes::Zerg_Hydralisk);
     }
-    _fleeingDmg = 24; // one round of storm = 14
+    _fleeingDmg = 36; // one round of storm = 14
 }
 
 ZealotUnit::~ZealotUnit()
@@ -32,12 +32,12 @@ ZealotUnit::~ZealotUnit()
 bool ZealotUnit::decideToFlee()
 {
     if (unit->getShields() < 10)
-        _fleeingDmg = 12;
+        _fleeingDmg = 24;
     // TODO complete conditions
     int diff = _lastTotalHP - (unit->getShields() + unit->getHitPoints());
     _HPLosts.push_back(diff);
     _sumLostHP += diff;
-    if (_HPLosts.size() > 24)
+    if (_HPLosts.size() > 19)
     {
         _sumLostHP -= _HPLosts.front();
         _HPLosts.pop_front();
@@ -172,47 +172,13 @@ void ZealotUnit::updateTargetEnemy()
             }
         }
     }
-    if (oorTargetEnemy == NULL || !oorTargetEnemy->exists())
-    {
-        /// take the best in focus fire order, not especially out of range
-        for (UnitDmgBimap::right_iterator it = _unitsGroup->unitDamages.right.begin();
-            it != _unitsGroup->unitDamages.right.end(); ++it)
-        {
-            if (!it->second->exists() || !it->second->isVisible())
-                continue;
-            UnitType testType = it->second->getType();
-            if (testType.isBuilding() 
-                && testType != BWAPI::UnitTypes::Protoss_Pylon
-                && testType != BWAPI::UnitTypes::Protoss_Photon_Cannon
-                && testType != BWAPI::UnitTypes::Terran_Bunker
-                && testType != BWAPI::UnitTypes::Terran_Missile_Turret
-                && testType != BWAPI::UnitTypes::Zerg_Sunken_Colony
-                && testType != BWAPI::UnitTypes::Zerg_Spore_Colony)
-                continue;
-            if (testType == BWAPI::UnitTypes::Protoss_High_Templar && it->second->getEnergy() < 60)
-                continue;
-            if (testType == BWAPI::UnitTypes::Protoss_Dark_Archon && it->second->getEnergy() < 80)
-                continue;
-            if (testType == BWAPI::UnitTypes::Terran_Science_Vessel && it->second->getEnergy() < 70)
-                continue;
-            if (testType == BWAPI::UnitTypes::Zerg_Defiler && it->second->getEnergy() < 60)
-                continue;
-            if (testType == BWAPI::UnitTypes::Zerg_Queen && it->second->getEnergy() < 60)
-                continue;
-            if (it->first.dmg < it->second->getHitPoints() + it->second->getShields())
-            {
-                oorTargetEnemy = it->second;
-                break;
-            }
-        }
-    }
 
     // ===== choose new targetEnemy =====
     /// 2 zealots by target
     for (std::multimap<double, Unit*>::const_iterator it = _rangeEnemies.begin();
         it != _rangeEnemies.end(); ++it)
     {
-        if (_zealotsOn[it->second] > 1)
+        if (_zealotsOn[it->second] > 2)
             continue;
         setTargetEnemy(it->second);
         return;
@@ -285,7 +251,19 @@ void ZealotUnit::micro()
         }
         else
         {
-            fightMove();
+            if (Broodwar->getFrameCount() - _lastClickFrame > 9) //TODO TOCHANGE TEST TEST HACK DEBUG
+                fightMove();
+            /*if (Broodwar->getFrameCount() - _lastClickFrame > 12)
+            {
+                if (oorTargetEnemy && oorTargetEnemy->exists() && oorTargetEnemy->isVisible())
+                {
+                    attackMove(oorTargetEnemy->getPosition());
+                }
+                else
+                {
+                    attackMove(_unitsGroup->enemiesCenter);
+                }
+            }*/
         }
     }
     return;

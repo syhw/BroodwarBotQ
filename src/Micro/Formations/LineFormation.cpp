@@ -20,9 +20,12 @@ LineFormation::LineFormation(const Position& p, const Vec& direction)
 
 void LineFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
 {
+    if (end_positions.size() == vUnits.size())
+        return;
+    if (!vUnits.size())
+        return;
     //BWTA::Chokepoint* nearestChoke = BWTA::getNearestChokepoint(center);
-    //BWTA::Region* region = BWTA::getRegion(TilePosition(center));
-	
+    //BWTA::Region* region = BWTA::getRegion(TilePosition(center));	
     end_positions.clear();
     if (vUnits.size() == 1)
     {
