@@ -224,43 +224,61 @@ void ZealotUnit::micro()
         clearDamages();
     updateRangeEnemies();
     updateTargetEnemy();
+    if (Broodwar->enemy()->getRace() == BWAPI::Races::Zerg) ////////////////////////// AttackMove vs Zerg
+        clearDamages();
 
     /// Dodge storm, drag mine, drag scarab
     if (dodgeStorm() || dragMine() || dragScarab()) 
         return;
 
-    if (unit->getGroundWeaponCooldown() <= Broodwar->getLatency() + 1)
+    if (Broodwar->enemy()->getRace() == BWAPI::Races::Zerg) ////////////////////////// AttackMove vs Zerg
     {
-        if (!inRange(targetEnemy))
+        if (currentFrame - _lastClickFrame > 21)
         {
-            clearDamages();
-        }
-        /// ATTACK
-        if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() && inRange(targetEnemy))
-            attackEnemyUnit(targetEnemy);
-        else if (oorTargetEnemy && oorTargetEnemy->exists() && oorTargetEnemy->isVisible() && oorTargetEnemy->getDistance(_unitPos) < 92.0) // TOCHANGE 92
-            attackEnemyUnit(oorTargetEnemy);
-        else if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible())
-            attackEnemyUnit(targetEnemy);
-        else
-        {
-            if (currentFrame - _lastClickFrame > Broodwar->getLatency())
-            {
+            if (target == _unitPos)
                 unit->attackMove(_unitsGroup->enemiesCenter);
-                _lastMoveFrame = Broodwar->getFrameCount();
-                _lastClickFrame = Broodwar->getFrameCount();
-            }
+            else
+                unit->attackMove(target);
+            _lastMoveFrame = Broodwar->getFrameCount();
+            _lastClickFrame = Broodwar->getFrameCount();
         }
     }
-    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatency()*2 + 2) // == (Broodwar->getLatency()+1)*2, safety
+    else
     {
-        if (_fleeing)
+
+        if (unit->getGroundWeaponCooldown() <= Broodwar->getLatency() + 1)
         {
-            simpleFlee();
+            if (!inRange(targetEnemy))
+            {
+                clearDamages();
+            }
+            /// ATTACK
+            if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() && inRange(targetEnemy))
+                attackEnemyUnit(targetEnemy);
+            else if (oorTargetEnemy && oorTargetEnemy->exists() && oorTargetEnemy->isVisible() && oorTargetEnemy->getDistance(_unitPos) < 92.0) // TOCHANGE 92
+                attackEnemyUnit(oorTargetEnemy);
+            else if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible())
+                attackEnemyUnit(targetEnemy);
+            else
+            {
+                if (currentFrame - _lastClickFrame > Broodwar->getLatency())
+                {
+                    unit->attackMove(_unitsGroup->enemiesCenter);
+                    _lastMoveFrame = Broodwar->getFrameCount();
+                    _lastClickFrame = Broodwar->getFrameCount();
+                }
+            }
         }
-        else
+        else if (unit->getGroundWeaponCooldown() > Broodwar->getLatency()*2 + 2) // == (Broodwar->getLatency()+1)*2, safety
         {
-            fightMove();
+            if (_fleeing)
+            {
+                simpleFlee();
+            }
+            else
+            {
+                fightMove();
+            }
         }
     }
     return;

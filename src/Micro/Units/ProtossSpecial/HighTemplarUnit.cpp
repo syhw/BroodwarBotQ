@@ -23,6 +23,8 @@ void HighTemplarUnit::micro()
             return;
     }
     int elapsed = Broodwar->getFrameCount() - _lastStormFrame;
+    if (elapsed <= Broodwar->getLatency() + getAttackDuration())
+        return;
     if (((!Broodwar->self()->hasResearched(BWAPI::TechTypes::Psionic_Storm) && unit->getEnergy() < 75) || unit->getEnergy() < 20 /* TODO */ || (unit->getEnergy() < 74 && unit->getHitPoints() < 20) 
         || (unit->getEnergy() < 55 && unit->getShields() < 2)) && elapsed > Broodwar->getLatency() + getAttackDuration())
     {
@@ -92,11 +94,27 @@ void HighTemplarUnit::micro()
     }
     else if (_fleeing)
     {
-        //flee();
+        flee();
     }
     else
     {
         //fightMove();
+        if (Broodwar->getFrameCount() - _lastClickFrame <= Broodwar->getLatency())
+            return;
+        if (_unitsGroup->distToNearestChoke < 128.0)
+        {
+            clickTarget();
+            _fightMoving = true;
+        }
+        else if (target == _unitPos)
+        {
+            this->move(_unitsGroup->center);
+        }
+        else
+        {
+            if (_unitPos.getDistance(target) > 192.0)
+                this->move(target);
+        }
     }
 }
 
