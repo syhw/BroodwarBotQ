@@ -31,6 +31,15 @@ ZealotUnit::~ZealotUnit()
 
 bool ZealotUnit::decideToFlee()
 {
+    if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() 
+        && Broodwar->getGroundHeight(targetEnemy->getPosition()) > Broodwar->getGroundHeight(_unitPos))
+    {
+        if (_unitsGroup->nearestChoke && _unitsGroup->nearestChoke->getCenter().getDistance(_unitPos) < 128)
+        {
+            _fleeing = false;
+            return false;
+        }
+    }
     if (unit->getShields() < 10)
         _fleeingDmg = 24;
     // TODO complete conditions
@@ -253,17 +262,6 @@ void ZealotUnit::micro()
         {
             if (Broodwar->getFrameCount() - _lastClickFrame > 9) //TODO TOCHANGE TEST TEST HACK DEBUG
                 fightMove();
-            /*if (Broodwar->getFrameCount() - _lastClickFrame > 12)
-            {
-                if (oorTargetEnemy && oorTargetEnemy->exists() && oorTargetEnemy->isVisible())
-                {
-                    attackMove(oorTargetEnemy->getPosition());
-                }
-                else
-                {
-                    attackMove(_unitsGroup->enemiesCenter);
-                }
-            }*/
         }
     }
     return;

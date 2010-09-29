@@ -6,7 +6,6 @@ using namespace BWAPI;
 using namespace std;
 
 EUnitsFilter::EUnitsFilter()
-: BaseObject( "EUnitsFilter")
 {
     timeManager = & TimeManager::Instance();
 

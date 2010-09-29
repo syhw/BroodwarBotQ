@@ -1563,7 +1563,7 @@ int BayesianUnit::fightMove()
     if (targetEnemy != NULL && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected()
         && ((targetEnemy->getType() == UnitTypes::Terran_Siege_Tank_Siege_Mode 
         && targetEnemy->getDistance(_unitPos) > 45.0) || !inRange(targetEnemy) || (_unitsGroup->units.size() > 10 && targetEnemy->getDistance(_unitPos) > 128)) // TODO MICROONLY (_unitsGroup->units.size() > 10 && targetEnemy->getDistance(_unitPos) > 128)
-        && (!_fightMoving || Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
+        && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
     {
         unit->move(targetEnemy->getPosition());
         _lastClickFrame = Broodwar->getFrameCount();
@@ -1576,7 +1576,7 @@ int BayesianUnit::fightMove()
     if (dist <= 192.0 && // 6 build tiles TOCHANGE
         oorTargetEnemy != NULL && oorTargetEnemy->exists() && oorTargetEnemy->isVisible() && targetEnemy->isDetected()
         && !inRange(oorTargetEnemy)
-        && (!_fightMoving || Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
+        && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
     {
         //unit->rightClick(oorTargetEnemy->getPosition());
         //_lastRightClick =  oorTargetEnemy->getPosition();
@@ -1586,9 +1586,9 @@ int BayesianUnit::fightMove()
         _fightMoving = true;
         return 2;
     }
-    /// move towards target
-    if (dist > 192.0
-        && (!_fightMoving || Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
+    /// move towards target if we are "far enough from it"
+    if (dist > 128.0 // 192.0 TOCHANGE
+        && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
     {
         clickTarget();
         _fightMoving = true;
@@ -1597,7 +1597,7 @@ int BayesianUnit::fightMove()
     /// Or simply move away from our friends and kite if we can
     if (targetEnemy != NULL && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected()
         && outRanges(targetEnemy) // don't kite it we don't outrange
-        && (!_fightMoving || Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
+        && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
     {
         // TODO TO COMPLETE (with a clickTarget() if dist > threshold)
         updateDir();

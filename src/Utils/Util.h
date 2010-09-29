@@ -2,3 +2,4 @@
 #include <map>
 void log(const char* text, ...);
 std::map<int, int> computeAssignments(Util::RectangleArray< double> &cost);
+int round(double a);

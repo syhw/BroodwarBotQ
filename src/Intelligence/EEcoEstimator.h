@@ -3,10 +3,9 @@
 #include "TimeManager.h"
 #include <BWAPI.h>
 #include <BWTA.h>
-#include "BaseObject.h"
 
 
-class EEcoEstimator : public CSingleton<EEcoEstimator>, public BaseObject
+class EEcoEstimator : public CSingleton<EEcoEstimator>
 {
 	friend class CSingleton<EEcoEstimator>;
 public:

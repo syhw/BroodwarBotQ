@@ -33,6 +33,7 @@ using namespace BWAPI;
 
 UnitsGroup::UnitsGroup()
 : defaultTargetEnemy(NULL)
+, nearestChoke(NULL)
 , totalHP(0)
 , totalMinPrice(0)
 , totalGazPrice(0)
@@ -195,7 +196,6 @@ void UnitsGroup::displayTargets()
 
 double UnitsGroup::evaluateForces()
 {
-    return 1.0; // FOR THE MICRO TOURNAMENT
     bool onlyInvisibles = true;
     int theirMinPrice = 0;
     int theirGazPrice = 0;
@@ -240,6 +240,8 @@ double UnitsGroup::evaluateForces()
     // trying a simple rule: 100 minerals == 4 pop == 75 gaz == 100 pts
     double ourScore = totalMinPrice + (4/3)*totalGazPrice + 25*totalSupply;
     double theirScore = theirMinPrice + (4/3)*theirGazPrice + 25*theirSupply;
+    if (enemiesAltitude > groupAltitude)
+        theirScore *= 1.5;
     if (onlyInvisibles && !_hasDetection)
         return 0.1;
     else
@@ -264,7 +266,7 @@ void UnitsGroup::update()
         accomplishGoal();
         return;
     }
-    /*if (!arrivingUnits.empty())
+    if (!arrivingUnits.empty())
     {
         if (units.size() <= 2)
         {
@@ -290,7 +292,7 @@ void UnitsGroup::update()
                     (*it++)->update();
             }
         }
-    }*/
+    }
 
     updateCenter();
     leadingUnit = units.front();
@@ -336,27 +338,31 @@ void UnitsGroup::update()
     if (enemies.size () != 0)
     {
         enemiesCenter = Position(0, 0);
+        enemiesAltitude = 0;
         for (std::map<Unit*, Position>::const_iterator it = enemies.begin();
             it != enemies.end(); ++it)
         {
             enemiesCenter += it->second;
+            if (!(it->first->getType().isFlyer()))
+                enemiesAltitude += BWAPI::Broodwar->getGroundHeight(it->second);
         }
         enemiesCenter.x() /= enemies.size();
         enemiesCenter.y() /= enemies.size();
         if (!enemiesCenter.isValid())
             enemiesCenter.makeValid();
+        enemiesAltitude = round((double)enemiesAltitude / enemies.size());
     }
     //clock_t f = clock();
     //double dur = (double)(f - s) / CLOCKS_PER_SEC;
     //Broodwar->printf( "UnitsGroup::update() took %2.5f seconds\n", dur); 
 #ifdef __DEBUG__
-    Broodwar->drawCircleMap((int)center.x(), (int)center.y(), maxRadius + maxRange + 32, Colors::Yellow);
+    Broodwar->drawCircleMap((int)center.x(), (int)center.y(), (int)maxRadius + (int)maxRange + 32, Colors::Yellow);
 #endif
 
     if (!enemies.empty()) /// We fight, we'll see later for the goals 
     {
         double force = evaluateForces();
-        if (force < 0.75) // TOCHANGE 0.75
+        if (force < 0.8) // TOCHANGE 0.8
         {
             // strategic withdrawal
             for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
@@ -369,11 +375,20 @@ void UnitsGroup::update()
             // we can be offensive, get our goals done
             accomplishGoal();
         }
-        else // stand our ground
+        else // stand our ground or go up the ramp
         {
             for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
             {
-                (*it)->target = (*it)->unit->getPosition();
+                if (enemiesAltitude > groupAltitude && nearestChoke)
+                {
+                    const std::pair<BWTA::Region*, BWTA::Region*> regions = nearestChoke->getRegions();
+                    BWTA::Region* higherRegion = 
+                        (Broodwar->getGroundHeight(regions.first->getCenter()) > Broodwar->getGroundHeight(regions.second->getCenter())) 
+                        ? regions.first : regions.second;
+                    (*it)->target = higherRegion->getCenter();
+                }
+                else
+                    (*it)->target = (*it)->unit->getPosition();
             }
         }
     }
@@ -675,13 +690,23 @@ void UnitsGroup::updateCenter()
         return;
     // update center
     center = Position(0, 0);
+    groupAltitude = 0;
     for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
     {
         center += (*it)->unit->getPosition();
+        if (!(*it)->unit->getType().isFlyer())
+            groupAltitude += Broodwar->getGroundHeight((*it)->unit->getPosition());
     }
     center.x() /= units.size();
     center.y() /= units.size();
+    groupAltitude = round((double)groupAltitude / units.size());
+    if (!nearestChoke || (nearestChoke && nearestChoke->getCenter().getDistance(center) > 256))
+    {
+        nearestChoke = BWTA::getNearestChokepoint(center);
+    }
 
+    // TODO USE RADIUS AND MAXRADIUS :)
+    /*
     // update stdDevRadius and maxRadius
     maxRadius = -1.0;
     double sum = 0.0;
@@ -693,6 +718,7 @@ void UnitsGroup::updateCenter()
         sum += (dist * dist);
     }
     stdDevRadius = sqrt((1/units.size()) * sum); // 1/(units.size() - 1) for the sample std dev
+    */
 }
 
 Position UnitsGroup::getCenter() const
@@ -787,7 +813,13 @@ void UnitsGroup::templarMergingStuff()
         }
         ++it;
     }
-    tomerge->useTech(TechTypes::Archon_Warp, closer);
-    _mergersHT.erase(tomerge);
-    _mergersHT.erase(closer);
+    if (tomerge != NULL)
+    {
+        if (tomerge->exists())
+        {
+            tomerge->useTech(TechTypes::Archon_Warp, closer);
+            _mergersHT.erase(closer);
+        }
+        _mergersHT.erase(tomerge);
+    }
 }

@@ -501,7 +501,7 @@ void MapManager::justStormed(Position p)
         _dontReStorm.insert(std::make_pair<Position, int>(p, 0));
 }
 
-void MapManager::onFrame()
+void MapManager::update()
 {
 #ifdef __DEBUG__
     clock_t start = clock();
@@ -680,7 +680,7 @@ void MapManager::onFrame()
     clock_t end = clock();
     double duration = (double)(end - start) / CLOCKS_PER_SEC;
     if (duration > 0.040) 
-        Broodwar->printf("MapManager::onFrame() took: %2.5f seconds\n", duration);
+        Broodwar->printf("MapManager::update() took: %2.5f seconds\n", duration);
     //this->drawGroundDamagesGrad(); // DRAW
     //this->drawGroundDamages();
     //this->drawAirDamagesGrad();

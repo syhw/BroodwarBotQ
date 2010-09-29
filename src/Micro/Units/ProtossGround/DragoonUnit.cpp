@@ -52,6 +52,15 @@ int DragoonUnit::addRangeAir()
 
 bool DragoonUnit::decideToFlee()
 {
+    if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() 
+        && Broodwar->getGroundHeight(targetEnemy->getPosition()) > Broodwar->getGroundHeight(_unitPos))
+    {
+        if (_unitsGroup->nearestChoke && _unitsGroup->nearestChoke->getCenter().getDistance(_unitPos) < 128)
+        {
+            _fleeing = false;
+            return false;
+        }
+    }
     if (unit->getShields() < 10)
         _fleeingDmg = 12;
     // TODO complete conditions
@@ -116,11 +125,13 @@ void DragoonUnit::micro()
         }
         else
         {
+            fightMove();
+            /* This should be done by the unitsgroup setting target
             if (!fightMove())
             {
                 if (currentFrame - _lastClickFrame > Broodwar->getLatency())
                     move(_unitsGroup->enemiesCenter);
-            }
+            }*/
         }
     }
 }

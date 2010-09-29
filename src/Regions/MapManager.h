@@ -75,7 +75,7 @@ public:
     void onUnitShow(BWAPI::Unit* u);
     void onUnitHide(BWAPI::Unit* u);
     void justStormed(BWAPI::Position p);
-    void onFrame();
+    void update();
     const std::map<BWAPI::Unit*, BWAPI::Position> & getOurUnits();
     const std::map<BWAPI::Unit*, BWAPI::Position> & getTrackedUnits();
     const std::map<BWAPI::Bullet*, BWAPI::Position> & getTrackedStorms();

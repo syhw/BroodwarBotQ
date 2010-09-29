@@ -10,7 +10,6 @@
 #include "SeeSubgoal.h"
 #include "FindSubgoal.h"
 #include "WarManager.h"
-#include "BaseObject.h"
 #include "ExploreGoal.h"
 
 class GoalManager;

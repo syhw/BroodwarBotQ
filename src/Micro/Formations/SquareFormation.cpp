@@ -15,12 +15,11 @@ SquareFormation::SquareFormation(const Position& p, const Vec& direction)
 
 void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
 {
-    //if (end_positions.size() == vUnits.size())
-    //    return;
+    if (end_positions.size() == vUnits.size())
+        return;
     if (!vUnits.size())
         return;
-    BWTA::Region* r = BWTA::getRegion(center.toPosition()); /// DEBUG HACK DEBUG
-    center = Vec(r->getCenter().x(), r->getCenter().y());   /// DEBUG HACK DEBUG
+
 	end_positions.clear();
 
     if (vUnits.size() == 1)
@@ -50,7 +49,7 @@ void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnit
 	for (unsigned int i = 0; i < vUnits.size(); i++)
     {
         Position topos = (corner + Position( int(i/sizeSide) * (space + maxDim), (i%sizeSide) * (space + maxDim))).toPosition();
-        if (!vUnits[i]->unit->getType().isFlyer() && Broodwar->isWalkable(topos.x()/8, topos.y()/8))
+        if (!vUnits[i]->unit->getType().isFlyer() && !Broodwar->isWalkable(topos.x()/8, topos.y()/8))
         {
             Position tmp = MapManager::Instance().closestWalkabableSameRegionOrConnected(topos);
             if (tmp != Positions::None)

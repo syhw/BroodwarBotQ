@@ -3,8 +3,7 @@
 using namespace BWAPI;
 
 EEcoEstimator::EEcoEstimator()
-: BaseObject("EEcoEstimator")
-, mWorkers(4)
+: mWorkers(4)
 , gWorkers(0)
 , totWorkers(4)
 , gaz_exploited(0)
@@ -30,11 +29,12 @@ EEcoEstimator::EEcoEstimator()
 	timeManager = NULL;
 }
 
-EEcoEstimator::~EEcoEstimator(){
-
+EEcoEstimator::~EEcoEstimator()
+{
 }
 
-void EEcoEstimator::setDependencies(){
+void EEcoEstimator::setDependencies()
+{
 	this->timeManager = & TimeManager::Instance();
 }
 
@@ -48,7 +48,8 @@ void EEcoEstimator::update()
 	}
 }
 
-int EEcoEstimator::m_per_mn() const{
+int EEcoEstimator::m_per_mn() const
+{
 		double worker_by_patch = static_cast<double>(patch_owned) / static_cast<double>(mWorkers);
 		if (worker_by_patch <= 1.0)
 			return 59*mWorkers;
@@ -66,30 +67,36 @@ int EEcoEstimator::m_per_mn() const{
 			return 41*mWorkers;
 }
 
-int EEcoEstimator::g_per_mn() const{
+int EEcoEstimator::g_per_mn() const
+{
 	return gWorkers*gaz_exploited*288;
 }
 
-void EEcoEstimator::start_gaz(int gWorkers){
+void EEcoEstimator::start_gaz(int gWorkers)
+{
 	this->gWorkers += gWorkers;
 	this->gaz_exploited++;
 }
 
-int EEcoEstimator::get_theo_workers() const{
+int EEcoEstimator::get_theo_workers() const
+{
 	return theo_workers;
 }
 
-void EEcoEstimator::update_workers(int mworkers, int gworkers){
+void EEcoEstimator::update_workers(int mworkers, int gworkers)
+{
 this->mWorkers = mworkers;
 this->gWorkers = gworkers;
 }
 
-void EEcoEstimator::add_workers(int mworkers, int gworkers){
+void EEcoEstimator::add_workers(int mworkers, int gworkers)
+{
 this->mWorkers += mworkers;
 this->gWorkers += gworkers;
 }
 
-void EEcoEstimator::rm_workers(int mworkers, int gworkers){
+void EEcoEstimator::rm_workers(int mworkers, int gworkers)
+{
 this->mWorkers -= mworkers;
 this->gWorkers -= gworkers;
 }

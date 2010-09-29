@@ -1,7 +1,6 @@
 #pragma once
 #include "Defines.h"
 #include "CSingleton.h"
-#include "BaseObject.h"
 #include "TimeManager.h"
 #include "EViewedUnit.h"
 #include <BWTA.h>
@@ -10,8 +9,8 @@
 #include <utility>
 #include "Data.h"
 
-// This class works closely tied to MapManager (see MapManager::onFrame())
-class EUnitsFilter : public CSingleton<EUnitsFilter>, public BaseObject
+// This class works closely tied to MapManager (see MapManager::update())
+class EUnitsFilter : public CSingleton<EUnitsFilter>
 {
     friend class CSingleton<EUnitsFilter>;
     TimeManager* timeManager;

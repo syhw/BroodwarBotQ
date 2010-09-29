@@ -26,9 +26,7 @@ void MicroAIModule::onStart()
     this->eTechEstimator = & ETechEstimator::Instance();
     this->mapManager = & MapManager::Instance();
 	this->objectManager = & ObjectManager::Instance();
-    // this->regions = & Regions::Instance();
     this->unitGroupManager = & UnitGroupManager::Instance();
-    // this->regions->setDependencies();
     this->mapManager->setDependencies();
 
 	mm = new UnitsGroup();
@@ -320,7 +318,7 @@ void MicroAIModule::onFrame()
 	}
 #endif
 
-    mapManager->onFrame();
+    mapManager->update();
     //Broodwar->printf("weapons ground upgrade level %d", Broodwar->enemy()->getUpgradeLevel(UpgradeTypes::Protoss_Ground_Weapons));
     //Broodwar->printf("weapons ground upgrade level %d", eUnitsFilter->getViewedUnits().begin()->first->getUpgradeLevel(UpgradeTypes::Protoss_Ground_Weapons));
     //Broodwar->printf("%s", Broodwar->getLastError().toString().c_str());

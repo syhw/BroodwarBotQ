@@ -58,31 +58,41 @@ BattleBroodAI::~BattleBroodAI()
     if (qapplication)
         qapplication->quit();
 #endif
-
-    TimeManager::Destroy();
-    Arbitrator::Arbitrator<BWAPI::Unit*,double>::Destroy();
-    BuildManager::Destroy();
-    TechManager::Destroy();
-    UpgradeManager::Destroy();
-    BuildOrderManager::Destroy();
-    ScoutManager::Destroy();
-    WorkerManager::Destroy();
-    BaseManager::Destroy();
-    SupplyManager::Destroy();
-    WarManager::Destroy();
-    MapManager::Destroy();
-    EUnitsFilter::Destroy();
-    ObjectManager::Destroy();
-    EEcoEstimator::Destroy();
-    GoalManager::Destroy();
-
-
     if( Broodwar->self()->getRace() == Races::Protoss)
         ProtossStrat::Destroy();
     else if( Broodwar->self()->getRace() == Races::Terran)
         TerranStrat::Destroy();
     else if( Broodwar->self()->getRace() == Races::Zerg)
         ZergStrat::Destroy();
+
+    // reverse order ;)
+#ifdef __DEBUG__
+    EnhancedUI::Destroy();
+#endif
+    GoalManager::Destroy();
+    TimeManager::Destroy();
+    ETechEstimator::Destroy();
+    EEcoEstimator::Destroy();
+    EUnitsFilter::Destroy();
+    WarManager::Destroy();
+    WorkerManager::Destroy();
+    MapManager::Destroy();
+    ScoutManager::Destroy();
+    InformationManager::Destroy();
+    UnitGroupManager::Destroy();
+    UpgradeManager::Destroy();
+    TechManager::Destroy();
+    SupplyManager::Destroy();
+    BuildOrderManager::Destroy();
+    ProductionManager::Destroy();
+    MorphManager::Destroy();
+    ConstructionManager::Destroy();
+    BuildManager::Destroy();
+    BuildingPlacer::Destroy();
+    BorderManager::Destroy();
+    BaseManager::Destroy();
+    Arbitrator::Arbitrator<BWAPI::Unit*,double>::Destroy();
+    ObjectManager::Destroy();
 }
 
 void BattleBroodAI::onStart()
@@ -121,17 +131,14 @@ void BattleBroodAI::onStart()
     this->analyzed=true;
 
     this->objManager = & ObjectManager::Instance();
-    //Managers
     this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
-    this->baseManager = &BaseManager::Instance();
+    this->baseManager = & BaseManager::Instance();
     this->borderManager = & BorderManager::Instance();
     this->buildingPlacer = & BuildingPlacer::Instance();
     this->buildManager = & BuildManager::Instance();
-    //Depends of BuildManager : {
     this->constructionManager = & ConstructionManager::Instance();
     this->morphManager = & MorphManager::Instance();
     this->productionManager = & ProductionManager::Instance();
-    // }
     this->buildOrderManager = & BuildOrderManager::Instance();
     this->supplyManager = & SupplyManager::Instance();
     this->techManager = & TechManager::Instance();
@@ -147,10 +154,10 @@ void BattleBroodAI::onStart()
     this->eTechEstimator = & ETechEstimator::Instance();
     this->timeManager = & TimeManager::Instance();
     this->goalManager = & GoalManager::Instance();
+    this->defenseManager = & DefenseManager::Instance();
 #ifdef __DEBUG__
     this->enhancedUI = & EnhancedUI::Instance();
 #endif
-    this->defenseManager = & DefenseManager::Instance();
     if( Broodwar->self()->getRace() == Races::Protoss)
         this->macroManager = & ProtossStrat::Instance();
     else if( Broodwar->self()->getRace() == Races::Terran)
@@ -159,8 +166,6 @@ void BattleBroodAI::onStart()
         this->macroManager = & ZergStrat::Instance();
 
     //Set dependencies
-
-
     this->baseManager->setDependencies();
     this->borderManager->setDependencies();
     this->buildManager->setDependencies();
@@ -172,18 +177,13 @@ void BattleBroodAI::onStart()
     this->techManager->setDependencies();
     this->upgradeManager->setDependencies();
     this->scoutManager->setDependencies();
+    this->mapManager->setDependencies();
     this->workerManager->setDependencies();
-    this->eEcoEstimator->setDependencies();
     this->warManager->setDependencies();
+    this->eEcoEstimator->setDependencies();
     this->goalManager->setDependencies();
     this->macroManager->setDependencies();
     this->defenseManager->setDependencies();
-    this->mapManager->setDependencies(); // added @merge
-
-    //Broodwar->printf("The match up is %s v %s",
-
-    Broodwar->self()->getRace().getName().c_str();
-    Broodwar->enemy()->getRace().getName().c_str();
 
     this->baseManager->update();
 #ifdef BW_QT_DEBUG
@@ -217,24 +217,31 @@ void BattleBroodAI::onFrame()
     sprintf_s(mousePos, "%d, %d", Broodwar->getMousePosition().x(), Broodwar->getMousePosition().y());
     Broodwar->drawTextMouse(12, 0, mousePos);
 #endif
-    this->buildManager->update();
-    this->buildOrderManager->update();
+   
+    this->objManager->onFrame();
+    this->arbitrator->update();
     this->baseManager->update();
-    this->workerManager->update();
+    this->borderManager->update();
+    this->buildManager->update();
+    this->constructionManager->update();
+    this->morphManager->update();
+    this->productionManager->update();
+    this->buildOrderManager->update();
+    this->supplyManager->update();
     this->techManager->update();
     this->upgradeManager->update();
-    this->supplyManager->update();
-    this->macroManager->update(); // @merge
+    this->scoutManager->update();
+    this->mapManager->update();
+    this->workerManager->update();
+    this->warManager->update();
+    this->eUnitsFilter->update();
+    this->eEcoEstimator->update();
+    this->timeManager->update();
+    this->macroManager->update();
+    this->defenseManager->update();
 #ifdef __DEBUG__
     this->enhancedUI->update();
 #endif
-    this->borderManager->update();
-    objManager->onFrame();
-    this->scoutManager->update();
-    this->mapManager->onFrame();
-    this->defenseManager->update();
-
-    this->arbitrator->update();
 
     std::set<Unit*> units=Broodwar->self()->getUnits();
     if (this->showManagerAssignments)

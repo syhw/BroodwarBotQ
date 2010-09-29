@@ -20,3 +20,8 @@ void log(const char* text, ...)
     fclose(outfile);
   }
 }
+
+int round(double a)
+{
+    return int(a + 0.5);
+}

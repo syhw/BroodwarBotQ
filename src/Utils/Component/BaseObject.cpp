@@ -18,7 +18,7 @@ BaseObject::~BaseObject()
 void BaseObject::onFrame()
 {
 #ifdef BW_QT_DEBUG
-	// Profile onFrame of the component
+	// Profile update of the component
 	beginTime = clock();
 
 	update();

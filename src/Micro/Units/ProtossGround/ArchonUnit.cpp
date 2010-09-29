@@ -1,4 +1,5 @@
 #include "ArchonUnit.h"
+#include <UnitsGroup.h>
 
 std::set<BWAPI::UnitType> ArchonUnit::setPrio;
 
@@ -25,6 +26,15 @@ ArchonUnit::~ArchonUnit()
 
 bool ArchonUnit::decideToFlee()
 {
+    if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() 
+        && Broodwar->getGroundHeight(targetEnemy->getPosition()) > Broodwar->getGroundHeight(_unitPos))
+    {
+        if (_unitsGroup->nearestChoke && _unitsGroup->nearestChoke->getCenter().getDistance(_unitPos) < 128)
+        {
+            _fleeing = false;
+            return false;
+        }
+    }
     if (unit->getShields() < 10)
         _fleeingDmg = 12;
     // TODO complete conditions

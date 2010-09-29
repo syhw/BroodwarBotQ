@@ -70,6 +70,7 @@ public:
     std::vector<BWAPI::Position> ppath;
     std::map<BWAPI::Unit*, BWAPI::Position> enemies;
     BWAPI::Position enemiesCenter;
+    int enemiesAltitude;
     UnitDmgBimap unitDamages;
     pBayesianUnit leadingUnit;
     BWAPI::Unit* defaultTargetEnemy;
@@ -77,7 +78,9 @@ public:
 	UnitsGroup();
 	virtual ~UnitsGroup();
 
+    BWTA::Chokepoint* nearestChoke;
     BWAPI::Position center;
+    int groupAltitude;
     double stdDevRadius, maxRadius;
     Vec centerSpeed;
 	std::map<BWAPI::UnitSizeType, int> sizes;
