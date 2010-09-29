@@ -638,7 +638,7 @@ void MapManager::update()
 #ifdef __DEBUG__
                 for (std::map<Unit*, std::pair<UnitType, Position> >::const_iterator ii = _invisibleUnitsBuf.begin();
                     ii != _invisibleUnitsBuf.end(); ++ii)
-                    Broodwar->drawCircleMap(ii->second.second.x(), ii->second.second.y(), 12, Colors::Red, true);
+                    Broodwar->drawCircleMap(ii->second.second.x(), ii->second.second.y(), 8, Colors::Red, true);
 #endif
                 // Don't restorm where there are already existing storms, lasting more than 48 frames
                 for (std::map<Bullet*, Position>::const_iterator it = _trackedStorms.begin();

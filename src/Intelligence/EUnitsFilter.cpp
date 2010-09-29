@@ -127,7 +127,9 @@ void EUnitsFilter::update(Unit* u)
 void EUnitsFilter::filter(Unit* u)
 {
     if (_eViewedUnits[u].type.isBuilding()) return; // we consider that buildings don't move
-    if (_invisibleUnits.count(u) && Broodwar->getFrameCount() - _eViewedUnits[u].lastSeen > 216) // 9 secondes
+    if (_invisibleUnits.count(u) && (
+        (u && u->exists() && ((!u->isCloaked() && !u->isBurrowed()) || u->isDetected())) 
+        || Broodwar->getFrameCount() - _eViewedUnits[u].lastSeen > 216)) // 9 secondes
     {
         _invisibleUnits.erase(u);
         return;

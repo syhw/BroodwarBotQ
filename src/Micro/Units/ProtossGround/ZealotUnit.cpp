@@ -223,8 +223,7 @@ void ZealotUnit::micro()
     if (currentFrame - _lastAttackFrame == getAttackDuration() + 1)
         clearDamages();
     updateRangeEnemies();
-    if (Broodwar->enemy()->getRace() == BWAPI::Races::Zerg) ////////////////////////////// AttackMove vs Zerg
-        updateTargetEnemy();
+    updateTargetEnemy();
 
     /// Dodge storm, drag mine, drag scarab
     if (dodgeStorm() || dragMine() || dragScarab()) 
@@ -232,39 +231,24 @@ void ZealotUnit::micro()
 
     if (unit->getGroundWeaponCooldown() <= Broodwar->getLatency() + 1)
     {
-        if (Broodwar->enemy()->getRace() == BWAPI::Races::Zerg) ////////////////////////// AttackMove vs Zerg
+        if (!inRange(targetEnemy))
+        {
+            clearDamages();
+        }
+        /// ATTACK
+        if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() && inRange(targetEnemy))
+            attackEnemyUnit(targetEnemy);
+        else if (oorTargetEnemy && oorTargetEnemy->exists() && oorTargetEnemy->isVisible() && oorTargetEnemy->getDistance(_unitPos) < 92.0) // TOCHANGE 92
+            attackEnemyUnit(oorTargetEnemy);
+        else if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible())
+            attackEnemyUnit(targetEnemy);
+        else
         {
             if (currentFrame - _lastClickFrame > Broodwar->getLatency())
             {
-                if (target == _unitPos)
-                    unit->attackMove(_unitsGroup->enemiesCenter);
-                else
-                    unit->attackMove(target);
+                unit->attackMove(_unitsGroup->enemiesCenter);
                 _lastMoveFrame = Broodwar->getFrameCount();
                 _lastClickFrame = Broodwar->getFrameCount();
-            }
-        }
-        else
-        {
-            if (!inRange(targetEnemy))
-            {
-                clearDamages();
-            }
-            /// ATTACK
-            if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() && inRange(targetEnemy))
-                attackEnemyUnit(targetEnemy);
-            else if (oorTargetEnemy && oorTargetEnemy->exists() && oorTargetEnemy->isVisible() && oorTargetEnemy->getDistance(_unitPos) < 92.0) // TOCHANGE 92
-                attackEnemyUnit(oorTargetEnemy);
-            else if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible())
-                attackEnemyUnit(targetEnemy);
-            else
-            {
-                if (currentFrame - _lastClickFrame > Broodwar->getLatency())
-                {
-                    unit->attackMove(_unitsGroup->enemiesCenter);
-                    _lastMoveFrame = Broodwar->getFrameCount();
-                    _lastClickFrame = Broodwar->getFrameCount();
-                }
             }
         }
     }
