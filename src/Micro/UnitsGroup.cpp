@@ -38,7 +38,7 @@ UnitsGroup::UnitsGroup()
 , totalMinPrice(0)
 , totalGazPrice(0)
 , totalSupply(0)
-, _alignFormation(true) // TODO TOCHANGE false
+, _alignFormation(true)
 , _hasDetection(0)
 , enemiesCenter(Position(0, 0))
 {
@@ -266,6 +266,8 @@ void UnitsGroup::update()
         accomplishGoal();
         return;
     }
+
+    // arriving units
     if (!arrivingUnits.empty())
     {
         if (units.size() <= 2)
@@ -315,22 +317,25 @@ void UnitsGroup::update()
 
     this->totalHP = 0;
     double maxRange = -1.0;
-    bool contactUnits = false;
+    /*** TODO BUG IN SquareFormation TODO TODO TODO volatile bool contactUnits = false; // why do I need volatile to make it work not erratically? */
     for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     {
+        /*** TODO BUG IN SquareFormation TODO TODO TODO
         if ((*it)->unit->getType() == UnitTypes::Protoss_Zealot 
             || (*it)->unit->getType() == UnitTypes::Protoss_Archon)
             contactUnits = true;
+        */
         this->totalHP += (*it)->unit->getHitPoints();
         double tmp_max = max(max((*it)->unit->getType().groundWeapon().maxRange(), (*it)->unit->getType().airWeapon().maxRange()), 
             (*it)->unit->getType().sightRange()); // TODO: upgrades
         if (tmp_max > maxRange)
             maxRange = tmp_max;
     }
+    /*** TODO BUG IN SquareFormation TODO TODO TODO
     if (contactUnits)
         _alignFormation = false;
     else
-        _alignFormation = true;
+        _alignFormation = true;*/
 
     //clock_t s = clock();
     updateNearbyEnemyUnitsFromFilter(center, maxRadius + maxRange + 92); // possibly hidden units, could be taken from onUnitsShow/View asynchronously for more efficiency
@@ -448,8 +453,8 @@ void UnitsGroup::formation(pFormation f)
 
     f->computeToPositions(units);
 
-    if (_alignFormation)
-    {
+    /*** TODO BUG IN SquareFormation TODO TODO TODOif (_alignFormation)
+    {*/
         const std::vector<BWAPI::Position>& to = f->end_positions;
         std::vector<unsigned int> alignment; // alignment[from_pos] = to_pos 
         // align(from, to, alignment);// TODO min crossing || fastest
@@ -459,14 +464,14 @@ void UnitsGroup::formation(pFormation f)
         {
             units[i]->target = to[alignment[i]];
         }
-    }
+    /*** TODO BUG IN SquareFormation TODO TODO TODO}
     else
     {
         for (unsigned int i = 0; i < units.size(); i++)
         {
             units[i]->target = f->end_positions[i];
         }
-    }
+    }*/
 
 }
 
@@ -530,7 +535,10 @@ void UnitsGroup::takeControl(Unit* u)
     if (u->getType() == BWAPI::UnitTypes::Protoss_Arbiter)
         tmp = pBayesianUnit(new ArbiterUnit(u, this));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Archon)
+    {
+        _alignFormation = false;
         tmp = pBayesianUnit(new ArchonUnit(u, this));
+    }
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Carrier)
         tmp = pBayesianUnit(new CarrierUnit(u, this));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Corsair)
@@ -554,7 +562,10 @@ void UnitsGroup::takeControl(Unit* u)
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Shuttle)
         tmp = pBayesianUnit(new ShuttleUnit(u, this));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Zealot)
+    {
+        _alignFormation = false;
         tmp = pBayesianUnit(new ZealotUnit(u, this));
+    }
     else if (u->getType() == BWAPI::UnitTypes::Zerg_Mutalisk)
         tmp = pBayesianUnit(new MutaliskUnit(u, this));
     else if (u->getType() == BWAPI::UnitTypes::Zerg_Scourge)

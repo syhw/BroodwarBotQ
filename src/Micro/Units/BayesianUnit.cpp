@@ -1903,6 +1903,9 @@ void BayesianUnit::update()
             this->switchMode(MODE_INPOS);
             return;
         }
+#ifdef __DEBUG__
+        Broodwar->drawLineMap(_unitPos.x(), _unitPos.y(), target.x(), target.y(), Colors::Purple);
+#endif
         if ((Broodwar->getFrameCount() - _lastMoveFrame) > 23
             && (Broodwar->getFrameCount() - _lastClickFrame) > Broodwar->getLatency() + getAttackDuration())
         {

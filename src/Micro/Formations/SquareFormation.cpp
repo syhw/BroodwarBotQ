@@ -30,13 +30,18 @@ void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnit
     }
 
     // find how many contact units we will have, and store their indices
+    /*** TODO BUG HERE TODO TODO TODO
     std::set<unsigned int> contactUnits;
 	for (unsigned int i = 0; i < vUnits.size(); i++)
     {
-        if (vUnits[i]->getType() == UnitTypes::Protoss_Zealot 
-            || vUnits[i]->getType() == UnitTypes::Protoss_Archon)
+        Broodwar->printf("id %d %s", vUnits[i]->getType().getID(), vUnits[i]->getType().getName().c_str());
+        //if (vUnits[i]->getType().getID() == 66 || vUnits[i]->getType().getID() == 68)
+        if (vUnits[i]->getType() == BWAPI::UnitTypes::Protoss_Zealot 
+            || vUnits[i]->getType() == BWAPI::UnitTypes::Protoss_Archon)
+        {
             contactUnits.insert(i);
-    }
+        }
+    }*/
 
     int maxDim = 0;
     for (std::vector<pBayesianUnit>::const_iterator it = vUnits.begin();
@@ -75,6 +80,7 @@ void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnit
     }
     computeMean();
 
+    /*** TODO BUG HERE TODO TODO TODO
     // add contact units in the direction of the formation, in the outer layer/ring if no direction
     if (!contactUnits.empty() && !contactUnits.size() == vUnits.size())
     {
@@ -118,4 +124,5 @@ void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnit
             contactUnits.erase(contactUnits.begin());
         }
     }
+    */
 }

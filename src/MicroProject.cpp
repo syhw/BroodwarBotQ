@@ -94,6 +94,9 @@ void MicroAIModule::onStart()
     goals.push_back(pGoal(new AttackGoal(mm, 
         Position(Broodwar->mapWidth()/2*32 - sign*256, (Broodwar->mapHeight()/2 + 4)*32))));
 
+    mm->setGoals(goals); // DEBUG DEBUG DEBUG
+    return; // DEBUG DEBUG DEBUG
+
     /* ARC IN THE MIDDLE (+/- 256 pixs) */
     pFormation tmp_form = pFormation(new ArcFormation(
         Position(Broodwar->mapWidth()/2*32 - sign*256,(Broodwar->mapHeight()/2 + 4)*32), 

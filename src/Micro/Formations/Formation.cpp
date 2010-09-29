@@ -7,7 +7,7 @@ Formation::Formation(const Formation& f)
 , direction(f.direction)
 , mean(f.center)
 , end_positions(f.end_positions)
-, space(30)
+, space(24)
 {
 }
 
@@ -15,7 +15,7 @@ Formation::Formation(const Vec& center, const Vec& direction)
 : center(center)
 , direction(direction)
 , mean(center)
-, space(30)
+, space(24)
 {
     end_positions.clear();
 }
@@ -24,7 +24,7 @@ Formation::Formation(const Position& p, const Vec& direction)
 : center(p.x(), p.y())
 , direction( direction)
 , mean(p.x(), p.y())
-, space(30)
+, space(24)
 {
     end_positions.clear();
 }
