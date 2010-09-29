@@ -1316,6 +1316,8 @@ int BayesianUnit::computeDmg(Unit* u)
 
 bool BayesianUnit::inRange(BWAPI::Unit* u)
 {
+    if (u == NULL || !u->exists() || !u->isVisible() || !u->isDetected()) // I think I have broken something in 30574ffac660d6e2f22077b485c7afaffe791989 TODO
+        return false;
     if (unit->getType() == UnitTypes::Protoss_Zealot 
         || unit->getType() == UnitTypes::Protoss_Dark_Templar)
     {
@@ -1587,7 +1589,7 @@ int BayesianUnit::fightMove()
         return 2;
     }
     /// move towards target if we are "far enough from it"
-    if ((dist > 192.0 || (_unitsGroup->distToNearestChoke < 128.0 && !unit->getType().isFlyer() && dist > unit->getType().groundWeapon().maxRange()))  // 192 == 6 build tiles TOCHANGE
+    if ((dist > 192.0 || (_unitsGroup->distToNearestChoke < 128.0 && !unit->getType().isFlyer() && dist > unit->getType().groundWeapon().maxRange() && _unitsGroup->enemiesAltitude > _unitsGroup->groupAltitude))  // 192 == 6 build tiles TOCHANGE
         && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
     {
         clickTarget();

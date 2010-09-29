@@ -223,15 +223,24 @@ void ZealotUnit::micro()
     if (currentFrame - _lastAttackFrame == getAttackDuration() + 1)
         clearDamages();
     updateRangeEnemies();
-    if (Broodwar->enemy()->getRace() == BWAPI::Races::Zerg) ////////////////////////// AttackMove vs Zerg
+    if (Broodwar->enemy()->getRace() == BWAPI::Races::Zerg ////////////////////////// AttackMove vs Zerg
+        || Broodwar->enemy()->getRace() == BWAPI::Races::Protoss) /////////////////// AttackMove vs Protoss
         updateTargetEnemy();
 
     /// Dodge storm, drag mine, drag scarab
     if (dodgeStorm() || dragMine() || dragScarab()) 
         return;
 
-    if (Broodwar->enemy()->getRace() == BWAPI::Races::Zerg) ////////////////////////// AttackMove vs Zerg
+    if (Broodwar->enemy()->getRace() == BWAPI::Races::Zerg ////////////////////////// AttackMove vs Zerg
+        || Broodwar->enemy()->getRace() == BWAPI::Races::Protoss) /////////////////// AttackMove vs Protoss
     {
+        if (unit->getGroundWeaponCooldown() > Broodwar->getLatency()
+            && (_unitsGroup->distToNearestChoke < 128.0 && _unitsGroup->enemiesAltitude > _unitsGroup->groupAltitude)
+            && (currentFrame - _lastClickFrame >= Broodwar->getLatency()))
+        {
+            clickTarget();
+            _fightMoving = true;
+        }
         if (currentFrame - _lastClickFrame > 21)
         {
             if (target == _unitPos)

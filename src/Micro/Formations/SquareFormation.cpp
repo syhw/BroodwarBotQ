@@ -2,6 +2,8 @@
 #include "MapManager.h"
 #include <BWTA.h>
 
+#define __SAFE_SQUARE_FORMATION__
+
 using namespace BWAPI;
 
 SquareFormation::SquareFormation(const SquareFormation& f)
@@ -19,7 +21,6 @@ void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnit
         return;
     if (!vUnits.size())
         return;
-
 	end_positions.clear();
 
     if (vUnits.size() == 1)
@@ -55,6 +56,15 @@ void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnit
             if (tmp != Positions::None)
                 topos = tmp;
         }
+#ifdef __SAFE_SQUARE_FORMATION__
+        BWTA::Region* regionCenter = BWTA::getRegion(center.toPosition());
+        if (BWTA::getRegion(topos) != regionCenter && center.toPosition() != regionCenter->getCenter())
+        {
+            center = regionCenter->getCenter();
+            this->computeToPositions(vUnits);
+            return;
+        }
+#endif
         if (topos.isValid())
             end_positions.push_back(topos);
         else

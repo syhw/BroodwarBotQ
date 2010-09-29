@@ -101,7 +101,7 @@ void HighTemplarUnit::micro()
         //fightMove();
         if (Broodwar->getFrameCount() - _lastClickFrame <= Broodwar->getLatency())
             return;
-        if (_unitsGroup->distToNearestChoke < 128.0)
+        if (_unitsGroup->distToNearestChoke < 128.0 && _unitsGroup->enemiesAltitude > _unitsGroup->groupAltitude)
         {
             clickTarget();
             _fightMoving = true;
