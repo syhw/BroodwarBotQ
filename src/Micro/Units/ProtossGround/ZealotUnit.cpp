@@ -223,9 +223,8 @@ void ZealotUnit::micro()
     if (currentFrame - _lastAttackFrame == getAttackDuration() + 1)
         clearDamages();
     updateRangeEnemies();
-    updateTargetEnemy();
     if (Broodwar->enemy()->getRace() == BWAPI::Races::Zerg) ////////////////////////// AttackMove vs Zerg
-        clearDamages();
+        updateTargetEnemy();
 
     /// Dodge storm, drag mine, drag scarab
     if (dodgeStorm() || dragMine() || dragScarab()) 
