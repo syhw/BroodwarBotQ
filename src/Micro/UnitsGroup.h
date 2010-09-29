@@ -79,6 +79,7 @@ public:
 	virtual ~UnitsGroup();
 
     BWTA::Chokepoint* nearestChoke;
+    double distToNearestChoke;
     BWAPI::Position center;
     int groupAltitude;
     double stdDevRadius, maxRadius;

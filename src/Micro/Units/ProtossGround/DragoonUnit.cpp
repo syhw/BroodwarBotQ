@@ -107,6 +107,9 @@ void DragoonUnit::micro()
         return;
     if (currentFrame - _lastAttackFrame == getAttackDuration() + 1)
         clearDamages();
+    /// Dodge storm, drag mine, drag scarab
+    if (dodgeStorm() || dragMine() || dragScarab()) 
+        return;
     if (unit->getGroundWeaponCooldown() <= Broodwar->getLatency() + 1)
     {
         updateRangeEnemies();
@@ -126,12 +129,6 @@ void DragoonUnit::micro()
         else
         {
             fightMove();
-            /* This should be done by the unitsgroup setting target
-            if (!fightMove())
-            {
-                if (currentFrame - _lastClickFrame > Broodwar->getLatency())
-                    move(_unitsGroup->enemiesCenter);
-            }*/
         }
     }
 }

@@ -23,12 +23,16 @@ void HighTemplarUnit::micro()
             return;
     }
     int elapsed = Broodwar->getFrameCount() - _lastStormFrame;
-    if ((unit->getEnergy() < 20 /* TODO */ || (unit->getEnergy() < 74 && unit->getHitPoints() < 20) || (unit->getEnergy() < 50 && unit->getHitPoints() < 30)) && elapsed > Broodwar->getLatency() + getAttackDuration())
+    if (((!Broodwar->self()->hasResearched(BWAPI::TechTypes::Psionic_Storm) && unit->getEnergy() < 75) || unit->getEnergy() < 20 /* TODO */ || (unit->getEnergy() < 74 && unit->getHitPoints() < 20) 
+        || (unit->getEnergy() < 55 && unit->getShields() < 2)) && elapsed > Broodwar->getLatency() + getAttackDuration())
     {
         _unitsGroup->signalMerge(unit);
         _mergingFrame = Broodwar->getFrameCount();
         return;
     }
+
+    if (dodgeStorm())
+        return;
 
     // Updating the map of stormable units
     if (lastStormableUnitsUpdateFrame != Broodwar->getFrameCount())
@@ -86,13 +90,13 @@ void HighTemplarUnit::micro()
             _lastStormPos = bestStormPos;
         }
     }
-    else if (!dodgeStorm() || _fleeing || this->unit->getEnergy() < 74)
+    else if (_fleeing)
     {
-        flee();
+        //flee();
     }
     else
     {
-        fightMove();
+        //fightMove();
     }
 }
 

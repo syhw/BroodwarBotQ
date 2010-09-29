@@ -356,7 +356,7 @@ void UnitsGroup::update()
     //double dur = (double)(f - s) / CLOCKS_PER_SEC;
     //Broodwar->printf( "UnitsGroup::update() took %2.5f seconds\n", dur); 
 #ifdef __DEBUG__
-    Broodwar->drawCircleMap((int)center.x(), (int)center.y(), (int)maxRadius + (int)maxRange + 32, Colors::Yellow);
+    Broodwar->drawCircleMap((int)center.x(), (int)center.y(), (int)maxRadius + (int)maxRange +  32, Colors::Yellow);
 #endif
 
     if (!enemies.empty()) /// We fight, we'll see later for the goals 
@@ -700,13 +700,13 @@ void UnitsGroup::updateCenter()
     center.x() /= units.size();
     center.y() /= units.size();
     groupAltitude = round((double)groupAltitude / units.size());
-    if (!nearestChoke || (nearestChoke && nearestChoke->getCenter().getDistance(center) > 256))
+    if (nearestChoke)
+        distToNearestChoke = nearestChoke->getCenter().getDistance(center);
+    if (!nearestChoke || distToNearestChoke > 256)
     {
         nearestChoke = BWTA::getNearestChokepoint(center);
     }
 
-    // TODO USE RADIUS AND MAXRADIUS :)
-    /*
     // update stdDevRadius and maxRadius
     maxRadius = -1.0;
     double sum = 0.0;
@@ -718,7 +718,6 @@ void UnitsGroup::updateCenter()
         sum += (dist * dist);
     }
     stdDevRadius = sqrt((1/units.size()) * sum); // 1/(units.size() - 1) for the sample std dev
-    */
 }
 
 Position UnitsGroup::getCenter() const
@@ -817,7 +816,11 @@ void UnitsGroup::templarMergingStuff()
     {
         if (tomerge->exists())
         {
-            tomerge->useTech(TechTypes::Archon_Warp, closer);
+            if (closer != NULL)
+            {
+                if (closer->exists())
+                    tomerge->useTech(TechTypes::Archon_Warp, closer);
+            }
             _mergersHT.erase(closer);
         }
         _mergersHT.erase(tomerge);

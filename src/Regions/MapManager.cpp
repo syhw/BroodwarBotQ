@@ -685,7 +685,7 @@ void MapManager::update()
     //this->drawGroundDamages();
     //this->drawAirDamagesGrad();
     //this->drawAirDamages();
-    //this->drawBestStorms();
+    this->drawBestStorms();
 #endif
 }
 

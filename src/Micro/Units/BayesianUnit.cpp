@@ -1587,7 +1587,7 @@ int BayesianUnit::fightMove()
         return 2;
     }
     /// move towards target if we are "far enough from it"
-    if (dist > 128.0 // 192.0 TOCHANGE
+    if ((dist > 192.0 || (_unitsGroup->distToNearestChoke < 128.0 && !unit->getType().isFlyer() && dist > unit->getType().groundWeapon().maxRange()))  // 192 == 6 build tiles TOCHANGE
         && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
     {
         clickTarget();
@@ -1819,8 +1819,8 @@ bool BayesianUnit::dragMine()
 
 bool BayesianUnit::dragScarab()
 {
-    if (Broodwar->enemy()->getRace() != Races::Protoss)
-        return false;
+    //if (Broodwar->enemy()->getRace() != Races::Protoss)
+    //    return false;
     return false;
 }
 
