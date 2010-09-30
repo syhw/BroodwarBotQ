@@ -21,22 +21,25 @@ bool g_onStartDone = false;
 
 #define BUF_SIZE 255
 
+#ifdef BW_QT_DEBUG
 static HANDLE  hThreadArrayMonitor;
 DWORD WINAPI LaunchMonitor( LPVOID lpParam );
-
+#endif
 
 namespace BWAPI { Game* Broodwar; }
 BOOL APIENTRY DllMain(HANDLE hModule,
                       DWORD  ul_reason_for_call,
                       LPVOID lpReserved)
 {
-	DWORD   dwThreadIdArray;
+#ifdef BW_QT_DEBUG
+    DWORD   dwThreadIdArray;
+#endif
 
 	switch (ul_reason_for_call)
 	{
 	    case DLL_PROCESS_ATTACH:
           BWAPI::BWAPI_init();
-
+#ifdef BW_QT_DEBUG
 	        hThreadArrayMonitor = CreateThread( 
 	        NULL,                   // default security attributes
 	        0,                      // use default stack size  
@@ -53,6 +56,7 @@ BOOL APIENTRY DllMain(HANDLE hModule,
 	        {
 	            ExitProcess(3);
 	        }
+#endif
 
 		    break;
 	    
@@ -60,13 +64,12 @@ BOOL APIENTRY DllMain(HANDLE hModule,
 #ifdef BW_QT_DEBUG
             if (qapplication)
                 qapplication->quit();
-#endif
 					
             // Wait until monitor thread have terminated.
 	        WaitForMultipleObjects(1, &hThreadArrayMonitor, TRUE, INFINITE);
 	        // Close all thread handles and free memory allocations.
 	        CloseHandle(&hThreadArrayMonitor);
-					
+#endif					
 	        break;
 	}
 
@@ -88,11 +91,9 @@ extern "C" __declspec(dllexport) BWAPI::AIModule* newAIModule(BWAPI::Game* game)
 	return broodAI;
 }
 
-
+#ifdef BW_QT_DEBUG
 DWORD WINAPI LaunchMonitor(LPVOID lpParam ) 
 { 
-#ifdef BW_QT_DEBUG
-
 	while(!broodAI)
 	{
 		Sleep(50);
@@ -112,6 +113,6 @@ DWORD WINAPI LaunchMonitor(LPVOID lpParam )
 	qmainwindow->show();
 	qmainwindow->initComponentsTree();
 	qapplication->exec();
-#endif
 	return 0; 
 }
+#endif

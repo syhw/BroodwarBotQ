@@ -227,14 +227,9 @@ void BattleBroodAI::onFrame()
     double duration = (double)(end - start) / CLOCKS_PER_SEC;
     if (duration > 0.040) 
         Broodwar->printf("onFrame() took: %2.5f seconds\n", duration);
-#endif
-    this->arbitrator->update();
-#ifdef __DEBUG__
     clock_t end2 = clock();
-    duration = (double)(end2 - end) / CLOCKS_PER_SEC;
-    if (duration > 0.040) 
-        Broodwar->printf("Arbitrator took: %2.5f seconds\n", duration);
 #endif
+
     this->baseManager->update();
 #ifdef __DEBUG__
     end = clock();
@@ -374,6 +369,14 @@ void BattleBroodAI::onFrame()
     duration = (double)(end2 - end) / CLOCKS_PER_SEC;
     if (duration > 0.040) 
         Broodwar->printf("EnhancedUI took: %2.5f seconds\n", duration);
+#endif
+
+    this->arbitrator->update();
+#ifdef __DEBUG__
+    end = clock();
+    duration = (double)(end - end2) / CLOCKS_PER_SEC;
+    if (duration > 0.040) 
+        Broodwar->printf("Arbitrator took: %2.5f seconds\n", duration);
 #endif
 
     std::set<Unit*> units=Broodwar->self()->getUnits();
