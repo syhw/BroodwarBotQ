@@ -37,13 +37,12 @@ std::string MacroManager::getName() const
 	return "Macro Manager";
 }
 
-void MacroManager::onStart(){
-
+void MacroManager::onStart()
+{
 }
 
-void MacroManager::eRush(){
-
-
+void MacroManager::eRush()
+{
 }
 
 void MacroManager::onUnitCreate(BWAPI::Unit* unit)
@@ -305,7 +304,7 @@ bool MacroManager::shouldExpand()
 	const std::set<Base*>& bases = baseManager->getAllBases();
 	for( std::set<Base*>::const_iterator it = bases.begin(); it != bases.end(); it++)
 	{
-		nbRessources += (int)(2 * (*it)->getMinerals().size()) + 3 * (*it)->getGeysers().size(); // TOCHANGE 2 for 2.5
+		nbRessources += (int)(2 * (*it)->getMinerals().size()) + 3 * (*it)->getGeysers().size(); // TOCHANGE 2 for 2.5, saturation is around 3
 	}
 	return workerManager->workers.size() >= nbRessources;
 }

@@ -73,10 +73,10 @@ public:
 	virtual void initWantedUnits();
     virtual void someAir();
 
-	int remainingTrainingPlace( UnitType type);
-	bool canTrainUnits( UnitType unitType, int remainingPlaces);
-	bool canCreateTechBuildings( UnitType techBuilding, UnitType buildingRequiered, int nbRequieredBuilding);
-	bool canCreateDefenseBuildings( UnitType techBuilding, UnitType buildingRequiered);
+	int remainingTrainingPlace(UnitType type);
+	bool canTrainUnits(UnitType unitType, int remainingPlaces);
+	bool canCreateTechBuildings(UnitType techBuilding, UnitType buildingRequiered, int nbRequieredBuilding);
+	bool canCreateDefenseBuildings(UnitType techBuilding, UnitType buildingRequiered);
 	bool shouldExpand();
 #ifdef BW_QT_DEBUG
     // Qt interface

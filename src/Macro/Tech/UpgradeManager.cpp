@@ -11,8 +11,9 @@ UpgradeManager::UpgradeManager()
   }
 }
 
-void UpgradeManager::setDependencies(){
-	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
+void UpgradeManager::setDependencies()
+{
+	this->arbitrator = static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(& Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance()) ;
 	this->placer= & BuildingPlacer::Instance();
 }
 

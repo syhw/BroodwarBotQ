@@ -116,7 +116,7 @@ template <class _Tp,class _Val>
     {
       inOnOffer=false;
       inOnRevoke=true;
-      owner[obj]->onRevoke(obj,bids[obj].top().second);
+      static_cast< Controller<_Tp,_Val>* >(owner[obj])->onRevoke(obj,bids[obj].top().second);
       inOnRevoke=false;
       inOnOffer=true;
       objects[owner[obj]].erase(obj); //remove this object from the set of objects owned by the former owner
@@ -152,7 +152,7 @@ template <class _Tp,class _Val>
     {
       inOnOffer=false;
       inOnRevoke=true;
-      owner[obj]->onRevoke(obj, bids[obj].top().second);
+      static_cast< Controller<_Tp,_Val>* >(owner[obj])->onRevoke(obj, bids[obj].top().second);
       inOnRevoke=false;
       inOnOffer=true;
       objects[owner[obj]].erase(obj); //remove this object from the set of objects owned by the former owner
@@ -271,7 +271,7 @@ template <class _Tp,class _Val>
           if (owner.find(*i) != owner.end())
           {
             _Val temp=0;
-            owner.find(*i)->second->onRevoke(*i,temp);
+            static_cast< Controller<_Tp,_Val>* >(owner.find(*i)->second)->onRevoke(*i,temp);
             owner.erase(*i);
           }
         }
@@ -286,7 +286,7 @@ template <class _Tp,class _Val>
         unansweredObjected=i->second;
 
         inOnOffer=true;
-        i->first->onOffer(i->second);
+        static_cast< Controller<_Tp,_Val>* >(i->first)->onOffer(i->second);
         inOnOffer=false;
 
         //decline all unanswered objects

@@ -8,20 +8,20 @@ using namespace BWAPI;
 using namespace std;
 using namespace Util;
 WorkerManager::WorkerManager()
+: arbitrator(NULL)
+, baseManager(NULL)
+, buildOrderManager(NULL)
+, lastSCVBalance(0)
+, WorkersPerGas(3)
+, mineralRate(0)
+, gasRate(0)
+, autoBuild(false)
+, autoBuildPriority(80)
 {
-  this->arbitrator        = NULL;
-  this->baseManager       = NULL;
-  this->buildOrderManager = NULL;
-  this->lastSCVBalance    = 0;
-  this->WorkersPerGas     = 3;
-  this->mineralRate       = 0;
-  this->gasRate           = 0;
-  this->autoBuild         = false;
-  this->autoBuildPriority = 80;
 }
 
 void WorkerManager::setDependencies(){
-	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
+	this->arbitrator = static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(& Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance()) ;
 	this->baseManager = & BaseManager::Instance();
 	this->buildOrderManager = & BuildOrderManager::Instance();
 }
@@ -32,7 +32,7 @@ void WorkerManager::onOffer(set<Unit*> units)
   {
     if ((*u)->getType().isWorker() && !this->mineralOrder.empty())
     {
-      arbitrator->accept(this, *u);
+      static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->accept(this, *u);
       WorkerData temp;
       this->desiredWorkerCount[this->mineralOrder[this->mineralOrderIndex].first]++;
       this->currentWorkers[this->mineralOrder[this->mineralOrderIndex].first].insert(*u);
@@ -41,7 +41,7 @@ void WorkerManager::onOffer(set<Unit*> units)
       workers.insert(make_pair(*u,temp));
     }
     else
-      arbitrator->decline(this, *u, 0);
+      static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->decline(this, *u, 0);
   }
 }
 void WorkerManager::onRevoke(Unit* unit, double bid)
@@ -180,6 +180,7 @@ void WorkerManager::rebalanceWorkers()
       }
     }
   }
+  optimalWorkerCount += 2; // to account for scouting and building
 
   //if no resources exist, return
   if (!mineralOrder.empty())
@@ -218,7 +219,7 @@ void WorkerManager::update()
   {
     if ((*u)->isCompleted() && (*u)->getType().isWorker())
     {
-      arbitrator->setBid(this, *u, 10);
+      static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->setBid(this, *u, 10);
     }
   }
 

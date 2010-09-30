@@ -6,8 +6,9 @@ TechManager::TechManager()
   this->placer = NULL;
 }
 
-void TechManager::setDependencies(){
-	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
+void TechManager::setDependencies()
+{
+	this->arbitrator = static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(& Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance()) ;
 	this->placer = & BuildingPlacer::Instance();
 }
 

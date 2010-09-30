@@ -11,8 +11,9 @@ MorphManager::MorphManager()
 }
 
 
-void MorphManager::setDependencies(){
-	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
+void MorphManager::setDependencies()
+{
+	this->arbitrator = static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(& Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance()) ;
 }
 
 bool MorphManager::canMake(BWAPI::Unit* builder, BWAPI::UnitType type)

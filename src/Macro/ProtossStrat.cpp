@@ -3,7 +3,7 @@
 
 ProtossStrat::ProtossStrat()
 : MacroManager()
-, _launchUpgrades(false)
+, _launchedUpgrades(false)
 , _activeBases(0)
 {
 	//Broodwar->printf("Protoss Macro Manager is used.");
@@ -36,7 +36,7 @@ void ProtossStrat::onStart()
 		this->priority[i] = 0;
 	}
 	MacroManager::onStart();
-	this->buildOrderManager->buildAdditional(4,BWAPI::UnitTypes::Protoss_Probe,100);
+	/*this->buildOrderManager->buildAdditional(4,BWAPI::UnitTypes::Protoss_Probe,100);
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Pylon,98);
 	this->buildOrderManager->buildAdditional(2,BWAPI::UnitTypes::Protoss_Probe,96);
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Gateway,94);
@@ -51,11 +51,13 @@ void ProtossStrat::onStart()
 	this->buildOrderManager->buildAdditional(1,BWAPI::UnitTypes::Protoss_Pylon,76);
 	this->buildOrderManager->upgrade(1,BWAPI::UpgradeTypes::Singularity_Charge, 74);
     this->buildOrderManager->buildAdditional(2,BWAPI::UnitTypes::Protoss_Gateway,73);
-    this->buildOrderManager->build(6,BWAPI::UnitTypes::Protoss_Dragoon,72);
+    this->buildOrderManager->build(6,BWAPI::UnitTypes::Protoss_Dragoon,72);*/
 	if (!this->workerManager->autoBuild)
     {
+        this->workerManager->setAutoBuildPriority(98);
 		this->workerManager->enableAutoBuild();
 	}
+    this->buildOrderManager->build(24, BWAPI::UnitTypes::Protoss_Probe, 95);
 	setScoutTime();
 	this->buildOrderManager->enableDependencyResolver();
 }
@@ -85,31 +87,21 @@ void ProtossStrat::setScoutTime()
 
 void ProtossStrat::update()
 {
-    if (Broodwar->getFrameCount() > 7200) // 5 minutes
+    return;
+    if (Broodwar->getFrameCount() > 7000) // a little less than 5 minutes
     {
         if (!this->workerManager->autoBuild)
         {
             this->workerManager->enableAutoBuild();
         }
-
-        if (Broodwar->self()->gas() >= 600)
-        {
-            this->workerManager->setWorkersPerGas(1); // TODO TOCHANGE TOURNAMENT3
-        } 
-        else if (Broodwar->self()->gas() >= 400)
-        {
-            this->workerManager->setWorkersPerGas(2); // TODO TOCHANGE TOURNAMENT3
-        }
-        else
-        {
+        if (Broodwar->getFrameCount() == 7001)
             this->workerManager->setWorkersPerGas(3);
-        }
     } else
     {
-        if (Broodwar->self()->gas() >= 170)
+        if (Broodwar->self()->gas() >= 170 && Broodwar->self()->minerals() <= 100)
         {
             this->workerManager->setWorkersPerGas(2); // TODO TOCHANGE TOURNAMENT3
-        } 
+        }
     }
 
 	this->createProdBuildings();
@@ -129,12 +121,12 @@ void ProtossStrat::update()
 	
 	this->buildUnits();	
 
-    if (!(Broodwar->getFrameCount() % 24))
+    if (!(Broodwar->getFrameCount() % 100)) // 24
     {
         this->buildOrderManager->build(this->needed[Dragoon],BWAPI::UnitTypes::Protoss_Dragoon,this->priority[Dragoon]);
-        if (Broodwar->self()->gas() < 50 && this->productionManager->getPlannedCount(UnitTypes::Protoss_Zealot) < 8)
-            this->buildOrderManager->build(this->needed[Zealot],BWAPI::UnitTypes::Protoss_Zealot,this->priority[Zealot]);
-        /*this->buildOrderManager->build(this->needed[Arbiter],BWAPI::UnitTypes::Protoss_Arbiter,this->priority[Arbiter]);
+        //if (Broodwar->self()->gas() < 50 && this->productionManager->getPlannedCount(UnitTypes::Protoss_Zealot) < 8)
+        this->buildOrderManager->build(this->needed[Zealot],BWAPI::UnitTypes::Protoss_Zealot,this->priority[Zealot]);
+        this->buildOrderManager->build(this->needed[Arbiter],BWAPI::UnitTypes::Protoss_Arbiter,this->priority[Arbiter]);
         this->buildOrderManager->build(this->needed[Archon],BWAPI::UnitTypes::Protoss_Archon,this->priority[Archon]);
         this->buildOrderManager->build(this->needed[Carrier],BWAPI::UnitTypes::Protoss_Carrier,this->priority[Carrier]);
         this->buildOrderManager->build(this->needed[Corsair],BWAPI::UnitTypes::Protoss_Corsair,this->priority[Corsair]);
@@ -144,7 +136,7 @@ void ProtossStrat::update()
         this->buildOrderManager->build(this->needed[Observer],BWAPI::UnitTypes::Protoss_Observer,this->priority[Observer]);
         this->buildOrderManager->build(this->needed[Reaver],BWAPI::UnitTypes::Protoss_Reaver,this->priority[Reaver]);
         this->buildOrderManager->build(this->needed[Scout],BWAPI::UnitTypes::Protoss_Scout,this->priority[Scout]);
-        this->buildOrderManager->build(this->needed[Shuttle],BWAPI::UnitTypes::Protoss_Shuttle,this->priority[Shuttle]);*/
+        this->buildOrderManager->build(this->needed[Shuttle],BWAPI::UnitTypes::Protoss_Shuttle,this->priority[Shuttle]);
     }
     if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Singularity_Charge))
     {
@@ -161,25 +153,27 @@ void ProtossStrat::update()
 void ProtossStrat::buildUnits()
 {
 	//BO with templar goon zealot
-	this->needed[Dragoon] = 10000;
+	this->needed[Dragoon] = 60;
 	this->priority[Dragoon] = 40;
     this->needed[Zealot] = 7;
-    this->priority[Zealot] = 40;
+    if (Broodwar->enemy()->getRace() == Races::Zerg)
+        this->priority[Zealot] = 41;
+    else
+        this->priority[Zealot] = 40;
 	if (this->baseManager->getActiveBases().size() > 1)
     {
-        if (!_launchUpgrades && Broodwar->self()->getUpgradeLevel(UpgradeTypes::Protoss_Ground_Weapons) < 3)
+        if (!_launchedUpgrades && Broodwar->self()->getUpgradeLevel(UpgradeTypes::Protoss_Ground_Weapons) < 3)
         {
             this->buildOrderManager->build(2, UnitTypes::Protoss_Forge, 50);
             this->buildOrderManager->upgrade(3, UpgradeTypes::Protoss_Ground_Weapons, 43);
             this->buildOrderManager->upgrade(3, UpgradeTypes::Protoss_Ground_Armor, 43);
             this->buildOrderManager->upgrade(3, UpgradeTypes::Protoss_Plasma_Shields, 43);
+            _launchedUpgrades = true;
         }
-        /*if (!Broodwar->self()->hasResearched(TechTypes::Psionic_Storm))
+        if (!Broodwar->self()->hasResearched(TechTypes::Psionic_Storm))
             this->buildOrderManager->research(TechTypes::Psionic_Storm, 70);
-		if(this->buildOrderManager->hasResources(BWAPI::UnitTypes::Protoss_High_Templar)){
-			this->needed[High_Templar]++;
-			this->priority[High_Templar] = 40;
-		}*/
+        this->needed[High_Templar] = 6; // TOCHANGE
+        this->priority[High_Templar] = 42;
 	}
 
 /*

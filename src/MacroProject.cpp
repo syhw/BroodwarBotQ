@@ -131,7 +131,7 @@ void BattleBroodAI::onStart()
     this->analyzed=true;
 
     this->objManager = & ObjectManager::Instance();
-    this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
+    this->arbitrator = static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(& Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance()) ;
     this->baseManager = & BaseManager::Instance();
     this->borderManager = & BorderManager::Instance();
     this->buildingPlacer = & BuildingPlacer::Instance();
@@ -205,6 +205,9 @@ void BattleBroodAI::onEnd(bool isWinner)
 
 void BattleBroodAI::onFrame()
 {
+#ifdef __DEBUG__
+    clock_t start = clock();
+#endif
     if (Broodwar->isReplay()) return;
     if (!this->analyzed) return;
 #ifdef __DEBUG__
@@ -219,28 +222,158 @@ void BattleBroodAI::onFrame()
 #endif
    
     this->objManager->onFrame();
+#ifdef __DEBUG__
+    clock_t end = clock();
+    double duration = (double)(end - start) / CLOCKS_PER_SEC;
+    if (duration > 0.040) 
+        Broodwar->printf("onFrame() took: %2.5f seconds\n", duration);
+#endif
     this->arbitrator->update();
+#ifdef __DEBUG__
+    clock_t end2 = clock();
+    duration = (double)(end2 - end) / CLOCKS_PER_SEC;
+    if (duration > 0.040) 
+        Broodwar->printf("Arbitrator took: %2.5f seconds\n", duration);
+#endif
     this->baseManager->update();
+#ifdef __DEBUG__
+    end = clock();
+    duration = (double)(end - end2) / CLOCKS_PER_SEC;
+    if (duration > 0.040) 
+        Broodwar->printf("BaseManager took: %2.5f seconds\n", duration);
+#endif
     this->borderManager->update();
+#ifdef __DEBUG__
+    end2 = clock();
+    duration = (double)(end2 - end) / CLOCKS_PER_SEC;
+    if (duration > 0.040) 
+        Broodwar->printf("BorderManager took: %2.5f seconds\n", duration);
+#endif
     this->buildManager->update();
+#ifdef __DEBUG__
+    end = clock();
+    duration = (double)(end - end2) / CLOCKS_PER_SEC;
+    if (duration > 0.040) 
+        Broodwar->printf("BuildManager took: %2.5f seconds\n", duration);
+#endif
     this->constructionManager->update();
+#ifdef __DEBUG__
+    end2 = clock();
+    duration = (double)(end2 - end) / CLOCKS_PER_SEC;
+    if (duration > 0.040) 
+        Broodwar->printf("ConstructionManager took: %2.5f seconds\n", duration);
+#endif
     this->morphManager->update();
+#ifdef __DEBUG__
+    end = clock();
+    duration = (double)(end - end2) / CLOCKS_PER_SEC;
+    if (duration > 0.040) 
+        Broodwar->printf("MorphManager took: %2.5f seconds\n", duration);
+#endif
     this->productionManager->update();
+#ifdef __DEBUG__
+    end2 = clock();
+    duration = (double)(end2 - end) / CLOCKS_PER_SEC;
+    if (duration > 0.040) 
+        Broodwar->printf("ProductionManager took: %2.5f seconds\n", duration);
+#endif
     this->buildOrderManager->update();
+#ifdef __DEBUG__
+    end = clock();
+    duration = (double)(end - end2) / CLOCKS_PER_SEC;
+    if (duration > 0.040) 
+        Broodwar->printf("BuildOrderManager took: %2.5f seconds\n", duration);
+#endif
     this->supplyManager->update();
+#ifdef __DEBUG__
+    end2 = clock();
+    duration = (double)(end2 - end) / CLOCKS_PER_SEC;
+    if (duration > 0.040) 
+        Broodwar->printf("SupplyManager took: %2.5f seconds\n", duration);
+#endif
     this->techManager->update();
+#ifdef __DEBUG__
+    end = clock();
+    duration = (double)(end - end2) / CLOCKS_PER_SEC;
+    if (duration > 0.040) 
+        Broodwar->printf("TechManager took: %2.5f seconds\n", duration);
+#endif
     this->upgradeManager->update();
+#ifdef __DEBUG__
+    end2 = clock();
+    duration = (double)(end2 - end) / CLOCKS_PER_SEC;
+    if (duration > 0.040) 
+        Broodwar->printf("UpgradeManager took: %2.5f seconds\n", duration);
+#endif
     this->scoutManager->update();
+#ifdef __DEBUG__
+    end = clock();
+    duration = (double)(end - end2) / CLOCKS_PER_SEC;
+    if (duration > 0.040) 
+        Broodwar->printf("ScoutManager took: %2.5f seconds\n", duration);
+#endif
     this->mapManager->update();
+#ifdef __DEBUG__
+    end2 = clock();
+    duration = (double)(end2 - end) / CLOCKS_PER_SEC;
+    if (duration > 0.040) 
+        Broodwar->printf("mapManager took: %2.5f seconds\n", duration);
+#endif
     this->workerManager->update();
+#ifdef __DEBUG__
+    end = clock();
+    duration = (double)(end - end2) / CLOCKS_PER_SEC;
+    if (duration > 0.040) 
+        Broodwar->printf("workerManager took: %2.5f seconds\n", duration);
+#endif
     this->warManager->update();
+#ifdef __DEBUG__
+    end2 = clock();
+    duration = (double)(end2 - end) / CLOCKS_PER_SEC;
+    if (duration > 0.040) 
+        Broodwar->printf("WarManager took: %2.5f seconds\n", duration);
+#endif
     this->eUnitsFilter->update();
+#ifdef __DEBUG__
+    end = clock();
+    duration = (double)(end - end2) / CLOCKS_PER_SEC;
+    if (duration > 0.040) 
+        Broodwar->printf("EUnitsFilter took: %2.5f seconds\n", duration);
+#endif
     this->eEcoEstimator->update();
+#ifdef __DEBUG__
+    end2 = clock();
+    duration = (double)(end2 - end) / CLOCKS_PER_SEC;
+    if (duration > 0.040) 
+        Broodwar->printf("EEcoEstimator took: %2.5f seconds\n", duration);
+#endif
     this->timeManager->update();
+#ifdef __DEBUG__
+    end = clock();
+    duration = (double)(end - end2) / CLOCKS_PER_SEC;
+    if (duration > 0.040) 
+        Broodwar->printf("TimeManager took: %2.5f seconds\n", duration);
+#endif
     this->macroManager->update();
+#ifdef __DEBUG__
+    end2 = clock();
+    duration = (double)(end2 - end) / CLOCKS_PER_SEC;
+    if (duration > 0.040) 
+        Broodwar->printf("MacroManager took: %2.5f seconds\n", duration);
+#endif
     this->defenseManager->update();
 #ifdef __DEBUG__
+    end = clock();
+    duration = (double)(end - end2) / CLOCKS_PER_SEC;
+    if (duration > 0.040) 
+        Broodwar->printf("DefenseManager took: %2.5f seconds\n", duration);
+#endif
+#ifdef __DEBUG__
     this->enhancedUI->update();
+    end2 = clock();
+    duration = (double)(end2 - end) / CLOCKS_PER_SEC;
+    if (duration > 0.040) 
+        Broodwar->printf("EnhancedUI took: %2.5f seconds\n", duration);
 #endif
 
     std::set<Unit*> units=Broodwar->self()->getUnits();
@@ -269,40 +402,26 @@ void BattleBroodAI::onFrame()
 
 #ifdef __DEBUG__
     display();
+    end = clock();
+    duration = (double)(end - start) / CLOCKS_PER_SEC;
+    if (duration > 0.040) 
+        Broodwar->printf("onFrame() took: %2.5f seconds\n", duration);
 #endif
     //clock_t end = clock();
     //Broodwar->printf("Iterations took %f", (double)(end-start)/CLOCKS_PER_SEC);
 }
 
-void BattleBroodAI::onUnitDiscover(BWAPI::Unit* unit)
-{
-    if (Broodwar->isReplay()) return;
-    this->informationManager->onUnitDiscover(unit);
-    this->unitGroupManager->onUnitDiscover(unit);
-}
-
-void BattleBroodAI::onUnitEvade(BWAPI::Unit* unit){
-    if (Broodwar->isReplay()) return;
-    this->informationManager->onUnitEvade(unit);
-    this->unitGroupManager->onUnitEvade(unit);
-    this->arbitrator->onRemoveObject(unit);
-}
-
 void BattleBroodAI::onUnitCreate(BWAPI::Unit* unit)
 {
-    //Update Managers
     this->scoutManager->onUnitCreate(unit);
     this->mapManager->onUnitCreate(unit);
     this->warManager->onUnitCreate(unit);
     this->macroManager->onUnitCreate(unit);
 }
 
-
 void BattleBroodAI::onUnitDestroy(BWAPI::Unit* unit)
 {
-    //if (!Broodwar->isReplay())
-    //	Broodwar->sendText("A %s [%x] has been destroyed at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x(),unit->getPosition().y());
-
+    this->arbitrator->onRemoveObject(unit);
     this->buildManager->onRemoveUnit(unit);
     this->baseManager->onRemoveUnit(unit);
     this->techManager->onRemoveUnit(unit);
@@ -314,13 +433,7 @@ void BattleBroodAI::onUnitDestroy(BWAPI::Unit* unit)
     this->eUnitsFilter->onUnitDestroy(unit);
     this->informationManager->onUnitDestroy(unit);
     this->defenseManager->onRemoveUnit(unit);
-    this->arbitrator->onRemoveObject(unit);
     this->scoutManager->onUnitDestroy(unit);
-}
-
-void BattleBroodAI::onUnitMorph(BWAPI::Unit* unit)
-{
-    eUnitsFilter->update(unit);
 }
 
 void BattleBroodAI::onUnitShow(BWAPI::Unit* unit)
@@ -339,7 +452,7 @@ void BattleBroodAI::onUnitShow(BWAPI::Unit* unit)
     }
     if (!unit->isDetected())
     {
-        this->macroManager->needed[Observer] = 4;
+        this->macroManager->needed[Observer] = 3;
         this->macroManager->priority[Observer] = 90;
     }
 }
@@ -350,9 +463,27 @@ void BattleBroodAI::onUnitHide(BWAPI::Unit* unit)
     eUnitsFilter->update(unit);
 }
 
+void BattleBroodAI::onUnitDiscover(BWAPI::Unit* unit)
+{
+    this->informationManager->onUnitDiscover(unit);
+    this->unitGroupManager->onUnitDiscover(unit);
+}
+
+void BattleBroodAI::onUnitEvade(BWAPI::Unit* unit){
+    this->informationManager->onUnitEvade(unit);
+    this->unitGroupManager->onUnitEvade(unit);
+    this->arbitrator->onRemoveObject(unit);
+}
+
+void BattleBroodAI::onUnitMorph(BWAPI::Unit* unit)
+{
+    unitGroupManager->onUnitMorph(unit);
+    eUnitsFilter->update(unit);
+}
+
 void BattleBroodAI::onUnitRenegade(BWAPI::Unit* unit)
 {
-    this->unitGroupManager->onUnitRenegade(unit);
+    unitGroupManager->onUnitRenegade(unit);
     eUnitsFilter->update(unit);
 }
 

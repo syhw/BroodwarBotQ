@@ -268,7 +268,7 @@ void UnitsGroup::update()
     }
 
     // arriving units
-    if (!arrivingUnits.empty())
+    /*if (!arrivingUnits.empty())
     {
         if (units.size() <= 2)
         {
@@ -294,7 +294,7 @@ void UnitsGroup::update()
                     (*it++)->update();
             }
         }
-    }
+    }*/
 
     updateCenter();
     leadingUnit = units.front();

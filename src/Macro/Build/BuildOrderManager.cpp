@@ -850,8 +850,8 @@ int BuildOrderManager::getPlannedCount(BWAPI::UnitType t)
   //builder unit type
   UnitType builder=t.whatBuilds().first;
   int c=this->buildManager->getPlannedCount(t);
-  //sum all the remaining units for every priority level
   
+  //sum all the remaining units for every priority level
   for(map<int, PriorityLevel>::iterator p=items.begin();p!=items.end();p++)
   {
     map<BWAPI::UnitType, map<BWAPI::UnitType, UnitItem > >* units=&(p->second.units);

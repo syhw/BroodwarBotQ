@@ -11,8 +11,9 @@ ConstructionManager::ConstructionManager()
     startedCount[*i]=0;
   }
 }
-void ConstructionManager::setDependencies(){
-	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
+void ConstructionManager::setDependencies()
+{
+	this->arbitrator = static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(& Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance()) ;
 	this->placer = & BuildingPlacer::Instance();
 }
 

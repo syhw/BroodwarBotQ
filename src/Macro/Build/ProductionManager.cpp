@@ -11,8 +11,9 @@ ProductionManager::ProductionManager()
     startedCount[*i]=0;
   }
 }
-void ProductionManager::setDependencies(){
-	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
+void ProductionManager::setDependencies()
+{
+	this->arbitrator = static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(& Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance()) ;
 	this->placer = & BuildingPlacer::Instance();
 }
 
@@ -109,8 +110,8 @@ void ProductionManager::onOffer(std::set<BWAPI::Unit*> units)
           producingUnits[*i].started=false;
           q->second.erase(t);
           //tell the arbitrator we accept the unit, and raise the bid to hopefully prevent other managers from using it
-          arbitrator->accept(this,*i);
-          arbitrator->setBid(this,*i,100.0);
+          static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->accept(this,*i);
+          static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->setBid(this,*i,100.0);
           used=true;
           break;
         }
@@ -118,8 +119,8 @@ void ProductionManager::onOffer(std::set<BWAPI::Unit*> units)
     }
     if (!used) //decline this unit if we didnt use it
     {
-      arbitrator->decline(this,*i,0);
-      arbitrator->removeBid(this,*i);
+      static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->decline(this,*i,0);
+      static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->removeBid(this,*i);
     }
   }
 }
@@ -131,16 +132,15 @@ void ProductionManager::onRevoke(BWAPI::Unit* unit, double bid)
 
 void ProductionManager::update()
 {
-
-	
-  std::set<BWAPI::Unit*> myPlayerUnits=BWAPI::Broodwar->self()->getUnits();
+    std::set<BWAPI::Unit*> myPlayerUnits=BWAPI::Broodwar->self()->getUnits();
 
   for(std::set<BWAPI::Unit*>::const_iterator u = myPlayerUnits.begin(); u != myPlayerUnits.end(); u++)
   {
     std::map<BWAPI::UnitType,std::list<ProductionUnitType> >::iterator p=productionQueues.find((*u)->getType());
-	if (p!=productionQueues.end() && !p->second.empty() && (*u)->isCompleted() && producingUnits.find(*u)==producingUnits.end()){
+	if (p!=productionQueues.end() && !p->second.empty() && (*u)->isCompleted() && producingUnits.find(*u)==producingUnits.end())
+    {
 	//	BWAPI::Broodwar->printf("Bid set on %s at adress %d coming from %d", (*u)->getType().getName().c_str(), (int)arbitrator, (int)this);
-		arbitrator->setBid(this, *u, 50);
+		static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->setBid(this, *u, 50);
 	}
   }
   std::map<BWAPI::Unit*,Unit>::iterator i_next;
@@ -185,7 +185,7 @@ void ProductionManager::update()
           if (i->second.unit->getType()==i->second.type.type)
           {
             //we are done!
-            arbitrator->removeBid(this, i->first);
+            static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->removeBid(this, i->first);
             startedCount[i->second.type.type]--;
             plannedCount[i->second.type.type]--;
             producingUnits.erase(i);

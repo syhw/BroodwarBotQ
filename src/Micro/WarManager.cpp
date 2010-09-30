@@ -30,13 +30,13 @@ WarManager::~WarManager()
 
 void WarManager::setDependencies()
 {
-	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
+	this->arbitrator = static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(& Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance()) ;
 }
 
-void WarManager::onStart(){
-
-
+void WarManager::onStart()
+{
 }
+
 void WarManager::update()
 {
     /*if (!ScoutManager::Instance().enemyFound && Broodwar->getFrameCount() > 4320)
@@ -62,7 +62,7 @@ void WarManager::update()
 	std::set<BWAPI::Unit *> myUnits = BWAPI::Broodwar->self()->getUnits();
 
 	for(std::set<BWAPI::Unit *>::iterator it = myUnits.begin(); it != myUnits.end(); ++it){
-		if( !(*it)->getType().isBuilding() && !(*it)->getType().isWorker() ){
+		if (!(*it)->getType().isBuilding() && !(*it)->getType().isWorker()){
 			this->arbitrator->setBid(this,(*it),20);
 		}
 	}

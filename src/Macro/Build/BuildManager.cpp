@@ -11,7 +11,6 @@ BuildManager::BuildManager()
 	this->productionManager= NULL;
 	this->morphManager= NULL;
 	this->debugMode = false;
-
 }
 
 BuildManager::~BuildManager()
@@ -22,13 +21,13 @@ BuildManager::~BuildManager()
     MorphManager::Destroy();
 }
 
-void BuildManager::setDependencies(){
-	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance() ;
+void BuildManager::setDependencies()
+{
+    this->arbitrator = static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(& Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance()) ;
 	this->buildingPlacer = & BuildingPlacer::Instance();
 	this->constructionManager = & ConstructionManager::Instance();
 	this->productionManager = & ProductionManager::Instance();
 	this->morphManager = & MorphManager::Instance();
-
 }
 
 BuildingPlacer* BuildManager::getBuildingPlacer(){

@@ -63,7 +63,7 @@ void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnit
         }
 #ifdef __SAFE_SQUARE_FORMATION__
         BWTA::Region* regionCenter = BWTA::getRegion(center.toPosition());
-        if (BWTA::getRegion(topos) != regionCenter && center.toPosition() != regionCenter->getCenter())
+        if (regionCenter != NULL && BWTA::getRegion(topos) != regionCenter && center.toPosition() != regionCenter->getCenter())
         {
             center = regionCenter->getCenter();
             this->computeToPositions(vUnits);

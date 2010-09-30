@@ -14,7 +14,7 @@ DefenseManager::DefenseManager()
 }
 void DefenseManager::setDependencies()
 {
-  this->arbitrator= & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
+  this->arbitrator = static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(& Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance()) ;
   this->borderManager = & BorderManager::Instance();
   this->warManager = & WarManager::Instance();
 }
@@ -76,8 +76,10 @@ void DefenseManager::checkGroundDefense(Base * b, bool toDef){
 					//Set bid on 1 unit until we have enough and record the unitsgroup that needed it
 
 					std::set<BWAPI::Unit *> allUnits = BWAPI::Broodwar->getAllUnits();
-					for(std::set<BWAPI::Unit * >::iterator selection = allUnits.begin() ; selection != allUnits.end() ; ++selection){
-						if((*selection)->getType() == BWAPI::UnitTypes::Protoss_Zealot || (*selection)->getType() == BWAPI::UnitTypes::Protoss_Dragoon ){
+					for (std::set<BWAPI::Unit * >::iterator selection = allUnits.begin() ; selection != allUnits.end() ; ++selection)
+                    {
+						if ((*selection)->getType() == BWAPI::UnitTypes::Protoss_Zealot || (*selection)->getType() == BWAPI::UnitTypes::Protoss_Dragoon)
+                        {
 							this->requesters.push_back(ug);
 							this->arbitrator->setBid(this, (*selection), 60);
 							break;
@@ -91,10 +93,13 @@ void DefenseManager::checkGroundDefense(Base * b, bool toDef){
 			}
 		} else {
 			//We do not need to defend
-			if(ug->size() > 0){
+			if (ug->size() > 0)
+            {
 				//We must give back those units to the WarManager
-				for(std::vector<pBayesianUnit>::iterator units = ((*ug).units).begin(); units != ((*ug).units).end(); ++ units){
-					this->arbitrator->setBid(this,(*units)->unit, 0);
+				for (std::vector<pBayesianUnit>::iterator units = ((*ug).units).begin(); units != ((*ug).units).end(); ++ units)
+                {
+                    this->arbitrator->removeBid(this,(*units)->unit);
+					//this->arbitrator->setBid(this,(*units)->unit, 0);
 					ug->giveUpControl((*units)->unit);
 				}
 			}
@@ -169,7 +174,7 @@ void DefenseManager::update()
 
 void DefenseManager::addBase(Base * b){
 #ifdef __DEBUG__
-	BWAPI::Broodwar->printf("Appel à addBase");
+    BWAPI::Broodwar->printf("DefenseManager::addBase");
 #endif
 	UnitsGroup * ug = new UnitsGroup();
 #ifdef __DEBUG___

@@ -1,6 +1,7 @@
 #include <BWTA.h>
 #include "Defines.h"
 #include "ScoutManager.h"
+#include "MacroManager.h"
 
 using namespace BWAPI;
 
@@ -18,7 +19,7 @@ ScoutManager::~ScoutManager()
 void ScoutManager::setDependencies()
 {
 	this->warManager = & WarManager::Instance();
-	this->arbitrator = & Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance();
+	this->arbitrator = static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(& Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance()) ;
     //// HACK for 2 players map:
     for (std::set<TilePosition>::const_iterator it = Broodwar->getStartLocations().begin();
         it != Broodwar->getStartLocations().end(); ++it)
@@ -26,12 +27,11 @@ void ScoutManager::setDependencies()
         if (*it != Broodwar->self()->getStartLocation())
             this->enemyStartLocation = *it;
     }
-    enemyFound = true;
+    //enemyFound = true;
 }
 
 void ScoutManager::update()
 {
-    return; // TOURNAMENT3 TODO REMOVE
     if (enemyFound && !exploringEnemy) 
     {
 		exploringEnemy = true;
@@ -59,10 +59,12 @@ void ScoutManager::update()
 		}
 	}
 
-	if(this->awaitingGoals.size() > 0){
+	if(this->awaitingGoals.size() > 0)
+    {
 		//ask units :
 		for(std::set<BWAPI::Unit *>::const_iterator it = BWAPI::Broodwar->self()->getUnits().begin(); it != BWAPI::Broodwar->self()->getUnits().end(); ++it){
-			if( (*it)->getType().isWorker() || (*it)->getType() == BWAPI::UnitTypes::Protoss_Observer ){
+			if ((*it)->getType().isWorker() || (*it)->getType() == BWAPI::UnitTypes::Protoss_Observer)
+            {
 				this->arbitrator->setBid(this, (*it),92);
 			}
 		}
@@ -112,8 +114,8 @@ void ScoutManager::checkEmptyXP()
 
 ////////////////////////////NEW SECTION
 
-void ScoutManager::onUnitCreate(BWAPI::Unit* unit){
-
+void ScoutManager::onUnitCreate(BWAPI::Unit* unit)
+{
 }
 
 void ScoutManager::onOffer(std::set<BWAPI::Unit*> units)
