@@ -33,6 +33,7 @@
 #include "MorphManager.h"
 #include "ProductionManager.h"
 #include "DefenseManager.h"
+#include "WorkerSelfDefenseManager.h"
 #ifdef __DEBUG__
 #include "EnhancedUI.h"
 #endif
@@ -82,6 +83,7 @@ public:
 	ETechEstimator* eTechEstimator;
 	TimeManager* timeManager;
     GoalManager* goalManager;
+    WorkerSelfDefenseManager* workerSelfDefenseManager;
 #ifdef __DEBUG__
     EnhancedUI * enhancedUI;
 #endif

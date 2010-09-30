@@ -112,8 +112,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="0"
+				Optimization="3"
 				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
 				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Intelligence;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ZergFlying;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Utils/Component;../../BWAPI_Beta_3.0.3/include;../../BWAPI_Beta_3.0.3/include/BWAPI;../../BWAPI_Beta_3.0.3/include/BWTA;../../boost_1_43_0;&quot;C:\Program Files\boost\boost_1_42\&quot;;../../boost_1_42;C:\Qt\4.6.2\include;C:\Qt\4.6.3\include;&quot;C:\dev\libQGLViewer-2.3.5\QGLViewer&quot;"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
@@ -202,6 +203,10 @@
 				</File>
 				<File
 					RelativePath="..\src\Micro\WarManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\WorkerSelfDefenseManager.cpp"
 					>
 				</File>
 				<Filter
@@ -626,6 +631,10 @@
 					RelativePath="..\src\Micro\WarManager.h"
 					>
 				</File>
+				<File
+					RelativePath="..\src\Micro\WorkerSelfDefenseManager.h"
+					>
+				</File>
 				<Filter
 					Name="Formations"
 					>
@@ -920,6 +929,10 @@
 				</File>
 				<File
 					RelativePath="..\src\Utils\Util.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Utils\UtilHeap.h"
 					>
 				</File>
 				<File

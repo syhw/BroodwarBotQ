@@ -12,6 +12,7 @@ protected:
     static std::map<BWAPI::Unit*, int> _zealotsOn;
     void setTargetEnemy(BWAPI::Unit* u);
     void clearDamages();
+    int fightMove();
 public:
     ZealotUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~ZealotUnit();

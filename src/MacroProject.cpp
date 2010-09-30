@@ -16,7 +16,7 @@ using namespace BWAPI;
 
 BattleBroodAI::BattleBroodAI()
 {
-    std::set<UnitType>& aut = BWAPI::UnitTypes::allUnitTypes();
+    /*std::set<UnitType>& aut = BWAPI::UnitTypes::allUnitTypes();
     for (std::set<UnitType>::iterator wu = aut.begin(); wu != aut.end(); wu++)
         log( "%s requieres %i %s", wu->getName().c_str(), wu->whatBuilds().second, wu->whatBuilds().first.getName().c_str());
 
@@ -48,7 +48,7 @@ BattleBroodAI::BattleBroodAI()
 
     for (std::set<UnitType>::iterator wu = aut.begin(); wu != aut.end(); wu++)
         if( !wu->isBuilding() && !wu->isWorker())
-            log( "%s has a range of %i.", wu->getName().c_str(), wu->seekRange());
+            log( "%s has a range of %i.", wu->getName().c_str(), wu->seekRange());*/
 
 }
 
@@ -93,16 +93,17 @@ BattleBroodAI::~BattleBroodAI()
     BaseManager::Destroy();
     Arbitrator::Arbitrator<BWAPI::Unit*,double>::Destroy();
     ObjectManager::Destroy();
+    delete this->workerSelfDefenseManager;
 }
 
 void BattleBroodAI::onStart()
 {
     //Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
     // Enable some cheat flags
-//#ifdef __DEBUG__
+#ifdef __DEBUG__
     Broodwar->enableFlag(Flag::UserInput);
     Broodwar->setLocalSpeed(0);
-//#endif
+#endif
     // Uncomment to enable complete map information
     //Broodwar->enableFlag(Flag::CompleteMapInformation);
 
@@ -131,7 +132,7 @@ void BattleBroodAI::onStart()
     this->analyzed=true;
 
     this->objManager = & ObjectManager::Instance();
-    this->arbitrator = static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(& Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance()) ;
+    this->arbitrator = static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(& Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance());
     this->baseManager = & BaseManager::Instance();
     this->borderManager = & BorderManager::Instance();
     this->buildingPlacer = & BuildingPlacer::Instance();
@@ -155,6 +156,7 @@ void BattleBroodAI::onStart()
     this->timeManager = & TimeManager::Instance();
     this->goalManager = & GoalManager::Instance();
     this->defenseManager = & DefenseManager::Instance();
+    this->workerSelfDefenseManager = new WorkerSelfDefenseManager(static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(& Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance()));
 #ifdef __DEBUG__
     this->enhancedUI = & EnhancedUI::Instance();
 #endif
@@ -363,6 +365,7 @@ void BattleBroodAI::onFrame()
     if (duration > 0.040) 
         Broodwar->printf("DefenseManager took: %2.5f seconds\n", duration);
 #endif
+    this->workerSelfDefenseManager->update();
 #ifdef __DEBUG__
     //this->enhancedUI->update();
     end2 = clock();
@@ -422,11 +425,11 @@ void BattleBroodAI::onUnitCreate(BWAPI::Unit* unit)
     this->macroManager->onUnitCreate(unit);
 
     if (unit->getType() == BWAPI::UnitTypes::Protoss_Nexus) // provisory
-        macroManager->nexuses.push_back(unit);
+        macroManager->nexuses.insert(unit);
     else if (unit->getType() == BWAPI::UnitTypes::Protoss_Gateway)
-        macroManager->gateways.push_back(unit);
+        macroManager->gateways.insert(unit);
     else if (unit->getType() == BWAPI::UnitTypes::Protoss_Forge)
-        macroManager->forges.push_back(unit);
+        macroManager->forges.insert(unit);
 }
 
 void BattleBroodAI::onUnitDestroy(BWAPI::Unit* unit)
@@ -443,7 +446,15 @@ void BattleBroodAI::onUnitDestroy(BWAPI::Unit* unit)
     this->eUnitsFilter->onUnitDestroy(unit);
     this->informationManager->onUnitDestroy(unit);
     this->defenseManager->onRemoveUnit(unit);
+    this->workerSelfDefenseManager->onRemoveUnit(unit);
     this->scoutManager->onUnitDestroy(unit);
+
+    if (unit->getType() == BWAPI::UnitTypes::Protoss_Nexus) // provisory
+        macroManager->nexuses.erase(unit);
+    else if (unit->getType() == BWAPI::UnitTypes::Protoss_Gateway)
+        macroManager->gateways.erase(unit);
+    else if (unit->getType() == BWAPI::UnitTypes::Protoss_Forge)
+        macroManager->forges.erase(unit);
 }
 
 void BattleBroodAI::onUnitShow(BWAPI::Unit* unit)

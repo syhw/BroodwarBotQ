@@ -29,7 +29,7 @@ bool ArchonUnit::decideToFlee()
     if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() 
         && Broodwar->getGroundHeight(targetEnemy->getPosition()) > Broodwar->getGroundHeight(_unitPos))
     {
-        if (_unitsGroup->nearestChoke && _unitsGroup->nearestChoke->getCenter().getDistance(_unitPos) < 128)
+        if (_unitsGroup && _unitsGroup->nearestChoke && _unitsGroup->nearestChoke->getCenter().getDistance(_unitPos) < 128)
         {
             _fleeing = false;
             return false;

@@ -6,7 +6,7 @@
 #include <map>
 #include "WarManager.h"
 
-//#define __DEFENSE__
+#define __DEFENSE__
 
 
 using namespace BWTA;
@@ -21,44 +21,48 @@ void DefenseManager::setDependencies()
   this->warManager = & WarManager::Instance();
 }
 
-void DefenseManager::checkDefenses(){
+void DefenseManager::checkDefenses()
+{
 	//Check on all bases that if we need to defend it, then it is defended
 	std::set<Base*> myBases =  BaseManager::Instance().getAllBases();
-	for(std::set<Base*>::iterator it = myBases.begin(); it != myBases.end(); ++it){
-		bool toDef=true;
+	for(std::set<Base*>::iterator it = myBases.begin(); it != myBases.end(); ++it)
+    {
+		bool toDef = true;
 		
-		
-		if((*it)->chokeToDef != NULL ) {
+		if ((*it)->chokeToDef != NULL)
+        {
 			//Should the chokepoint of this base be defended ?
 
 			//Check if the next region contains a base of ours or not
 			BWTA::Region* nextRegion;
 			std::pair<Region*,Region*> regions = (*it)->chokeToDef->getRegions();
-			if(regions.first == (*it)->getBaseLocation()->getRegion()){
+			if(regions.first == (*it)->getBaseLocation()->getRegion())
+            {
 				nextRegion = regions.second;
-			} else {
+			} 
+            else 
+            {
 				nextRegion = regions.first;
 			}
 			
 			//Search nextRegion in our bases
-			for(std::set<Base*>::iterator search = myBases.begin(); search != myBases.end(); ++search){
-				if( (*search)->getBaseLocation()->getRegion() == nextRegion ){
+			for (std::set<Base*>::iterator search = myBases.begin(); search != myBases.end(); ++search)
+            {
+				if ((*search)->getBaseLocation()->getRegion() == nextRegion)
+                {
 					//The chokepoint does not need to be defended because the next Region is a base of ours
-					toDef=false;
+					toDef = false;
 					break;
 				}
 			}
 		}
-
 		//If the field chokeToDef is NULL we consider we have to defend the base in the middle
 		checkGroundDefense((*it),toDef);
-
-
 	}
-
 }
 
-void DefenseManager::checkGroundDefense(Base * b, bool toDef){
+void DefenseManager::checkGroundDefense(Base * b, bool toDef)
+{
 
 	//Find the unitsGroup that must defend this base against ground attack
 #ifdef __DEBUG___
@@ -66,13 +70,16 @@ void DefenseManager::checkGroundDefense(Base * b, bool toDef){
 #endif
 	UnitsGroup * ug = (*this->groundDefenders.find(b)).second;
 
-
 	//Check if they must defend at middle or at chokepoint
-	if(b->chokeToDef != NULL){
+	if (b->chokeToDef != NULL)
+    {
 		//If they must defend the chokepoint check if their DefendBaseGroundGoal is accomplished (enough units)
-		if(toDef){
-			if(ug->getLastGoal() != NULL){
-				if( ug->getLastGoal()->getStatus() == GS_NOT_ENOUGH_UNITS ){
+		if (toDef)
+        {
+			if (ug->getLastGoal() != NULL)
+            {
+				if (ug->getLastGoal()->getStatus() == GS_NOT_ENOUGH_UNITS)
+                {
 					//We need more units
 					
 					//Set bid on 1 unit until we have enough and record the unitsgroup that needed it
@@ -88,12 +95,14 @@ void DefenseManager::checkGroundDefense(Base * b, bool toDef){
 						}
 					}
 
-				} else {	
-				//Nothing to do, the defense at this chokepoint is correct
-				
+				} else 
+                {	
+                    //Nothing to do, the defense at this chokepoint is correct
 				}
 			}
-		} else {
+		} 
+        else 
+        {
 			//We do not need to defend
 			if (ug->size() > 0)
             {
@@ -114,8 +123,6 @@ void DefenseManager::checkGroundDefense(Base * b, bool toDef){
 		
 	} else {
 		//If they must defend in the middle of the base 
-
-
 		//TODO
 	}
 }
@@ -124,14 +131,16 @@ void DefenseManager::checkGroundDefense(Base * b, bool toDef){
 
 void DefenseManager::onOffer(std::set<BWAPI::Unit*> units)
 {
-	for(std::set<BWAPI::Unit*>::iterator u = units.begin(); u != units.end(); u++){
-		
-		if(this->requesters.size() != 0 ){
+	for(std::set<BWAPI::Unit*>::iterator u = units.begin(); u != units.end(); u++)
+    {
+		if (this->requesters.size() != 0)
+        {
 			static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->accept(this, *u);
 			this->requesters.front()->takeControl(*u);
 			this->requesters.pop_front();
-
-		} else {
+		} 
+        else 
+        {
 			static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->decline(this, *u, 0);
 		}
 	}
@@ -139,14 +148,16 @@ void DefenseManager::onOffer(std::set<BWAPI::Unit*> units)
 
 void DefenseManager::onRevoke(BWAPI::Unit* unit, double bid)
 {
-	for(std::map<Base *, UnitsGroup *>::iterator it = this->groundDefenders.begin(); it != this->groundDefenders.end(); ++it){
-		for(std::vector<pBayesianUnit>::iterator u = (*it).second->units.begin(); u != (*it).second->units.end(); ++u ){
-			if((*u)->unit == unit ){
+	for(std::map<Base *, UnitsGroup *>::iterator it = this->groundDefenders.begin(); it != this->groundDefenders.end(); ++it)
+    {
+		for(std::vector<pBayesianUnit>::iterator u = (*it).second->units.begin(); u != (*it).second->units.end(); ++u )
+        {
+			if ((*u)->unit == unit)
+            {
 				(*it).second->giveUpControl((*u)->unit);
 			}
 		}
 	}
-
 }
 
 void DefenseManager::onRemoveUnit(BWAPI::Unit* unit)

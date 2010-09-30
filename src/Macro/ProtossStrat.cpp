@@ -97,9 +97,9 @@ void ProtossStrat::update()
             neededWorkers += 3*(*it)->getMinerals().size() + 3*(*it)->getGeysers().size();
         }
         neededWorkers += 2;
-        if (workerManager->workers.size() < neededWorkers)
+        if (workerManager->workers.size() < neededWorkers && SelectAll(UnitTypes::Protoss_Probe).size() < 70)
         {
-            for (std::list<BWAPI::Unit*>::iterator it = nexuses.begin(); it != nexuses.end(); ++it)
+            for (std::set<BWAPI::Unit*>::iterator it = nexuses.begin(); it != nexuses.end(); ++it)
             {
                 if (!(*it)->isTraining() && Broodwar->self()->minerals() >= 50)
                     (*it)->train(UnitTypes::Protoss_Probe);
@@ -110,13 +110,13 @@ void ProtossStrat::update()
     if (Broodwar->getFrameCount() > 3200) // provisory
     {
         this->workerManager->setWorkersPerGas(3);
-        for (std::list<BWAPI::Unit*>::iterator it = gateways.begin(); it != gateways.end(); ++it) // provisory
+        for (std::set<BWAPI::Unit*>::iterator it = gateways.begin(); it != gateways.end(); ++it) // provisory
         {
             if (!(*it)->isTraining())
             {
-                if (Broodwar->self()->gas() >= 250)
+                if (Broodwar->self()->gas() >= 250 && Broodwar->self()->minerals() >= 350)
                     (*it)->train(UnitTypes::Protoss_Dragoon);
-                else if (SelectAll(UnitTypes::Protoss_Zealot).size() < 30 && ((!this->shouldExpand() && Broodwar->self()->minerals() >= 300) || Broodwar->self()->minerals() >= 500))
+                else if (SelectAll(UnitTypes::Protoss_Zealot).size() < 20 && ((!this->shouldExpand() && Broodwar->self()->minerals() >= 300) || Broodwar->self()->minerals() >= 500))
                     (*it)->train(UnitTypes::Protoss_Zealot);
             }
         }
@@ -146,11 +146,11 @@ void ProtossStrat::update()
         this->workerManager->setWorkersPerGas(3);
 		if (this->baseManager->getBase(this->baseManager->naturalExpand) == NULL)
         {
-			this->baseManager->expand(this->baseManager->naturalExpand,92);
+			this->baseManager->expand(this->baseManager->naturalExpand,82);
 		} 
         else 
         {
-			this->baseManager->expand(90);
+			this->baseManager->expand(80);
 		}
 	}
 	
@@ -194,7 +194,12 @@ void ProtossStrat::buildUnits()
     if (Broodwar->enemy()->getRace() == Races::Zerg)
         this->priority[Zealot] = 41;
     else
-        this->priority[Zealot] = 40;
+    {
+        if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Leg_Enhancements))
+            this->priority[Zealot] = 40;
+        else
+            this->priority[Zealot] = 30;
+    }
 	if (this->baseManager->getActiveBases().size() > 1)
     {
         if (!_launchedUpgrades && Broodwar->self()->getUpgradeLevel(UpgradeTypes::Protoss_Ground_Weapons) < 3)
@@ -206,13 +211,17 @@ void ProtossStrat::buildUnits()
             _launchedUpgrades = true;
         }
         if (!Broodwar->self()->hasResearched(TechTypes::Psionic_Storm))
-            this->buildOrderManager->research(TechTypes::Psionic_Storm, 80);
+            this->buildOrderManager->research(TechTypes::Psionic_Storm, 92);
         this->needed[High_Templar] = 12; // TOCHANGE
         this->priority[High_Templar] = 42;
         this->buildOrderManager->build(3, UnitTypes::Protoss_High_Templar, 51);
+        if (!Broodwar->self()->getUpgradeLevel(UpgradeTypes::Leg_Enhancements))
+            this->buildOrderManager->upgrade(1, UpgradeTypes::Leg_Enhancements, 70);
 	}
-    if (this->baseManager->getActiveBases().size() > 2)
+    if (this->baseManager->getActiveBases().size() > 3)
     {
+        if (this->buildManager->getPlannedCount(UnitTypes::Protoss_Templar_Archives) < 1)
+            this->buildOrderManager->build(1, UnitTypes::Protoss_Templar_Archives, 90);
         this->buildOrderManager->build(2, UnitTypes::Protoss_Forge, 50);
         this->priority[High_Templar] = 50;
     }
@@ -269,23 +278,22 @@ void ProtossStrat::createProdBuildings()
 
 void ProtossStrat::buildGates()
 {	
-    if (!prodBuildings.count(UnitTypes::Protoss_Gateway))
+    if (this->gateways.empty())
         return;
-    if (this->baseManager->getActiveBases().size() > 2 && _activeBases - this->baseManager->getActiveBases().size() != 0)
-        this->buildOrderManager->build(3*this->baseManager->getActiveBases().size(), BWAPI::UnitTypes::Protoss_Gateway, 40);
+    //if (this->baseManager->getActiveBases().size() > 2 && _activeBases - this->baseManager->getActiveBases().size() != 0)
+    //    this->buildOrderManager->build(3*this->baseManager->getActiveBases().size(), BWAPI::UnitTypes::Protoss_Gateway, 40);
     if (this->baseManager->getActiveBases().size() > 1)
     {
         bool allGatesFull = true;
-        const list<Unit*>& buildings = prodBuildings[UnitTypes::Protoss_Gateway];
-        for (list<Unit*>::const_iterator it = buildings.begin(); it != buildings.end(); it++)
+        for (std::set<Unit*>::const_iterator it = gateways.begin(); it != gateways.end(); it++)
             if (!(*it)->isCompleted() || !(*it)->isTraining())
             {
                 allGatesFull = false;
                 break;
             }
-            if (allGatesFull && Broodwar->self()->minerals() >= 150)
+            if (allGatesFull && Broodwar->self()->minerals() >= 150 && this->buildManager->getPlannedCount(UnitTypes::Protoss_Gateway) < (int)gateways.size() + 1)
             {
-                this->buildOrderManager->buildAdditional(1,UnitTypes::Protoss_Gateway,80);
+                this->buildOrderManager->buildAdditional(1,UnitTypes::Protoss_Gateway, 50);
             }
     }
 }

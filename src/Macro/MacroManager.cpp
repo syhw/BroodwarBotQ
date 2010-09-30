@@ -58,30 +58,29 @@ void MacroManager::onUnitCreate(BWAPI::Unit* unit)
 
 
 	// ***********   Expand   *********** //
-	if( unit->getType().isResourceDepot())
+	if (unit->getType().isResourceDepot())
 		expanding = false;
 
 
 	
 	// *******   ProdBuildings   ******** //
-	/*
-	if( unit->getType().isBuilding() && !unit->getType().isResourceDepot())
+	/*if( unit->getType().isBuilding() && !unit->getType().isResourceDepot())
 	{
-		if( unit->getType().canProduce())
+		if (unit->getType().canProduce())
 		{
-			prodBuildings[unit->getType()].push_back( unit);
+			prodBuildings[unit->getType()].push_back(unit);
 			underConstruction[unit->getType()]--;
 		}
-		else if( unit->getType().canAttack())
+		else if (unit->getType().canAttack())
 		{
-			defBuildings[unit->getType()].push_back( unit);
+			defBuildings[unit->getType()].push_back(unit);
 			underConstruction[unit->getType()]--;
 		}
 		else
 		{
-			techBuildings.insert( unit->getType());
+			techBuildings.insert(unit->getType());
 		}
-	}
+	}*/
 
 	/*
 	// ***********   Units   ************ //
@@ -98,7 +97,7 @@ void MacroManager::onUnitCreate(BWAPI::Unit* unit)
 
 void MacroManager::onUnitDestroy(BWAPI::Unit* unit)
 {
-	if( !unit->getType().isBuilding() && !unit->getType().isWorker() && unit->getPlayer() == Broodwar->self())
+	if (!unit->getType().isBuilding() && !unit->getType().isWorker() && unit->getPlayer() == Broodwar->self())
 		wantedUnits[unit->getType()].completedNb--;
 }
 

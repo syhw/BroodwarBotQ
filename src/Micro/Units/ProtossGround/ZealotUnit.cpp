@@ -29,12 +29,44 @@ ZealotUnit::~ZealotUnit()
         clearDamages();
 }
 
+int ZealotUnit::fightMove()
+{
+    /// approach siege tanks or approach our targetEnemy if not in range
+    if (targetEnemy != NULL && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected()
+        && ((targetEnemy->getType() == UnitTypes::Terran_Siege_Tank_Siege_Mode 
+        && targetEnemy->getDistance(_unitPos) > 45.0) || !inRange(targetEnemy) || (_unitsGroup->units.size() > 10 && targetEnemy->getDistance(_unitPos) > 128)) // TODO MICROONLY (_unitsGroup->units.size() > 10 && targetEnemy->getDistance(_unitPos) > 128)
+        && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
+    {
+        unit->move(targetEnemy->getPosition());
+        _lastClickFrame = Broodwar->getFrameCount();
+        _lastMoveFrame = Broodwar->getFrameCount();
+        _fightMoving = true;
+        return 1;
+    }
+    double dist = target.getDistance(_unitPos);
+    /// approach out of range target
+    if (dist <= 192.0 && // 6 build tiles TOCHANGE
+        oorTargetEnemy != NULL && oorTargetEnemy->exists() && oorTargetEnemy->isVisible() && targetEnemy->isDetected()
+        && !inRange(oorTargetEnemy)
+        && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
+    {
+        //unit->rightClick(oorTargetEnemy->getPosition());
+        //_lastRightClick =  oorTargetEnemy->getPosition();
+        unit->move(oorTargetEnemy->getPosition());
+        _lastClickFrame = Broodwar->getFrameCount();
+        _lastMoveFrame = Broodwar->getFrameCount();
+        _fightMoving = true;
+        return 2;
+    }
+    return 0;
+}
+
 bool ZealotUnit::decideToFlee()
 {
     if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() 
         && Broodwar->getGroundHeight(targetEnemy->getPosition()) > Broodwar->getGroundHeight(_unitPos))
     {
-        if (_unitsGroup->nearestChoke && _unitsGroup->nearestChoke->getCenter().getDistance(_unitPos) < 128)
+        if (_unitsGroup && _unitsGroup->nearestChoke && _unitsGroup->nearestChoke->getCenter().getDistance(_unitPos) < 128)
         {
             _fleeing = false;
             return false;

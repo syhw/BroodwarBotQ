@@ -27,6 +27,11 @@
 #include <typeinfo>
 #include "Nearby.h"
 
+int round(double a)
+{
+    return int(a + 0.5);
+}
+
 #define __ARRIVING__UNITS__
 
 using namespace BWAPI;
@@ -272,7 +277,7 @@ void UnitsGroup::update()
 #ifdef __ARRIVING__UNITS__
     if (!arrivingUnits.empty())
     {
-        if (units.size() <= 2)
+        if (units.size() <= 3)
         {
             for (std::list<pBayesianUnit>::iterator it = arrivingUnits.begin();
                 it != arrivingUnits.end(); )
@@ -294,8 +299,8 @@ void UnitsGroup::update()
                 }
                 else
                 {
-                    (*it)->attackMove(center);
-                    //(*it)->update();
+                    (*it)->target = center;
+                    (*it)->update();
                     ++it;
                 }
             }

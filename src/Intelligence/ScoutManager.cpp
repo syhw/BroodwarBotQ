@@ -9,6 +9,7 @@ ScoutManager::ScoutManager()
 : exploringEnemy(false)
 , enemyFound(false)
 {
+    _sawStartLocations.insert(BWTA::getNearestBaseLocation(Broodwar->self()->getStartLocation()));
 	warManager = NULL;
 }
 
@@ -20,12 +21,23 @@ void ScoutManager::setDependencies()
 {
 	this->warManager = & WarManager::Instance();
 	this->arbitrator = static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(& Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance()) ;
-    //// HACK for 2 players map:
-    for (std::set<TilePosition>::const_iterator it = Broodwar->getStartLocations().begin();
-        it != Broodwar->getStartLocations().end(); ++it)
+    //// 2 players map:
+    std::string s = BWAPI::Broodwar->mapFileName();
+    if (s == "ICCup destination 1.1.scx" || s =="ICCup destination 1.1_ob.scx")
     {
-        if (*it != Broodwar->self()->getStartLocation())
-            this->enemyStartLocation = *it;
+        for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getStartLocations().begin(); it != BWTA::getStartLocations().end(); ++it)
+        {
+            if (!Broodwar->isVisible((*it)->getTilePosition()))
+                this->enemyStartLocation = (*it)->getTilePosition();
+        }
+    }
+    else if (s == "iCCup heartbreak ridge1.1.scx" || s == "iCCup heartbreak ridge1.1ob.scx")
+    {
+                for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getStartLocations().begin(); it != BWTA::getStartLocations().end(); ++it)
+        {
+            if (!Broodwar->isVisible((*it)->getTilePosition()))
+                this->enemyStartLocation = (*it)->getTilePosition();
+        }
     }
     //enemyFound = true;
 }
@@ -37,6 +49,36 @@ void ScoutManager::update()
 		exploringEnemy = true;
 		this->awaitingGoals.push_back(pGoal(new ExploreGoal(BWTA::getRegion(enemyStartLocation))));
 	}
+
+    if (!enemyFound)
+    {
+        if (Broodwar->getStartLocations().size() == 2)
+        {
+            for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getStartLocations().begin(); it != BWTA::getStartLocations().end(); ++it)
+            {
+                if (!Broodwar->isVisible((*it)->getTilePosition()))
+                    this->enemyStartLocation = (*it)->getTilePosition();
+            }
+        }
+        else if (Broodwar->getStartLocations().size() > 2)
+        {
+            for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getStartLocations().begin(); it != BWTA::getStartLocations().end(); ++it)
+            {
+                if (Broodwar->isVisible((*it)->getTilePosition()))
+                    _sawStartLocations.insert(*it);
+            }
+            if (_sawStartLocations.size() == (BWTA::getStartLocations().size() - 1))
+            {
+                std::set<BWTA::BaseLocation*>::iterator enemyIsThere;
+                std::set_difference(_sawStartLocations.begin(), _sawStartLocations.end(), BWTA::getStartLocations().begin(), BWTA::getStartLocations().end(), enemyIsThere);
+                this->enemyStartLocation = (*enemyIsThere)->getTilePosition();
+                Broodwar->pingMinimap(this->enemyStartLocation.x()*4, this->enemyStartLocation.y()*4);
+            }
+        }
+    }
+
+    //if (enemyStartLocation != TilePositions::None)
+    //    Broodwar->drawCircleMap(enemyStartLocation.x()*4, enemyStartLocation.y()*4, 50, Colors::Red, true);
 
 	std::set<UnitsGroup *> toTrash;
 	//Free units that need to be freed and add goals to other
@@ -223,6 +265,7 @@ void ScoutManager::onUnitShow(BWAPI::Unit* unit)
                 {
                     enemyFound = true;
                     enemyStartLocation = unit->getTilePosition();
+                    Broodwar->pingMinimap(this->enemyStartLocation.x()*4, this->enemyStartLocation.y()*4);
                     return;
                 }
             }
@@ -230,6 +273,7 @@ void ScoutManager::onUnitShow(BWAPI::Unit* unit)
             {
                 enemyFound = true;
                 enemyStartLocation = unit->getTilePosition();
+                Broodwar->pingMinimap(this->enemyStartLocation.x()*4, this->enemyStartLocation.y()*4);
             }
         } 
         else

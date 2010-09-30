@@ -24,6 +24,7 @@ class ScoutManager :  public CSingleton<ScoutManager>, public Arbitrator::Contro
 	std::list<pGoal> awaitingGoals;
 	bool exploringEnemy;
 	std::list<UnitsGroup *> myUnitsGroups;
+    std::set<BWTA::BaseLocation*> _sawStartLocations;
 
 public:
 	void setDependencies();
