@@ -1,0 +1,54 @@
+             *************************************************
+             * BroodwarBotQ, a good zergling is better BBQ'd *
+             *************************************************
+
+===== Foreword / Bullshit =====
+Hi you,
+
+Gabriel Synnaeve is writing to you right now. I hope that the same of the bot
+told you it plays Protoss (only for the moment).
+
+This bot is using BWAPI 3.0.3, and BWTA. It is heavily based on BWSAL, 
+so thanks and kudos to lowerlogic and other contributors. I hope to be
+able to contribute (for instance MapManager) too.
+
+There are still A LOT of improvements to do. // TODO or // HACK or // TOCHANGE
+are everywhere. A lot of improvements are in my head and some others in texts/
+sources files, but I think that if I don't release early, release poorly, 
+I'll simply never release. (It even still get stomped by 6pool and fast DT!)
+Some part of the code are really messy, there were produced under heavy sleep
+deprivation and a mindset of no tomorrow, you've been warned: go hide yourself
+behind a good text editor and an open mind. I have some problems with BWSAL
+and used duct tape to counter them (ProductionManager / Arbitrator, and lately,
+performances issues with the BuildManager / ConstructionManager). Also, there's
+a lot of code duplication in the units (micro) code.
+
+There are different contributions of:
+Guillaume Bousket, 
+Louis Schimchowitsch,
+Nicolas Biagianti
+
+===== Install / Serious Stuff =====
+1. You need BWAPI 3.0.3, go on the BWAPI website to install it
+
+2. Open BattleBroodAI.sln and compile the project as RELEASE.
+   To do this:
+   2.1. Change the dropdown box in the top center of the window from "Debug" to
+        "Release".
+   2.2. Click Build -> Build Solution. The MacroProject and MicroProject 
+        are now compiled into 2 dlls. Macro is for full games.
+
+3. Open <starcraft folder>/bwapi-data/bwapi.ini and set the ai_dll as follows:
+     ai_dll = <BlaBlaPath>/Release/M{a|i}croProject.dl
+
+4. Run Chaoslauncher with BWAPI Injector checked.
+
+5. Start Starcraft: Broodwar and create a match, picking Protoss if you
+    use MacroProject.dll. Running BBQ as any other race or on any other map
+   will produce unexpected results and may crash.
+
+===== Additional Info / Did You Read That ? =====
+The BWAPI web site    		http://code.google.com/p/bwapi/
+The BWSAL web site    		http://code.google.com/p/bwsal/
+The BWTA  web site    		http://code.google.com/p/bwta/
+IRC Channel           		QuakeNet #BWAPI

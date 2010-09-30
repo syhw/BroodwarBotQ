@@ -33,5 +33,6 @@ void AttackGoal::createMidSubgoal()
     BWTA::Region* r = BWTA::getRegion(tmpPos);
     tmpPos = r->getCenter();
 	//Create an intermediate subgoal at half the way of the path of the unitsgroup
-	this->addSubgoal(pSubgoal(new FormationSubgoal(SL_AND,pFormation(new SquareFormation(tmpPos)))));
+    if (r != BWTA::getRegion(unitsGroup->center))
+        this->addSubgoal(pSubgoal(new FormationSubgoal(SL_AND,pFormation(new SquareFormation(tmpPos)))));
 }

@@ -6,7 +6,7 @@
 #include <map>
 #include "WarManager.h"
 
-#define __DEFENSE__
+#define __DEFENSE__ // still buggy
 
 
 using namespace BWTA;
@@ -27,9 +27,17 @@ void DefenseManager::checkDefenses()
 	std::set<Base*> myBases =  BaseManager::Instance().getAllBases();
 	for(std::set<Base*>::iterator it = myBases.begin(); it != myBases.end(); ++it)
     {
-		bool toDef = true;
+        const BaseLocation* bl = (*it)->getBaseLocation();
+        const Region* region = bl->getRegion();
+        bool toDef = false;
+        for (std::map<Unit*, EViewedUnit>::const_iterator evu = EUnitsFilter::Instance().getViewedUnits().begin();
+            evu != EUnitsFilter::Instance().getViewedUnits().end(); ++evu)
+        {
+            if (region == BWTA::getRegion(evu->second.position)) // HACK HACK HACK TODO
+                toDef = true;
+        }
 		
-		if ((*it)->chokeToDef != NULL)
+        /*if ((*it)->chokeToDef != NULL) // removed because of HACK HACK HACK TODO
         {
 			//Should the chokepoint of this base be defended ?
 
@@ -55,7 +63,7 @@ void DefenseManager::checkDefenses()
 					break;
 				}
 			}
-		}
+		}*/
 		//If the field chokeToDef is NULL we consider we have to defend the base in the middle
 		checkGroundDefense((*it),toDef);
 	}

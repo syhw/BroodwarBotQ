@@ -1,91 +1,12 @@
-#####  Plantage(s) #####
-
-
-#####  Etrange	   #####
-- Ligne bleue vers la droite par moments (target morte et acquisition d'une
-nouvelle ?) en mode fight_g avec les goons
-
-#####  En général  #####
-Micro:
-- Zealots
-- Templars
-- Flocking in Formation
-- Dancing
-
-Macro:
-- Goal de Drop
-
-Scout:
-- perhaps include the damage map in the pathfinder
-
-
-#####  Post it Guillaume #####
-- implanter ScoutManager::checkEmptyXP(): parcourrir les baseLoc des regions inoccupées.
-- creer un groupe de defense sur une nouvelle expand (revoir la condition d'envoi d'un groupe a l'attaque...).
-- implanter le map control (gestion des regions, explo)
-- gerer les taux d'eco (futur critere bayesien)
-- finir les call back dans Time
-- tout repartir selon les bases( batiments de prod, production, groupes de defense)
-
-- gerer les lords
-
-
-Chaque base doit lister ses batiments de prod (excepte les iles, mais qui peuvent faire de l'aerien qd mm), ses entrees.
-Les bases connectées (proches) comme les expands ne font qu'une.
-
-Pour la defense, les unites creees sont envoyes aux entrees de la base ou elles ont ete creees.
-En cas d'attaque, les differents groupes d'une même base se donnent un coup de main.
-
-Une fois que l'attaque a ete decidee ou que le nombre d'unites est assez important,
-ces unites sont envoyes en gardant en memoire leur base d'origine.
-
---------
-
-Pour la defense quand on expand:
-affecter un groupe en defense avec une nouvelle expand.
-modifier l'ajout d'unites dans les groupes par une fonction needUnits dans les groupes par ex.
-Recencer les groupes suivants les regions.
-Tenir a jour les regions que l'on occupe.
-
-
-Les regions visitees lors de l'update ne sont pas bonnes (l'enemi est tjs verifie par ex...)
-
-
-###########  Apres discussion:  ###########
-Time manager:
-- faire les callback avec une certaine frequence.
-  Timer les fonctions a l'execution pour repartir la charge avec un ordonnanceur basique.
-
-
-
-Appli QT pour debugger.
-
-
-#################
-workers:
-- base, degroupage, attaque (rush...), repair
-
-placement batiments
-
-strategies:
-- 
-
-
-
-
-
-########### la, de suite ########
-- trouver comment donner des fichiers en relatif a QtCreator plutot qu'en absolu pour lui faire compiler les cpp de components
-- lancer un QTimer dans mainWindows pour checker le changement d'etat de gameIsFinished pour quitter l'appli lors du detachement de la dll
-- linker gameSpeed pour le changer a partir de l'ui
-- faire les data getValue(), beginEdit() et installer les mutex
-- faire l'inscription automatique des BaseObject et BaseData dans le parent
-- commencer l'arbre des composants dans l'ui et afficher leur propriete
-- trouver un apercu de la minimap dans les map star pour l'affichage de la minimap qt (ou walkability pour l'instant)
-
-
-http://msdn.microsoft.com/en-us/library/kdxzbw9t%28v=VS.80%29.aspx
-
-
-
-
+* More thread safety? (BayesianUnit, MapManager)
+* Re-use flocking (+learning of its parameters) in BayesianUnit
+* Modify MapManager's damages maps to use DPS instead of raw damages
+* Modify MapManager::updateStormPos() to use the interpolation of units 
+  movements (with speed, done in BayesianUnit for the flocking for instance,
+  just a matter of changing the datastruct)
+* A finer resolution MapManager's damages maps / damages gradient?
+* DEBUG ProductionManager/Arbitrator (see/breakpoints all producingUnits.erase(i))
+* PROFILE and DEBUG ConstructionManager / BuildManager
+* Add features, like reaver drop, drops, photons defenses, rushes, cheeses counters
+* Remove HACK / TODO / TOCHANGE
+* Clean and optimize only then

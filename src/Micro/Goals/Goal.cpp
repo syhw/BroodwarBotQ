@@ -56,7 +56,6 @@ void Goal::achieve()
 				selected->tryToRealize();
 			} else {
 				//TODO
-                //BWAPI::Broodwar->printf("(Goal) Tell Louis this situation happened subgoals size %d", subgoals.size());
 			}
 		}
 	}
