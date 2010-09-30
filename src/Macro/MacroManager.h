@@ -108,4 +108,5 @@ protected:
 	bool expanding;
 	int firstScout;
 	bool scouting;
+    bool _shouldExpand;
 };

@@ -60,6 +60,7 @@ void ProtossStrat::onStart()
     this->buildOrderManager->build(24, BWAPI::UnitTypes::Protoss_Probe, 95);
 	setScoutTime();
 	this->buildOrderManager->enableDependencyResolver();
+    this->workerManager->setWorkersPerGas(2);
 }
 
 void ProtossStrat::setScoutTime()
@@ -108,13 +109,14 @@ void ProtossStrat::update()
 
     if (Broodwar->getFrameCount() > 3200) // provisory
     {
+        this->workerManager->setWorkersPerGas(3);
         for (std::list<BWAPI::Unit*>::iterator it = gateways.begin(); it != gateways.end(); ++it) // provisory
         {
             if (!(*it)->isTraining())
             {
-                if (Broodwar->self()->gas() >= 50)
+                if (Broodwar->self()->gas() >= 250)
                     (*it)->train(UnitTypes::Protoss_Dragoon);
-                else if (Broodwar->self()->minerals() >= 150 && SelectAll(UnitTypes::Protoss_Zealot).size() < 20)
+                else if (SelectAll(UnitTypes::Protoss_Zealot).size() < 30 && ((!this->shouldExpand() && Broodwar->self()->minerals() >= 300) || Broodwar->self()->minerals() >= 500))
                     (*it)->train(UnitTypes::Protoss_Zealot);
             }
         }
@@ -141,6 +143,7 @@ void ProtossStrat::update()
 	if (this->shouldExpand() && !expanding)
     {
 		this->expanding = true;
+        this->workerManager->setWorkersPerGas(3);
 		if (this->baseManager->getBase(this->baseManager->naturalExpand) == NULL)
         {
 			this->baseManager->expand(this->baseManager->naturalExpand,92);
@@ -158,17 +161,17 @@ void ProtossStrat::update()
         this->buildOrderManager->build(this->needed[Dragoon],BWAPI::UnitTypes::Protoss_Dragoon,this->priority[Dragoon]);
         //if (Broodwar->self()->gas() < 50 && this->productionManager->getPlannedCount(UnitTypes::Protoss_Zealot) < 8)
         this->buildOrderManager->build(this->needed[Zealot],BWAPI::UnitTypes::Protoss_Zealot,this->priority[Zealot]);
-        this->buildOrderManager->build(this->needed[Arbiter],BWAPI::UnitTypes::Protoss_Arbiter,this->priority[Arbiter]);
+        //this->buildOrderManager->build(this->needed[Arbiter],BWAPI::UnitTypes::Protoss_Arbiter,this->priority[Arbiter]);
         this->buildOrderManager->build(this->needed[Archon],BWAPI::UnitTypes::Protoss_Archon,this->priority[Archon]);
-        this->buildOrderManager->build(this->needed[Carrier],BWAPI::UnitTypes::Protoss_Carrier,this->priority[Carrier]);
-        this->buildOrderManager->build(this->needed[Corsair],BWAPI::UnitTypes::Protoss_Corsair,this->priority[Corsair]);
-        this->buildOrderManager->build(this->needed[Dark_Archon],BWAPI::UnitTypes::Protoss_Dark_Archon,this->priority[Dark_Archon]);
-        this->buildOrderManager->build(this->needed[Dark_Templar],BWAPI::UnitTypes::Protoss_Dark_Templar,this->priority[Dark_Templar]);
+        //this->buildOrderManager->build(this->needed[Carrier],BWAPI::UnitTypes::Protoss_Carrier,this->priority[Carrier]);
+        //this->buildOrderManager->build(this->needed[Corsair],BWAPI::UnitTypes::Protoss_Corsair,this->priority[Corsair]);
+        //this->buildOrderManager->build(this->needed[Dark_Archon],BWAPI::UnitTypes::Protoss_Dark_Archon,this->priority[Dark_Archon]);
+        //this->buildOrderManager->build(this->needed[Dark_Templar],BWAPI::UnitTypes::Protoss_Dark_Templar,this->priority[Dark_Templar]);
         this->buildOrderManager->build(this->needed[High_Templar],BWAPI::UnitTypes::Protoss_High_Templar,this->priority[High_Templar]);
         this->buildOrderManager->build(this->needed[Observer],BWAPI::UnitTypes::Protoss_Observer,this->priority[Observer]);
         this->buildOrderManager->build(this->needed[Reaver],BWAPI::UnitTypes::Protoss_Reaver,this->priority[Reaver]);
-        this->buildOrderManager->build(this->needed[Scout],BWAPI::UnitTypes::Protoss_Scout,this->priority[Scout]);
-        this->buildOrderManager->build(this->needed[Shuttle],BWAPI::UnitTypes::Protoss_Shuttle,this->priority[Shuttle]);
+        //this->buildOrderManager->build(this->needed[Scout],BWAPI::UnitTypes::Protoss_Scout,this->priority[Scout]);
+        //this->buildOrderManager->build(this->needed[Shuttle],BWAPI::UnitTypes::Protoss_Shuttle,this->priority[Shuttle]);
     }
     if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Singularity_Charge))
     {
@@ -196,7 +199,7 @@ void ProtossStrat::buildUnits()
     {
         if (!_launchedUpgrades && Broodwar->self()->getUpgradeLevel(UpgradeTypes::Protoss_Ground_Weapons) < 3)
         {
-            this->buildOrderManager->build(2, UnitTypes::Protoss_Forge, 50);
+            this->buildOrderManager->build(1, UnitTypes::Protoss_Forge, 50);
             this->buildOrderManager->upgrade(3, UpgradeTypes::Protoss_Ground_Weapons, 43);
             this->buildOrderManager->upgrade(3, UpgradeTypes::Protoss_Ground_Armor, 43);
             this->buildOrderManager->upgrade(3, UpgradeTypes::Protoss_Plasma_Shields, 43);
@@ -206,7 +209,13 @@ void ProtossStrat::buildUnits()
             this->buildOrderManager->research(TechTypes::Psionic_Storm, 80);
         this->needed[High_Templar] = 12; // TOCHANGE
         this->priority[High_Templar] = 42;
+        this->buildOrderManager->build(3, UnitTypes::Protoss_High_Templar, 51);
 	}
+    if (this->baseManager->getActiveBases().size() > 2)
+    {
+        this->buildOrderManager->build(2, UnitTypes::Protoss_Forge, 50);
+        this->priority[High_Templar] = 50;
+    }
 
 /*
 	//BO with templar goon zealot
@@ -262,8 +271,8 @@ void ProtossStrat::buildGates()
 {	
     if (!prodBuildings.count(UnitTypes::Protoss_Gateway))
         return;
-    //if (_activeBases - this->baseManager->getActiveBases().size() != 0)
-    //    this->buildOrderManager->build(4*this->baseManager->getActiveBases().size(), BWAPI::UnitTypes::Protoss_Gateway, 40);
+    if (this->baseManager->getActiveBases().size() > 2 && _activeBases - this->baseManager->getActiveBases().size() != 0)
+        this->buildOrderManager->build(3*this->baseManager->getActiveBases().size(), BWAPI::UnitTypes::Protoss_Gateway, 40);
     if (this->baseManager->getActiveBases().size() > 1)
     {
         bool allGatesFull = true;
@@ -290,11 +299,11 @@ void ProtossStrat::createTechBuildings()
 		techBuildings.insert( UnitTypes::Protoss_Forge);
 	}
 	*/
-	if (canCreateTechBuildings( UnitTypes::Protoss_Cybernetics_Core, UnitTypes::Protoss_Gateway, 2))
+	/*if (canCreateTechBuildings( UnitTypes::Protoss_Cybernetics_Core, UnitTypes::Protoss_Gateway, 2))
 	{
 		this->buildOrderManager->buildAdditional(1,UnitTypes::Protoss_Cybernetics_Core,70);
 		techBuildings.insert(UnitTypes::Protoss_Cybernetics_Core);
-	}
+	}*/
 	/*
 	if( canCreateTechBuildings( UnitTypes::Protoss_Citadel_of_Adun, UnitTypes::Protoss_Cybernetics_Core, 1))
 	{
@@ -324,5 +333,8 @@ void ProtossStrat::buildDefenses()
 
 void ProtossStrat::someAir()
 {
-    return;
+    if (Broodwar->enemy()->getRace() == Races::Zerg)
+    {
+        buildOrderManager->build(8, UnitTypes::Protoss_Corsair, 42);
+    }
 }

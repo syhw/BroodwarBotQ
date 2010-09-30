@@ -66,6 +66,7 @@ void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnit
         if (regionCenter != NULL && BWTA::getRegion(topos) != regionCenter && center.toPosition() != regionCenter->getCenter())
         {
             center = regionCenter->getCenter();
+            end_positions.clear();
             this->computeToPositions(vUnits);
             return;
         }
@@ -79,6 +80,11 @@ void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnit
         }
     }
     computeMean();
+    if (vUnits.size() != end_positions.size())
+    {
+        end_positions.clear();
+        this->computeToPositions(vUnits);
+    }
 
     /*** TODO BUG HERE TODO TODO TODO
     // add contact units in the direction of the formation, in the outer layer/ring if no direction

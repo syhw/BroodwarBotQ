@@ -6,6 +6,8 @@
 #include <map>
 #include "WarManager.h"
 
+//#define __DEFENSE__
+
 
 using namespace BWTA;
 DefenseManager::DefenseManager()
@@ -95,13 +97,18 @@ void DefenseManager::checkGroundDefense(Base * b, bool toDef){
 			//We do not need to defend
 			if (ug->size() > 0)
             {
+                std::list<BWAPI::Unit*> giveBack;
 				//We must give back those units to the WarManager
 				for (std::vector<pBayesianUnit>::iterator units = ((*ug).units).begin(); units != ((*ug).units).end(); ++ units)
                 {
                     static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->removeBid(this,(*units)->unit);
 					//this->arbitrator->setBid(this,(*units)->unit, 0);
-					ug->giveUpControl((*units)->unit);
+					giveBack.push_back((*units)->unit);
 				}
+                for (std::list<BWAPI::Unit*>::const_iterator gbit = giveBack.begin(); gbit != giveBack.end(); ++gbit)
+                {
+                    ug->giveUpControl(*gbit);
+                }
 			}
 		}
 		
@@ -162,14 +169,13 @@ void DefenseManager::onRemoveUnit(BWAPI::Unit* unit)
 
 void DefenseManager::update()
 {
-	/*
+#ifdef __DEFENSE__
 	this->checkDefenses();
-
-//update unitsgroups depending of the defenseManager
+    //update unitsgroups depending of the defenseManager
 	for(std::map<Base *, UnitsGroup *>::iterator it = this->groundDefenders.begin(); it != this->groundDefenders.end(); ++it){
 		it->second->update();
 	}
-	*/
+#endif
 }
 
 void DefenseManager::addBase(Base * b){

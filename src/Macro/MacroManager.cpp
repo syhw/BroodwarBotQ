@@ -12,6 +12,7 @@ MacroManager::MacroManager()
 , expanding(0)
 , scouting(false)
 , firstScout(15)
+, _shouldExpand(false)
 {
 	this->buildOrderManager = NULL;
 	this->productionManager = NULL;
@@ -299,6 +300,8 @@ bool MacroManager::canCreateDefenseBuildings( UnitType techBuilding, UnitType bu
 
 bool MacroManager::shouldExpand()
 {
+    if (_shouldExpand)
+        return true;
 	// Expand if all the bases are fully functionnal
 	unsigned int nbRessources = 0;
 	const std::set<Base*>& bases = baseManager->getAllBases();
@@ -306,7 +309,8 @@ bool MacroManager::shouldExpand()
 	{
 		nbRessources += (int)(2.4 * (*it)->getMinerals().size()) + 3 * (*it)->getGeysers().size(); // TOCHANGE 2 for 2.5, saturation is around 3
 	}
-	return workerManager->workers.size() >= nbRessources;
+	_shouldExpand = workerManager->workers.size() >= nbRessources;
+    return _shouldExpand;
 }
 
 #ifdef BW_QT_DEBUG

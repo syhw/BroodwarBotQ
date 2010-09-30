@@ -46,24 +46,31 @@ void WarManager::update()
         {
             pGoal goal = pGoal(new AttackGoal(*it, Scout
         }
-    }*/
+        }*/
 
-	//Suppress the list prompted to suppress 
-	for(std::list<UnitsGroup *>::iterator ug = this->promptedRemove.begin() ; ug != this->promptedRemove.end(); ++ug){
-		this->remove(*ug);
-		(*ug)->idle();	//Set target of units to their position so that they are now idling
-		delete (*ug); // @merge
-		// @merge ug->~UnitsGroup();
-	}
-	promptedRemove.clear();
+    //Suppress the list prompted to suppress 
+    if (!promptedRemove.empty())
+    {
+        for (std::list<UnitsGroup *>::iterator ug = this->promptedRemove.begin(); ug != this->promptedRemove.end(); ++ug)
+        {
+            if (*ug == NULL)
+                continue;
+            this->remove(*ug);
+            (*ug)->idle();	//Set target of units to their position so that they are now idling
+            delete (*ug); // @merge
+            // @merge ug->~UnitsGroup();
+        }
+        promptedRemove.clear();
+    }
 
 
 	//Set bid on appropriate units (not workers and not building)
 	std::set<BWAPI::Unit *> myUnits = BWAPI::Broodwar->self()->getUnits();
 
 	for(std::set<BWAPI::Unit *>::iterator it = myUnits.begin(); it != myUnits.end(); ++it){
-		if (!(*it)->getType().isBuilding() && !(*it)->getType().isWorker()){
-			this->arbitrator->setBid(this,(*it),20);
+		if (!(*it)->getType().isBuilding() && !(*it)->getType().isWorker())
+        {
+			this->arbitrator->setBid(this, (*it), 20);
 		}
 	}
 
@@ -149,17 +156,23 @@ void WarManager::sendGroupToDefense( UnitsGroup* ug)
 }
 
 
-bool WarManager::remove(UnitsGroup* u){
-	for(std::list<UnitsGroup *>::iterator it = unitsGroups.begin(); it != unitsGroups.end(); it ++){
-		if( (*it) == u){
-			unitsGroups.erase(it);
+bool WarManager::remove(UnitsGroup* u)
+{
+	for(std::list<UnitsGroup *>::iterator it = unitsGroups.begin(); it != unitsGroups.end(); )
+    {
+		if ((*it) == u)
+        {
+			unitsGroups.erase(it++);
 			return true;
 		}
+        else
+            ++it;
 	}
 	return false;
 }
 
-void WarManager::promptRemove(UnitsGroup* ug){
+void WarManager::promptRemove(UnitsGroup* ug)
+{
 	this->promptedRemove.push_back(ug);
 }
 

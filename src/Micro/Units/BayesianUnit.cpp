@@ -87,6 +87,15 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 
 BayesianUnit::~BayesianUnit()
 {
+    DWORD waitResult = WaitForSingleObject(_pathMutex, 10);
+    switch (waitResult) 
+    {
+    case WAIT_OBJECT_0: 
+        break;
+    case WAIT_ABANDONED:
+        //TerminateThread(thread);
+        break;
+    }
     CloseHandle(_pathMutex);
 }
 
@@ -625,6 +634,8 @@ void BayesianUnit::updateObj()
 void BayesianUnit::updatePPath()
 {
 #ifndef __OUR_PATHFINDER__
+    if (unit->getHitPoints() + unit->getShields() < 81)
+        return;
     double targetDistance = _unitPos.getDistance(target);
     Position p;
     TilePosition tptarget = target;

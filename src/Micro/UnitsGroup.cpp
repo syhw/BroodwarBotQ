@@ -27,6 +27,8 @@
 #include <typeinfo>
 #include "Nearby.h"
 
+#define __ARRIVING__UNITS__
+
 using namespace BWAPI;
 
 #define __MAX_DISTANCE_TO_GROUP__ 512
@@ -207,14 +209,13 @@ double UnitsGroup::evaluateForces()
         if (ut.isBuilding())
         {
             // consider ground defenses only because we have only ground atm
-            if (ut == UnitTypes::Protoss_Photon_Cannon)
+            if (ut == UnitTypes::Protoss_Photon_Cannon || ut == UnitTypes::Terran_Bunker)
             {
                 theirMinPrice += 3*ut.mineralPrice();
             } else if (ut == UnitTypes::Zerg_Sunken_Colony)
             {
                 theirMinPrice += 3*(ut.mineralPrice() + 50);
-            } else if (ut == UnitTypes::Protoss_Shield_Battery
-                || ut == UnitTypes::Terran_Bunker)
+            } else if (ut == UnitTypes::Protoss_Shield_Battery)
             {
                 theirMinPrice += 2*ut.mineralPrice();
             }
@@ -264,16 +265,17 @@ void UnitsGroup::update()
     {
         defaultTargetEnemy = NULL;
         accomplishGoal();
+        (*units.begin())->update();
         return;
     }
 
-    // arriving units
-    /*if (!arrivingUnits.empty())
+#ifdef __ARRIVING__UNITS__
+    if (!arrivingUnits.empty())
     {
         if (units.size() <= 2)
         {
             for (std::list<pBayesianUnit>::iterator it = arrivingUnits.begin();
-                it != arrivingUnits.end(); ++it)
+                it != arrivingUnits.end(); )
             {
                 units.push_back(*it);
                 arrivingUnits.erase(it++);
@@ -287,14 +289,19 @@ void UnitsGroup::update()
                 if ((*it)->unit->getPosition().getDistance(center) < __MAX_DISTANCE_TO_GROUP__)
                 {
                     units.push_back(*it);
-                    goals.front()->achieve();
+                    //goals.front()->achieve();
                     arrivingUnits.erase(it++);
                 }
                 else
-                    (*it++)->update();
+                {
+                    (*it)->attackMove(center);
+                    //(*it)->update();
+                    ++it;
+                }
             }
         }
-    }*/
+    }
+#endif
 
     updateCenter();
     leadingUnit = units.front();
@@ -302,9 +309,9 @@ void UnitsGroup::update()
     { 
         if ((*it)->unit->getType().isFlyer())
             continue;
-        if (leadingUnit->unit->getType().size() < (*it)->unit->getType().size() 
+        if ((leadingUnit->unit->getType().size() < (*it)->unit->getType().size() 
             || ( leadingUnit->unit->getType().size() == (*it)->unit->getType().size() && 
-                 leadingUnit->unit->getDistance(center) > (*it)->unit->getDistance(center) )
+                 leadingUnit->unit->getDistance(center) > (*it)->unit->getDistance(center) )) && (leadingUnit->unit->getHitPoints() + leadingUnit->unit->getShields() > 100)
             )
             leadingUnit = *it;
     }
@@ -531,6 +538,11 @@ double UnitsGroup::getDistance(BWAPI::Unit* u) const
 
 void UnitsGroup::takeControl(Unit* u)
 {//TOCHECK FOR THE GOAL MANAGEMENT
+    //for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
+    //{
+    //    if ((*it)->unit == u)
+    //        return;
+    //}
     pBayesianUnit tmp;
     if (u->getType() == BWAPI::UnitTypes::Protoss_Arbiter)
         tmp = pBayesianUnit(new ArbiterUnit(u, this));
@@ -573,17 +585,21 @@ void UnitsGroup::takeControl(Unit* u)
     else
         Broodwar->printf("Cette race n'est pas correctement gérée par l'IA pour le moment !");
 
-    //if (u->getDistance(center) < __MAX_DISTANCE_TO_GROUP__ || !units.size())
+#ifdef __ARRIVING__UNITS__
+    if (u->getDistance(center) < __MAX_DISTANCE_TO_GROUP__ || !units.size())
     {
+#endif
         if (tmp != NULL)
             this->units.push_back(tmp);
+#ifdef __ARRIVING__UNITS__
     }
-    /*else
+    else
     {
         u->attackMove(center);
         if (tmp != NULL)
             this->arrivingUnits.push_back(tmp);
-    }*/
+    }
+#endif
     if (u->getType() == UnitTypes::Protoss_Observer)
         _hasDetection = true;
     totalMinPrice += u->getType().mineralPrice();
