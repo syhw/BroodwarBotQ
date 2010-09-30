@@ -13,7 +13,7 @@ MorphManager::MorphManager()
 
 void MorphManager::setDependencies()
 {
-	this->arbitrator = static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(& Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance()) ;
+	static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator) = static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(& Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance()) ;
 }
 
 bool MorphManager::canMake(BWAPI::Unit* builder, BWAPI::UnitType type)
@@ -103,8 +103,8 @@ void MorphManager::onOffer(std::set<BWAPI::Unit*> units)
           morphingUnits.insert(std::make_pair(*i,newUnit));
           q->second.erase(t);
           //tell the arbitrator we accept the unit, and raise the bid to hopefully prevent other managers from using it
-          arbitrator->accept(this,*i);
-          arbitrator->setBid(this,*i,100.0);
+          static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->accept(this,*i);
+          static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->setBid(this,*i,100.0);
           used=true;
           break;
         }
@@ -120,8 +120,8 @@ void MorphManager::onOffer(std::set<BWAPI::Unit*> units)
     //if we didnt use this unit, tell the arbitrator we decline it
     if (!used)
     {
-      arbitrator->decline(this,*i,0);
-      arbitrator->removeBid(this,*i);
+      static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->decline(this,*i,0);
+      static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->removeBid(this,*i);
     }
   }
 }
@@ -145,7 +145,7 @@ void MorphManager::update()
   {
     std::map<BWAPI::UnitType,std::list<BWAPI::UnitType> >::iterator q=morphQueues.find((*u)->getType());
     if (q!=morphQueues.end() && !q->second.empty() && (*u)->isCompleted() && morphingUnits.find(*u)==morphingUnits.end())
-      arbitrator->setBid(this, *u, 50);
+      static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->setBid(this, *u, 50);
   }
   std::map<BWAPI::Unit*,Unit>::iterator i_next;
   //iterate through all the morphing units
@@ -158,7 +158,7 @@ void MorphManager::update()
       //if the unit is completed and is the right type, we are done
       if (i->first->getType()==i->second.type)
       {
-        arbitrator->removeBid(this, i->first);
+        static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->removeBid(this, i->first);
         plannedCount[i->second.type]--;
         startedCount[i->second.type]--;
         morphingUnits.erase(i);

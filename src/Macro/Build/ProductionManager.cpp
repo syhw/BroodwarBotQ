@@ -139,8 +139,11 @@ void ProductionManager::update()
     std::map<BWAPI::UnitType,std::list<ProductionUnitType> >::iterator p=productionQueues.find((*u)->getType());
 	if (p!=productionQueues.end() && !p->second.empty() && (*u)->isCompleted() && producingUnits.find(*u)==producingUnits.end())
     {
-        static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->setBid(this, *u, 50.0);
-        BWAPI::Broodwar->printf("Bid set on %s at adress %d coming from %d", (*u)->getType().getName().c_str(), (int)arbitrator, (int)this);
+        if (static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->getAllBidders(*u).size() < 10)
+        {
+            static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->setBid(this, *u, 50.0);
+            //BWAPI::Broodwar->printf("Bid set on %s at adress %d coming from %d", (*u)->getType().getName().c_str(), (int)arbitrator, (int)this);
+        }
 	}
   }
   std::map<BWAPI::Unit*,Unit>::iterator i_next;
@@ -179,7 +182,7 @@ void ProductionManager::update()
         }
 
         //if the build unit is completed
-        if (i->second.unit->isCompleted() || i->second.unit->getRemainingTrainTime() == 0)
+        if (i->second.unit->isCompleted()) // || i->second.unit->getRemainingTrainTime() == 0)
         {
           //and if the build unit is the right type
           if (i->second.unit->getType()==i->second.type.type)

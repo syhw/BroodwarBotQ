@@ -53,8 +53,8 @@ void ConstructionManager::onOffer(std::set<BWAPI::Unit*> units)
       if (builder != NULL)
       {
         //tell the arbitrator we accept the unit, and raise the bid to hopefully prevent other managers from using it
-        arbitrator->accept(this, builder);
-        arbitrator->setBid(this, builder, 100.0);
+        static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->accept(this, builder);
+        static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->setBid(this, builder, 100.0);
 
         //add builder to builders map
         builders.insert(std::make_pair(builder, *b));
@@ -99,8 +99,8 @@ void ConstructionManager::onOffer(std::set<BWAPI::Unit*> units)
   //decline whatever is left
   for(std::set<BWAPI::Unit*>::iterator u = units.begin(); u != units.end(); u++)
   {
-    arbitrator->decline(this, *u, 0);
-    arbitrator->removeBid(this, *u);
+    static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->decline(this, *u, 0);
+    static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->removeBid(this, *u);
   }
 }
 
@@ -139,9 +139,9 @@ void ConstructionManager::update()
           double bid = 80 - (min_dist - 10)/(256*32)*60;
           //if this isn't a worker, we don't care about distance
           if (!(*u)->getType().isWorker())
-            arbitrator->setBid(this, *u, 80);
+            static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->setBid(this, *u, 80);
           else
-            arbitrator->setBid(this, *u, bid);
+            static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->setBid(this, *u, bid);
         }
       }
     }
@@ -175,7 +175,7 @@ void ConstructionManager::update()
         if (u != NULL)
         {
           this->builders.erase(u);
-          arbitrator->removeBid(this,u);
+          static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->removeBid(this,u);
         }
         this->placer->freeTiles(b->tilePosition, 4,3);
         this->placer->freeTiles(b->tilePosition+BWAPI::TilePosition(4,1), 2,2);
@@ -304,7 +304,7 @@ void ConstructionManager::update()
         if (u != NULL)
         {
           this->builders.erase(u);
-          arbitrator->removeBid(this,u);
+          static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->removeBid(this,u);
         }
         this->placer->freeTiles(b->tilePosition, b->type.tileWidth(), b->type.tileHeight());
 
@@ -346,7 +346,7 @@ void ConstructionManager::update()
             if (u != NULL)
             {
               this->builders.erase(u);
-              arbitrator->removeBid(this, u);
+              static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->removeBid(this, u);
               b->builderUnit = NULL;  
               u = b->builderUnit;
             }

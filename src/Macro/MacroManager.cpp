@@ -304,7 +304,7 @@ bool MacroManager::shouldExpand()
 	const std::set<Base*>& bases = baseManager->getAllBases();
 	for( std::set<Base*>::const_iterator it = bases.begin(); it != bases.end(); it++)
 	{
-		nbRessources += (int)(2 * (*it)->getMinerals().size()) + 3 * (*it)->getGeysers().size(); // TOCHANGE 2 for 2.5, saturation is around 3
+		nbRessources += (int)(2.4 * (*it)->getMinerals().size()) + 3 * (*it)->getGeysers().size(); // TOCHANGE 2 for 2.5, saturation is around 3
 	}
 	return workerManager->workers.size() >= nbRessources;
 }

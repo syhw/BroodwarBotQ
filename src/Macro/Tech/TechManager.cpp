@@ -28,8 +28,8 @@ void TechManager::onOffer(std::set<BWAPI::Unit*> units)
           q->second.erase(t);
 
           //tell the arbitrator we accept the unit, and raise the bid to hopefully prevent other managers from using it
-          arbitrator->accept(this,*i);
-          arbitrator->setBid(this,*i,100.0);
+          static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->accept(this,*i);
+          static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->setBid(this,*i,100.0);
           used=true;
           break;
         }
@@ -38,8 +38,8 @@ void TechManager::onOffer(std::set<BWAPI::Unit*> units)
     //if we didnt use this unit, tell the arbitrator we decline it
     if (!used)
     {
-      arbitrator->decline(this,*i,0);
-      arbitrator->removeBid(this,*i);
+      static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->decline(this,*i,0);
+      static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->removeBid(this,*i);
     }
   }
 }
@@ -56,7 +56,7 @@ void TechManager::update()
   {
     std::map<BWAPI::UnitType,std::list<BWAPI::TechType> >::iterator r=researchQueues.find((*u)->getType());
     if ((*u)->isCompleted() && r!=researchQueues.end() && !r->second.empty())
-      arbitrator->setBid(this, *u, 50);
+      static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->setBid(this, *u, 50);
   }
   std::map<BWAPI::Unit*,BWAPI::TechType>::iterator i_next;
   //iterate through all the researching units
@@ -75,7 +75,7 @@ void TechManager::update()
     {
       if (BWAPI::Broodwar->self()->hasResearched(i->second)) //if we have researched the given tech, we are done
       {
-        arbitrator->removeBid(this, i->first);
+        static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->removeBid(this, i->first);
         researchingUnits.erase(i);
       }
       else //if we haven't researched the given tech, we need to order this unit to research it

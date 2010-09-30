@@ -50,6 +50,10 @@ priorite entre les type ? rejoins requiered pour la tech
 class MacroManager: public BaseObject
 {
 public:
+    std::list<BWAPI::Unit*> nexuses; // provisory
+    std::list<BWAPI::Unit*> gateways; // provisory
+    std::list<BWAPI::Unit*> forges; // provisory
+
 	MacroManager();
 	~MacroManager();
 	void setDependencies();

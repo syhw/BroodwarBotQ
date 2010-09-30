@@ -81,7 +81,7 @@ void DefenseManager::checkGroundDefense(Base * b, bool toDef){
 						if ((*selection)->getType() == BWAPI::UnitTypes::Protoss_Zealot || (*selection)->getType() == BWAPI::UnitTypes::Protoss_Dragoon)
                         {
 							this->requesters.push_back(ug);
-							this->arbitrator->setBid(this, (*selection), 60);
+							static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->setBid(this, (*selection), 60);
 							break;
 						}
 					}
@@ -98,7 +98,7 @@ void DefenseManager::checkGroundDefense(Base * b, bool toDef){
 				//We must give back those units to the WarManager
 				for (std::vector<pBayesianUnit>::iterator units = ((*ug).units).begin(); units != ((*ug).units).end(); ++ units)
                 {
-                    this->arbitrator->removeBid(this,(*units)->unit);
+                    static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->removeBid(this,(*units)->unit);
 					//this->arbitrator->setBid(this,(*units)->unit, 0);
 					ug->giveUpControl((*units)->unit);
 				}
@@ -120,12 +120,12 @@ void DefenseManager::onOffer(std::set<BWAPI::Unit*> units)
 	for(std::set<BWAPI::Unit*>::iterator u = units.begin(); u != units.end(); u++){
 		
 		if(this->requesters.size() != 0 ){
-			this->arbitrator->accept(this, *u);
+			static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->accept(this, *u);
 			this->requesters.front()->takeControl(*u);
 			this->requesters.pop_front();
 
 		} else {
-			this->arbitrator->decline(this, *u, 0);
+			static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->decline(this, *u, 0);
 		}
 	}
 }

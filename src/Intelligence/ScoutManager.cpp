@@ -47,7 +47,7 @@ void ScoutManager::update()
 			//If no new goal available release the ug : 
 			if(this->awaitingGoals.size() <= 0){
 				for(std::vector<pBayesianUnit>::iterator u = (*it)->units.begin(); u != (*it)->units.end(); ++u){
-					this->arbitrator->removeBid(this, (*u)->unit);
+					static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->removeBid(this, (*u)->unit);
 				}
 				this->warManager->promptRemove(*it);
 				toTrash.insert(*it);
@@ -65,7 +65,7 @@ void ScoutManager::update()
 		for(std::set<BWAPI::Unit *>::const_iterator it = BWAPI::Broodwar->self()->getUnits().begin(); it != BWAPI::Broodwar->self()->getUnits().end(); ++it){
 			if ((*it)->getType().isWorker() || (*it)->getType() == BWAPI::UnitTypes::Protoss_Observer)
             {
-				this->arbitrator->setBid(this, (*it),92);
+				static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->setBid(this, (*it),92);
 			}
 		}
 	}
@@ -144,7 +144,7 @@ void ScoutManager::onOffer(std::set<BWAPI::Unit*> units)
 				bestUnit = (*units);
 			}
 			test = (*goals)->estimateDistance((*units)->getPosition());
-			if (test < dist)
+            if (test < dist && (*units)->getType() == BWAPI::UnitTypes::Protoss_Probe)
             {
 				bestUnit = (*units);
 				dist = test;
@@ -155,11 +155,11 @@ void ScoutManager::onOffer(std::set<BWAPI::Unit*> units)
 				break;
 			}
 		}
-		this->arbitrator->accept(this, bestUnit, 92);
+		static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->accept(this, bestUnit, 92);
 		giveMeTheGoal = new UnitsGroup();
 		this->myUnitsGroups.push_back(giveMeTheGoal);
 		giveMeTheGoal->takeControl(bestUnit);
-        bestUnit->move(Position(Broodwar->mapWidth()*16, Broodwar->mapHeight()*16));
+        //bestUnit->move(Position(Broodwar->mapWidth()*16, Broodwar->mapHeight()*16));
 		remainingUnits.erase(bestUnit);
 	
 		//We have a unitsGroup
@@ -168,14 +168,17 @@ void ScoutManager::onOffer(std::set<BWAPI::Unit*> units)
 	
 		warManager->unitsGroups.push_back(giveMeTheGoal);
 		giveMeTheGoal->switchMode(MODE_SCOUT);
+        giveMeTheGoal->update();
 		goalsDone.push_back((*goals));
 	}
 
-	for(std::set<BWAPI::Unit *>::iterator it = remainingUnits.begin(); it != remainingUnits.end(); ++it){
-		this->arbitrator->decline(this,(*it), 0);
+	for(std::set<BWAPI::Unit *>::iterator it = remainingUnits.begin(); it != remainingUnits.end(); ++it)
+    {
+		static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->decline(this,(*it), 0);
 	}
 
-	for(std::vector<pGoal>::const_iterator it = goalsDone.begin(); it != goalsDone.end(); ++it ){
+	for(std::vector<pGoal>::const_iterator it = goalsDone.begin(); it != goalsDone.end(); ++it )
+    {
 		this->awaitingGoals.remove(*it);
 	}
 
@@ -195,7 +198,7 @@ void ScoutManager::findEnemy()
     {	
 		if ((*it)->getType().isWorker() || (*it)->getType() == BWAPI::UnitTypes::Protoss_Observer)
         {
-			this->arbitrator->setBid(this, (*it),92);
+			static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->setBid(this, (*it),92);
 		}
 	}
 }

@@ -719,9 +719,9 @@ string BuildOrderManager::getName() const
 }
 void BuildOrderManager::build(int count, BWAPI::UnitType t, int priority, BWAPI::TilePosition seedPosition)
 {
-	if(count == 0 || priority == 0){
-		return;
-	}
+	//if(count == 0 || priority == 0){
+	//	return;
+	//}
   if (t == BWAPI::UnitTypes::None || t == BWAPI::UnitTypes::Unknown) return;
   if (seedPosition == BWAPI::TilePositions::None || seedPosition == BWAPI::TilePositions::Unknown)
     seedPosition=BWAPI::Broodwar->self()->getStartLocation();

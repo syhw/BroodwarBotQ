@@ -364,14 +364,14 @@ void BattleBroodAI::onFrame()
         Broodwar->printf("DefenseManager took: %2.5f seconds\n", duration);
 #endif
 #ifdef __DEBUG__
-    this->enhancedUI->update();
+    //this->enhancedUI->update();
     end2 = clock();
     duration = (double)(end2 - end) / CLOCKS_PER_SEC;
     if (duration > 0.040) 
         Broodwar->printf("EnhancedUI took: %2.5f seconds\n", duration);
 #endif
 
-    this->arbitrator->update();
+    static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->update();
 #ifdef __DEBUG__
     end = clock();
     duration = (double)(end - end2) / CLOCKS_PER_SEC;
@@ -420,6 +420,13 @@ void BattleBroodAI::onUnitCreate(BWAPI::Unit* unit)
     this->mapManager->onUnitCreate(unit);
     this->warManager->onUnitCreate(unit);
     this->macroManager->onUnitCreate(unit);
+
+    if (unit->getType() == BWAPI::UnitTypes::Protoss_Nexus) // provisory
+        macroManager->nexuses.push_back(unit);
+    else if (unit->getType() == BWAPI::UnitTypes::Protoss_Gateway)
+        macroManager->gateways.push_back(unit);
+    else if (unit->getType() == BWAPI::UnitTypes::Protoss_Forge)
+        macroManager->forges.push_back(unit);
 }
 
 void BattleBroodAI::onUnitDestroy(BWAPI::Unit* unit)
@@ -457,6 +464,7 @@ void BattleBroodAI::onUnitShow(BWAPI::Unit* unit)
     {
         this->macroManager->needed[Observer] = 3;
         this->macroManager->priority[Observer] = 90;
+        this->buildOrderManager->build(3, UnitTypes::Protoss_Observer, 100);
     }
 }
 

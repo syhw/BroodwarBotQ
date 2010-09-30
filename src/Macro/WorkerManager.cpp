@@ -182,6 +182,32 @@ void WorkerManager::rebalanceWorkers()
   }
   optimalWorkerCount += 2; // to account for scouting and building
 
+    if (mineralOrder.empty())
+    {
+        double min_dist = 1000000000.0;
+        BWTA::BaseLocation* closest_base_location = NULL;
+        for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getBaseLocations().begin(); it != BWTA::getBaseLocations().end(); ++it)
+        {
+            if ((*it)->getMinerals().empty())
+                continue;
+            for(set<Base*>::iterator b = this->basesCache.begin(); b != this->basesCache.end(); b++)
+            {
+                if ((*b)->getBaseLocation() == *it)
+                    continue;
+                double tmp_dist = (*it)->getPosition().getDistance((*b)->getBaseLocation()->getPosition());
+                if (tmp_dist < min_dist)
+                {
+                    min_dist = tmp_dist;
+                    closest_base_location = *it;
+                }
+            }
+        }
+        for (std::set<BWAPI::Unit*>::const_iterator it = closest_base_location->getMinerals().begin(); it != closest_base_location->getMinerals().end(); ++it)
+        {
+            mineralOrder.push_back(make_pair(*it, (*it)->getResources()));
+        }
+    }
+
   //if no resources exist, return
   if (!mineralOrder.empty())
   {
