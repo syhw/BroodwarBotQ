@@ -144,11 +144,11 @@ void MicroAIModule::onStart()
 
 
     /* SQUARE ON THE OTHER SIDE */
-    /*tmp_form = pFormation(new SquareFormation(
+    tmp_form = pFormation(new SquareFormation(
         Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
     tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
     tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
-    goals.push_back(tmp_goal);*/
+    goals.push_back(tmp_goal);
     
     if (mapName == std::string("muta.scm") || mapName == std::string("mutaCOMPUTER.scm"))
     {
