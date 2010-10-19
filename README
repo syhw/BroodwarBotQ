@@ -47,6 +47,9 @@ Nicolas Biagianti
     use MacroProject.dll. Running BBQ as any other race or on any other map
    will produce unexpected results and may crash.
 
+A more detailled install guide is there:
+http://emotion.inrialpes.fr/people/synnaeve/bwiki/html/install
+
 ===== Additional Info / Did You Read That ? =====
 The BWAPI web site    		http://code.google.com/p/bwapi/
 The BWSAL web site    		http://code.google.com/p/bwsal/
