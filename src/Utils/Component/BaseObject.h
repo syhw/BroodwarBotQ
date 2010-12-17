@@ -10,7 +10,7 @@
 #include "RefreshWidgetEmiter.h"
 #endif
 #include "time.h"
-#include "BWAPI.h"
+#include <BWAPI.h>
 
 class BaseData;
 

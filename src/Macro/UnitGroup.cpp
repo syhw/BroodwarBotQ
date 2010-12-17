@@ -1507,7 +1507,7 @@ bool UnitGroup::setRallyPosition(Position target) const
   bool retval=true;
   for(set<Unit*>::const_iterator i=this->begin();i!=this->end();i++)
   {
-    retval = retval && (*i)->setRallyPosition(target);
+    retval = retval && (*i)->setRallyPoint(target);
   }
   return retval;
 }
@@ -1516,7 +1516,7 @@ bool UnitGroup::setRallyUnit(Unit* target) const
   bool retval=true;
   for(set<Unit*>::const_iterator i=this->begin();i!=this->end();i++)
   {
-    retval = retval && (*i)->setRallyUnit(target);
+    retval = retval && (*i)->setRallyPoint(target);
   }
   return retval;
 }

@@ -361,7 +361,7 @@ void UnitsGroup::update()
         {
             enemiesCenter += it->second;
             if (!(it->first->getType().isFlyer()))
-                enemiesAltitude += BWAPI::Broodwar->getGroundHeight(it->second);
+                enemiesAltitude += BWAPI::Broodwar->getGroundHeight(TilePosition(it->second));
         }
         enemiesCenter.x() /= enemies.size();
         enemiesCenter.y() /= enemies.size();
@@ -400,7 +400,7 @@ void UnitsGroup::update()
                 {
                     const std::pair<BWTA::Region*, BWTA::Region*> regions = nearestChoke->getRegions();
                     BWTA::Region* higherRegion = 
-                        (Broodwar->getGroundHeight(regions.first->getCenter()) > Broodwar->getGroundHeight(regions.second->getCenter())) 
+                        (Broodwar->getGroundHeight(TilePosition(regions.first->getCenter())) > Broodwar->getGroundHeight(TilePosition(regions.second->getCenter()))) 
                         ? regions.first : regions.second;
                     (*it)->target = higherRegion->getCenter();
                 }
@@ -727,7 +727,7 @@ void UnitsGroup::updateCenter()
     {
         center += (*it)->unit->getPosition();
         if (!(*it)->unit->getType().isFlyer())
-            groupAltitude += Broodwar->getGroundHeight((*it)->unit->getPosition());
+            groupAltitude += Broodwar->getGroundHeight(TilePosition((*it)->unit->getPosition()));
     }
     center.x() /= units.size();
     center.y() /= units.size();
