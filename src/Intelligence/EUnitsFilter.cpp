@@ -1,6 +1,4 @@
 #include "EUnitsFilter.h"
-#include <QtGui/QTableWidgetItem>
-#include <QtGui/QApplication>
 
 using namespace BWAPI;
 using namespace std;
@@ -115,7 +113,7 @@ void EUnitsFilter::update(Unit* u)
         _eViewedUnits[u].update(Broodwar->getFrameCount());
     else 
         _eViewedUnits[u] = EViewedUnit(u, Broodwar->getFrameCount());
-    if ((!(u->isDetected()) || u->isCloaked() || u->isBurrowed()) && Broodwar->isVisible(_eViewedUnits[u].position))
+    if ((!(u->isDetected()) || u->isCloaked() || u->isBurrowed()) && Broodwar->isVisible(TilePosition(_eViewedUnits[u].position)))
     {
         _invisibleUnits[u] = std::make_pair<UnitType, Position>(u->getType(), u->getPosition());
 #ifdef __DEBUG__

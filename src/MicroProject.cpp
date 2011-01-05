@@ -3,7 +3,6 @@
 #include "FormationSubgoal.h"
 #include "AttackGoal.h"
 #include <stdio.h>
-#include <QtGui/QApplication.h>
 #include <string>
 using namespace BWAPI;
 using namespace std;

@@ -64,7 +64,7 @@ int ZealotUnit::fightMove()
 bool ZealotUnit::decideToFlee()
 {
     if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() 
-        && Broodwar->getGroundHeight(targetEnemy->getPosition()) > Broodwar->getGroundHeight(_unitPos))
+        && Broodwar->getGroundHeight(TilePosition(targetEnemy->getPosition())) > Broodwar->getGroundHeight(TilePosition(_unitPos)))
     {
         if (_unitsGroup && _unitsGroup->nearestChoke && _unitsGroup->nearestChoke->getCenter().getDistance(_unitPos) < 128)
         {

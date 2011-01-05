@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <tchar.h>
 #include <BWAPI.h>
-#include <QtGui/QApplication>
 #include "MainWindow.h"
 #include "MicroProject.h"
 

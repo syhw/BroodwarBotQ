@@ -50,7 +50,7 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 , _lastTotalHP(unit->getHitPoints() + unit->getShields())
 , _sumLostHP(0)
 , _refreshPathFramerate(12)
-, _maxDistWhileRefreshingPath((int)max(_refreshPathFramerate * _topSpeed, 45.26)) // 45.26 = sqrt(BWAPI::TILE_SIZE^2 + BWAPI::TILE_SIZE^2)
+, _maxDistWhileRefreshingPath((int)max(_refreshPathFramerate * _topSpeed, 45.26)) // 45.26 = sqrt(32^2 + 32^2)
 , _newPath(false)
 , _inPos(Position(0, 0))
 , _fleeing(false)
@@ -651,9 +651,9 @@ void BayesianUnit::updatePPath()
         return;
     double targetDistance = _unitPos.getDistance(target);
     Position p;
-    TilePosition tptarget = target;
+    TilePosition tptarget = TilePosition(target);
 
-    if (targetDistance <= 45.26) // sqrt(BWAPI::TILE_SIZE^2 + BWAPI::TILE_SIZE^2)
+    if (targetDistance <= 45.26) // sqrt(32^2 + 32^2)
     {
         _ppath.clear();
         if (targetDistance <= _maxDimension) // dirty hack to click farther than the unit size when really near
@@ -672,7 +672,7 @@ void BayesianUnit::updatePPath()
             {
                 _ppath.clear();
                 for (std::vector<TilePosition>::const_iterator it = _btpath.begin(); it != _btpath.end(); ++it)
-                    _ppath.push_back(*it);
+                    _ppath.push_back(Position(*it));
             }
             _newPath = false;
         }
@@ -717,7 +717,7 @@ void BayesianUnit::updatePPath()
         unsigned int count = 0;
         for (unsigned int i = 0; i < _ppath.size(); ++i) 
         {
-            if (_ppath[i].getDistance(_unitPos) < _maxDistWhileRefreshingPath) //45.26) // sqrt(BWAPI::TILE_SIZE^2 + BWAPI::TILE_SIZE^2)
+            if (_ppath[i].getDistance(_unitPos) < _maxDistWhileRefreshingPath) //45.26) // sqrt(32^2 + 32^2)
                 count = i;
         }
         for (; count > 0; --count) 
@@ -728,9 +728,9 @@ void BayesianUnit::updatePPath()
     {
         obj = Vec(0, 0);
     }
-    else if (_unitPos.getDistance(target) >= WALK_TILES_SIZE/2 && _unitPos.getDistance(target) < BWAPI::TILE_SIZE)
+    else if (_unitPos.getDistance(target) >= WALK_TILES_SIZE/2 && _unitPos.getDistance(target) < 32)
     {*/
-    if (_unitPos.getDistance(target) < BWAPI::TILE_SIZE)
+    if (_unitPos.getDistance(target) < 32)
     {
         obj = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y());
     }
@@ -1515,7 +1515,7 @@ void BayesianUnit::updateDir()
 void BayesianUnit::drawDir()
 {
     Position up = _unitPos;
-    if (dir.translate(up).y() <= Broodwar->mapHeight()*BWAPI::TILE_SIZE && dir.translate(up).x() <= Broodwar->mapWidth()*BWAPI::TILE_SIZE)
+    if (dir.translate(up).y() <= Broodwar->mapHeight()*32 && dir.translate(up).x() <= Broodwar->mapWidth()*32)
         Broodwar->drawLineMap(up.x(), up.y(), dir.translate(up).x(), dir.translate(up).y(), Colors::Red);
 }
 
