@@ -102,7 +102,7 @@ void BattleBroodAI::onStart()
     // Enable some cheat flags
 #ifdef __DEBUG__
     Broodwar->enableFlag(Flag::UserInput);
-    //Broodwar->setLocalSpeed(0);
+    Broodwar->setLocalSpeed(0);
 #endif
     // Uncomment to enable complete map information
     //Broodwar->enableFlag(Flag::CompleteMapInformation);

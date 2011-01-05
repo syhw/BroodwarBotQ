@@ -134,6 +134,19 @@ void BayesianUnit::computeDamageValues()
     }
 }
 
+#ifdef WITH_FLOCKING
+void BayesianUnit::computeFlockValues()
+{
+    _flockValues.clear();
+    for (unsigned int i = 0;i < _dirv.size(); ++i)
+    {
+        for (units in group)
+        {
+        }
+    }
+}
+#endif
+
 void BayesianUnit::computeRepulseValues()
 {
     _repulseValues.clear();

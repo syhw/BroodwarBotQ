@@ -18,6 +18,7 @@ typedef boost::shared_ptr<BayesianUnit> pBayesianUnit;
 #include <process.h>
 
 // #define PROBT 1
+#define WITH_FLOCKING 1
 
 // TODO, this class has to be derived to take Flying/Ground/Special Units 
 // (templars, tanks, lurkers, etc.) into account
@@ -37,6 +38,9 @@ enum unit_mode {
     MODE_FIGHT_G,   // ground
     MODE_FIGHT_A,   // air
     MODE_SCOUT,
+#ifdef WITH_FLOCKING
+    MODE_FLOCK,
+#endif
     MODE_MOVE
 }; 
 
@@ -92,6 +96,9 @@ protected:
     This grid because there are only 16 possible directions in Broodwar */
     MapManager* mapManager;
     std::vector<repulse_value> _repulseValues;
+#ifdef WITH_FLOCKING
+    std::vector<repulse_value> _flockValues;
+#endif
     std::vector<damage_value> _damageValues;
     std::vector<double> _damageProb; // TODO decide if static, perhaps unit dependant
     std::vector<double> _repulseProb;
@@ -105,6 +112,9 @@ protected:
 
     inline void initDefaultProb();
     inline void computeRepulseValues();
+#ifdef WITH_FLOCKING
+    inline void computeFlockValues();
+#endif
     inline void computeDamageValues();
     void straightLine(std::vector<BWAPI::Position>& ppath, 
         const BWAPI::Position& p_start, 
@@ -135,6 +145,9 @@ protected:
     inline void updateAttractors();
     void drawAttractors();
     void drawRepulseValues();
+#ifdef WITH_FLOCKING
+    void drawFlockValues();
+#endif
     void drawOccupation(int number);
     // TODO:
     // goal direction
