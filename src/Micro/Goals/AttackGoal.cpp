@@ -8,6 +8,11 @@ AttackGoal::AttackGoal(UnitsGroup* ug, BWAPI::Position p)
 {
 }
 
+AttackGoal::AttackGoal(UnitsGroup* ug, BWAPI::TilePosition tp)
+: Goal(ug, pSubgoal(new FormationSubgoal(SL_AND, pFormation(new SquareFormation(BWAPI::Position(tp))))))
+{
+}
+
 void AttackGoal::achieve()
 {
 	//See if we need an intermediate subgoal : 

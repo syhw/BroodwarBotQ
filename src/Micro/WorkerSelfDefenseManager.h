@@ -2,7 +2,7 @@
 #include <Arbitrator.h>
 #include <BWAPI.h>
 #include <UnitGroupManager.h>
-#include <UtilHeap.h>
+#include <Heap.h>
 class WorkerSelfDefenseManager : public Arbitrator::Controller<BWAPI::Unit*,double>
 {
   public:
@@ -16,5 +16,5 @@ class WorkerSelfDefenseManager : public Arbitrator::Controller<BWAPI::Unit*,doub
   private:
     Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
     std::set<BWAPI::Unit*> myWorkers;
-    std::map<BWAPI::Unit*,Util::Heap<BWAPI::Unit*, int> > getAttackers;
+    std::map<BWAPI::Unit*,Arbitrator::Heap<BWAPI::Unit*, int> > getAttackers;
 };

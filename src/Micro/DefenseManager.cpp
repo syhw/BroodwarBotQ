@@ -33,7 +33,7 @@ void DefenseManager::checkDefenses()
         for (std::map<Unit*, EViewedUnit>::const_iterator evu = EUnitsFilter::Instance().getViewedUnits().begin();
             evu != EUnitsFilter::Instance().getViewedUnits().end(); ++evu)
         {
-            if (region == BWTA::getRegion(evu->second.position)) // HACK HACK HACK TODO
+			if (region == BWTA::getRegion(TilePosition(evu->second.position))) // HACK HACK HACK TODO
                 toDef = true;
         }
 		

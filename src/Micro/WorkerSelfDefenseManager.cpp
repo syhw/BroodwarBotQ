@@ -1,7 +1,6 @@
 #include <WorkerSelfDefenseManager.h>
 using namespace BWAPI;
 using namespace std;
-using namespace Util;
 WorkerSelfDefenseManager::WorkerSelfDefenseManager(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator)
 {
   this->arbitrator = arbitrator;
@@ -53,7 +52,7 @@ void WorkerSelfDefenseManager::update()
   }
 
   //remove units from getAttackers that have not attacked in a while
-  for(std::map<Unit*, Heap<Unit*,int> >::iterator i =getAttackers.begin(); i!=getAttackers.end(); i++)
+  for(std::map<Unit*, Arbitrator::Heap<Unit*,int> >::iterator i =getAttackers.begin(); i!=getAttackers.end(); i++)
   {
     while(i->second.empty()==false && (i->second.top().first->exists()==false || i->second.top().second+48<frame))
     {
