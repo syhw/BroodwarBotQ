@@ -18,7 +18,7 @@ typedef boost::shared_ptr<BayesianUnit> pBayesianUnit;
 #include <process.h>
 
 // #define PROBT 1
-#define WITH_FLOCKING 1
+// #define WITH_FLOCKING 1
 
 // TODO, this class has to be derived to take Flying/Ground/Special Units 
 // (templars, tanks, lurkers, etc.) into account
