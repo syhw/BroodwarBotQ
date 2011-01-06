@@ -1,3 +1,5 @@
+* Pass distribution on dirV/actions from BayesianUnit upstream in UnitsGroup
+  for a more "global" optimal
 * More thread safety? (BayesianUnit, MapManager)
 * Re-use flocking (+learning of its parameters) in BayesianUnit
 * Modify MapManager's damages maps to use DPS instead of raw damages
