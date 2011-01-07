@@ -1863,14 +1863,6 @@ void BayesianUnit::update()
     /// check() for all inherited classes
     check();
 
-    if (!(Broodwar->getFrameCount()%1440)) // HACK TODO REMOVE
-    {
-        unit->attackMove(target);
-        _lastRightClick = target;
-        _lastClickFrame = Broodwar->getFrameCount();
-        _lastMoveFrame = Broodwar->getFrameCount();
-    }
-
     //if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->getDistance(_unitPos) > 512) // 16buildtiles*32
         //switchMode(MODE_MOVE);
     if (_mode != MODE_FIGHT_G && _mode != MODE_SCOUT 
