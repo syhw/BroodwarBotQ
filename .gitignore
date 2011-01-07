@@ -1,0 +1,9 @@
+*.ncb
+*.suo
+MacroProject/
+MicroProject/
+*.exp
+*.lib
+*.pdb
+vcproj2cmake.rb
+CMakeList.txt
