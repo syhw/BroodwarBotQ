@@ -16,7 +16,7 @@ void MicroAIModule::onStart()
     //Broodwar->printf("ON START !!\n");
 #ifdef __DEBUG__
     Broodwar->enableFlag(Flag::UserInput);
-    //Broodwar->setLocalSpeed(0);
+    Broodwar->setLocalSpeed(0);
 #endif
 	//Broodwar->enableFlag(Flag::CompleteMapInformation);
 	BWTA::readMap();

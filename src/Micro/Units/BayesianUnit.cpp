@@ -1596,10 +1596,6 @@ int BayesianUnit::fightMove()
         && targetEnemy->getDistance(_unitPos) > 45.0) || !inRange(targetEnemy) || (_unitsGroup->units.size() > 10 && targetEnemy->getDistance(_unitPos) > 128)) // TODO MICROONLY (_unitsGroup->units.size() > 10 && targetEnemy->getDistance(_unitPos) > 128)
         && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
     {
-        unit->move(targetEnemy->getPosition());
-        _lastClickFrame = Broodwar->getFrameCount();
-        _lastMoveFrame = Broodwar->getFrameCount();
-        _fightMoving = true;
         return 1;
     }
     double dist = target.getDistance(_unitPos);
@@ -1609,20 +1605,12 @@ int BayesianUnit::fightMove()
         && !inRange(oorTargetEnemy)
         && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
     {
-        //unit->rightClick(oorTargetEnemy->getPosition());
-        //_lastRightClick =  oorTargetEnemy->getPosition();
-        unit->move(oorTargetEnemy->getPosition());
-        _lastClickFrame = Broodwar->getFrameCount();
-        _lastMoveFrame = Broodwar->getFrameCount();
-        _fightMoving = true;
         return 2;
     }
     /// move towards target if we are "far enough from it"
     if ((dist > 192.0 || (_unitsGroup->distToNearestChoke < 128.0 && !unit->getType().isFlyer() && dist > unit->getType().groundWeapon().maxRange() && _unitsGroup->enemiesAltitude > _unitsGroup->groupAltitude))  // 192 == 6 build tiles TOCHANGE
         && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
     {
-        clickTarget();
-        _fightMoving = true;
         return 3;
     }
     /// Or simply move away from our friends and kite if we can
@@ -1630,47 +1618,11 @@ int BayesianUnit::fightMove()
         && outRanges(targetEnemy) // don't kite it we don't outrange
         && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
     {
-        // TODO TO COMPLETE (with a clickTarget() if dist > threshold)
         updateDir();
-        clickDir();
         _fightMoving = true;
         return 4;
     }
     return 0;
-    /// Or simply move away from our friends
-    /*updateDirV();
-    updateAttractors();
-    obj = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y());
-    _dirvProb.clear();
-    for (unsigned int i = 0; i < _dirv.size(); ++i)
-    {
-        double prob = 1.0;
-        prob *= _repulseProb[_repulseValues[i]]; /// Repulsion of the other units incoming towards us
-        if (!(unit->getType().isFlyer()))
-        {
-            if (_occupation[i] == OCCUP_BUILDING) /// NON-WALKABLE (BUILDING) INFLUENCE
-            {	
-                prob *= 1.0-_PROB_NO_BUILDING_MOVE;
-            }
-            else if (_occupation[i] == OCCUP_BLOCKING) /// NON-WALKABLE INFLUENCE
-            {
-                prob *= 1.0-_PROB_NO_WALL_MOVE;
-            }
-            else if (_occupation[i] == OCCUP_UNIT)
-            {
-                prob *= 1.0-_PROB_NO_UNIT_MOVE;
-            }
-        }
-        _dirvProb.insert(make_pair(prob, _dirv[i]));
-    }
-    selectDir(obj);*/
-    /*if (!_fightMoving || Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency())
-    {
-        // TODO TO COMPLETE (with a clickTarget() if dist > threshold)
-        updateDir();
-        clickDir();
-        _fightMoving = true;
-    }*/
 }
 
 void BayesianUnit::drawArrow(Vec& v)
@@ -1718,11 +1670,6 @@ bool BayesianUnit::decideToFlee()
 void BayesianUnit::simpleFlee()
 {
     _fightMoving = false;
-    /*if (!this->mapManager->groundDamages[_unitPos.x()/32 + _unitPos.y()/32*Broodwar->mapWidth()])
-    {
-        _fleeing = false;
-        return;
-    }*/
     if (_unitsGroup->enemies.size() <= 1 && targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() && !outRanges(targetEnemy)) // TOCHANGE 1
     {
         _fleeing = false;
@@ -1780,7 +1727,7 @@ void BayesianUnit::simpleFlee()
                 tmp = Vec(tmp.x() - (*it)->getPosition().x(), tmp.y() - (*it)->getPosition().y()).translate(tmp);
         }
     }
-    unit->move(tmp);
+	dir = tmp;
 }
 
 bool BayesianUnit::dodgeStorm()

@@ -37,10 +37,6 @@ int ZealotUnit::fightMove()
         && targetEnemy->getDistance(_unitPos) > 45.0) || !inRange(targetEnemy) || (_unitsGroup->units.size() > 10 && targetEnemy->getDistance(_unitPos) > 128)) // TODO MICROONLY (_unitsGroup->units.size() > 10 && targetEnemy->getDistance(_unitPos) > 128)
         && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
     {
-        unit->move(targetEnemy->getPosition());
-        _lastClickFrame = Broodwar->getFrameCount();
-        _lastMoveFrame = Broodwar->getFrameCount();
-        _fightMoving = true;
         return 1;
     }
     double dist = target.getDistance(_unitPos);
@@ -50,12 +46,6 @@ int ZealotUnit::fightMove()
         && !inRange(oorTargetEnemy)
         && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
     {
-        //unit->rightClick(oorTargetEnemy->getPosition());
-        //_lastRightClick =  oorTargetEnemy->getPosition();
-        unit->move(oorTargetEnemy->getPosition());
-        _lastClickFrame = Broodwar->getFrameCount();
-        _lastMoveFrame = Broodwar->getFrameCount();
-        _fightMoving = true;
         return 2;
     }
     return 0;
