@@ -1,3 +1,4 @@
+* rename UnitGroup in UnitSet, not to confuse with UnitsGroup
 * Pass distribution on dirV/actions from BayesianUnit upstream in UnitsGroup
   for a more "global" optimal
 * More thread safety? (BayesianUnit, MapManager)
