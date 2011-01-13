@@ -1802,6 +1802,16 @@ bool BayesianUnit::dragScarab()
     return false;
 }
 
+const std::multimap<double, Vec>& BayesianUnit::getDirvProb()
+{
+	return this->_dirvProb;
+}
+
+const std::vector<Vec>& BayesianUnit::getDirv()
+{
+	return this->_dirv;
+}
+
 void BayesianUnit::update()
 {
     if (!unit || !unit->exists()) return;

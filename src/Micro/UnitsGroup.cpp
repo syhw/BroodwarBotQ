@@ -27,6 +27,8 @@
 #include <typeinfo>
 #include "Nearby.h"
 
+// TODO: refactor this horrible file
+
 int round(double a)
 {
     return int(a + 0.5);
@@ -266,13 +268,17 @@ void UnitsGroup::update()
 		accomplishGoal();
 		return;
     }
-    if (units.size() == 1 && (*units.begin())->getMode() == MODE_SCOUT) // quick/dirty fix for scouting / scout goals :(
+	
+	////////////////////////////////////////////////
+	// quick/dirty fix for scouting / scout goals :(
+    if (units.size() == 1 && (*units.begin())->getMode() == MODE_SCOUT) 
     {
         defaultTargetEnemy = NULL;
         accomplishGoal();
         (*units.begin())->update();
         return;
     }
+	////////////////////////////////////////////////
 
 #ifdef __ARRIVING__UNITS__
     if (!arrivingUnits.empty())
@@ -426,8 +432,17 @@ void UnitsGroup::update()
         Broodwar->printf( "UnitsGroup::update() took %2.5f seconds\n", duration);
 #endif
 
+	/// Launch updates on Units
     for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
         (*it)->update();
+	/// Select the best moves more globally
+	std::vector<Vec> tmpSolutions;
+	for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+	{
+		tmpSolutions.push_back((*it)->getDirvProb().begin()->second);
+	}
+	/// WORKHERE
+
     templarMergingStuff();
 }
 

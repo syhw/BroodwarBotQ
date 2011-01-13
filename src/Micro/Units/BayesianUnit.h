@@ -168,7 +168,7 @@ protected:
     std::set<Unit*> _targetingMe;
     void updateTargetingMe();
 public:
-    void move(BWAPI::Position p); // debug purposes
+    void move(BWAPI::Position p);
 	void switchMode(unit_mode um);
     unit_mode getMode();
     int getMaxDimension();
@@ -181,6 +181,9 @@ public:
     virtual void onUnitDestroy(BWAPI::Unit* u);
     virtual void onUnitShow(BWAPI::Unit* u);
     virtual void onUnitHide(BWAPI::Unit* u);
+
+	virtual const std::multimap<double, Vec>& getDirvProb();
+	virtual const std::vector<Vec>& getDirv();
 
     void update();
     virtual void attackMove(const BWAPI::Position& p);
