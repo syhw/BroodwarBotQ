@@ -425,25 +425,33 @@ void UnitsGroup::update()
     displayTargets();
 #endif
 
+	/// Launch updates on Units and build up the units to be managed
+	std::vector<pBayesianUnit> tmpUnits;
+    for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+	{
+        (*it)->update();
+		if ((*it)->getMode() == MODE_FIGHT_G 
+			&& !((*it)->unit->isStartingAttack()) && (*it)->unit->getGroundWeaponCooldown()) // not attacking
+			tmpUnits.push_back(*it);
+	}
+	/// For fleeing and fightmoving: select the best moves more globally
+	std::vector<Vec> tmpSolutions;
+	for (std::vector<pBayesianUnit>::iterator it = tmpUnits.begin(); it != tmpUnits.end(); ++it)
+	{
+		std::multimap<double, Vec>::const_iterator i = (*it)->getDirvProb().begin();
+		//i->second.x;
+		//tmpSolutions.push_back(i->second);
+	}
+	/// WORKHERE
+
+    templarMergingStuff();
+
 #ifdef __DEBUG__
     clock_t finish = clock();
     double duration = (double)(finish - start) / CLOCKS_PER_SEC;
     if (duration > 0.040) 
         Broodwar->printf( "UnitsGroup::update() took %2.5f seconds\n", duration);
 #endif
-
-	/// Launch updates on Units
-    for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
-        (*it)->update();
-	/// Select the best moves more globally
-	std::vector<Vec> tmpSolutions;
-	for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
-	{
-		tmpSolutions.push_back((*it)->getDirvProb().begin()->second);
-	}
-	/// WORKHERE
-
-    templarMergingStuff();
 }
 
 void UnitsGroup::attackMove(int x, int y)

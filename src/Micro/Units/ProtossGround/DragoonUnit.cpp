@@ -124,7 +124,7 @@ void DragoonUnit::micro()
     {
         if (!dodgeStorm() && !dragScarab() && !dragMine() && _fleeing)
         {
-            simpleFlee();
+            flee();
         }
         else
         {
@@ -135,6 +135,7 @@ void DragoonUnit::micro()
 
 void DragoonUnit::check()
 {
+	// TODO: Asynchronous
     if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Singularity_Charge))
         addRange = 64;
 }

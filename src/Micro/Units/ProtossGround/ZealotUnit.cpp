@@ -303,7 +303,7 @@ void ZealotUnit::micro()
         {
             if (_fleeing)
             {
-                simpleFlee();
+                flee();
             }
             else
             {

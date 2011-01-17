@@ -91,7 +91,7 @@ void ArchonUnit::micro()
     {
         if (!dodgeStorm() && !dragScarab() && !dragMine() && _fleeing)
         {
-            simpleFlee();
+            flee();
         }
         else
         {

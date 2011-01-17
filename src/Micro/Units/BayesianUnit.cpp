@@ -347,7 +347,7 @@ void BayesianUnit::updateAttractors()
             _occupation.push_back(OCCUP_BUILDING);
         else if (!mapManager->walkability[tmp.x()/8 + (tmp.y()/8)*4*width])
             _occupation.push_back(OCCUP_BLOCKING);
-		/*else if (!mapManager->walkability[hG.x()/8 + (hG.y()/8)*4*width]) // TODo
+		/*else if (!mapManager->walkability[hG.x()/8 + (hG.y()/8)*4*width]) // TODO
             _occupation.push_back(OCCUP_BLOCKING);
         else if (!mapManager->walkability[bG.x()/8 + (bG.y()/8)*4*width])
             _occupation.push_back(OCCUP_BLOCKING);
@@ -1495,20 +1495,11 @@ void BayesianUnit::updateDir()
 
     // update attractions
     updateAttractors();
-    
-    // update objectives
-    updateObj();
    
     // compute the probability to go in each dirv(ector)
     computeProbs();
 #ifdef __DEBUG__
-    //drawProbs(_dirvProb, _unitsGroup->size()); // DRAWPROBS
-#endif
-
-    // select the most probable, most in the direction of obj if equally probables
-    selectDir(obj);
-#ifdef __DEBUG__
-    drawDir();
+    drawProbs(_dirvProb, _unitsGroup->size()); // DRAWPROBS
 #endif
 }
 
@@ -1585,7 +1576,6 @@ void BayesianUnit::flee()
     }
     _fleeing = true;
     updateDir();
-    clickDir();
 }
 
 int BayesianUnit::fightMove()
