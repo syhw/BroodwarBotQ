@@ -1,8 +1,11 @@
-* rename UnitGroup in UnitSet, not to confuse with UnitsGroup
+// * rename UnitGroup in UnitSet, not to confuse with UnitsGroup
+* refactor BayesianUnit to set one time only the perceptions before computeProb()
 * Pass distribution on dirV/actions from BayesianUnit upstream in UnitsGroup
   for a more "global" optimal
 * More thread safety? (BayesianUnit, MapManager)
 * Re-use flocking (+learning of its parameters) in BayesianUnit
+* refactor BayesianUnits inheriting classes to be more standard (par
+ticularly for the MODE_FIGHT_G
 * Modify MapManager's damages maps to use DPS instead of raw damages
 * Modify MapManager::updateStormPos() to use the interpolation of units 
   movements (with speed, done in BayesianUnit for the flocking for instance,

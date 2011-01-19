@@ -337,24 +337,10 @@ void BayesianUnit::updateAttractors()
     {
         Position tmp = _dirv[i].translate(up);
         
-        // TODO optimize/clean this
-        Position hG = Position(tmp.x() - this->unit->getType().dimensionUp(), tmp.y() - this->unit->getType().dimensionLeft());
-        Position hD = Position(tmp.x() - this->unit->getType().dimensionUp(), tmp.y() + this->unit->getType().dimensionRight());
-        Position bG = Position(tmp.x() + this->unit->getType().dimensionDown(), tmp.y() - this->unit->getType().dimensionLeft());
-        Position bD = Position(tmp.x() + this->unit->getType().dimensionDown(), tmp.y() + this->unit->getType().dimensionRight());
-        
         if (mapManager->buildings_wt[tmp.x()/8 + (tmp.y()/8)*4*width])
             _occupation.push_back(OCCUP_BUILDING);
         else if (!mapManager->walkability[tmp.x()/8 + (tmp.y()/8)*4*width])
             _occupation.push_back(OCCUP_BLOCKING);
-		/*else if (!mapManager->walkability[hG.x()/8 + (hG.y()/8)*4*width]) // TODO
-            _occupation.push_back(OCCUP_BLOCKING);
-        else if (!mapManager->walkability[bG.x()/8 + (bG.y()/8)*4*width])
-            _occupation.push_back(OCCUP_BLOCKING);
-        else if (!mapManager->walkability[hD.x()/8 + (hD.y()/8)*4*width])
-            _occupation.push_back(OCCUP_BLOCKING);
-        else if (!mapManager->walkability[bD.x()/8 + (bD.y()/8)*4*width])
-            _occupation.push_back(OCCUP_BLOCKING);*/
 
         //else if (0/*TODO TEST SI Y A UNE UNITE QUI BLOQUE en TMP*/)
         //    _occupation.push_back(OCCUP_UNIT);
@@ -634,9 +620,10 @@ void BayesianUnit::updateObj()
         }
         else /// target influence
         {
-            if (unit->isMoving() && _fightMoving) // && _lastRightClick == target)
-                obj = Vec(unit->getVelocityX(), unit->getVelocityY());
-            else if (_unitPos.getDistance(target) < 1.0)
+            //if (unit->isMoving() && _fightMoving) // && _lastRightClick == target)
+            //    obj = Vec(unit->getVelocityX(), unit->getVelocityY());
+            //else if (_unitPos.getDistance(target) < 1.0)
+            if (_unitPos.getDistance(target) < 1.0)
                 obj = Vec(0, 0);
             else
                 obj = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y());
@@ -1493,6 +1480,9 @@ void BayesianUnit::updateDir()
     // update possible directions vector
     updateDirV();
 
+	// update obj
+	updateObj();
+
     // update attractions
     updateAttractors();
    
@@ -1580,39 +1570,9 @@ void BayesianUnit::flee()
 
 int BayesianUnit::fightMove()
 {
-    /// approach siege tanks or approach our targetEnemy if not in range
-    if (targetEnemy != NULL && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected()
-        && ((targetEnemy->getType() == UnitTypes::Terran_Siege_Tank_Siege_Mode 
-        && targetEnemy->getDistance(_unitPos) > 45.0) || !inRange(targetEnemy) || (_unitsGroup->units.size() > 10 && targetEnemy->getDistance(_unitPos) > 128)) // TODO MICROONLY (_unitsGroup->units.size() > 10 && targetEnemy->getDistance(_unitPos) > 128)
-        && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
-    {
-        return 1;
-    }
-    double dist = target.getDistance(_unitPos);
-    /// approach out of range target
-    if (dist <= 192.0 && // 6 build tiles TOCHANGE
-        oorTargetEnemy != NULL && oorTargetEnemy->exists() && oorTargetEnemy->isVisible() && targetEnemy->isDetected()
-        && !inRange(oorTargetEnemy)
-        && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
-    {
-        return 2;
-    }
-    /// move towards target if we are "far enough from it"
-    if ((dist > 192.0 || (_unitsGroup->distToNearestChoke < 128.0 && !unit->getType().isFlyer() && dist > unit->getType().groundWeapon().maxRange() && _unitsGroup->enemiesAltitude > _unitsGroup->groupAltitude))  // 192 == 6 build tiles TOCHANGE
-        && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
-    {
-        return 3;
-    }
-    /// Or simply move away from our friends and kite if we can
-    if (targetEnemy != NULL && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected()
-        && outRanges(targetEnemy) // don't kite it we don't outrange
-        && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
-    {
-        updateDir();
-        _fightMoving = true;
-        return 4;
-    }
-    return 0;
+    updateDir();
+    _fightMoving = true;
+	return 0;
 }
 
 void BayesianUnit::drawArrow(Vec& v)

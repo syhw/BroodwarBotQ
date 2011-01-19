@@ -35,6 +35,7 @@ int round(double a)
 }
 
 #define __ARRIVING__UNITS__
+// #define __CLEAN_MODEL__
 
 using namespace BWAPI;
 
@@ -51,6 +52,7 @@ UnitsGroup::UnitsGroup()
 , _hasDetection(0)
 , enemiesCenter(Position(0, 0))
 {
+	units.clear();
     _eUnitsFilter = & EUnitsFilter::Instance();
 }
 
@@ -425,22 +427,33 @@ void UnitsGroup::update()
 
 	/// Launch updates on Units and build up the units to be managed
 	std::vector<pBayesianUnit> tmpUnits;
-    for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+    for (std::vector<pBayesianUnit>::const_iterator it = this->units.begin(); it != this->units.end(); ++it)
 	{
         (*it)->update();
 		if ((*it)->getMode() == MODE_FIGHT_G 
-			&& !((*it)->unit->isStartingAttack()) && (*it)->unit->getGroundWeaponCooldown()) // not attacking
+			&& (*it)->unit->getGroundWeaponCooldown() > Broodwar->getLatency()*2 + 2) // fightmoving or fleeing
 			tmpUnits.push_back(*it);
 	}
+
+#ifndef __CLEAN_MODEL__
 	/// For fleeing and fightmoving: select the best moves more globally
 	std::vector<Vec> tmpSolutions;
-	for (std::vector<pBayesianUnit>::iterator it = tmpUnits.begin(); it != tmpUnits.end(); ++it)
+	for (std::vector<pBayesianUnit>::const_iterator it = tmpUnits.begin(); it != tmpUnits.end(); ++it)
 	{
-		std::multimap<double, Vec>::const_iterator i = (*it)->getDirvProb().begin();
-		//i->second.x;
-		//tmpSolutions.push_back(i->second);
+		if ((*it)->getDirvProb().empty())
+		{
+			Broodwar->printf("EMPTY");
+		}
+		else
+		{
+			Broodwar->printf("NOT EMPTY, SIZE: %d", (*it)->getDirvProb().size());
+		}
+		//tmpSolutions.push_back((*it)->getDirvProb().begin()->second);
 	}
 	/// WORKHERE
+#else
+	// TODO implement clean model
+#endif
 
     templarMergingStuff();
 
