@@ -375,9 +375,7 @@ void UnitsGroup::update()
             enemiesCenter.makeValid();
         enemiesAltitude = round((double)enemiesAltitude / enemies.size());
     }
-    //clock_t f = clock();
-    //double dur = (double)(f - s) / CLOCKS_PER_SEC;
-    //Broodwar->printf( "UnitsGroup::update() took %2.5f seconds\n", dur); 
+
 #ifdef __DEBUG__
     Broodwar->drawCircleMap((int)center.x(), (int)center.y(), (int)maxRadius + (int)maxRange +  32, Colors::Yellow);
 #endif
