@@ -168,6 +168,8 @@ protected:
     std::set<Unit*> _targetingMe;
     void updateTargetingMe();
 public:
+	std::multimap<double, WalkTilePosition> wtpositionsProb;
+
     void move(BWAPI::Position p);
 	void switchMode(unit_mode um);
     unit_mode getMode();

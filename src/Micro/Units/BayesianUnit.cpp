@@ -1403,7 +1403,11 @@ void BayesianUnit::computeProbs()
 {
     _dirvProb.clear();
     for (unsigned int i = 0; i < _dirv.size(); ++i)
-        _dirvProb.insert(make_pair(computeProb(i), _dirv[i]));
+	{
+		double tmpProb = computeProb(i);
+        _dirvProb.insert(make_pair(tmpProb, _dirv[i]));
+		wtpositionsProb.insert(make_pair(tmpProb, _dirv[i].translate(_unitPos)));
+	}
 }
 
 void BayesianUnit::selectDir(const Vec& criterium)

@@ -437,18 +437,17 @@ void UnitsGroup::update()
 
 #ifndef __CLEAN_MODEL__
 	/// For fleeing and fightmoving: select the best moves more globally
-	std::vector<Vec> tmpSolutions;
+	std::vector<WalkTilePosition> tmpSolutions;
 	for (std::vector<pBayesianUnit>::const_iterator it = tmpUnits.begin(); it != tmpUnits.end(); ++it)
 	{
-		if ((*it)->getDirvProb().empty())
+		if ((*it)->wtpositionsProb.empty())
 		{
-			Broodwar->printf("EMPTY");
+			Broodwar->printf("EMPTY"); // TODO deal with that
 		}
 		else
 		{
-			Broodwar->printf("NOT EMPTY, SIZE: %d", (*it)->getDirvProb().size());
+			tmpSolutions.push_back((*it)->wtpositionsProb.begin()->second);
 		}
-		//tmpSolutions.push_back((*it)->getDirvProb().begin()->second);
 	}
 	/// WORKHERE
 #else
