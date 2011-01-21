@@ -1,4 +1,3 @@
-#pragma once
 #include <Defines.h>
 #include "MapManager.h"
 #include "UnitGroupManager.h"
