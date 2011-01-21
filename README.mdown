@@ -49,7 +49,8 @@ http://emotion.inrialpes.fr/people/synnaeve/bwiki/html/install
 
 ## Additional Info / Did You Read That ? ##
 
-The BWAPI web site    		http://code.google.com/p/bwapi/
-The BWSAL web site    		http://code.google.com/p/bwsal/
-The BWTA  web site    		http://code.google.com/p/bwta/
+The BWAPI web site    		http://code.google.com/p/bwapi/  
+The BWSAL web site    		http://code.google.com/p/bwsal/  
+The BWTA  web site    		http://code.google.com/p/bwta/  
 IRC Channel           		QuakeNet #BWAPI
+
