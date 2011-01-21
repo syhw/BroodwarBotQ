@@ -426,29 +426,35 @@ void UnitsGroup::update()
 #endif
 
 	/// Launch updates on Units and build up the units to be managed
-	std::vector<pBayesianUnit> tmpUnits;
+	std::vector<pBayesianUnit> movingUnits;
     for (std::vector<pBayesianUnit>::const_iterator it = this->units.begin(); it != this->units.end(); ++it)
 	{
         (*it)->update();
 		if ((*it)->getMode() == MODE_FIGHT_G 
 			&& (*it)->unit->getGroundWeaponCooldown() > Broodwar->getLatency()*2 + 2) // fightmoving or fleeing
-			tmpUnits.push_back(*it);
+			movingUnits.push_back(*it);
 	}
 
 #ifndef __CLEAN_MODEL__
 	/// For fleeing and fightmoving: select the best moves more globally
-	std::multimap<double, WalkTilePosition> tmpSolutions;
-	for (std::vector<pBayesianUnit>::const_iterator it = tmpUnits.begin(); it != tmpUnits.end(); ++it)
+	std::map<WalkTilePosition, pBayesianUnit> solutions;
+	std::multimap<double, std::pair<pBayesianUnit, WalkTilePosition> > probsSolutions;
+	for (std::vector<pBayesianUnit>::const_iterator it = movingUnits.begin(); it != movingUnits.end(); ++it)
 	{
 		if ((*it)->wtpositionsProb.empty())
 		{
-			Broodwar->printf("EMPTY"); // TODO deal with that
+			// Broodwar->printf("EMPTY"); // TODO deal with that
 		}
 		else
 		{
-			tmpSolutions.insert(*((*it)->wtpositionsProb.begin()));
+			probsSolutions.insert(std::make_pair<double, std::pair<pBayesianUnit, WalkTilePosition> >(
+				(*it)->wtpositionsProb.begin()->first, std::make_pair<pBayesianUnit, WalkTilePosition>(
+				*it, (*it)->wtpositionsProb.begin()->second)));
 		}
-
+	}
+	for (std::multimap<double, std::pair<pBayesianUnit, WalkTilePosition> >::const_iterator it = probsSolutions.begin();
+		it != probsSolutions.end(); ++it)
+	{
 	}
 	
 #else
