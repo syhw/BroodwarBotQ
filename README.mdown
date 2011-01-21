@@ -1,8 +1,7 @@
-             *************************************************
-             * BroodwarBotQ, a good zergling is better BBQ'd *
-             *************************************************
+BroodwarBotQ, a good zergling is better BBQ'd
+=============================================
 
-===== Foreword / Bullshit =====
+## Foreword / Bullshit ##
 
 This bot is using BWAPI 3.0.3, and BWTA. It is heavily based on BWSAL, 
 so thanks and kudos to lowerlogic and other contributors. I hope to be
@@ -25,7 +24,7 @@ Guillaume Bousket,
 Louis Schimchowitsch,
 Nicolas Biagianti
 
-===== Install / Serious Stuff =====
+## Install / Serious Stuff ##
 
 1. You need BWAPI 3.0.3, go on the BWAPI website to install it
 
@@ -48,7 +47,7 @@ Nicolas Biagianti
 A more detailled install guide is there:
 http://emotion.inrialpes.fr/people/synnaeve/bwiki/html/install
 
-===== Additional Info / Did You Read That ? =====
+## Additional Info / Did You Read That ? ##
 
 The BWAPI web site    		http://code.google.com/p/bwapi/
 The BWSAL web site    		http://code.google.com/p/bwsal/
