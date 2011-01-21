@@ -3,10 +3,6 @@
              *************************************************
 
 ===== Foreword / Bullshit =====
-Hi you,
-
-Gabriel Synnaeve is writing to you right now. I hope that the same of the bot
-told you it plays Protoss (only for the moment).
 
 This bot is using BWAPI 3.0.3, and BWTA. It is heavily based on BWSAL, 
 so thanks and kudos to lowerlogic and other contributors. I hope to be
@@ -22,6 +18,7 @@ behind a good text editor and an open mind. I have some problems with BWSAL
 and used duct tape to counter them (ProductionManager / Arbitrator, and lately,
 performances issues with the BuildManager / ConstructionManager). Also, there's
 a lot of code duplication in the units (micro) code.
+I hope that the same of the bot told you it plays Protoss (only for the moment).
 
 There are different contributions of:
 Guillaume Bousket, 
@@ -29,6 +26,7 @@ Louis Schimchowitsch,
 Nicolas Biagianti
 
 ===== Install / Serious Stuff =====
+
 1. You need BWAPI 3.0.3, go on the BWAPI website to install it
 
 2. Open BattleBroodAI.sln and compile the project as RELEASE.
@@ -51,6 +49,7 @@ A more detailled install guide is there:
 http://emotion.inrialpes.fr/people/synnaeve/bwiki/html/install
 
 ===== Additional Info / Did You Read That ? =====
+
 The BWAPI web site    		http://code.google.com/p/bwapi/
 The BWSAL web site    		http://code.google.com/p/bwsal/
 The BWTA  web site    		http://code.google.com/p/bwta/
