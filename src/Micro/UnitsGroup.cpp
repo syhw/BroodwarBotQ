@@ -437,7 +437,7 @@ void UnitsGroup::update()
 
 #ifndef __CLEAN_MODEL__
 	/// For fleeing and fightmoving: select the best moves more globally
-	std::vector<WalkTilePosition> tmpSolutions;
+	std::multimap<double, WalkTilePosition> tmpSolutions;
 	for (std::vector<pBayesianUnit>::const_iterator it = tmpUnits.begin(); it != tmpUnits.end(); ++it)
 	{
 		if ((*it)->wtpositionsProb.empty())
@@ -446,10 +446,11 @@ void UnitsGroup::update()
 		}
 		else
 		{
-			tmpSolutions.push_back((*it)->wtpositionsProb.begin()->second);
+			tmpSolutions.insert(*((*it)->wtpositionsProb.begin()));
 		}
+
 	}
-	/// WORKHERE
+	
 #else
 	// TODO implement clean model
 #endif
