@@ -2,6 +2,7 @@
 #include <fstream>
 #include <stdarg.h>
 #include <sys/stat.h>
+#include <windows.h>
 char buffer[1024];
 void log(const char* text, ...)
 {
@@ -20,3 +21,33 @@ void log(const char* text, ...)
     fclose(outfile);
   }
 }
+
+void myRestartGame()
+{
+	/////////// Launch an AutoHotkey that will click on "OK" in 10 sec /////////////
+	char procName[200];
+	sprintf_s(procName, "C:\\StarCraft\\AI\\BroodwarBotQ\\scripts\\startGame.exe");
+	// Initialize StartupInfo structure
+	STARTUPINFO    StartupInfo;
+	memset(&StartupInfo, 0, sizeof(StartupInfo));
+	StartupInfo.cb = sizeof(StartupInfo);
+
+	// This will contain the information about the newly created process
+	PROCESS_INFORMATION ProcessInformation;
+
+	BOOL results = CreateProcess(0,
+	                         procName, // Process and arguments
+	                         0, // Process Attributes
+	                         0, // Thread Attributes
+	                         FALSE, // Inherit Handles
+	                         0, // CreationFlags,
+	                         0, // Environment
+	                         0, // Current Directory
+	                         &StartupInfo, // StartupInfo
+	                         &ProcessInformation // Process Information
+	                         );
+	// Cleanup
+	CloseHandle(ProcessInformation.hProcess);
+	CloseHandle(ProcessInformation.hThread);
+}
+

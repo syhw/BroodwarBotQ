@@ -1,3 +1,4 @@
+#include "Util.h"
 #include "MicroProject.h"
 #include "Goal.h"
 #include "FormationSubgoal.h"
@@ -349,6 +350,8 @@ MicroAIModule::MicroAIModule()
 
 void MicroAIModule::onEnd(bool isWinner)
 {
+	myRestartGame();
+	return;
 	char buffer[5];
 	if (isWinner)
 	{

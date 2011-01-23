@@ -648,10 +648,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Utils\Util.h"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Utils\Vec.h"
 					>
 				</File>
