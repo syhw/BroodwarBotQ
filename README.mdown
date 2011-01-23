@@ -30,6 +30,7 @@ Nicolas Biagianti
 
 2. Open BattleBroodAI.sln and compile the project as RELEASE.
    To do this:
+
    2.1. Change the dropdown box in the top center of the window from "Debug" to
         "Release".
    2.2. Click Build -> Build Solution. The MacroProject and MicroProject 
