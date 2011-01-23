@@ -14,6 +14,10 @@
 //#define __EXACT_OBJ__
 //#define __HEIGHTS_ATTRACTION__
 #define __NOT_IN_RANGE_BY__ 128.1
+#define __SAMPLE_DIR__
+#ifdef __SAMPLE_DIR__
+#include <RandomGenerators.h>
+#endif
 
 using namespace std;
 using namespace BWAPI;
@@ -1421,6 +1425,26 @@ void BayesianUnit::computeProbs()
 
 void BayesianUnit::selectDir(const Vec& criterium)
 {
+#ifdef __SAMPLE_DIR__
+	RandomGenerators* rdm = & RandomGenerators::Instance();
+	double sum = 0.0;
+	for (multimap<double, Vec>::const_iterator it = _dirvProb.begin();
+		it != _dirvProb.end(); ++it)
+	{
+		sum += it->first;
+	}
+	double sample = rdm->uni_0_1();
+	double mark = 0.0;
+	for (multimap<double, Vec>::const_iterator it = _dirvProb.begin();
+		it != _dirvProb.end(); ++it)
+	{
+		mark += it->first;
+		if (mark / sum > sample)
+		{
+			dir = it->second;
+		}
+	}
+#else
     multimap<double, Vec>::const_iterator last = _dirvProb.end(); 
     // I want the right probabilities and not 1-prob in the multimap
     --last;
@@ -1476,6 +1500,7 @@ void BayesianUnit::selectDir(const Vec& criterium)
             }
         }
     }
+#endif
 }
 
 int BayesianUnit::addRangeGround()

@@ -27,6 +27,7 @@ void MicroAIModule::onStart()
 	this->objectManager = & ObjectManager::Instance();
     this->unitGroupManager = & UnitGroupManager::Instance();
     this->mapManager->setDependencies();
+	// this->rdmGenerators = & RandomGenerators::Instance();
 
 	mm = new UnitsGroup();
 

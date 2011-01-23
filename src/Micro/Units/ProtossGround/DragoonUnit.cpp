@@ -2,6 +2,8 @@
 #include <BWAPI.h>
 #include <UnitsGroup.h>
 
+//#define __SIMPLE_FLEE__
+
 using namespace std;
 using namespace BWAPI;
 
@@ -124,7 +126,11 @@ void DragoonUnit::micro()
     {
         if (!dodgeStorm() && !dragScarab() && !dragMine() && _fleeing)
         {
+#ifdef __SIMPLE_FLEE__
             simpleFlee();
+#else
+			flee();
+#endif
         }
         else
         {
