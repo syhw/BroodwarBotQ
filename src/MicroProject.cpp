@@ -16,7 +16,7 @@ void MicroAIModule::onStart()
     //Broodwar->printf("ON START !!\n");
 #ifdef __DEBUG__
     Broodwar->enableFlag(Flag::UserInput);
-    //Broodwar->setLocalSpeed(0);
+    Broodwar->setLocalSpeed(0);
 #endif
 	//Broodwar->enableFlag(Flag::CompleteMapInformation);
 	BWTA::readMap();
@@ -348,9 +348,22 @@ MicroAIModule::MicroAIModule()
 
 void MicroAIModule::onEnd(bool isWinner)
 {
+	char buffer[5];
 	if (isWinner)
 	{
-		//log win to file
+		sprintf_s(buffer, "won");
+	} 
+	else
+	{
+		sprintf_s(buffer, "lost");
+	}
+    std::string mapName = Broodwar->mapPathName();
+	mapName = mapName.substr(mapName.find_last_of("\\") + 1, mapName.length() - mapName.find_last_of("\\") - 1);
+	FILE *outfile;
+	if (fopen_s(&outfile, "bwapi-data\\logs\\wins_loses.log", "a+")==0)
+	{
+		fprintf_s(outfile, "NMAI %s on map %s\n", buffer, mapName.c_str());
+		fclose(outfile);
 	}
 }
 
