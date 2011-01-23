@@ -363,7 +363,7 @@ void MicroAIModule::onEnd(bool isWinner)
 	FILE *outfile;
 	if (fopen_s(&outfile, "bwapi-data\\logs\\wins_loses.log", "a+")==0)
 	{
-		fprintf_s(outfile, "%s on map %s", buffer, mapName.c_str());
+		fprintf_s(outfile, "NMAI %s on map %s\n", buffer, mapName.c_str());
 		fclose(outfile);
 	}
 }
