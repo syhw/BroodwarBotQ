@@ -3,3 +3,4 @@
 void log(const char* text, ...);
 std::map<int, int> computeAssignments(Util::RectangleArray< double> &cost);
 void myRestartGame();
+void logScore(bool isWinner, std::string mapName);

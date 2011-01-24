@@ -351,24 +351,7 @@ MicroAIModule::MicroAIModule()
 void MicroAIModule::onEnd(bool isWinner)
 {
 	myRestartGame();
-	return;
-	char buffer[5];
-	if (isWinner)
-	{
-		sprintf_s(buffer, "won");
-	} 
-	else
-	{
-		sprintf_s(buffer, "lost");
-	}
-    std::string mapName = Broodwar->mapPathName();
-	mapName = mapName.substr(mapName.find_last_of("\\") + 1, mapName.length() - mapName.find_last_of("\\") - 1);
-	FILE *outfile;
-	if (fopen_s(&outfile, "bwapi-data\\logs\\wins_loses.log", "a+")==0)
-	{
-		fprintf_s(outfile, "NMAI %s on map %s\n", buffer, mapName.c_str());
-		fclose(outfile);
-	}
+	logScore(isWinner, Broodwar->mapPathName());
 }
 
 void MicroAIModule::onSendText(std::string text)
