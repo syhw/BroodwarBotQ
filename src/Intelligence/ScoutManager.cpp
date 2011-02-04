@@ -8,6 +8,7 @@ using namespace BWAPI;
 ScoutManager::ScoutManager()
 : exploringEnemy(false)
 , enemyFound(false)
+, _notSeenStartLocations(BWTA::getBaseLocations())
 {
     _sawStartLocations.insert(BWTA::getNearestBaseLocation(Broodwar->self()->getStartLocation()));
 	warManager = NULL;
@@ -65,13 +66,14 @@ void ScoutManager::update()
             for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getStartLocations().begin(); it != BWTA::getStartLocations().end(); ++it)
             {
                 if (Broodwar->isVisible((*it)->getTilePosition()))
+				{
                     _sawStartLocations.insert(*it);
+					_notSeenStartLocations.erase(*it);
+				}
             }
             if (_sawStartLocations.size() == (BWTA::getStartLocations().size() - 1))
             {
-                std::set<BWTA::BaseLocation*>::iterator enemyIsThere;
-                std::set_difference(_sawStartLocations.begin(), _sawStartLocations.end(), BWTA::getStartLocations().begin(), BWTA::getStartLocations().end(), enemyIsThere);
-                this->enemyStartLocation = (*enemyIsThere)->getTilePosition();
+                this->enemyStartLocation = (*_notSeenStartLocations.begin())->getTilePosition();
                 Broodwar->pingMinimap(this->enemyStartLocation.x()*4, this->enemyStartLocation.y()*4);
             }
         }
