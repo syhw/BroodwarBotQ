@@ -99,7 +99,7 @@ void MapManager::setDependencies()
 
 void MapManager::modifyBuildings(Unit* u, bool b)
 {
-    // TODO Optimize (3 loops are unecessary)
+    // TODO Optimize (3 loops are not necessary)
     if (!u->getType().isBuilding() 
         || (u->isLifted() && b)) // lifted building won't be added (b==true)
         return;

@@ -40,12 +40,6 @@ public:
 	//-The target of the units of this UG will be their position so they are idling
 	//-The unitsgroup will be removed from unitsGroups and deleted
 
-#ifdef BW_QT_DEBUG
-	// Qt interface
-	virtual QWidget* createWidget(QWidget* parent) const;
-	virtual void refreshWidget(QWidget* widget) const;
-#endif
-
 	static std::set<BWAPI::Unit*> getEnemies();
 
 };
