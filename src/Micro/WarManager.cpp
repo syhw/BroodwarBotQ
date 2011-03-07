@@ -182,16 +182,3 @@ std::set<Unit*> WarManager::getEnemies()
     for(;iter != Broodwar->getPlayers().end() && !(*iter)->isEnemy(Broodwar->self());iter++);
     return (*iter)->getUnits();
 }
-
-#ifdef BW_QT_DEBUG
-QWidget* WarManager::createWidget(QWidget* parent) const
-{
-	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
-}
-
-void WarManager::refreshWidget(QWidget* widget) const
-{
-// TODO update your widget after having defined it in the previous method :)
-}
-#endif
-

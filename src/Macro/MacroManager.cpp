@@ -311,15 +311,3 @@ bool MacroManager::shouldExpand()
 	_shouldExpand = workerManager->workers.size() >= nbRessources;
     return _shouldExpand;
 }
-
-#ifdef BW_QT_DEBUG
-QWidget* MacroManager::createWidget(QWidget* parent) const
-{
-	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
-}
-
-void MacroManager::refreshWidget(QWidget* widget) const
-{
-// TODO update your widget after having defined it in the previous method :)
-}
-#endif

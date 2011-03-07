@@ -419,8 +419,7 @@ void BattleUnit::damagesAwarePathFind(std::vector<TilePosition>& btpath,
 void BattleUnit::straightLine(std::vector<TilePosition>& btpath, 
         const TilePosition& start, const TilePosition& end)
 {
-
-    // DO NOT CLEAR btpath for you
+    // it does NOT clea btpath for you
     if (start.x() == end.x() && start.y() == end.y()) return;
     TilePosition current = start;
     btpath.push_back(current);
@@ -461,7 +460,7 @@ void BattleUnit::quickPathFind(std::vector<TilePosition>& btpath,
                                         const TilePosition& start, 
                                         const TilePosition& end)
 {
-    clock_t endTimer(0), startTimer(0) ;
+    clock_t endTimer(0), startTimer(0);
     btpath.clear();
     BWTA::Region* r_begin = BWTA::getRegion(start);
     BWTA::Region* r_end = BWTA::getRegion(end);

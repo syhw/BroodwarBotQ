@@ -19,13 +19,6 @@ void ObjectManager::onFrame()
 		(*it)->onFrame();
 }
 
-void ObjectManager::setGameSpeed(int speed)
-{
-#ifndef CREATOR_COMPIL
-    BWAPI::Broodwar->setLocalSpeed(speed);
-#endif
-}
-
 void ObjectManager::addObject(BaseObject* p)
 {
     vObject.push_back(p);

@@ -2,9 +2,6 @@
 #include <Util.h>
 #include <time.h>
 #include <UnitsGroup.h>
-#ifdef BW_QT_DEBUG
-#include <QtGui/QApplication.h>
-#endif
 
 #define __POOL_TIME_RUSH__ 130 // seconds, 3 workers + 1 pool + 11 seconds
 #define __BBS_TIME_RUSH__ 230 // seconds, 4 workers + 2 barracks + 18 seconds
@@ -54,10 +51,6 @@ BattleBroodAI::BattleBroodAI()
 
 BattleBroodAI::~BattleBroodAI()
 {
-#ifdef BW_QT_DEBUG
-    if (qapplication)
-        qapplication->quit();
-#endif
     if( Broodwar->self()->getRace() == Races::Protoss)
         ProtossStrat::Destroy();
     else if( Broodwar->self()->getRace() == Races::Terran)
@@ -188,9 +181,6 @@ void BattleBroodAI::onStart()
     this->defenseManager->setDependencies();
 
     this->baseManager->update();
-#ifdef BW_QT_DEBUG
-    g_onStartDone = true;
-#endif
 
     //Call on start functions
     this->macroManager->onStart();

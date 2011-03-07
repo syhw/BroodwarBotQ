@@ -235,19 +235,12 @@ void MicroAIModule::onStart()
 
 	mm->setGoals(goals);
 
-#ifdef BW_QT_DEBUG
-	g_onStartDone = true;
-#endif
 }
 
 void MicroAIModule::onFrame()
 {
     if (Broodwar->getLastError() != BWAPI::Errors::None)
         Broodwar->printf("LAST ERROR: %s", Broodwar->getLastError().toString().c_str());
-#ifdef BW_QT_DEBUG
-    if (!*qapp)
-        Broodwar->printf("Qt not connected\n");
-#endif
     objectManager->onFrame();
 	if (mm != NULL) 
         mm->update();
@@ -327,26 +320,16 @@ void MicroAIModule::onFrame()
 
 MicroAIModule::~MicroAIModule()
 {
-#ifdef BW_QT_DEBUG
-    (*qapp)->quit();
-#endif
     MapManager::Destroy();
     ObjectManager::Destroy();
     // regions::Destroy();
     mm->~UnitsGroup();
 }
 
-#ifdef BW_QT_DEBUG
-MicroAIModule::MicroAIModule(QApplication** qapplication)
-: enemiesFound(false)
-{
-    qapp = qapplication;
-}
-#else
 MicroAIModule::MicroAIModule()
 {
 }
-#endif
+
 
 void MicroAIModule::onEnd(bool isWinner)
 {

@@ -13,7 +13,6 @@ public:
     ObjectManager();
 	~ObjectManager();
 	virtual void onFrame(); // call for bwapi
-	void setGameSpeed(int speed); // call for qt appli
     void addObject(BaseObject* p);
     const std::vector<BaseObject*>& getObjects() const;
 

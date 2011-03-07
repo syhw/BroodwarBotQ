@@ -29,12 +29,7 @@ public:
     Regions* regions;
     UnitGroupManager * unitGroupManager;
 	virtual void onStart();
-#ifdef BW_QT_DEBUG
-	MicroAIModule(QApplication** qapplication);
-    QApplication** qapp;
-#else
     MicroAIModule();
-#endif
     ~MicroAIModule();
     bool enemiesFound;
     BWAPI::TilePosition eStartLocation;

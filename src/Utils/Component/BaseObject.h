@@ -4,11 +4,6 @@
 #include <iostream>
 #include "CustomOStream.h"
 #include "Defines.h"
-#ifdef BW_QT_DEBUG
-#include <QtGui/QWidget>
-#include <QtGui/QMessageBox>
-#include "RefreshWidgetEmiter.h"
-#endif
 #include "time.h"
 #include <BWAPI.h>
 
@@ -22,12 +17,6 @@ public:
 
     void onFrame();
     virtual void update() = 0;
-
-#ifdef BW_QT_DEBUG
-    // Qt widget interface
-    virtual QWidget* createWidget(QWidget* parent) const; // must return the new widget with given parent
-    virtual void refreshWidget(QWidget* widget) const = 0; // update the given widget wich was returned by createWidget(QWidget* parent)
-#endif
 
     // Minimap display
     virtual void display() const; // Each baseObject can display informations on the minimap by overloading this method
@@ -45,10 +34,6 @@ public:
 
     // Profiling
     clock_t beginTime, endTime, timeEllapsed;
-
-#ifdef BW_QT_DEBUG
-    RefreshWidgetEmiter* refreshWidgetEmiter;
-#endif
 
 protected:
     std::vector<BaseData*> vData;
