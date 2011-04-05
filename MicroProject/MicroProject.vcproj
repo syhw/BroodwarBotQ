@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="MicroProject"
 	ProjectGUID="{305604F2-9728-4D61-AC29-4658B31533DF}"
 	RootNamespace="MicroProject"
-	AssemblyReferenceSearchPaths="&quot;..\..\..\..\boost_1_42_0&quot;"
 	TargetFrameworkVersion="196613"
 	>
 	<Platforms>
@@ -41,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Regions;../src/Utils;../src/Intelligence;../src/Utils/Component;../../BWAPI_Beta_2.8/include;../../BWAPI_Beta_2.8/include/BWAPI;../../BWAPI_Beta_2.8/include/BWTA;../../boost_1_43_0;&quot;C:\Program Files\boost\boost_1_42\&quot;;../../boost_1_42;C:\Qt\4.6.2\include;C:\Qt\4.6.3\include"
+				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Regions;../src/Utils;../src/Intelligence;../src/Utils/Component;../../BWAPI_3.5.1/include;../../BWAPI_3.5.1/include/BWAPI;../../BWAPI_3/5/1/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
 				BasicRuntimeChecks="3"
@@ -60,7 +59,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="../../BWAPI_Beta_3.4/lib/BWAPId.lib ../../BWAPI_Beta_3.4/lib/BWTAd.lib ../../BWAPI_Beta_3.4/lib/CGAL-vc90-mt-gd.lib ../../BWAPI_Beta_3.4/lib/gmp-vc90-mt-gd.lib ../../BWAPI_Beta_3.4/lib/libboost_thread-vc90-mt-gd-1_40.lib ../../BWAPI_Beta_3.4/lib/mpfr-vc90-mt-gd.lib ../../BWAPI_Beta_3.4/lib/tinyxmld.lib QtCore4.lib QtGui4.lib QtOpenGL4.lib QtXml4.lib opengl32.lib glu32.lib"
+				AdditionalDependencies="../../BWAPI_3.5.1/lib/BWAPId.lib ../../BWAPI_3.5.1/lib/BWTAd.lib ../../BWAPI_3.5.1/lib/CGAL-vc90-mt-gd.lib ../../BWAPI_3.5.1/lib/gmp-vc90-mt-gd.lib ../../BWAPI_3.5.1/lib/libboost_thread-vc90-mt-gd-1_40.lib ../../BWAPI_3.5.1/lib/mpfr-vc90-mt-gd.lib ../../BWAPI_3.5.1/lib/tinyxmld.lib"
 				AdditionalLibraryDirectories="C:\Qt\4.6.2\lib;C:\Qt\4.6.3\lib;&quot;C:\dev\libQGLViewer-2.3.5\QGLViewer\release&quot;"
 				GenerateDebugInformation="true"
 				TargetMachine="1"
@@ -114,11 +113,13 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Intelligence;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ZergFlying;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Utils/Component;../../BWAPI_Beta_3.4/include;../../BWAPI_Beta_3.4/include/BWAPI;../../BWAPI_Beta_3.4/include/BWTA;../../boost_1_43_0;../../boost_1_45_0"
+				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Intelligence;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ZergFlying;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Utils/Component;../../BWAPI_3.5.1/include;../../BWAPI_3.5.1/include/BWAPI;../../BWAPI_3.5.1/include/BWTA;../../boost_1_45_0;../../boost_1_43_0"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
+				UsePrecompiledHeader="1"
+				PrecompiledHeaderThrough="PrecompiledHeader.h"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -133,7 +134,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="../../BWAPI_Beta_3.4/lib/BWAPI.lib ../../BWAPI_Beta_3.4/lib/BWTA.lib ../../BWAPI_Beta_3.4/lib/tinyxml.lib ../../BWAPI_Beta_3.4/lib/CGAL-vc90-mt.lib ../../BWAPI_Beta_3.4/lib/libboost_thread-vc90-mt-1_40.lib ../../BWAPI_Beta_3.4/lib/gmp-vc90-mt.lib ../../BWAPI_Beta_3.4/lib/mpfr-vc90-mt.lib"
+				AdditionalDependencies="../../BWAPI_3.5.1/lib/BWAPI.lib ../../BWAPI_3.5.1/lib/BWTA.lib ../../BWAPI_3.5.1/lib/tinyxml.lib ../../BWAPI_3.5.1/lib/CGAL-vc90-mt.lib ../../BWAPI_3.5.1/lib/libboost_thread-vc90-mt-1_40.lib ../../BWAPI_3.5.1/lib/gmp-vc90-mt.lib ../../BWAPI_3.5.1/lib/mpfr-vc90-mt.lib"
 				LinkIncremental="0"
 				AdditionalLibraryDirectories=""
 				IgnoreAllDefaultLibraries="false"
@@ -663,6 +664,10 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 		</Filter>
+		<File
+			RelativePath=".\ClassDiagram1.cd"
+			>
+		</File>
 	</Files>
 	<Globals>
 	</Globals>
