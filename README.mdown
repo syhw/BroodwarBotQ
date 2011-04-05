@@ -3,7 +3,7 @@ BroodwarBotQ, a good zergling is better BBQ'd
 
 ## Foreword / Bullshit ##
 
-This bot is using BWAPI 3.0.3, and BWTA. It is heavily based on BWSAL, 
+This bot is using BWAPI 3.5.1, and BWTA. It is heavily based on BWSAL, 
 so thanks and kudos to lowerlogic and other contributors. I hope to be
 able to contribute (for instance MapManager) too.
 
@@ -26,9 +26,10 @@ Nicolas Biagianti
 
 ## Install / Serious Stuff ##
 
-1. You need BWAPI 3.0.3, go on the BWAPI website to install it
+1. You need BWAPI 3.5.1, go on the [BWAPI](http://code.google.com/p/bwapi/)
+     website to install it.
 
-2. Open BattleBroodAI.sln and compile the project as RELEASE.
+2. Open BattleBroodAI.sln and compile the project as Release.
    To do this:
 
    2.1. Change the dropdown box in the top center of the window from "Debug" to
@@ -36,8 +37,8 @@ Nicolas Biagianti
    2.2. Click Build -> Build Solution. The MacroProject and MicroProject 
         are now compiled into 2 dlls. Macro is for full games.
 
-3. Open <starcraft folder>/bwapi-data/bwapi.ini and set the ai_dll as follows:
-     ai_dll = <BlaBlaPath>/Release/M{a|i}croProject.dl
+3. Open \<starcraft folder\>/bwapi-data/bwapi.ini and set the ai_dll as follows:
+     ai_dll = \<BlaBlaPath\>/Release/M{a|i}croProject.dl
 
 4. Run Chaoslauncher with BWAPI Injector checked.
 
@@ -45,13 +46,16 @@ Nicolas Biagianti
     use MacroProject.dll. Running BBQ as any other race or on any other map
    will produce unexpected results and may crash.
 
-A more detailled install guide is there:
-http://emotion.inrialpes.fr/people/synnaeve/bwiki/html/install
+A more detailled (and outdated) install guide is there:
+<http://emotion.inrialpes.fr/people/synnaeve/bwiki/html/install>
+
+A *global view* (_not_ a class diagram) of what I'm looking foward to have:
+<http://dl.dropbox.com/u/14035465/starcraft_overall.pdf>
 
 ## Additional Info / Did You Read That ? ##
 
-The BWAPI web site    		http://code.google.com/p/bwapi/  
-The BWSAL web site    		http://code.google.com/p/bwsal/  
-The BWTA  web site    		http://code.google.com/p/bwta/  
+The BWAPI web site    		<http://code.google.com/p/bwapi/> 
+The BWSAL web site    		<http://code.google.com/p/bwsal/>
+The BWTA  web site    		<http://code.google.com/p/bwta/> 
 IRC Channel           		QuakeNet #BWAPI
 
