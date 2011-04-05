@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include <ProductionManager.h>
 
 ProductionManager::ProductionManager()

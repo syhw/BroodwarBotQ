@@ -1,10 +1,9 @@
+#include <PrecompiledHeader.h>
 #include "Util.h"
 #include "MicroProject.h"
 #include "Goal.h"
 #include "FormationSubgoal.h"
 #include "AttackGoal.h"
-#include <stdio.h>
-#include <string>
 using namespace BWAPI;
 using namespace std;
 

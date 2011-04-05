@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include "DefendBaseGroundGoal.h"
 #include "SeeSubgoal.h"
 #include "FormationSubgoal.h"

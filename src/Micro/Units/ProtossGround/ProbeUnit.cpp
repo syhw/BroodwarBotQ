@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include "ProbeUnit.h"
 
 ProbeUnit::ProbeUnit(BWAPI::Unit* u, UnitsGroup* ug)
@@ -14,7 +15,7 @@ void ProbeUnit::micro()
     if (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency())
     {
         _lastClickFrame = Broodwar->getFrameCount();
-        unit->attackMove(target);
+        unit->attack(target);
     }
 }
 

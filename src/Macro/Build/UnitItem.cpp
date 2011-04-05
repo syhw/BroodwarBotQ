@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include "UnitItem.h"
 #include "BuildManager.h"
 BuildManager*& UnitItem::getBuildManager()

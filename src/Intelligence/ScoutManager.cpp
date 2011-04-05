@@ -1,4 +1,4 @@
-#include <BWTA.h>
+#include <PrecompiledHeader.h>
 #include "Defines.h"
 #include "ScoutManager.h"
 #include "MacroManager.h"

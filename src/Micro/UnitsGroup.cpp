@@ -1,12 +1,9 @@
+#include <PrecompiledHeader.h>
 #include <Defines.h>
 #include <UnitsGroup.h>
 #include <Position.h>
-#include <algorithm>
 #include <util.h>
 #include <cmath>
-#include <assert.h>
-#include <fstream>
-#include <iostream>
 #include <ArbiterUnit.h>
 #include <ArchonUnit.h>
 #include <CarrierUnit.h>
@@ -431,17 +428,17 @@ void UnitsGroup::update()
     templarMergingStuff();
 }
 
-void UnitsGroup::attackMove(int x, int y)
+void UnitsGroup::attack(int x, int y)
 {
-    attackMove(Position(x, y));
+    attack(Position(x, y));
 }
 
-void UnitsGroup::attackMove(BWAPI::Position& p)
+void UnitsGroup::attack(BWAPI::Position& p)
 {
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); it++)
     {
         (*it)->target = p;
-        //(*it)->attackMove(p); // TODO, for the moment, each unit keeps a path, needs to be 1 unit per UnitsGroup + flocking
+        //(*it)->attack(p); // TODO, for the moment, each unit keeps a path, needs to be 1 unit per UnitsGroup + flocking
     }
 }
 
@@ -600,7 +597,7 @@ void UnitsGroup::takeControl(Unit* u)
     }
     else
     {
-        u->attackMove(center);
+        u->attack(center);
         if (tmp != NULL)
             this->arrivingUnits.push_back(tmp);
     }

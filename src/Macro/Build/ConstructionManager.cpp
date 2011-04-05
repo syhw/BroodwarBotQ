@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include <ConstructionManager.h>
 #include <UnitGroupManager.h>
 ConstructionManager::ConstructionManager()
@@ -280,7 +281,7 @@ void ConstructionManager::update()
       if (b->buildingUnit == NULL) //if we don't have a building yet, look for it
       {
         //look at the units on the tile to see if it exists yet
-        std::set<BWAPI::Unit*> unitsOnTile = BWAPI::Broodwar->unitsOnTile(b->tilePosition.x(), b->tilePosition.y());
+        std::set<BWAPI::Unit*> unitsOnTile = BWAPI::Broodwar->getUnitsOnTile(b->tilePosition.x(), b->tilePosition.y());
         for(std::set<BWAPI::Unit*>::iterator t = unitsOnTile.begin(); t != unitsOnTile.end(); t++)
           if ((*t)->getType() == b->type && !(*t)->isLifted())
           {

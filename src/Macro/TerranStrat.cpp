@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include <TerranStrat.h>
 
 TerranStrat::TerranStrat():MacroManager()

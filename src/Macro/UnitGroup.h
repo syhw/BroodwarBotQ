@@ -345,8 +345,8 @@ class UnitGroup : public std::set<BWAPI::Unit*>
     bool contains(BWAPI::Unit* u) const;
     BWAPI::Position getCenter() const;
 
-    bool attackMove(BWAPI::Position position) const;
-    bool attackUnit(BWAPI::Unit* target) const;
+    bool attack(BWAPI::Position position) const;
+    bool attack(BWAPI::Unit* target) const;
     bool rightClick(BWAPI::Position position) const;
     bool rightClick(BWAPI::Unit* target) const;
     bool train(BWAPI::UnitType type) const;

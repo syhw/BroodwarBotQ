@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include "ScourgeUnit.h"
 
 std::set<BWAPI::UnitType> ScourgeUnit::setPrio;

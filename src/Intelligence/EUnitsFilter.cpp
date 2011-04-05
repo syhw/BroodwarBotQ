@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include "EUnitsFilter.h"
 
 using namespace BWAPI;

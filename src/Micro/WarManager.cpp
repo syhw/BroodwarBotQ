@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include <WarManager.h>
 #include <util.h>
 #include <UnitsGroup.h>

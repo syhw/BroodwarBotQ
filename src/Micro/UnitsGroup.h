@@ -89,8 +89,8 @@ public:
 	virtual void update();
 	virtual void display();
 	// Goals interface
-	virtual void attackMove(int x, int y);
-	virtual void attackMove(BWAPI::Position& p);
+	virtual void attack(int x, int y);
+	virtual void attack(BWAPI::Position& p);
 	virtual void move(BWAPI::Position& p);
 
 	virtual void formation(pFormation f);

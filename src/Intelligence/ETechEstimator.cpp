@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include "ETechEstimator.h"	
 
 using namespace BWAPI;
@@ -95,10 +96,12 @@ double ETechEstimator::hasTech(BWAPI::TechType tt)
 
 
     //Result
+	return 0.5;
 }
 
 double ETechEstimator::hasUpgrade(BWAPI::UpgradeType upt)
 {
+	return 0.5;
 }
 
 void ETechEstimator::updateProbs()

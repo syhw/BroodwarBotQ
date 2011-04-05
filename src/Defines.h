@@ -1,5 +1,4 @@
 #pragma once
-
 //our defines
 
 #define __DEBUG__

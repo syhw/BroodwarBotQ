@@ -1,7 +1,6 @@
+#include <PrecompiledHeader.h>
 #include <MacroManager.h>
-#include <math.h>
 #include "BorderManager.h"
-#include <assert.h>
 #include "ScoutManager.h"
 using namespace BWAPI;
 using namespace BWTA;

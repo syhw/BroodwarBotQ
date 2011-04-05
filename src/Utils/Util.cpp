@@ -1,8 +1,7 @@
+#include <PrecompiledHeader.h>
 #include "Util.h"
-#include <fstream>
 #include <stdarg.h>
 #include <sys/stat.h>
-#include <windows.h>
 char buffer[1024];
 void log(const char* text, ...)
 {

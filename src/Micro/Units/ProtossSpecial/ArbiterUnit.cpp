@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include "ArbiterUnit.h"
 
 std::set<BWAPI::UnitType> ArbiterUnit::setPrio;

@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include <algorithm>
 #include "Goal.h"
 #include "UnitsGroup.h"

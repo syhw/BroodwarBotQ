@@ -1,9 +1,5 @@
-#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
-
-#include <windows.h>
-#include <stdio.h>
+#include <PrecompiledHeader.h>
 #include <tchar.h>
-#include <BWAPI.h>
 #include "MacroProject.h"
 #include "Defines.h"
 

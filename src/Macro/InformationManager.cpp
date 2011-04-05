@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include <InformationManager.h>
 #include "Util.h"
 using namespace std;

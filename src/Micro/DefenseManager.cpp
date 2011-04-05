@@ -1,9 +1,9 @@
+#include <PrecompiledHeader.h>
 #include <DefenseManager.h>
 #include <BorderManager.h>
 #include "BaseManager.h"
 #include "Base.h"
 #include "DefendBaseGroundGoal.h"
-#include <map>
 #include "WarManager.h"
 
 #define __DEFENSE__ // still buggy

@@ -1,5 +1,6 @@
+#include <PrecompiledHeader.h>
 #include "HighTemplarUnit.h"
-#include <UnitsGroup.h>
+#include "UnitsGroup.h"
 
 int HighTemplarUnit::lastStormableUnitsUpdateFrame;
 

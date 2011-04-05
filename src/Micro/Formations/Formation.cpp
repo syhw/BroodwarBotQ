@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include "Formation.h"
 
 using namespace BWAPI;

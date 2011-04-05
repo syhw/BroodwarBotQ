@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include "Subgoal.h"	
 using namespace BWAPI;
 

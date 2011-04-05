@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include <ProtossStrat.h>
 #include <UnitGroupManager.h>
 

@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include <UnitGroupManager.h>
 
 std::map<BWAPI::Unit*,BWAPI::Player*> unitOwner;

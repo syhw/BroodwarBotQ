@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include <MorphManager.h>
 
 MorphManager::MorphManager()

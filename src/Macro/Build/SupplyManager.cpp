@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include <SupplyManager.h>
 #include <UnitGroupManager.h>
 SupplyManager::SupplyManager()

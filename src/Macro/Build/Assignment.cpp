@@ -1,5 +1,4 @@
-#include <vector>
-#include <map>
+#include <PrecompiledHeader.h>
 #include <RectangleArray.h>
 using namespace std;
 using namespace Util;

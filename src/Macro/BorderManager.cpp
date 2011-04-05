@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include <BorderManager.h>
 #include <InformationManager.h>
 void BorderManager::setDependencies()

@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include "SeeSubgoal.h"
 	
 SeeSubgoal::SeeSubgoal(SubgoalLogic l, BWAPI::Position pos)

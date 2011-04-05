@@ -1,8 +1,8 @@
+#include <PrecompiledHeader.h>
 #include <WorkerManager.h>
 #include <BaseManager.h>
 #include <RectangleArray.h>
 #include <BuildOrderManager.h>
-#include <algorithm>
 #include "Util.h"
 using namespace BWAPI;
 using namespace std;

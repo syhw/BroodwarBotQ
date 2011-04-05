@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include "BuildOrderManager.h"
 BuildOrderManager::MetaUnit::MetaUnit(BWAPI::Unit* unit)
 {

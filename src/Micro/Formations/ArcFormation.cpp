@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include "ArcFormation.h"
 #include "MapManager.h"
 

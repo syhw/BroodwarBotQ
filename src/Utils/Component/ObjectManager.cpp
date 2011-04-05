@@ -1,6 +1,6 @@
+#include <PrecompiledHeader.h>
 #include "ObjectManager.h"
 #include "Data.inl"
-#include <BWAPI.h>
 #include "BaseObject.h"
 
 ObjectManager::ObjectManager()

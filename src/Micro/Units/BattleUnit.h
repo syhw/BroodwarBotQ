@@ -59,7 +59,7 @@ public:
 
 	BattleUnit(BWAPI::Unit* unit);
     ~BattleUnit();
-    void attackMove(const BWAPI::Position& p);
+    void attack(const BWAPI::Position& p);
     bool operator == (const BattleUnit& bu) const;
     void update();
     virtual void onUnitDestroy(BWAPI::Unit* u);

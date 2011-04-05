@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include <TechManager.h>
 
 TechManager::TechManager()

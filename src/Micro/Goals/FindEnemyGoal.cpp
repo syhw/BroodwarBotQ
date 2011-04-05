@@ -1,5 +1,5 @@
+#include <PrecompiledHeader.h>
 #include "FindEnemyGoal.h"
-#include "float.h"
 
 FindEnemyGoal::FindEnemyGoal()
 {

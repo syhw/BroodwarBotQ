@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include "RandomGenerators.h"
 
 RandomGenerators::RandomGenerators()

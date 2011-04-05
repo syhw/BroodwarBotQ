@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include "DarkArchonUnit.h"
 
 DarkArchonUnit::DarkArchonUnit(BWAPI::Unit* u, UnitsGroup* ug)

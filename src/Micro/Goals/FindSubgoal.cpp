@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include "FindSubgoal.h"
 #include "Defines.h"
 #include "ScoutManager.h"

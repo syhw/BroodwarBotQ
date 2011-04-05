@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include "LineFormation.h"
 #include "MapManager.h"
 

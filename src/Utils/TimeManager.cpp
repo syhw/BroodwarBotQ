@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include <TimeManager.h>
 
 TimeManager::TimeManager()

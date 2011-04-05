@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include "ScoutUnit.h"
 
 std::set<BWAPI::UnitType> ScoutUnit::setPrio;

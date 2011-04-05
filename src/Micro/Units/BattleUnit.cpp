@@ -1,9 +1,8 @@
+#include <PrecompiledHeader.h>
 #include "BattleUnit.h"
 #include "Vec.h"
 #include "Defines.h"
 #include "MapManager.h"
-#include <map>
-#include <stdio.h>
 using namespace BWAPI;
 
 //////////////////////////////////////////////////
@@ -32,7 +31,7 @@ BattleUnit::~BattleUnit()
 {
 }
 
-void BattleUnit::attackMove(const Position& p)
+void BattleUnit::attack(const Position& p)
 {
     target = p;
     //pathFind(_path, unit->getPosition(), target);
@@ -43,7 +42,7 @@ void BattleUnit::attackMove(const Position& p)
     if (path.size() == 0) 
         Broodwar->printf("Scandale path.size()==0");*/
     //unit->rightClick(path.pop....
-	unit->attackMove(p);
+	unit->attack(p);
 }
 
 bool BattleUnit::operator == (const BattleUnit& bu) const

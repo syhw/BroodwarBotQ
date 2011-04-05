@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include "EViewedUnit.h"
 
 using namespace BWAPI;

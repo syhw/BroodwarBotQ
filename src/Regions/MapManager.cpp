@@ -1,11 +1,8 @@
+#include <PrecompiledHeader.h>
 #include <Defines.h>
 #include "MapManager.h"
 #include "UnitGroupManager.h"
-#include <stdio.h>
-#include <string.h>
-#include <assert.h>
 #include "HighTemplarUnit.h"
-#include <BWTA.h>
 
 #define __MESH_SIZE__ 32 // 16 // 24 // 32 // 48
 #define __STORM_SIZE__ 96

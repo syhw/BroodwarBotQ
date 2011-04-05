@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include "FormationSubgoal.h"	
 using namespace BWAPI;
 using namespace std;

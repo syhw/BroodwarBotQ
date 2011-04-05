@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include "GoalManager.h"
 
 using namespace BWAPI;

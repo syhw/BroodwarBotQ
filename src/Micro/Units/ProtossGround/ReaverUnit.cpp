@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include "ReaverUnit.h"
 
 std::set<BWAPI::UnitType> ReaverUnit::setPrio;
@@ -32,7 +33,7 @@ void ReaverUnit::micro()
     {
         updateRangeEnemies();
         updateTargetEnemy();
-        unit->attackUnit(targetEnemy);
+        unit->attack(targetEnemy);
         _lastAttackFrame = Broodwar->getFrameCount();
     } else if (!(Broodwar->getFrameCount() % 5))
     {

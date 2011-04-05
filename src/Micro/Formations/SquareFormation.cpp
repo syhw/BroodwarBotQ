@@ -1,6 +1,6 @@
+#include <PrecompiledHeader.h>
 #include "SquareFormation.h"
 #include "MapManager.h"
-#include <BWTA.h>
 
 #define __SAFE_SQUARE_FORMATION__
 

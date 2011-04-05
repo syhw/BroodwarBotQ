@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include <WorkerSelfDefenseManager.h>
 using namespace BWAPI;
 using namespace std;
@@ -79,7 +80,7 @@ void WorkerSelfDefenseManager::update()
     {
       if (u->getOrder()!=Orders::AttackUnit)
       {
-        u->attackUnit(getAttackers[u].top().first);
+        u->attack(getAttackers[u].top().first);
       }
     }
   }

@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include <ZergStrat.h>
 
 ZergStrat::ZergStrat():MacroManager()

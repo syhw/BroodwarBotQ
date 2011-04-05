@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include <EnhancedUI.h>
 using namespace BWAPI;
 

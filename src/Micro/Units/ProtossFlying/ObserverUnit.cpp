@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include "ObserverUnit.h"
 #include "EUnitsFilter.h"
 #include "UnitsGroup.h"

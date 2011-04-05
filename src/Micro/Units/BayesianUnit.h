@@ -183,7 +183,7 @@ public:
     virtual void onUnitHide(BWAPI::Unit* u);
 
     void update();
-    virtual void attackMove(const BWAPI::Position& p);
+    virtual void attack(const BWAPI::Position& p);
 
     virtual void micro() = 0;
     virtual void check() = 0;

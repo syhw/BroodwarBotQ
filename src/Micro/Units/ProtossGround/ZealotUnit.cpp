@@ -1,6 +1,6 @@
+#include <PrecompiledHeader.h>
 #include "ZealotUnit.h"
-#include <BWAPI.h>
-#include <UnitsGroup.h>
+#include "UnitsGroup.h"
 #include "MapManager.h"
 
 using namespace std;
@@ -276,9 +276,9 @@ void ZealotUnit::micro()
         if (currentFrame - _lastClickFrame > 21)
         {
             if (target == _unitPos)
-                unit->attackMove(_unitsGroup->enemiesCenter);
+                unit->attack(_unitsGroup->enemiesCenter);
             else
-                unit->attackMove(target);
+                unit->attack(target);
             _lastMoveFrame = Broodwar->getFrameCount();
             _lastClickFrame = Broodwar->getFrameCount();
         }
@@ -303,7 +303,7 @@ void ZealotUnit::micro()
             {
                 if (currentFrame - _lastClickFrame > Broodwar->getLatency())
                 {
-                    unit->attackMove(_unitsGroup->enemiesCenter);
+                    unit->attack(_unitsGroup->enemiesCenter);
                     _lastMoveFrame = Broodwar->getFrameCount();
                     _lastClickFrame = Broodwar->getFrameCount();
                 }
@@ -333,7 +333,7 @@ void ZealotUnit::micro()
         else if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible())
             attackEnemyUnit(targetEnemy);
         else
-            unit->attackMove(_unitsGroup->enemiesCenter);
+            unit->attack(_unitsGroup->enemiesCenter);
     }*/
     /*
     int hpDiff = _lastTotalHP - (unit->getShields() + unit->getHitPoints()) + 1; // +1 for regen shield

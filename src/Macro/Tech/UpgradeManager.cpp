@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include <UpgradeManager.h>
 
 UpgradeManager::UpgradeManager()

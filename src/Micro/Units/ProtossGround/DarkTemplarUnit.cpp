@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include "DarkTemplarUnit.h"
 
 std::set<BWAPI::UnitType> DarkTemplarUnit::setPrio;

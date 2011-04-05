@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include "ExploreGoal.h"
 using namespace BWAPI;
 

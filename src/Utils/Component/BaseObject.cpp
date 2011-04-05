@@ -1,6 +1,6 @@
+#include <PrecompiledHeader.h>
 #include "BaseObject.h"
 #include "ObjectManager.h"
-#include <algorithm>
 
 BaseObject::BaseObject(std::string name)
 : className(name)

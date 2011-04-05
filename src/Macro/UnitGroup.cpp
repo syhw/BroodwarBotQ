@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include <UnitGroup.h>
 
 using namespace BWAPI;
@@ -1385,21 +1386,21 @@ Position UnitGroup::getCenter() const
   return Position((int)(x/count),(int)(y/count));
 }
 
-bool UnitGroup::attackMove(Position position) const
+bool UnitGroup::attack(Position position) const
 {
   bool retval=true;
   for(set<Unit*>::const_iterator i=this->begin();i!=this->end();i++)
   {
-    retval = retval && (*i)->attackMove(position);
+    retval = retval && (*i)->attack(position);
   }
   return retval;
 }
-bool UnitGroup::attackUnit(Unit* target) const
+bool UnitGroup::attack(Unit* target) const
 {
   bool retval=true;
   for(set<Unit*>::const_iterator i=this->begin();i!=this->end();i++)
   {
-    retval = retval && (*i)->attackUnit(target);
+    retval = retval && (*i)->attack(target);
   }
   return retval;
 }

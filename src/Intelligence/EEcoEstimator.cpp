@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include "EEcoEstimator.h"
 
 using namespace BWAPI;

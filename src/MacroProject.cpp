@@ -1,6 +1,6 @@
+#include <PrecompiledHeader.h>
 #include "MacroProject.h"
 #include <Util.h>
-#include <time.h>
 #include <UnitsGroup.h>
 
 #define __POOL_TIME_RUSH__ 130 // seconds, 3 workers + 1 pool + 11 seconds

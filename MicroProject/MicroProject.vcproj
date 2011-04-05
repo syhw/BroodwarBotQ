@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Regions;../src/Utils;../src/Intelligence;../src/Utils/Component;../../BWAPI_3.5.1/include;../../BWAPI_3.5.1/include/BWAPI;../../BWAPI_3/5/1/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
+				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Intelligence;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ZergFlying;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Utils/Component;../../BWAPI_3.5.1/include;../../BWAPI_3.5.1/include/BWAPI;../../BWAPI_3.5.1/include/BWTA;../../boost_1_45_0;../../boost_1_43_0"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
 				BasicRuntimeChecks="3"
@@ -60,8 +60,10 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="../../BWAPI_3.5.1/lib/BWAPId.lib ../../BWAPI_3.5.1/lib/BWTAd.lib ../../BWAPI_3.5.1/lib/CGAL-vc90-mt-gd.lib ../../BWAPI_3.5.1/lib/gmp-vc90-mt-gd.lib ../../BWAPI_3.5.1/lib/libboost_thread-vc90-mt-gd-1_40.lib ../../BWAPI_3.5.1/lib/mpfr-vc90-mt-gd.lib ../../BWAPI_3.5.1/lib/tinyxmld.lib"
-				AdditionalLibraryDirectories="C:\Qt\4.6.2\lib;C:\Qt\4.6.3\lib;&quot;C:\dev\libQGLViewer-2.3.5\QGLViewer\release&quot;"
+				LinkIncremental="2"
+				AdditionalLibraryDirectories=""
 				GenerateDebugInformation="true"
+				SubSystem="1"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -118,7 +120,7 @@
 				ExceptionHandling="2"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="1"
+				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="PrecompiledHeader.h"
 				WarningLevel="3"
 				DebugInformationFormat="3"
@@ -182,6 +184,14 @@
 			<File
 				RelativePath="..\src\MicroDll.cpp"
 				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\src\MicroProject.cpp"
@@ -419,6 +429,10 @@
 			</File>
 			<File
 				RelativePath="..\src\Utils\MinHeap.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\PrecompiledHeader.h"
 				>
 			</File>
 			<File
@@ -664,10 +678,6 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 		</Filter>
-		<File
-			RelativePath=".\ClassDiagram1.cd"
-			>
-		</File>
 	</Files>
 	<Globals>
 	</Globals>

@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include "CarrierUnit.h"
 
 std::set<BWAPI::UnitType> CarrierUnit::setPrio;

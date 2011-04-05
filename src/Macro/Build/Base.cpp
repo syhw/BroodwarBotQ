@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include <BaseManager.h>
 using namespace BWTA;
 Base::Base(BWTA::BaseLocation* location)

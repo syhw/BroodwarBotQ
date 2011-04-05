@@ -1,3 +1,4 @@
+#include <PrecompiledHeader.h>
 #include <BuildManager.h>
 #include <BuildingPlacer.h>
 #include <ConstructionManager.h>

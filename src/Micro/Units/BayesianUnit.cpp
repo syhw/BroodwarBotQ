@@ -1,11 +1,8 @@
+#include <PrecompiledHeader.h>
 #include "BayesianUnit.h"
 #include "Rainbow.h"
-#include <utility>
 #include <Defines.h>
-#include <time.h>
-#include <UnitsGroup.h>
-#include <set>
-#include <stdio.h>
+#include "UnitsGroup.h"
 
 //#include <boost/math/distributions/normal.hpp>
 //using boost::math::normal;
@@ -694,7 +691,7 @@ void BayesianUnit::updatePPath()
                     //Broodwar->printf("_tptarget == TilePositions::None");
 #endif
                     if (!unit->isMoving()) // hack to deblock
-                        unit->attackMove(target);
+                        unit->attack(target);
                     return;
                 }
             }
@@ -1405,13 +1402,13 @@ void BayesianUnit::drawDirV()
             Broodwar->drawLine(CoordinateType::Map, up.x(), up.y(), _dirv[i].translate(up).x(), _dirv[i].translate(up).y(), Colors::Black);
 }
 
-void BayesianUnit::attackMove(const Position& p)
+void BayesianUnit::attack(const Position& p)
 {
     int cd = unit->getType().groundWeapon() != WeaponTypes::None ? unit->getType().groundWeapon().damageCooldown() : unit->getType().airWeapon().damageCooldown();
     target = p;
     if (Broodwar->getFrameCount() - _lastClickFrame >= cd)
     {
-        unit->attackMove(p);
+        unit->attack(p);
         _lastClickFrame = Broodwar->getFrameCount();
     }
 }
