@@ -13,6 +13,8 @@
 class EUnitsFilter : public CSingleton<EUnitsFilter>
 {
     friend class CSingleton<EUnitsFilter>;
+    EUnitsFilter();
+    ~EUnitsFilter() { }
     TimeManager* timeManager;
     std::set<BWAPI::UnitType> _interestingTypes;
     std::map<BWAPI::Unit*, EViewedUnit> _eViewedUnits;
@@ -35,8 +37,4 @@ public:
     bool empty();
     void bwOutput();
     virtual void update();
-
-private:
-    EUnitsFilter();
-    ~EUnitsFilter() { }
 };

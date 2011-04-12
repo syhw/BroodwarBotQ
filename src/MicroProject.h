@@ -28,11 +28,11 @@ public:
     ObjectManager* objectManager;
     Regions* regions;
     UnitGroupManager * unitGroupManager;
-	virtual void onStart();
-    MicroAIModule();
-    ~MicroAIModule();
     bool enemiesFound;
     BWAPI::TilePosition eStartLocation;
+    MicroAIModule();
+    ~MicroAIModule();
+	virtual void onStart();
 	virtual void onEnd(bool isWinner);
 	virtual void onFrame();
 	//virtual void onRemove(BWAPI::Unit* unit);

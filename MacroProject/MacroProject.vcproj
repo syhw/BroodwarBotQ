@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Intelligence;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ZergFlying;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Utils/Component;../../BWAPI_3.5.1/include;../../BWAPI_3.5.1/include/BWAPI;../../BWAPI_3.5.1/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
+				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Intelligence;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ZergFlying;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Utils/Component;../../BWAPI_3.5.4/include;../../BWAPI_3.5.4/include/BWAPI;../../BWAPI_3.5.4/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="../../BWAPI_3.5.1/lib/BWAPId.lib ../../BWAPI_3.5.1/lib/BWTAd.lib ../../BWAPI_3.5.1/lib/CGAL-vc90-mt-gd.lib ../../BWAPI_3.5.1/lib/gmp-vc90-mt-gd.lib ../../BWAPI_3.5.1/lib/libboost_thread-vc90-mt-gd-1_40.lib ../../BWAPI_3.5.1/lib/mpfr-vc90-mt-gd.lib ../../BWAPI_3.5.1/lib/tinyxmld.lib"
+				AdditionalDependencies="../../BWAPI_3.5.4/lib/BWAPId.lib ../../BWAPI_3.5.4/lib/BWTAd.lib ../../BWAPI_3.5.4/lib/CGAL-vc90-mt-gd.lib ../../BWAPI_3.5.4/lib/gmp-vc90-mt-gd.lib ../../BWAPI_3.5.4/lib/libboost_thread-vc90-mt-gd-1_40.lib ../../BWAPI_3.5.4/lib/mpfr-vc90-mt-gd.lib ../../BWAPI_3.5.4/lib/tinyxmld.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
 				IgnoreDefaultLibraryNames=""
@@ -119,7 +119,7 @@
 				Optimization="3"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Intelligence;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ZergFlying;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Utils/Component;../../BWAPI_3.5.1/include;../../BWAPI_3.5.1/include/BWAPI;../../BWAPI_3.5.1/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
+				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Intelligence;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ZergFlying;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Utils/Component;../../BWAPI_3.5.4/include;../../BWAPI_3.5.4/include/BWAPI;../../BWAPI_3.5.4/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
 				RuntimeLibrary="2"
@@ -140,7 +140,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="&#x0D;&#x0A;"
-				AdditionalDependencies="../../BWAPI_3.5.1/lib/BWAPI.lib ../../BWAPI_3.5.1/lib/BWTA.lib ../../BWAPI_3.5.1/lib/CGAL-vc90-mt.lib ../../BWAPI_3.5.1/lib/gmp-vc90-mt.lib ../../BWAPI_3.5.1/lib/libboost_thread-vc90-mt-1_40.lib ../../BWAPI_3.5.1/lib/mpfr-vc90-mt.lib ../../BWAPI_3.5.1/lib/tinyxml.lib"
+				AdditionalDependencies="../../BWAPI_3.5.4/lib/BWAPI.lib ../../BWAPI_3.5.4/lib/BWTA.lib ../../BWAPI_3.5.4/lib/CGAL-vc90-mt.lib ../../BWAPI_3.5.4/lib/gmp-vc90-mt.lib ../../BWAPI_3.5.4/lib/libboost_thread-vc90-mt-1_40.lib ../../BWAPI_3.5.4/lib/mpfr-vc90-mt.lib ../../BWAPI_3.5.4/lib/tinyxml.lib"
 				AdditionalLibraryDirectories=""
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
@@ -198,7 +198,7 @@
 				Optimization="0"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Intelligence;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ZergFlying;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Utils/Component;../../BWAPI_3.5.1/include;../../BWAPI_3.5.1/include/BWAPI;../../BWAPI_3.5.1/include/BWTA;../../boost_1_45_0;../../boost_1_43_0"
+				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Intelligence;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ZergFlying;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Utils/Component;../../BWAPI_3.5.4/include;../../BWAPI_3.5.4/include/BWAPI;../../BWAPI_3.5.4/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
 				RuntimeLibrary="2"
@@ -220,7 +220,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="&#x0D;&#x0A;"
-				AdditionalDependencies="../../BWAPI_3.5.1/lib/BWAPI.lib ../../BWAPI_3.5.1/lib/BWTA.lib ../../BWAPI_3.5.1/lib/CGAL-vc90-mt.lib ../../BWAPI_3.5.1/lib/gmp-vc90-mt.lib ../../BWAPI_3.5.1/lib/libboost_thread-vc90-mt-1_40.lib ../../BWAPI_3.5.1/lib/mpfr-vc90-mt.lib ../../BWAPI_3.5.1/lib/tinyxml.lib"
+				AdditionalDependencies="../../BWAPI_3.5.4/lib/BWAPI.lib ../../BWAPI_3.5.4/lib/BWTA.lib ../../BWAPI_3.5.4/lib/CGAL-vc90-mt.lib ../../BWAPI_3.5.4/lib/gmp-vc90-mt.lib ../../BWAPI_3.5.4/lib/libboost_thread-vc90-mt-1_40.lib ../../BWAPI_3.5.4/lib/mpfr-vc90-mt.lib ../../BWAPI_3.5.4/lib/tinyxml.lib"
 				AdditionalLibraryDirectories=""
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
