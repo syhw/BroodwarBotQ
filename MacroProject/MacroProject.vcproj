@@ -124,7 +124,8 @@
 				ExceptionHandling="2"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
-				UsePrecompiledHeader="1"
+				UsePrecompiledHeader="2"
+				PrecompiledHeaderThrough="PrecompiledHeader.h"
 				WarningLevel="3"
 				DebugInformationFormat="3"
 			/>
@@ -262,10 +263,26 @@
 			<File
 				RelativePath="..\src\EnhancedUI.cpp"
 				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="2"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\src\MacroDll.cpp"
 				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
 				<FileConfiguration
 					Name="Release_wo_optims|Win32"
 					>
