@@ -4,12 +4,13 @@
 #include <Defines.h>
 #include "UnitsGroup.h"
 
+// Copyright 2010-2011 <Gabriel Synnaeve> gabriel.synnaeve@gmail.com
+
 //#include <boost/math/distributions/normal.hpp>
 //using boost::math::normal;
 
 //#define __OUR_PATHFINDER__
 //#define __EXACT_OBJ__
-//#define __HEIGHTS_ATTRACTION__
 #define __NOT_IN_RANGE_BY__ 128.1
 #define __SAMPLE_DIR__
 #ifdef __SAMPLE_DIR__
@@ -27,7 +28,8 @@ using namespace BWAPI;
 #define _PROB_GO_OBJ 0.9
 ///#define _PROB_GO_NOT_VISIBLE 0.4
 
-BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
+BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug,
+						   const ProbTables* probTables)
 : BattleUnit(u)
 , _pathMutex(CreateMutex( 
         NULL,                  // default security attributes
@@ -40,23 +42,29 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
 , _maxDimension(max(_slarge, _sheight))
 , _minDimension(min(_slarge, _sheight))
 , _maxDiag(sqrt((double)(_slarge*_slarge + _sheight*_sheight)))
-, _maxWeaponsRange(max(unit->getType().groundWeapon().maxRange(), unit->getType().airWeapon().maxRange()))
+, _maxWeaponsRange(max(unit->getType().groundWeapon().maxRange(), 
+				   unit->getType().airWeapon().maxRange()))
 , _lastRightClick(unit->getPosition())
 , _lastAttackFrame(-100)
 , _lastClickFrame(-100)
 , _lastMoveFrame(-100)
-, _posAtMost13FramesAgo(Position(unit->getPosition().x() + 1, unit->getPosition().y() + 1)) // we don't want posAtMost13FramesAgo  
-, _posAtMost23FramesAgo(unit->getPosition())                                                // and posAtMost23FramesAgo to be equal
+, _posAtMost13FramesAgo(Position(unit->getPosition().x() + 1, 
+						unit->getPosition().y() + 1))
+						// we don't want posAtMost13FramesAgo  
+, _posAtMost23FramesAgo(unit->getPosition()) 
+						// and posAtMost23FramesAgo to be equal
 , _iThinkImBlocked(false)
 , _lastTotalHP(unit->getHitPoints() + unit->getShields())
 , _sumLostHP(0)
 , _refreshPathFramerate(12)
-, _maxDistWhileRefreshingPath((int)max(_refreshPathFramerate * _topSpeed, 45.26)) // 45.26 = sqrt(32^2 + 32^2)
+, _maxDistWhileRefreshingPath((int)max(_refreshPathFramerate * _topSpeed,
+							  45.26)) // 45.26 = sqrt(32^2 + 32^2)
 , _newPath(false)
 , _inPos(Position(0, 0))
 , _fleeing(false)
 , _fightMoving(false)
 , _fleeingDmg(20)
+, _probTables(probTables)
 {
     if (_pathMutex == NULL) 
     {
@@ -67,23 +75,6 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug)
     mapManager = & MapManager::Instance();
     switchMode(_mode);
     updateAttractors();
-    initDefaultProb();
-
-    _damageProb.push_back(_PROB_NO_DAMAGE_MOVE); //DAMAGE__NO
-    _damageProb.push_back(0.06);                 //DAMAGE_LOW
-    _damageProb.push_back(0.03);                 //DAMAGE_MED
-    _damageProb.push_back(0.01);                 //DAMAGE_HIGH
-
-    _repulseProb.push_back(_PROB_NO_REPULSE_MOVE); // REPULSE_NO
-    _repulseProb.push_back(0.2);                  // REPULSE_LOW
-    _repulseProb.push_back(0.1);                  // REPULSE_HIGH
-
-#ifdef __HEIGHTS_ATTRACTION__
-    _heightProb.push_back(0.2);                  // NORMAL_GROUND
-    _heightProb.push_back(0.3);                  // HIGH_GROUND
-    _heightProb.push_back(0.45);                 // VERY_HIGH_GROUND
-    _heightProb.push_back(0.05);                 // UNKOWN_HEIGHT
-#endif
 }
 
 BayesianUnit::~BayesianUnit()
@@ -105,13 +96,6 @@ UnitType BayesianUnit::getType()
     return unit->getType();
 }
 
-void BayesianUnit::initDefaultProb()
-{
-    _defaultProb.insert(make_pair(OCCUP_UNIT, _PROB_NO_UNIT_MOVE));           // P(allied_unit_in_this_case=false | we_go_in_this_case=true)
-    _defaultProb.insert(make_pair(OCCUP_BLOCKING, _PROB_NO_WALL_MOVE));       // P(this_case_is_blocking=false | we_go_in_this_case=true)
-    _defaultProb.insert(make_pair(OCCUP_BUILDING, _PROB_NO_BUILDING_MOVE));   // P(there_is_a_building_in_this_case=false | we_go_in_this_case=true)
-}
-
 void BayesianUnit::computeDamageValues()
 {
     _damageValues.clear();
@@ -126,9 +110,11 @@ void BayesianUnit::computeDamageValues()
 
         if (!tab[tmp.x()/32 + tmp.y()/32 * Broodwar->mapWidth()])
             _damageValues.push_back(DAMAGE_NO);
-        else if (tab[tmp.x()/32 + tmp.y()/32 * Broodwar->mapWidth()] < unit->getShields())
+        else if (tab[tmp.x()/32 + tmp.y()/32 * Broodwar->mapWidth()] < 
+			unit->getShields())
             _damageValues.push_back(DAMAGE_LOW);
-        else if (tab[tmp.x()/32 + tmp.y()/32 * Broodwar->mapWidth()] < (unit->getHitPoints()+unit->getShields()))
+        else if (tab[tmp.x()/32 + tmp.y()/32 * Broodwar->mapWidth()] < 
+			(unit->getHitPoints()+unit->getShields()))
             _damageValues.push_back(DAMAGE_MED);
         else 
             _damageValues.push_back(DAMAGE_HIGH);
@@ -156,17 +142,22 @@ void BayesianUnit::computeRepulseValues()
         repulse_value value = REPULSE_NO;
         Position tmp = _dirv[i].translate(this->_unitPos);
         double v = 100000.0;
-        for (std::set<Unit*>::const_iterator it = Broodwar->self()->getUnits().begin();
+        for (std::set<Unit*>::const_iterator it 
+			= Broodwar->self()->getUnits().begin();
             it != Broodwar->self()->getUnits().end(); ++it)
         {
             if (*it == unit)
                 continue;
             if ((*it)->getType().isBuilding())
                 continue;
-            if (_mode == MODE_FIGHT_A) /// repulse on actual units positions (against splash damage)
+            if (_mode == MODE_FIGHT_A)
+			/// repulse on actual units positions (against splash damage)
             { // dumb/quickfix
-                double otherMaxDiag = 1.4143 * max((*it)->getType().dimensionDown() - (*it)->getType().dimensionUp(),
-                    (*it)->getType().dimensionRight() - (*it)->getType().dimensionLeft());
+                double otherMaxDiag = 1.4143 * 
+					max((*it)->getType().dimensionDown() 
+					- (*it)->getType().dimensionUp(),
+                    (*it)->getType().dimensionRight() 
+					- (*it)->getType().dimensionLeft());
                 double dist = (*it)->getDistance(tmp);
                 if (dist < min(_maxDiag, otherMaxDiag))
                     value = REPULSE_HIGH;
@@ -182,19 +173,27 @@ void BayesianUnit::computeRepulseValues()
             {
                 Vec tmpvit((*it)->getVelocityX(), 
                     (*it)->getVelocityY());
-                tmpvit *= tmp.getDistance((*it)->getPosition()) / (*it)->getType().topSpeed();
+                tmpvit *= tmp.getDistance((*it)->getPosition()) 
+					/ (*it)->getType().topSpeed();
                 Position interp_pos = tmpvit.translate((*it)->getPosition());
-                double otherMaxDiag = 1.4143 * max((*it)->getType().dimensionDown() - (*it)->getType().dimensionUp(),
-                    (*it)->getType().dimensionRight() - (*it)->getType().dimensionLeft());
-                if (tmp.getDistance(interp_pos) < max(_maxDiag, otherMaxDiag)) // collision route
+                double otherMaxDiag = 1.4143 * 
+					max((*it)->getType().dimensionDown() 
+					- (*it)->getType().dimensionUp(),
+                    (*it)->getType().dimensionRight() 
+					- (*it)->getType().dimensionLeft());
+				// collision route
+                if (tmp.getDistance(interp_pos) < max(_maxDiag, otherMaxDiag))
                 {
-                    if (value == REPULSE_NO && (*it)->getType().size() == BWAPI::UnitSizeTypes::Small)
+                    if (value == REPULSE_NO && (*it)->getType().size()
+						== BWAPI::UnitSizeTypes::Small)
                         value = REPULSE_LOW;
                     else if (value < REPULSE_HIGH 
-                        && (*it)->getType().size() != BWAPI::UnitSizeTypes::Small)
+                        && (*it)->getType().size() 
+						!= BWAPI::UnitSizeTypes::Small)
                         value = REPULSE_HIGH;
                 }
-                if (!value && tmp.getDistance((*it)->getPosition()) < max(_maxDiag, otherMaxDiag))
+                if (!value && tmp.getDistance((*it)->getPosition()) 
+					< max(_maxDiag, otherMaxDiag))
                     value = REPULSE_LOW;
             }
         }
@@ -228,14 +227,16 @@ void BayesianUnit::switchMode(unit_mode um)
             //unit->holdPosition();
             break;
         case MODE_SCOUT:
-            if (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency())
+            if (Broodwar->getFrameCount() - _lastClickFrame 
+					> Broodwar->getLatency())
                 clickTarget();
 #ifdef __DEBUG__
             Broodwar->printf("Switch SCOUT!");
 #endif
             break;
         case MODE_MOVE:
-            if (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency())
+            if (Broodwar->getFrameCount() - _lastClickFrame 
+					> Broodwar->getLatency())
                 clickTarget();
 #ifdef __DEBUG__
             Broodwar->printf("Switch MOVE!");
@@ -260,7 +261,8 @@ void BayesianUnit::straightLine(vector<Position>& ppath,
         const Position& p_start, const Position& p_end, bool quick)
 {
     ppath.clear();
-    if (p_start.getDistance(p_end) < 8) return; // <=> if (p_start == p_end) return;
+	// <=> if (p_start == p_end) return;
+    if (p_start.getDistance(p_end) < 8) return;
     // not anti-aliased :)
     vector<Vec> dirvnorm;
     for (unsigned int i = 0; i < _dirv.size(); ++i)
@@ -279,9 +281,10 @@ void BayesianUnit::straightLine(vector<Position>& ppath,
             for (unsigned int i = 0; i < _dirv.size(); ++i)
             {
                 double tmp = dirvnorm[i].dot(objnorm);
-                if (tmp > maxv || 
-                        (tmp >= maxv && _dirv[i].norm() > _dirv[imax].norm()))
-                {
+				if (tmp > maxv || 
+					(tmp >= maxv && _dirv[i].norm() 
+						> _dirv[imax].norm()))
+				{
                     maxv = tmp;
                     imax = i;
                 }
@@ -339,16 +342,20 @@ void BayesianUnit::updateAttractors()
         Position tmp = _dirv[i].translate(up);
         
         // TODO optimize/clean this
-        Position hG = Position(tmp.x() - this->unit->getType().dimensionUp(), tmp.y() - this->unit->getType().dimensionLeft());
-        Position hD = Position(tmp.x() - this->unit->getType().dimensionUp(), tmp.y() + this->unit->getType().dimensionRight());
-        Position bG = Position(tmp.x() + this->unit->getType().dimensionDown(), tmp.y() - this->unit->getType().dimensionLeft());
-        Position bD = Position(tmp.x() + this->unit->getType().dimensionDown(), tmp.y() + this->unit->getType().dimensionRight());
+        Position hG = Position(tmp.x() - this->unit->getType().dimensionUp(),
+			tmp.y() - this->unit->getType().dimensionLeft());
+        Position hD = Position(tmp.x() - this->unit->getType().dimensionUp(),
+			tmp.y() + this->unit->getType().dimensionRight());
+        Position bG = Position(tmp.x() + this->unit->getType().dimensionDown(),
+			tmp.y() - this->unit->getType().dimensionLeft());
+        Position bD = Position(tmp.x() + this->unit->getType().dimensionDown(),
+			tmp.y() + this->unit->getType().dimensionRight());
         
         if (mapManager->buildings_wt[tmp.x()/8 + (tmp.y()/8)*4*width])
             _occupation.push_back(OCCUP_BUILDING);
         else if (!mapManager->walkability[tmp.x()/8 + (tmp.y()/8)*4*width])
             _occupation.push_back(OCCUP_BLOCKING);
-		/*else if (!mapManager->walkability[hG.x()/8 + (hG.y()/8)*4*width]) // TODo
+		/*else if (!mapManager->walkability[hG.x()/8 + (hG.y()/8)*4*width])
             _occupation.push_back(OCCUP_BLOCKING);
         else if (!mapManager->walkability[bG.x()/8 + (bG.y()/8)*4*width])
             _occupation.push_back(OCCUP_BLOCKING);
@@ -376,13 +383,17 @@ void BayesianUnit::drawAttractors()
             continue;
         }
         if (_occupation[i] == OCCUP_BUILDING)
-            Broodwar->drawBox(CoordinateType::Map, p.x() - 2, p.y() -2, p.x() + 2, p.y() + 2, Colors::Orange, true);
+            Broodwar->drawBox(CoordinateType::Map, p.x() - 2, p.y() -2,
+			p.x() + 2, p.y() + 2, Colors::Orange, true);
         else if (_occupation[i] == OCCUP_BLOCKING)
-            Broodwar->drawBox(CoordinateType::Map, p.x() - 2, p.y() - 2, p.x() + 2, p.y() + 2, Colors::Red, true);
+            Broodwar->drawBox(CoordinateType::Map, p.x() - 2, p.y() - 2,
+			p.x() + 2, p.y() + 2, Colors::Red, true);
         if (_occupation[i] == OCCUP_UNIT)
-            Broodwar->drawBox(CoordinateType::Map, p.x() - 2, p.y() - 2, p.x() + 2, p.y() + 2, Colors::Green, true);
+            Broodwar->drawBox(CoordinateType::Map, p.x() - 2, p.y() - 2,
+			p.x() + 2, p.y() + 2, Colors::Green, true);
         else if (_occupation[i] == OCCUP_EUNIT)
-            Broodwar->drawBox(CoordinateType::Map, p.x() - 2, p.y() - 2, p.x() + 2, p.y() + 2, Colors::Purple, true);
+            Broodwar->drawBox(CoordinateType::Map, p.x() - 2, p.y() - 2,
+			p.x() + 2, p.y() + 2, Colors::Purple, true);
     }
 }
 
@@ -392,7 +403,9 @@ void BayesianUnit::drawRepulseValues()
     for (unsigned int i = 0; i < _repulseValues.size(); ++i)
     {
         Position p = _dirv[i].translate(this->_unitPos);
-        Broodwar->drawBox(CoordinateType::Map, p.x() - 3, p.y() - 3, p.x() + 3, p.y() + 3, colors.rainbow[(_repulseValues[i]) % 3], true);
+        Broodwar->drawBox(CoordinateType::Map, p.x() - 3, p.y() - 3,
+			p.x() + 3, p.y() + 3,
+			colors.rainbow[(_repulseValues[i]) % 3], true);
     }
 }
 
@@ -408,25 +421,28 @@ double BayesianUnit::computeProb(unsigned int i)
         {
             Position tmp = _dirv[i].translate(_unitPos);
             Position tmp_obj = obj.translate(_unitPos);
+			// 11.32 = sqrt(8^2+8^2)
             double mult = (1.0 / (tmp.getDistance(tmp_obj)/11.32) < 1.0) 
-                ? (1.0 / (tmp.getDistance(tmp_obj)/11.32)) : 1.0; // 11.32 = sqrt(8^2+8^2)
+                ? (1.0 / (tmp.getDistance(tmp_obj)/11.32)) : 1.0; 
             val *= mult;
         }
     }
 
     if (_mode == MODE_INPOS || _mode == MODE_FIGHT_G || _mode == MODE_FIGHT_A)
     {
-        val *= _repulseProb[_repulseValues[i]]; /// Repulsion of the other units incoming towards us
+		/// Repulsion of the other units incoming towards us
+        val *= _probTables->_repulseProb[_repulseValues[i]];
     }
 
 #ifdef __HEIGHTS_ATTRACTION__
     if (_mode == MODE_FIGHT_G)
     {
-        int height = Broodwar->getGroundHeight(tmpTilePos); /// Attraction for heights
+		/// Attraction for heights
+        int height = Broodwar->getGroundHeight(tmpTilePos);
         if (height >= 0 && height < 3)
-            val *= _heightProb[height];
+            val *= _probTables->_heightProb[height];
         else
-            val *= _heightProb[_heightProb.size() - 1];
+            val *= _probTables->_heightProb[_probTables->_heightProb.size() - 1];
     }
 #endif
 
@@ -436,15 +452,17 @@ double BayesianUnit::computeProb(unsigned int i)
         {
             /*Vec dmgGrad;
             if (unit->getType().isFlyer())
-                dmgGrad = this->mapManager->airDamagesGrad[_unitPos.x()/32 + _unitPos.y()/32*Broodwar->mapWidth()];
+                dmgGrad = this->mapManager->airDamagesGrad[_unitPos.x()/32 
+					+ _unitPos.y()/32*Broodwar->mapWidth()];
             else
-                dmgGrad = this->mapManager->groundDamagesGrad[_unitPos.x()/32 + _unitPos.y()/32*Broodwar->mapWidth()];
+                dmgGrad = this->mapManager->groundDamagesGrad[_unitPos.x()/32 
+					+ _unitPos.y()/32*Broodwar->mapWidth()];
             Vec dirvtmp = _dirv[i];
             dmgGrad.normalize();
             dirvtmp.normalize();
             const double tmp = dirvtmp.dot(dmgGrad);
             val *= (_PROB_GO_OBJ*tmp > 0.1 ? _PROB_GO_OBJ*tmp : 0.1);*/
-            val *= _damageProb[_damageValues[i]];
+            val *= _probTables->_damageProb[_damageValues[i]];
         }
         else /// wanted target influence
         {
@@ -459,7 +477,7 @@ double BayesianUnit::computeProb(unsigned int i)
 
     if (_mode == MODE_SCOUT)
     {
-        val *= _damageProb[_damageValues[i]];
+        val *= _probTables->_damageProb[_damageValues[i]];
     }
 
     if (!(unit->getType().isFlyer()))
@@ -514,44 +532,66 @@ void BayesianUnit::drawProbs(multimap<double, Vec>& probs, int number)
     multimap<double, Vec>::const_iterator itmax = probs.end();
     --itmax;
     double max = itmax->first;
-    for (multimap<double, Vec>::const_iterator it = probs.begin(); it != probs.end(); ++it)
+    for (multimap<double, Vec>::const_iterator it = probs.begin();
+		it != probs.end(); ++it)
     {
-        //Broodwar->printf("proba: %f, Vec: %f, %f\n", it->first, it->second.x, it->second.y);
+        //Broodwar->printf("proba: %f, Vec: %f, %f\n", it->first,
+		//it->second.x, it->second.y);
         if (number == 1)
         {
             const int middle = 64;
             if (it->first < 0.2*max)
-                Broodwar->drawBoxScreen(middle - 4 + (int)it->second.x, middle - 4 + (int)it->second.y,
-                middle + 4 + (int)it->second.x, middle + 4 + (int)it->second.y, colors.rainbow[0], true);
+                Broodwar->drawBoxScreen(middle - 4 + (int)it->second.x,
+				middle - 4 + (int)it->second.y,
+                middle + 4 + (int)it->second.x, middle + 4 + (int)it->second.y,
+				colors.rainbow[0], true);
             else if (it->first >= 0.2*max && it->first < 0.4*max)
-                Broodwar->drawBoxScreen(middle - 4 + (int)it->second.x, middle - 4 + (int)it->second.y,
-                middle + 4 + (int)it->second.x, middle + 4 + (int)it->second.y, colors.rainbow[1], true);
+                Broodwar->drawBoxScreen(middle - 4 + (int)it->second.x,
+				middle - 4 + (int)it->second.y,
+                middle + 4 + (int)it->second.x, middle + 4 + (int)it->second.y,
+				colors.rainbow[1], true);
             else if (it->first >= 0.4*max && it->first < 0.6*max)
-                Broodwar->drawBoxScreen(middle - 4 + (int)it->second.x, middle - 4 + (int)it->second.y,
-                middle + 4 + (int)it->second.x, middle + 4 + (int)it->second.y, colors.rainbow[2], true);
+                Broodwar->drawBoxScreen(middle - 4 + (int)it->second.x,
+				middle - 4 + (int)it->second.y,
+                middle + 4 + (int)it->second.x, middle + 4 + (int)it->second.y,
+				colors.rainbow[2], true);
             else if (it->first >= 0.6*max && it->first < 0.8*max)
-                Broodwar->drawBoxScreen(middle - 4 + (int)it->second.x, middle - 4 + (int)it->second.y,
-                middle + 4 + (int)it->second.x, middle + 4 + (int)it->second.y, colors.rainbow[3], true);
+                Broodwar->drawBoxScreen(middle - 4 + (int)it->second.x,
+				middle - 4 + (int)it->second.y,
+                middle + 4 + (int)it->second.x, middle + 4 + (int)it->second.y,
+				colors.rainbow[3], true);
             else if (it->first >= 0.8*max)
-                Broodwar->drawBoxScreen(middle - 4 + (int)it->second.x, middle - 4 + (int)it->second.y,
-                middle + 4 + (int)it->second.x, middle + 4 + (int)it->second.y, colors.rainbow[4], true);
+                Broodwar->drawBoxScreen(middle - 4 + (int)it->second.x,
+				middle - 4 + (int)it->second.y,
+                middle + 4 + (int)it->second.x, middle + 4 + (int)it->second.y,
+				colors.rainbow[4], true);
         } else
         {
             if (it->first < 0.2*max)
-                Broodwar->drawBoxMap(up.x() - 4 + (int)it->second.x, up.y() - 4 + (int)it->second.y,
-                up.x() + 4 + (int)it->second.x, up.y() + 4 + (int)it->second.y, colors.rainbow[0], true);
+                Broodwar->drawBoxMap(up.x() - 4 + (int)it->second.x,
+				up.y() - 4 + (int)it->second.y,
+                up.x() + 4 + (int)it->second.x, up.y() + 4 + (int)it->second.y,
+				colors.rainbow[0], true);
             else if (it->first >= 0.2*max && it->first < 0.4*max)
-                Broodwar->drawBoxMap(up.x() - 4 + (int)it->second.x, up.y() - 4 + (int)it->second.y,
-                up.x() + 4 + (int)it->second.x, up.y() + 4 + (int)it->second.y, colors.rainbow[1], true);
+                Broodwar->drawBoxMap(up.x() - 4 + (int)it->second.x,
+				up.y() - 4 + (int)it->second.y,
+                up.x() + 4 + (int)it->second.x, up.y() + 4 + (int)it->second.y,
+				colors.rainbow[1], true);
             else if (it->first >= 0.4*max && it->first < 0.6*max)
-                Broodwar->drawBoxMap(up.x() - 4 + (int)it->second.x, up.y() - 4 + (int)it->second.y,
-                up.x() + 4 + (int)it->second.x, up.y() + 4 + (int)it->second.y, colors.rainbow[2], true);
+                Broodwar->drawBoxMap(up.x() - 4 + (int)it->second.x,
+				up.y() - 4 + (int)it->second.y,
+                up.x() + 4 + (int)it->second.x, up.y() + 4 + (int)it->second.y,
+				colors.rainbow[2], true);
             else if (it->first >= 0.6*max && it->first < 0.8*max)
-                Broodwar->drawBoxMap(up.x() - 4 + (int)it->second.x, up.y() - 4 + (int)it->second.y,
-                up.x() + 4 + (int)it->second.x, up.y() + 4 + (int)it->second.y, colors.rainbow[3], true);
+                Broodwar->drawBoxMap(up.x() - 4 + (int)it->second.x,
+				up.y() - 4 + (int)it->second.y,
+                up.x() + 4 + (int)it->second.x, up.y() + 4 + (int)it->second.y,
+				colors.rainbow[3], true);
             else if (it->first >= 0.8*max)
-                Broodwar->drawBoxMap(up.x() - 4 + (int)it->second.x, up.y() - 4 + (int)it->second.y,
-                up.x() + 4 + (int)it->second.x, up.y() + 4 + (int)it->second.y, colors.rainbow[4], true);
+                Broodwar->drawBoxMap(up.x() - 4 + (int)it->second.x,
+				up.y() - 4 + (int)it->second.y,
+                up.x() + 4 + (int)it->second.x, up.y() + 4 + (int)it->second.y,
+				colors.rainbow[4], true);
         }
     }
 }
@@ -581,7 +621,8 @@ DWORD BayesianUnit::LaunchPathfinding()
                 tab = mapManager->airDamages;
             else
                 tab = mapManager->groundDamages;
-            damagesAwarePathFind(_btpath, TilePosition(_unitPos), _tptarget, tab);
+            damagesAwarePathFind(_btpath, 
+				TilePosition(_unitPos), _tptarget, tab);
         }
         else
             _btpath = BWTA::getShortestPath(TilePosition(_unitPos), _tptarget);
@@ -624,18 +665,21 @@ void BayesianUnit::updateObj()
     {
         if (_fleeing) /// fleeing gradient influence
         {
-            if (unit->getType().size() == UnitSizeTypes::Small) // the damage maps / gradients are BuildTile resolution, too big
+			// the damage maps / gradients are BuildTile resolution, too big
+            if (unit->getType().size() == UnitSizeTypes::Small)
             {
                 obj = Vec(0, 0);
             }
             if (unit->getType().isFlyer())
-                obj = this->mapManager->airDamagesGrad[_unitPos.x()/32 + _unitPos.y()/32*Broodwar->mapWidth()];
+                obj = this->mapManager->airDamagesGrad[_unitPos.x()/32 
+				+ _unitPos.y()/32*Broodwar->mapWidth()];
             else
-                obj = this->mapManager->groundDamagesGrad[_unitPos.x()/32 + _unitPos.y()/32*Broodwar->mapWidth()];
+                obj = this->mapManager->groundDamagesGrad[_unitPos.x()/32 
+				+ _unitPos.y()/32*Broodwar->mapWidth()];
         }
         else /// target influence
         {
-            if (unit->isMoving() && _fightMoving) // && _lastRightClick == target)
+            if (unit->isMoving() && _fightMoving) //& _lastRightClick == target)
                 obj = Vec(unit->getVelocityX(), unit->getVelocityY());
             else if (_unitPos.getDistance(target) < 1.0)
                 obj = Vec(0, 0);
@@ -657,7 +701,8 @@ void BayesianUnit::updatePPath()
     if (targetDistance <= 45.26) // sqrt(32^2 + 32^2)
     {
         _ppath.clear();
-        if (targetDistance <= _maxDimension) // dirty hack to click farther than the unit size when really near
+		// dirty hack to click farther than the unit size when really near
+        if (targetDistance <= _maxDimension)
         {
             obj = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y());
             obj *= 2;
@@ -672,7 +717,8 @@ void BayesianUnit::updatePPath()
             if (_btpath.size())                
             {
                 _ppath.clear();
-                for (std::vector<TilePosition>::const_iterator it = _btpath.begin(); it != _btpath.end(); ++it)
+                for (std::vector<TilePosition>::const_iterator it 
+					= _btpath.begin(); it != _btpath.end(); ++it)
                     _ppath.push_back(Position(*it));
             }
             _newPath = false;
@@ -681,10 +727,12 @@ void BayesianUnit::updatePPath()
         if (!(Broodwar->getFrameCount() % _refreshPathFramerate))
         {
             // new, in test
-            _tptarget = TilePosition(target);
-            if (!mapManager->lowResWalkability[_tptarget.x() + _tptarget.y()*Broodwar->mapWidth()])
+			_tptarget = TilePosition(target);
+			if (!mapManager->lowResWalkability[_tptarget.x() 
+				+ _tptarget.y()*Broodwar->mapWidth()])
             {
-                _tptarget = mapManager->closestWalkabableSameRegionOrConnected(_tptarget);
+                _tptarget = mapManager->closestWalkabableSameRegionOrConnected(
+					_tptarget);
                 if (_tptarget == TilePositions::None)
                 {
 #ifdef __DEBUG__ 
@@ -718,7 +766,7 @@ void BayesianUnit::updatePPath()
         unsigned int count = 0;
         for (unsigned int i = 0; i < _ppath.size(); ++i) 
         {
-            if (_ppath[i].getDistance(_unitPos) < _maxDistWhileRefreshingPath) //45.26) // sqrt(32^2 + 32^2)
+            if (_ppath[i].getDistance(_unitPos) < _maxDistWhileRefreshingPath)
                 count = i;
         }
         for (; count > 0; --count) 
@@ -729,7 +777,8 @@ void BayesianUnit::updatePPath()
     {
         obj = Vec(0, 0);
     }
-    else if (_unitPos.getDistance(target) >= WALK_TILES_SIZE/2 && _unitPos.getDistance(target) < 32)
+    else if (_unitPos.getDistance(target) >= WALK_TILES_SIZE/2 
+		&& _unitPos.getDistance(target) < 32)
     {*/
     if (_unitPos.getDistance(target) < 32)
     {
@@ -738,7 +787,8 @@ void BayesianUnit::updatePPath()
     else
     {
         Position p;
-        if (Broodwar->getFrameCount()%10 == 0 || !_path.size()) // hack to remove with the introduction of TimeManager
+		// hack to remove with the introduction of TimeManager
+        if (Broodwar->getFrameCount()%10 == 0 || !_path.size())
         {
             // clock_t start = clock();
             /*
@@ -773,7 +823,8 @@ void BayesianUnit::updatePPath()
         }
         else
             p = _unitPos;
-        obj = Vec(p.x() - _unitPos.x() + 15, p.y() - _unitPos.y() + 15); // top left Positoin in a Build Tile -> middle Position = +15
+		// top left Positoin in a Build Tile -> middle Position = +15
+        obj = Vec(p.x() - _unitPos.x() + 15, p.y() - _unitPos.y() + 15);
     }     
 
 #endif
@@ -788,32 +839,44 @@ void BayesianUnit::updatePPath()
 void BayesianUnit::drawObj(int number)
 {
     Position up = _unitPos;
-    Broodwar->drawLine(CoordinateType::Map, up.x(), up.y(), up.x() + (int)obj.x, up.y() + (int)obj.y, Colors::Green);
+    Broodwar->drawLine(CoordinateType::Map, up.x(), up.y(), up.x() 
+		+ (int)obj.x, up.y() + (int)obj.y, Colors::Green);
     if (number == 0) return;
     if (number == 1)
     {
         const int middle = 64;
         for (unsigned int i = 0; i < this->_dirv.size(); ++i)
         {
-            //Broodwar->printf("obj.x: %f, obj.y: %f, _dirv[i].x: %f, _dirv[i].y: %f\n", obj.x, obj.y, _dirv[i].x, _dirv[i].y);
+            //Broodwar->printf("obj.x: %f, obj.y: %f, _dirv[i].x: %f, 
+			//_dirv[i].y: %f\n", obj.x, obj.y, _dirv[i].x, _dirv[i].y);
             if (obj == _dirv[i])
-                Broodwar->drawBoxScreen(middle - 4 + (int)_dirv[i].x, middle - 4 + (int)_dirv[i].y,
-                middle + 4 + (int)_dirv[i].x, middle + 4 + (int)_dirv[i].y, Colors::Green, true);
+                Broodwar->drawBoxScreen(middle - 4 + (int)_dirv[i].x, 
+				middle - 4 + (int)_dirv[i].y, middle + 4 + (int)_dirv[i].x,
+				middle + 4 + (int)_dirv[i].y, Colors::Green, true);
             else
-                Broodwar->drawBoxScreen(middle - 4 + (int)(int)_dirv[i].x, middle - 4 + (int)(int)_dirv[i].y,
-                middle + 4 + (int)(int)_dirv[i].x, middle + 4 + (int)(int)_dirv[i].y, Colors::Orange);
+                Broodwar->drawBoxScreen(middle - 4 + (int)(int)_dirv[i].x,
+				middle - 4 + (int)(int)_dirv[i].y, 
+				middle + 4 + (int)(int)_dirv[i].x,
+				middle + 4 + (int)(int)_dirv[i].y, Colors::Orange);
         }
     } else
     {
         for (unsigned int i = 0; i < this->_dirv.size(); ++i)
         {
-            //Broodwar->printf("obj.x: %f, obj.y: %f, _dirv[i].x: %f, _dirv[i].y: %f\n", obj.x, obj.y, _dirv[i].x, _dirv[i].y);
+            //Broodwar->printf("obj.x: %f, obj.y: %f, _dirv[i].x: %f, 
+			//_dirv[i].y: %f\n", obj.x, obj.y, _dirv[i].x, _dirv[i].y);
             if (obj == _dirv[i])
-                Broodwar->drawBoxMap(up.x() - 4 + (int)_dirv[i].x, up.y() - 4 + (int)_dirv[i].y,
-                up.x() + 4 + (int)_dirv[i].x, up.y() + 4 + (int)_dirv[i].y, Colors::Green, true);
+                Broodwar->drawBoxMap(up.x() - 4 + (int)_dirv[i].x, 
+				up.y() - 4 + (int)_dirv[i].y,
+                up.x() + 4 + (int)_dirv[i].x,
+				up.y() + 4 + (int)_dirv[i].y,
+				Colors::Green, true);
             else
-                Broodwar->drawBoxMap(up.x() - 4 + (int)(int)_dirv[i].x, up.y() - 4 + (int)(int)_dirv[i].y,
-                up.x() + 4 + (int)(int)_dirv[i].x, up.y() + 4 + (int)(int)_dirv[i].y, Colors::Orange);
+                Broodwar->drawBoxMap(up.x() - 4 + (int)(int)_dirv[i].x, 
+				up.y() - 4 + (int)(int)_dirv[i].y,
+                up.x() + 4 + (int)(int)_dirv[i].x,
+				up.y() + 4 + (int)(int)_dirv[i].y,
+				Colors::Orange);
         }
     }
 }
@@ -828,25 +891,35 @@ void BayesianUnit::drawOccupation(int number)
         const int middleY = 150;
         for (unsigned int i = 0; i < this->_dirv.size(); ++i)
         {
-            //Broodwar->printf("obj.x: %f, obj.y: %f, _dirv[i].x: %f, _dirv[i].y: %f\n", obj.x, obj.y, _dirv[i].x, _dirv[i].y);
+            //Broodwar->printf("obj.x: %f, obj.y: %f, _dirv[i].x: %f, 
+			//_dirv[i].y: %f\n", obj.x, obj.y, _dirv[i].x, _dirv[i].y);
             if (_occupation[i] == OCCUP_BLOCKING)
-                Broodwar->drawBoxScreen(middleX - 4 + (int)_dirv[i].x, middleY - 4 + (int)_dirv[i].y,
-                middleX + 4 + (int)_dirv[i].x, middleY + 4 + (int)_dirv[i].y, Colors::Red, true);
+                Broodwar->drawBoxScreen(middleX - 4 + (int)_dirv[i].x,
+				middleY - 4 + (int)_dirv[i].y,
+                middleX + 4 + (int)_dirv[i].x, middleY + 4 + (int)_dirv[i].y,
+				Colors::Red, true);
             else if (_occupation[i] == OCCUP_BUILDING)
-                Broodwar->drawBoxScreen(middleX - 4 + (int)(int)_dirv[i].x, middleY - 4 + (int)(int)_dirv[i].y,
-                middleX + 4 + (int)(int)_dirv[i].x, middleY + 4 + (int)(int)_dirv[i].y, Colors::Orange, true);
+                Broodwar->drawBoxScreen(middleX - 4 + (int)(int)_dirv[i].x,
+				middleY - 4 + (int)(int)_dirv[i].y,
+                middleX + 4 + (int)(int)_dirv[i].x,
+				middleY + 4 + (int)(int)_dirv[i].y, Colors::Orange, true);
         }
     } else
     {
         for (unsigned int i = 0; i < this->_dirv.size(); ++i)
         {
-            //Broodwar->printf("obj.x: %f, obj.y: %f, _dirv[i].x: %f, _dirv[i].y: %f\n", obj.x, obj.y, _dirv[i].x, _dirv[i].y);
+            //Broodwar->printf("obj.x: %f, obj.y: %f, _dirv[i].x: %f,
+			//_dirv[i].y: %f\n", obj.x, obj.y, _dirv[i].x, _dirv[i].y);
             if (_occupation[i] == OCCUP_BLOCKING)
-                Broodwar->drawBoxMap(up.x() - 4 + (int)_dirv[i].x, up.y() - 4 + (int)_dirv[i].y,
-                up.x() + 4 + (int)_dirv[i].x, up.y() + 4 + (int)_dirv[i].y, Colors::Red, true);
+                Broodwar->drawBoxMap(up.x() - 4 + (int)_dirv[i].x, 
+				up.y() - 4 + (int)_dirv[i].y,
+                up.x() + 4 + (int)_dirv[i].x,
+				up.y() + 4 + (int)_dirv[i].y, Colors::Red, true);
             else if (_occupation[i] == OCCUP_BUILDING)
-                Broodwar->drawBoxMap(up.x() - 4 + (int)(int)_dirv[i].x, up.y() - 4 + (int)(int)_dirv[i].y,
-                up.x() + 4 + (int)(int)_dirv[i].x, up.y() + 4 + (int)(int)_dirv[i].y, Colors::Orange, true);
+                Broodwar->drawBoxMap(up.x() - 4 + (int)(int)_dirv[i].x,
+				up.y() - 4 + (int)(int)_dirv[i].y,
+                up.x() + 4 + (int)(int)_dirv[i].x,
+				up.y() + 4 + (int)(int)_dirv[i].y, Colors::Orange, true);
         }
     }
 }
@@ -883,9 +956,12 @@ void BayesianUnit::updateDirV()
             Vec v(xx, yy);
 
             Position tmp = v.translate(p);
-            if (tmp.x() <= 32*Broodwar->mapWidth() && tmp.y() <= 32*Broodwar->mapHeight()       // in the map and
+			// in the map and walkable (statically)
+            if (tmp.x() <= 32*Broodwar->mapWidth() && tmp.y() 
+				<= 32*Broodwar->mapHeight()
                 && tmp.x() >= 0 && tmp.y() >= 0 
-                && (unit->getType().isFlyer() || _mode == MODE_SCOUT || Broodwar->isWalkable(tmp.x()/8, tmp.y()/8)))   // walkable (statically)
+                && (unit->getType().isFlyer() || _mode == MODE_SCOUT 
+					|| Broodwar->isWalkable(tmp.x()/8, tmp.y()/8)))
             {
                 _dirv.push_back(v);
             }
@@ -900,8 +976,10 @@ void BayesianUnit::testIfBlocked()
         _posAtMost23FramesAgo = _unitPos;
     if (!(Broodwar->getFrameCount() % 11))
     {
-        if (!(_iThinkImBlocked && Broodwar->getFrameCount() - _lastClickFrame < 12))
-            _iThinkImBlocked = (_posAtMost13FramesAgo == _unitPos && _posAtMost23FramesAgo == _unitPos) ? true : false;    
+        if (!(_iThinkImBlocked && Broodwar->getFrameCount() - _lastClickFrame 
+			< 12))
+            _iThinkImBlocked = (_posAtMost13FramesAgo == _unitPos 
+				&& _posAtMost23FramesAgo == _unitPos) ? true : false;    
     }
     if (!target.isValid())
         target.makeValid();
@@ -921,7 +999,8 @@ void BayesianUnit::resumeFromBlocked()
         }
         else if (_lastRightClick == target)
         {
-            Vec tmpv = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y()) * 2;
+            Vec tmpv = Vec(target.x() - _unitPos.x(), 
+				target.y() - _unitPos.y()) * 2;
             Position tmpp = tmpv.translate(_unitPos);
             if (!tmpp.isValid())
                 tmpp.makeValid();
@@ -936,10 +1015,12 @@ void BayesianUnit::resumeFromBlocked()
 void BayesianUnit::updateRangeEnemies()
 {
     _rangeEnemies.clear();
-    for (std::map<Unit*, Position>::const_iterator it = _unitsGroup->enemies.begin(); 
+    for (std::map<Unit*, Position>::const_iterator it 
+		= _unitsGroup->enemies.begin(); 
         it != _unitsGroup->enemies.end(); ++it)
     {
-        _rangeEnemies.insert(std::make_pair<double, Unit*>(_unitPos.getDistance(it->second), it->first));
+        _rangeEnemies.insert(std::make_pair<double, Unit*>(
+			_unitPos.getDistance(it->second), it->first));
     }
 }
 
@@ -948,12 +1029,15 @@ void BayesianUnit::clearDamages()
     // ===== clear old damage =====
     if (targetEnemy != NULL && _unitsGroup->unitDamages.left.count(targetEnemy))
     {
-        UnitDmgBimap::left_iterator unitdmgit = _unitsGroup->unitDamages.left.find(targetEnemy);
+        UnitDmgBimap::left_iterator unitdmgit 
+			= _unitsGroup->unitDamages.left.find(targetEnemy);
         int tmp_dmg = unitdmgit->second.dmg - computeDmg(targetEnemy);
         Unit* tmp_unit = unitdmgit->first;
         _unitsGroup->unitDamages.left.erase(unitdmgit);
-        _unitsGroup->unitDamages.insert(UnitDmg(tmp_unit, Dmg(tmp_dmg, tmp_unit, 
-            (targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected() ? tmp_unit->getHitPoints() + tmp_unit->getShields() : 0))));
+		_unitsGroup->unitDamages.insert(UnitDmg(tmp_unit, Dmg(tmp_dmg, tmp_unit, 
+			(targetEnemy->exists() && targetEnemy->isVisible() 
+			&& targetEnemy->isDetected() ? tmp_unit->getHitPoints() 
+			+ tmp_unit->getShields() : 0))));
     }
 }
 
@@ -961,7 +1045,8 @@ void BayesianUnit::updateTargetEnemy()
 {
     // ===== update oorTargetEnemy =====
     /// take one in our priority set and in focus fire order
-    for (UnitDmgBimap::right_iterator it = _unitsGroup->unitDamages.right.begin();
+    for (UnitDmgBimap::right_iterator it 
+		= _unitsGroup->unitDamages.right.begin();
         it != _unitsGroup->unitDamages.right.end(); ++it)
     {
         if (!it->second->exists() || !it->second->isVisible())
@@ -977,18 +1062,24 @@ void BayesianUnit::updateTargetEnemy()
             && testType != BWAPI::UnitTypes::Zerg_Sunken_Colony
             && testType != BWAPI::UnitTypes::Zerg_Spore_Colony)
             continue;
-        if (testType == BWAPI::UnitTypes::Protoss_High_Templar && it->second->getEnergy() < 60)
+        if (testType == BWAPI::UnitTypes::Protoss_High_Templar
+			&& it->second->getEnergy() < 60)
             continue;
-        if (testType == BWAPI::UnitTypes::Protoss_Dark_Archon && it->second->getEnergy() < 80)
+        if (testType == BWAPI::UnitTypes::Protoss_Dark_Archon
+			&& it->second->getEnergy() < 80)
             continue;
-        if (testType == BWAPI::UnitTypes::Terran_Science_Vessel && it->second->getEnergy() < 70)
+        if (testType == BWAPI::UnitTypes::Terran_Science_Vessel
+			&& it->second->getEnergy() < 70)
             continue;
-        if (testType == BWAPI::UnitTypes::Zerg_Defiler && it->second->getEnergy() < 60)
+        if (testType == BWAPI::UnitTypes::Zerg_Defiler
+			&& it->second->getEnergy() < 60)
             continue;
-        if (testType == BWAPI::UnitTypes::Zerg_Queen && it->second->getEnergy() < 60)
+        if (testType == BWAPI::UnitTypes::Zerg_Queen
+			&& it->second->getEnergy() < 60)
             continue;
         if (getSetPrio().count(testType)
-            && it->first.dmg < it->second->getHitPoints() + it->second->getShields())
+            && it->first.dmg < it->second->getHitPoints()
+			+ it->second->getShields())
         {
             oorTargetEnemy = it->second;
             break;
@@ -997,7 +1088,8 @@ void BayesianUnit::updateTargetEnemy()
     if (oorTargetEnemy == NULL || !oorTargetEnemy->exists())
     {
         /// take one in our priority set
-        for (std::multimap<double, BWAPI::Unit*>::const_iterator it = _rangeEnemies.begin();
+        for (std::multimap<double, BWAPI::Unit*>::const_iterator it 
+			= _rangeEnemies.begin();
             it != _rangeEnemies.end(); ++it)
         {
             if (!it->second->exists() || !it->second->isVisible())
@@ -1025,7 +1117,8 @@ void BayesianUnit::updateTargetEnemy()
     if (oorTargetEnemy == NULL || !oorTargetEnemy->exists())
     {
         /// take the best in focus fire order, not especially out of range
-        for (UnitDmgBimap::right_iterator it = _unitsGroup->unitDamages.right.begin();
+        for (UnitDmgBimap::right_iterator it 
+			= _unitsGroup->unitDamages.right.begin();
             it != _unitsGroup->unitDamages.right.end(); ++it)
         {
             if (!it->second->exists() || !it->second->isVisible())
@@ -1039,15 +1132,20 @@ void BayesianUnit::updateTargetEnemy()
                 && testType != BWAPI::UnitTypes::Zerg_Sunken_Colony
                 && testType != BWAPI::UnitTypes::Zerg_Spore_Colony)
                 continue;
-            if (testType == BWAPI::UnitTypes::Protoss_High_Templar && it->second->getEnergy() < 60)
+            if (testType == BWAPI::UnitTypes::Protoss_High_Templar &&
+				it->second->getEnergy() < 60)
                 continue;
-            if (testType == BWAPI::UnitTypes::Protoss_Dark_Archon && it->second->getEnergy() < 80)
+            if (testType == BWAPI::UnitTypes::Protoss_Dark_Archon &&
+				it->second->getEnergy() < 80)
                 continue;
-            if (testType == BWAPI::UnitTypes::Terran_Science_Vessel && it->second->getEnergy() < 70)
+            if (testType == BWAPI::UnitTypes::Terran_Science_Vessel &&
+				it->second->getEnergy() < 70)
                 continue;
-            if (testType == BWAPI::UnitTypes::Zerg_Defiler && it->second->getEnergy() < 60)
+            if (testType == BWAPI::UnitTypes::Zerg_Defiler &&
+				it->second->getEnergy() < 60)
                 continue;
-            if (testType == BWAPI::UnitTypes::Zerg_Queen && it->second->getEnergy() < 60)
+            if (testType == BWAPI::UnitTypes::Zerg_Queen &&
+				it->second->getEnergy() < 60)
                 continue;
             if (it->first.dmg < it->second->getHitPoints() + it->second->getShields())
             {
@@ -1074,19 +1172,25 @@ void BayesianUnit::updateTargetEnemy()
             && testType != BWAPI::UnitTypes::Zerg_Sunken_Colony
             && testType != BWAPI::UnitTypes::Zerg_Spore_Colony)
             continue;
-        if (testType == BWAPI::UnitTypes::Protoss_High_Templar && it->second->getEnergy() < 60)
+        if (testType == BWAPI::UnitTypes::Protoss_High_Templar &&
+			it->second->getEnergy() < 60)
             continue;
-        if (testType == BWAPI::UnitTypes::Protoss_Dark_Archon && it->second->getEnergy() < 80)
+        if (testType == BWAPI::UnitTypes::Protoss_Dark_Archon &&
+			it->second->getEnergy() < 80)
             continue;
-        if (testType == BWAPI::UnitTypes::Terran_Science_Vessel && it->second->getEnergy() < 70)
+        if (testType == BWAPI::UnitTypes::Terran_Science_Vessel &&
+			it->second->getEnergy() < 70)
             continue;
-        if (testType == BWAPI::UnitTypes::Zerg_Defiler && it->second->getEnergy() < 60)
+        if (testType == BWAPI::UnitTypes::Zerg_Defiler &&
+			it->second->getEnergy() < 60)
             continue;
-        if (testType == BWAPI::UnitTypes::Zerg_Queen && it->second->getEnergy() < 60)
+        if (testType == BWAPI::UnitTypes::Zerg_Queen &&
+			it->second->getEnergy() < 60)
             continue;
 
         if (getSetPrio().count(testType)
-            && it->first.dmg < it->second->getHitPoints() + it->second->getShields()
+            && it->first.dmg < it->second->getHitPoints() 
+			+ it->second->getShields()
             && inRange(it->second))
         {
             setTargetEnemy(it->second);
@@ -1111,7 +1215,8 @@ void BayesianUnit::updateTargetEnemy()
         if (testType == BWAPI::UnitTypes::Protoss_Interceptor)
             continue;
         // focus
-        if (it->first.dmg < it->second->getHitPoints() + it->second->getShields()
+        if (it->first.dmg < it->second->getHitPoints() 
+			+ it->second->getShields()
             && inRange(it->second))
         {
             setTargetEnemy(it->second);
@@ -1128,24 +1233,31 @@ void BayesianUnit::updateTargetEnemy()
     /// Take a new one
     if (_rangeEnemies.size())
     {
-        std::multimap<double, BWAPI::Unit*>::const_iterator stopPrio = _rangeEnemies.begin();
+        std::multimap<double, BWAPI::Unit*>::const_iterator stopPrio
+			= _rangeEnemies.begin();
         /// In range or almost and in the priority set
-        for (std::multimap<double, BWAPI::Unit*>::const_iterator it = _rangeEnemies.begin();
+        for (std::multimap<double, BWAPI::Unit*>::const_iterator it
+			= _rangeEnemies.begin();
             it != _rangeEnemies.end(); ++it)
         {
             stopPrio = it;
             if (it->first > _maxWeaponsRange)// + __NOT_IN_RANGE_BY__)
                 break;
             UnitType testType = it->second->getType();
-            if (testType == BWAPI::UnitTypes::Protoss_High_Templar && it->second->getEnergy() < 60)
+            if (testType == BWAPI::UnitTypes::Protoss_High_Templar &&
+				it->second->getEnergy() < 60)
                 continue;
-            if (testType == BWAPI::UnitTypes::Protoss_Dark_Archon && it->second->getEnergy() < 80)
+            if (testType == BWAPI::UnitTypes::Protoss_Dark_Archon &&
+				it->second->getEnergy() < 80)
                 continue;
-            if (testType == BWAPI::UnitTypes::Terran_Science_Vessel && it->second->getEnergy() < 70)
+            if (testType == BWAPI::UnitTypes::Terran_Science_Vessel &&
+				it->second->getEnergy() < 70)
                 continue;
-            if (testType == BWAPI::UnitTypes::Zerg_Defiler && it->second->getEnergy() < 60)
+            if (testType == BWAPI::UnitTypes::Zerg_Defiler &&
+				it->second->getEnergy() < 60)
                 continue;
-            if (testType == BWAPI::UnitTypes::Zerg_Queen && it->second->getEnergy() < 60)
+            if (testType == BWAPI::UnitTypes::Zerg_Queen &&
+				it->second->getEnergy() < 60)
                 continue;
             if (testType.isBuilding() 
                 && testType != BWAPI::UnitTypes::Protoss_Pylon
@@ -1158,10 +1270,16 @@ void BayesianUnit::updateTargetEnemy()
             if (it->second->exists() && it->second->isVisible()
                 && getSetPrio().count(testType)
                 && (
-                (!(testType.isFlyer()) && unit->getType().groundWeapon() != BWAPI::WeaponTypes::None &&
-                _unitPos.getDistance(it->second->getPosition()) < (double)unit->getType().groundWeapon().maxRange() + addRangeGround())// + __NOT_IN_RANGE_BY__) 
-                || (testType.isFlyer() && unit->getType().airWeapon() != BWAPI::WeaponTypes::None &&
-                _unitPos.getDistance(it->second->getPosition()) < (double)unit->getType().airWeapon().maxRange() + addRangeAir())// + __NOT_IN_RANGE_BY__)
+                (!(testType.isFlyer()) && unit->getType().groundWeapon()
+				!= BWAPI::WeaponTypes::None &&
+                _unitPos.getDistance(it->second->getPosition()) 
+				< (double)unit->getType().groundWeapon().maxRange() 
+				+ addRangeGround())// + __NOT_IN_RANGE_BY__) 
+                || (testType.isFlyer() && unit->getType().airWeapon() 
+				!= BWAPI::WeaponTypes::None &&
+                _unitPos.getDistance(it->second->getPosition()) 
+				< (double)unit->getType().airWeapon().maxRange() + addRangeAir())
+				// + __NOT_IN_RANGE_BY__)
                 ))
             {
                 setTargetEnemy(it->second);
@@ -1169,21 +1287,27 @@ void BayesianUnit::updateTargetEnemy()
             }
         }
         /// In range and not in the priority set
-        for (std::multimap<double, BWAPI::Unit*>::const_iterator it = _rangeEnemies.begin();
+        for (std::multimap<double, BWAPI::Unit*>::const_iterator it 
+			= _rangeEnemies.begin();
             it != _rangeEnemies.end(); ++it)
         {
             if (it->first > _maxWeaponsRange)
                 break;
             UnitType testType = it->second->getType();
-            if (testType == BWAPI::UnitTypes::Protoss_High_Templar && it->second->getEnergy() < 60)
+            if (testType == BWAPI::UnitTypes::Protoss_High_Templar 
+				&& it->second->getEnergy() < 60)
                 continue;
-            if (testType == BWAPI::UnitTypes::Protoss_Dark_Archon && it->second->getEnergy() < 80)
+            if (testType == BWAPI::UnitTypes::Protoss_Dark_Archon 
+				&& it->second->getEnergy() < 80)
                 continue;
-            if (testType == BWAPI::UnitTypes::Terran_Science_Vessel && it->second->getEnergy() < 70)
+            if (testType == BWAPI::UnitTypes::Terran_Science_Vessel 
+				&& it->second->getEnergy() < 70)
                 continue;
-            if (testType == BWAPI::UnitTypes::Zerg_Defiler && it->second->getEnergy() < 60)
+            if (testType == BWAPI::UnitTypes::Zerg_Defiler 
+				&& it->second->getEnergy() < 60)
                 continue;
-            if (testType == BWAPI::UnitTypes::Zerg_Queen && it->second->getEnergy() < 60)
+            if (testType == BWAPI::UnitTypes::Zerg_Queen 
+				&& it->second->getEnergy() < 60)
                 continue;
             if (testType.isBuilding() 
                 && testType != BWAPI::UnitTypes::Protoss_Pylon
@@ -1203,20 +1327,26 @@ void BayesianUnit::updateTargetEnemy()
                 return;
             }
         }
-        /// Not in range and the first one, priority to the priority set // TODO change for rings priority/not around the out of range
+        /// Not in range and the first one, priority to the priority set 
+		// TODO change for rings priority/not around the out of range
         for (std::multimap<double, BWAPI::Unit*>::const_iterator it = stopPrio;
             it != _rangeEnemies.end(); ++it)
         {
             UnitType testType = it->second->getType();
-            if (testType == BWAPI::UnitTypes::Protoss_High_Templar && it->second->getEnergy() < 60)
+            if (testType == BWAPI::UnitTypes::Protoss_High_Templar 
+				&& it->second->getEnergy() < 60)
                 continue;
-            if (testType == BWAPI::UnitTypes::Protoss_Dark_Archon && it->second->getEnergy() < 80)
+            if (testType == BWAPI::UnitTypes::Protoss_Dark_Archon 
+				&& it->second->getEnergy() < 80)
                 continue;
-            if (testType == BWAPI::UnitTypes::Terran_Science_Vessel && it->second->getEnergy() < 70)
+            if (testType == BWAPI::UnitTypes::Terran_Science_Vessel 
+				&& it->second->getEnergy() < 70)
                 continue;
-            if (testType == BWAPI::UnitTypes::Zerg_Defiler && it->second->getEnergy() < 60)
+            if (testType == BWAPI::UnitTypes::Zerg_Defiler 
+				&& it->second->getEnergy() < 60)
                 continue;
-            if (testType == BWAPI::UnitTypes::Zerg_Queen && it->second->getEnergy() < 60)
+            if (testType == BWAPI::UnitTypes::Zerg_Queen 
+				&& it->second->getEnergy() < 60)
                 continue;
             if (testType.isBuilding() 
                 && testType != BWAPI::UnitTypes::Protoss_Pylon
@@ -1239,7 +1369,8 @@ void BayesianUnit::updateTargetEnemy()
             }
         }
         /// Anywhere and not particularly in the priority set OR not defense building
-        for (std::multimap<double, BWAPI::Unit*>::const_iterator it = _rangeEnemies.begin();
+        for (std::multimap<double, BWAPI::Unit*>::const_iterator it 
+			= _rangeEnemies.begin();
             it != _rangeEnemies.end(); ++it)
         {
             if (it->second->exists() && it->second->isVisible())
@@ -1250,7 +1381,8 @@ void BayesianUnit::updateTargetEnemy()
         }
     }
     /// Take the default target of the UnitGroup
-    else if (_unitsGroup->defaultTargetEnemy != NULL && _unitsGroup->defaultTargetEnemy->exists())
+    else if (_unitsGroup->defaultTargetEnemy != NULL 
+		&& _unitsGroup->defaultTargetEnemy->exists())
         setTargetEnemy(_unitsGroup->defaultTargetEnemy);
     /// No target in rangeEnemies nor as a default target, follow the old one          // should never happen
     else if (targetEnemy != NULL && targetEnemy->exists() && targetEnemy->isVisible()) // should never happen
@@ -1667,7 +1799,7 @@ int BayesianUnit::fightMove()
     for (unsigned int i = 0; i < _dirv.size(); ++i)
     {
         double prob = 1.0;
-        prob *= _repulseProb[_repulseValues[i]]; /// Repulsion of the other units incoming towards us
+        prob *= _probTables->_repulseProb[_repulseValues[i]]; /// Repulsion of the other units incoming towards us
         if (!(unit->getType().isFlyer()))
         {
             if (_occupation[i] == OCCUP_BUILDING) /// NON-WALKABLE (BUILDING) INFLUENCE
@@ -1973,4 +2105,29 @@ void BayesianUnit::update()
 #endif
     _lastTotalHP = unit->getShields() + unit->getHitPoints();
     return;
+}
+
+ProbTables::ProbTables()
+{
+	// P(allied_unit_in_this_case=false | we_go_in_this_case=true)
+    _defaultProb.insert(make_pair(OCCUP_UNIT, _PROB_NO_UNIT_MOVE));
+	// P(this_case_is_blocking=false | we_go_in_this_case=true)
+    _defaultProb.insert(make_pair(OCCUP_BLOCKING, _PROB_NO_WALL_MOVE));
+	// P(there_is_a_building_in_this_case=false | we_go_in_this_case=true)
+    _defaultProb.insert(make_pair(OCCUP_BUILDING, _PROB_NO_BUILDING_MOVE));
+    _damageProb.push_back(_PROB_NO_DAMAGE_MOVE); //DAMAGE__NO
+    _damageProb.push_back(0.06);                 //DAMAGE_LOW
+    _damageProb.push_back(0.03);                 //DAMAGE_MED
+    _damageProb.push_back(0.01);                 //DAMAGE_HIGH
+
+    _repulseProb.push_back(_PROB_NO_REPULSE_MOVE); // REPULSE_NO
+    _repulseProb.push_back(0.2);                  // REPULSE_LOW
+    _repulseProb.push_back(0.1);                  // REPULSE_HIGH
+
+#ifdef __HEIGHTS_ATTRACTION__
+    _heightProb.push_back(0.2);                  // NORMAL_GROUND
+    _heightProb.push_back(0.3);                  // HIGH_GROUND
+    _heightProb.push_back(0.45);                 // VERY_HIGH_GROUND
+    _heightProb.push_back(0.05);                 // UNKOWN_HEIGHT
+#endif
 }

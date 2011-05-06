@@ -19,6 +19,7 @@ typedef boost::shared_ptr<BayesianUnit> pBayesianUnit;
 
 // #define PROBT 1
 // #define WITH_FLOCKING 1
+#define __HEIGHTS_ATTRACTION__
 
 // TODO, this class has to be derived to take Flying/Ground/Special Units 
 // (templars, tanks, lurkers, etc.) into account
@@ -55,6 +56,17 @@ enum damage_value {
     DAMAGE_LOW,
     DAMAGE_MED,
     DAMAGE_HIGH
+};
+
+struct ProbTables
+{
+    std::vector<double> _damageProb;
+    std::vector<double> _repulseProb;
+    std::map<occupation_type, double> _defaultProb;
+#ifdef __HEIGHTS_ATTRACTION__
+    std::vector<double> _heightProb;
+#endif
+	ProbTables();
 };
 
 class BayesianUnit : public BattleUnit
@@ -97,20 +109,14 @@ protected:
     MapManager* mapManager;
     std::vector<repulse_value> _repulseValues;
 #ifdef WITH_FLOCKING
-    std::vector<repulse_value> _flockValues;
+    static std::vector<repulse_value> _flockValues;
 #endif
     std::vector<damage_value> _damageValues;
-    std::vector<double> _damageProb; // TODO decide if static, perhaps unit dependant
-    std::vector<double> _repulseProb;
-#ifdef __HEIGHTS_ATTRACTION__
-    std::vector<double> _heightProb;
-#endif
+	const ProbTables* _probTables;
     UnitsGroup* _unitsGroup;
     std::multimap<double, BWAPI::Unit*> _rangeEnemies;
-    std::map<occupation_type, double> _defaultProb;
     std::multimap<double, Vec> _dirvProb;
 
-    inline void initDefaultProb();
     inline void computeRepulseValues();
 #ifdef WITH_FLOCKING
     inline void computeFlockValues();
@@ -168,13 +174,14 @@ protected:
     std::set<Unit*> _targetingMe;
     void updateTargetingMe();
 public:
+	static void init();
     void move(BWAPI::Position p); // debug purposes
 	void switchMode(unit_mode um);
     unit_mode getMode();
     int getMaxDimension();
     void updatePPath();
     Vec dir, obj; // dir=current direction, obj=pathfinder's direction
-    BayesianUnit(BWAPI::Unit* u, UnitsGroup* ug);
+    BayesianUnit(BWAPI::Unit* u, UnitsGroup* ug, const ProbTables* probTables);
     ~BayesianUnit();
     BWAPI::UnitType getType();
 
