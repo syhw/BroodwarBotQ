@@ -6,11 +6,13 @@
 using namespace std;
 using namespace BWAPI;
 
+ProbTables ZealotUnit::_sProbTables = ProbTables(BWAPI::UnitTypes::Protoss_Zealot.getID());
+
 std::set<BWAPI::UnitType> ZealotUnit::setPrio;
 std::map<BWAPI::Unit*, int> ZealotUnit::_zealotsOn;
 
 ZealotUnit::ZealotUnit(BWAPI::Unit* u, UnitsGroup* ug)
-: GroundUnit(u, ug)
+: GroundUnit(u, ug, &_sProbTables)
 {
     if (setPrio.empty())
     {

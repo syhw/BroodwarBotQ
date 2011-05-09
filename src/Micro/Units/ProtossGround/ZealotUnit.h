@@ -20,4 +20,6 @@ public:
     virtual void check();
     virtual int getAttackDuration();
     virtual std::set<BWAPI::UnitType> getSetPrio();
+private:
+	static ProbTables _sProbTables;
 };

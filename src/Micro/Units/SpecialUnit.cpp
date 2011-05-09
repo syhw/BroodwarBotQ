@@ -1,7 +1,7 @@
 #include <PrecompiledHeader.h>
 #include "SpecialUnit.h"
 
-ProbTables SpecialUnit::_sProbTables = ProbTables();
+ProbTables SpecialUnit::_sProbTables = ProbTables(-3); // -3 for special
 
 SpecialUnit::SpecialUnit(BWAPI::Unit* u, UnitsGroup* ug)
 : BayesianUnit(u, ug, &_sProbTables)

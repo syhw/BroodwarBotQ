@@ -431,7 +431,7 @@ double BayesianUnit::computeProb(unsigned int i)
     if (_mode == MODE_INPOS || _mode == MODE_FIGHT_G || _mode == MODE_FIGHT_A)
     {
 		/// Repulsion of the other units incoming towards us
-        val *= _probTables->_repulseProb[_repulseValues[i]];
+        val *= _probTables->probTablesData._repulseProb[_repulseValues[i]];
     }
 
 #ifdef __HEIGHTS_ATTRACTION__
@@ -440,9 +440,9 @@ double BayesianUnit::computeProb(unsigned int i)
 		/// Attraction for heights
         int height = Broodwar->getGroundHeight(tmpTilePos);
         if (height >= 0 && height < 3)
-            val *= _probTables->_heightProb[height];
+            val *= _probTables->probTablesData._heightProb[height];
         else
-            val *= _probTables->_heightProb[_probTables->_heightProb.size() - 1];
+            val *= _probTables->probTablesData._heightProb[_probTables->probTablesData._heightProb.size() - 1];
     }
 #endif
 
@@ -462,7 +462,7 @@ double BayesianUnit::computeProb(unsigned int i)
             dirvtmp.normalize();
             const double tmp = dirvtmp.dot(dmgGrad);
             val *= (_PROB_GO_OBJ*tmp > 0.1 ? _PROB_GO_OBJ*tmp : 0.1);*/
-            val *= _probTables->_damageProb[_damageValues[i]];
+            val *= _probTables->probTablesData._damageProb[_damageValues[i]];
         }
         else /// wanted target influence
         {
@@ -477,7 +477,7 @@ double BayesianUnit::computeProb(unsigned int i)
 
     if (_mode == MODE_SCOUT)
     {
-        val *= _probTables->_damageProb[_damageValues[i]];
+        val *= _probTables->probTablesData._damageProb[_damageValues[i]];
     }
 
     if (!(unit->getType().isFlyer()))
@@ -1799,7 +1799,7 @@ int BayesianUnit::fightMove()
     for (unsigned int i = 0; i < _dirv.size(); ++i)
     {
         double prob = 1.0;
-        prob *= _probTables->_repulseProb[_repulseValues[i]]; /// Repulsion of the other units incoming towards us
+        prob *= _probTables->_probTablesData.repulseProb[_repulseValues[i]]; /// Repulsion of the other units incoming towards us
         if (!(unit->getType().isFlyer()))
         {
             if (_occupation[i] == OCCUP_BUILDING) /// NON-WALKABLE (BUILDING) INFLUENCE
@@ -2107,27 +2107,102 @@ void BayesianUnit::update()
     return;
 }
 
-ProbTables::ProbTables()
+ProbTables::ProbTables(int ut)
+: unitTypeID(ut)
 {
-	// P(allied_unit_in_this_case=false | we_go_in_this_case=true)
-    _defaultProb.insert(make_pair(OCCUP_UNIT, _PROB_NO_UNIT_MOVE));
-	// P(this_case_is_blocking=false | we_go_in_this_case=true)
-    _defaultProb.insert(make_pair(OCCUP_BLOCKING, _PROB_NO_WALL_MOVE));
-	// P(there_is_a_building_in_this_case=false | we_go_in_this_case=true)
-    _defaultProb.insert(make_pair(OCCUP_BUILDING, _PROB_NO_BUILDING_MOVE));
-    _damageProb.push_back(_PROB_NO_DAMAGE_MOVE); //DAMAGE__NO
-    _damageProb.push_back(0.06);                 //DAMAGE_LOW
-    _damageProb.push_back(0.03);                 //DAMAGE_MED
-    _damageProb.push_back(0.01);                 //DAMAGE_HIGH
+	string filename;
+	if (unitTypeID >= 0)
+	{
+		BWAPI::UnitType tmp(unitTypeID);
+		filename = tmp.getName();
+	}
+	else if (unitTypeID == -1)
+		filename = "Ground";
+	else if (unitTypeID == -2)
+		filename = "Flying";
+	else if (unitTypeID == -3)
+		filename = "Special";
+	FILE* fpointer;
+	fopen_s(&fpointer, filename.c_str(), "r");
+	if (fpointer != NULL)
+	{
+		fclose(fpointer);
+        std::ifstream ifs("filename");
+        boost::archive::text_iarchive ia(ifs);
+        ia >> probTablesData;
+	}
+	else
+	{
+		// P(allied_unit_in_this_case=false | we_go_in_this_case=true)
+	    probTablesData._defaultProb.insert(make_pair(OCCUP_UNIT, _PROB_NO_UNIT_MOVE));
+		// P(this_case_is_blocking=false | we_go_in_this_case=true)
+	    probTablesData._defaultProb.insert(make_pair(OCCUP_BLOCKING, _PROB_NO_WALL_MOVE));
+		// P(there_is_a_building_in_this_case=false | we_go_in_this_case=true)
+	    probTablesData._defaultProb.insert(make_pair(OCCUP_BUILDING, _PROB_NO_BUILDING_MOVE));
+	    probTablesData._damageProb.push_back(_PROB_NO_DAMAGE_MOVE); //DAMAGE__NO
+	    probTablesData._damageProb.push_back(0.06);                 //DAMAGE_LOW
+	    probTablesData._damageProb.push_back(0.03);                 //DAMAGE_MED
+	    probTablesData._damageProb.push_back(0.01);                 //DAMAGE_HIGH
 
-    _repulseProb.push_back(_PROB_NO_REPULSE_MOVE); // REPULSE_NO
-    _repulseProb.push_back(0.2);                  // REPULSE_LOW
-    _repulseProb.push_back(0.1);                  // REPULSE_HIGH
+	    probTablesData._repulseProb.push_back(_PROB_NO_REPULSE_MOVE); // REPULSE_NO
+	    probTablesData._repulseProb.push_back(0.2);                  // REPULSE_LOW
+	    probTablesData._repulseProb.push_back(0.1);                  // REPULSE_HIGH
 
 #ifdef __HEIGHTS_ATTRACTION__
-    _heightProb.push_back(0.2);                  // NORMAL_GROUND
-    _heightProb.push_back(0.3);                  // HIGH_GROUND
-    _heightProb.push_back(0.45);                 // VERY_HIGH_GROUND
-    _heightProb.push_back(0.05);                 // UNKOWN_HEIGHT
+	    probTablesData._heightProb.push_back(0.2);                  // NORMAL_GROUND
+	    probTablesData._heightProb.push_back(0.3);                  // HIGH_GROUND
+	    probTablesData._heightProb.push_back(0.45);                 // VERY_HIGH_GROUND
+	    probTablesData._heightProb.push_back(0.05);                 // UNKOWN_HEIGHT
+#endif
+	}
+}
+
+ProbTablesData::ProbTablesData()
+{
+}
+
+ProbTablesData::ProbTablesData(int utID, std::vector<double>damageP, 
+					   std::vector<double>repulseP 
+					   , std::map<occupation_type, double> defaultP
+#ifdef __HEIGHTS_ATTRACTION__
+					   , std::vector<double> heightP
+#endif
+					   )
+					   : _damageProb(damageP)
+					   , _repulseProb(repulseP)
+					   , _defaultProb(defaultP)
+#ifdef __HEIGHTS_ATTRACTION__
+					   , _heightProb(heightP)
+#endif
+{
+}
+
+ProbTables::~ProbTables()
+{
+	string filename;
+	if (unitTypeID >= 0)
+	{
+		BWAPI::UnitType tmp(unitTypeID);
+		filename = tmp.getName();
+	}
+	else if (unitTypeID == -1)
+		filename = "Ground";
+	else if (unitTypeID == -2)
+		filename = "Flying";
+	else if (unitTypeID == -3)
+		filename = "Special";
+    std::ofstream ofs(filename.c_str());
+	boost::archive::text_oarchive oa(ofs);
+	oa << probTablesData;
+}
+    
+template<class Archive>
+void ProbTablesData::serialize(Archive & ar, const unsigned int version)
+{
+    ar & _damageProb;
+    ar & _repulseProb;
+    ar & _defaultProb;
+#ifdef __HEIGHTS_ATTRACTION__
+    ar & _heightProb;
 #endif
 }

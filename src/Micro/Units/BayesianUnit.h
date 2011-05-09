@@ -9,7 +9,12 @@
 //#include "UnitsGroup.h"
 #include <map>
 #include <set>
+#include <boost/archive/text_oarchive.hpp>
+#include <boost/archive/text_iarchive.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/map.hpp>
 #include <boost/shared_ptr.hpp>
+#include <fstream>
 
 class BayesianUnit;
 typedef boost::shared_ptr<BayesianUnit> pBayesianUnit;
@@ -58,15 +63,33 @@ enum damage_value {
     DAMAGE_HIGH
 };
 
-struct ProbTables
+struct ProbTablesData
 {
+	friend class boost::serialization::access;
     std::vector<double> _damageProb;
     std::vector<double> _repulseProb;
     std::map<occupation_type, double> _defaultProb;
 #ifdef __HEIGHTS_ATTRACTION__
     std::vector<double> _heightProb;
 #endif
-	ProbTables();
+	ProbTablesData();
+	ProbTablesData(int utID, std::vector<double>damageP, 
+		std::vector<double>repulseP
+		, std::map<occupation_type, double> defaultP
+#ifdef __HEIGHTS_ATTRACTION__
+		, std::vector<double> heightP
+#endif
+		);
+	template<class Archive>
+	void serialize(Archive & ar, const unsigned int version);
+};
+
+struct ProbTables
+{
+	int unitTypeID; // -1 for ground, -2 for flying, -3 for special
+	ProbTablesData probTablesData;
+	ProbTables(int utID);
+	~ProbTables();
 };
 
 class BayesianUnit : public BattleUnit
