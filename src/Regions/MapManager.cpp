@@ -81,6 +81,7 @@ MapManager::~MapManager()
     delete [] walkability;
     delete [] lowResWalkability;
     delete [] buildings_wt;
+    delete [] buildings_wt_strict;
     delete [] buildings;
     delete [] groundDamages;
     delete [] airDamages;
