@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="../../BWAPI_3.5.4/lib/BWAPId.lib ../../BWAPI_3.5.4/lib/BWTAd.lib ../../BWAPI_3.5.4/lib/CGAL-vc90-mt-gd.lib ../../BWAPI_3.5.4/lib/gmp-vc90-mt-gd.lib ../../BWAPI_3.5.4/lib/libboost_thread-vc90-mt-gd-1_40.lib ../../BWAPI_3.5.4/lib/mpfr-vc90-mt-gd.lib ../../BWAPI_3.5.4/lib/tinyxmld.lib"
+				AdditionalDependencies="../../BWAPI_3.5.4/lib/BWAPId.lib ../../BWAPI_3.5.4/lib/BWTAd.lib ../../BWAPI_3.5.4/lib/CGAL-vc90-mt-gd.lib ../../BWAPI_3.5.4/lib/gmp-vc90-mt-gd.lib ../../BWAPI_3.5.4/lib/libboost_thread-vc90-mt-gd-1_40.lib ../../BWAPI_3.5.4/lib/mpfr-vc90-mt-gd.lib ../../BWAPI_3.5.4/lib/tinyxmld.lib ../../boost_1_45_0/stage/lib/libboost_serialization-vc90-mt-gd-1_45.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories=""
 				IgnoreDefaultLibraryNames=""
@@ -141,7 +141,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="&#x0D;&#x0A;"
-				AdditionalDependencies="../../BWAPI_3.5.4/lib/BWAPI.lib ../../BWAPI_3.5.4/lib/BWTA.lib ../../BWAPI_3.5.4/lib/CGAL-vc90-mt.lib ../../BWAPI_3.5.4/lib/gmp-vc90-mt.lib ../../BWAPI_3.5.4/lib/libboost_thread-vc90-mt-1_40.lib ../../BWAPI_3.5.4/lib/mpfr-vc90-mt.lib ../../BWAPI_3.5.4/lib/tinyxml.lib"
+				AdditionalDependencies="../../BWAPI_3.5.4/lib/BWAPI.lib ../../BWAPI_3.5.4/lib/BWTA.lib ../../BWAPI_3.5.4/lib/CGAL-vc90-mt.lib ../../BWAPI_3.5.4/lib/gmp-vc90-mt.lib ../../BWAPI_3.5.4/lib/libboost_thread-vc90-mt-1_40.lib ../../BWAPI_3.5.4/lib/mpfr-vc90-mt.lib ../../BWAPI_3.5.4/lib/tinyxml.lib ../../boost_1_45_0/stage/lib/libboost_serialization-vc90-mt-1_45.lib"
 				AdditionalLibraryDirectories=""
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
@@ -221,7 +221,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="&#x0D;&#x0A;"
-				AdditionalDependencies="../../BWAPI_3.5.4/lib/BWAPI.lib ../../BWAPI_3.5.4/lib/BWTA.lib ../../BWAPI_3.5.4/lib/CGAL-vc90-mt.lib ../../BWAPI_3.5.4/lib/gmp-vc90-mt.lib ../../BWAPI_3.5.4/lib/libboost_thread-vc90-mt-1_40.lib ../../BWAPI_3.5.4/lib/mpfr-vc90-mt.lib ../../BWAPI_3.5.4/lib/tinyxml.lib"
+				AdditionalDependencies="../../BWAPI_3.5.4/lib/BWAPI.lib ../../BWAPI_3.5.4/lib/BWTA.lib ../../BWAPI_3.5.4/lib/CGAL-vc90-mt.lib ../../BWAPI_3.5.4/lib/gmp-vc90-mt.lib ../../BWAPI_3.5.4/lib/libboost_thread-vc90-mt-1_40.lib ../../BWAPI_3.5.4/lib/mpfr-vc90-mt.lib ../../BWAPI_3.5.4/lib/tinyxml.lib ../../boost_1_45_0/stage/lib/libboost_serialization-vc90-mt-1_45.lib"
 				AdditionalLibraryDirectories=""
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
@@ -355,7 +355,7 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\Micro\Units\GrountUnit.cpp"
+						RelativePath="..\src\Micro\Units\GroundUnit.cpp"
 						>
 					</File>
 					<File
