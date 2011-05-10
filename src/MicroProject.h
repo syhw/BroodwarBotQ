@@ -16,7 +16,6 @@ static bool analyzed;
 static bool analysis_just_finished;
 static BWTA::Region* home;
 static BWTA::Region* enemy_base;
-static int runNumber;
 DWORD WINAPI AnalyzeThread();
 
 class MicroAIModule : public BWAPI::AIModule

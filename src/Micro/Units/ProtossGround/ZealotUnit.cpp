@@ -14,7 +14,6 @@ std::map<BWAPI::Unit*, int> ZealotUnit::_zealotsOn;
 ZealotUnit::ZealotUnit(BWAPI::Unit* u, UnitsGroup* ug)
 : GroundUnit(u, ug, &_sProbTables)
 {
-	Broodwar->printf("Zealot ID %d", BWAPI::UnitTypes::Protoss_Zealot.getID());
     if (setPrio.empty())
     {
         setPrio.insert(BWAPI::UnitTypes::Protoss_Reaver);
@@ -31,6 +30,13 @@ ZealotUnit::~ZealotUnit()
     if (Broodwar->getFrameCount() - _lastAttackFrame <= getAttackDuration())
         clearDamages();
 }
+
+#ifdef __LEARNING_PROB_TABLES__
+void ZealotUnit::initProbTables()
+{
+	_sProbTables = ProbTables(BWAPI::UnitTypes::Protoss_Zealot.getID());
+}
+#endif
 
 int ZealotUnit::fightMove()
 {

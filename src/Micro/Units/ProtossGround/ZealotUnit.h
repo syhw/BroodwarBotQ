@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Defines.h"
 #include <GroundUnit.h>
 #include <BWAPI.h>
 
@@ -16,6 +17,9 @@ protected:
 public:
     ZealotUnit(BWAPI::Unit* u, UnitsGroup* ug);
     ~ZealotUnit();
+#ifdef __LEARNING_PROB_TABLES__
+	static void initProbTables();
+#endif
     virtual void micro();
     virtual void check();
     virtual int getAttackDuration();

@@ -1,7 +1,6 @@
 #pragma once
 #include <BWAPI.h>
 #include <BWTA.h>
-#include <windows.h>
 #include <math.h>
 #include "Vec.h"
 #include "BattleUnit.h"
@@ -84,7 +83,7 @@ struct ProbTablesData
 	void serialize(Archive & ar, const unsigned int version);
 };
 
-BOOST_CLASS_TRACKING(ProbTablesData, boost::serialization::track_never ) 
+BOOST_CLASS_TRACKING(ProbTablesData, boost::serialization::track_never) 
 
 struct ProbTables
 {
@@ -199,7 +198,6 @@ protected:
     std::set<Unit*> _targetingMe;
     void updateTargetingMe();
 public:
-	static void init();
     void move(BWAPI::Position p); // debug purposes
 	void switchMode(unit_mode um);
     unit_mode getMode();

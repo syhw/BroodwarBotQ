@@ -4,6 +4,7 @@
 #include "Goal.h"
 #include "FormationSubgoal.h"
 #include "AttackGoal.h"
+#include "ZealotUnit.h"
 using namespace BWAPI;
 using namespace std;
 
@@ -11,7 +12,9 @@ using namespace std;
 
 void MicroAIModule::onStart()
 {
-	++runNumber;
+#ifdef __LEARNING_PROB_TABLES__
+	ZealotUnit::initProbTables();
+#endif
 	///Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
 	// Enable some cheat flags
     //Broodwar->printf("ON START !!\n");
@@ -320,20 +323,19 @@ void MicroAIModule::onFrame()
 
 MicroAIModule::~MicroAIModule()
 {
-    MapManager::Destroy();
-    ObjectManager::Destroy();
-    // regions::Destroy();
-    mm->~UnitsGroup();
 }
 
 MicroAIModule::MicroAIModule()
 {
-	runNumber = 0;
 }
 
 
 void MicroAIModule::onEnd(bool isWinner)
 {
+    MapManager::Destroy();
+    ObjectManager::Destroy();
+    // regions::Destroy();
+    mm->~UnitsGroup();
 	myRestartGame();
 	logScore(isWinner, Broodwar->mapPathName());
 }
