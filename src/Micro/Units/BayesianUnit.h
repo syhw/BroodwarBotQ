@@ -24,7 +24,7 @@ typedef boost::shared_ptr<BayesianUnit> pBayesianUnit;
 
 // #define PROBT 1
 // #define WITH_FLOCKING 1
-#define __HEIGHTS_ATTRACTION__
+//#define __HEIGHTS_ATTRACTION__
 
 // TODO, this class has to be derived to take Flying/Ground/Special Units 
 // (templars, tanks, lurkers, etc.) into account
@@ -68,14 +68,14 @@ struct ProbTablesData
 	friend class boost::serialization::access;
     std::vector<double> _damageProb;
     std::vector<double> _repulseProb;
-    std::map<occupation_type, double> _defaultProb;
+    std::map<int, double> _defaultProb; // int == occupation_type, for s13n
 #ifdef __HEIGHTS_ATTRACTION__
     std::vector<double> _heightProb;
 #endif
 	ProbTablesData();
 	ProbTablesData(int utID, std::vector<double>damageP, 
 		std::vector<double>repulseP
-		, std::map<occupation_type, double> defaultP
+		, std::map<int, double> defaultP // int == occupation_type, for s13n
 #ifdef __HEIGHTS_ATTRACTION__
 		, std::vector<double> heightP
 #endif
@@ -83,6 +83,8 @@ struct ProbTablesData
 	template<class Archive>
 	void serialize(Archive & ar, const unsigned int version);
 };
+
+BOOST_CLASS_TRACKING(ProbTablesData, boost::serialization::track_never ) 
 
 struct ProbTables
 {

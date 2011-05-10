@@ -14,6 +14,7 @@ std::map<BWAPI::Unit*, int> ZealotUnit::_zealotsOn;
 ZealotUnit::ZealotUnit(BWAPI::Unit* u, UnitsGroup* ug)
 : GroundUnit(u, ug, &_sProbTables)
 {
+	Broodwar->printf("Zealot ID %d", BWAPI::UnitTypes::Protoss_Zealot.getID());
     if (setPrio.empty())
     {
         setPrio.insert(BWAPI::UnitTypes::Protoss_Reaver);

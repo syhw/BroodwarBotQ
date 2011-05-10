@@ -2110,35 +2110,35 @@ void BayesianUnit::update()
 ProbTables::ProbTables(int ut)
 : unitTypeID(ut)
 {
-	string filename;
+	string filename("bwapi-data/prob_tables/");
 	if (unitTypeID >= 0)
 	{
 		BWAPI::UnitType tmp(unitTypeID);
-		filename = tmp.getName();
+		filename.append(tmp.getName());
 	}
 	else if (unitTypeID == -1)
-		filename = "Ground";
+		filename.append("Ground");
 	else if (unitTypeID == -2)
-		filename = "Flying";
+		filename.append("Flying");
 	else if (unitTypeID == -3)
-		filename = "Special";
+		filename.append("Special");
 	FILE* fpointer;
 	fopen_s(&fpointer, filename.c_str(), "r");
 	if (fpointer != NULL)
 	{
 		fclose(fpointer);
-        std::ifstream ifs("filename");
+        std::ifstream ifs(filename.c_str());
         boost::archive::text_iarchive ia(ifs);
         ia >> probTablesData;
 	}
 	else
 	{
 		// P(allied_unit_in_this_case=false | we_go_in_this_case=true)
-	    probTablesData._defaultProb.insert(make_pair(OCCUP_UNIT, _PROB_NO_UNIT_MOVE));
+	    probTablesData._defaultProb.insert(make_pair((int)OCCUP_UNIT, _PROB_NO_UNIT_MOVE));
 		// P(this_case_is_blocking=false | we_go_in_this_case=true)
-	    probTablesData._defaultProb.insert(make_pair(OCCUP_BLOCKING, _PROB_NO_WALL_MOVE));
+	    probTablesData._defaultProb.insert(make_pair((int)OCCUP_BLOCKING, _PROB_NO_WALL_MOVE));
 		// P(there_is_a_building_in_this_case=false | we_go_in_this_case=true)
-	    probTablesData._defaultProb.insert(make_pair(OCCUP_BUILDING, _PROB_NO_BUILDING_MOVE));
+	    probTablesData._defaultProb.insert(make_pair((int)OCCUP_BUILDING, _PROB_NO_BUILDING_MOVE));
 	    probTablesData._damageProb.push_back(_PROB_NO_DAMAGE_MOVE); //DAMAGE__NO
 	    probTablesData._damageProb.push_back(0.06);                 //DAMAGE_LOW
 	    probTablesData._damageProb.push_back(0.03);                 //DAMAGE_MED
@@ -2163,7 +2163,7 @@ ProbTablesData::ProbTablesData()
 
 ProbTablesData::ProbTablesData(int utID, std::vector<double>damageP, 
 					   std::vector<double>repulseP 
-					   , std::map<occupation_type, double> defaultP
+					   , std::map<int, double> defaultP
 #ifdef __HEIGHTS_ATTRACTION__
 					   , std::vector<double> heightP
 #endif
@@ -2179,18 +2179,18 @@ ProbTablesData::ProbTablesData(int utID, std::vector<double>damageP,
 
 ProbTables::~ProbTables()
 {
-	string filename;
+	string filename("bwapi-data/prob_tables/");
 	if (unitTypeID >= 0)
 	{
 		BWAPI::UnitType tmp(unitTypeID);
-		filename = tmp.getName();
+		filename.append(tmp.getName());
 	}
 	else if (unitTypeID == -1)
-		filename = "Ground";
+		filename.append("Ground");
 	else if (unitTypeID == -2)
-		filename = "Flying";
+		filename.append("Flying");
 	else if (unitTypeID == -3)
-		filename = "Special";
+		filename.append("Special");
     std::ofstream ofs(filename.c_str());
 	boost::archive::text_oarchive oa(ofs);
 	oa << probTablesData;
