@@ -11,6 +11,7 @@ using namespace std;
 
 void MicroAIModule::onStart()
 {
+	++runNumber;
 	///Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
 	// Enable some cheat flags
     //Broodwar->printf("ON START !!\n");
@@ -327,6 +328,7 @@ MicroAIModule::~MicroAIModule()
 
 MicroAIModule::MicroAIModule()
 {
+	runNumber = 0;
 }
 
 
