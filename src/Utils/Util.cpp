@@ -69,3 +69,19 @@ void logScore(bool isWinner, std::string mapName)
 		fclose(outfile);
 	}
 }
+
+std::vector<double> exponentialDistribution(double lambda, int bins)
+{
+	std::vector<double> r;
+	r.reserve(bins);
+	double sum = 0.0;
+	double fact = 5.0/(bins-1);
+	for (unsigned int i = 0; i < bins; ++i)
+	{
+		r.push_back(lambda*exp(-lambda*i*fact));
+		sum += r[i];
+	}
+	for (unsigned int i = 0; i < bins; ++i)
+		r[i] /= sum;
+	return r;
+}

@@ -336,7 +336,9 @@ void MicroAIModule::onEnd(bool isWinner)
     ObjectManager::Destroy();
     // regions::Destroy();
     mm->~UnitsGroup();
+#ifndef __LEARNING_PROB_TABLES__
 	myRestartGame();
+#endif
 	logScore(isWinner, Broodwar->mapPathName());
 }
 

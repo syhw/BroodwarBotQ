@@ -3,6 +3,8 @@
 #include "Rainbow.h"
 #include <Defines.h>
 #include "UnitsGroup.h"
+#include "Util.h"
+#include <set>
 
 // Copyright 2010-2011 <Gabriel Synnaeve> gabriel.synnaeve@gmail.com
 
@@ -14,6 +16,9 @@
 #define __NOT_IN_RANGE_BY__ 128.1
 #define __SAMPLE_DIR__
 #ifdef __SAMPLE_DIR__
+#include <RandomGenerators.h>
+#endif
+#ifdef __LEARNING_PROB_TABLES__
 #include <RandomGenerators.h>
 #endif
 
@@ -1555,14 +1560,14 @@ void BayesianUnit::computeProbs()
 void BayesianUnit::selectDir(const Vec& criterium)
 {
 #ifdef __SAMPLE_DIR__
-	RandomGenerators* rdm = & RandomGenerators::Instance();
+	RandomGenerators<0, 1>* rdm = & RandomGenerators<0, 1>::Instance();
 	double sum = 0.0;
 	for (multimap<double, Vec>::const_iterator it = _dirvProb.begin();
 		it != _dirvProb.end(); ++it)
 	{
 		sum += it->first;
 	}
-	double sample = rdm->uni_0_1();
+	double sample = rdm->uni();
 	double mark = 0.0;
 	for (multimap<double, Vec>::const_iterator it = _dirvProb.begin();
 		it != _dirvProb.end(); ++it)
@@ -2110,8 +2115,6 @@ void BayesianUnit::update()
 ProbTables::ProbTables(int ut)
 : unitTypeID(ut)
 {
-#define __LEARNING_PROB_TABLES__
-#ifdef __LEARNING_PROB_TABLES__
 	string filename("bwapi-data/prob_tables/");
 	if (unitTypeID >= 0)
 	{
@@ -2126,12 +2129,10 @@ ProbTables::ProbTables(int ut)
 		filename.append("Special");
 	FILE* fpointer;
 	fopen_s(&fpointer, filename.c_str(), "r");
+#ifdef __LEARNING_PROB_TABLES__
 	if (fpointer != NULL)
 	{
 		fclose(fpointer);
-        //std::ifstream ifs(filename.c_str());
-        //boost::archive::text_iarchive ia(ifs);
-        // ia >> probTablesData;
 		++probTablesData.version;
 		probTablesData.fillProbTables();
 	}
@@ -2143,21 +2144,6 @@ ProbTables::ProbTables(int ut)
 	}
 
 #else
-
-	string filename("bwapi-data/prob_tables/");
-	if (unitTypeID >= 0)
-	{
-		BWAPI::UnitType tmp(unitTypeID);
-		filename.append(tmp.getName());
-	}
-	else if (unitTypeID == -1)
-		filename.append("Ground");
-	else if (unitTypeID == -2)
-		filename.append("Flying");
-	else if (unitTypeID == -3)
-		filename.append("Special");
-	FILE* fpointer;
-	fopen_s(&fpointer, filename.c_str(), "r");
 	if (fpointer != NULL)
 	{
 		fclose(fpointer);
@@ -2226,9 +2212,30 @@ ProbTables::~ProbTables()
 		filename.append("Flying");
 	else if (unitTypeID == -3)
 		filename.append("Special");
+#ifdef __LEARNING_PROB_TABLES__
+	int tmpScore = 0;
+	set<Unit*> tmpUnits = Broodwar->getAllUnits();
+	for (set<Unit*>::const_iterator it = tmpUnits.begin();
+		it != tmpUnits.end(); ++it)
+	{
+		if ((*it)->getPlayer() == Broodwar->self())
+			tmpScore += (*it)->getHitPoints() + (*it)->getShields();
+		else if ((*it)->getPlayer()->isEnemy(Broodwar->self()))
+			tmpScore -= (*it)->getHitPoints() + (*it)->getShields();
+	}
+	if (tmpScore > probTablesData.score)
+	{
+		probTablesData.score = tmpScore;
+		filename.append("BestScore");
+		std::ofstream ofs(filename.c_str());
+		boost::archive::text_oarchive oa(ofs);
+		oa << probTablesData;
+	}
+#else
     std::ofstream ofs(filename.c_str());
 	boost::archive::text_oarchive oa(ofs);
 	oa << probTablesData;
+#endif
 }
     
 template<class Archive>
@@ -2251,10 +2258,13 @@ void ProbTablesData::fillProbTables()
 	_defaultProb.insert(make_pair((int)OCCUP_BLOCKING, _PROB_NO_WALL_MOVE));
 	// P(there_is_a_building_in_this_case=false | we_go_in_this_case=true)
 	_defaultProb.insert(make_pair((int)OCCUP_BUILDING, _PROB_NO_BUILDING_MOVE));
-	_damageProb.push_back(_PROB_NO_DAMAGE_MOVE); //DAMAGE__NO
-	_damageProb.push_back(0.06);                 //DAMAGE_LOW
-	_damageProb.push_back(0.03);                 //DAMAGE_MED
-	_damageProb.push_back(0.01);                 //DAMAGE_HIGH
+	RandomGenerators<0, 3>* rdm = & RandomGenerators<0, 3>::Instance();
+	double lambda = rdm->uni();
+	_damageProb = exponentialDistribution(lambda, 4);
+	//_damageProb.push_back(_PROB_NO_DAMAGE_MOVE); //DAMAGE__NO
+	//_damageProb.push_back(0.06);                 //DAMAGE_LOW
+	//_damageProb.push_back(0.03);                 //DAMAGE_MED
+	//_damageProb.push_back(0.01);                 //DAMAGE_HIGH
 
 	_repulseProb.push_back(_PROB_NO_REPULSE_MOVE); // REPULSE_NO
 	_repulseProb.push_back(0.2);                  // REPULSE_LOW
