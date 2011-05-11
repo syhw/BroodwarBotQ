@@ -2110,28 +2110,37 @@ void BayesianUnit::update()
 ProbTables::ProbTables(int ut)
 : unitTypeID(ut)
 {
+#define __LEARNING_PROB_TABLES__
 #ifdef __LEARNING_PROB_TABLES__
-	// P(allied_unit_in_this_case=false | we_go_in_this_case=true)
-    probTablesData._defaultProb.insert(make_pair((int)OCCUP_UNIT, _PROB_NO_UNIT_MOVE));
-	// P(this_case_is_blocking=false | we_go_in_this_case=true)
-    probTablesData._defaultProb.insert(make_pair((int)OCCUP_BLOCKING, _PROB_NO_WALL_MOVE));
-	// P(there_is_a_building_in_this_case=false | we_go_in_this_case=true)
-    probTablesData._defaultProb.insert(make_pair((int)OCCUP_BUILDING, _PROB_NO_BUILDING_MOVE));
-    probTablesData._damageProb.push_back(_PROB_NO_DAMAGE_MOVE); //DAMAGE__NO
-    probTablesData._damageProb.push_back(0.06);                 //DAMAGE_LOW
-    probTablesData._damageProb.push_back(0.03);                 //DAMAGE_MED
-    probTablesData._damageProb.push_back(0.01);                 //DAMAGE_HIGH
-
-    probTablesData._repulseProb.push_back(_PROB_NO_REPULSE_MOVE); // REPULSE_NO
-    probTablesData._repulseProb.push_back(0.2);                  // REPULSE_LOW
-    probTablesData._repulseProb.push_back(0.1);                  // REPULSE_HIGH
-
-#ifdef __HEIGHTS_ATTRACTION__
-    probTablesData._heightProb.push_back(0.2);                  // NORMAL_GROUND
-    probTablesData._heightProb.push_back(0.3);                  // HIGH_GROUND
-    probTablesData._heightProb.push_back(0.45);                 // VERY_HIGH_GROUND
-    probTablesData._heightProb.push_back(0.05);                 // UNKOWN_HEIGHT
-#endif
+	string filename("bwapi-data/prob_tables/");
+	if (unitTypeID >= 0)
+	{
+		BWAPI::UnitType tmp(unitTypeID);
+		filename.append(tmp.getName());
+	}
+	else if (unitTypeID == -1)
+		filename.append("Ground");
+	else if (unitTypeID == -2)
+		filename.append("Flying");
+	else if (unitTypeID == -3)
+		filename.append("Special");
+	FILE* fpointer;
+	fopen_s(&fpointer, filename.c_str(), "r");
+	if (fpointer != NULL)
+	{
+		fclose(fpointer);
+        //std::ifstream ifs(filename.c_str());
+        //boost::archive::text_iarchive ia(ifs);
+        // ia >> probTablesData;
+		++probTablesData.version;
+		probTablesData.fillProbTables();
+	}
+	else
+	{
+		probTablesData.version = 0;
+		probTablesData.score = 0;
+		probTablesData.fillProbTables();
+	}
 
 #else
 
@@ -2232,3 +2241,30 @@ void ProbTablesData::serialize(Archive & ar, const unsigned int version)
     ar & _heightProb;
 #endif
 }
+
+#ifdef __LEARNING_PROB_TABLES__
+void ProbTablesData::fillProbTables()
+{
+	// P(allied_unit_in_this_case=false | we_go_in_this_case=true)
+	_defaultProb.insert(make_pair((int)OCCUP_UNIT, _PROB_NO_UNIT_MOVE));
+	// P(this_case_is_blocking=false | we_go_in_this_case=true)
+	_defaultProb.insert(make_pair((int)OCCUP_BLOCKING, _PROB_NO_WALL_MOVE));
+	// P(there_is_a_building_in_this_case=false | we_go_in_this_case=true)
+	_defaultProb.insert(make_pair((int)OCCUP_BUILDING, _PROB_NO_BUILDING_MOVE));
+	_damageProb.push_back(_PROB_NO_DAMAGE_MOVE); //DAMAGE__NO
+	_damageProb.push_back(0.06);                 //DAMAGE_LOW
+	_damageProb.push_back(0.03);                 //DAMAGE_MED
+	_damageProb.push_back(0.01);                 //DAMAGE_HIGH
+
+	_repulseProb.push_back(_PROB_NO_REPULSE_MOVE); // REPULSE_NO
+	_repulseProb.push_back(0.2);                  // REPULSE_LOW
+	_repulseProb.push_back(0.1);                  // REPULSE_HIGH
+
+#ifdef __HEIGHTS_ATTRACTION__
+	_heightProb.push_back(0.2);                  // NORMAL_GROUND
+	_heightProb.push_back(0.3);                  // HIGH_GROUND
+	_heightProb.push_back(0.45);                 // VERY_HIGH_GROUND
+	_heightProb.push_back(0.05);                 // UNKOWN_HEIGHT
+#endif
+}
+#endif

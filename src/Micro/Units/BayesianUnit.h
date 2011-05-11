@@ -65,6 +65,11 @@ enum damage_value {
 struct ProbTablesData
 {
 	friend class boost::serialization::access;
+#ifdef __LEARNING_PROB_TABLES__
+	int version;
+	int score;
+	void fillProbTables();
+#endif
     std::vector<double> _damageProb;
     std::vector<double> _repulseProb;
     std::map<int, double> _defaultProb; // int == occupation_type, for s13n
@@ -83,7 +88,7 @@ struct ProbTablesData
 	void serialize(Archive & ar, const unsigned int version);
 };
 
-BOOST_CLASS_TRACKING(ProbTablesData, boost::serialization::track_never) 
+BOOST_CLASS_TRACKING(ProbTablesData, boost::serialization::track_never)
 
 struct ProbTables
 {
