@@ -70,7 +70,7 @@ void logScore(bool isWinner, std::string mapName)
 	}
 }
 
-std::vector<double> exponentialDistribution(double lambda, int bins)
+std::vector<double> exponentialDistribution(double lambda, unsigned int bins)
 {
 	std::vector<double> r;
 	r.reserve(bins);

@@ -1661,7 +1661,7 @@ void BayesianUnit::updateDir()
     // compute the probability to go in each dirv(ector)
     computeProbs();
 #ifdef __DEBUG__
-    //drawProbs(_dirvProb, _unitsGroup->size()); // DRAWPROBS
+    drawProbs(_dirvProb, _unitsGroup->size()); // DRAWPROBS
 #endif
 
     // select the most probable, most in the direction of obj if equally probables

@@ -333,6 +333,34 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="Utils"
+					>
+					<File
+						RelativePath="..\src\Utils\TimeManager.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Utils\Util.cpp"
+						>
+					</File>
+					<Filter
+						Name="Component"
+						>
+						<File
+							RelativePath="..\src\Utils\Component\BaseData.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\src\Utils\Component\BaseObject.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\src\Utils\Component\ObjectManager.cpp"
+							>
+						</File>
+					</Filter>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="Goals"
@@ -357,34 +385,6 @@
 					RelativePath="..\src\Micro\Goals\Subgoal.cpp"
 					>
 				</File>
-			</Filter>
-			<Filter
-				Name="Utils"
-				>
-				<File
-					RelativePath="..\src\Utils\TimeManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Utils\Util.cpp"
-					>
-				</File>
-				<Filter
-					Name="Component"
-					>
-					<File
-						RelativePath="..\src\Utils\Component\BaseData.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Utils\Component\BaseObject.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Utils\Component\ObjectManager.cpp"
-						>
-					</File>
-				</Filter>
 			</Filter>
 			<Filter
 				Name="Intelligence"
