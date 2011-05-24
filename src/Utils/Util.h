@@ -1,3 +1,4 @@
+#pragma once
 #include <RectangleArray.h>
 #include <map>
 #include <vector>

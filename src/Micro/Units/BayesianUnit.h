@@ -1,4 +1,5 @@
 #pragma once
+#include <PrecompiledHeader.h>
 #include <BWAPI.h>
 #include <BWTA.h>
 #include <math.h>
@@ -17,9 +18,6 @@
 
 class BayesianUnit;
 typedef boost::shared_ptr<BayesianUnit> pBayesianUnit;
-
-#include <windows.h>
-#include <process.h>
 
 // #define PROBT 1
 // #define WITH_FLOCKING 1
