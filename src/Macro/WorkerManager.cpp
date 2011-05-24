@@ -3,36 +3,39 @@
 #include <BaseManager.h>
 #include <RectangleArray.h>
 #include <BuildOrderManager.h>
+#include <UnitGroupManager.h>
+#include <algorithm>
 #include "Util.h"
 using namespace BWAPI;
 using namespace std;
 using namespace Util;
-WorkerManager::WorkerManager()
-: arbitrator(NULL)
-, baseManager(NULL)
-, buildOrderManager(NULL)
-, lastSCVBalance(0)
-, WorkersPerGas(3)
-, mineralRate(0)
-, gasRate(0)
-, autoBuild(false)
-, autoBuildPriority(80)
+WorkerManager::WorkerManager(Arbitrator::Arbitrator<Unit*,double>* arbitrator)
 {
+  this->arbitrator        = arbitrator;
+  this->baseManager       = NULL;
+  this->buildOrderManager = NULL;
+  this->lastSCVBalance    = 0;
+  this->WorkersPerGas     = 3;
+  this->mineralRate       = 0;
+  this->gasRate           = 0;
+  this->autoBuild         = false;
+  this->autoBuildPriority = 80;
 }
-
-void WorkerManager::setDependencies(){
-	this->arbitrator = static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(& Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance()) ;
-	this->baseManager = & BaseManager::Instance();
-	this->buildOrderManager = & BuildOrderManager::Instance();
+void WorkerManager::setBaseManager(BaseManager* baseManager)
+{
+  this->baseManager = baseManager;
 }
-
+void WorkerManager::setBuildOrderManager(BuildOrderManager* buildOrderManager)
+{
+  this->buildOrderManager = buildOrderManager;
+}
 void WorkerManager::onOffer(set<Unit*> units)
 {
   for(set<Unit*>::iterator u = units.begin(); u != units.end(); u++)
   {
     if ((*u)->getType().isWorker() && !this->mineralOrder.empty())
     {
-      static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->accept(this, *u);
+      arbitrator->accept(this, *u);
       WorkerData temp;
       this->desiredWorkerCount[this->mineralOrder[this->mineralOrderIndex].first]++;
       this->currentWorkers[this->mineralOrder[this->mineralOrderIndex].first].insert(*u);
@@ -41,7 +44,7 @@ void WorkerManager::onOffer(set<Unit*> units)
       workers.insert(make_pair(*u,temp));
     }
     else
-      static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->decline(this, *u, 0);
+      arbitrator->decline(this, *u, 0);
   }
 }
 void WorkerManager::onRevoke(Unit* unit, double bid)
@@ -180,33 +183,6 @@ void WorkerManager::rebalanceWorkers()
       }
     }
   }
-  optimalWorkerCount += 2; // to account for scouting and building
-
-    if (mineralOrder.empty())
-    {
-        double min_dist = 1000000000.0;
-        BWTA::BaseLocation* closest_base_location = NULL;
-        for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getBaseLocations().begin(); it != BWTA::getBaseLocations().end(); ++it)
-        {
-            if ((*it)->getMinerals().empty())
-                continue;
-            for(set<Base*>::iterator b = this->basesCache.begin(); b != this->basesCache.end(); b++)
-            {
-                if ((*b)->getBaseLocation() == *it)
-                    continue;
-                double tmp_dist = (*it)->getPosition().getDistance((*b)->getBaseLocation()->getPosition());
-                if (tmp_dist < min_dist)
-                {
-                    min_dist = tmp_dist;
-                    closest_base_location = *it;
-                }
-            }
-        }
-        for (std::set<BWAPI::Unit*>::const_iterator it = closest_base_location->getMinerals().begin(); it != closest_base_location->getMinerals().end(); ++it)
-        {
-            mineralOrder.push_back(make_pair(*it, (*it)->getResources()));
-        }
-    }
 
   //if no resources exist, return
   if (!mineralOrder.empty())
@@ -240,14 +216,9 @@ void WorkerManager::rebalanceWorkers()
 void WorkerManager::update()
 {
   //bid a constant value of 10 on all completed workers
-  set<Unit*> myPlayerUnits=Broodwar->self()->getUnits();
-  for(set<Unit*>::iterator u = myPlayerUnits.begin(); u != myPlayerUnits.end(); u++)
-  {
-    if ((*u)->isCompleted() && (*u)->getType().isWorker())
-    {
-      static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(arbitrator)->setBid(this, *u, 10);
-    }
-  }
+  set<Unit*> w = SelectAll()(isCompleted)(isWorker);
+  for each(Unit* u in w)
+    arbitrator->setBid(this, u, 10);
 
   //rebalance workers when necessary
   set<Base*> bases = this->baseManager->getActiveBases();
@@ -271,7 +242,7 @@ void WorkerManager::update()
       else
         gasRate+=8/180.0;
     }
-
+    
     //switch current resource to newResource when appropiate
     if (u->second.resource == NULL || (i->getTarget() != NULL && !i->getTarget()->getType().isResourceDepot()))
       u->second.resource = u->second.newResource;

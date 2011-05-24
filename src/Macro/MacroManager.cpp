@@ -1,312 +1,330 @@
 #include <PrecompiledHeader.h>
 #include <MacroManager.h>
-#include "BorderManager.h"
-#include "ScoutManager.h"
+#include <BWAPI.h>
+#include <ResourceRates.h>
+#include <math.h>
 using namespace BWAPI;
-using namespace BWTA;
+using namespace std;
+MacroManager* TheMacroManager = NULL;
+std::set<TaskStream*> emptyTSSet;
 
-
-MacroManager::MacroManager()
-: BaseObject("MacroManager")
-, expanding(0)
-, scouting(false)
-, firstScout(15)
-, _shouldExpand(false)
+MacroManager* MacroManager::create()
 {
-	this->buildOrderManager = NULL;
-	this->productionManager = NULL;
-	this->buildManager = NULL;
-	this->baseManager = NULL;
-	this->workerManager = NULL;
+  if (TheMacroManager) return TheMacroManager;
+  return new MacroManager();
 }
-
+void MacroManager::destroy()
+{
+  if (TheMacroManager)
+    delete TheMacroManager;
+}
+MacroManager::MacroManager()
+{
+  TheMacroManager = this;
+  taskstream_list_visible = true;
+}
 MacroManager::~MacroManager()
 {
+  TheMacroManager = NULL;
+  for(std::list<TaskStream*>::iterator i=taskStreams.begin();i!=taskStreams.end();i++)
+    delete *i;
 }
-
-void MacroManager::setDependencies(){
-	this->buildOrderManager = & BuildOrderManager::Instance();
-	this->productionManager = & ProductionManager::Instance();
-	this->buildManager = & BuildManager::Instance();
-	this->baseManager = & BaseManager::Instance();
-	this->workerManager = & WorkerManager::Instance();
-}
-
-std::string MacroManager::getName() const
+void MacroManager::onOffer(std::set<BWAPI::Unit*> units)
 {
-	return "Macro Manager";
-}
-
-void MacroManager::onStart()
-{
-}
-
-void MacroManager::eRush()
-{
-}
-
-void MacroManager::onUnitCreate(BWAPI::Unit* unit)
-{
-	
-    if(unit->getType().isBuilding() && scouting == false && BWAPI::Broodwar->self()->supplyUsed() >= firstScout)
-    //if (scouting == false)
+  for each(Unit* u in units)
+  {
+    if (unitToTaskStreams.find(u)!=unitToTaskStreams.end() && !unitToTaskStreams[u].empty())
     {
-		this->scouting = true;
-		ScoutManager::Instance().findEnemy();
-	}
-
-
-	// ***********   Expand   *********** //
-	if (unit->getType().isResourceDepot())
-		expanding = false;
-
-
-	
-	// *******   ProdBuildings   ******** //
-	/*if( unit->getType().isBuilding() && !unit->getType().isResourceDepot())
-	{
-		if (unit->getType().canProduce())
-		{
-			prodBuildings[unit->getType()].push_back(unit);
-			underConstruction[unit->getType()]--;
-		}
-		else if (unit->getType().canAttack())
-		{
-			defBuildings[unit->getType()].push_back(unit);
-			underConstruction[unit->getType()]--;
-		}
-		else
-		{
-			techBuildings.insert(unit->getType());
-		}
-	}*/
-
-	/*
-	// ***********   Units   ************ //
-	if( !unit->getType().isBuilding() && !unit->getType().isWorker() && unit->getPlayer() == Broodwar->self())
-	{
-		if (!(unit->getType() == UnitTypes::Zerg_Larva))
-		{
-			wantedUnits[unit->getType()].completedNb++;
-			wantedUnits[unit->getType()].criteria += 1.0 / float(wantedUnits[unit->getType()].plannedValue);
-		}
-	}
-	*/
+      //The Arbitrator has offered us a worker our task streams want to use, so accept it
+      TheArbitrator->accept(this,u);
+      TheArbitrator->setBid(this,u,100);
+      ownedUnits.insert(u);
+    }
+    else
+    {
+      //The Arbitrator has offered us a worker we don't want, decline it and remove the bid
+      TheArbitrator->decline(this,u,0);
+      TheArbitrator->removeBid(this,u);
+    }
+  }
 }
-
-void MacroManager::onUnitDestroy(BWAPI::Unit* unit)
+void MacroManager::onRevoke(BWAPI::Unit* unit, double bid)
 {
-	if (!unit->getType().isBuilding() && !unit->getType().isWorker() && unit->getPlayer() == Broodwar->self())
-		wantedUnits[unit->getType()].completedNb--;
+  ownedUnits.erase(unit);
+  if (unitToTaskStreams.find(unit)!=unitToTaskStreams.end())
+  {
+    //tell all task streams that were using this worker that it is no longer available.
+    for each(TaskStream* ts in unitToTaskStreams[unit])
+    {
+      ts->onRevoke(unit);
+    }
+  }
+  unitToTaskStreams.erase(unit);
 }
-
 void MacroManager::update()
 {
-	/*
-	buildGeyser();
-	trainWorkers();
-	createProdBuildings();
-	trainUnits();
-	createTechBuildings();
-	researchTech();
-	expand();
-	buildDefenses();
-	*/
+  bool done= false;
+  while (!done)
+  {
+    done=true;
+    for(std::map<BWAPI::Unit*, std::set<TaskStream*> >::iterator i=unitToTaskStreams.begin();i!=unitToTaskStreams.end();i++)
+    {
+      if (i->second.empty())
+      {
+        TheArbitrator->removeBid(this,i->first);
+        unitToTaskStreams.erase(i);
+        done = false;
+        break;
+      }
+    }
+  }
+
+  spentResources.setSupply(0);//don't keep track of spent supply
+  Resources r = CumulativeResources(Broodwar->self())-spentResources;
+  rtl.reset(r,Broodwar->self()->supplyTotal(),TheResourceRates->getGatherRate().getMinerals(),TheResourceRates->getGatherRate().getGas());
+  uctl.reset();
+  ttl.reset();
+  utl.reset();
+  wttl.reset();
+  ltl.reset();
+  plan.clear();
+  for each(TaskStream* ts in killSet)
+  {
+    Unit* worker = ts->getWorker();
+    if (worker!=NULL)
+    {
+      //remove the task stream from the worker's set in unitToTaskStreams
+      unitToTaskStreams[worker].erase(ts);
+    }
+
+    //find and remove the task stream from the taskStreams list
+    for(std::list<TaskStream*>::iterator i=taskStreams.begin();i!=taskStreams.end();i++)
+    {
+      if (*i == ts)
+      {
+        taskStreams.erase(i);
+        break;
+      }
+    }
+    //finally, delete the task stream
+    delete ts;
+  }
+  //clear the planning data of each task stream
+  for each(TaskStream* ts in taskStreams)
+    ts->clearPlanningData();
+  Broodwar->drawTextScreen(452,16,"\x07%d",(int)(TheResourceRates->getGatherRate().getMinerals()*23*60));
+  Broodwar->drawTextScreen(520,16,"\x07%d",(int)(TheResourceRates->getGatherRate().getGas()*23*60));
+  killSet.clear();
+  int y=30;
+  Broodwar->drawTextScreen(10,5,"Frame: %d",Broodwar->getFrameCount());
+  bool plannedAdditionalResources = true;
+  while(plannedAdditionalResources)
+  {
+    plannedAdditionalResources = false;
+    for each(TaskStream* ts in taskStreams)
+    {
+      if (ts->updateStatus())
+      {
+        plannedAdditionalResources = true;
+        break;
+      }
+    }
+  }
+  for each(TaskStream* ts in taskStreams)
+    ts->update();
+
+  if (taskstream_list_visible)
+  {
+    for each(TaskStream* ts in taskStreams)
+    {
+      ts->printToScreen(10,y);
+      y+=20;
+    }
+  }
+  {
+    int currentFrameCount = Broodwar->getFrameCount();
+    double ymax = 200;
+    double y=ymax;
+    double hscale = 0.3;
+    double vscale = 0.3;
+    int v=0;
+    if (v==0)
+    {
+      y+=r.getMinerals()*vscale;
+      for each(std::pair<int, std::list< std::pair<TaskStream*, Task> > > tl in plan)
+      {
+        int frame = tl.first;
+        for each(std::pair<TaskStream*, Task> tp in tl.second)
+        {
+          Task t=tp.second;
+          if (t.getName()=="None") continue;
+          double x=(frame - currentFrameCount)*hscale;
+          double res=t.getResources().getMinerals()*vscale;
+          y-=res;
+          double duration=t.getTime()*hscale;
+          Broodwar->drawBoxScreen((int)(x),(int)(y),(int)(x+duration),(int)(y+res),Colors::White);
+          Broodwar->drawTextScreen((int)(x),(int)(y),"%s",t.getName().c_str());
+        }
+      }
+      y=ymax;
+      int y2=(int)(y-TheResourceRates->getGatherRate().getMinerals()*(640/hscale)*vscale);
+      if (y2>-1000 && y2<=y)
+        Broodwar->drawLineScreen(0,(int)(y),640,y2,Colors::Cyan);
+    }
+    else if (v==1)
+    {
+      y+=r.getGas()*vscale;
+      for each(std::pair<int, std::list< std::pair<TaskStream*, Task> > > tl in plan)
+      {
+        int frame = tl.first;
+        for each(std::pair<TaskStream*, Task> tp in tl.second)
+        {
+          Task t=tp.second;
+          double x=(frame - currentFrameCount)*hscale;
+          double res=t.getResources().getGas()*vscale;
+          y-=res;
+          double duration=t.getTime()*hscale;
+          Broodwar->drawBoxScreen((int)(x),(int)(y),(int)(x+duration),(int)(y+res),Colors::White);
+          Broodwar->drawTextScreen((int)(x),(int)(y),"%s",t.getName().c_str());
+        }
+      }
+      y=ymax;
+      int y2=(int)(y-TheResourceRates->getGatherRate().getGas()*(640/hscale)*vscale);
+      if (y2>-1000 && y2<=y)
+        Broodwar->drawLineScreen(0,(int)(y),640,y2,Colors::Cyan);
+    }
+    
+    Unit* worker = NULL;
+    for each(Unit* u in Broodwar->self()->getUnits())
+      if (u->getType().producesLarva()) worker = u;
+    if (worker)
+    {
+    std::list<int>& testNewLarvaUseTimes = ltl.larvaUseTimes[worker];
+    std::list<int>& testNewLarvaSpawnTimes = ltl.larvaSpawnTimes[worker];
+    std::list<int>::iterator i_u = testNewLarvaUseTimes.begin();
+    std::list<int>::iterator i_s = testNewLarvaSpawnTimes.begin();
+    int larvaCount = worker->getLarva().size();
+    int curFrame=Broodwar->getFrameCount();
+    int prvFrame=curFrame;
+    for(;i_u!=testNewLarvaUseTimes.end() || i_s!=testNewLarvaSpawnTimes.end();)
+    {
+      if (i_u==testNewLarvaUseTimes.end() || (i_s!=testNewLarvaSpawnTimes.end() && *i_s<=*i_u))
+      {
+        curFrame = *i_s;
+        double x1=(prvFrame - currentFrameCount)*hscale;
+        double x2=(curFrame - currentFrameCount)*hscale;
+        Broodwar->drawLineScreen(x1,280-larvaCount*20,x2,280-larvaCount*20,Colors::Green);
+        Broodwar->drawLineScreen(x2,280-larvaCount*20,x2,280-(larvaCount+1)*20,Colors::Green);
+        larvaCount++;
+        i_s++;
+      }
+      else
+      {
+        curFrame = *i_u;
+        double x1=(prvFrame - currentFrameCount)*hscale;
+        double x2=(curFrame - currentFrameCount)*hscale;
+        Broodwar->drawLineScreen(x1,280-larvaCount*20,x2,280-larvaCount*20,Colors::Green);
+        Broodwar->drawLineScreen(x2,280-larvaCount*20,x2,280-(larvaCount-1)*20,Colors::Green);
+        larvaCount--;
+        i_u++;
+      }
+      prvFrame = curFrame;
+    }
+    double x1=(prvFrame - currentFrameCount)*hscale;
+    Broodwar->drawLineScreen(x1,280-larvaCount*20,640,280-larvaCount*20,Colors::Green);
+    Broodwar->drawLineScreen(0,280-0*20,640,280-0*20,Colors::Red);
+  }
+  }
+
+  /*
+    for(std::map<int, Resources>::iterator i=rtl.resourceEvents.begin();i!=rtl.resourceEvents.end();i++)
+    {
+      Broodwar->drawTextScreen(10,y,"%d: %s",(*i).first,(*i).second.toString().c_str());
+      y+=20;
+    }
+  */
+  //bid on all the workers our task streams want to use
+  for(std::map<BWAPI::Unit*, std::set<TaskStream*> >::iterator i=unitToTaskStreams.begin();i!=unitToTaskStreams.end();i++)
+  {
+    if (!i->second.empty())
+      TheArbitrator->setBid(this,i->first,100);
+  }
+  for each(Unit* u in ownedUnits)
+  {
+    std::map<BWAPI::Unit*, std::set<TaskStream*> >::iterator i=unitToTaskStreams.find(u);
+    if (i==unitToTaskStreams.end() || i->second.empty())
+      TheArbitrator->removeBid(this,u);
+    if (i==unitToTaskStreams.end())
+      unitToTaskStreams.erase(u);
+  }
+}
+std::string MacroManager::getName() const
+{
+  return "Macro Manager";
+}
+std::string MacroManager::getShortName() const
+{
+  return "Macro";
 }
 
-void MacroManager::trainWorkers()
+bool MacroManager::insertTaskStreamAbove(TaskStream* newTS, TaskStream* existingTS)
 {
-	/*
-	BWAPI::UnitType workerType=(Broodwar->self()->getRace().getWorker());
-	if( workerManager->workers.size() >= MAX_WORKERS_NB ||  // max nb worker reached
-		workerType.mineralPrice() > buildOrderManager->getUnusedMinerals())
-		return;
-
-	// Get remaining places
-	const std::set<Base*>& bases = baseManager->getActiveBases();
-	unsigned int remainingPlaces;
-	if( Broodwar->self()->getRace() != Races::Zerg)
-	{
-		remainingPlaces = bases.size();
-	}
-	else
-	{
-		remainingPlaces = 0;
-		const set<Unit*>& myUnits = Broodwar->self()->getUnits();
-		for( set<Unit*>::const_iterator itMyUnits = myUnits.begin(); itMyUnits != myUnits.end(); itMyUnits++)
-			if( (*itMyUnits)->getType() == UnitTypes::Zerg_Larva)
-				remainingPlaces++;
-	}
-
-	unsigned int nbMinedBlocks = 0;
-	unsigned int nbWorkers = 0;
-	for( std::set<Base*>::const_iterator it = bases.begin(); it != bases.end(); it++)
-	{
-		Unit* ressourceDepot = (*it)->getResourceDepot();
-		if( ressourceDepot->isTraining()) continue;
-		nbMinedBlocks += (*it)->getMinerals().size();
-		// Get nb workers in this base
-		const std::set<BWAPI::Unit*>& minBlocks = (*it)->getMinerals();
-		for( std::set<BWAPI::Unit*>::const_iterator itBlock = minBlocks.begin(); itBlock != minBlocks.end(); itBlock++)
-			nbWorkers += workerManager->currentWorkers[*itBlock].size();
-	}
-
-	// if nbWorker <= 2*nbBlock on this base
-	if( nbWorkers <= (unsigned int)(2*nbMinedBlocks) &&
-		(remainingPlaces - buildOrderManager->getPlannedCount( workerType)) > 0)
-		this->buildOrderManager->buildAdditional( 1, workerType, 150);
-		*/
+  if (newTS==NULL || existingTS==NULL) return false;
+  std::list<TaskStream*>::iterator e_iter = taskStreams.end();
+  for(std::list<TaskStream*>::iterator i=taskStreams.begin();i!=taskStreams.end();i++)
+  {
+    if (*i==existingTS)
+    {
+      e_iter = i;
+      break;
+    }
+  }
+  if (e_iter == taskStreams.end()) return false;
+  taskStreams.insert(e_iter,newTS);
+  return true;
 }
-
-void MacroManager::trainUnits()
+bool MacroManager::insertTaskStreamBelow(TaskStream* newTS, TaskStream* existingTS)
 {
-	/*
-	for( map<UnitType, list<Unit*> >::iterator pb = prodBuildings.begin(); pb != prodBuildings.end(); pb++)
-	{
-		if( !pb->first.canProduce()) continue;
-		int remainingPlaces = remainingTrainingPlace( pb->first); //TODO a passer dans la map des buildings...
-
-		//TODO trier les units selon le ratio
-		list<UnitType> sortedUnitsType;
-		for( map<UnitType, PlannedUnit>::iterator wu = wantedUnits.begin(); wu != wantedUnits.end(); wu++)
-		{
-			if(wu->first.whatBuilds().first != pb->first) continue; // Check we are on the good production building.
-			list<UnitType>::iterator posToInsert = sortedUnitsType.begin();
-			for( list<UnitType>::iterator sut = sortedUnitsType.begin(); sut != sortedUnitsType.end(); sut++)
-			{
-				if( wu->second.criteria > wantedUnits[*sut].criteria) break;
-				posToInsert++;
-			}
-			sortedUnitsType.insert( posToInsert, wu->first);
-		}
-
-		list<UnitType>::iterator st = sortedUnitsType.begin();
-		while( remainingPlaces && st != sortedUnitsType.end())
-		{
-			UnitType type = *st;
-			if( canTrainUnits( type, remainingPlaces))
-			{
-				this->buildOrderManager->buildAdditional( 1, type, 50);
-				remainingPlaces--;
-				st = sortedUnitsType.begin();
-			}
-			else
-			{
-				st++;
-			}
-		}
-	}
-	*/
+  if (newTS==NULL || existingTS==NULL) return false;
+  std::list<TaskStream*>::iterator e_iter = taskStreams.end();
+  for(std::list<TaskStream*>::iterator i=taskStreams.begin();i!=taskStreams.end();i++)
+  {
+    if (*i==existingTS)
+    {
+      e_iter = i;
+      break;
+    }
+  }
+  if (e_iter == taskStreams.end()) return false;
+  e_iter++;
+  taskStreams.insert(e_iter,newTS);
+  return true;
 }
-
-void MacroManager::createTechBuildings()
+bool MacroManager::swapTaskStreams(TaskStream* a, TaskStream* b)
 {
+  if (a==NULL || b==NULL) return false;
+  std::list<TaskStream*>::iterator a_iter = taskStreams.end();
+  std::list<TaskStream*>::iterator b_iter = taskStreams.end();
+  for(std::list<TaskStream*>::iterator i=taskStreams.begin();i!=taskStreams.end();i++)
+  {
+    if (*i==a)
+      a_iter = i;
+    if (*i==b)
+      b_iter = i;
+  }
+  if (a_iter == taskStreams.end() || b_iter == taskStreams.end()) return false;
+  *a_iter = b;
+  *b_iter = a;
+  return true;
 }
-
-void MacroManager::researchTech()
+const std::set<TaskStream*>& MacroManager::getTaskStreams(BWAPI::Unit* unit) const
 {
-}
+  //returns the set of task streams that are using this worker
+  std::map<BWAPI::Unit*, std::set<TaskStream*> >::const_iterator i=unitToTaskStreams.find(unit);
 
-void MacroManager::expand()
-{
-	/*
-	if( expanding ) return;
-	if( shouldExpand())
-	{
-		const std::set<BaseLocation*>& baseLocations = getBaseLocations();
-		const std::set<Base*>& activeBases = baseManager->getActiveBases();
-		const std::set<Base*>& allBases = baseManager->getAllBases();
-		// Search a new expand location.
-		double dist = 0xFFFF;
-		BaseLocation* nearestLocation = NULL;
-		for( std::set<Base*>::const_iterator itBaseFrom = activeBases.begin(); itBaseFrom != activeBases.end(); itBaseFrom++)
-		{
-			BaseLocation* baseLocFrom = (*itBaseFrom)->getBaseLocation();
-			for( std::set<BaseLocation*>::const_iterator itBaseTo = baseLocations.begin(); itBaseTo != baseLocations.end(); itBaseTo++)
-			{
-				std::map<BWTA::BaseLocation*,Base*>::iterator itUsedBase = baseManager->location2base.find( *itBaseTo);
-				if( itUsedBase != baseManager->location2base.end()) continue;
-				double dist2 = baseLocFrom->getGroundDistance( *itBaseTo);
-				if( dist2 <= 0) continue; //(*it)->minerals() == 0 || // Enable scouting before call this. Minerals are unknown before viewing it
-				if( dist2 < dist)
-				{
-					dist = dist2;
-					nearestLocation = *itBaseTo;
-				}
-			}
-		}
-		if( nearestLocation)
-		{
+  if (i==unitToTaskStreams.end()) //nothing is using this worker, so return an empty set
+    return emptyTSSet;
 
-			this->baseManager->expand( nearestLocation, 80);
-			expanding = true;
-		}
-	}
-	*/
-}
-
-void MacroManager::buildDefenses()
-{
-}
-
-void MacroManager::initWantedUnits()
-{
-}
-
-void MacroManager::someAir()
-{
-}
-
-int MacroManager::remainingTrainingPlace( UnitType type)
-{
-	unsigned int remainingPlaces = 0;
-	const list<Unit*>& buildings = prodBuildings[type];
-	for( list<Unit*>::const_iterator it = buildings.begin(); it != buildings.end(); it++)
-		if( (*it)->isCompleted() && !(*it)->isTraining())
-			remainingPlaces++;
-	return remainingPlaces;
-}
-
-bool MacroManager::canTrainUnits( UnitType unitType, int remainingPlaces)
-{
-	bool haveTech = true;
-	const std::map<UnitType, int> reqTech = unitType.requiredUnits();
-	for( std::map<UnitType, int>::const_iterator it = reqTech.begin(); it != reqTech.end(); it++)
-		if(buildManager->getCompletedCount(it->first) < it->second) // what if a building is destroyed?
-			haveTech = false;
-
-	return	/*buildOrderManager->getUnusedMinerals() >= unitType.mineralPrice() &&
-					buildOrderManager->getUnusedGas() >= unitType.gasPrice() &&*/
-					(remainingPlaces - buildOrderManager->getPlannedCount( unitType)) >= 0 &&
-					haveTech;
-}
-
-bool MacroManager::canCreateTechBuildings( UnitType techBuilding, UnitType buildingRequiered, int nbRequieredBuilding)
-{
-	return techBuildings.find( techBuilding) == techBuildings.end() &&
-		this->buildManager->getPlannedCount( techBuilding) == 0 &&
-		(this->buildManager->getCompletedCount( buildingRequiered) >= nbRequieredBuilding ||
-		buildingRequiered == UnitTypes::None);
-}
-
-bool MacroManager::canCreateDefenseBuildings( UnitType techBuilding, UnitType buildingRequiered)
-{
-	return prodBuildings[techBuilding].size() < 3 &&
-		this->buildManager->getPlannedCount( techBuilding) == 0 &&
-		this->buildManager->getCompletedCount( buildingRequiered);
-}
-
-bool MacroManager::shouldExpand()
-{
-    if (_shouldExpand)
-        return true;
-	// Expand if all the bases are fully functionnal
-	unsigned int nbRessources = 0;
-	const std::set<Base*>& bases = baseManager->getAllBases();
-	for( std::set<Base*>::const_iterator it = bases.begin(); it != bases.end(); it++)
-	{
-		nbRessources += (int)(2.4 * (*it)->getMinerals().size()) + 3 * (*it)->getGeysers().size(); // TOCHANGE 2 for 2.5, saturation is around 3
-	}
-	_shouldExpand = workerManager->workers.size() >= nbRessources;
-    return _shouldExpand;
+  //return the set of tsak streams
+  return i->second;
 }

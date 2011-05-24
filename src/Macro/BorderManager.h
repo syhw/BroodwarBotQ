@@ -1,13 +1,11 @@
 #pragma once
 #include <BWAPI.h>
 #include <BWTA.h>
-#include "CSingleton.h"
-class InformationManager;
-class BorderManager : public CSingleton<BorderManager>
+class BorderManager
 {
-	friend class CSingleton<BorderManager>;
   public:
-	void setDependencies();
+    static BorderManager* create();
+    static void destroy();
     void addMyBase(BWTA::BaseLocation* location);
     void removeMyBase(BWTA::BaseLocation* location);
     const std::set<BWTA::Chokepoint*>& getMyBorder() const;
@@ -16,9 +14,9 @@ class BorderManager : public CSingleton<BorderManager>
     const std::set<BWTA::Chokepoint*>& getEnemyRegions() const;
     void update();
   private:
-	  BorderManager(){}
+    BorderManager();
+    ~BorderManager();
     void recalculateBorders();
-    InformationManager* informationManager;
     std::set<BWTA::BaseLocation*> myBases;
     std::set<BWTA::BaseLocation*> enemyBases;
     std::set<BWTA::Region*> myRegions;
@@ -26,3 +24,5 @@ class BorderManager : public CSingleton<BorderManager>
     std::set<BWTA::Chokepoint*> myBorder;
     std::set<BWTA::Chokepoint*> enemyBorder;
 };
+
+extern BorderManager* TheBorderManager;

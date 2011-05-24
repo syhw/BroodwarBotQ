@@ -4,7 +4,11 @@
 #include "Goal.h"
 #include "FormationSubgoal.h"
 #include "AttackGoal.h"
+
+#ifdef __LEARNING_PROB_TABLES__
 #include "ZealotUnit.h"
+#endif
+
 using namespace BWAPI;
 using namespace std;
 
@@ -29,7 +33,7 @@ void MicroAIModule::onStart()
     this->eTechEstimator = & ETechEstimator::Instance();
     this->mapManager = & MapManager::Instance();
 	this->objectManager = & ObjectManager::Instance();
-    this->unitGroupManager = & UnitGroupManager::Instance();
+	this->unitGroupManager = UnitGroupManager::create();
     this->mapManager->setDependencies();
 	// this->rdmGenerators = & RandomGenerators::Instance();
 
