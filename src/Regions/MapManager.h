@@ -69,7 +69,6 @@ public:
     Vec* groundDamagesGrad;     // build tiles
     Vec* airDamagesGrad;        // build tiles
     std::map<Position, int> stormPos;
-    void setDependencies();
     void onUnitCreate(BWAPI::Unit* u);
     void onUnitDestroy(BWAPI::Unit* u);
     void onUnitShow(BWAPI::Unit* u);

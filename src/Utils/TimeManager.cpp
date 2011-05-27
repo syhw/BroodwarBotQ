@@ -2,7 +2,6 @@
 #include <TimeManager.h>
 
 TimeManager::TimeManager()
-: BaseObject("TimeManager")
 {
 
 }

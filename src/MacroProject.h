@@ -3,40 +3,9 @@
 #include <BWTA.h>
 #include <windows.h>
 #include "Defines.h"
-#include "Arbitrator.h"
-#include "WorkerManager.h"
-#include "SupplyManager.h"
-#include "BuildManager.h"
-#include "BuildOrderManager.h"
-#include "TechManager.h"
-#include "UpgradeManager.h"
-#include "BaseManager.h"
-#include "ScoutManager.h"
-#include "MacroManager.h"
-#include "MapManager.h"
-#include "ProtossStrat.h"
-#include "TerranStrat.h"
-#include "ZergStrat.h"
-#include "TimeManager.h"
-#include "WarManager.h"
-#include "ObjectManager.h"
-#include "EUnitsFilter.h"
-#include "EEcoEstimator.h"
-#include "ETechEstimator.h"
-#include "GoalManager.h"
-#include "TimeManaged.h"
-#include "InformationManager.h"
-#include "BorderManager.h"
-#include "UnitGroupManager.h"
-#include "BuildingPlacer.h"
-#include "ConstructionManager.h"
-#include "MorphManager.h"
-#include "ProductionManager.h"
-#include "DefenseManager.h"
-#include "WorkerSelfDefenseManager.h"
-#ifdef __DEBUG__
-#include "EnhancedUI.h"
-#endif
+#include "Intelligence.h"
+#include "Macro.h"
+#include "Micro.h"
 
 class BattleBroodAI;
 extern BattleBroodAI* broodAI;
@@ -56,39 +25,11 @@ public:
 	bool analyzed;
 	std::map<BWAPI::Unit*,BWAPI::UnitType> buildings;
 
-	//Managers
-	Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
-	BaseManager* baseManager;
-	BorderManager * borderManager;
-	BuildingPlacer * buildingPlacer;
-	BuildManager* buildManager;
-	//Depends of BuildManager :
-		ConstructionManager * constructionManager;
-		MorphManager * morphManager;
-		ProductionManager * productionManager;
-
-	BuildOrderManager* buildOrderManager;
-	SupplyManager* supplyManager;
-	TechManager* techManager;
-	UpgradeManager* upgradeManager;
-	UnitGroupManager * unitGroupManager;
-	InformationManager * informationManager;
-	ScoutManager* scoutManager;
-	MapManager* mapManager;
-	WorkerManager* workerManager;
-	MacroManager* macroManager;
-	WarManager* warManager;
-	EUnitsFilter* eUnitsFilter;
-	EEcoEstimator* eEcoEstimator;
-	ETechEstimator* eTechEstimator;
+	Intelligence* intelligence;
+	Macro* macro;
+	Micro* micro;
 	TimeManager* timeManager;
-    GoalManager* goalManager;
-    WorkerSelfDefenseManager* workerSelfDefenseManager;
-#ifdef __DEBUG__
-    EnhancedUI * enhancedUI;
-#endif
-	DefenseManager * defenseManager;
-    ObjectManager* objManager;
+
 	bool showManagerAssignments;
 	
     BattleBroodAI();
@@ -97,6 +38,7 @@ public:
 	virtual void onEnd(bool isWinner);
 	virtual void onFrame();
 	virtual void onSendText(std::string text);
+	virtual void onReceiveText(BWAPI::Player* player, std::string text);
 	virtual void onPlayerLeft(BWAPI::Player* player);
 	virtual void onNukeDetect(BWAPI::Position target);
 	virtual void onUnitCreate(BWAPI::Unit* unit);
@@ -107,8 +49,10 @@ public:
 	virtual void onUnitRenegade(BWAPI::Unit* unit);
 	virtual void onUnitDiscover(BWAPI::Unit* unit);
 	virtual void onUnitEvade(BWAPI::Unit* unit);
-	void drawStats(); //not part of BWAPI::AIModule
+	virtual void onSaveGame(std::stringbuf gameName);
+
+	//not part of BWAPI::AIModule
+	void drawStats(); 
 	void showPlayers();
 	void showForces();
-	void display();
 };

@@ -32,7 +32,6 @@ void MicroAIModule::onStart()
     this->eUnitsFilter = & EUnitsFilter::Instance();
     this->eTechEstimator = & ETechEstimator::Instance();
     this->mapManager = & MapManager::Instance();
-	this->objectManager = & ObjectManager::Instance();
 	this->unitGroupManager = UnitGroupManager::create();
     this->mapManager->setDependencies();
 	// this->rdmGenerators = & RandomGenerators::Instance();
@@ -248,7 +247,6 @@ void MicroAIModule::onFrame()
 {
     if (Broodwar->getLastError() != BWAPI::Errors::None)
         Broodwar->printf("LAST ERROR: %s", Broodwar->getLastError().toString().c_str());
-    objectManager->onFrame();
 	if (mm != NULL) 
         mm->update();
     // regions->display();
@@ -337,7 +335,6 @@ MicroAIModule::MicroAIModule()
 void MicroAIModule::onEnd(bool isWinner)
 {
     MapManager::Destroy();
-    ObjectManager::Destroy();
     // regions::Destroy();
     mm->~UnitsGroup();
 #ifndef __LEARNING_PROB_TABLES__

@@ -298,6 +298,10 @@
 				Name="Micro"
 				>
 				<File
+					RelativePath="..\src\Micro\Micro.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Micro\UnitsGroup.cpp"
 					>
 				</File>
@@ -542,6 +546,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Macro\Macro.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Macro\MacroBase.cpp"
 					>
 				</File>
@@ -689,38 +697,10 @@
 					RelativePath="..\src\Utils\Util.cpp"
 					>
 				</File>
-				<Filter
-					Name="Component"
-					>
-					<File
-						RelativePath="..\src\Utils\Component\BaseData.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Utils\Component\BaseObject.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Utils\Component\Data.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Utils\Component\ObjectManager.cpp"
-						>
-					</File>
-				</Filter>
 			</Filter>
 			<Filter
 				Name="Intelligence"
 				>
-				<File
-					RelativePath="..\src\Intelligence\EEcoEstimator.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Intelligence\EStrat.cpp"
-					>
-				</File>
 				<File
 					RelativePath="..\src\Intelligence\ETechEstimator.cpp"
 					>
@@ -734,7 +714,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Intelligence\Intelligence.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Regions\MapManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Intelligence\ScoutController.cpp"
 					>
 				</File>
 			</Filter>
@@ -760,15 +748,11 @@
 				Name="Micro"
 				>
 				<File
-					RelativePath="..\src\Micro\DefenseManager.h"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Micro\Formations.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\Micro\UnitManager.h"
+					RelativePath="..\src\Micro\Micro.h"
 					>
 				</File>
 				<File
@@ -1012,6 +996,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Macro\Macro.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Macro\MacroBaseManager.h"
 					>
 				</File>
@@ -1247,42 +1235,10 @@
 					RelativePath="..\src\Regions\WalkTilePosition.h"
 					>
 				</File>
-				<Filter
-					Name="Component"
-					>
-					<File
-						RelativePath="..\src\Utils\Component\BaseData.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Utils\Component\BaseObject.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Utils\Component\Data.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Utils\Component\Data.inl"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Utils\Component\ObjectManager.h"
-						>
-					</File>
-				</Filter>
 			</Filter>
 			<Filter
 				Name="Intelligence"
 				>
-				<File
-					RelativePath="..\src\Intelligence\EEcoEstimator.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Intelligence\EStrat.h"
-					>
-				</File>
 				<File
 					RelativePath="..\src\Intelligence\ETechEstimator.h"
 					>
@@ -1296,11 +1252,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Intelligence\Intelligence.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Regions\MapManager.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\Intelligence\ScoutManager.h"
+					RelativePath="..\src\Intelligence\ScoutController.h"
 					>
 				</File>
 			</Filter>

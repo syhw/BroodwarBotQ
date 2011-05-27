@@ -7,7 +7,6 @@
 #include "EUnitsFilter.h"
 #include "ETechEstimator.h"
 #include "MapManager.h"
-#include "ObjectManager.h"
 #include "Regions.h"
 #include "UnitsGroup.h"
 #include <UnitGroupManager.h>
@@ -25,7 +24,6 @@ public:
     EUnitsFilter* eUnitsFilter;
     ETechEstimator* eTechEstimator;
     MapManager* mapManager;
-    ObjectManager* objectManager;
     Regions* regions;
     UnitGroupManager * unitGroupManager;
     bool enemiesFound;

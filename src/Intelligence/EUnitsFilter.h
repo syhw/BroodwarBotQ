@@ -7,7 +7,6 @@
 #include <BWAPI.h>
 #include <map>
 #include <utility>
-#include "Data.h"
 
 // This class works closely tied to MapManager (see MapManager::update())
 class EUnitsFilter : public CSingleton<EUnitsFilter>

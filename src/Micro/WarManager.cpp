@@ -5,8 +5,7 @@
 #include "DefendBaseGroundGoal.h"
 #include "BorderManager.h"
 #include "AttackGoal.h"
-#include "ScoutManager.h"
-
+#include "ScoutController.h"
 
 using std::map;
 using std::set;
@@ -16,7 +15,6 @@ using namespace BWAPI;
 using namespace BWTA;
 
 WarManager::WarManager() 
-: BaseObject("WarManager")
 {
 	arbitrator = NULL;
     unitsGroups.push_front(new UnitsGroup()); // to garbage collect idle units
@@ -34,13 +32,9 @@ void WarManager::setDependencies()
 	this->arbitrator = static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(& Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance()) ;
 }
 
-void WarManager::onStart()
-{
-}
-
 void WarManager::update()
 {
-    /*if (!ScoutManager::Instance().enemyFound && Broodwar->getFrameCount() > 4320)
+    /*if (!ScoutController::Instance().enemyFound && Broodwar->getFrameCount() > 4320)
     {
         for (std::list<UnitsGroup*>::iterator it = unitsGroups.begin();
             it != unitsGroups.end(); ++it)
@@ -137,17 +131,11 @@ void WarManager::onUnitDestroy(BWAPI::Unit* unit)
 	}
 }
 
-void WarManager::display()
-{
-	for( std::list<UnitsGroup*>::iterator it = unitsGroups.begin(); it != unitsGroups.end(); it++) // SEGFAULT
-		(*it)->display();
-}
-
 void WarManager::sendGroupToAttack( UnitsGroup* ug)
 {
-	if (ScoutManager::Instance().enemyFound)
+	if (ScoutController::Instance().enemyFound)
     {
-        ug->addGoal(pGoal(new AttackGoal(ug, ScoutManager::Instance().enemyStartLocation)));
+        ug->addGoal(pGoal(new AttackGoal(ug, ScoutController::Instance().enemyStartLocation)));
 	}
 }
 
@@ -175,11 +163,4 @@ bool WarManager::remove(UnitsGroup* u)
 void WarManager::promptRemove(UnitsGroup* ug)
 {
 	this->promptedRemove.push_back(ug);
-}
-
-std::set<Unit*> WarManager::getEnemies()
-{
-    std::set<BWAPI::Player*>::iterator iter = Broodwar->getPlayers().begin();
-    for(;iter != Broodwar->getPlayers().end() && !(*iter)->isEnemy(Broodwar->self());iter++);
-    return (*iter)->getUnits();
 }

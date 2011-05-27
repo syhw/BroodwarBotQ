@@ -9,8 +9,6 @@
 #include <set>
 #include <list>
 #include <vector>
-#include "BaseObject.h"
-
 
 class RegionsUnitData
 {
@@ -39,7 +37,7 @@ public:
 };
 
 
-class Regions : public CSingleton<Regions>, public BaseObject
+class Regions : public CSingleton<Regions>
 {
 	friend class CSingleton<Regions>;
 

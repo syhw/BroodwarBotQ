@@ -90,11 +90,6 @@ MapManager::~MapManager()
     CloseHandle(_stormPosMutex);
 }
 
-void MapManager::setDependencies()
-{
-    _eUnitsFilter = & EUnitsFilter::Instance();
-}
-
 void MapManager::modifyBuildings(Unit* u, bool b)
 {
     // TODO Optimize (3 loops are not necessary)
