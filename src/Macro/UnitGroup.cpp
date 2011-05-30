@@ -1573,7 +1573,7 @@ Position UnitGroup::getCenter() const
   return Position((int)(x/count),(int)(y/count));
 }
 
-bool UnitGroup::attackMove(Position position) const
+bool UnitGroup::attack(Position position) const
 {
   bool retval=true;
   for(set<Unit*>::const_iterator i=this->begin();i!=this->end();i++)

@@ -344,22 +344,6 @@
 						RelativePath="..\src\Utils\Util.cpp"
 						>
 					</File>
-					<Filter
-						Name="Component"
-						>
-						<File
-							RelativePath="..\src\Utils\Component\BaseData.cpp"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Utils\Component\BaseObject.cpp"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Utils\Component\ObjectManager.cpp"
-							>
-						</File>
-					</Filter>
 				</Filter>
 			</Filter>
 			<Filter
@@ -623,34 +607,6 @@
 					RelativePath="..\src\Utils\Vec.h"
 					>
 				</File>
-				<Filter
-					Name="Component"
-					>
-					<File
-						RelativePath="..\src\Utils\Component\BaseData.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Utils\Component\BaseObject.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Utils\Component\Data.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Utils\Component\Data.inl"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Utils\Component\ObjectManager.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Utils\Component\RefreshWidgetEmiter.h"
-						>
-					</File>
-				</Filter>
 			</Filter>
 			<Filter
 				Name="Intelligence"

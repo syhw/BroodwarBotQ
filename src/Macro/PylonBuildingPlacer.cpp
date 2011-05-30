@@ -156,7 +156,7 @@ bool PylonBuildingPlacer::canBuildHere(BWAPI::Unit* builder, BWAPI::TilePosition
     {
       if (TheReservedMap->getReservedType(x,y)==UnitTypes::Protoss_Pylon)
         return false;
-      for each(Unit* u in Broodwar->unitsOnTile(x,y))
+      for each(Unit* u in Broodwar->getUnitsOnTile(x,y))
         if (u->getPlayer()==Broodwar->self() && u->getType()==UnitTypes::Protoss_Pylon)
           return false;
     }
@@ -197,7 +197,7 @@ bool PylonBuildingPlacer::buildable(BWAPI::Unit* builder, int x, int y) const
 {
   //returns true if this tile is currently buildable, takes into account units on tile
   if (!BWAPI::Broodwar->isBuildable(x,y)) return false;
-  std::set<BWAPI::Unit*> units = BWAPI::Broodwar->unitsOnTile(x, y);
+  std::set<BWAPI::Unit*> units = BWAPI::Broodwar->getUnitsOnTile(x, y);
   for(std::set<BWAPI::Unit*>::iterator i = units.begin(); i != units.end(); i++)
     if ((*i)->getType().isBuilding() && !(*i)->isLifted() && !(*i)->getType().isFlyer() && *i != builder)
       return false;

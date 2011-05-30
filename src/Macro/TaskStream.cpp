@@ -64,7 +64,7 @@ void TaskStream::computeBuildUnit()
     {
       TilePosition bl = task[0].getTilePosition();
       //look at the units on the tile to see if it exists yet
-      for each(Unit* u in Broodwar->unitsOnTile(bl.x(), bl.y()))
+      for each(Unit* u in Broodwar->getUnitsOnTile(bl.x(), bl.y()))
         if (u->getType() == ut && !u->isLifted())
         {
           //we found the building
@@ -77,7 +77,7 @@ void TaskStream::computeBuildUnit()
       TilePosition bl = task[0].getTilePosition();
       bl.x()+=4;
       bl.y()++;
-      for each(Unit* u in Broodwar->unitsOnTile(bl.x(), bl.y()))
+      for each(Unit* u in Broodwar->getUnitsOnTile(bl.x(), bl.y()))
         if (u->getType() == ut && !u->isLifted())
         {
           //we found the building

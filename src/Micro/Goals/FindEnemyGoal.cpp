@@ -3,7 +3,7 @@
 
 FindEnemyGoal::FindEnemyGoal()
 {
-	scoutManager = & ScoutManager::Instance();
+	scoutController = & ScoutController::Instance();
 	warManager = & WarManager::Instance();
 
 	//Scout the different possible bases

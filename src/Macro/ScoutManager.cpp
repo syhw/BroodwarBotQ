@@ -254,7 +254,7 @@ void ScoutManager::updateScoutAssignments()
       {
         for(int y=(*u).second.target->getTilePosition().y();y<(*u).second.target->getTilePosition().y()+3;y++)
         {
-          std::set<BWAPI::Unit*> unitsOnTile = BWAPI::Broodwar->unitsOnTile(x,y);
+          std::set<BWAPI::Unit*> unitsOnTile = BWAPI::Broodwar->getUnitsOnTile(x,y);
           for each(BWAPI::Unit* u in unitsOnTile)
           {
             if (u->getType().isResourceDepot())

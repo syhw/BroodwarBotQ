@@ -302,7 +302,7 @@ int Task::getTime() const
   if (type == TaskTypes::Tech)
     return TechType(id).researchTime();
   if (type == TaskTypes::Upgrade)
-    return UpgradeType(id).upgradeTimeBase()+UpgradeType(id).upgradeTimeFactor()*(level-1);
+    return UpgradeType(id).upgradeTime()+UpgradeType(id).upgradeTimeFactor()*(level-1);
   return 0;
 }
 std::string Task::getName() const

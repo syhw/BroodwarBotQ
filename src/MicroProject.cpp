@@ -33,7 +33,6 @@ void MicroAIModule::onStart()
     this->eTechEstimator = & ETechEstimator::Instance();
     this->mapManager = & MapManager::Instance();
 	this->unitGroupManager = UnitGroupManager::create();
-    this->mapManager->setDependencies();
 	// this->rdmGenerators = & RandomGenerators::Instance();
 
 	mm = new UnitsGroup();

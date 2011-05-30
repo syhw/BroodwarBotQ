@@ -30,7 +30,7 @@ void MacroBaseManager::update()
     if (location2base.find(location) == location2base.end())
     {
       TilePosition tile = location->getTilePosition();
-      for each(Unit* u in Broodwar->unitsOnTile(tile.x(), tile.y()))
+      for each(Unit* u in Broodwar->getUnitsOnTile(tile.x(), tile.y()))
         if (u->getPlayer() == Broodwar->self() && u->getType().isResourceDepot())
         {
           MacroBase* mb = MacroBase::RecognizeExistingBase(location,u);

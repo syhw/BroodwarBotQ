@@ -12,6 +12,6 @@ public:
 	FindEnemyGoal();
 	void achieve();
 private:
-	ScoutController * scoutManager;
+	ScoutController * scoutController;
 	WarManager * warManager;
 };

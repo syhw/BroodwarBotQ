@@ -203,7 +203,7 @@ bool SpiralBuildingPlacer::canBuildHereWithSpace(BWAPI::Unit* builder, BWAPI::Ti
     for(int x = startx2; x < startx; x++)
       for(int y = starty; y < endy; y++)
       {
-        std::set<BWAPI::Unit*> units = BWAPI::Broodwar->unitsOnTile(x, y);
+        std::set<BWAPI::Unit*> units = BWAPI::Broodwar->getUnitsOnTile(x, y);
         for(std::set<BWAPI::Unit*>::iterator i = units.begin(); i != units.end(); i++)
         {
           if (!(*i)->isLifted() && *i != builder)
@@ -227,7 +227,7 @@ bool SpiralBuildingPlacer::buildable(BWAPI::Unit* builder, int x, int y) const
 {
   //returns true if this tile is currently buildable, takes into account units on tile
   if (!BWAPI::Broodwar->isBuildable(x,y)) return false;
-  std::set<BWAPI::Unit*> units = BWAPI::Broodwar->unitsOnTile(x, y);
+  std::set<BWAPI::Unit*> units = BWAPI::Broodwar->getUnitsOnTile(x, y);
   for(std::set<BWAPI::Unit*>::iterator i = units.begin(); i != units.end(); i++)
     if ((*i)->getType().isBuilding() && !(*i)->isLifted() && !(*i)->getType().isFlyer() && *i != builder)
       return false;

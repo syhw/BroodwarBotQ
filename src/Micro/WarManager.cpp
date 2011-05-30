@@ -2,10 +2,9 @@
 #include <WarManager.h>
 #include <util.h>
 #include <UnitsGroup.h>
-#include "DefendBaseGroundGoal.h"
-#include "BorderManager.h"
 #include "AttackGoal.h"
 #include "ScoutController.h"
+#include "BWSAL.h"
 
 using std::map;
 using std::set;
@@ -18,7 +17,7 @@ WarManager::WarManager()
 {
 	arbitrator = NULL;
     unitsGroups.push_front(new UnitsGroup()); // to garbage collect idle units
-    informationManager = & InformationManager::Instance();
+    informationManager = TheInformationManager;
     home = BWTA::getStartLocation(Broodwar->self());
 }
 
@@ -29,7 +28,7 @@ WarManager::~WarManager()
 
 void WarManager::setDependencies()
 {
-	this->arbitrator = static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(& Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance()) ;
+	this->arbitrator = TheArbitrator;
 }
 
 void WarManager::update()

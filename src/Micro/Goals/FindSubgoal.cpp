@@ -1,7 +1,7 @@
 #include <PrecompiledHeader.h>
 #include "FindSubgoal.h"
 #include "Defines.h"
-#include "ScoutManager.h"
+#include "ScoutController.h"
 
 FindSubgoal::FindSubgoal(SubgoalLogic l)
 : Subgoal(l)
@@ -20,7 +20,7 @@ bool FindSubgoal::isRealized()
 
 bool FindSubgoal::check()
 {
-    return ScoutManager::Instance().enemyFound; // quick fix
+    return ScoutController::Instance().enemyFound; // quick fix
 }
 
 void FindSubgoal::tryToRealize()
