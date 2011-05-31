@@ -3,16 +3,12 @@
 
 using namespace BWAPI;
 GoalManager::GoalManager()
+: _warManager(& WarManager::Instance())
 {
-	this->warManager = NULL;
 }
 
 GoalManager::~GoalManager()
 {
-}
-void GoalManager::setDependencies()
-{
-	this->warManager = & WarManager::Instance();
 }
 
 void GoalManager::insert(UnitsGroup * ug, pGoal g)

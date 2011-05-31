@@ -19,7 +19,6 @@ class WarManager: public CSingleton<WarManager>, public Arbitrator::Controller<B
 	Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
     InformationManager* informationManager;
 public:
-	void setDependencies();
 	std::list<UnitsGroup*> unitsGroups;
 	virtual void onOffer(std::set<BWAPI::Unit*> units);
 	virtual void onRevoke(BWAPI::Unit* unit, double bid);

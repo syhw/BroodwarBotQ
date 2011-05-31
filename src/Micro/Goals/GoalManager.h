@@ -13,7 +13,7 @@ class GoalManager : public CSingleton<GoalManager>
 {
 	friend class CSingleton<GoalManager>;
 private:
-	WarManager * warManager;
+	WarManager * _warManager;
 	std::map<UnitsGroup *, std::list<pGoal> > attributedGoals;
 	GoalManager();
 	~GoalManager();

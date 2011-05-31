@@ -21,6 +21,7 @@ MapManager::MapManager()
         FALSE,                 // initially not owned
         NULL))                  // unnamed mutex
 , _lastStormUpdateFrame(0)
+,_eUnitsFilter(& EUnitsFilter::Instance())
 {
 #ifdef __DEBUG__
     if (_stormPosMutex == NULL) 
@@ -70,7 +71,6 @@ MapManager::MapManager()
             airDamagesGrad[x + y*_width/4] = Vec(0, 0);
         }
     }
-    _eUnitsFilter = NULL;
 }
 
 MapManager::~MapManager()

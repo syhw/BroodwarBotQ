@@ -14,21 +14,16 @@ using namespace BWAPI;
 using namespace BWTA;
 
 WarManager::WarManager() 
+: arbitrator(TheArbitrator)
+, informationManager(TheInformationManager)
+, home(BWTA::getStartLocation(Broodwar->self()))
 {
-	arbitrator = NULL;
     unitsGroups.push_front(new UnitsGroup()); // to garbage collect idle units
-    informationManager = TheInformationManager;
-    home = BWTA::getStartLocation(Broodwar->self());
 }
 
 WarManager::~WarManager() 
 {
 	//Broodwar->printf("INOUT WarManager::~WarManager()");
-}
-
-void WarManager::setDependencies()
-{
-	this->arbitrator = TheArbitrator;
 }
 
 void WarManager::update()
