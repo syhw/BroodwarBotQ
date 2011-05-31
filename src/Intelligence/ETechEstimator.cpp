@@ -7,6 +7,10 @@ ETechEstimator::ETechEstimator()
 {
 }
 
+ETechEstimator::~ETechEstimator()
+{
+}
+
 void ETechEstimator::onUnitDestroy(Unit* u)
 {
 }

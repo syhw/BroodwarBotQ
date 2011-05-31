@@ -249,6 +249,16 @@ void BattleBroodAI::onSendText(std::string text)
     return;
 }
 
+void BattleBroodAI::onReceiveText(BWAPI::Player* player, std::string text)
+{
+	return;
+}
+
+void BattleBroodAI::onSaveGame(std::stringbuf gameName)
+{
+	return;
+}
+
 DWORD WINAPI AnalyzeThread()
 {
     BWTA::analyze();

@@ -3,24 +3,24 @@
 #include <MacroManager.h>
 using namespace BWAPI;
 using namespace std;
-map<BWAPI::UnitType, set<BWAPI::UnitType> > makes;
-map<BWAPI::UnitType, set<BWAPI::TechType> > researches;
-map<BWAPI::UnitType, set<BWAPI::UpgradeType> > upgrades;
+map<BWAPI::UnitType, set<BWAPI::UnitType> > makesURTC; // TODO remove?
+map<BWAPI::UnitType, set<BWAPI::TechType> > researchesURTC; // TODO remove?
+map<BWAPI::UnitType, set<BWAPI::UpgradeType> > upgradesURTC; // TODO remove?
 
 void UnitReadyTimeCalculator::init()
 {
   //Compute the reverse of whatBuilds, whatResearches, and whatUpgrades
   for(set<BWAPI::UnitType>::iterator i=UnitTypes::allUnitTypes().begin();i!=UnitTypes::allUnitTypes().end();i++)
   {
-    makes[(*i).whatBuilds().first].insert(*i);
+    makesURTC[(*i).whatBuilds().first].insert(*i);
   }
   for(set<BWAPI::TechType>::iterator i=TechTypes::allTechTypes().begin();i!=TechTypes::allTechTypes().end();i++)
   {
-    researches[i->whatResearches()].insert(*i);
+    researchesURTC[i->whatResearches()].insert(*i);
   }
   for(set<BWAPI::UpgradeType>::iterator i=UpgradeTypes::allUpgradeTypes().begin();i!=UpgradeTypes::allUpgradeTypes().end();i++)
   {
-    upgrades[i->whatUpgrades()].insert(*i);
+    upgradesURTC[i->whatUpgrades()].insert(*i);
   }
 }
 //computes when a unit will be ready to do any task

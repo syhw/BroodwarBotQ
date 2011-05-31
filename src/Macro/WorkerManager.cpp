@@ -134,7 +134,7 @@ void WorkerManager::updateWorkerAssignments()
   }
 }
 
-bool mineralCompare (const pair<Unit*, int> i, const pair<Unit*, int> j) { return (i.second>j.second); }
+bool mineralCompareWM (const pair<Unit*, int> i, const pair<Unit*, int> j) { return (i.second>j.second); }
 
 void WorkerManager::rebalanceWorkers()
 {
@@ -157,7 +157,7 @@ void WorkerManager::rebalanceWorkers()
       baseMineralOrder.push_back(std::make_pair(*m,(*m)->getResources() - 2*(int)(*m)->getPosition().getDistance((*b)->getBaseLocation()->getPosition())));
       optimalWorkerCount+=2;
     }
-    sort(baseMineralOrder.begin(), baseMineralOrder.end(), mineralCompare);
+    sort(baseMineralOrder.begin(), baseMineralOrder.end(), mineralCompareWM);
     for(int i=0;i<(int)baseMineralOrder.size();i++)
     {
       Unit* mineral=baseMineralOrder[i].first;
@@ -189,7 +189,7 @@ void WorkerManager::rebalanceWorkers()
   {
 
     //order minerals by score (based on distance and resource amount)
-    sort(mineralOrder.begin(), mineralOrder.end(), mineralCompare);
+    sort(mineralOrder.begin(), mineralOrder.end(), mineralCompareWM);
 
     //calculate optimal worker count for each mineral patch
     mineralOrderIndex = 0;
