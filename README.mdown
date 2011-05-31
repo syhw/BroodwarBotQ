@@ -20,7 +20,7 @@ a lot of code duplication in the units (micro) code.
 I hope that the same of the bot told you it plays Protoss (only for the moment).
 
 Older versions had contributions of:
-Guillaume Bousket, 
+Guillaume Bousquet, 
 Louis Schimchowitsch,
 Nicolas Biagianti
 
