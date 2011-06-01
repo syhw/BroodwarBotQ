@@ -16,7 +16,6 @@ class WarManager: public CSingleton<WarManager>, public Arbitrator::Controller<B
 	~WarManager();
 	std::list<UnitsGroup *> promptedRemove;
 	bool remove(UnitsGroup* u);
-	Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
     InformationManager* informationManager;
 public:
 	std::list<UnitsGroup*> unitsGroups;

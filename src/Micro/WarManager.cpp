@@ -1,6 +1,6 @@
 #include <PrecompiledHeader.h>
 #include <WarManager.h>
-#include <util.h>
+#include <UnitGroupManager.h>
 #include <UnitsGroup.h>
 #include "AttackGoal.h"
 #include "ScoutController.h"
@@ -14,8 +14,7 @@ using namespace BWAPI;
 using namespace BWTA;
 
 WarManager::WarManager() 
-: arbitrator(TheArbitrator)
-, informationManager(TheInformationManager)
+: informationManager(TheInformationManager)
 , home(BWTA::getStartLocation(Broodwar->self()))
 {
     unitsGroups.push_front(new UnitsGroup()); // to garbage collect idle units
@@ -54,14 +53,16 @@ void WarManager::update()
 
 
 	//Set bid on appropriate units (not workers and not building)
-	std::set<BWAPI::Unit *> myUnits = BWAPI::Broodwar->self()->getUnits();
-
-	for(std::set<BWAPI::Unit *>::iterator it = myUnits.begin(); it != myUnits.end(); ++it){
+	/*std::set<BWAPI::Unit*> myUnits = BWAPI::Broodwar->self()->getUnits();
+	for(std::set<BWAPI::Unit*>::iterator it = myUnits.begin(); it != myUnits.end(); ++it){
 		if (!(*it)->getType().isBuilding() && !(*it)->getType().isWorker())
         {
-			this->arbitrator->setBid(this, (*it), 20);
+			TheArbitrator->setBid(this, (*it), 20);
 		}
-	}
+	}*/
+	//std::set<BWAPI::Unit*> usefulUnits=SelectAll()(isCompleted).not(isWorker,isBuilding);
+	//TheArbitrator->setBid(this,usefulUnits,20);
+
 
 	//Update unitsgroup;
 	if (unitsGroups.empty()) return;
@@ -84,20 +85,21 @@ void WarManager::onOffer(std::set<BWAPI::Unit*> units)
 	{
 		if (!(*u)->getType().isWorker() && !(*u)->getType().isBuilding())
 		{
-			arbitrator->accept(this, *u);
+			TheArbitrator->accept(this, *u);
+			TheArbitrator->setBid(this, *u, 100);
             unitsGroups.front()->takeControl(*u);
 			//Broodwar->printf("New %s added to the micro manager", (*u)->getType().getName().c_str());
 		}
 		else
 		{
-			arbitrator->decline(this, *u, 0);
+			TheArbitrator->decline(this, *u, 0);
 		}
 	}
 }
 
 void WarManager::onRevoke(BWAPI::Unit* unit, double bid)
 {
-	// @merge this->onUnitDestroy(unit);
+	this->onUnitDestroy(unit);
 }
 
 std::string WarManager::getName() const
@@ -107,10 +109,8 @@ std::string WarManager::getName() const
 
 void WarManager::onUnitCreate(BWAPI::Unit* unit)
 {
-	/*
 	if (!unit->getType().isWorker() && unit->getPlayer()==Broodwar->self() && !unit->getType().isBuilding() && unit->getType().canAttack())
-		arbitrator->setBid(this, unit, 100);
-	*/
+		TheArbitrator->setBid(this, unit, 20);
 }
 
 void WarManager::onUnitDestroy(BWAPI::Unit* unit)
