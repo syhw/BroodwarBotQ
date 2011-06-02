@@ -668,7 +668,7 @@ void UnitsGroup::updateNearbyEnemyUnitsFromFilter(BWAPI::Position p, double radi
     }
 }
 
-const BayesianUnit& UnitsGroup::operator[](int i)
+const BayesianUnit& UnitsGroup::operator[](ptrdiff_t i)
 {
     return *(units[i]);
 }

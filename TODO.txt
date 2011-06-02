@@ -1,3 +1,4 @@
+* BayesianUnit.cpp:442 Use _beginthreadex/_endthreadex functions instead of CreateThread/ExitThread functions.
 * Pass distribution on dirV/actions from BayesianUnit upstream in UnitsGroup
   for a more "global" optimal
 * More thread safety? (BayesianUnit, MapManager)

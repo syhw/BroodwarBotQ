@@ -105,7 +105,7 @@ void BayesianUnit::computeDamageValues()
 {
     _damageValues.clear();
     int* tab;
-    for (unsigned int i = 0; i <_dirv.size(); ++i)
+    for (size_t i = 0; i <_dirv.size(); ++i)
     {
         Position tmp = _dirv[i].translate(this->_unitPos);
         if (unit->getType().isFlyer())
@@ -142,7 +142,7 @@ void BayesianUnit::computeFlockValues()
 void BayesianUnit::computeRepulseValues()
 {
     _repulseValues.clear();
-    for (unsigned int i = 0; i < _dirv.size(); ++i)
+    for (size_t i = 0; i < _dirv.size(); ++i)
     {
         repulse_value value = REPULSE_NO;
         Position tmp = _dirv[i].translate(this->_unitPos);
@@ -270,7 +270,7 @@ void BayesianUnit::straightLine(vector<Position>& ppath,
     if (p_start.getDistance(p_end) < 8) return;
     // not anti-aliased :)
     vector<Vec> dirvnorm;
-    for (unsigned int i = 0; i < _dirv.size(); ++i)
+    for (size_t i = 0; i < _dirv.size(); ++i)
         dirvnorm.push_back(_dirv[i] / _dirv[i].norm());
     Position p_current = p_start;
     ppath.push_back(p_current);
@@ -282,8 +282,8 @@ void BayesianUnit::straightLine(vector<Position>& ppath,
                 p_end.y() - p_current.y()); 
             Vec objnorm = line.normalize();
             double maxv = -10.;
-            unsigned int imax = 0;
-            for (unsigned int i = 0; i < _dirv.size(); ++i)
+            size_t imax = 0;
+            for (size_t i = 0; i < _dirv.size(); ++i)
             {
                 double tmp = dirvnorm[i].dot(objnorm);
 				if (tmp > maxv || 
@@ -306,8 +306,8 @@ void BayesianUnit::straightLine(vector<Position>& ppath,
                 p_end.y() - p_current.y()); 
             Vec objnorm = line.normalize();
             double maxv = -10.;
-            unsigned int imax = 0;
-            for (unsigned int i = 0; i < _dirv.size(); ++i)
+            size_t imax = 0;
+            for (size_t i = 0; i < _dirv.size(); ++i)
             {
                 double tmp = dirvnorm[i].dot(objnorm);
                 if (tmp > maxv || 
@@ -342,7 +342,7 @@ void BayesianUnit::updateAttractors()
     // buildings and blocking attraction (repulsion)
     const int width = Broodwar->mapWidth();
     Position up = _unitPos;
-    for (unsigned int i = 0; i < _dirv.size(); ++i)
+    for (size_t i = 0; i < _dirv.size(); ++i)
     {
         Position tmp = _dirv[i].translate(up);
         
@@ -380,7 +380,7 @@ void BayesianUnit::updateAttractors()
 void BayesianUnit::drawAttractors()
 {
     Position up = _unitPos;
-    for (unsigned int i = 0; i < _dirv.size(); ++i)
+    for (size_t i = 0; i < _dirv.size(); ++i)
     {
         Position p = _dirv[i].translate(up);
         if (!_occupation[i])
@@ -405,7 +405,7 @@ void BayesianUnit::drawAttractors()
 void BayesianUnit::drawRepulseValues()
 {
     Rainbow colors = Rainbow(Color(12, 12, 255), 51);
-    for (unsigned int i = 0; i < _repulseValues.size(); ++i)
+    for (size_t i = 0; i < _repulseValues.size(); ++i)
     {
         Position p = _dirv[i].translate(this->_unitPos);
         Broodwar->drawBox(CoordinateType::Map, p.x() - 3, p.y() - 3,
@@ -769,7 +769,7 @@ void BayesianUnit::updatePPath()
 
         // remove path points we passed
         unsigned int count = 0;
-        for (unsigned int i = 0; i < _ppath.size(); ++i) 
+        for (size_t i = 0; i < _ppath.size(); ++i) 
         {
             if (_ppath[i].getDistance(_unitPos) < _maxDistWhileRefreshingPath)
                 count = i;
@@ -850,7 +850,7 @@ void BayesianUnit::drawObj(int number)
     if (number == 1)
     {
         const int middle = 64;
-        for (unsigned int i = 0; i < this->_dirv.size(); ++i)
+        for (size_t i = 0; i < this->_dirv.size(); ++i)
         {
             //Broodwar->printf("obj.x: %f, obj.y: %f, _dirv[i].x: %f, 
 			//_dirv[i].y: %f\n", obj.x, obj.y, _dirv[i].x, _dirv[i].y);
@@ -866,7 +866,7 @@ void BayesianUnit::drawObj(int number)
         }
     } else
     {
-        for (unsigned int i = 0; i < this->_dirv.size(); ++i)
+        for (size_t i = 0; i < this->_dirv.size(); ++i)
         {
             //Broodwar->printf("obj.x: %f, obj.y: %f, _dirv[i].x: %f, 
 			//_dirv[i].y: %f\n", obj.x, obj.y, _dirv[i].x, _dirv[i].y);
@@ -894,7 +894,7 @@ void BayesianUnit::drawOccupation(int number)
     {
         const int middleX = 64;
         const int middleY = 150;
-        for (unsigned int i = 0; i < this->_dirv.size(); ++i)
+        for (size_t i = 0; i < this->_dirv.size(); ++i)
         {
             //Broodwar->printf("obj.x: %f, obj.y: %f, _dirv[i].x: %f, 
 			//_dirv[i].y: %f\n", obj.x, obj.y, _dirv[i].x, _dirv[i].y);
@@ -911,7 +911,7 @@ void BayesianUnit::drawOccupation(int number)
         }
     } else
     {
-        for (unsigned int i = 0; i < this->_dirv.size(); ++i)
+        for (size_t i = 0; i < this->_dirv.size(); ++i)
         {
             //Broodwar->printf("obj.x: %f, obj.y: %f, _dirv[i].x: %f,
 			//_dirv[i].y: %f\n", obj.x, obj.y, _dirv[i].x, _dirv[i].y);
@@ -1529,12 +1529,12 @@ bool BayesianUnit::outRanges(BWAPI::Unit* u)
 void BayesianUnit::drawDirV()
 {
     Position up = _unitPos;
-    for (unsigned int i = 0; i < _dirv.size(); ++i)
+    for (size_t i = 0; i < _dirv.size(); ++i)
     {
         //Broodwar->printf("_dirv[i].x: %f, _dirv[i].y: %f \n", _dirv[i].x, _dirv[i].y);
         Broodwar->drawLine(CoordinateType::Map, up.x(), up.y(), _dirv[i].translate(up).x(), _dirv[i].translate(up).y(), Colors::Grey);
     }
-    for (unsigned int i = 0; i < _dirv.size(); ++i)
+    for (size_t i = 0; i < _dirv.size(); ++i)
         if (_dirv[i].norm() < 15.5)
             Broodwar->drawLine(CoordinateType::Map, up.x(), up.y(), _dirv[i].translate(up).x(), _dirv[i].translate(up).y(), Colors::Black);
 }
@@ -1553,7 +1553,7 @@ void BayesianUnit::attack(const Position& p)
 void BayesianUnit::computeProbs()
 {
     _dirvProb.clear();
-    for (unsigned int i = 0; i < _dirv.size(); ++i)
+    for (size_t i = 0; i < _dirv.size(); ++i)
         _dirvProb.insert(make_pair(computeProb(i), _dirv[i]));
 }
 
