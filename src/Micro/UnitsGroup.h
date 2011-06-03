@@ -122,7 +122,7 @@ public:
 #ifdef _UNITS_DEBUG
     void selectedUnits(std::set<pBayesianUnit>& u);
 #endif
-	const BayesianUnit& operator[](int i);
+	const BayesianUnit& operator[](ptrdiff_t i);
 	void accomplishGoal();
 	void switchMode(unit_mode um);
 	void idle();
