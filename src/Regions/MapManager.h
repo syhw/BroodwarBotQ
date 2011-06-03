@@ -1,5 +1,6 @@
 #pragma once
 #include <BWAPI.h>
+#include <BWTA.h>
 #include "CSingleton.h"
 #include "EUnitsFilter.h"
 #include <vector>
@@ -68,6 +69,7 @@ public:
     int* airDamages;            // build tiles
     Vec* groundDamagesGrad;     // build tiles
     Vec* airDamagesGrad;        // build tiles
+	std::map<BWTA::Region*, std::map<BWTA::Region*, double> > distRegions; // distRegions[R1][R2]
     std::map<Position, int> stormPos;
     void onUnitCreate(BWAPI::Unit* u);
     void onUnitDestroy(BWAPI::Unit* u);

@@ -21,7 +21,7 @@ MapManager::MapManager()
         FALSE,                 // initially not owned
         NULL))                  // unnamed mutex
 , _lastStormUpdateFrame(0)
-,_eUnitsFilter(& EUnitsFilter::Instance())
+, _eUnitsFilter(& EUnitsFilter::Instance())
 {
 #ifdef __DEBUG__
     if (_stormPosMutex == NULL) 
@@ -39,6 +39,21 @@ MapManager::MapManager()
     airDamages = new int[Broodwar->mapWidth() * Broodwar->mapHeight()];
     groundDamagesGrad = new Vec[Broodwar->mapWidth() * Broodwar->mapHeight()];
     airDamagesGrad = new Vec[Broodwar->mapWidth() * Broodwar->mapHeight()];
+	const std::set<BWTA::Region*> allRegions = BWTA::getRegions();
+	//distRegions = std::map<BWTA::Region*, std::map<BWTA::Region*, double> >();
+	for (std::set<BWTA::Region*>::const_iterator it = allRegions.begin();
+		it != allRegions.end(); ++it)
+	{
+		distRegions.insert(std::pair<BWTA::Region*, std::map<BWTA::Region*, double> >(*it,
+			std::map<BWTA::Region*, double>()));
+		for (std::set<BWTA::Region*>::const_iterator it2 = allRegions.begin();
+			it2 != allRegions.end(); ++it2)
+		{
+			distRegions[*it].insert(std::pair<BWTA::Region*, double>(*it2, 
+				BWTA::getGroundDistance(BWAPI::TilePosition((*it)->getCenter()), 
+				BWAPI::TilePosition((*it2)->getCenter()))));
+		}
+	}
 
     // initialization
     for (int x = 0; x < _width; ++x) 
