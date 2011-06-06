@@ -17,5 +17,5 @@
 #include <BWAPI.h>
 #include <float.h>
 #include <math.h>
-#include <Util.h>
+#include "Utils/Util.h"
 #endif

@@ -1,5 +1,5 @@
 #pragma once
-#include <CSingleton.h>
+#include <Utils/CSingleton.h>
 #include "BWSAL.h"
 #include "GoalManager.h"
 #include "WarManager.h"

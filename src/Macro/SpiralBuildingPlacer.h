@@ -1,7 +1,7 @@
 #pragma once
 #include <MacroManager/TaskStreamObserver.h>
 #include <MacroManager/TaskStream.h>
-#include <RectangleArray.h>
+#include <Macro/RectangleArray.h>
 class SpiralBuildingPlacer : public TaskStreamObserver
 {
   public:

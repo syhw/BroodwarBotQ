@@ -1,12 +1,12 @@
 #pragma once
-#include <CSingleton.h>
+#include <Utils/CSingleton.h>
 #include <Arbitrator.h>
 #include <BWAPI.h>
 #include <BWTA.h>
 #include "Goal.h"
 #include "Subgoal.h"
 #include "FindEnemyGoal.h"
-#include "EUnitsFilter.h"
+#include "Intelligence/EUnitsFilter.h"
 #include "SeeSubgoal.h"
 #include "FindSubgoal.h"
 #include "WarManager.h"

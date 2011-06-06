@@ -18,6 +18,8 @@
 #include <DragoonUnit.h>
 #include <DarkTemplarUnit.h>
 #include <DarkArchonUnit.h>
+#include <MarineUnit.h>
+#include <MedicUnit.h>
 #include <ScourgeUnit.h>
 #include <MutaliskUnit.h>
 #include <stack>
@@ -584,6 +586,10 @@ void UnitsGroup::takeControl(Unit* u)
         tmp = pBayesianUnit(new MutaliskUnit(u, this));
     else if (u->getType() == BWAPI::UnitTypes::Zerg_Scourge)
         tmp = pBayesianUnit(new ScourgeUnit(u, this));
+	else if (u->getType() == BWAPI::UnitTypes::Terran_Marine)
+		tmp = pBayesianUnit(new MarineUnit(u, this));
+	else if (u->getType() == BWAPI::UnitTypes::Terran_Medic)
+		tmp = pBayesianUnit(new MedicUnit(u, this));
     else
         Broodwar->printf("Cette race n'est pas correctement gérée par l'IA pour le moment !");
 

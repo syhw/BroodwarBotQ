@@ -3,7 +3,7 @@
 #include <BWTA.h>
 #include <math.h>
 #include <windows.h>
-#include <Vec.h>
+#include <Utils/Utils/Vec.h>
 #include <BayesianUnit.h>
 
 #ifndef _SMART_POINTER_FORMATION_INCLUDED

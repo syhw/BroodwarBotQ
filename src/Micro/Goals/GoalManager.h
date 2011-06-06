@@ -1,6 +1,6 @@
 #pragma once
 #include "Goal.h"
-#include "CSingleton.h"
+#include "Utils/CSingleton.h"
 #include <stdlib.h>
 #include "UnitsGroup.h"
 #include <BWAPI.h>

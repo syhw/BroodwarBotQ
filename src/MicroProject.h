@@ -4,7 +4,7 @@
 #include <windows.h>
 #include "Defines.h"
 #include "Formations.h"
-#include "EUnitsFilter.h"
+#include "Intelligence/EUnitsFilter.h"
 #include "ETechEstimator.h"
 #include "MapManager.h"
 #include "Regions.h"

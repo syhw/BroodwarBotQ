@@ -3,7 +3,7 @@
 #include <BWTA.h>
 #include <windows.h>
 #include "Defines.h"
-#include "Intelligence.h"
+#include "Intelligence/Intelligence.h"
 #include "Macro.h"
 #include "Micro.h"
 

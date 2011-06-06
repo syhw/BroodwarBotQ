@@ -1,7 +1,7 @@
 #pragma once
 #include <BWAPI.h>
 #include <BWTA.h>
-#include <CSingleton.h>
+#include <Utils/CSingleton.h>
 #include <Arbitrator.h>
 #include "InformationManager.h"
 

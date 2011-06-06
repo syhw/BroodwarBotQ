@@ -6,10 +6,10 @@
 #include "BayesianUnit.h"
 #include "Goal.h"
 #include "Formations.h"
-#include <Vec.h>
+#include <Utils/Utils/Vec.h>
 #include <set>
 #include <boost/bimap/bimap.hpp>
-#include <EUnitsFilter.h>
+#include <Intelligence/Intelligence/EUnitsFilter.h>
 
 #define _UNITS_DEBUG 1
 

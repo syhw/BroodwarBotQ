@@ -1,5 +1,5 @@
 #include <PrecompiledHeader.h>
-#include "Intelligence.h"
+#include "Intelligence/Intelligence.h"
 
 using namespace BWAPI;
 

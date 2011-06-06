@@ -1,6 +1,6 @@
 #include <PrecompiledHeader.h>
 #include "ObserverUnit.h"
-#include "EUnitsFilter.h"
+#include "Intelligence/Intelligence/EUnitsFilter.h"
 #include "UnitsGroup.h"
 
 using namespace BWAPI;

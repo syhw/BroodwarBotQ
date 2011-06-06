@@ -1,7 +1,7 @@
 #include <PrecompiledHeader.h>
 #include <WorkerManager.h>
 #include <BaseManager.h>
-#include <RectangleArray.h>
+#include <Macro/RectangleArray.h>
 #include <BuildOrderManager.h>
 #include <UnitGroupManager.h>
 #include <algorithm>

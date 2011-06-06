@@ -1,6 +1,6 @@
 #pragma once
 #include <BWAPI.h>
-#include <RectangleArray.h>
+#include <Macro/RectangleArray.h>
 class BuildingPlacer
 {
   public:

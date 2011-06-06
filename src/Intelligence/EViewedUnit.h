@@ -2,7 +2,7 @@
 #include <BWTA.h>
 #include <BWAPI.h>
 #include <vector>
-#include "Vec.h"
+#include "Utils/Vec.h"
 
 struct EViewedUnit
 {

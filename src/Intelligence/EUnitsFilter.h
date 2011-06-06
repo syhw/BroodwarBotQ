@@ -1,7 +1,7 @@
 #pragma once
 #include "Defines.h"
-#include "CSingleton.h"
-#include "TimeManager.h"
+#include "Utils/CSingleton.h"
+#include "Utils/TimeManager.h"
 #include "EViewedUnit.h"
 #include <BWTA.h>
 #include <BWAPI.h>

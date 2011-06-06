@@ -3,7 +3,7 @@
 #include <BWAPI.h>
 #include <BWTA.h>
 #include <math.h>
-#include "Vec.h"
+#include "Utils/Utils/Vec.h"
 #include "BattleUnit.h"
 #include "MapManager.h"
 //#include "UnitsGroup.h"

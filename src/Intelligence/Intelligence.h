@@ -1,6 +1,6 @@
 #pragma once
 #include <PrecompiledHeader.h>
-#include "EUnitsFilter.h"
+#include "Intelligence/EUnitsFilter.h"
 #include "ETechEstimator.h"
 #include "MapManager.h"
 #include "ScoutController.h"

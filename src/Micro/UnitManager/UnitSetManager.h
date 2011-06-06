@@ -1,7 +1,7 @@
 #pragma once
 #include <BWAPI.h>
 #include <UnitSet.h>
-#include "CSingleton.h"
+#include "Utils/CSingleton.h"
 class UnitSetManager: public CSingleton<UnitSetManager>
 {
 	friend class CSingleton<UnitSetManager>;

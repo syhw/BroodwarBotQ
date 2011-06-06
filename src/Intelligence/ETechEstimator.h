@@ -1,6 +1,6 @@
 #pragma once
 #include "BWAPI.h"
-#include "CSingleton.h"
+#include "Utils/CSingleton.h"
 
 class ETechEstimator : public CSingleton<ETechEstimator>
 {

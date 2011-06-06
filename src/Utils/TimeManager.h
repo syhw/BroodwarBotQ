@@ -1,6 +1,6 @@
 #pragma once
 #include <windows.h>
-#include <CSingleton.h>
+#include "Utils/CSingleton.h"
 #include <BWAPI.h>
 #include <string>
 #include <exception>

@@ -1,10 +1,10 @@
 #pragma once
 #include <BWAPI.h>
 #include <BWTA.h>
-#include "CSingleton.h"
-#include "EUnitsFilter.h"
+#include "Utils/Utils/CSingleton.h"
+#include "Intelligence/Intelligence/EUnitsFilter.h"
 #include <vector>
-#include "Vec.h"
+#include "Utils/Utils/Vec.h"
 
 #include <windows.h>
 #include <process.h>

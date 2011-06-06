@@ -1,7 +1,7 @@
 #include <PrecompiledHeader.h>
 #include <MacroWorkerManager.h>
 #include <MacroBaseManager.h>
-#include <RectangleArray.h>
+#include <Macro/RectangleArray.h>
 #include <MacroManager.h>
 #include <UnitGroupManager.h>
 #include "Util.h"

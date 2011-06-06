@@ -1,5 +1,5 @@
 #pragma once
-#include <CSingleton.h>
+#include <Utils/CSingleton.h>
 #include <BasicTaskExecutor.h>
 #include <SpiralBuildingPlacer.h>
 #include <BFSBuildingPlacer.h>

@@ -1,6 +1,6 @@
 #include <PrecompiledHeader.h>
 #include "BattleUnit.h"
-#include "Vec.h"
+#include "Utils/Utils/Vec.h"
 #include "Defines.h"
 #include "MapManager.h"
 using namespace BWAPI;

@@ -31,7 +31,7 @@ Macro::Macro()
 	ts->attach(BasicTaskExecutor::getInstance(),false);
 	ts->attach(new UnitPump(Broodwar->self()->getRace().getWorker()),true);
 	ts->attach(new TerminateIfWorkerLost(),true);
-	if (Broodwar->self()->getRace()==Races::Protoss)
+	if (Broodwar->self()->getRace() == Races::Protoss)
 	{
 		buildOrderAdd(UnitTypes::Protoss_Gateway);
 		buildOrderAdd(UnitTypes::Protoss_Cybernetics_Core);
@@ -42,7 +42,19 @@ Macro::Macro()
 		infantryProducer->setUnitWeight(UnitTypes::Protoss_Zealot,1.0);
 		upgradeAdd(UpgradeTypes::Singularity_Charge);
 	}
-	else
+	else if (Broodwar->self()->getRace() == Races::Terran)
+	{
+		buildOrderAdd(UnitTypes::Terran_Supply_Depot);
+		buildOrderAdd(UnitTypes::Terran_Barracks);
+		buildOrderAdd(UnitTypes::Terran_Refinery);
+		buildOrderAdd(UnitTypes::Terran_Academy);
+		buildOrderAdd(UnitTypes::Terran_Barracks);
+		buildOrderAdd(UnitTypes::Terran_Barracks);
+		infantryProducer = new UnitCompositionProducer(UnitTypes::Terran_Barracks);
+		infantryProducer->setUnitWeight(UnitTypes::Terran_Marine, 3.0);
+		infantryProducer->setUnitWeight(UnitTypes::Terran_Medic, 1.0);
+		techAdd(TechTypes::Stim_Packs);
+	}
 	{
 		Broodwar->printf("Race not implemented");
 	}
