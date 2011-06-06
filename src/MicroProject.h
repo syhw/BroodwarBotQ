@@ -3,13 +3,13 @@
 #include <BWTA.h>
 #include <windows.h>
 #include "Defines.h"
-#include "Micro/Formations/Formations.h"
+#include "Micro/Formations.h"
 #include "Intelligence/EUnitsFilter.h"
-#include "ETechEstimator.h"
+#include "Intelligence/ETechEstimator.h"
 #include "Regions/MapManager.h"
-#include "Regions.h"
+#include "Regions/Regions.h"
 #include "Micro/UnitsGroup.h"
-#include <UnitGroupManager.h>
+#include "Macro/UnitGroupManager.h"
 
 static bool analyzed;
 static bool analysis_just_finished;

@@ -1,10 +1,10 @@
 #pragma once
-#include "CSingleton.h"
+#include "Utils/CSingleton.h"
 #include <BWTA.h>
 #include <BWAPI.h>
-#include "BaseManager.h"
-#include "TimeManager.h"
-#include "MapManager.h"
+#include "Macro/BaseManager.h"
+#include "Utils/TimeManager.h"
+#include "Regions/MapManager.h"
 #include <map>
 #include <set>
 #include <list>

@@ -1,7 +1,7 @@
 #pragma once
 #include <PrecompiledHeader.h>
 #include "Intelligence/EUnitsFilter.h"
-#include "ETechEstimator.h"
+#include "Intelligence/ETechEstimator.h"
 #include "Regions/MapManager.h"
 #include "Intelligence/ScoutController.h"
 

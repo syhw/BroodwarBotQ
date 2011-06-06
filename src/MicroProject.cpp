@@ -1,9 +1,9 @@
 #include <PrecompiledHeader.h>
-#include "Util.h"
+#include "Utils/Util.h"
 #include "MicroProject.h"
 #include "Micro/Goals/Goal.h"
-#include "FormationSubgoal.h"
-#include "AttackMicro/Goals/Goal.h"
+#include "Micro/Goals/FormationSubgoal.h"
+#include "Micro/Goals/AttackGoal.h"
 
 #ifdef __LEARNING_PROB_TABLES__
 #include "ZealotUnit.h"

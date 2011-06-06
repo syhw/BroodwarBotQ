@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="MacroProject"
 	ProjectGUID="{F39C7417-770D-4635-8A47-77BD9CDDCD71}"
 	RootNamespace="MacroProject"
@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Intelligence;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ZergFlying;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Utils/Component;../../BWAPI_3.5.4/include;../../BWAPI_3.5.4/include/BWAPI;../../BWAPI_3.5.4/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
+				AdditionalIncludeDirectories="../src;../../BWAPI_3.5.4/include;../../BWAPI_3.5.4/include/BWAPI;../../BWAPI_3.5.4/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
@@ -204,7 +204,7 @@
 				Optimization="0"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Intelligence;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ZergFlying;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Utils/Component;../../BWAPI_3.5.4/include;../../BWAPI_3.5.4/include/BWAPI;../../BWAPI_3.5.4/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
+				AdditionalIncludeDirectories="../src;../../BWAPI_3.5.4/include;../../BWAPI_3.5.4/include/BWAPI;../../BWAPI_3.5.4/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
 				RuntimeLibrary="2"

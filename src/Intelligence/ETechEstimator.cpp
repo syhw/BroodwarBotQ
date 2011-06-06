@@ -1,5 +1,5 @@
 #include <PrecompiledHeader.h>
-#include "ETechEstimator.h"	
+#include "Intelligence/ETechEstimator.h"	
 
 using namespace BWAPI;
 
