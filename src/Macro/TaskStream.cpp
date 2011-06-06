@@ -1,11 +1,11 @@
 #include <PrecompiledHeader.h>
-#include <MacroManager/TaskStream.h>
-#include <MacroManager/TaskStreamObserver.h>
-#include <MacroManager/UnitReadyTimeCalculator.h>
-#include <BasicWorkerFinder.h>
-#include <TerminateIfEmpty.h>
-#include <BasicTaskExecutor.h>
-#include <BFSBuildingPlacer.h>
+#include "Macro/MacroManager/TaskStream.h"
+#include "Macro/MacroManager/TaskStreamObserver.h"
+#include "Macro/MacroManager/UnitReadyTimeCalculator.h"
+#include "Macro/BasicWorkerFinder.h"
+#include "Macro/TerminateIfEmpty.h"
+#include "Macro/BasicTaskExecutor.h"
+#include "Macro/BFSBuildingPlacer.h"
 using namespace BWAPI;
 using namespace std;
 TaskStream::TaskStream(Task t0, Task t1, Task t2, Task t3)

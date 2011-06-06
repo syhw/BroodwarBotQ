@@ -1,5 +1,6 @@
 #include <PrecompiledHeader.h>
-#include "ExploreGoal.h"
+#include "Micro/Goals/ExploreGoal.h"
+
 using namespace BWAPI;
 
 ExploreGoal::ExploreGoal(BWTA::Region* region) 

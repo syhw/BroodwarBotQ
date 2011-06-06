@@ -1,16 +1,16 @@
 #include <PrecompiledHeader.h>
-#include <MacroSupplyManager.h>
-#include <MacroManager.h>
-#include <ResourceRates.h>
-#include <BasicTaskExecutor.h>
-#include <SpiralBuildingPlacer.h>
-#include <BFSBuildingPlacer.h>
-#include <PylonBuildingPlacer.h>
-#include <UnitPump.h>
-#include <TerminateIfWorkerLost.h>
-#include <TerminateIfEmpty.h>
-#include <BasicWorkerFinder.h>
-#include <UnitCompositionProducer.h>
+#include "Macro/MacroSupplyManager.h"
+#include "Macro/MacroManager.h"
+#include "Macro/ResourceRates.h"
+#include "Macro/BasicTaskExecutor.h"
+#include "Macro/SpiralBuildingPlacer.h"
+#include "Macro/BFSBuildingPlacer.h"
+#include "Macro/PylonBuildingPlacer.h"
+#include "Macro/UnitPump.h"
+#include "Macro/TerminateIfWorkerLost.h"
+#include "Macro/TerminateIfEmpty.h"
+#include "Macro/BasicWorkerFinder.h"
+#include "Macro/UnitCompositionProducer.h"
 using namespace BWAPI;
 using namespace std;
 set<UnitType> factoryTypes;

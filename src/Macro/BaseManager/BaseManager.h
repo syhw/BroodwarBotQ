@@ -2,7 +2,7 @@
 #include <map>
 #include <set>
 #include <BWAPI.h>
-#include <Arbitrator.h>
+#include "Macro/Arbitrator.h"
 #include <BWTA.h>
 #include "Base.h"
 class BuildOrderManager;

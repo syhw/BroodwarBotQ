@@ -1,10 +1,10 @@
 #include <PrecompiledHeader.h>
-#include <WarManager.h>
-#include <UnitGroupManager.h>
-#include <UnitsGroup.h>
-#include "AttackGoal.h"
-#include "ScoutController.h"
-#include "BWSAL.h"
+#include <Micro/WarManager.h>
+#include "Macro/UnitGroupManager.h"
+#include "Micro/UnitsGroup.h"
+#include "Micro/Goals/AttackGoal.h"
+#include "Intelligence/ScoutController.h"
+#include "Macro/BWSAL.h"
 
 using std::map;
 using std::set;

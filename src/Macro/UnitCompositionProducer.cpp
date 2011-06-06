@@ -1,13 +1,13 @@
 #include <PrecompiledHeader.h>
-#include <UnitCompositionProducer.h>
-#include <BasicTaskExecutor.h>
-#include <SpiralBuildingPlacer.h>
-#include <UnitPump.h>
-#include <TerminateIfWorkerLost.h>
-#include <TerminateIfEmpty.h>
-#include <BasicWorkerFinder.h>
-#include <MacroManager.h>
-#include <MacroManager/UnitReadyTimeCalculator.h>
+#include "Macro/UnitCompositionProducer.h"
+#include "Macro/BasicTaskExecutor.h"
+#include "Macro/SpiralBuildingPlacer.h"
+#include "Macro/UnitPump.h"
+#include "Macro/TerminateIfWorkerLost.h"
+#include "Macro/TerminateIfEmpty.h"
+#include "Macro/BasicWorkerFinder.h"
+#include "Macro/MacroManager.h"
+#include "Macro/MacroManager/UnitReadyTimeCalculator.h"
 using namespace BWAPI;
 using namespace std;
 std::set<UnitType> requiresAddon;

@@ -1,4 +1,4 @@
 #pragma once
 #include <BWAPI.h>
-#include <Arbitrator.h>
+#include "Macro/Arbitrator.h"
 extern Arbitrator::Arbitrator<BWAPI::Unit*,double>* TheArbitrator;

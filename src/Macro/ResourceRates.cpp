@@ -1,5 +1,5 @@
 #include <PrecompiledHeader.h>
-#include <ResourceRates.h>
+#include "Macro/ResourceRates.h"
 using namespace BWAPI;
 ResourceRates* TheResourceRates = NULL;
 

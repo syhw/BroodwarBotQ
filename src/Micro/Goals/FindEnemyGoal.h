@@ -1,11 +1,11 @@
 #pragma once
 #include <BWTA.h>
-#include "Goal.h"
-#include "Subgoal.h"
-#include "SeeSubgoal.h"
-#include "FindSubgoal.h"
-#include "ScoutController.h"
-#include "WarManager.h"
+#include "Micro/Goals/Goal.h"
+#include "Micro/Goals/Subgoal.h"
+#include "Micro/Goals/SeeSubgoal.h"
+#include "Micro/Goals/FindSubgoal.h"
+#include "Intelligence/ScoutController.h"
+#include "Micro/WarManager.h"
 class FindEnemyGoal: public Goal
 {
 public:

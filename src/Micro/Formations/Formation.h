@@ -3,8 +3,8 @@
 #include <BWTA.h>
 #include <math.h>
 #include <windows.h>
-#include <Utils/Utils/Vec.h>
-#include <BayesianUnit.h>
+#include <Utils/Vec.h>
+#include <Micro/Units/BayesianUnit.h>
 
 #ifndef _SMART_POINTER_FORMATION_INCLUDED
 #define _SMART_POINTER_FORMATION_INCLUDED 1

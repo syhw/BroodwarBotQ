@@ -3,13 +3,13 @@
 #include <BWTA.h>
 #include <windows.h>
 #include <math.h>
-#include "BayesianUnit.h"
-#include "Goal.h"
-#include "Formations.h"
-#include <Utils/Utils/Vec.h>
+#include "Micro/Units/BayesianUnit.h"
+#include "Micro/Goals/Goal.h"
+#include "Micro/Formations.h"
+#include "Utils/Vec.h"
 #include <set>
 #include <boost/bimap/bimap.hpp>
-#include <Intelligence/Intelligence/EUnitsFilter.h>
+#include "Intelligence/EUnitsFilter.h"
 
 #define _UNITS_DEBUG 1
 

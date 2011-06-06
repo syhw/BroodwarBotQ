@@ -1,7 +1,7 @@
 #include <PrecompiledHeader.h>
 #include "MacroProject.h"
-#include <Util.h>
-#include <BWSAL.h>
+#include "Utils/Util.h"
+#include "Macro/BWSAL.h"
 #include <set>
 
 #define __POOL_TIME_RUSH__ 130 // seconds, 3 workers + 1 pool + 11 seconds

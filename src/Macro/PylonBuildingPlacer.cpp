@@ -1,7 +1,7 @@
 #include <PrecompiledHeader.h>
-#include <PylonBuildingPlacer.h>
-#include <ReservedMap.h>
-#include <Heap.h>
+#include "Macro/PylonBuildingPlacer.h"
+#include "Macro/ReservedMap.h"
+#include "Macro/Heap.h"
 using namespace std;
 using namespace BWAPI;
 PylonBuildingPlacer* instance = NULL;

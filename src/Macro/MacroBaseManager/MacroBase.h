@@ -2,7 +2,7 @@
 #include <BWAPI.h>
 #include <BWTA.h>
 #include <set>
-#include <MacroManager.h>
+#include "Macro/MacroManager.h"
 class MacroBase : public TaskStreamObserver
 {
   public:

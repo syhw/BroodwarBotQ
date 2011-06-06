@@ -1,8 +1,8 @@
 #pragma once
 #include <Utils/CSingleton.h>
-#include "BWSAL.h"
-#include "GoalManager.h"
-#include "WarManager.h"
+#include "Macro/BWSAL.h"
+#include "Micro/Goals/GoalManager.h"
+#include "Micro/WarManager.h"
 
 class Micro : public CSingleton<Micro>
 {

@@ -1,6 +1,6 @@
 #pragma once
-#include <MacroManager/TaskStreamObserver.h>
-#include <MacroManager/TaskStream.h>
+#include "Macro/MacroManager/TaskStreamObserver.h"
+#include "Macro/MacroManager/TaskStream.h"
 class BasicWorkerFinder : public TaskStreamObserver
 {
   public:

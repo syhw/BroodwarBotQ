@@ -3,7 +3,7 @@
 #include <BWTA.h>
 #include <windows.h>
 #include <algorithm>
-#include "WalkTilePosition.h"
+#include "Regions/WalkTilePosition.h"
 
 #define BU_EVAL_FREQ 6
 #define UNIT_DEBUG 1

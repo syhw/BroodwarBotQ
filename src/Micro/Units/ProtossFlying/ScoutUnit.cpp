@@ -1,5 +1,5 @@
 #include <PrecompiledHeader.h>
-#include "ScoutUnit.h"
+#include "Micro/Units/ProtossFlying/ScoutUnit.h"
 
 std::set<BWAPI::UnitType> ScoutUnit::setPrio;
 

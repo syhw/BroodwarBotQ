@@ -1,5 +1,5 @@
 #include <PrecompiledHeader.h>
-#include <BaseManager.h>
+#include "Macro/BaseManager.h"
 Base::Base(BWTA::BaseLocation* location)
 {
   this->baseLocation     = location;

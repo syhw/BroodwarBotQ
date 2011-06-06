@@ -1,7 +1,7 @@
 #include <PrecompiledHeader.h>
 #include "FindSubgoal.h"
 #include "Defines.h"
-#include "ScoutController.h"
+#include "Intelligence/ScoutController.h"
 
 FindSubgoal::FindSubgoal(SubgoalLogic l)
 : Subgoal(l)

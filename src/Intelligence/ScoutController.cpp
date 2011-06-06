@@ -1,7 +1,7 @@
 #include <PrecompiledHeader.h>
 #include "Defines.h"
-#include "ScoutController.h"
-#include "MacroManager.h"
+#include "Intelligence/ScoutController.h"
+#include "Macro/MacroManager.h"
 
 using namespace BWAPI;
 

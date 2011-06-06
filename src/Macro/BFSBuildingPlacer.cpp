@@ -1,7 +1,7 @@
 #include <PrecompiledHeader.h>
-#include <BFSBuildingPlacer.h>
-#include <ReservedMap.h>
-#include <Heap.h>
+#include "Macro/BFSBuildingPlacer.h"
+#include "Macro/ReservedMap.h"
+#include "Macro/Heap.h"
 using namespace std;
 using namespace BWAPI;
 BFSBuildingPlacer* instance = NULL;

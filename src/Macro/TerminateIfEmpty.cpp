@@ -1,5 +1,5 @@
 #include <PrecompiledHeader.h>
-#include <TerminateIfEmpty.h>
+#include "Macro/TerminateIfEmpty.h"
 using namespace BWAPI;
 TerminateIfEmpty::TerminateIfEmpty()
 {

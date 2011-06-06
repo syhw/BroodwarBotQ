@@ -1,7 +1,7 @@
 #pragma once
-#include <Arbitrator.h>
+#include "Macro/Arbitrator.h"
 #include <BWAPI.h>
-#include <BaseManager.h>
+#include "Macro/BaseManager.h"
 class BuildOrderManager;
 class WorkerManager : public Arbitrator::Controller<BWAPI::Unit*,double>
 {

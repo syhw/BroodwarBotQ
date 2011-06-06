@@ -1,7 +1,7 @@
 #include <PrecompiledHeader.h>
 #include <BWTA.h>
-#include <ScoutManager.h>
-#include <UnitGroupManager.h>
+#include "Macro/ScoutManager.h"
+#include "Macro/UnitGroupManager.h"
 std::pair<std::list<BWTA::BaseLocation*>, double> getBestPathHelper(std::set<BWTA::BaseLocation* > baseLocations)
 {
   std::pair<std::list<BWTA::BaseLocation*>, double> shortest_path;

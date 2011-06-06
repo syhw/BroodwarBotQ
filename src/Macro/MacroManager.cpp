@@ -1,7 +1,7 @@
 #include <PrecompiledHeader.h>
-#include <MacroManager.h>
+#include "Macro/MacroManager.h"
 #include <BWAPI.h>
-#include <ResourceRates.h>
+#include "Macro/ResourceRates.h"
 #include <math.h>
 using namespace BWAPI;
 using namespace std;

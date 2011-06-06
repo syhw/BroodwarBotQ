@@ -1,8 +1,8 @@
 #pragma once
 
-#include <SpecialUnit.h>
+#include "Micro/Units/SpecialUnit.h"
 #include <BWAPI.h>
-#include "MapManager.h"
+#include "Regions/MapManager.h"
 
 class HighTemplarUnit : public SpecialUnit
 {

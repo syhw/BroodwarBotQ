@@ -1,5 +1,5 @@
 #include <PrecompiledHeader.h>
-#include "ArbiterUnit.h"
+#include "Micro/Units/ProtossSpecial/ArbiterUnit.h"
 
 std::set<BWAPI::UnitType> ArbiterUnit::setPrio;
 

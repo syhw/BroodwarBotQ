@@ -1,11 +1,11 @@
 #include <PrecompiledHeader.h>
-#include <MacroBaseManager.h>
-#include <MacroManager.h>
-#include <BasicTaskExecutor.h>
-#include <BFSBuildingPlacer.h>
-#include <TerminateIfEmpty.h>
-#include <BasicWorkerFinder.h>
-#include <Task.h>
+#include "Macro/MacroBaseManager.h"
+#include "Macro/MacroManager.h"
+#include "Macro/BasicTaskExecutor.h"
+#include "Macro/BFSBuildingPlacer.h"
+#include "Macro/TerminateIfEmpty.h"
+#include "Macro/BasicWorkerFinder.h"
+#include "Macro/Task.h"
 using namespace BWAPI;
 std::set<Unit*> emptySet;
 MacroBase* MacroBase::CreateBaseNow(BWTA::BaseLocation* b, bool getGas)

@@ -1,5 +1,5 @@
 #include <PrecompiledHeader.h>
-#include "ScourgeUnit.h"
+#include "Micro/Units/ZergFlying/ScourgeUnit.h"
 
 std::set<BWAPI::UnitType> ScourgeUnit::setPrio;
 

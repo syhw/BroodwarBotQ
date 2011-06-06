@@ -1,6 +1,6 @@
 #include <PrecompiledHeader.h>
-#include <SpiralBuildingPlacer.h>
-#include <ReservedMap.h>
+#include "Macro/SpiralBuildingPlacer.h"
+#include "Macro/ReservedMap.h"
 using namespace BWAPI;
 SpiralBuildingPlacer* instance = NULL;
 SpiralBuildingPlacer* SpiralBuildingPlacer::getInstance()

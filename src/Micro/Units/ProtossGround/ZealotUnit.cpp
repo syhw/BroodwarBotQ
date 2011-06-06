@@ -1,7 +1,7 @@
 #include <PrecompiledHeader.h>
-#include "ZealotUnit.h"
-#include "UnitsGroup.h"
-#include "MapManager.h"
+#include "Micro/Units/ProtossGround/ZealotUnit.h"
+#include "Micro/UnitsGroup.h"
+#include "Regions/MapManager.h"
 
 using namespace std;
 using namespace BWAPI;

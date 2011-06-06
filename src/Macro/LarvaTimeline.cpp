@@ -1,6 +1,6 @@
 #include <PrecompiledHeader.h>
-#include <MacroManager/LarvaTimeline.h>
-#include <MacroManager.h>
+#include "Macro/MacroManager/LarvaTimeline.h"
+#include "Macro/MacroManager.h"
 using namespace std;
 using namespace BWAPI;
 

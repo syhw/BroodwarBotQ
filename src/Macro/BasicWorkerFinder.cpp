@@ -1,7 +1,7 @@
 #include <PrecompiledHeader.h>
-#include <BasicWorkerFinder.h>
-#include <Arbitrator.h>
-#include <MacroManager.h>
+#include "Macro/BasicWorkerFinder.h"
+#include "Macro/Arbitrator.h"
+#include "Macro/MacroManager.h"
 using namespace BWAPI;
 void BasicWorkerFinder::update(TaskStream* ts)
 {

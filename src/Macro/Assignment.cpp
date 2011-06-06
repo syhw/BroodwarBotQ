@@ -1,7 +1,7 @@
 #include <PrecompiledHeader.h>
 #include <vector>
 #include <map>
-#include <Macro/RectangleArray.h>
+#include "Macro/RectangleArray.h"
 using namespace std;
 using namespace Util;
 map<int, int> makeAssignments(RectangleArray< double> &cost)

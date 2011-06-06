@@ -1,7 +1,7 @@
 #pragma once
-#include <MacroManager/TaskStreamObserver.h>
-#include <MacroManager/TaskStream.h>
-#include <Macro/RectangleArray.h>
+#include "Macro/MacroManager/TaskStreamObserver.h"
+#include "Macro/MacroManager/TaskStream.h"
+#include "Macro/RectangleArray.h"
 class PylonBuildingPlacer : public TaskStreamObserver
 {
   public:

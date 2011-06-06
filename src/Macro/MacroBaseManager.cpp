@@ -1,6 +1,6 @@
 #include <PrecompiledHeader.h>
-#include <MacroBaseManager.h>
-#include <BorderManager.h>
+#include "Macro/MacroBaseManager.h"
+#include "Macro/BorderManager.h"
 using namespace BWAPI;
 
 MacroBaseManager* TheMacroBaseManager = NULL;

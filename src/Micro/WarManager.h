@@ -2,8 +2,8 @@
 #include <BWAPI.h>
 #include <BWTA.h>
 #include <Utils/CSingleton.h>
-#include <Arbitrator.h>
-#include "InformationManager.h"
+#include <Macro/Arbitrator.h>
+#include "Macro/InformationManager.h"
 
 class UnitsGroup;
 class ScoutController;

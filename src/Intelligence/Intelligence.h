@@ -2,8 +2,8 @@
 #include <PrecompiledHeader.h>
 #include "Intelligence/EUnitsFilter.h"
 #include "ETechEstimator.h"
-#include "MapManager.h"
-#include "ScoutController.h"
+#include "Regions/MapManager.h"
+#include "Intelligence/ScoutController.h"
 
 class Intelligence : public CSingleton<Intelligence>
 {

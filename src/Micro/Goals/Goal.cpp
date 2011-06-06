@@ -1,7 +1,7 @@
 #include <PrecompiledHeader.h>
 #include <algorithm>
-#include "Goal.h"
-#include "UnitsGroup.h"
+#include "Micro/Goals/Goal.h"
+#include "Micro/UnitsGroup.h"
 #include "float.h"
 #include "Defines.h"
 

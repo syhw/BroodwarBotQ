@@ -8,8 +8,8 @@ typedef boost::shared_ptr<Subgoal> pSubgoal;
 #endif
 
 #include <BWAPI.h>
-#include "Formations.h"
-#include "UnitsGroup.h"
+#include "Micro/Formations.h"
+#include "Micro/UnitsGroup.h"
 
 
 typedef enum

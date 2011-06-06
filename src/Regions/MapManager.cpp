@@ -1,8 +1,7 @@
 #include <PrecompiledHeader.h>
-#include <Defines.h>
-#include "MapManager.h"
-#include "UnitGroupManager.h"
-#include "HighTemplarUnit.h"
+#include "Defines.h"
+#include "Regions/MapManager.h"
+#include "Micro/Units/ProtossSpecial/HighTemplarUnit.h"
 
 #define __MESH_SIZE__ 32 // 16 // 24 // 32 // 48
 #define __STORM_SIZE__ 96

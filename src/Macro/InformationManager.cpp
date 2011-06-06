@@ -1,6 +1,6 @@
 #include <PrecompiledHeader.h>
-#include <InformationManager.h>
-#include "Util.h"
+#include "Macro/InformationManager.h"
+#include "Utils/Util.h"
 using namespace std;
 using namespace BWAPI;
 

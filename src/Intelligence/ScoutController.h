@@ -1,16 +1,16 @@
 #pragma once
-#include <Utils/CSingleton.h>
-#include <Arbitrator.h>
+#include "Utils/CSingleton.h"
+#include "Macro/Arbitrator.h"
 #include <BWAPI.h>
 #include <BWTA.h>
-#include "Goal.h"
-#include "Subgoal.h"
-#include "FindEnemyGoal.h"
+#include "Micro/Goals/Goal.h"
+#include "Micro/Goals/Subgoal.h"
+#include "Micro/Goals/FindEnemyGoal.h"
 #include "Intelligence/EUnitsFilter.h"
-#include "SeeSubgoal.h"
-#include "FindSubgoal.h"
-#include "WarManager.h"
-#include "ExploreGoal.h"
+#include "Micro/Goals/SeeSubgoal.h"
+#include "Micro/Goals/FindSubgoal.h"
+#include "Micro/WarManager.h"
+#include "Micro/Goals/ExploreGoal.h"
 
 class GoalManager;
 

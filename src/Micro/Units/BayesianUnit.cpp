@@ -1,9 +1,9 @@
 #include <PrecompiledHeader.h>
-#include "BayesianUnit.h"
-#include "Rainbow.h"
-#include <Defines.h>
-#include "UnitsGroup.h"
-#include "Util.h"
+#include "Micro/Units/BayesianUnit.h"
+#include "Utils/Rainbow.h"
+#include "Defines.h"
+#include "Micro/UnitsGroup.h"
+#include "Utils/Util.h"
 #include <set>
 
 // Copyright 2010-2011 <Gabriel Synnaeve> gabriel.synnaeve@gmail.com
@@ -16,10 +16,10 @@
 #define __NOT_IN_RANGE_BY__ 128.1
 #define __SAMPLE_DIR__
 #ifdef __SAMPLE_DIR__
-#include <RandomGenerators.h>
+#include "Utils/RandomGenerators.h"
 #endif
 #ifdef __LEARNING_PROB_TABLES__
-#include <RandomGenerators.h>
+#include "Utils/RandomGenerators.h"
 #endif
 
 using namespace std;

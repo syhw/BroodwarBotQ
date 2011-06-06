@@ -1,6 +1,6 @@
 #include <PrecompiledHeader.h>
-#include <BasicTaskExecutor.h>
-#include <MacroManager.h>
+#include "Macro/BasicTaskExecutor.h"
+#include "Macro/MacroManager.h"
 using namespace BWAPI;
 BasicTaskExecutor* instance = NULL;
 BasicTaskExecutor* BasicTaskExecutor::getInstance()

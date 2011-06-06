@@ -1,8 +1,8 @@
 #pragma once
-#include <Arbitrator.h>
+#include "Macro/Arbitrator.h"
 #include <BWAPI.h>
-#include <BuildManager.h>
-#include <BuildOrderManager.h>
+#include "Macro/BuildManager.h"
+#include "Macro/BuildOrderManager.h"
 class SupplyManager
 {
   public:

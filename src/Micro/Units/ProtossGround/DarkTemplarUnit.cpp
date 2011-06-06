@@ -1,5 +1,5 @@
 #include <PrecompiledHeader.h>
-#include "DarkTemplarUnit.h"
+#include "Micro/Units/ProtossGround/DarkTemplarUnit.h"
 
 std::set<BWAPI::UnitType> DarkTemplarUnit::setPrio;
 

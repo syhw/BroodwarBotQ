@@ -7,7 +7,7 @@ typedef boost::shared_ptr<Goal> pGoal;
 #include <BWAPI.h>
 #include <BWTA.h>
 #include <windows.h>
-#include "Formations.h"
+#include "Micro/Formations.h"
 #include <list>
 
 class UnitsGroup;

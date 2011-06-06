@@ -1,5 +1,5 @@
 #include <PrecompiledHeader.h>
-#include <Resources.h>
+#include "Macro/Resources.h"
 Resources::Resources(BWAPI::Player* player)
 {
   if (player==NULL)

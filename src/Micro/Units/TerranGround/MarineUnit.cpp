@@ -1,7 +1,7 @@
 #include <PrecompiledHeader.h>
-#include "MarineUnit.h"
-#include "UnitsGroup.h"
-#include "MapManager.h"
+#include "Micro/Units/TerranGround/MarineUnit.h"
+#include "Micro/UnitsGroup.h"
+#include "Regions/MapManager.h"
 
 using namespace std;
 using namespace BWAPI;

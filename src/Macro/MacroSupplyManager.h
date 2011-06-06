@@ -1,7 +1,7 @@
 #pragma once
-#include <Arbitrator.h>
+#include "Macro/Arbitrator.h"
 #include <BWAPI.h>
-#include <MacroManager.h>
+#include "Macro/MacroManager.h"
 class MacroSupplyManager
 {
   public:

@@ -1,13 +1,13 @@
 #include <PrecompiledHeader.h>
-#include <BuildOrderManager.h>
-#include <BuildManager.h>
-#include <TechManager.h>
-#include <UpgradeManager.h>
-#include <WorkerManager.h>
-#include <SupplyManager.h>
+#include "Macro/BuildOrderManager.h"
+#include "Macro/BuildManager.h"
+#include "Macro/TechManager.h"
+#include "Macro/UpgradeManager.h"
+#include "Macro/WorkerManager.h"
+#include "Macro/SupplyManager.h"
 #include <algorithm>
 #include <stdarg.h>
-#include <UnitGroupManager.h>
+#include "Macro/UnitGroupManager.h"
 using namespace std;
 using namespace BWAPI;
 map<BWAPI::UnitType, map<BWAPI::UnitType, UnitItem* > >* globalUnitSet;

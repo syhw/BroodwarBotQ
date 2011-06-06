@@ -1,9 +1,9 @@
 #include <PrecompiledHeader.h>
-#include <BuildManager.h>
-#include <BuildingPlacer.h>
-#include <ConstructionManager.h>
-#include <ProductionManager.h>
-#include <MorphManager.h>
+#include "Macro/BuildManager.h"
+#include "Macro/BuildingPlacer.h"
+#include "Macro/ConstructionManager.h"
+#include "Macro/ProductionManager.h"
+#include "Macro/MorphManager.h"
 BuildManager::BuildManager(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator)
 {
   this->arbitrator=arbitrator;

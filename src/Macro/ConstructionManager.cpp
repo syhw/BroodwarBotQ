@@ -1,6 +1,6 @@
 #include <PrecompiledHeader.h>
-#include <ConstructionManager.h>
-#include <UnitGroupManager.h>
+#include "Macro/ConstructionManager.h"
+#include "Macro/UnitGroupManager.h"
 ConstructionManager::ConstructionManager(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator, BuildingPlacer* placer)
 {
   this->arbitrator   = arbitrator;

@@ -1,5 +1,5 @@
 #include <PrecompiledHeader.h>
-#include "GoalManager.h"
+#include "Micro/Goals/GoalManager.h"
 
 using namespace BWAPI;
 GoalManager::GoalManager()

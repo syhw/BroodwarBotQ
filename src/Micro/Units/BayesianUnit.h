@@ -3,10 +3,10 @@
 #include <BWAPI.h>
 #include <BWTA.h>
 #include <math.h>
-#include "Utils/Utils/Vec.h"
+#include "Utils/Vec.h"
 #include "BattleUnit.h"
-#include "MapManager.h"
-//#include "UnitsGroup.h"
+#include "Regions/MapManager.h"
+//#include "Micro/UnitsGroup.h"
 #include <map>
 #include <set>
 #include <boost/archive/text_oarchive.hpp>

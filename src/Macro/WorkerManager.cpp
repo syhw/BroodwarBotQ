@@ -1,11 +1,11 @@
 #include <PrecompiledHeader.h>
-#include <WorkerManager.h>
-#include <BaseManager.h>
-#include <Macro/RectangleArray.h>
-#include <BuildOrderManager.h>
-#include <UnitGroupManager.h>
+#include "Macro/WorkerManager.h"
+#include "Macro/BaseManager.h"
+#include "Macro/RectangleArray.h"
+#include "Macro/BuildOrderManager.h"
+#include "Macro/UnitGroupManager.h"
 #include <algorithm>
-#include "Util.h"
+#include "Utils/Util.h"
 using namespace BWAPI;
 using namespace std;
 using namespace Util;

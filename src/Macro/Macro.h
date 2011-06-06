@@ -1,23 +1,23 @@
 #pragma once
 #include <Utils/CSingleton.h>
-#include <BasicTaskExecutor.h>
-#include <SpiralBuildingPlacer.h>
-#include <BFSBuildingPlacer.h>
-#include <UnitPump.h>
-#include <TerminateIfWorkerLost.h>
-#include <TerminateIfEmpty.h>
-#include <BasicWorkerFinder.h>
-#include <UnitCompositionProducer.h>
-#include <MacroManager.h>
-#include <ResourceRates.h>
-#include <MacroSupplyManager.h>
-#include <MacroDependencyResolver.h>
-#include <InformationManager.h>
-#include <BorderManager.h>
-#include <MacroBaseManager.h>
-#include <UnitGroupManager.h>
-#include <MacroWorkerManager.h>
-#include <ReservedMap.h>
+#include "Macro/BasicTaskExecutor.h"
+#include "Macro/SpiralBuildingPlacer.h"
+#include "Macro/BFSBuildingPlacer.h"
+#include "Macro/UnitPump.h"
+#include "Macro/TerminateIfWorkerLost.h"
+#include "Macro/TerminateIfEmpty.h"
+#include "Macro/BasicWorkerFinder.h"
+#include "Macro/UnitCompositionProducer.h"
+#include "Macro/MacroManager.h"
+#include "Macro/ResourceRates.h"
+#include "Macro/MacroSupplyManager.h"
+#include "Macro/MacroDependencyResolver.h"
+#include "Macro/InformationManager.h"
+#include "Macro/BorderManager.h"
+#include "Macro/MacroBaseManager.h"
+#include "Macro/UnitGroupManager.h"
+#include "Macro/MacroWorkerManager.h"
+#include "Macro/ReservedMap.h"
 
 class Macro: public CSingleton<Macro>
 {

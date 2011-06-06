@@ -1,5 +1,5 @@
 #include <PrecompiledHeader.h>
-#include <TerminateIfWorkerLost.h>
+#include "Macro/TerminateIfWorkerLost.h"
 using namespace BWAPI;
 TerminateIfWorkerLost::TerminateIfWorkerLost()
 {

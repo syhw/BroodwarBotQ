@@ -4,8 +4,8 @@
 #include <windows.h>
 #include "Defines.h"
 #include "Intelligence/Intelligence.h"
-#include "Macro.h"
-#include "Micro.h"
+#include "Macro/Macro.h"
+#include "Micro/Micro.h"
 
 class BattleBroodAI;
 extern BattleBroodAI* broodAI;

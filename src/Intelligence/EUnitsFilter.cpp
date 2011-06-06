@@ -1,5 +1,5 @@
 #include <PrecompiledHeader.h>
-#include "Intelligence/Intelligence/EUnitsFilter.h"
+#include "Intelligence/EUnitsFilter.h"
 
 using namespace BWAPI;
 using namespace std;

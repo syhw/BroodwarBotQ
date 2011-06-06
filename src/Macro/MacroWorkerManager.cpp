@@ -1,10 +1,10 @@
 #include <PrecompiledHeader.h>
-#include <MacroWorkerManager.h>
-#include <MacroBaseManager.h>
-#include <Macro/RectangleArray.h>
-#include <MacroManager.h>
-#include <UnitGroupManager.h>
-#include "Util.h"
+#include "Macro/MacroWorkerManager.h"
+#include "Macro/MacroBaseManager.h"
+#include "Macro/RectangleArray.h"
+#include "Macro/MacroManager.h"
+#include "Macro/UnitGroupManager.h"
+#include "Utils/Util.h"
 using namespace BWAPI;
 using namespace std;
 using namespace Util;

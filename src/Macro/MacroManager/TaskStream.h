@@ -1,8 +1,8 @@
 #pragma once
-#include <Task.h>
-#include <Arbitrator.h>
+#include "Macro/Task.h"
+#include "Macro/Arbitrator.h"
 #include <BWAPI.h>
-#include <MacroManager.h>
+#include "Macro/MacroManager.h"
 
 class TaskStreamObserver;
 class TaskStream

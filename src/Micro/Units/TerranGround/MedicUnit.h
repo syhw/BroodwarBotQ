@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Defines.h"
-#include <GroundUnit.h>
+#include "Micro/Units/GroundUnit.h"
 #include <BWAPI.h>
 
 class MedicUnit : public GroundUnit

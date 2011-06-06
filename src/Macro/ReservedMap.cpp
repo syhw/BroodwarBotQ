@@ -1,5 +1,5 @@
 #include <PrecompiledHeader.h>
-#include <ReservedMap.h>
+#include "Macro/ReservedMap.h"
 using namespace BWAPI;
 ReservedMap* TheReservedMap = NULL;
 ReservedMap* ReservedMap::create()

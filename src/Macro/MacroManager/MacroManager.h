@@ -1,14 +1,14 @@
 #pragma once
 #include <BWAPI.h>
-#include <BWSAL.h>
-#include <Arbitrator.h>
-#include <ResourceTimeline.h>
-#include <UnitCountTimeline.h>
-#include <TechTimeline.h>
-#include <UpgradeTimeline.h>
-#include <MacroManager/WorkerTaskTimeline.h>
-#include <MacroManager/LarvaTimeline.h>
-#include <Task.h>
+#include "Macro/BWSAL.h"
+#include "Macro/Arbitrator.h"
+#include "ResourceTimeline.h"
+#include "UnitCountTimeline.h"
+#include "TechTimeline.h"
+#include "UpgradeTimeline.h"
+#include "MacroManager/WorkerTaskTimeline.h"
+#include "MacroManager/LarvaTimeline.h"
+#include "Task.h"
 class TaskStream;
 class MacroManager : public Arbitrator::Controller<BWAPI::Unit*,double>
 {

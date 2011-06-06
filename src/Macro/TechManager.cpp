@@ -1,5 +1,5 @@
 #include <PrecompiledHeader.h>
-#include <TechManager.h>
+#include "Macro/TechManager.h"
 
 TechManager::TechManager(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator)
 {

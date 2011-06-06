@@ -1,6 +1,6 @@
 #pragma once
 #include <BWAPI.h>
-#include <Resources.h>
+#include "Macro/Resources.h"
 namespace TaskTypes
 {
   enum Enum

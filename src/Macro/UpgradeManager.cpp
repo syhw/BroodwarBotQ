@@ -1,5 +1,5 @@
 #include <PrecompiledHeader.h>
-#include <UpgradeManager.h>
+#include "Macro/UpgradeManager.h"
 
 UpgradeManager::UpgradeManager(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator)
 {

@@ -1,6 +1,6 @@
 #include <PrecompiledHeader.h>
-#include <MacroManager/WorkerTaskTimeline.h>
-#include <MacroManager.h>
+#include "Macro/MacroManager/WorkerTaskTimeline.h"
+#include "Macro/MacroManager.h"
 using namespace std;
 using namespace BWAPI;
 

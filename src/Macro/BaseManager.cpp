@@ -1,7 +1,7 @@
 #include <PrecompiledHeader.h>
-#include <BaseManager.h>
-#include <BuildOrderManager.h>
-#include <BorderManager.h>
+#include "Macro/BaseManager.h"
+#include "Macro/BuildOrderManager.h"
+#include "Macro/BorderManager.h"
 BaseManager::BaseManager()
 {
   this->builder = NULL;

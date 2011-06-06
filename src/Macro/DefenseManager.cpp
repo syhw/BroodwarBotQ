@@ -1,6 +1,6 @@
 #include <PrecompiledHeader.h>
-#include <DefenseManager.h>
-#include <BorderManager.h>
+#include "Macro/DefenseManager.h"
+#include "Macro/BorderManager.h"
 DefenseManager::DefenseManager(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator)
 {
   this->arbitrator = arbitrator;

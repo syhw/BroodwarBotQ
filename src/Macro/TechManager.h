@@ -1,7 +1,7 @@
 #pragma once
-#include <Arbitrator.h>
+#include "Macro/Arbitrator.h"
 #include <BWAPI.h>
-#include <BuildingPlacer.h>
+#include "Macro/BuildingPlacer.h"
 class TechManager : public Arbitrator::Controller<BWAPI::Unit*,double>
 {
   public:

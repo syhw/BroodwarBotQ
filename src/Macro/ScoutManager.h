@@ -1,6 +1,6 @@
 #pragma once
-#include <Arbitrator.h>
-#include <InformationManager.h>
+#include "Macro/Arbitrator.h"
+#include "Macro/InformationManager.h"
 #include <BWAPI.h>
 
 class ScoutManager : public Arbitrator::Controller<BWAPI::Unit*,double>

@@ -1,5 +1,5 @@
 #include <PrecompiledHeader.h>
-#include "Micro.h"
+#include "Micro/Micro.h"
 
 using namespace BWAPI;
 

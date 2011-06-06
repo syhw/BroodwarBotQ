@@ -1,5 +1,5 @@
 #include <PrecompiledHeader.h>
-#include "FindEnemyGoal.h"
+#include "Micro/Goals/FindEnemyGoal.h"
 
 FindEnemyGoal::FindEnemyGoal()
 {

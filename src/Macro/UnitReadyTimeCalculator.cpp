@@ -1,6 +1,6 @@
 #include <PrecompiledHeader.h>
-#include <MacroManager/UnitReadyTimeCalculator.h>
-#include <MacroManager.h>
+#include "Macro/MacroManager/UnitReadyTimeCalculator.h"
+#include "Macro/MacroManager.h"
 using namespace BWAPI;
 using namespace std;
 map<BWAPI::UnitType, set<BWAPI::UnitType> > makesURTC; // TODO remove?

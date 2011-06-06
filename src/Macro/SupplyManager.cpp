@@ -1,6 +1,6 @@
 #include <PrecompiledHeader.h>
-#include <SupplyManager.h>
-#include <UnitGroupManager.h>
+#include "Macro/SupplyManager.h"
+#include "Macro/UnitGroupManager.h"
 SupplyManager::SupplyManager()
 {
   this->buildManager      = NULL;
