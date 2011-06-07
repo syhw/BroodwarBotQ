@@ -47,14 +47,24 @@ struct i_dist
 	//bool operator<(i_dist& ext) { return (ext.dist < dist); }
 };
 
-class UnitsGroup
+class BasicUnitsGroup
+{
+protected:
+	std::list<pGoal> goals;
+public:
+	std::vector<pBayesianUnit> units;
+	virtual void setGoals(std::list<pGoal>& goals);
+	virtual void addGoal(pGoal goal);
+    virtual void addGoalFront(pGoal goal);
+};
+
+class UnitsGroup : public BasicUnitsGroup
 {
 private:
 	int totalHP;
     int totalMinPrice;
     int totalGazPrice;
     int totalSupply;
-	std::list<pGoal> goals;
     EUnitsFilter* _eUnitsFilter;
     std::set<BWAPI::Unit*> _mergersHT;
     bool _alignFormation;
@@ -65,7 +75,6 @@ private:
 public:
 	bool isWaiting(); //Return if the 1st goal is accomplished && no other goals
 	pGoal getLastGoal();
-	std::vector<pBayesianUnit> units;
     std::list<pBayesianUnit> arrivingUnits;
     std::vector<BWAPI::Position> ppath;
     std::map<BWAPI::Unit*, BWAPI::Position> enemies;
@@ -94,9 +103,6 @@ public:
 	virtual void move(BWAPI::Position& p);
 
 	virtual void formation(pFormation f);
-	virtual void setGoals(std::list<pGoal>& goals);
-	virtual void addGoal(pGoal goal);
-    virtual void addGoalFront(pGoal goal);
 	
 	inline void updateCenter();
     virtual BWAPI::Position getCenter() const;

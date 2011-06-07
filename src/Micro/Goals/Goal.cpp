@@ -2,7 +2,6 @@
 #include <algorithm>
 #include "Micro/Goals/Goal.h"
 #include "Micro/UnitsGroup.h"
-#include "float.h"
 #include "Defines.h"
 
 Goal::~Goal()
@@ -14,14 +13,14 @@ Goal::Goal()
 {
 }
 
-Goal::Goal(UnitsGroup * ug)
+Goal::Goal(BasicUnitsGroup * ug)
 : status(GS_IN_PROGRESS)
 , unitsGroup(ug)
 , firstFrame(BWAPI::Broodwar->getFrameCount())
 {
 }
 
-Goal::Goal(UnitsGroup * ug, pSubgoal s)
+Goal::Goal(BasicUnitsGroup * ug, pSubgoal s)
 : status(GS_IN_PROGRESS)
 , unitsGroup(ug)
 , firstFrame(BWAPI::Broodwar->getFrameCount())
@@ -123,7 +122,7 @@ void Goal::setStatus(GoalStatus s)
 
 
 
-void Goal::setUnitsGroup(UnitsGroup * ug)
+void Goal::setUnitsGroup(BasicUnitsGroup * ug)
 {
 	this->status = GS_IN_PROGRESS;
 	for (std::list<pSubgoal>::iterator it = this->subgoals.begin(); it != subgoals.end(); ++it)

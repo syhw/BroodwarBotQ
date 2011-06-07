@@ -10,7 +10,7 @@ typedef boost::shared_ptr<Goal> pGoal;
 #include "Micro/Formations.h"
 #include <list>
 
-class UnitsGroup;
+class BasicUnitsGroup;
 class Subgoal;
 
 typedef enum
@@ -25,19 +25,19 @@ typedef enum
 class Goal
 {
 protected:
-	UnitsGroup * unitsGroup;        //Use setUnitsGroup
+	BasicUnitsGroup * unitsGroup;   //Use setUnitsGroup
 	std::list<pSubgoal> subgoals;   //The subgoals cannot be shared
 	GoalStatus status;              /**< status of the goal */
     int firstFrame;
 
 public:
-	void setUnitsGroup(UnitsGroup * ug);
+	void setUnitsGroup(BasicUnitsGroup * ug);
 	
 
 	//Constructors
 	Goal();//Don't forget to set the unitsGroup
-	Goal(UnitsGroup * ug);
-    Goal(UnitsGroup * ug, pSubgoal s);
+	Goal(BasicUnitsGroup * ug);
+    Goal(BasicUnitsGroup * ug, pSubgoal s);
 	virtual ~Goal();
 	
 	virtual void achieve();//Start the goal

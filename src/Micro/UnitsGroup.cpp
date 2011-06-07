@@ -486,14 +486,14 @@ void UnitsGroup::formation(pFormation f)
 
 }
 
-void UnitsGroup::setGoals(std::list<pGoal>& goals)
+void BasicUnitsGroup::setGoals(std::list<pGoal>& goals)
 {
     this->goals = goals;
 	if(!this->goals.empty())
 		this->goals.front()->achieve();
 }
 
-void UnitsGroup::addGoal(pGoal goal)
+void BasicUnitsGroup::addGoal(pGoal goal)
 {
     this->goals.push_back(goal);
 	goal->setUnitsGroup(this);
@@ -501,7 +501,7 @@ void UnitsGroup::addGoal(pGoal goal)
    // this->goals.front()->achieve();
 }
 
-void UnitsGroup::addGoalFront(pGoal goal)
+void BasicUnitsGroup::addGoalFront(pGoal goal)
 {
     this->goals.push_front(goal);
     goal->setUnitsGroup(this);
@@ -802,11 +802,9 @@ pGoal UnitsGroup::getLastGoal(){
 }
 
 bool UnitsGroup::isWaiting(){
-
 	if(goals.size() <= 0)
 		//Problematic situation
 		return true;
-
 	return goals.size() == 1 && (*goals.front()).getStatus() == GS_ACHIEVED ;
 }
 
