@@ -27,6 +27,14 @@ WarManager::~WarManager()
 
 void WarManager::update()
 {
+	/*
+	int count = 0;
+	for (std::list<UnitsGroup *>::const_iterator it = this->unitsGroups.begin();
+		it != unitsGroups.end(); ++it)
+		count += (*it)->getUnits()->size();
+	Broodwar->printf("I have: %d units groups and %d units total", unitsGroups.size(), count);
+	*/
+
     /*if (!ScoutController::Instance().enemyFound && Broodwar->getFrameCount() > 4320)
     {
         for (std::list<UnitsGroup*>::iterator it = unitsGroups.begin();

@@ -4,7 +4,7 @@
 
 int HighTemplarUnit::lastStormableUnitsUpdateFrame;
 
-HighTemplarUnit::HighTemplarUnit(BWAPI::Unit* u, UnitsGroup* ug)
+HighTemplarUnit::HighTemplarUnit(BWAPI::Unit* u, BasicUnitsGroup* ug)
 : SpecialUnit(u, ug)
 , _lastStormFrame(0)
 , _mergingFrame(0)

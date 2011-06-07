@@ -3,7 +3,7 @@
 
 std::set<BWAPI::UnitType> ArbiterUnit::setPrio;
 
-ArbiterUnit::ArbiterUnit(BWAPI::Unit* u, UnitsGroup* ug)
+ArbiterUnit::ArbiterUnit(BWAPI::Unit* u, BasicUnitsGroup* ug)
 : FlyingUnit(u, ug)
 {
     if (setPrio.empty())

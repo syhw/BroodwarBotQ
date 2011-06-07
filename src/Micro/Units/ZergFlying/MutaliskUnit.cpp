@@ -5,7 +5,7 @@ using namespace BWAPI;
 
 std::set<BWAPI::UnitType> MutaliskUnit::setPrio;
 
-MutaliskUnit::MutaliskUnit(BWAPI::Unit* u, UnitsGroup* ug)
+MutaliskUnit::MutaliskUnit(BWAPI::Unit* u, BasicUnitsGroup* ug)
 : FlyingUnit(u, ug)
 {
     if (setPrio.empty())

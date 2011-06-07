@@ -33,7 +33,7 @@ using namespace BWAPI;
 #define _PROB_GO_OBJ 0.9
 ///#define _PROB_GO_NOT_VISIBLE 0.4
 
-BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug,
+BayesianUnit::BayesianUnit(Unit* u, BasicUnitsGroup* ug,
 						   const ProbTables* probTables)
 : BattleUnit(u)
 , _pathMutex(CreateMutex( 

@@ -4,7 +4,7 @@
 
 std::set<BWAPI::UnitType> ArchonUnit::setPrio;
 
-ArchonUnit::ArchonUnit(BWAPI::Unit* u, UnitsGroup* ug)
+ArchonUnit::ArchonUnit(BWAPI::Unit* u, BasicUnitsGroup* ug)
 : GroundUnit(u, ug)
 {
     if (setPrio.empty())

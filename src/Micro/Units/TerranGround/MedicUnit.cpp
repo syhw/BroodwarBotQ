@@ -10,7 +10,7 @@ ProbTables MedicUnit::_sProbTables = ProbTables(BWAPI::UnitTypes::Terran_Medic.g
 
 std::set<BWAPI::UnitType> MedicUnit::setPrio;
 
-MedicUnit::MedicUnit(BWAPI::Unit* u, UnitsGroup* ug)
+MedicUnit::MedicUnit(BWAPI::Unit* u, BasicUnitsGroup* ug)
 : GroundUnit(u, ug, &_sProbTables)
 {
     _fleeingDmg = 32; // one round of storm = 14

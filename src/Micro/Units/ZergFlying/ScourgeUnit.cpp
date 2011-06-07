@@ -5,7 +5,7 @@ std::set<BWAPI::UnitType> ScourgeUnit::setPrio;
 
 std::set<BWAPI::Unit*> ScourgeUnit::alreadyTargeted;
 
-ScourgeUnit::ScourgeUnit(BWAPI::Unit* u, UnitsGroup* ug)
+ScourgeUnit::ScourgeUnit(BWAPI::Unit* u, BasicUnitsGroup* ug)
 : FlyingUnit(u, ug)
 {
     if (setPrio.empty())

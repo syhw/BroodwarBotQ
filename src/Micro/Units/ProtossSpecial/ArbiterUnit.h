@@ -8,7 +8,7 @@ class ArbiterUnit : public FlyingUnit
 protected:
     static std::set<BWAPI::UnitType> setPrio;
 public:
-    ArbiterUnit(BWAPI::Unit* u, UnitsGroup* ug);
+    ArbiterUnit(BWAPI::Unit* u, BasicUnitsGroup* ug);
     ~ArbiterUnit();
     virtual void micro();
     virtual void check();

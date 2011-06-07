@@ -44,7 +44,6 @@ UnitsGroup::UnitsGroup()
 , totalMinPrice(0)
 , totalGazPrice(0)
 , totalSupply(0)
-, _alignFormation(true)
 , _hasDetection(0)
 , enemiesCenter(Position(0, 0))
 {
@@ -540,21 +539,13 @@ double UnitsGroup::getDistance(BWAPI::Unit* u) const
     return Vec(center - u->getPosition()).norm();
 }
 
-void UnitsGroup::takeControl(Unit* u)
-{//TOCHECK FOR THE GOAL MANAGEMENT
-    //for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
-    //{
-    //    if ((*it)->unit == u)
-    //        return;
-    //}
+pBayesianUnit BasicUnitsGroup::addUnit(Unit* u)
+{
     pBayesianUnit tmp;
     if (u->getType() == BWAPI::UnitTypes::Protoss_Arbiter)
         tmp = pBayesianUnit(new ArbiterUnit(u, this));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Archon)
-    {
-        _alignFormation = false;
         tmp = pBayesianUnit(new ArchonUnit(u, this));
-    }
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Carrier)
         tmp = pBayesianUnit(new CarrierUnit(u, this));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Corsair)
@@ -578,10 +569,7 @@ void UnitsGroup::takeControl(Unit* u)
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Shuttle)
         tmp = pBayesianUnit(new ShuttleUnit(u, this));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Zealot)
-    {
-        _alignFormation = false;
         tmp = pBayesianUnit(new ZealotUnit(u, this));
-    }
     else if (u->getType() == BWAPI::UnitTypes::Zerg_Mutalisk)
         tmp = pBayesianUnit(new MutaliskUnit(u, this));
     else if (u->getType() == BWAPI::UnitTypes::Zerg_Scourge)
@@ -591,20 +579,28 @@ void UnitsGroup::takeControl(Unit* u)
 	else if (u->getType() == BWAPI::UnitTypes::Terran_Medic)
 		tmp = pBayesianUnit(new MedicUnit(u, this));
     else
-        Broodwar->printf("Cette race n'est pas correctement gérée par l'IA pour le moment !");
+	{
+        Broodwar->printf("This race/unit is not implemented");
+		return tmp;
+	}
+	return tmp;
+}
 
+void UnitsGroup::takeControl(Unit* u)
+{
+	pBayesianUnit tmp = addUnit(u);
 #ifdef __ARRIVING__UNITS__
     if (u->getDistance(center) < __MAX_DISTANCE_TO_GROUP__ || !units.size())
     {
 #endif
-        if (tmp != NULL)
+		if (tmp.get() != NULL)
             this->units.push_back(tmp);
 #ifdef __ARRIVING__UNITS__
     }
     else
     {
         u->attack(center);
-        if (tmp != NULL)
+        if (tmp.get() != NULL)
             this->arrivingUnits.push_back(tmp);
     }
 #endif
@@ -613,14 +609,9 @@ void UnitsGroup::takeControl(Unit* u)
     totalMinPrice += u->getType().mineralPrice();
     totalGazPrice += u->getType().gasPrice();
     totalSupply += u->getType().supplyRequired();
-	/*if(this->goals.size()==1){
-		if(this->goals.front()->getStatus()==GS_ACHIEVED){
-			goals.front()->achieve();
-		}
-	}*/
 }
 
-void UnitsGroup::giveUpControl(Unit* u)
+void BasicUnitsGroup::removeUnit(Unit* u)
 {
     for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
         if ((*it)->unit == u)
@@ -628,6 +619,11 @@ void UnitsGroup::giveUpControl(Unit* u)
             units.erase(it);
             break;
         }
+}
+
+void UnitsGroup::giveUpControl(Unit* u)
+{
+	removeUnit(u);
     if (u->getType() == UnitTypes::Protoss_Observer)
     {
         _hasDetection = false;
@@ -643,11 +639,11 @@ void UnitsGroup::giveUpControl(Unit* u)
     totalSupply -= u->getType().supplyRequired();
 }
 
-bool UnitsGroup::emptyUnits()
+bool BasicUnitsGroup::emptyUnits()
 {
     return units.empty();
 }
-bool UnitsGroup::emptyGoals()
+bool BasicUnitsGroup::emptyGoals()
 {
     return goals.empty();
 }
@@ -714,7 +710,7 @@ void UnitsGroup::display()
 	
 }
 
-int UnitsGroup::size() const
+int BasicUnitsGroup::size() const
 {
     return units.size();
 }
@@ -772,7 +768,7 @@ void UnitsGroup::selectedUnits(std::set<pBayesianUnit>& u)
 #endif
 
 
-void UnitsGroup::accomplishGoal()
+void BasicUnitsGroup::accomplishGoal()
 {	
 	if(goals.size() > 0){
 		if (goals.front()->getStatus() != GS_ACHIEVED) {

@@ -1,7 +1,7 @@
 #include <PrecompiledHeader.h>
 #include "Micro/Units/ProtossGround/ProbeUnit.h"
 
-ProbeUnit::ProbeUnit(BWAPI::Unit* u, UnitsGroup* ug)
+ProbeUnit::ProbeUnit(BWAPI::Unit* u, BasicUnitsGroup* ug)
 : GroundUnit(u, ug)
 {
 }

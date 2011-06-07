@@ -26,6 +26,7 @@ typedef boost::shared_ptr<BayesianUnit> pBayesianUnit;
 // TODO, this class has to be derived to take Flying/Ground/Special Units 
 // (templars, tanks, lurkers, etc.) into account
 
+class BasicUnitsGroup;
 class UnitsGroup;
 
 enum occupation_type {
@@ -207,7 +208,7 @@ public:
     int getMaxDimension();
     void updatePPath();
     Vec dir, obj; // dir=current direction, obj=pathfinder's direction
-    BayesianUnit(BWAPI::Unit* u, UnitsGroup* ug, const ProbTables* probTables);
+    BayesianUnit(BWAPI::Unit* u, BasicUnitsGroup* ug, const ProbTables* probTables);
     ~BayesianUnit();
     BWAPI::UnitType getType();
 

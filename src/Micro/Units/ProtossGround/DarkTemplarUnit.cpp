@@ -3,7 +3,7 @@
 
 std::set<BWAPI::UnitType> DarkTemplarUnit::setPrio;
 
-DarkTemplarUnit::DarkTemplarUnit(BWAPI::Unit* u, UnitsGroup* ug)
+DarkTemplarUnit::DarkTemplarUnit(BWAPI::Unit* u, BasicUnitsGroup* ug)
 : GroundUnit(u, ug)
 {
     if (setPrio.empty())

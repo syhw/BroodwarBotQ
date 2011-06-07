@@ -4,21 +4,13 @@
 FindEnemyGoal::FindEnemyGoal()
 {
 	scoutController = & ScoutController::Instance();
-	warManager = & WarManager::Instance();
-
 	//Scout the different possible bases
 	BWTA::BaseLocation * myStartLocation = BWTA::getStartLocation(BWAPI::Broodwar->self());
 	std::set<BWTA::BaseLocation*> path = BWTA::getStartLocations();
-    if (Broodwar->getFrameCount() > 4320) // 4 minutes, in case of CC lift
-        path = BWTA::getBaseLocations();
-		
 	for (std::set<BWTA::BaseLocation*>::iterator p=path.begin(); p!=path.end(); p++)
     {
 		if ((*p) != myStartLocation)
-        {
-            Position debug = (*p)->getPosition();
 			addSubgoal(pSubgoal(new SeeSubgoal(SL_AND, (*p)->getPosition())));
-		}
 	}
 	addSubgoal(pSubgoal(new FindSubgoal(SL_OR)));
 }

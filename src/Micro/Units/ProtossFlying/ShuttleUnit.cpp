@@ -1,7 +1,7 @@
 #include <PrecompiledHeader.h>
 #include "Micro/Units/ProtossFlying/ShuttleUnit.h"
 
-ShuttleUnit::ShuttleUnit(BWAPI::Unit* u, UnitsGroup* ug)
+ShuttleUnit::ShuttleUnit(BWAPI::Unit* u, BasicUnitsGroup* ug)
 : FlyingUnit(u, ug)
 {
 }

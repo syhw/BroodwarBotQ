@@ -5,7 +5,7 @@
 class FlyingUnit : public BayesianUnit
 {
 public:
-	FlyingUnit(BWAPI::Unit* u, UnitsGroup* ug);
+	FlyingUnit(BWAPI::Unit* u, BasicUnitsGroup* ug);
 	~FlyingUnit();
 	virtual void micro() = 0;
 	virtual void check() = 0;

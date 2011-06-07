@@ -53,9 +53,16 @@ protected:
 	std::list<pGoal> goals;
 public:
 	std::vector<pBayesianUnit> units;
-	virtual void setGoals(std::list<pGoal>& goals);
-	virtual void addGoal(pGoal goal);
-    virtual void addGoalFront(pGoal goal);
+	void setGoals(std::list<pGoal>& goals);
+	void addGoal(pGoal goal);
+    void addGoalFront(pGoal goal);
+    // Units interface
+    pBayesianUnit addUnit(BWAPI::Unit* u);
+    void removeUnit(BWAPI::Unit* u);
+	void accomplishGoal();
+	bool emptyUnits();
+	bool emptyGoals();
+    int size() const;
 };
 
 class UnitsGroup : public BasicUnitsGroup
@@ -67,12 +74,13 @@ private:
     int totalSupply;
     EUnitsFilter* _eUnitsFilter;
     std::set<BWAPI::Unit*> _mergersHT;
-    bool _alignFormation;
     bool _hasDetection;
     inline void updateNearbyEnemyUnitsFromFilter(BWAPI::Position p, double radius = 400.0);
     double evaluateForces();
     void displayTargets();  // debug purpose
 public:
+    void takeControl(BWAPI::Unit* u);
+    void giveUpControl(BWAPI::Unit* u);
 	bool isWaiting(); //Return if the 1st goal is accomplished && no other goals
 	pGoal getLastGoal();
     std::list<pBayesianUnit> arrivingUnits;
@@ -113,12 +121,6 @@ public:
     virtual void onUnitShow(BWAPI::Unit* u);
     virtual void onUnitHide(BWAPI::Unit* u);
 
-    // Units interface
-    virtual void takeControl(BWAPI::Unit* u);
-    virtual void giveUpControl(BWAPI::Unit* u);
-	bool emptyUnits();
-	bool emptyGoals();
-    int size() const;
     int getTotalHP() const;
     std::vector<pBayesianUnit>* getUnits();
 
@@ -129,7 +131,6 @@ public:
     void selectedUnits(std::set<pBayesianUnit>& u);
 #endif
 	const BayesianUnit& operator[](ptrdiff_t i);
-	void accomplishGoal();
 	void switchMode(unit_mode um);
 	void idle();
 };

@@ -11,7 +11,7 @@ ProbTables ZealotUnit::_sProbTables = ProbTables(BWAPI::UnitTypes::Protoss_Zealo
 std::set<BWAPI::UnitType> ZealotUnit::setPrio;
 std::map<BWAPI::Unit*, int> ZealotUnit::_zealotsOn;
 
-ZealotUnit::ZealotUnit(BWAPI::Unit* u, UnitsGroup* ug)
+ZealotUnit::ZealotUnit(BWAPI::Unit* u, BasicUnitsGroup* ug)
 : GroundUnit(u, ug, &_sProbTables)
 {
     if (setPrio.empty())

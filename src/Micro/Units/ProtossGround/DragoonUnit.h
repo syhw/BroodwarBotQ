@@ -11,7 +11,7 @@ protected:
     static int attackDuration;
     virtual bool decideToFlee();
 public:
-    DragoonUnit(BWAPI::Unit* u, UnitsGroup* ug);
+    DragoonUnit(BWAPI::Unit* u, BasicUnitsGroup* ug);
     ~DragoonUnit();
     virtual int addRangeGround();
     virtual int addRangeAir();
