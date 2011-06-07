@@ -55,6 +55,7 @@ void BattleBroodAI::onEnd(bool isWinner)
 void BattleBroodAI::onFrame()
 {
 #ifdef __DEBUG__
+	Broodwar->drawTextScreen(300, 20, "APM %d", Broodwar->getAPM());
     clock_t start = clock();
 
     if (Broodwar->getLastError() != BWAPI::Errors::None)
