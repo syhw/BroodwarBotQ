@@ -53,6 +53,7 @@ protected:
 	std::list<pGoal> goals;
 public:
 	std::vector<pBayesianUnit> units;
+	virtual void update();
 	void setGoals(std::list<pGoal>& goals);
 	void addGoal(pGoal goal);
     void addGoalFront(pGoal goal);

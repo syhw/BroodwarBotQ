@@ -252,26 +252,24 @@ double UnitsGroup::evaluateForces()
         return ourScore/theirScore;
 }
 
+void BasicUnitsGroup::update()
+{
+    accomplishGoal();
+	for (std::vector<pBayesianUnit>::const_iterator it = units.begin();
+		it != units.end(); ++it)
+	    (*it)->update();
+}
+
 void UnitsGroup::update()
 {
 #ifdef __DEBUG__
     clock_t start = clock();
 #endif
-    if (this == NULL)
-        return;
 	if (units.empty())
     {
 		accomplishGoal();
 		return;
     }
-    if (units.size() == 1 && (*units.begin())->getMode() == MODE_SCOUT) // quick/dirty fix for scouting / scout goals :(
-    {
-        defaultTargetEnemy = NULL;
-        accomplishGoal();
-        (*units.begin())->update();
-        return;
-    }
-
 #ifdef __ARRIVING__UNITS__
     if (!arrivingUnits.empty())
     {
