@@ -3,7 +3,7 @@
 
 std::set<BWAPI::UnitType> ReaverUnit::setPrio;
 
-ReaverUnit::ReaverUnit(BWAPI::Unit* u, BasicUnitsGroup* ug)
+ReaverUnit::ReaverUnit(BWAPI::Unit* u,UnitsGroup* ug)
 : GroundUnit(u, ug)
 {
     if (setPrio.empty())

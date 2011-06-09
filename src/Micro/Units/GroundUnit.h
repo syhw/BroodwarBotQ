@@ -5,8 +5,8 @@
 class GroundUnit : public BayesianUnit
 {
 public:
-	GroundUnit(BWAPI::Unit* u, BasicUnitsGroup* ug);
-	GroundUnit(BWAPI::Unit* u, BasicUnitsGroup* ug,
+	GroundUnit(BWAPI::Unit* u, UnitsGroup* ug);
+	GroundUnit(BWAPI::Unit* u, UnitsGroup* ug,
 		const ProbTables* probtables);
 	~GroundUnit();
 	virtual void micro() = 0;

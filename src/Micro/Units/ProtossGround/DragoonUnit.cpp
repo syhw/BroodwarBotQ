@@ -12,7 +12,7 @@ int DragoonUnit::attackDuration;
 
 std::set<BWAPI::UnitType> DragoonUnit::setPrio;
 
-DragoonUnit::DragoonUnit(BWAPI::Unit* u, BasicUnitsGroup* ug)
+DragoonUnit::DragoonUnit(BWAPI::Unit* u,UnitsGroup* ug)
 : GroundUnit(u, ug)
 {
     if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Singularity_Charge))

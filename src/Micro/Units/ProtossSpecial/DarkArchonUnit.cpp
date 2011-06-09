@@ -1,7 +1,7 @@
 #include <PrecompiledHeader.h>
 #include "Micro/Units/ProtossSpecial/DarkArchonUnit.h"
 
-DarkArchonUnit::DarkArchonUnit(BWAPI::Unit* u, BasicUnitsGroup* ug)
+DarkArchonUnit::DarkArchonUnit(BWAPI::Unit* u,UnitsGroup* ug)
 : SpecialUnit(u, ug)
 {
 }

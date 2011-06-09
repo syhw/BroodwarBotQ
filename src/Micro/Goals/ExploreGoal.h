@@ -8,6 +8,7 @@
 class ExploreGoal: public Goal
 {
 public:
+	ExploreGoal::ExploreGoal(BWAPI::TilePosition tp);
 	ExploreGoal(BWTA::Region* region);
 	void achieve();
 };

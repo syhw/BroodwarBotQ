@@ -25,19 +25,19 @@ typedef enum
 class Goal
 {
 protected:
-	BasicUnitsGroup * unitsGroup;   //Use setUnitsGroup
+	UnitsGroup * unitsGroup;   //Use setUnitsGroup
 	std::list<pSubgoal> subgoals;   //The subgoals cannot be shared
 	GoalStatus status;              /**< status of the goal */
     int firstFrame;
 
 public:
-	void setUnitsGroup(BasicUnitsGroup * ug);
+	void setUnitsGroup(UnitsGroup * ug);
 	
 
 	//Constructors
 	Goal();//Don't forget to set the unitsGroup
-	Goal(BasicUnitsGroup * ug);
-    Goal(BasicUnitsGroup * ug, pSubgoal s);
+	Goal(UnitsGroup * ug);
+    Goal(UnitsGroup * ug, pSubgoal s);
 	virtual ~Goal();
 	
 	virtual void achieve();//Start the goal

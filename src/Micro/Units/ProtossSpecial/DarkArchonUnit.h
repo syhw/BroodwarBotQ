@@ -6,7 +6,7 @@
 class DarkArchonUnit : public SpecialUnit
 {
 public:
-    DarkArchonUnit(BWAPI::Unit* u, BasicUnitsGroup* ug);
+    DarkArchonUnit(BWAPI::Unit* u,UnitsGroup* ug);
     ~DarkArchonUnit();
     virtual void micro();
     virtual void check();

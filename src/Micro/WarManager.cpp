@@ -35,14 +35,14 @@ void WarManager::update()
 	Broodwar->printf("I have: %d units groups and %d units total", unitsGroups.size(), count);
 	*/
 
-    /*if (!ScoutController::Instance().enemyFound && Broodwar->getFrameCount() > 4320)
-    {
-        for (std::list<UnitsGroup*>::iterator it = unitsGroups.begin();
-            it != unitsGroups.end(); ++it)
-        {
-            pGoal goal = pGoal(new AttackGoal(*it, Scout
-        }
-        }*/
+//    if (!ScoutController::Instance().enemyFound && Broodwar->getFrameCount() > 4320)
+//    {
+//        for (std::list<UnitsGroup*>::iterator it = unitsGroups.begin();
+//            it != unitsGroups.end(); ++it)
+//        {
+//			pGoal goal = pGoal(new AttackGoal(*it, ScoutController::Instance().enemyStartLocation));
+//        }
+//	}
 
     //Suppress the list prompted to suppress 
     if (!promptedRemove.empty())
@@ -61,16 +61,14 @@ void WarManager::update()
 
 
 	//Set bid on appropriate units (not workers and not building)
-	/*std::set<BWAPI::Unit*> myUnits = BWAPI::Broodwar->self()->getUnits();
-	for(std::set<BWAPI::Unit*>::iterator it = myUnits.begin(); it != myUnits.end(); ++it){
-		if (!(*it)->getType().isBuilding() && !(*it)->getType().isWorker())
-        {
-			TheArbitrator->setBid(this, (*it), 20);
-		}
-	}*/
-	//std::set<BWAPI::Unit*> usefulUnits=SelectAll()(isCompleted).not(isWorker,isBuilding);
-	//TheArbitrator->setBid(this,usefulUnits,20);
-
+	std::set<Unit*> usefulUnits = 
+		SelectAll().not(isWorker, isBuilding);
+	for (std::set<Unit*>::const_iterator it = usefulUnits.begin();
+		it != usefulUnits.end(); ++it)
+	{
+		if (!(TheArbitrator->hasBid(*it)))
+			TheArbitrator->setBid(this, *it, 20);
+	}
 
 	//Update unitsgroup;
 	if (unitsGroups.empty()) return;

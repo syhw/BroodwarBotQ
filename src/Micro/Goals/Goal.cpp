@@ -13,14 +13,14 @@ Goal::Goal()
 {
 }
 
-Goal::Goal(BasicUnitsGroup * ug)
+Goal::Goal(UnitsGroup * ug)
 : status(GS_IN_PROGRESS)
 , unitsGroup(ug)
 , firstFrame(BWAPI::Broodwar->getFrameCount())
 {
 }
 
-Goal::Goal(BasicUnitsGroup * ug, pSubgoal s)
+Goal::Goal(UnitsGroup * ug, pSubgoal s)
 : status(GS_IN_PROGRESS)
 , unitsGroup(ug)
 , firstFrame(BWAPI::Broodwar->getFrameCount())
@@ -122,7 +122,7 @@ void Goal::setStatus(GoalStatus s)
 
 
 
-void Goal::setUnitsGroup(BasicUnitsGroup * ug)
+void Goal::setUnitsGroup(UnitsGroup * ug)
 {
 	this->status = GS_IN_PROGRESS;
 	for (std::list<pSubgoal>::iterator it = this->subgoals.begin(); it != subgoals.end(); ++it)

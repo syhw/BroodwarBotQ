@@ -23,13 +23,14 @@ void Intelligence::update()
 {
 	eUnitsFilter->update();
 	mapManager->update();
+	if (Broodwar->getFrameCount() == 4300)
+		scoutController->findEnemy();
 	scoutController->update();
 }
 
 void Intelligence::onUnitCreate(Unit* u)
 {
 	mapManager->onUnitCreate(u);
-	scoutController->onUnitCreate(u);
 }
 
 void Intelligence::onUnitDestroy(Unit* u)

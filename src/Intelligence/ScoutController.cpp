@@ -2,55 +2,52 @@
 #include "Defines.h"
 #include "Intelligence/ScoutController.h"
 #include "Macro/MacroManager.h"
+#include "Macro/UnitGroupManager.h"
 
 using namespace BWAPI;
 
-ScoutController::ScoutController()
-: exploringEnemy(false)
-, enemyFound(false)
-, _notSeenStartLocations(BWTA::getBaseLocations())
-, _warManager(& WarManager::Instance())
-, _arbitrator(TheArbitrator)
+TilePosition getNearestStartLocation(const TilePosition& tp)
 {
-    _sawStartLocations.insert(BWTA::getNearestBaseLocation(Broodwar->self()->getStartLocation()));
-	setDependencies();
+	TilePosition ret;
+	bool first = true;
+	double min = 100000000000.0;
+	for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getStartLocations().begin(); 
+		it != BWTA::getStartLocations().end(); ++it)
+	{
+		if (first)
+		{
+			first = false;
+			ret = (*it)->getTilePosition();
+			continue;
+		}
+		double tmp = BWTA::getGroundDistance((*it)->getTilePosition(), tp);
+		if (tmp < min)
+		{
+			min = tmp;
+			ret = (*it)->getTilePosition();
+		}
+	}
+	return ret;
+}
+
+ScoutController::ScoutController()
+: enemyFound(false)
+, _notSeenStartLocations(BWTA::getBaseLocations())
+, _requestedScouts(false)
+{
+    _seenStartLocations.insert(BWTA::getNearestBaseLocation(Broodwar->self()->getStartLocation()));
 }
 
 ScoutController::~ScoutController()
 {
-}
-
-void ScoutController::setDependencies()
-{
-    //// 2 players map:
-    std::string s = BWAPI::Broodwar->mapFileName();
-    if (s == "ICCup destination 1.1.scx" || s =="ICCup destination 1.1_ob.scx")
-    {
-        for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getStartLocations().begin(); it != BWTA::getStartLocations().end(); ++it)
-        {
-            if (!Broodwar->isVisible((*it)->getTilePosition()))
-                this->enemyStartLocation = (*it)->getTilePosition();
-        }
-    }
-    else if (s == "iCCup heartbreak ridge1.1.scx" || s == "iCCup heartbreak ridge1.1ob.scx")
-    {
-                for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getStartLocations().begin(); it != BWTA::getStartLocations().end(); ++it)
-        {
-            if (!Broodwar->isVisible((*it)->getTilePosition()))
-                this->enemyStartLocation = (*it)->getTilePosition();
-        }
-    }
-    //enemyFound = true;
+    
 }
 
 void ScoutController::update()
 {
-    if (enemyFound && !exploringEnemy) 
-    {
-		exploringEnemy = true;
-		this->awaitingGoals.push_back(pGoal(new ExploreGoal(BWTA::getRegion(enemyStartLocation))));
-	}
+	Broodwar->printf("update ScoutController called on frame %d", Broodwar->getFrameCount());
 
+	/********* Infer enemyStartLocation if possible **********/
     if (!enemyFound)
     {
         if (Broodwar->getStartLocations().size() == 2)
@@ -58,7 +55,7 @@ void ScoutController::update()
             for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getStartLocations().begin(); it != BWTA::getStartLocations().end(); ++it)
             {
                 if (!Broodwar->isVisible((*it)->getTilePosition()))
-                    this->enemyStartLocation = (*it)->getTilePosition();
+                    enemyStartLocation = (*it)->getTilePosition();
             }
         }
         else if (Broodwar->getStartLocations().size() > 2)
@@ -67,80 +64,58 @@ void ScoutController::update()
             {
                 if (Broodwar->isVisible((*it)->getTilePosition()))
 				{
-                    _sawStartLocations.insert(*it);
+                    _seenStartLocations.insert(*it);
 					_notSeenStartLocations.erase(*it);
 				}
             }
-            if (_sawStartLocations.size() == (BWTA::getStartLocations().size() - 1))
+            if (_seenStartLocations.size() == (BWTA::getStartLocations().size() - 1))
             {
-                this->enemyStartLocation = (*_notSeenStartLocations.begin())->getTilePosition();
-                Broodwar->pingMinimap(this->enemyStartLocation.x()*4, this->enemyStartLocation.y()*4);
+				std::set<BWTA::BaseLocation*>::iterator tmpit = _notSeenStartLocations.begin();
+				enemyStartLocation = (*tmpit)->getTilePosition();
             }
         }
     }
 
-    //if (enemyStartLocation != TilePositions::None)
-    //    Broodwar->drawCircleMap(enemyStartLocation.x()*4, enemyStartLocation.y()*4, 50, Colors::Red, true);
+#ifdef __DEBUG__
+	/********* Print enemyStartLocation if known **********/
+    if (enemyStartLocation != TilePositions::None)
+        Broodwar->drawCircleMap(enemyStartLocation.x()*4, enemyStartLocation.y()*4, 50, Colors::Red, true);
+#endif
 
-	std::set<UnitsGroup *> toTrash;
-	//Free units that need to be freed and add goals to other
-	for(std::list<UnitsGroup *>::iterator it = this->myUnitsGroups.begin(); it != this->myUnitsGroups.end(); ++it ){
-		
-		if((*it)->isWaiting())
+	/********* Free units groups that need to be freed and add goals to other *********/
+	std::list<std::list<UnitsGroup *>::iterator> toTrash;
+	for(std::list<UnitsGroup>::iterator it = _unitsGroups.begin(); it != _unitsGroups.end(); ++it )
+	{
+		if (it->isWaiting())
         {
 			//If no new goal available release the ug : 
-			if(this->awaitingGoals.size() <= 0){
-				for(std::vector<pBayesianUnit>::iterator u = (*it)->units.begin(); u != (*it)->units.end(); ++u){
-					static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(_arbitrator)->removeBid(this, (*u)->unit);
-				}
-				this->_warManager->promptRemove(*it);
-				toTrash.insert(*it);
-			} else {
+			if(_awaitingGoals.size() <= 0)
+			{
+				for (std::vector<pBayesianUnit>::const_iterator u = it->units.begin();
+					u != it->units.end(); ++u)
+					TheArbitrator->removeBid(this, (*u)->unit);
+				_unitsGroups.erase(it);
+			}
+			else
+			{
 			//New goal available : assign it to the ug
-				(*it)->addGoal(this->awaitingGoals.front());
-				this->awaitingGoals.pop_front();
+				it->addGoal(_awaitingGoals.front());
+				_awaitingGoals.pop_front();
 			}
 		}
 	}
 
-	if(this->awaitingGoals.size() > 0)
+	/********* Ask units if needed *********/
+	if (!_requestedScouts && _awaitingGoals.size() > 0)
     {
-		//ask units :
-		for(std::set<BWAPI::Unit *>::const_iterator it = BWAPI::Broodwar->self()->getUnits().begin(); it != BWAPI::Broodwar->self()->getUnits().end(); ++it){
-			if ((*it)->getType().isWorker() || (*it)->getType() == BWAPI::UnitTypes::Protoss_Observer)
-            {
-				//static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(_arbitrator)->setBid(this, (*it),92);
-			}
-		}
+		requestScout(95);
 	}
-	for(std::set<UnitsGroup *>::iterator trash = toTrash.begin(); trash != toTrash.end(); ++trash){
-		this->myUnitsGroups.remove(*trash);
-	}
-	toTrash.empty();
 }
+
 
 std::string ScoutController::getName() const
 {
-	return "Scout Manager";
-}
-
-void ScoutController::scoutAllEnemies()
-{
-	// TODO
-}
-
-void ScoutController::counterWall()
-{
-	// TODO
-	// se placer ou construire a l'endroit du wall
-	// pour photon ensuite ?
-}
-
-void ScoutController::counterBuild()
-{
-	// TODO
-	// En placant le drone aux endroits de construction.
-	// Si terran, attaquer le scv qui construit
+	return "ScoutController";
 }
 
 void ScoutController::harassWorkers()
@@ -149,102 +124,67 @@ void ScoutController::harassWorkers()
 	// hit and run dans les drones aux min
 }
 
-void ScoutController::checkEmptyXP()
+void ScoutController::check(BWAPI::TilePosition tp)
 {
-	//TODO
+	_awaitingGoals.push_back(pGoal(new ExploreGoal(tp)));
 }
 
-
-
-////////////////////////////NEW SECTION
-
-void ScoutController::onUnitCreate(BWAPI::Unit* unit)
+void ScoutController::onOffer(std::set<Unit*> units)
 {
-}
-
-void ScoutController::onOffer(std::set<BWAPI::Unit*> units)
-{
-	std::vector<pGoal> goalsDone;
-	std::set<BWAPI::Unit*> remainingUnits = units;
-
-	//Else grab a new unit
-	//Obs are always the best
-	BWAPI::Unit * bestUnit = NULL;
+	std::set<Unit*> remainingUnits = units;
+	Unit * bestUnit = NULL;
 	int dist= 999999999;
-	int test = 0;
-	UnitsGroup * giveMeTheGoal = NULL;
+	std::list<pGoal> distributedGoals;
 
-	for (std::list<pGoal>::iterator goals = this->awaitingGoals.begin(); goals != this->awaitingGoals.end(); ++goals)
+	/**** Pick the best units for the jobs ****/
+	for (std::list<pGoal>::iterator goal = _awaitingGoals.begin();
+		goal != _awaitingGoals.end(); ++goal)
     {
-	//find the best unit for each goal
-		dist = 99999999;
+		//find the closest unit for each goal
 		bestUnit = NULL;
-
-		for (std::set<BWAPI::Unit *>::iterator units = remainingUnits.begin(); units != remainingUnits.end(); ++units)
+		for (std::set<Unit*>::iterator unit = remainingUnits.begin();
+			unit != remainingUnits.end(); ++unit)
         {
-					
-			if (bestUnit == NULL)
+			int tmp = (*goal)->estimateDistance((*unit)->getPosition());
+            if (tmp < dist)
             {
-				bestUnit = (*units);
-			}
-			test = (*goals)->estimateDistance((*units)->getPosition());
-            if (test < dist && (*units)->getType() == BWAPI::UnitTypes::Protoss_Probe)
-            {
-				bestUnit = (*units);
-				dist = test;
-			}
-			if ((*units)->getType() == BWAPI::UnitTypes::Protoss_Observer)
-            {
-				bestUnit = (*units);
-				break;
+				bestUnit = *unit;
+				dist = tmp;
 			}
 		}
-		static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(_arbitrator)->accept(this, bestUnit, 92);
-		giveMeTheGoal = new UnitsGroup();
-		this->myUnitsGroups.push_back(giveMeTheGoal);
-		giveMeTheGoal->takeControl(bestUnit);
-        //bestUnit->move(Position(Broodwar->mapWidth()*16, Broodwar->mapHeight()*16));
+		TheArbitrator->accept(this, bestUnit, 100);
+		UnitsGroup tmpp;
+		tmpp.takeControl(bestUnit);
 		remainingUnits.erase(bestUnit);
-	
-		//We have a unitsGroup
-		(*goals)->setUnitsGroup(giveMeTheGoal);
-		giveMeTheGoal->addGoal((*goals));
-	
-		_warManager->unitsGroups.push_back(giveMeTheGoal);
-		giveMeTheGoal->switchMode(MODE_SCOUT);
-        giveMeTheGoal->update();
-		goalsDone.push_back((*goals));
+		tmpp.addGoal((*goal));
+		tmpp.switchMode(MODE_SCOUT);
+        tmpp.update();
+		_unitsGroups.push_back(tmpp);
+		distributedGoals.push_back(*goal);
 	}
+	for (std::list<pGoal>::const_iterator it = distributedGoals.begin();
+		it != distributedGoals.end(); ++it)
+		_awaitingGoals.remove(*it);
 
-	for(std::set<BWAPI::Unit *>::iterator it = remainingUnits.begin(); it != remainingUnits.end(); ++it)
-    {
-		static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(_arbitrator)->decline(this,(*it), 0);
+	/**** Decline other units and remove bids ****/
+	for (std::set<Unit*>::iterator it = remainingUnits.begin();
+		it != remainingUnits.end(); ++it)
+	{
+		TheArbitrator->decline(this, *it, 0);
+		TheArbitrator->removeBid(this, *it);
 	}
-
-	for(std::vector<pGoal>::const_iterator it = goalsDone.begin(); it != goalsDone.end(); ++it )
-    {
-		this->awaitingGoals.remove(*it);
-	}
-
+	_requestedScouts = false;
 }
 
 
-void ScoutController::onRevoke(BWAPI::Unit* unit, double bid){
-
+void ScoutController::onRevoke(Unit* unit, double bid)
+{
+	onUnitDestroy(unit);
 }
 
 void ScoutController::findEnemy()
 {
-	this->awaitingGoals.push_back(pGoal(new FindEnemyGoal()));
-	//Set bid on all units that can scout for this goal
-
-	for (std::set<BWAPI::Unit *>::const_iterator it = BWAPI::Broodwar->self()->getUnits().begin(); it != BWAPI::Broodwar->self()->getUnits().end(); ++it)
-    {	
-		if ((*it)->getType().isWorker() || (*it)->getType() == BWAPI::UnitTypes::Protoss_Observer)
-        {
-			static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(_arbitrator)->setBid(this, (*it),92);
-		}
-	}
+	_awaitingGoals.push_front(pGoal(new FindEnemyGoal()));
 }
 
 
@@ -252,63 +192,50 @@ void ScoutController::onUnitShow(BWAPI::Unit* unit)
 {
     if (unit->getPlayer() != Broodwar->enemy())
         return;
-    if (unit->getType() == UnitTypes::Protoss_Nexus 
+    if (!enemyFound && unit->getType() == UnitTypes::Protoss_Nexus 
         || unit->getType() == UnitTypes::Terran_Command_Center 
         || unit->getType() == UnitTypes::Zerg_Hatchery
         || unit->getType() == UnitTypes::Zerg_Lair
         || unit->getType() == UnitTypes::Zerg_Hive)
     {
-        if (!enemyFound)
+        for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getStartLocations().begin(); // fuck BaseLocation that we can't build from a (Tile)Position
+            it != BWTA::getStartLocations().end(); ++it)
         {
-            for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getStartLocations().begin(); // fuck BaseLocation that we can't build from a (Tile)Position
-                it != BWTA::getStartLocations().end(); ++it)
-            {
-                if ((*it)->getTilePosition() == unit->getTilePosition())
-                {
-                    enemyFound = true;
-                    enemyStartLocation = unit->getTilePosition();
-                    Broodwar->pingMinimap(this->enemyStartLocation.x()*4, this->enemyStartLocation.y()*4);
-                    return;
-                }
-            }
-            if (Broodwar->getFrameCount() > 4320) // 4 minutes
+            if ((*it)->getTilePosition() == unit->getTilePosition())
             {
                 enemyFound = true;
                 enemyStartLocation = unit->getTilePosition();
-                Broodwar->pingMinimap(this->enemyStartLocation.x()*4, this->enemyStartLocation.y()*4);
+				Broodwar->printf("Found enemy here!");
+				Broodwar->pingMinimap(unit->getPosition());
+                return;
             }
-        } 
-        else
+        }
+        if (Broodwar->getFrameCount() > 4320) // 4 minutes
         {
-            enemyExpandLocations.insert(unit->getTilePosition());
+            enemyFound = true;
+            enemyStartLocation = getNearestStartLocation(unit->getTilePosition());
+			Broodwar->printf("Found enemy here!");
+			Broodwar->pingMinimap(Position(enemyStartLocation));
         }
     }
 }
 
 void ScoutController::onUnitDestroy(BWAPI::Unit* unit)
 {
-	//Find if a ug is concerned
-	for(std::list<UnitsGroup *>::iterator it = myUnitsGroups.begin(); it != myUnitsGroups.end(); ++it)
-    {
-		if ((*it)->emptyUnits())
-        {
-			this->myUnitsGroups.remove((*it));
-			break;
-		}
-    }
-    if (unit->getPlayer() != Broodwar->enemy())
-        return;
-    if (unit->getType() == UnitTypes::Protoss_Nexus 
-        || unit->getType() == UnitTypes::Terran_Command_Center 
-        || unit->getType() == UnitTypes::Zerg_Hatchery
-        || unit->getType() == UnitTypes::Zerg_Lair
-        || unit->getType() == UnitTypes::Zerg_Hive)
-    {
-        enemyExpandLocations.erase(unit->getTilePosition());
-    }
+	for (std::list<UnitsGroup>::iterator it = _unitsGroups.begin();
+		it != _unitsGroups.end(); ++it)
+	{
+	    if (it->removeUnit(unit))
+			return;
+	}
 }
 
-
-
-
-
+void ScoutController::requestScout(double bid)
+{
+  // Bid on all completed workers + observers/overlords
+  std::set<Unit*> usefulUnits = 
+	  SelectAll()(isWorker,Overlord,Observer)(isCompleted)
+	  .not(isCarryingMinerals,isCarryingGas,isGatheringGas);
+  TheArbitrator->setBid(this, usefulUnits, bid);
+  _requestedScouts = true;
+}

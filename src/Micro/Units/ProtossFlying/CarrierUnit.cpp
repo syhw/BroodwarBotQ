@@ -3,7 +3,7 @@
 
 std::set<BWAPI::UnitType> CarrierUnit::setPrio;
 
-CarrierUnit::CarrierUnit(BWAPI::Unit* u, BasicUnitsGroup* ug)
+CarrierUnit::CarrierUnit(BWAPI::Unit* u,UnitsGroup* ug)
 : FlyingUnit(u, ug)
 {
     if (setPrio.empty())

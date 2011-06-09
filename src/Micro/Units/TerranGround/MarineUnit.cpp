@@ -10,7 +10,7 @@ ProbTables MarineUnit::_sProbTables = ProbTables(BWAPI::UnitTypes::Terran_Marine
 
 std::set<BWAPI::UnitType> MarineUnit::setPrio;
 
-MarineUnit::MarineUnit(BWAPI::Unit* u, BasicUnitsGroup* ug)
+MarineUnit::MarineUnit(BWAPI::Unit* u,UnitsGroup* ug)
 : GroundUnit(u, ug, &_sProbTables)
 {
     if (setPrio.empty())

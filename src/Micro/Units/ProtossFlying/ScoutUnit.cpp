@@ -3,7 +3,7 @@
 
 std::set<BWAPI::UnitType> ScoutUnit::setPrio;
 
-ScoutUnit::ScoutUnit(BWAPI::Unit* u, BasicUnitsGroup* ug)
+ScoutUnit::ScoutUnit(BWAPI::Unit* u,UnitsGroup* ug)
 : FlyingUnit(u, ug)
 {
     if (setPrio.empty())

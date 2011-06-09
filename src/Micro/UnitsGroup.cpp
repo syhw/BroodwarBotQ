@@ -52,7 +52,6 @@ UnitsGroup::UnitsGroup()
 
 UnitsGroup::~UnitsGroup()
 {
-
 }
 
 bool comp_i_dist(const i_dist& l, const i_dist& r) { return (r.dist < l.dist); }
@@ -483,22 +482,20 @@ void UnitsGroup::formation(pFormation f)
 
 }
 
-void BasicUnitsGroup::setGoals(std::list<pGoal>& goals)
+void UnitsGroup::setGoals(std::list<pGoal>& goals)
 {
     this->goals = goals;
 	if(!this->goals.empty())
 		this->goals.front()->achieve();
 }
 
-void BasicUnitsGroup::addGoal(pGoal goal)
+void UnitsGroup::addGoal(pGoal goal)
 {
     this->goals.push_back(goal);
 	goal->setUnitsGroup(this);
-   // if (goals.size() == 1 && !this->units.empty())
-   // this->goals.front()->achieve();
 }
 
-void BasicUnitsGroup::addGoalFront(pGoal goal)
+void UnitsGroup::addGoalFront(pGoal goal)
 {
     this->goals.push_front(goal);
     goal->setUnitsGroup(this);
@@ -537,7 +534,7 @@ double UnitsGroup::getDistance(BWAPI::Unit* u) const
     return Vec(center - u->getPosition()).norm();
 }
 
-pBayesianUnit BasicUnitsGroup::addUnit(Unit* u)
+pBayesianUnit UnitsGroup::addUnit(Unit* u)
 {
     pBayesianUnit tmp;
     if (u->getType() == BWAPI::UnitTypes::Protoss_Arbiter)
@@ -609,14 +606,15 @@ void UnitsGroup::takeControl(Unit* u)
     totalSupply += u->getType().supplyRequired();
 }
 
-void BasicUnitsGroup::removeUnit(Unit* u)
+bool BasicUnitsGroup::removeUnit(Unit* u)
 {
     for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
         if ((*it)->unit == u)
         {
             units.erase(it);
-            break;
+			return true;
         }
+	return false;
 }
 
 void UnitsGroup::giveUpControl(Unit* u)

@@ -6,7 +6,7 @@
 class ProbeUnit : public GroundUnit
 {
 public:
-    ProbeUnit(BWAPI::Unit* u, BasicUnitsGroup* ug);
+    ProbeUnit(BWAPI::Unit* u,UnitsGroup* ug);
     ~ProbeUnit();
     virtual void micro();
     virtual void check();

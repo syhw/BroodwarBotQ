@@ -54,12 +54,9 @@ protected:
 public:
 	std::vector<pBayesianUnit> units;
 	virtual void update();
-	void setGoals(std::list<pGoal>& goals);
-	void addGoal(pGoal goal);
-    void addGoalFront(pGoal goal);
     // Units interface
-    pBayesianUnit addUnit(BWAPI::Unit* u);
-    void removeUnit(BWAPI::Unit* u);
+    bool removeUnit(BWAPI::Unit* u);
+	// Goals interface
 	void accomplishGoal();
 	bool emptyUnits();
 	bool emptyGoals();
@@ -106,7 +103,15 @@ public:
 
 	virtual void update();
 	virtual void display();
+
+	// Units interface
+    pBayesianUnit addUnit(BWAPI::Unit* u);
+
 	// Goals interface
+	void setGoals(std::list<pGoal>& goals);
+	void addGoal(pGoal goal);
+    void addGoalFront(pGoal goal);
+
 	virtual void attack(int x, int y);
 	virtual void attack(BWAPI::Position& p);
 	virtual void move(BWAPI::Position& p);
