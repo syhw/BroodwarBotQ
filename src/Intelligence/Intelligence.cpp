@@ -23,7 +23,7 @@ void Intelligence::update()
 {
 	eUnitsFilter->update();
 	mapManager->update();
-	if (Broodwar->getFrameCount() == 4300)
+	if (Broodwar->getFrameCount() == 3000)
 		scoutController->findEnemy();
 	scoutController->update();
 }
