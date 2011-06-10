@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="MicroProject"
 	ProjectGUID="{305604F2-9728-4D61-AC29-4658B31533DF}"
 	RootNamespace="MicroProject"
@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../src;../../BWAPI_3.5.4/include;../../BWAPI_3.5.4/include/BWAPI;../../BWAPI_3.5.4/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
+				AdditionalIncludeDirectories="../src;../../BWAPI_3.6/include;../../BWAPI_3.6/include/BWAPI;../../BWAPI_3.6/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
 				BasicRuntimeChecks="3"
@@ -116,7 +116,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../src;../../BWAPI_3.5.4/include;../../BWAPI_3.5.4/include/BWAPI;../../BWAPI_3.5.4/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
+				AdditionalIncludeDirectories="../src;../../BWAPI_3.6/include;../../BWAPI_3.6/include/BWAPI;../../BWAPI_3.6/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
 				RuntimeLibrary="2"
