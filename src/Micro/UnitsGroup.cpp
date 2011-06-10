@@ -3,7 +3,6 @@
 #include "Micro/UnitsGroup.h"
 #include <Position.h>
 #include "Utils/Util.h"
-#include <cmath>
 #include "Micro/Units/ProtossSpecial/ArbiterUnit.h"
 #include "Micro/Units/ProtossSpecial/DarkArchonUnit.h"
 #include "Micro/Units/ProtossSpecial/HighTemplarUnit.h"
