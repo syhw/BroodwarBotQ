@@ -1,6 +1,8 @@
 #pragma once
 //our defines
 
+//#define _SECURE_SCL 0 // remove iterator runtime checks
+
 #define __DEBUG__
 //#define __NON_IMPLEMENTE__
 //#define BW_POS_MOUSE
