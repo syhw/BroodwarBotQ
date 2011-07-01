@@ -1262,6 +1262,10 @@
 				Name="Intelligence"
 				>
 				<File
+					RelativePath="..\src\Intelligence\enums_name_tables_tt.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Intelligence\ETechEstimator.h"
 					>
 				</File>
@@ -1283,6 +1287,10 @@
 				</File>
 				<File
 					RelativePath="..\src\Intelligence\ScoutController.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Intelligence\serialized_tables.h"
 					>
 				</File>
 			</Filter>

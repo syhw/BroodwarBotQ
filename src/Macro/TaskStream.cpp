@@ -299,7 +299,7 @@ void TaskStream::update()
     {
       notifyCompletedTask();
       status = None;
-      Broodwar->printf("Completed Task %s!",task[0].getName().c_str());
+      //Broodwar->printf("Completed Task %s!",task[0].getName().c_str());
       for(int i=0;i+1<(int)(task.size());i++)
         task[i]=task[i+1];
       task[task.size()-1] = Task();

@@ -30,7 +30,6 @@ void MicroAIModule::onStart()
 	BWTA::readMap();
 	BWTA::analyze();
     this->eUnitsFilter = & EUnitsFilter::Instance();
-    this->eTechEstimator = & ETechEstimator::Instance();
     this->mapManager = & MapManager::Instance();
 	this->unitGroupManager = UnitGroupManager::create();
 	// this->rdmGenerators = & RandomGenerators::Instance();

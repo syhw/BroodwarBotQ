@@ -45,8 +45,6 @@ ScoutController::~ScoutController()
 
 void ScoutController::update()
 {
-	Broodwar->printf("update ScoutController called on frame %d", Broodwar->getFrameCount());
-
 	/********* Infer enemyStartLocation if possible **********/
     if (!enemyFound)
     {

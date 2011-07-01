@@ -388,10 +388,6 @@
 				Name="Intelligence"
 				>
 				<File
-					RelativePath="..\src\Intelligence\ETechEstimator.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Intelligence\EUnitsFilter.cpp"
 					>
 				</File>
@@ -637,10 +633,6 @@
 			<Filter
 				Name="Intelligence"
 				>
-				<File
-					RelativePath="..\src\Intelligence\ETechEstimator.h"
-					>
-				</File>
 				<File
 					RelativePath="..\src\Intelligence\EUnitsFilter.h"
 					>
