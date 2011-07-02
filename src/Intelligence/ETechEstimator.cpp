@@ -2,17 +2,26 @@
 #include "Intelligence/ETechEstimator.h"	
 #include "enums_name_tables_tt.h"
 
+#define LEARNED_TIME_LIMIT 1080 // 18 minutes
+
 using namespace BWAPI;
 using namespace std;
 
 ETechEstimator::ETechEstimator()
 : notFirstOverlord(false)
 {
+	/// Load the learned prob tables (uniforms + bell shapes) for the right match up
 	{
+		// TODO right matchup
 		std::ifstream ifs("C:\\StarCraft\\AI\\BroodwarBotQ\\data\\tables\\PvP.table");
 		boost::archive::text_iarchive ia(ifs);
 		ia >> st;
 	}
+	
+	/// Initialize openingsProbas with a uniform distribution
+	size_t nbOpenings = st.openings.size();
+	for (size_t i = 0; i < nbOpenings; ++i)
+		openingsProbas.push_back(1.0 / nbOpenings); 
 }
 
 ETechEstimator::~ETechEstimator()
@@ -163,7 +172,7 @@ bool ETechEstimator::insertBuilding(Unit* u)
 		if (ut == UnitTypes::Protoss_Nexus)
 		{
 			int tmp = Protoss_Nexus;
-			while (buildingsSeen.count(u))
+			while (buildingsTypesSeen.count(tmp))
 				++tmp;
 			if (tmp <= Protoss_Nexus3)
 				buildingsTypesSeen.insert(tmp);
@@ -173,7 +182,7 @@ bool ETechEstimator::insertBuilding(Unit* u)
 		else if (ut == UnitTypes::Protoss_Pylon)
 		{
 			int tmp = Protoss_Pylon;
-			while (buildingsSeen.count(u))
+			while (buildingsTypesSeen.count(tmp))
 				++tmp;
 			if (tmp <= Protoss_Pylon3)
 				buildingsTypesSeen.insert(tmp);
@@ -181,7 +190,7 @@ bool ETechEstimator::insertBuilding(Unit* u)
 		else if (ut == UnitTypes::Protoss_Assimilator)
 		{
 			int tmp = Protoss_Assimilator;
-			while (buildingsSeen.count(u))
+			while (buildingsTypesSeen.count(tmp))
 				++tmp;
 			if (tmp <= Protoss_Assimilator2)
 				buildingsTypesSeen.insert(tmp);
@@ -191,7 +200,7 @@ bool ETechEstimator::insertBuilding(Unit* u)
 		else if (ut == UnitTypes::Protoss_Gateway)
 		{
 			int tmp = Protoss_Gateway;
-			while (buildingsSeen.count(u))
+			while (buildingsTypesSeen.count(tmp))
 				++tmp;
 			if (tmp <= Protoss_Gateway4)
 				buildingsTypesSeen.insert(tmp);
@@ -222,7 +231,7 @@ bool ETechEstimator::insertBuilding(Unit* u)
 		if (ut == UnitTypes::Terran_Command_Center)
 		{
 			int tmp = Terran_Command_Center;
-			while (buildingsSeen.count(u))
+			while (buildingsTypesSeen.count(tmp))
 				++tmp;
 			if (tmp <= Terran_Command_Center3)
 				buildingsTypesSeen.insert(tmp);
@@ -234,7 +243,7 @@ bool ETechEstimator::insertBuilding(Unit* u)
 		else if (ut == UnitTypes::Terran_Supply_Depot)
 		{
 			int tmp = Terran_Supply_Depot;
-			while (buildingsSeen.count(u))
+			while (buildingsTypesSeen.count(tmp))
 				++tmp;
 			if (tmp <= Terran_Supply_Depot3)
 				buildingsTypesSeen.insert(tmp);
@@ -242,7 +251,7 @@ bool ETechEstimator::insertBuilding(Unit* u)
 		else if (ut == UnitTypes::Terran_Refinery)
 		{
 			int tmp = Terran_Refinery;
-			while (buildingsSeen.count(u))
+			while (buildingsTypesSeen.count(tmp))
 				++tmp;
 			if (tmp <= Terran_Refinery2)
 				buildingsTypesSeen.insert(tmp);
@@ -250,7 +259,7 @@ bool ETechEstimator::insertBuilding(Unit* u)
 		else if (ut == UnitTypes::Terran_Barracks)
 		{
 			int tmp = Terran_Barracks;
-			while (buildingsSeen.count(u))
+			while (buildingsTypesSeen.count(tmp))
 				++tmp;
 			if (tmp <= Terran_Barracks4)
 				buildingsTypesSeen.insert(tmp);
@@ -285,7 +294,7 @@ bool ETechEstimator::insertBuilding(Unit* u)
 		if (ut == UnitTypes::Zerg_Hatchery)
 		{
 			int tmp = Zerg_Hatchery;
-			while (buildingsSeen.count(u))
+			while (buildingsTypesSeen.count(tmp))
 				++tmp;
 			if (tmp <= Zerg_Hatchery4)
 				buildingsTypesSeen.insert(tmp);
@@ -321,7 +330,7 @@ bool ETechEstimator::insertBuilding(Unit* u)
 		else if (ut == UnitTypes::Zerg_Extractor)
 		{
 			int tmp = Zerg_Extractor;
-			while (buildingsSeen.count(u))
+			while (buildingsTypesSeen.count(tmp))
 				++tmp;
 			if (tmp <= Zerg_Extractor2)
 				buildingsTypesSeen.insert(tmp);
@@ -331,7 +340,7 @@ bool ETechEstimator::insertBuilding(Unit* u)
 			if (notFirstOverlord)
 			{
 				int tmp = Zerg_Overlord;
-				while (buildingsSeen.count(u))
+				while (buildingsTypesSeen.count(tmp))
 					++tmp;
 				if (tmp <= Zerg_Overlord3)
 					buildingsTypesSeen.insert(tmp);
@@ -353,4 +362,45 @@ bool ETechEstimator::insertBuilding(Unit* u)
 
 void ETechEstimator::computeDistribOpenings(int time)
 {
+	size_t nbXes = st.vector_X.size();
+	list<unsigned int> compatibleXes;
+	for (size_t i = 0; i < nbXes; ++i)
+	{
+		if (testBuildTreePossible(i, buildingsTypesSeen))
+			compatibleXes.push_back(i);
+	}
+	double runningSum = 0.0;
+	for (size_t i = 0; i < openingsProbas.size(); ++i)
+	{
+		double sumX = 0.0;
+		for (list<unsigned int>::const_iterator it = compatibleXes.begin();
+			it != compatibleXes.end(); ++it)
+		{
+			sumX += st.tabulated_P_X_Op[*it * openingsProbas.size() + i]
+				* st.tabulated_P_Time_X_Op[*it * openingsProbas.size() * LEARNED_TIME_LIMIT
+				+ i * LEARNED_TIME_LIMIT + time];
+		}
+		openingsProbas[i] = openingsProbas[i] * sumX;
+		runningSum += openingsProbas[i];
+	}
+	for (size_t i = 0; i < openingsProbas.size(); ++i)
+		openingsProbas[i] = openingsProbas[i] / runningSum;
+}
+
+/**
+ * Tests if the given build tree (X) value
+ * is compatible with obervations (what have been seen)
+ * {X ^ observed} covers all observed if X is possible
+ * so X is impossible if {observed \ {X ^ observed}} != {}
+ * => X is compatible with observations if it covers them fully
+ */
+bool ETechEstimator::testBuildTreePossible(int indBuildTree, const set<int>& setObs)
+{
+    for (set<int>::const_iterator it = setObs.begin();
+        it != setObs.end(); ++it)
+    {
+        if (!st.vector_X[indBuildTree].count(*it))
+            return false;
+    }
+    return true;
 }
