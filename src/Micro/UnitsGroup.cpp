@@ -260,6 +260,8 @@ void BasicUnitsGroup::update()
 
 void UnitsGroup::update()
 {
+	if (this == NULL) /// WHAT
+		return;  /// THE FUCK?
 #ifdef __DEBUG__
     clock_t start = clock();
 #endif
@@ -331,7 +333,9 @@ void UnitsGroup::update()
             || (*it)->unit->getType() == UnitTypes::Protoss_Archon)
             contactUnits = true;
         */
-        this->totalHP += (*it)->unit->getHitPoints();
+        totalHP += (*it)->unit->getHitPoints();
+		if (Broodwar->self()->getRace() == Races::Protoss)
+			totalHP += (*it)->unit->getShields();
         double tmp_max = max(max((*it)->unit->getType().groundWeapon().maxRange(), (*it)->unit->getType().airWeapon().maxRange()), 
             (*it)->unit->getType().sightRange()); // TODO: upgrades
         if (tmp_max > maxRange)
@@ -394,8 +398,8 @@ void UnitsGroup::update()
                 {
                     const std::pair<BWTA::Region*, BWTA::Region*> regions = nearestChoke->getRegions();
                     BWTA::Region* higherRegion = 
-						(Broodwar->getGroundHeight(TilePosition(MapManager::Instance().regionsPFCenters[regions.first])) 
-> Broodwar->getGroundHeight(TilePosition(MapManager::Instance().regionsPFCenters[regions.second])))
+						(Broodwar->getGroundHeight(TilePosition(regions.first->getCenter()))
+> Broodwar->getGroundHeight(TilePosition(regions.second->getCenter())))
                         ? regions.first : regions.second;
 					(*it)->target = MapManager::Instance().regionsPFCenters[higherRegion];
                 }

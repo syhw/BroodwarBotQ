@@ -26,6 +26,7 @@ class Macro: public CSingleton<Macro>
 	~Macro();
     Arbitrator::Arbitrator<BWAPI::Unit*,double> arbitrator;
 	int expands;
+	int addedGates;
 public:
 	void buildOrderAdd(BWAPI::UnitType type);
 	void techAdd(BWAPI::TechType type);

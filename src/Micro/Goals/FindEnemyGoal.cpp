@@ -5,11 +5,10 @@ FindEnemyGoal::FindEnemyGoal()
 {
 	scoutController = & ScoutController::Instance();
 	//Scout the different possible bases
-	BWTA::BaseLocation * myStartLocation = BWTA::getStartLocation(BWAPI::Broodwar->self());
-	std::set<BWTA::BaseLocation*> path = BWTA::getStartLocations();
-	for (std::set<BWTA::BaseLocation*>::iterator p=path.begin(); p!=path.end(); p++)
+	for (std::set<BWTA::BaseLocation*>::const_iterator p = BWTA::getStartLocations().begin();
+		p != BWTA::getStartLocations().end(); ++p)
     {
-		if ((*p) != myStartLocation)
+		if ((*p) != BWTA::getStartLocation(BWAPI::Broodwar->self()))
 			addSubgoal(pSubgoal(new SeeSubgoal(SL_AND, (*p)->getPosition())));
 	}
 	addSubgoal(pSubgoal(new FindSubgoal(SL_OR)));
@@ -25,7 +24,7 @@ void FindEnemyGoal::achieve()
         {
 			double test;
 			pSubgoal selected;
-			double min = DBL_MAX;
+			double min = 10000000000.0;
 			
 			for (std::list<pSubgoal>::iterator it = subgoals.begin(); it != subgoals.end(); ++it)
             {
@@ -43,6 +42,7 @@ void FindEnemyGoal::achieve()
             {
 				selected->tryToRealize();
 			} else {
+				Broodwar->printf("ERROR IN FindEnemyGoal");
 				// TODO
                 // Problem if here
 			}

@@ -7,6 +7,7 @@ UnitCompositionProducer* infantryProducer = NULL; // TODO remove
 
 Macro::Macro()
 : expands(0)
+, addedGates(0)
 {
 	TheArbitrator = & arbitrator;
 	MacroManager::create();
@@ -38,7 +39,7 @@ Macro::Macro()
 		buildOrderAdd(UnitTypes::Protoss_Cybernetics_Core);
 		buildOrderAdd(UnitTypes::Protoss_Assimilator);
 		buildOrderAdd(UnitTypes::Protoss_Gateway);
-		buildOrderAdd(UnitTypes::Protoss_Gateway);
+		addedGates = 2;
 		infantryProducer = new UnitCompositionProducer(UnitTypes::Protoss_Gateway);
 		infantryProducer->setUnitWeight(UnitTypes::Protoss_Dragoon, 3.0);
 		infantryProducer->setUnitWeight(UnitTypes::Protoss_Zealot, 1.0);
@@ -122,12 +123,29 @@ void Macro::update()
 	{
 		++expands;
 		TheMacroBaseManager->expandWhenPossible();
+		buildOrderAdd(UnitTypes::Protoss_Gateway);
+		++addedGates;
+		//buildOrderAdd(UnitTypes::Protoss_Assimilator);
 	}
 	else if (expands == 1 && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Observer))
 	{
 		++expands;
 		TheMacroBaseManager->expandWhenPossible();
+		//buildOrderAdd(UnitTypes::Protoss_Assimilator);
 	}
+	
+	if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Nexus) > 1)
+	{
+		buildOrderAdd(UnitTypes::Protoss_Observatory);
+		upgradeAdd(UpgradeTypes::Protoss_Ground_Weapons);
+		upgradeAdd(UpgradeTypes::Protoss_Ground_Armor);
+	}
+	/*
+	if (Broodwar->self()->minerals() > 500 && addedGates < 8)
+	{
+        ++addedGates;
+		buildOrderAdd(UnitTypes::Protoss_Gateway);
+	}*/
 }
 
 void Macro::onUnitDiscover(BWAPI::Unit* unit)

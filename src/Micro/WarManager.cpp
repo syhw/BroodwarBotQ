@@ -136,6 +136,15 @@ void WarManager::sendGroupToAttack(UnitsGroup* ug)
 	if (ScoutController::Instance().enemyFound)
     {
         ug->addGoal(pGoal(new AttackGoal(ug, ScoutController::Instance().enemyStartLocation)));
+	} 
+	else 
+	{
+		for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getStartLocations().begin();
+			it != BWTA::getStartLocations().end(); ++it)
+		{
+			if (*it != BWTA::getStartLocation(Broodwar->self()))
+				ug->addGoal(pGoal(new AttackGoal(ug, (*it)->getPosition())));
+		}
 	}
 }
 
