@@ -77,7 +77,7 @@ void ScoutController::update()
 #ifdef __DEBUG__
 	/********* Print enemyStartLocation if known **********/
     if (enemyStartLocation != TilePositions::None)
-        Broodwar->drawCircleMap(enemyStartLocation.x()*4, enemyStartLocation.y()*4, 50, Colors::Red, true);
+        Broodwar->drawCircleMap(enemyStartLocation.x()*4, enemyStartLocation.y()*4, 30, Colors::Red, true);
 #endif
 
 	/********* Free units groups that need to be freed and add goals to other *********/

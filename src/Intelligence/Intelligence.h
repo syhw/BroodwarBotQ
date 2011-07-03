@@ -4,6 +4,7 @@
 #include "Intelligence/ETechEstimator.h"
 #include "Regions/MapManager.h"
 #include "Intelligence/ScoutController.h"
+#include "Defines.h"
 
 class Intelligence : public CSingleton<Intelligence>
 {

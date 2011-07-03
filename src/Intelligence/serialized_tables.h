@@ -17,14 +17,14 @@ struct serialized_tables
         ar & vector_X;
         ar & distances_X;
     }
-	std::vector<double> tabulated_P_Time_X_Op;
-    std::vector<double> tabulated_P_X_Op;
+	std::vector<long double> tabulated_P_Time_X_Op;
+    std::vector<long double> tabulated_P_X_Op;
     std::vector<std::string> openings;
     std::vector<std::set<int> > vector_X;
     std::vector<std::vector<int> > distances_X;
     serialized_tables() {};
-    serialized_tables(const std::vector<double>& time_x,
-            const std::vector<double>& x,
+    serialized_tables(const std::vector<long double>& time_x,
+            const std::vector<long double>& x,
             const std::vector<std::string>& op,
             const std::vector<std::set<int> >& vx,
             const std::vector<std::vector<int> >& dx)

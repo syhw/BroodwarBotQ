@@ -6,6 +6,7 @@ using namespace BWAPI;
 UnitCompositionProducer* infantryProducer = NULL; // TODO remove
 
 Macro::Macro()
+: expands(0)
 {
 	TheArbitrator = & arbitrator;
 	MacroManager::create();
@@ -37,9 +38,10 @@ Macro::Macro()
 		buildOrderAdd(UnitTypes::Protoss_Cybernetics_Core);
 		buildOrderAdd(UnitTypes::Protoss_Assimilator);
 		buildOrderAdd(UnitTypes::Protoss_Gateway);
+		buildOrderAdd(UnitTypes::Protoss_Gateway);
 		infantryProducer = new UnitCompositionProducer(UnitTypes::Protoss_Gateway);
-		infantryProducer->setUnitWeight(UnitTypes::Protoss_Dragoon,2.0);
-		infantryProducer->setUnitWeight(UnitTypes::Protoss_Zealot,1.0);
+		infantryProducer->setUnitWeight(UnitTypes::Protoss_Dragoon, 3.0);
+		infantryProducer->setUnitWeight(UnitTypes::Protoss_Zealot, 1.0);
 		upgradeAdd(UpgradeTypes::Singularity_Charge);
 	}
 	else if (Broodwar->self()->getRace() == Races::Terran)
@@ -115,6 +117,17 @@ void Macro::update()
 	TheMacroBaseManager->update();
 	TheMacroWorkerManager->update();
 	TheArbitrator->update();
+
+	if (!expands && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 2)
+	{
+		++expands;
+		TheMacroBaseManager->expandWhenPossible();
+	}
+	else if (expands == 1 && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Observer))
+	{
+		++expands;
+		TheMacroBaseManager->expandWhenPossible();
+	}
 }
 
 void Macro::onUnitDiscover(BWAPI::Unit* unit)

@@ -76,7 +76,9 @@ void BattleBroodAI::onFrame()
 
 #ifdef BW_POS_MOUSE
     char mousePos[100];
-    sprintf_s(mousePos, "%d, %d", Broodwar->getMousePosition().x(), Broodwar->getMousePosition().y());
+	sprintf_s(mousePos, "%d, %d", 
+		Broodwar->getScreenPosition().x() + Broodwar->getMousePosition().x(), 
+		Broodwar->getScreenPosition().y() + Broodwar->getMousePosition().y());
     Broodwar->drawTextMouse(12, 0, mousePos);
 #endif
 

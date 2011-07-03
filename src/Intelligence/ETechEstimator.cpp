@@ -12,8 +12,24 @@ ETechEstimator::ETechEstimator()
 {
 	/// Load the learned prob tables (uniforms + bell shapes) for the right match up
 	{
-		// TODO right matchup
-		std::ifstream ifs("C:\\StarCraft\\AI\\BroodwarBotQ\\data\\tables\\PvP.table");
+		Race enemyRace;
+		for (set<Player*>::const_iterator p = Broodwar->getPlayers().begin();
+			p != Broodwar->getPlayers().end(); ++p)
+		{
+			if (!(*p)->isNeutral() && (*p)->isEnemy(Broodwar->self()))
+			{
+				enemyRace = (*p)->getRace();
+				break;
+			}
+		}
+		string serializedTablesFileName("C:\\StarCraft\\AI\\BroodwarBotQ\\data\\tables\\");
+		if (enemyRace == Races::Terran)
+			serializedTablesFileName.append("TvP.table");
+		else if (enemyRace == Races::Protoss)
+			serializedTablesFileName.append("PvP.table");
+		else if (enemyRace == Races::Zerg)
+			serializedTablesFileName.append("ZvP.table");
+		std::ifstream ifs(serializedTablesFileName.c_str());
 		boost::archive::text_iarchive ia(ifs);
 		ia >> st;
 	}
@@ -66,6 +82,19 @@ void ETechEstimator::onUnitShow(Unit* u)
 void ETechEstimator::onUnitHide(Unit* u)
 {
 }
+
+#ifdef __DEBUG__
+void ETechEstimator::onFrame()
+{
+	Broodwar->drawTextScreen(510, 150, "Opening Prediction");
+	Broodwar->drawLineScreen(490, 148, 630, 148, BWAPI::Colors::Blue);
+	Broodwar->drawLineScreen(490, 148, 490, 170 + 18*openingsProbas.size(), BWAPI::Colors::Blue);
+	Broodwar->drawLineScreen(630, 148, 630, 170 + 18*openingsProbas.size(), BWAPI::Colors::Blue);
+	Broodwar->drawLineScreen(490, 170 + 18*openingsProbas.size(), 630, 170 + 18*openingsProbas.size(), BWAPI::Colors::Blue);
+	for (size_t i = 0; i < openingsProbas.size(); ++i)
+		Broodwar->drawTextScreen(500, 170+18*i, "%s ==> %Lg", st.openings[i].c_str(), openingsProbas[i]);
+}
+#endif
 
 bool ETechEstimator::insertBuilding(UnitType ut)
 {
@@ -369,22 +398,31 @@ void ETechEstimator::computeDistribOpenings(int time)
 		if (testBuildTreePossible(i, buildingsTypesSeen))
 			compatibleXes.push_back(i);
 	}
-	double runningSum = 0.0;
+	long double runningSum = 0.0;
 	for (size_t i = 0; i < openingsProbas.size(); ++i)
 	{
-		double sumX = 0.0;
+		long double sumX = 0.0;
 		for (list<unsigned int>::const_iterator it = compatibleXes.begin();
 			it != compatibleXes.end(); ++it)
 		{
-			sumX += st.tabulated_P_X_Op[*it * openingsProbas.size() + i]
-				* st.tabulated_P_Time_X_Op[*it * openingsProbas.size() * LEARNED_TIME_LIMIT
+			sumX += st.tabulated_P_X_Op[(*it) * openingsProbas.size() + i]
+				* st.tabulated_P_Time_X_Op[(*it) * openingsProbas.size() * LEARNED_TIME_LIMIT
 				+ i * LEARNED_TIME_LIMIT + time];
 		}
-		openingsProbas[i] = openingsProbas[i] * sumX;
+		openingsProbas[i] *= sumX;
 		runningSum += openingsProbas[i];
 	}
+	long double verifSum = 0.0;
 	for (size_t i = 0; i < openingsProbas.size(); ++i)
-		openingsProbas[i] = openingsProbas[i] / runningSum;
+	{
+		openingsProbas[i] /= runningSum;
+		verifSum += openingsProbas[i];
+	}
+	if (verifSum < 0.99)
+	{
+		for (size_t i = 0; i < openingsProbas.size(); ++i)
+			openingsProbas[i] = 1.0 / openingsProbas.size();
+	}
 }
 
 /**

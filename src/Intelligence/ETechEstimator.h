@@ -5,6 +5,7 @@
 #include <vector>
 #include <set>
 #include <string>
+#include "Defines.h"
 
 class ETechEstimator : public CSingleton<ETechEstimator>
 {
@@ -12,7 +13,7 @@ class ETechEstimator : public CSingleton<ETechEstimator>
     ETechEstimator();
     ~ETechEstimator();
 	serialized_tables st;
-	std::vector<double> openingsProbas;
+	std::vector<long double> openingsProbas;
 	std::set<BWAPI::Unit*> buildingsSeen; 
 	std::set<int> buildingsTypesSeen;
 	bool notFirstOverlord;
@@ -25,4 +26,7 @@ public:
 	void onUnitDestroy(BWAPI::Unit* u);
 	void onUnitShow(BWAPI::Unit* u);
 	void onUnitHide(BWAPI::Unit* u);
+#ifdef __DEBUG__
+	void onFrame();
+#endif
 };
