@@ -394,9 +394,10 @@ void UnitsGroup::update()
                 {
                     const std::pair<BWTA::Region*, BWTA::Region*> regions = nearestChoke->getRegions();
                     BWTA::Region* higherRegion = 
-                        (Broodwar->getGroundHeight(TilePosition(regions.first->getCenter())) > Broodwar->getGroundHeight(TilePosition(regions.second->getCenter()))) 
+						(Broodwar->getGroundHeight(TilePosition(MapManager::Instance().regionsPFCenters[regions.first])) 
+> Broodwar->getGroundHeight(TilePosition(MapManager::Instance().regionsPFCenters[regions.second])))
                         ? regions.first : regions.second;
-                    (*it)->target = higherRegion->getCenter();
+					(*it)->target = MapManager::Instance().regionsPFCenters[higherRegion];
                 }
                 else
                     (*it)->target = (*it)->unit->getPosition();

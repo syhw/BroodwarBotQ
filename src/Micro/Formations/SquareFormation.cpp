@@ -29,7 +29,7 @@ void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnit
 #ifdef __SAFE_SQUARE_FORMATION__
 	BWTA::Region* regionCenter = BWTA::getRegion(TilePosition(center.toPosition()));
 	if (regionCenter != NULL)
-		center = regionCenter->getCenter();
+		center = MapManager::Instance().regionsPFCenter[regionCenter];
 #endif
 	if (!Broodwar->isWalkable(center.toPosition().x()/8, center.toPosition().y()/8))
 		center = Vec(MapManager::Instance().closestWalkabableSameRegionOrConnected(center.toPosition()));
@@ -77,14 +77,6 @@ void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnit
 		}
 		bool isWalkable = Broodwar->isWalkable(topos.x()/8, topos.y()/8);
 		bool isGoodHeight = (Broodwar->getGroundHeight(TilePosition(topos)) == Broodwar->getGroundHeight(TilePosition(center.toPosition())));
-		/*if (!isWalkable)
-		{
-            Position tmp = MapManager::Instance().closestWalkabableSameRegionOrConnected(topos);
-            if (tmp != Positions::None)
-                topos = tmp;
-	        isGoodHeight = (Broodwar->getGroundHeight(TilePosition(topos)) == Broodwar->getGroundHeight(TilePosition(center.toPosition())));
-		}
-		if (!isGoodHeight)*/
 		if (!isWalkable || !isGoodHeight)
 		{
 			++moreSlots;
