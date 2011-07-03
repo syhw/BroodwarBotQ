@@ -6,11 +6,14 @@
 
 Goal::~Goal()
 {
+	log("deleted a goal\n");
 }
+
 Goal::Goal()
 : status(GS_NOT_ATTRIBUTED)
 , firstFrame(BWAPI::Broodwar->getFrameCount())
 {
+	log("created a goal\n");
 }
 
 Goal::Goal(UnitsGroup * ug)
@@ -18,6 +21,7 @@ Goal::Goal(UnitsGroup * ug)
 , unitsGroup(ug)
 , firstFrame(BWAPI::Broodwar->getFrameCount())
 {
+	log("created a goal\n");
 }
 
 Goal::Goal(UnitsGroup * ug, pSubgoal s)
@@ -25,6 +29,7 @@ Goal::Goal(UnitsGroup * ug, pSubgoal s)
 , unitsGroup(ug)
 , firstFrame(BWAPI::Broodwar->getFrameCount())
 {
+	log("created a goal\n");
     addSubgoal(s);
 }
 

@@ -131,7 +131,7 @@ void WarManager::onUnitDestroy(BWAPI::Unit* unit)
 	}
 }
 
-void WarManager::sendGroupToAttack( UnitsGroup* ug)
+void WarManager::sendGroupToAttack(UnitsGroup* ug)
 {
 	if (ScoutController::Instance().enemyFound)
     {
@@ -139,7 +139,7 @@ void WarManager::sendGroupToAttack( UnitsGroup* ug)
 	}
 }
 
-void WarManager::sendGroupToDefense( UnitsGroup* ug)
+void WarManager::sendGroupToDefense(UnitsGroup* ug)
 {
 
 }

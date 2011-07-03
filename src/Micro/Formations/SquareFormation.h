@@ -9,4 +9,5 @@ public:
     SquareFormation(const BWAPI::Position& p, const Vec& direction = Vec(0,0));
 
 	virtual void computeToPositions(const std::vector<pBayesianUnit>& vUnits);
+	virtual void computeToPositions(const std::vector<pBayesianUnit>& vUnits, unsigned int unwantedSlots);
 };

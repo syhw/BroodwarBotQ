@@ -55,6 +55,16 @@ void BattleBroodAI::onEnd(bool isWinner)
 void BattleBroodAI::onFrame()
 {
 #ifdef __DEBUG__
+	for(std::set<BWTA::Region*>::const_iterator r=BWTA::getRegions().begin();r!=BWTA::getRegions().end();r++)
+	{
+		BWTA::Polygon p=(*r)->getPolygon();
+		for(int j=0;j<(int)p.size();j++)
+		{
+			Position point1=p[j];
+			Position point2=p[(j+1) % p.size()];
+			Broodwar->drawLine(CoordinateType::Map,point1.x(),point1.y(),point2.x(),point2.y(),Colors::Green);
+		}
+	}
 	Broodwar->drawTextScreen(300, 20, "APM %d", Broodwar->getAPM());
     clock_t start = clock();
 

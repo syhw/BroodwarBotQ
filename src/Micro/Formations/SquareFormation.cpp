@@ -2,7 +2,7 @@
 #include "SquareFormation.h"
 #include "Regions/MapManager.h"
 
-#define __SAFE_SQUARE_FORMATION__
+//#define __SAFE_SQUARE_FORMATION__
 
 using namespace BWAPI;
 
@@ -17,11 +17,22 @@ SquareFormation::SquareFormation(const Position& p, const Vec& direction)
 
 void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
 {
-    if (end_positions.size() == vUnits.size())
-        return;
+	computeToPositions(vUnits, 0);
+}
+
+void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits, unsigned int unwantedSlots)
+{
     if (!vUnits.size())
         return;
 	end_positions.clear();
+
+#ifdef __SAFE_SQUARE_FORMATION__
+	BWTA::Region* regionCenter = BWTA::getRegion(TilePosition(center.toPosition()));
+	if (regionCenter != NULL)
+		center = regionCenter->getCenter();
+#endif
+	if (!Broodwar->isWalkable(center.toPosition().x()/8, center.toPosition().y()/8))
+		center = Vec(MapManager::Instance().closestWalkabableSameRegionOrConnected(center.toPosition()));
 
     if (vUnits.size() == 1)
     {
@@ -50,40 +61,50 @@ void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnit
         if ((*it)->getMaxDimension() > maxDim)
             maxDim = (*it)->getMaxDimension();
     }
-	unsigned int sizeSide = (unsigned int)sqrt((double)vUnits.size());
+	int sizeSide = int(sqrt((double)(vUnits.size() + unwantedSlots)) + 1);
+	int maxContainance = sizeSide*sizeSide;
+	unsigned int moreSlots = 0;
 	Vec corner = center - Position( (int)(sizeSide/2.0 * (space + maxDim)), (int)(sizeSide/2.0 * (space + maxDim)));
-	for (unsigned int i = 0; i < vUnits.size(); i++)
+	//goto safe_exit;
+	unsigned int ii = 0;
+	for (unsigned int i = 0; i < (unsigned int)maxContainance && ii < vUnits.size(); ++i)
     {
-        Position topos = (corner + Position( int(i/sizeSide) * (space + maxDim), (i%sizeSide) * (space + maxDim))).toPosition();
-        if (!vUnits[i]->unit->getType().isFlyer() && !Broodwar->isWalkable(topos.x()/8, topos.y()/8))
+        Position topos = (corner + Position(int(i/sizeSide) * (space + maxDim), (i%sizeSide) * (space + maxDim))).toPosition();
+        if (vUnits[ii]->unit->getType().isFlyer())
         {
+			end_positions.push_back(topos);
+			++ii;
+		}
+		bool isWalkable = Broodwar->isWalkable(topos.x()/8, topos.y()/8);
+		bool isGoodHeight = (Broodwar->getGroundHeight(TilePosition(topos)) == Broodwar->getGroundHeight(TilePosition(center.toPosition())));
+		/*if (!isWalkable)
+		{
             Position tmp = MapManager::Instance().closestWalkabableSameRegionOrConnected(topos);
             if (tmp != Positions::None)
                 topos = tmp;
-        }
-#ifdef __SAFE_SQUARE_FORMATION__
-        BWTA::Region* regionCenter = BWTA::getRegion(TilePosition(center.toPosition()));
-        if (regionCenter != NULL && BWTA::getRegion(TilePosition(topos)) != regionCenter && center.toPosition() != regionCenter->getCenter())
-        {
-            center = regionCenter->getCenter();
-            end_positions.clear();
-            this->computeToPositions(vUnits);
-            return;
-        }
-#endif
-        if (topos.isValid())
-            end_positions.push_back(topos);
-        else
-        {
+	        isGoodHeight = (Broodwar->getGroundHeight(TilePosition(topos)) == Broodwar->getGroundHeight(TilePosition(center.toPosition())));
+		}
+		if (!isGoodHeight)*/
+		if (!isWalkable || !isGoodHeight)
+		{
+			++moreSlots;
+			continue;
+		}
+        if (!topos.isValid())
             topos.makeValid();
-            end_positions.push_back(topos);
-        }
+		if (end_positions.size() < vUnits.size())
+		{
+			end_positions.push_back(topos);
+			++ii;
+		}
+		else
+			break;
     }
     computeMean();
     if (vUnits.size() != end_positions.size())
     {
         end_positions.clear();
-        this->computeToPositions(vUnits);
+        this->computeToPositions(vUnits, unwantedSlots + moreSlots);
     }
 
     /*** TODO BUG HERE TODO TODO TODO
@@ -131,4 +152,13 @@ void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnit
         }
     }
     */
+	return;
+/*safe_exit:
+	{
+		Broodwar->printf("ERROR IN SQUAREFORMATION");
+		log("ERROR IN SQUAREFORMATION");
+		for (unsigned int i = 0; i < vUnits.size(); ++i)
+			end_positions.push_back(center.toPosition());
+		return;
+	}*/
 }

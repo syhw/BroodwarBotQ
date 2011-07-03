@@ -2,7 +2,11 @@
 #include "Utils/Util.h"
 #include <stdarg.h>
 #include <sys/stat.h>
+#include "Defines.h"
+
 char buffer[1024];
+
+#ifdef __DEBUG__
 void log(const char* text, ...)
 {
   const int BUFFER_SIZE = 1024;
@@ -20,6 +24,11 @@ void log(const char* text, ...)
     fclose(outfile);
   }
 }
+#else
+void log(const char* text, ...)
+{
+}
+#endif
 
 void myRestartGame()
 {
