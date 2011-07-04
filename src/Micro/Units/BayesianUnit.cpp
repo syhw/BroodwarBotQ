@@ -2058,11 +2058,12 @@ void BayesianUnit::update()
         break;
 
     case MODE_INPOS:       
-        if (_unitPos.getDistance(target) > 96)
+        /*if (_unitPos.getDistance(target) > 96)
         {
             this->switchMode(MODE_MOVE);
             return;
-        }
+        }*/
+		Broodwar->printf("in Pos");
         updateDir();
         clickDir();
         break;
