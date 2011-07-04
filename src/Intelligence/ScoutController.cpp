@@ -81,9 +81,10 @@ void ScoutController::update()
 #endif
 
 	/********* Free units groups that need to be freed and add goals to other *********/
-	std::list<std::list<UnitsGroup *>::iterator> toTrash;
 	for(std::list<UnitsGroup>::iterator it = _unitsGroups.begin(); it != _unitsGroups.end(); ++it )
 	{
+		if (_unitsGroups.empty())
+			break;
 		if (it->isWaiting())
         {
 			//If no new goal available release the ug : 

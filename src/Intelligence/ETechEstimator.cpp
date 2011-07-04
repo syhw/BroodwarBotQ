@@ -24,11 +24,11 @@ ETechEstimator::ETechEstimator()
 		}
 		string serializedTablesFileName("C:\\StarCraft\\AI\\BroodwarBotQ\\data\\tables\\");
 		if (enemyRace == Races::Terran)
-			serializedTablesFileName.append("TvP.table");
+			serializedTablesFileName.append("TvPx.table");
 		else if (enemyRace == Races::Protoss)
-			serializedTablesFileName.append("PvP.table");
+			serializedTablesFileName.append("PvPx.table");
 		else if (enemyRace == Races::Zerg)
-			serializedTablesFileName.append("ZvP.table");
+			serializedTablesFileName.append("ZvPx.table");
 		std::ifstream ifs(serializedTablesFileName.c_str());
 		boost::archive::text_iarchive ia(ifs);
 		ia >> st;
@@ -416,12 +416,15 @@ void ETechEstimator::computeDistribOpenings(int time)
 	for (size_t i = 0; i < openingsProbas.size(); ++i)
 	{
 		openingsProbas[i] /= runningSum;
+		if (openingsProbas[i] == openingsProbas[i] // test for NaN / 1#IND
+		    || openingsProbas[i] < 0.0001)         // min proba
+			openingsProbas[i] = 0.0001;
 		verifSum += openingsProbas[i];
 	}
-	if (verifSum < 0.99)
+	if (verifSum < 0.99 || verifSum > 1.01)
 	{
 		for (size_t i = 0; i < openingsProbas.size(); ++i)
-			openingsProbas[i] = 1.0 / openingsProbas.size();
+			openingsProbas[i] /= verifSum;
 	}
 }
 
