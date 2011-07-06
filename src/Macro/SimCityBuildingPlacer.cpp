@@ -63,7 +63,7 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 			in.swap(newIn);
 		}
 	}
-	TilePosition nexus = TilePosition(home->getPosition());
+	TilePosition nexus = home->getTilePosition();
 	TilePosition front = TilePosition(frontChoke->getCenter());
 
 	/// best place to do a pylons/gates cluster
@@ -76,16 +76,16 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 	if (vertical)
 	{
 		minX = center.x() - UnitTypes::Protoss_Gateway.tileWidth() - 1; // 1 additional tile to move around
-		maxX = center.x() + UnitTypes::Protoss_Gateway.tileWidth() + 1; // +1 for the half of the Pylon
-		minY = center.y() - 2*UnitTypes::Protoss_Gateway.tileHeight() - 1;
-		maxY = center.y() + 2*UnitTypes::Protoss_Gateway.tileHeight() + 1;
+		maxX = center.x() + UnitTypes::Protoss_Pylon.tileWidth()-1 + UnitTypes::Protoss_Gateway.tileWidth() + 1;
+		minY = center.y() - UnitTypes::Protoss_Gateway.tileHeight() - 1;
+		maxY = center.y() + UnitTypes::Protoss_Pylon.tileHeight()-1 + UnitTypes::Protoss_Gateway.tileHeight() + 1;
 	}
 	else // horizontal
 	{
-		minX = center.x() - 2*UnitTypes::Protoss_Gateway.tileWidth() - 1; // 1 additional tile to move around
-		maxX = center.x() + 2*UnitTypes::Protoss_Gateway.tileWidth() + 1;
+		minX = center.x() - UnitTypes::Protoss_Gateway.tileWidth() - 1; // 1 additional tile to move around
+		maxX = center.x() + UnitTypes::Protoss_Pylon.tileWidth()-1 + UnitTypes::Protoss_Gateway.tileWidth() + 1;
 		minY = center.y() - UnitTypes::Protoss_Gateway.tileHeight() - 1;
-		maxY = center.y() + UnitTypes::Protoss_Gateway.tileHeight() + 1;
+		maxY = center.y() + UnitTypes::Protoss_Pylon.tileHeight()-1 + UnitTypes::Protoss_Gateway.tileHeight() + 1;
 	}
 	bool canBuildCluster = true;
 	for (unsigned int x = minX; x < minY; ++x)
@@ -105,10 +105,11 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 	{
 		if (vertical)
 		{
-			pylons.pos.push_back(TilePosition(center.x(), center.y() - 1));
-			pylons.pos.push_back(TilePosition(center.x(), center.y() - 1 - UnitTypes::Protoss_Pylon.tileHeight()));
-			pylons.pos.push_back(TilePosition(center.x(), center.y() + 1 + UnitTypes::Protoss_Pylon.tileHeight()));
-			pylons.pos.push_back(TilePosition(center.x(), center.y() + 1));
+			pylons.pos.push_back(TilePosition(center.x(), center.y()));
+			pylons.pos.push_back(TilePosition(center.x(), center.y() - UnitTypes::Protoss_Pylon.tileHeight()));
+			pylons.pos.push_back(TilePosition(center.x(), center.y() + UnitTypes::Protoss_Pylon.tileHeight()));
+			pylons.pos.push_back(TilePosition(center.x(), center.y() - 2*UnitTypes::Protoss_Pylon.tileHeight()));
+			pylons.pos.push_back(TilePosition(center.x(), center.y() + 2*UnitTypes::Protoss_Pylon.tileHeight()));
 			gates.pos.push_back(TilePosition(minX + 1, minY + 1));
 			gates.pos.push_back(TilePosition(minX + 1, minY + 1 + UnitTypes::Protoss_Gateway.tileHeight()));
 			gates.pos.push_back(TilePosition(minX + 1, minY + 1 + 2*UnitTypes::Protoss_Gateway.tileHeight()));
@@ -118,16 +119,17 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 		}
 		else
 		{
-			pylons.pos.push_back(TilePosition(center.x() - 1, center.y()));
-			pylons.pos.push_back(TilePosition(center.x() + 1, center.y()));
-			pylons.pos.push_back(TilePosition(center.x() - 1 - UnitTypes::Protoss_Pylon.tileWidth(), center.y()));
-			pylons.pos.push_back(TilePosition(center.x() + 1 + UnitTypes::Protoss_Pylon.tileWidth(), center.y()));
+			pylons.pos.push_back(TilePosition(center.x(), center.y()));
+			pylons.pos.push_back(TilePosition(center.x() + UnitTypes::Protoss_Pylon.tileWidth(), center.y()));
+			pylons.pos.push_back(TilePosition(center.x() - UnitTypes::Protoss_Pylon.tileWidth(), center.y()));
+			pylons.pos.push_back(TilePosition(center.x() - 2*UnitTypes::Protoss_Pylon.tileWidth(), center.y()));
+			pylons.pos.push_back(TilePosition(center.x() + 2*UnitTypes::Protoss_Pylon.tileWidth(), center.y()));
 			gates.pos.push_back(TilePosition(minX + 1, minY + 1));
 			gates.pos.push_back(TilePosition(minX + 1 + UnitTypes::Protoss_Gateway.tileWidth(), minY + 1));
 			gates.pos.push_back(TilePosition(minX + 1 + 2*UnitTypes::Protoss_Gateway.tileWidth(), minY + 1));
-			gates.pos.push_back(TilePosition(minX + 1, maxY - 1 - UnitTypes::Protoss_Gateway.tileHeight()));
-			gates.pos.push_back(TilePosition(minX + 1 + UnitTypes::Protoss_Gateway.tileWidth(), maxY - 1 - UnitTypes::Protoss_Gateway.tileHeight()));
-			gates.pos.push_back(TilePosition(minX + 1 + 2*UnitTypes::Protoss_Gateway.tileWidth(), maxY - 1 - UnitTypes::Protoss_Gateway.tileHeight()));
+			gates.pos.push_back(TilePosition(minX + 1, maxY - UnitTypes::Protoss_Gateway.tileHeight()));
+			gates.pos.push_back(TilePosition(minX + UnitTypes::Protoss_Gateway.tileWidth(), maxY - UnitTypes::Protoss_Gateway.tileHeight()));
+			gates.pos.push_back(TilePosition(minX + 1 + 2*UnitTypes::Protoss_Gateway.tileWidth(), maxY - UnitTypes::Protoss_Gateway.tileHeight()));
 		}
 	}
 
@@ -178,11 +180,19 @@ void SimCityBuildingPlacer::completedTask(TaskStream* ts, const Task &t)
 
 void SimCityBuildingPlacer::update(TaskStream* ts)
 {
+	for (list<TilePosition>::const_iterator it = pylons.pos.begin();
+		it != pylons.pos.end(); ++it)
+		Broodwar->drawBoxMap(it->x()*32, it->y()*32, (it->x()+2)*32, (it->y()+2)*32, Colors::Yellow);
+	for (list<TilePosition>::const_iterator it = gates.pos.begin();
+		it != gates.pos.end(); ++it)
+		Broodwar->drawBoxMap(it->x()*32, it->y()*32, (it->x()+3)*32, (it->y()+3)*32, Colors::Yellow);
+	
 	if (Broodwar->getFrameCount()%10 != 0) return;
 
 	if (ts->getTask(0).getType() != TaskTypes::Unit) return;
 
 	UnitType type = ts->getTask(0).getUnit();
+	std::string tmpS = type.getName();
 
 	// don't look for a build location if this building requires power and we have no pylons
 	if (type.requiresPsi() && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Pylon) == 0) return;
@@ -194,7 +204,7 @@ void SimCityBuildingPlacer::update(TaskStream* ts)
 	if (type == UnitTypes::Protoss_Pylon)
 	{
 		if (!pylons.empty())
-			ts->getTask(0).setTilePosition(pylons.reservePos());
+			pylons.reservePos(ts->getTask(0));
 		else
 		{
 			// TODO generate gates pos
@@ -203,10 +213,20 @@ void SimCityBuildingPlacer::update(TaskStream* ts)
 	else if (type == UnitTypes::Protoss_Gateway || type == UnitTypes::Protoss_Cybernetics_Core)
 	{
 		if (!gates.empty())
-			ts->getTask(0).setTilePosition(gates.reservePos());
+			gates.reservePos(ts->getTask(0));
 		else
 		{
 			// TODO generate gates pos
+		}
+	}
+	else if (type.isRefinery())
+	{
+		set<Unit*>::const_iterator it = home->getGeysers().begin();
+		if (canBuildHere(NULL, (*it)->getTilePosition(), type))
+			ts->getTask(0).setTilePosition((*it)->getTilePosition());
+		else
+		{
+			// TODO other gas
 		}
 	}
 
@@ -222,6 +242,10 @@ void SimCityBuildingPlacer::update(TaskStream* ts)
 			int bd = taskStreams[ts].buildDistance;
 			TilePosition newtp = TilePositions::None;
 			newtp = getBuildLocationNear(ts->getWorker(), tp, type, bd);
+			if (type == UnitTypes::Protoss_Pylon)
+				pylons.freePos(ts->getTask(0).getTilePosition());
+			else if (type == UnitTypes::Protoss_Gateway || type == UnitTypes::Protoss_Cybernetics_Core)
+				gates.freePos(ts->getTask(0).getTilePosition());
 			if (newtp != TilePositions::None)
 				ts->getTask(0).setTilePosition(newtp);
 		}
@@ -265,6 +289,7 @@ void SimCityBuildingPlacer::setBuildDistance(TaskStream* ts, int distance)
 BWAPI::TilePosition SimCityBuildingPlacer::getBuildLocationNear(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type, int buildDist)
 {
 	/// Returns a valid build location near the specified tile position.
+	std::string tmpS = type.getName();
 	if (type.isAddon()) type = type.whatBuilds().first;
 
 	if (type == UnitTypes::Protoss_Pylon)
@@ -276,13 +301,23 @@ BWAPI::TilePosition SimCityBuildingPlacer::getBuildLocationNear(BWAPI::Unit* bui
 			// GENERATE
 		}
 	}
-	else
+	else if (type == UnitTypes::Protoss_Gateway || type == UnitTypes::Protoss_Cybernetics_Core)
 	{
 		if (!gates.empty())
 			return gates.reservePos();
 		else
 		{
 			// GENERATE
+		}
+	}
+	else if (type.isRefinery())
+	{
+		set<Unit*>::const_iterator it = home->getGeysers().begin();
+		if (canBuildHere(NULL, (*it)->getTilePosition(), type))
+			return ((*it)->getTilePosition());
+		else
+		{
+			// TODO other gas
 		}
 	}
 	return BWAPI::TilePositions::None;

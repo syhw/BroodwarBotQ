@@ -5,7 +5,7 @@
 #include "Macro/BasicWorkerFinder.h"
 #include "Macro/TerminateIfEmpty.h"
 #include "Macro/BasicTaskExecutor.h"
-#include "Macro/BFSBuildingPlacer.h"
+#include "Macro/SimCityBuildingPlacer.h"
 using namespace BWAPI;
 using namespace std;
 TaskStream::TaskStream(Task t0, Task t1, Task t2, Task t3)
@@ -563,7 +563,7 @@ TaskStream* TaskStream::forkCurrentTask()
   TaskStream* ts = new TaskStream(task[0]);
   ts->attach(BasicTaskExecutor::getInstance(),false);
   ts->attach(new TerminateIfEmpty(),true);
-  ts->attach(BFSBuildingPlacer::getInstance(),false);
+  ts->attach(SimCityBuildingPlacer::getInstance(),false);
   ts->attach(new BasicWorkerFinder(),true);
   ts->buildUnit = buildUnit;
   Broodwar->printf("Forked Task %s!",task[0].getName().c_str());

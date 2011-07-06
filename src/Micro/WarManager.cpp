@@ -76,7 +76,9 @@ void WarManager::update()
 	{
         if ((*it)->size() > 2 && (*it)->emptyGoals())
             sendGroupToAttack(*it);
-	        (*it)->update();
+		else if ((*it)->emptyGoals())
+			sendGroupToDefense(*it);
+		(*it)->update();
 	}
 }
 
@@ -150,7 +152,14 @@ void WarManager::sendGroupToAttack(UnitsGroup* ug)
 
 void WarManager::sendGroupToDefense(UnitsGroup* ug)
 {
-
+	if (home->getRegion()->getChokepoints().size() == 1)
+	{
+		ug->addGoal(pGoal(new AttackGoal(ug, (*(home->getRegion()->getChokepoints().begin()))->getCenter())));
+	}
+	else 
+	{
+		// TODO
+	}
 }
 
 

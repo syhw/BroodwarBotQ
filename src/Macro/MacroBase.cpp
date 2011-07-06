@@ -2,7 +2,7 @@
 #include "Macro/MacroBaseManager.h"
 #include "Macro/MacroManager.h"
 #include "Macro/BasicTaskExecutor.h"
-#include "Macro/BFSBuildingPlacer.h"
+#include "Macro/SimCityBuildingPlacer.h"
 #include "Macro/TerminateIfEmpty.h"
 #include "Macro/BasicWorkerFinder.h"
 #include "Macro/Task.h"
@@ -17,9 +17,9 @@ MacroBase* MacroBase::CreateBaseNow(BWTA::BaseLocation* b, bool getGas)
   mb->depot_ts->attach(new BasicWorkerFinder(),true);
   mb->depot_ts->attach(BasicTaskExecutor::getInstance(),false);
   mb->depot_ts->attach(new TerminateIfEmpty(),true);
-  mb->depot_ts->attach(BFSBuildingPlacer::getInstance(),false); 
+  mb->depot_ts->attach(SimCityBuildingPlacer::getInstance(),false); 
   mb->depot_ts->attach(mb,false);
-  BFSBuildingPlacer::getInstance()->setRelocatable(mb->depot_ts,false);
+  SimCityBuildingPlacer::getInstance()->setRelocatable(mb->depot_ts,false);
   return mb;
 }
 MacroBase* MacroBase::CreateBaseWhenPossible(BWTA::BaseLocation* b, bool getGas)
@@ -31,9 +31,9 @@ MacroBase* MacroBase::CreateBaseWhenPossible(BWTA::BaseLocation* b, bool getGas)
   mb->depot_ts->attach(new BasicWorkerFinder(),true);
   mb->depot_ts->attach(BasicTaskExecutor::getInstance(),false);
   mb->depot_ts->attach(new TerminateIfEmpty(),true);
-  mb->depot_ts->attach(BFSBuildingPlacer::getInstance(),false);
+  mb->depot_ts->attach(SimCityBuildingPlacer::getInstance(),false);
   mb->depot_ts->attach(mb,false);
-  BFSBuildingPlacer::getInstance()->setRelocatable(mb->depot_ts,false);
+  SimCityBuildingPlacer::getInstance()->setRelocatable(mb->depot_ts,false);
   return mb;
 }
 MacroBase* MacroBase::CreateBaseAtFrame(BWTA::BaseLocation* b, int frame, bool getGas)
@@ -46,9 +46,9 @@ MacroBase* MacroBase::CreateBaseAtFrame(BWTA::BaseLocation* b, int frame, bool g
   mb->depot_ts->attach(new BasicWorkerFinder(),true);
   mb->depot_ts->attach(BasicTaskExecutor::getInstance(),false);
   mb->depot_ts->attach(new TerminateIfEmpty(),true);
-  mb->depot_ts->attach(BFSBuildingPlacer::getInstance(),false);
+  mb->depot_ts->attach(SimCityBuildingPlacer::getInstance(),false);
   mb->depot_ts->attach(mb,false);
-  BFSBuildingPlacer::getInstance()->setRelocatable(mb->depot_ts,false);
+  SimCityBuildingPlacer::getInstance()->setRelocatable(mb->depot_ts,false);
   return mb;
 }
 MacroBase* MacroBase::RecognizeExistingBase(BWTA::BaseLocation* b, BWAPI::Unit* depot)

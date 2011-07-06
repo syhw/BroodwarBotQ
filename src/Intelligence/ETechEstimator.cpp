@@ -12,6 +12,7 @@ ETechEstimator::ETechEstimator()
 {
 	/// Load the learned prob tables (uniforms + bell shapes) for the right match up
 	{
+		// TODO Random case!!
 		Race enemyRace;
 		for (set<Player*>::const_iterator p = Broodwar->getPlayers().begin();
 			p != Broodwar->getPlayers().end(); ++p)

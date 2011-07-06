@@ -4,7 +4,7 @@
 #include "Macro/ResourceRates.h"
 #include "Macro/BasicTaskExecutor.h"
 #include "Macro/SpiralBuildingPlacer.h"
-#include "Macro/BFSBuildingPlacer.h"
+#include "Macro/SimCityBuildingPlacer.h"
 #include "Macro/PylonBuildingPlacer.h"
 #include "Macro/UnitPump.h"
 #include "Macro/TerminateIfWorkerLost.h"
@@ -62,11 +62,11 @@ void MacroSupplyManager::update()
           ts->attach(new TerminateIfEmpty(),true);
           if (Broodwar->self()->getRace()==Races::Protoss)
           {
-            ts->attach(PylonBuildingPlacer::getInstance(),false);
-            PylonBuildingPlacer::getInstance()->setBuildDistance(ts,4);
+            ts->attach(SimCityBuildingPlacer::getInstance(),false);
+            SimCityBuildingPlacer::getInstance()->setBuildDistance(ts,4);
           }
           else
-            ts->attach(BFSBuildingPlacer::getInstance(),false);
+            ts->attach(SimCityBuildingPlacer::getInstance(),false);
 
         }
       }
@@ -86,9 +86,9 @@ void MacroSupplyManager::update()
             ts->attach(BasicTaskExecutor::getInstance(),false);
             ts->attach(new TerminateIfEmpty(),true);
             if (Broodwar->self()->getRace()==Races::Protoss)
-              ts->attach(PylonBuildingPlacer::getInstance(),false);
+              ts->attach(SimCityBuildingPlacer::getInstance(),false);
             else
-              ts->attach(BFSBuildingPlacer::getInstance(),false);
+              ts->attach(SimCityBuildingPlacer::getInstance(),false);
           }
         }
       }

@@ -2,7 +2,7 @@
 #include <Utils/CSingleton.h>
 #include "Macro/BasicTaskExecutor.h"
 #include "Macro/SpiralBuildingPlacer.h"
-#include "Macro/BFSBuildingPlacer.h"
+#include "Macro/SimCityBuildingPlacer.h"
 #include "Macro/UnitPump.h"
 #include "Macro/TerminateIfWorkerLost.h"
 #include "Macro/TerminateIfEmpty.h"

@@ -4,7 +4,7 @@
 #include "Macro/ResourceRates.h"
 #include "Macro/BasicTaskExecutor.h"
 #include "Macro/SpiralBuildingPlacer.h"
-#include "Macro/BFSBuildingPlacer.h"
+#include "Macro/SimCityBuildingPlacer.h"
 #include "Macro/UnitPump.h"
 #include "Macro/TerminateIfWorkerLost.h"
 #include "Macro/TerminateIfEmpty.h"
@@ -57,7 +57,7 @@ void MacroDependencyResolver::update()
             nts->attach(new BasicWorkerFinder(),true);
             nts->attach(BasicTaskExecutor::getInstance(),false);
             nts->attach(new TerminateIfEmpty(),true);
-            nts->attach(BFSBuildingPlacer::getInstance(),false);
+            nts->attach(SimCityBuildingPlacer::getInstance(),false);
           }
           map<UnitType, int> requiredUnits = ts->getTask(i).getRequiredUnits();
           for each(pair<UnitType,int> r in requiredUnits)
@@ -74,7 +74,7 @@ void MacroDependencyResolver::update()
               nts->attach(new BasicWorkerFinder(),true);
               nts->attach(BasicTaskExecutor::getInstance(),false);
               nts->attach(new TerminateIfEmpty(),true);
-              nts->attach(BFSBuildingPlacer::getInstance(),false);
+              nts->attach(SimCityBuildingPlacer::getInstance(),false);
             }
           }
         }

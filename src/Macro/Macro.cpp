@@ -35,6 +35,7 @@ Macro::Macro()
 	ts->attach(new TerminateIfWorkerLost(),true);
 	if (Broodwar->self()->getRace() == Races::Protoss)
 	{
+		buildOrderAdd(UnitTypes::Protoss_Pylon);
 		buildOrderAdd(UnitTypes::Protoss_Gateway);
 		buildOrderAdd(UnitTypes::Protoss_Cybernetics_Core);
 		buildOrderAdd(UnitTypes::Protoss_Assimilator);
@@ -84,7 +85,7 @@ void Macro::buildOrderAdd(UnitType type)
 	ts->attach(new BasicWorkerFinder(),true);
 	ts->attach(BasicTaskExecutor::getInstance(),false);
 	ts->attach(new TerminateIfEmpty(),true);
-	ts->attach(BFSBuildingPlacer::getInstance(),false);
+	ts->attach(SimCityBuildingPlacer::getInstance(),false);
 }
 
 void Macro::techAdd(TechType type)
@@ -94,7 +95,7 @@ void Macro::techAdd(TechType type)
 	ts->attach(new BasicWorkerFinder(),true);
 	ts->attach(BasicTaskExecutor::getInstance(),false);
 	ts->attach(new TerminateIfEmpty(),true);
-	ts->attach(BFSBuildingPlacer::getInstance(),false);
+	ts->attach(SimCityBuildingPlacer::getInstance(),false);
 }
 
 void Macro::upgradeAdd(UpgradeType type)
@@ -104,7 +105,7 @@ void Macro::upgradeAdd(UpgradeType type)
 	ts->attach(new BasicWorkerFinder(),true);
 	ts->attach(BasicTaskExecutor::getInstance(),false);
 	ts->attach(new TerminateIfEmpty(),true);
-	ts->attach(BFSBuildingPlacer::getInstance(),false);
+	ts->attach(SimCityBuildingPlacer::getInstance(),false);
 }
 
 void Macro::update()
