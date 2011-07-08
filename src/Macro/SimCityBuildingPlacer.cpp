@@ -7,6 +7,95 @@
 using namespace std;
 using namespace BWAPI;
 
+/***
+ * returns true if a (Manhattan, sure) path inside a square of size 
+ * max(dist(tp1, tp2).x, dist(tp1, tp2).y) exists between tp1 and tp2
+ */
+inline bool existsInnerPath(const TilePosition& tp1,
+							const TilePosition& tp2,
+							const list<TilePosition>& occupied)
+{
+	if (tp1 == tp2) // same
+		return true;
+	if (abs(tp1.x()-tp2.x()) + abs(tp1.y()-tp2.y()) < 2) // adjacent in Manhattan distance
+		return true;
+	set<TilePosition> from1;
+	from1.insert(tp1);
+	set<TilePosition> from2;
+	from2.insert(tp2);
+	int max = max(abs(tp1.x() - tp2.x()), abs(tp1.y() - tp2.y()));
+	for (unsigned int i = 0; i < max; ++i)
+	{
+		set<TilePosition> tmp1;
+		for (set<TilePosition>::const_iterator it = from1.begin();
+			it != from1.end(); ++it)
+		{
+			tmp1.insert(TilePosition(it->x()+1, it->y()));
+			tmp1.insert(TilePosition(it->x(), it->y()+1));
+			tmp1.insert(TilePosition(it->x()-1, it->y()));
+			tmp1.insert(TilePosition(it->x(), it->y()-1));
+		}
+		tmp1.swap(from1);
+		set<TilePosition> tmp2;
+		for (set<TilePosition>::const_iterator it = from2.begin();
+			it != from2.end(); ++it)
+		{
+			TilePosition tmp = TilePosition(it->x()+1, it->y());
+			if (from1.count(tmp))
+				return true;
+			tmp2.insert(tmp);
+			tmp = TilePosition(it->x(), it->y()+1);
+			if (from1.count(tmp))
+				return true;
+			tmp2.insert(tmp);
+			tmp = TilePosition(it->x()-1, it->y());
+			if (from1.count(tmp))
+				return true;
+			tmp2.insert(tmp);
+			tmp = TilePosition(it->x(), it->y()-1);
+			if (from1.count(tmp))
+				return true;
+			tmp2.insert(tmp);
+		}
+		tmp2.swap(from2);
+	}
+	return false;
+}
+
+TilePosition PositionAccountant::reservePos(Task& task)
+{
+	for (list<BWAPI::TilePosition>::const_iterator it = pos.begin();
+		it != pos.end(); ++it)
+	{
+		if (!givenPos.count(*it))
+		{
+			givenPos.erase(task.getTilePosition());
+			givenPos.insert(*it);
+			task.setTilePosition(*it);
+			return *it;
+		}
+	}
+	return TilePositions::None;
+}
+
+TilePosition PositionAccountant::reservePos()
+{
+	for (list<BWAPI::TilePosition>::const_iterator it = pos.begin();
+		it != pos.end(); ++it)
+	{
+		if (!givenPos.count(*it))
+		{
+			givenPos.insert(*it);
+			return *it;
+		}
+	}
+	return TilePositions::None;
+}
+
+void PositionAccountant::generate()
+{
+}
+
 SimCityBuildingPlacer* instance = NULL;
 SimCityBuildingPlacer* SimCityBuildingPlacer::getInstance()
 {
@@ -33,6 +122,7 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 		}
 	}
 	backdoorChokes.erase(frontChoke);
+	
 
 	/// search the center of our home Region
 	TilePosition center = TilePosition(home->getRegion()->getCenter()); // region->getCenter() is bad (can be out of the Region)
@@ -154,12 +244,20 @@ void SimCityBuildingPlacer::attached(TaskStream* ts)
 void SimCityBuildingPlacer::detached(TaskStream* ts)
 {
 	taskStreams.erase(ts);
-	// TODO cancel
 }
 
 void SimCityBuildingPlacer::newStatus(TaskStream* ts)
 {
 	// TODO cancel
+	/*UnitType type = ts->getTask(0).getUnit();
+	if (type == UnitTypes::Protoss_Pylon)
+	{
+		pylons.freePos(ts->getTask(0).getTilePosition());
+	}
+	else if (type == UnitTypes::Protoss_Gateway || type == UnitTypes::Protoss_Cybernetics_Core)
+	{
+		gates.freePos(ts->getTask(0).getTilePosition());
+	}*/
 }
 
 void SimCityBuildingPlacer::completedTask(TaskStream* ts, const Task &t)
@@ -201,35 +299,6 @@ void SimCityBuildingPlacer::update(TaskStream* ts)
 
 	int width = ts->getTask(0).getUnit().tileWidth();
 
-	if (type == UnitTypes::Protoss_Pylon)
-	{
-		if (!pylons.empty())
-			pylons.reservePos(ts->getTask(0));
-		else
-		{
-			// TODO generate gates pos
-		}
-	}
-	else if (type == UnitTypes::Protoss_Gateway || type == UnitTypes::Protoss_Cybernetics_Core)
-	{
-		if (!gates.empty())
-			gates.reservePos(ts->getTask(0));
-		else
-		{
-			// TODO generate gates pos
-		}
-	}
-	else if (type.isRefinery())
-	{
-		set<Unit*>::const_iterator it = home->getGeysers().begin();
-		if (canBuildHere(NULL, (*it)->getTilePosition(), type))
-			ts->getTask(0).setTilePosition((*it)->getTilePosition());
-		else
-		{
-			// TODO other gas
-		}
-	}
-
 	/// Something blocks construction
 	if (ts->getStatus()==TaskStream::Error_Location_Blocked || ts->getStatus()==TaskStream::Error_Location_Not_Specified)
 	{
@@ -246,6 +315,8 @@ void SimCityBuildingPlacer::update(TaskStream* ts)
 				pylons.freePos(ts->getTask(0).getTilePosition());
 			else if (type == UnitTypes::Protoss_Gateway || type == UnitTypes::Protoss_Cybernetics_Core)
 				gates.freePos(ts->getTask(0).getTilePosition());
+			else if (type == UnitTypes::Protoss_Photon_Cannon)
+				cannons.freePos(ts->getTask(0).getTilePosition());
 			if (newtp != TilePositions::None)
 				ts->getTask(0).setTilePosition(newtp);
 		}
@@ -318,6 +389,15 @@ BWAPI::TilePosition SimCityBuildingPlacer::getBuildLocationNear(BWAPI::Unit* bui
 		else
 		{
 			// TODO other gas
+		}
+	}
+	else if (type == UnitTypes::Protoss_Photon_Cannon)
+	{
+		if (!cannons.empty())
+			return cannons.reservePos();
+		else
+		{
+			// GENERATE
 		}
 	}
 	return BWAPI::TilePositions::None;

@@ -5,38 +5,14 @@
 #include <list>
 #include <set>
 
+
 struct PositionAccountant
 {
 	std::list<BWAPI::TilePosition> pos;
 	std::set<BWAPI::TilePosition> givenPos;
-	BWAPI::TilePosition reservePos(Task& task)
-	{
-		for (std::list<BWAPI::TilePosition>::const_iterator it = pos.begin();
-			it != pos.end(); ++it)
-		{
-			if (!givenPos.count(*it))
-			{
-				givenPos.erase(task.getTilePosition());
-				givenPos.insert(*it);
-				task.setTilePosition(*it);
-				return *it;
-			}
-		}
-		return BWAPI::TilePositions::None;
-	}
-	BWAPI::TilePosition reservePos()
-	{
-		for (std::list<BWAPI::TilePosition>::const_iterator it = pos.begin();
-			it != pos.end(); ++it)
-		{
-			if (!givenPos.count(*it))
-			{
-				givenPos.insert(*it);
-				return *it;
-			}
-		}
-		return BWAPI::TilePositions::None;
-	}
+	BWAPI::TilePosition reservePos(Task& task);
+	BWAPI::TilePosition reservePos();
+	inline void generate();
 	inline void freePos(BWAPI::TilePosition tp)
 	{
 		givenPos.erase(tp);
@@ -69,6 +45,7 @@ private:
 	std::list<BWAPI::TilePosition> existingPylons;
 	PositionAccountant pylons;
 	PositionAccountant gates;
+	PositionAccountant cannons;
 	BWTA::BaseLocation* home;
 	BWTA::Chokepoint* frontChoke;
 	std::set<BWTA::Chokepoint*> backdoorChokes;

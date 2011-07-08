@@ -402,7 +402,7 @@ void ETechEstimator::computeDistribOpenings(int time)
 	long double runningSum = 0.0;
 	for (size_t i = 0; i < openingsProbas.size(); ++i)
 	{
-		long double sumX = 0.0;
+		long double sumX = 0.0000001;
 		for (list<unsigned int>::const_iterator it = compatibleXes.begin();
 			it != compatibleXes.end(); ++it)
 		{

@@ -35,7 +35,6 @@ Macro::Macro()
 	ts->attach(new TerminateIfWorkerLost(),true);
 	if (Broodwar->self()->getRace() == Races::Protoss)
 	{
-		buildOrderAdd(UnitTypes::Protoss_Pylon);
 		buildOrderAdd(UnitTypes::Protoss_Gateway);
 		buildOrderAdd(UnitTypes::Protoss_Cybernetics_Core);
 		buildOrderAdd(UnitTypes::Protoss_Assimilator);
