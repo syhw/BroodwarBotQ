@@ -3,6 +3,7 @@
 #include "Macro/ReservedMap.h"
 #include "Macro/Heap.h"
 #include "Utils/Vec.h"
+#include "Regions/MapManager.h"
 
 using namespace std;
 using namespace BWAPI;
@@ -13,27 +14,36 @@ using namespace BWAPI;
  */
 inline bool existsInnerPath(const TilePosition& tp1,
 							const TilePosition& tp2,
-							const list<TilePosition>& occupied)
+							const set<TilePosition>& occupied)
 {
 	if (tp1 == tp2) // same
 		return true;
 	if (abs(tp1.x()-tp2.x()) + abs(tp1.y()-tp2.y()) < 2) // adjacent in Manhattan distance
 		return true;
+	MapManager* mm = & MapManager::Instance();
 	set<TilePosition> from1;
 	from1.insert(tp1);
 	set<TilePosition> from2;
 	from2.insert(tp2);
-	int max = max(abs(tp1.x() - tp2.x()), abs(tp1.y() - tp2.y()));
+	unsigned int max = max(abs(tp1.x() - tp2.x()), abs(tp1.y() - tp2.y()));
 	for (unsigned int i = 0; i < max; ++i)
 	{
 		set<TilePosition> tmp1;
 		for (set<TilePosition>::const_iterator it = from1.begin();
 			it != from1.end(); ++it)
 		{
-			tmp1.insert(TilePosition(it->x()+1, it->y()));
-			tmp1.insert(TilePosition(it->x(), it->y()+1));
-			tmp1.insert(TilePosition(it->x()-1, it->y()));
-			tmp1.insert(TilePosition(it->x(), it->y()-1));
+			TilePosition tmp = TilePosition(it->x()+1, it->y());
+			if (mm->isBTWalkable(tmp) && !occupied.count(tmp))
+				tmp1.insert(tmp);
+			tmp = TilePosition(it->x(), it->y()+1);
+			if (mm->isBTWalkable(tmp) && !occupied.count(tmp))
+				tmp1.insert(tmp);
+			tmp = TilePosition(it->x()-1, it->y());
+			if (mm->isBTWalkable(tmp) && !occupied.count(tmp))
+				tmp1.insert(tmp);
+			tmp = TilePosition(it->x(), it->y()-1);
+			if (mm->isBTWalkable(tmp) && !occupied.count(tmp))
+				tmp1.insert(tmp);
 		}
 		tmp1.swap(from1);
 		set<TilePosition> tmp2;
@@ -43,19 +53,23 @@ inline bool existsInnerPath(const TilePosition& tp1,
 			TilePosition tmp = TilePosition(it->x()+1, it->y());
 			if (from1.count(tmp))
 				return true;
-			tmp2.insert(tmp);
+			if (mm->isBTWalkable(tmp) && !occupied.count(tmp))
+				tmp2.insert(tmp);
 			tmp = TilePosition(it->x(), it->y()+1);
 			if (from1.count(tmp))
 				return true;
-			tmp2.insert(tmp);
+			if (mm->isBTWalkable(tmp) && !occupied.count(tmp))
+				tmp2.insert(tmp);
 			tmp = TilePosition(it->x()-1, it->y());
 			if (from1.count(tmp))
 				return true;
-			tmp2.insert(tmp);
+			if (mm->isBTWalkable(tmp) && !occupied.count(tmp))
+				tmp2.insert(tmp);
 			tmp = TilePosition(it->x(), it->y()-1);
 			if (from1.count(tmp))
 				return true;
-			tmp2.insert(tmp);
+			if (mm->isBTWalkable(tmp) && !occupied.count(tmp))
+				tmp2.insert(tmp);
 		}
 		tmp2.swap(from2);
 	}

@@ -865,6 +865,18 @@ TilePosition MapManager::closestWalkabableSameRegionOrConnected(TilePosition tp)
     return TilePositions::None;
 }
 
+bool MapManager::isBTWalkable(int x, int y)
+{
+	return lowResWalkability[x + y*Broodwar->mapWidth()] 
+		   && !buildings[x + y*Broodwar->mapWidth()];
+}
+
+bool MapManager::isBTWalkable(TilePosition tp)
+{
+	return lowResWalkability[tp.x() + tp.y()*Broodwar->mapWidth()] 
+		   && !buildings[tp.x() + tp.y()*Broodwar->mapWidth()];
+}
+
 void MapManager::drawBuildings()
 {
     for (int x = 0; x < _width; ++x)
