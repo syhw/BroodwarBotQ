@@ -25,12 +25,6 @@ public:
 	//Take care, gworkers is added directly to the number of workers on gaz
 	//And the number of gaz_exploited is increased
 
-#ifdef BW_QT_DEBUG
-	// Qt interface
-	virtual QWidget* createWidget(QWidget* parent) const;
-	virtual void refreshWidget(QWidget* widget) const;
-#endif
-
 private:
 	EEcoEstimator();
 	~EEcoEstimator();

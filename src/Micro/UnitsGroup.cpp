@@ -437,8 +437,10 @@ void UnitsGroup::update()
 
 #ifndef __CLEAN_MODEL__
 	/// For fleeing and fightmoving: select the best moves more globally
+	std::set<pBayesianUnit> unitsTreated;
 	std::map<WalkTilePosition, pBayesianUnit> solutions;
-	std::multimap<double, std::pair<pBayesianUnit, WalkTilePosition> > probsSolutions;
+	std::multimap<double, std::pair<WalkTilePosition, pBayesianUnit> > probsSolutions;
+	/*
 	for (std::vector<pBayesianUnit>::const_iterator it = movingUnits.begin(); it != movingUnits.end(); ++it)
 	{
 		if ((*it)->wtpositionsProb.empty())
@@ -447,15 +449,27 @@ void UnitsGroup::update()
 		}
 		else
 		{
-			probsSolutions.insert(std::make_pair<double, std::pair<pBayesianUnit, WalkTilePosition> >(
-				(*it)->wtpositionsProb.begin()->first, std::make_pair<pBayesianUnit, WalkTilePosition>(
-				*it, (*it)->wtpositionsProb.begin()->second)));
+			probsSolutions.insert(std::make_pair<double, std::pair<WalkTilePosition, pBayesianUnit> >(
+				(*it)->wtpositionsProb.begin()->first, std::make_pair<WalkTilePosition, pBayesianUnit>(
+				(*it)->wtpositionsProb.begin()->second, *it)));
 		}
 	}
-	for (std::multimap<double, std::pair<pBayesianUnit, WalkTilePosition> >::const_iterator it = probsSolutions.begin();
+	for (std::multimap<double, std::pair<WalkTilePosition, pBayesianUnit> >::const_iterator it = probsSolutions.begin();
 		it != probsSolutions.end(); ++it)
 	{
+		if (!solutions.count(it->second.first) 
+			&& !unitsTreated.count(it->second.second))
+		{
+			solutions.insert(it->second);
+			unitsTreated.insert(it->second.second);
+		}
 	}
+	for (std::map<WalkTilePosition, pBayesianUnit>::const_iterator it = solutions.begin();
+		it != solutions.end(); ++it)
+	{
+		it->second->move(it->first.getPosition());
+	}*/
+
 	
 #else
 	// TODO implement clean model

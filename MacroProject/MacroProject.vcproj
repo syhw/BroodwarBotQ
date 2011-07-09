@@ -583,50 +583,10 @@
 						>
 					</File>
 					<File
-						RelativePath="..\src\Utils\Component\moc_RefreshWidgetEmiter.cpp"
-						>
-					</File>
-					<File
 						RelativePath="..\src\Utils\Component\ObjectManager.cpp"
 						>
 					</File>
 				</Filter>
-			</Filter>
-			<Filter
-				Name="AI_Monitor"
-				>
-				<File
-					RelativePath="..\src\AI-Monitor\Mainwindow.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\AI-Monitor\menuwidget.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\AI-Monitor\MiniMap.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\AI-Monitor\release\moc_Mainwindow.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\AI-Monitor\release\moc_menuwidget.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\AI-Monitor\release\moc_MiniMap.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\AI-Monitor\release\moc_QComponentWidget.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\AI-Monitor\QComponentWidget.cpp"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="Intelligence"
@@ -1040,10 +1000,6 @@
 						RelativePath="..\src\Utils\Component\ObjectManager.h"
 						>
 					</File>
-					<File
-						RelativePath="..\src\Utils\Component\RefreshWidgetEmiter.h"
-						>
-					</File>
 				</Filter>
 			</Filter>
 			<Filter
@@ -1063,42 +1019,6 @@
 				</File>
 				<File
 					RelativePath="..\src\Arbitrator\Heap.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\AI-Monitor\WidgetCreator.inl"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="AI_Monitor"
-				>
-				<File
-					RelativePath="..\src\AI-Monitor\Mainwindow.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\AI-Monitor\menuwidget.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\AI-Monitor\MiniMap.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\AI-Monitor\QComponentWidget.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\AI-Monitor\ui_Mainwindow.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\AI-Monitor\ui_menuwidget.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\AI-Monitor\WidgetCreator.h"
 					>
 				</File>
 			</Filter>

@@ -100,15 +100,3 @@ void EEcoEstimator::rm_workers(int mworkers, int gworkers)
 this->mWorkers -= mworkers;
 this->gWorkers -= gworkers;
 }
-
-#ifdef BW_QT_DEBUG
-QWidget* EEcoEstimator::createWidget(QWidget* parent) const
-{
-	return new QLabel(QString("createWidget and refreshWidget undefined for this component."), parent);
-}
-
-void EEcoEstimator::refreshWidget(QWidget* widget) const
-{
-// TODO update your widget after having defined it in the previous method :)
-}
-#endif

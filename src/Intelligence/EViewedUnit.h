@@ -6,10 +6,6 @@
 
 struct EViewedUnit
 {
-#ifdef BW_QT_DEBUG
-    friend std::ostream& operator <<(std::ostream&, const EViewedUnit&);
-#endif
-
     // TODO add probability to be in each of the regions.
     BWAPI::Unit* unit;
     BWAPI::UnitType type;
