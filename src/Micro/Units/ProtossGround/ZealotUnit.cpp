@@ -72,42 +72,8 @@ int ZealotUnit::fightMove()
 
 bool ZealotUnit::decideToFlee()
 {
-    if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() 
-        && Broodwar->getGroundHeight(TilePosition(targetEnemy->getPosition())) > Broodwar->getGroundHeight(TilePosition(_unitPos)))
-    {
-        if (_unitsGroup && _unitsGroup->nearestChoke && _unitsGroup->nearestChoke->getCenter().getDistance(_unitPos) < 128)
-        {
-            _fleeing = false;
-            return false;
-        }
-    }
     if (unit->getShields() < 10)
-        _fleeingDmg = 24;
-    // TODO complete conditions
-    int diff = _lastTotalHP - (unit->getShields() + unit->getHitPoints());
-    _HPLosts.push_back(diff);
-    _sumLostHP += diff;
-    if (_HPLosts.size() > 19)
-    {
-        _sumLostHP -= _HPLosts.front();
-        _HPLosts.pop_front();
-    }
-    if (_sumLostHP > _fleeingDmg)
-        _fleeing = true;
-    else
-        _fleeing = false;
-    if (!_fleeing)
-    {
-        int incDmg = 0;
-        for (std::set<Unit*>::const_iterator it = _targetingMe.begin();
-            it != _targetingMe.end(); ++it)
-        {
-            if ((*it)->getDistance(_unitPos) <= (*it)->getType().groundWeapon().maxRange() + 16)
-                incDmg += (*it)->getType().groundWeapon().damageAmount() * (*it)->getType().maxGroundHits();
-        }
-        if (incDmg + _sumLostHP > _fleeingDmg)
-            _fleeing = true;
-    }
+		_fleeing = true;
     return _fleeing;
 }
 
@@ -322,7 +288,7 @@ void ZealotUnit::micro()
         {
             if (_fleeing)
             {
-                simpleFlee();
+                flee();
             }
             else
             {
