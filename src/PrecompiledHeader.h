@@ -3,7 +3,9 @@
 #include <windows.h>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <stdio.h>
+#include <list>
 #include <vector>
 #include <set>
 #include <map>
@@ -16,4 +18,6 @@
 #include <BWAPI.h>
 #include <float.h>
 #include <math.h>
+#include <cmath>
+#include "Utils/Util.h"
 #endif
