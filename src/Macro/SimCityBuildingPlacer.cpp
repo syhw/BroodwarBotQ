@@ -76,6 +76,16 @@ inline bool existsInnerPath(const TilePosition& tp1,
 	return false;
 }
 
+/***
+ * Gives a buildable TilePosition farther from nexus
+ */
+TilePosition buildFartherFrom(const TilePosition& tp,
+							  const TilePosition& fartherFrom,
+							  const UnitType& ut)
+{
+	/// TODO
+}
+
 TilePosition PositionAccountant::reservePos(Task& task)
 {
 	for (list<BWAPI::TilePosition>::const_iterator it = pos.begin();
@@ -136,7 +146,6 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 		}
 	}
 	backdoorChokes.erase(frontChoke);
-	
 
 	/// search the center of our home Region
 	TilePosition center = TilePosition(home->getRegion()->getCenter()); // region->getCenter() is bad (can be out of the Region)
@@ -238,7 +247,39 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 	}
 
 	/// search places to put cannons behind minerals
-	// TODO
+	int x = 0;
+	int y = 0;
+	for (set<Unit*>::const_iterator it = home->getMinerals().begin();
+		it != home->getMinerals().end(); ++it)
+	{
+		x += (*it)->getTilePosition().x();
+		y += (*it)->getTilePosition().y();
+	}
+	TilePosition gasTilePos;
+	for (set<Unit*>::const_iterator it = home->getGeysers().begin();
+		it != home->getGeysers().end(); ++it)
+	{
+		gasTilePos = (*it)->getTilePosition();
+		x += gasTilePos.x();
+		y += gasTilePos.y();
+	}
+	TilePosition meanMineral(x / (home->getMinerals().size()+home->getGeysers().size()),
+		y / (home->getMinerals().size()+home->getGeysers().size()));
+	double dist = 0.0;
+	TilePosition furtherMineral;
+	for (set<Unit*>::const_iterator it = home->getMinerals().begin();
+		it != home->getMinerals().end(); ++it)
+	{
+		double tmp = meanMineral.getDistance((*it)->getTilePosition());
+		if (tmp > dist)
+		{
+			dist = tmp;
+			furtherMineral = (*it)->getTilePosition();
+		}
+	}
+	cannons.pos.push_back(buildFartherFrom(furtherMineral, home->getTilePosition(), UnitTypes::Protoss_Photon_Cannon));
+	cannons.pos.push_back(buildFartherFrom(gasTilePos, home->getTilePosition(), UnitTypes::Protoss_Photon_Cannon));
+
 
 	/// search places to put cannons at chokes
 	// TODO
