@@ -79,11 +79,22 @@ inline bool existsInnerPath(const TilePosition& tp1,
 /***
  * Gives a buildable TilePosition farther from nexus
  */
-TilePosition buildFartherFrom(const TilePosition& tp,
+TilePosition SimCityBuildingPlacer::buildFartherFrom(const TilePosition& tp,
 							  const TilePosition& fartherFrom,
 							  const UnitType& ut)
 {
-	/// TODO
+	Vec dir(tp.x() - fartherFrom.x(), tp.y() - fartherFrom.y());
+	int signx = (int)(dir.x/abs(dir.x));
+	TilePosition tmpx(tp.x() + signx*UnitTypes::Resource_Mineral_Field.tileWidth(), tp.y());
+	if (abs(dir.x) > abs(dir.y) || canBuildHere(NULL, tmpx, ut))
+		return tmpx;
+	int signy = int(dir.y/abs(dir.y));
+	TilePosition tmpy(tp.x(), tp.y() + signy*UnitTypes::Resource_Mineral_Field.tileWidth());
+	if (canBuildHere(NULL, tmpy, ut))
+		return tmpy;
+	if (canBuildHere(NULL, tmpx, ut))
+		return tmpx;
+	return TilePositions::None;
 }
 
 TilePosition PositionAccountant::reservePos(Task& task)
@@ -126,6 +137,84 @@ SimCityBuildingPlacer* SimCityBuildingPlacer::getInstance()
 	if (instance==NULL)
 		instance = new SimCityBuildingPlacer();
 	return instance;
+}
+
+void SimCityBuildingPlacer::makeCluster(const TilePosition& center, bool vertical)
+{
+	unsigned int minX;
+	unsigned int maxX;
+	unsigned int minY;
+	unsigned int maxY;
+	if (vertical)
+	{
+		minX = center.x() - UnitTypes::Protoss_Gateway.tileWidth() - 1; // 1 additional tile to move around
+		maxX = center.x() + UnitTypes::Protoss_Pylon.tileWidth()-1 + UnitTypes::Protoss_Gateway.tileWidth() + 1;
+		minY = center.y() - UnitTypes::Protoss_Gateway.tileHeight() - 1;
+		maxY = center.y() + UnitTypes::Protoss_Pylon.tileHeight()-1 + UnitTypes::Protoss_Gateway.tileHeight() + 1;
+	}
+	else // horizontal
+	{
+		minX = center.x() - UnitTypes::Protoss_Gateway.tileWidth() - 1; // 1 additional tile to move around
+		maxX = center.x() + UnitTypes::Protoss_Pylon.tileWidth()-1 + UnitTypes::Protoss_Gateway.tileWidth() + 1;
+		minY = center.y() - UnitTypes::Protoss_Gateway.tileHeight() - 1;
+		maxY = center.y() + UnitTypes::Protoss_Pylon.tileHeight()-1 + UnitTypes::Protoss_Gateway.tileHeight() + 1;
+	}
+	bool canBuildCluster = true;
+	bool canBuildSmallCluster = true;
+	for (unsigned int x = minX; x < maxX; ++x)
+	{
+		for (unsigned int y = minY; y < maxY; ++y)
+		{
+			if (!(Broodwar->canBuildHere(NULL, TilePosition(x, y), UnitTypes::Protoss_Pylon)))
+			{
+				canBuildCluster = false;
+				if (x > minX+2 && x < maxX-2 && y > minY+2 && y < maxY-2)
+				{
+					canBuildSmallCluster = false;
+					break;
+				}
+			}
+		}
+		if (!canBuildSmallCluster)
+			break;
+	}
+	if (canBuildSmallCluster)
+	{
+		if (vertical)
+		{
+			pylons.pos.push_back(TilePosition(center.x(), center.y()));
+			pylons.pos.push_back(TilePosition(center.x(), center.y() - UnitTypes::Protoss_Pylon.tileHeight()));
+			pylons.pos.push_back(TilePosition(center.x(), center.y() + UnitTypes::Protoss_Pylon.tileHeight()));
+			gates.pos.push_back(TilePosition(minX + min(1,UnitTypes::Protoss_Pylon.tileWidth()/2), minY + min(1,UnitTypes::Protoss_Pylon.tileHeight()/2)));
+			gates.pos.push_back(TilePosition(minX + min(1,UnitTypes::Protoss_Pylon.tileWidth()/2), minY + min(1,UnitTypes::Protoss_Pylon.tileHeight()/2) + UnitTypes::Protoss_Gateway.tileHeight()));
+			gates.pos.push_back(TilePosition(maxX - UnitTypes::Protoss_Gateway.tileWidth(), minY + min(1,UnitTypes::Protoss_Pylon.tileHeight()/2)));
+			gates.pos.push_back(TilePosition(maxX - UnitTypes::Protoss_Gateway.tileWidth(), minY + min(1,UnitTypes::Protoss_Pylon.tileHeight()/2) + UnitTypes::Protoss_Gateway.tileHeight()));
+			if (canBuildCluster)
+			{
+				pylons.pos.push_back(TilePosition(center.x(), center.y() - 2*UnitTypes::Protoss_Pylon.tileHeight()));
+				pylons.pos.push_back(TilePosition(center.x(), center.y() + 2*UnitTypes::Protoss_Pylon.tileHeight()));
+				gates.pos.push_back(TilePosition(minX + min(1,UnitTypes::Protoss_Pylon.tileWidth()/2), minY + min(1,UnitTypes::Protoss_Pylon.tileHeight()/2) + 2*UnitTypes::Protoss_Gateway.tileHeight()));
+				gates.pos.push_back(TilePosition(maxX - UnitTypes::Protoss_Gateway.tileWidth(), minY + min(1,UnitTypes::Protoss_Pylon.tileHeight()/2) + 2*UnitTypes::Protoss_Gateway.tileHeight()));
+			}
+		}
+		else
+		{
+			pylons.pos.push_back(TilePosition(center.x(), center.y()));
+			pylons.pos.push_back(TilePosition(center.x() + UnitTypes::Protoss_Pylon.tileWidth(), center.y()));
+			pylons.pos.push_back(TilePosition(center.x() - UnitTypes::Protoss_Pylon.tileWidth(), center.y()));
+			gates.pos.push_back(TilePosition(minX + 1, minY + 1));
+			gates.pos.push_back(TilePosition(minX + 1 + UnitTypes::Protoss_Gateway.tileWidth(), minY + 1));
+			gates.pos.push_back(TilePosition(minX + 1, maxY - UnitTypes::Protoss_Gateway.tileHeight()));
+			gates.pos.push_back(TilePosition(minX + 1 + UnitTypes::Protoss_Gateway.tileWidth(), maxY - UnitTypes::Protoss_Gateway.tileHeight()));
+			if (canBuildCluster)
+			{
+				pylons.pos.push_back(TilePosition(center.x() - 2*UnitTypes::Protoss_Pylon.tileWidth(), center.y()));
+				pylons.pos.push_back(TilePosition(center.x() + 2*UnitTypes::Protoss_Pylon.tileWidth(), center.y()));
+				gates.pos.push_back(TilePosition(minX + 1 + 2*UnitTypes::Protoss_Gateway.tileWidth(), minY + 1));
+				gates.pos.push_back(TilePosition(minX + 1 + 2*UnitTypes::Protoss_Gateway.tileWidth(), maxY - UnitTypes::Protoss_Gateway.tileHeight()));
+			}
+		}
+	}
 }
 
 SimCityBuildingPlacer::SimCityBuildingPlacer()
@@ -182,69 +271,12 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 	/// best place to do a pylons/gates cluster
 	Vec dir(front.x() - nexus.x(), front.y() - nexus.y());
 	bool vertical = abs((int)dir.y) > abs((int)dir.x);
-	unsigned int minX;
-	unsigned int maxX;
-	unsigned int minY;
-	unsigned int maxY;
-	if (vertical)
-	{
-		minX = center.x() - UnitTypes::Protoss_Gateway.tileWidth() - 1; // 1 additional tile to move around
-		maxX = center.x() + UnitTypes::Protoss_Pylon.tileWidth()-1 + UnitTypes::Protoss_Gateway.tileWidth() + 1;
-		minY = center.y() - UnitTypes::Protoss_Gateway.tileHeight() - 1;
-		maxY = center.y() + UnitTypes::Protoss_Pylon.tileHeight()-1 + UnitTypes::Protoss_Gateway.tileHeight() + 1;
-	}
-	else // horizontal
-	{
-		minX = center.x() - UnitTypes::Protoss_Gateway.tileWidth() - 1; // 1 additional tile to move around
-		maxX = center.x() + UnitTypes::Protoss_Pylon.tileWidth()-1 + UnitTypes::Protoss_Gateway.tileWidth() + 1;
-		minY = center.y() - UnitTypes::Protoss_Gateway.tileHeight() - 1;
-		maxY = center.y() + UnitTypes::Protoss_Pylon.tileHeight()-1 + UnitTypes::Protoss_Gateway.tileHeight() + 1;
-	}
-	bool canBuildCluster = true;
-	for (unsigned int x = minX; x < minY; ++x)
-	{
-		for (unsigned int y = minY; y < minY; ++y)
-		{
-			if (!(Broodwar->canBuildHere(NULL, TilePosition(x, y), UnitTypes::Protoss_Pylon)))
-			{
-				canBuildCluster = false;
-				break;
-			}
-		}
-		if (!canBuildCluster)
-			break;
-	}
-	if (canBuildCluster)
-	{
-		if (vertical)
-		{
-			pylons.pos.push_back(TilePosition(center.x(), center.y()));
-			pylons.pos.push_back(TilePosition(center.x(), center.y() - UnitTypes::Protoss_Pylon.tileHeight()));
-			pylons.pos.push_back(TilePosition(center.x(), center.y() + UnitTypes::Protoss_Pylon.tileHeight()));
-			pylons.pos.push_back(TilePosition(center.x(), center.y() - 2*UnitTypes::Protoss_Pylon.tileHeight()));
-			pylons.pos.push_back(TilePosition(center.x(), center.y() + 2*UnitTypes::Protoss_Pylon.tileHeight()));
-			gates.pos.push_back(TilePosition(minX + 1, minY + 1));
-			gates.pos.push_back(TilePosition(minX + 1, minY + 1 + UnitTypes::Protoss_Gateway.tileHeight()));
-			gates.pos.push_back(TilePosition(minX + 1, minY + 1 + 2*UnitTypes::Protoss_Gateway.tileHeight()));
-			gates.pos.push_back(TilePosition(maxX - 1 - UnitTypes::Protoss_Gateway.tileWidth(), minY + 1));
-			gates.pos.push_back(TilePosition(maxX - 1 - UnitTypes::Protoss_Gateway.tileWidth(), minY + 1 + UnitTypes::Protoss_Gateway.tileHeight()));
-			gates.pos.push_back(TilePosition(maxX - 1 - UnitTypes::Protoss_Gateway.tileWidth(), minY + 1 + 2*UnitTypes::Protoss_Gateway.tileHeight()));
-		}
-		else
-		{
-			pylons.pos.push_back(TilePosition(center.x(), center.y()));
-			pylons.pos.push_back(TilePosition(center.x() + UnitTypes::Protoss_Pylon.tileWidth(), center.y()));
-			pylons.pos.push_back(TilePosition(center.x() - UnitTypes::Protoss_Pylon.tileWidth(), center.y()));
-			pylons.pos.push_back(TilePosition(center.x() - 2*UnitTypes::Protoss_Pylon.tileWidth(), center.y()));
-			pylons.pos.push_back(TilePosition(center.x() + 2*UnitTypes::Protoss_Pylon.tileWidth(), center.y()));
-			gates.pos.push_back(TilePosition(minX + 1, minY + 1));
-			gates.pos.push_back(TilePosition(minX + 1 + UnitTypes::Protoss_Gateway.tileWidth(), minY + 1));
-			gates.pos.push_back(TilePosition(minX + 1 + 2*UnitTypes::Protoss_Gateway.tileWidth(), minY + 1));
-			gates.pos.push_back(TilePosition(minX + 1, maxY - UnitTypes::Protoss_Gateway.tileHeight()));
-			gates.pos.push_back(TilePosition(minX + UnitTypes::Protoss_Gateway.tileWidth(), maxY - UnitTypes::Protoss_Gateway.tileHeight()));
-			gates.pos.push_back(TilePosition(minX + 1 + 2*UnitTypes::Protoss_Gateway.tileWidth(), maxY - UnitTypes::Protoss_Gateway.tileHeight()));
-		}
-	}
+	Vec nex(nexus.x(), nexus.y());
+	dir = dir.normalize();
+	dir *= 2*UnitTypes::Protoss_Gateway.tileWidth() + UnitTypes::Protoss_Pylon.tileWidth();
+	nex = nex.vecTranslate(dir);
+	TilePosition cluster_center(nex.toTilePosition());
+	makeCluster(cluster_center, vertical);
 
 	/// search places to put cannons behind minerals
 	int x = 0;

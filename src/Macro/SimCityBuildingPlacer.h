@@ -50,7 +50,13 @@ private:
 	BWTA::Chokepoint* frontChoke;
 	std::set<BWTA::Chokepoint*> backdoorChokes;
 
-	BWAPI::TilePosition getBuildLocationNear(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type, int buildDist);
+	BWAPI::TilePosition buildFartherFrom(const BWAPI::TilePosition& tp,
+		const BWAPI::TilePosition& fartherFrom,
+		const BWAPI::UnitType& ut);
+	BWAPI::TilePosition getBuildLocationNear(BWAPI::Unit* builder,
+		BWAPI::TilePosition position,
+		BWAPI::UnitType type, int buildDist);
+	inline void makeCluster(const BWAPI::TilePosition& center, bool vertical);
 	bool canBuildHere(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type) const;
 	bool canBuildHereWithSpace(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type, int buildDist) const;
 	bool buildable(BWAPI::Unit* builder, int x, int y) const;
