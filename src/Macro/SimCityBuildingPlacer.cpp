@@ -269,70 +269,8 @@ void SimCityBuildingPlacer::makeCluster(const TilePosition& center, int nbTechBu
 	}
 }
 
-SimCityBuildingPlacer::SimCityBuildingPlacer()
-: home(BWTA::getStartLocation(Broodwar->self()))
+void SimCityBuildingPlacer::makeCannons(BWTA::BaseLocation* home)
 {
-	/// search and save front and backdoor chokes
-	backdoorChokes = home->getRegion()->getChokepoints();
-	double minDist = 100000000.0;
-	for (set<BWTA::Chokepoint*>::const_iterator it = backdoorChokes.begin();
-		it != backdoorChokes.end(); ++it)
-	{
-		double tmpDist = BWTA::getGroundDistance(TilePosition((*it)->getCenter()), 
-			TilePosition(Broodwar->mapHeight()/2, Broodwar->mapWidth()/2));
-		if (tmpDist < minDist)
-		{
-			minDist = tmpDist;
-			frontChoke = *it;
-		}
-	}
-	backdoorChokes.erase(frontChoke);
-
-	/// search the center of our home Region
-	/*
-	TilePosition center = TilePosition(home->getRegion()->getCenter()); // region->getCenter() is bad (can be out of the Region)
-	BWTA::Polygon polygon = home->getRegion()->getPolygon();
-	set<TilePosition> out;
-	list<TilePosition>in;
-	for (vector<Position>::const_iterator it = polygon.begin();
-		it != polygon.end(); ++it)
-	{
-		in.push_back(TilePosition(*it));
-	}
-	while (!out.empty())
-	{
-		if (out.size() == 1)
-			center = *(out.begin());
-		else
-		{
-			list<TilePosition> newIn;
-			for (list<TilePosition>::const_iterator it = in.begin();
-				it != in.end(); ++it)
-			{
-				out.erase(*it);
-				newIn.push_back(TilePosition(it->x()+1, it->y()));
-				newIn.push_back(TilePosition(it->x(), it->y()+1));
-				newIn.push_back(TilePosition(it->x()-1, it->y()));
-				newIn.push_back(TilePosition(it->x(), it->y()-1));
-			}
-			in.swap(newIn);
-		}
-	}
-	*/
-	TilePosition nexus = home->getTilePosition();
-	TilePosition front = TilePosition(frontChoke->getCenter());
-
-	/// best place to do a pylons/gates cluster
-	Vec dir(front.x() - nexus.x(), front.y() - nexus.y());
-	bool vertical = abs((int)dir.y) > abs((int)dir.x);
-	Vec nex(nexus.x(), nexus.y());
-	dir = dir.normalize();
-	dir *= 2*UnitTypes::Protoss_Gateway.tileWidth() + UnitTypes::Protoss_Pylon.tileWidth() + 1;
-	nex = nex.vecTranslate(dir);
-	TilePosition cluster_center(nex.toTilePosition());
-	makeCluster(cluster_center, 1, vertical);
-
-	/// search places to put cannons behind minerals
 	int x = 0;
 	int y = 0;
 	for (set<Unit*>::const_iterator it = home->getMinerals().begin();
@@ -365,6 +303,74 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 	}
 	cannons.pos.push_back(buildFartherFrom(furtherMineral, home->getTilePosition(), UnitTypes::Protoss_Photon_Cannon));
 	cannons.pos.push_back(buildFartherFrom(gasTilePos, home->getTilePosition(), UnitTypes::Protoss_Photon_Cannon));
+}
+
+SimCityBuildingPlacer::SimCityBuildingPlacer()
+: home(BWTA::getStartLocation(Broodwar->self()))
+{
+	/// search and save front and backdoor chokes
+	backdoorChokes = home->getRegion()->getChokepoints();
+	double minDist = 100000000.0;
+	for (set<BWTA::Chokepoint*>::const_iterator it = backdoorChokes.begin();
+		it != backdoorChokes.end(); ++it)
+	{
+		double tmpDist = BWTA::getGroundDistance(TilePosition((*it)->getCenter()), 
+			TilePosition(Broodwar->mapHeight()/2, Broodwar->mapWidth()/2));
+		if (tmpDist < minDist)
+		{
+			minDist = tmpDist;
+			frontChoke = *it;
+		}
+	}
+	backdoorChokes.erase(frontChoke);
+
+	/// search the center of our home Region
+	homeRegionCenter = TilePosition(home->getRegion()->getCenter()); // region->getCenter() is bad (can be out of the Region)
+	BWTA::Polygon polygon = home->getRegion()->getPolygon();
+	set<TilePosition> out;
+	list<TilePosition>in;
+	for (vector<Position>::const_iterator it = polygon.begin();
+		it != polygon.end(); ++it)
+	{
+		in.push_back(TilePosition(*it));
+	}
+	while (!out.empty())
+	{
+		if (out.size() == 1)
+		{
+			homeRegionCenter = *(out.begin());
+			break;
+		}
+		else
+		{
+			list<TilePosition> newIn;
+			for (list<TilePosition>::const_iterator it = in.begin();
+				it != in.end(); ++it)
+			{
+				out.erase(*it);
+				newIn.push_back(TilePosition(it->x()+1, it->y()));
+				newIn.push_back(TilePosition(it->x(), it->y()+1));
+				newIn.push_back(TilePosition(it->x()-1, it->y()));
+				newIn.push_back(TilePosition(it->x(), it->y()-1));
+			}
+			in.swap(newIn);
+		}
+	}
+	TilePosition nexus = home->getTilePosition();
+	TilePosition front = TilePosition(frontChoke->getCenter());
+
+	/// best place to do a pylons/gates cluster
+	Vec dir(front.x() - nexus.x(), front.y() - nexus.y());
+	bool vertical = abs((int)dir.y) > abs((int)dir.x);
+	Vec nex(nexus.x(), nexus.y());
+	dir = dir.normalize();
+	dir *= 2*UnitTypes::Protoss_Gateway.tileWidth() + UnitTypes::Protoss_Pylon.tileWidth() + 1;
+	nex = nex.vecTranslate(dir);
+	TilePosition cluster_center(nex.toTilePosition());
+	makeCluster(cluster_center, 1, vertical);
+
+	/// search places to put cannons behind minerals
+	makeCannons(home);
 
 
 	/// search places to put cannons at chokes

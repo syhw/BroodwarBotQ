@@ -42,6 +42,7 @@ public:
 	void setRelocatable(TaskStream* ts, bool isRelocatable);
 	void setBuildDistance(TaskStream* ts, int distance);
 private:
+	BWAPI::TilePosition homeRegionCenter;
 	std::list<BWAPI::TilePosition> existingPylons;
 	PositionAccountant pylons;
 	PositionAccountant gates;
@@ -59,6 +60,7 @@ private:
 		BWAPI::UnitType type, int buildDist);
 	inline void makeCluster(const BWAPI::TilePosition& center,
 		int nbTechBuildings, bool vertical);
+    inline void makeCannons(BWTA::BaseLocation* home);
 	bool canBuildHere(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type) const;
 	bool canBuildHereWithSpace(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type, int buildDist) const;
 	bool buildable(BWAPI::Unit* builder, int x, int y) const;
