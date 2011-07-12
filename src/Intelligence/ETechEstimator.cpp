@@ -10,6 +10,7 @@ using namespace std;
 ETechEstimator::ETechEstimator()
 : notFirstOverlord(false)
 {
+	return;
 	/// Load the learned prob tables (uniforms + bell shapes) for the right match up
 	{
 		// TODO Random case!!
@@ -392,6 +393,7 @@ bool ETechEstimator::insertBuilding(Unit* u)
 
 void ETechEstimator::computeDistribOpenings(int time)
 {
+	return;
 	size_t nbXes = st.vector_X.size();
 	list<unsigned int> compatibleXes;
 	for (size_t i = 0; i < nbXes; ++i)
