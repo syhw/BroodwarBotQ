@@ -132,8 +132,32 @@ TilePosition PositionAccountant::reservePos()
 	return TilePositions::None;
 }
 
-void PositionAccountant::generate()
+const TilePosition& searchForClusterCenter(Region* r)
 {
+	// TODO
+}
+
+void SimCityBuildingPlacer::generate()
+{
+	TilePosition center;
+	if (nbClusters < 3)
+	{
+		center = searchForClusterCenter(home->getRegion());
+	}
+	if (center == TilePositions::None)
+	{
+		for (set<MacroBase*>::const_iterator it = TheMacroBaseManager->getActiveBases().begin();
+			it != TheMacroBaseManager->getActiveBases().end())
+		{
+			if ((*it)->getBaseLocation()->getRegion() != home->getRegion())
+				center = searchForClusterCenter((*it)->getBaseLocation()->getRegion());
+			if (center != TilePositions::None)
+				break;
+		}
+	}
+	if (center != TilePositions::None)
+		makeCluster(center);
+	// TODO finish this function
 }
 
 SimCityBuildingPlacer* instance = NULL;
@@ -144,9 +168,12 @@ SimCityBuildingPlacer* SimCityBuildingPlacer::getInstance()
 	return instance;
 }
 
-void SimCityBuildingPlacer::makeCluster(const TilePosition& center, int nbTechBuildings, bool vertical)
+/***
+ * Returns either false (0) or the size (1=small, 2=big) of the cluster
+ * one can build at around "center"
+ */
+int SimCityBuildingPlacer::canBuildCluster(const TilePosition& center, bool vertical)
 {
-	int techToPlace = min(4, nbTechBuildings);
 	unsigned int minX;
 	unsigned int maxX;
 	unsigned int minY;
@@ -166,7 +193,6 @@ void SimCityBuildingPlacer::makeCluster(const TilePosition& center, int nbTechBu
 		maxY = center.y() + UnitTypes::Protoss_Pylon.tileHeight()-1 + UnitTypes::Protoss_Gateway.tileHeight() + 1;
 	}
 	bool canBuildCluster = true;
-	bool canBuildSmallCluster = true;
 	for (unsigned int x = minX; x < maxX; ++x)
 	{
 		for (unsigned int y = minY; y < maxY; ++y)
@@ -175,15 +201,27 @@ void SimCityBuildingPlacer::makeCluster(const TilePosition& center, int nbTechBu
 			{
 				canBuildCluster = false;
 				if (x > minX+2 && x < maxX-2 && y > minY+2 && y < maxY-2)
-				{
-					canBuildSmallCluster = false;
-					break;
-				}
+					return 0;
 			}
 		}
-		if (!canBuildSmallCluster)
-			break;
 	}
+	if (canBuildCluster)
+		return 2; // big cluster
+	else
+		return 1; // small cluster
+}
+
+void SimCityBuildingPlacer::makeCluster(const TilePosition& center, int nbTechBuildings, bool vertical)
+{
+	++nbClusters;
+	int clusterSize = canBuildCluster(center, vertical);
+	bool canBuildCluster = false;
+	bool canBuildSmallCluster = false;
+	if (clusterSize > 0)
+		canBuildSmallCluster = true;
+	if (clusterSize > 1)
+		canBuildCluster = true;
+	int techToPlace = min(4, nbTechBuildings);
 	int techPlaced = 0;
 	if (canBuildSmallCluster)
 	{
@@ -274,30 +312,30 @@ void SimCityBuildingPlacer::makeCluster(const TilePosition& center, int nbTechBu
 	}
 }
 
-void SimCityBuildingPlacer::makeCannonsMinerals(BWTA::BaseLocation* home)
+void SimCityBuildingPlacer::makeCannonsMinerals(BWTA::BaseLocation* hom)
 {
 	int x = 0;
 	int y = 0;
-	for (set<Unit*>::const_iterator it = home->getMinerals().begin();
-		it != home->getMinerals().end(); ++it)
+	for (set<Unit*>::const_iterator it = hom->getMinerals().begin();
+		it != hom->getMinerals().end(); ++it)
 	{
 		x += (*it)->getTilePosition().x();
 		y += (*it)->getTilePosition().y();
 	}
 	TilePosition gasTilePos;
-	for (set<Unit*>::const_iterator it = home->getGeysers().begin();
-		it != home->getGeysers().end(); ++it)
+	for (set<Unit*>::const_iterator it = hom->getGeysers().begin();
+		it != hom->getGeysers().end(); ++it)
 	{
 		gasTilePos = (*it)->getTilePosition();
 		x += gasTilePos.x();
 		y += gasTilePos.y();
 	}
-	TilePosition meanMineral(x / (home->getMinerals().size()+home->getGeysers().size()),
-		y / (home->getMinerals().size()+home->getGeysers().size()));
+	TilePosition meanMineral(x / (hom->getMinerals().size()+hom->getGeysers().size()),
+		y / (hom->getMinerals().size()+hom->getGeysers().size()));
 	double dist = 0.0;
 	TilePosition furtherMineral;
-	for (set<Unit*>::const_iterator it = home->getMinerals().begin();
-		it != home->getMinerals().end(); ++it)
+	for (set<Unit*>::const_iterator it = hom->getMinerals().begin();
+		it != hom->getMinerals().end(); ++it)
 	{
 		double tmp = meanMineral.getDistance((*it)->getTilePosition());
 		if (tmp > dist)
@@ -306,16 +344,58 @@ void SimCityBuildingPlacer::makeCannonsMinerals(BWTA::BaseLocation* home)
 			furtherMineral = (*it)->getTilePosition();
 		}
 	}
-	TilePosition tmp = buildFartherFrom(furtherMineral, home->getTilePosition(), 3, UnitTypes::Protoss_Photon_Cannon);
-	cannons.pos.push_back(tmp);
-	pylons.pos.push_back(buildFartherFrom(tmp, home->getTilePosition(), 3, UnitTypes::Protoss_Pylon));
-    tmp = buildFartherFrom(gasTilePos, home->getTilePosition(), 4, UnitTypes::Protoss_Photon_Cannon);
-	cannons.pos.push_back(tmp);
-	pylons.pos.push_back(buildFartherFrom(tmp, home->getTilePosition(), 3, UnitTypes::Protoss_Pylon));
+	dist = 1000000.0;
+	double distb = 1000000.0;
+	double dist2 = 1000000.0;
+	double dist2b = 1000000.0;
+	TilePosition cannon1;
+	TilePosition cannon2;
+	TilePosition pylon1;
+	TilePosition pylon2;
+	for (x = min(max(gasTilePos.x() - UnitTypes::Protoss_Pylon.tileWidth(), 0), max(furtherMineral.x() - UnitTypes::Protoss_Pylon.tileWidth(), 0));
+		x < max(min(gasTilePos.x() + UnitTypes::Resource_Vespene_Geyser.tileWidth() + UnitTypes::Protoss_Pylon.tileWidth() + 1, Broodwar->mapWidth()),
+		min(furtherMineral.x() + UnitTypes::Resource_Mineral_Field.tileWidth() + UnitTypes::Protoss_Pylon.tileWidth() + 1, Broodwar->mapWidth())); x += 2)
+		for (y = min(max(gasTilePos.y() - UnitTypes::Protoss_Pylon.tileHeight(), 0), max(furtherMineral.y() - UnitTypes::Protoss_Pylon.tileHeight(), 0));
+			y < max(min(gasTilePos.y() + UnitTypes::Resource_Vespene_Geyser.tileHeight() + UnitTypes::Protoss_Pylon.tileHeight() + 1, Broodwar->mapHeight()),
+			min(furtherMineral.y() + UnitTypes::Resource_Mineral_Field.tileHeight() + UnitTypes::Protoss_Pylon.tileHeight() + 1, Broodwar->mapHeight())); y += 2)
+		{
+			TilePosition tmp(x, y);
+			if (tmp.getDistance(hom->getTilePosition()) < 6)
+				continue;
+			double tmpd1 = tmp.getDistance(furtherMineral);
+			if (tmpd1 < dist && canBuildHere(NULL, tmp, UnitTypes::Protoss_Pylon))
+			{
+				cannon1 = tmp;
+				pylon1 = cannon1;
+				dist = tmpd1;
+			}
+			else if (tmpd1 < distb && canBuildHere(NULL, tmp, UnitTypes::Protoss_Pylon))
+			{
+				pylon1 = tmp;
+				distb = tmpd1;
+			}
+			double tmpd2 = tmp.getDistance(gasTilePos);
+			if (tmpd2 < dist2 && canBuildHere(NULL, tmp, UnitTypes::Protoss_Pylon))
+			{
+				cannon2 = tmp;
+				pylon2 = cannon2;
+				dist2 = tmpd2;
+			}
+			else if (tmpd2 < dist2b && canBuildHere(NULL, tmp, UnitTypes::Protoss_Pylon))
+			{
+				pylon2 = tmp;
+				dist2b = tmpd2;
+			}
+		}
+	cannons.pos.push_back(cannon1);
+	pylons.pos.push_back(pylon1);
+	cannons.pos.push_back(cannon2);
+	pylons.pos.push_back(pylon2);
 }
 
 SimCityBuildingPlacer::SimCityBuildingPlacer()
 : home(BWTA::getStartLocation(Broodwar->self()))
+, nbClusters(0)
 {
 	/// search and save front and backdoor chokes
 	backdoorChokes = home->getRegion()->getChokepoints();
@@ -539,7 +619,7 @@ BWAPI::TilePosition SimCityBuildingPlacer::getBuildLocationNear(BWAPI::Unit* bui
 			return pylons.reservePos();
 		else
 		{
-			// GENERATE
+            // GENERATE
 		}
 	}
 	else if (type == UnitTypes::Protoss_Gateway || type == UnitTypes::Protoss_Stargate)

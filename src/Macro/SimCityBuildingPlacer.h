@@ -5,14 +5,12 @@
 #include <list>
 #include <set>
 
-
 struct PositionAccountant
 {
 	std::list<BWAPI::TilePosition> pos;
 	std::set<BWAPI::TilePosition> givenPos;
 	BWAPI::TilePosition reservePos(Task& task);
 	BWAPI::TilePosition reservePos();
-	inline void generate();
 	inline void freePos(BWAPI::TilePosition tp)
 	{
 		givenPos.erase(tp);
@@ -51,6 +49,7 @@ private:
 	BWTA::BaseLocation* home;
 	BWTA::Chokepoint* frontChoke;
 	std::set<BWTA::Chokepoint*> backdoorChokes;
+	int nbClusters;
 
 	BWAPI::TilePosition buildFartherFrom(const BWAPI::TilePosition& tp,
 		const BWAPI::TilePosition& fartherFrom,
@@ -59,9 +58,11 @@ private:
 	BWAPI::TilePosition getBuildLocationNear(BWAPI::Unit* builder,
 		BWAPI::TilePosition position,
 		BWAPI::UnitType type, int buildDist);
+	inline int canBuildCluster(const BWAPI::TilePosition& center, bool vertical);
 	inline void makeCluster(const BWAPI::TilePosition& center,
 		int nbTechBuildings, bool vertical);
     inline void makeCannonsMinerals(BWTA::BaseLocation* home);
+	inline void generate();
 	bool canBuildHere(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type) const;
 	bool canBuildHereWithSpace(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type, int buildDist) const;
 	bool buildable(BWAPI::Unit* builder, int x, int y) const;
