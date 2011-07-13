@@ -12,6 +12,9 @@ ETechEstimator::ETechEstimator()
 {
 	return;
 	/// Load the learned prob tables (uniforms + bell shapes) for the right match up
+	/// This is not obfuscation, the learning of these tables is described in the CIG 2011 Paper
+	/// A Bayesian Model for Opening Prediction in RTS Games with Application to StarCraft, Gabriel Synnaeve, Pierre Bessière, CIG (IEEE) 2011
+	/// All code for the learning is here: https://github.com/SnippyHolloW/OpeningTech
 	{
 		// TODO Random case!!
 		Race enemyRace;

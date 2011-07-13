@@ -81,15 +81,20 @@ inline bool existsInnerPath(const TilePosition& tp1,
  */
 TilePosition SimCityBuildingPlacer::buildFartherFrom(const TilePosition& tp,
 							  const TilePosition& fartherFrom,
+							  int howMuchFarther,
 							  const UnitType& ut)
 {
 	Vec dir(tp.x() - fartherFrom.x(), tp.y() - fartherFrom.y());
-	int signx = (int)(dir.x/abs(dir.x));
-	TilePosition tmpx(tp.x() + signx*UnitTypes::Resource_Mineral_Field.tileWidth(), tp.y());
+    int signx = 1;
+	if (dir.x)
+		signx = (int)(dir.x/abs(dir.x));
+	TilePosition tmpx(tp.x() + signx*howMuchFarther, tp.y());
 	if (abs(dir.x) > abs(dir.y) || canBuildHere(NULL, tmpx, ut))
 		return tmpx;
-	int signy = int(dir.y/abs(dir.y));
-	TilePosition tmpy(tp.x(), tp.y() + signy*UnitTypes::Resource_Mineral_Field.tileWidth());
+	int signy = 1;
+	if (dir.y)
+		signy = int(dir.y/abs(dir.y));
+	TilePosition tmpy(tp.x(), tp.y() + signy*howMuchFarther);
 	if (canBuildHere(NULL, tmpy, ut))
 		return tmpy;
 	if (canBuildHere(NULL, tmpx, ut))
@@ -269,7 +274,7 @@ void SimCityBuildingPlacer::makeCluster(const TilePosition& center, int nbTechBu
 	}
 }
 
-void SimCityBuildingPlacer::makeCannons(BWTA::BaseLocation* home)
+void SimCityBuildingPlacer::makeCannonsMinerals(BWTA::BaseLocation* home)
 {
 	int x = 0;
 	int y = 0;
@@ -301,8 +306,12 @@ void SimCityBuildingPlacer::makeCannons(BWTA::BaseLocation* home)
 			furtherMineral = (*it)->getTilePosition();
 		}
 	}
-	cannons.pos.push_back(buildFartherFrom(furtherMineral, home->getTilePosition(), UnitTypes::Protoss_Photon_Cannon));
-	cannons.pos.push_back(buildFartherFrom(gasTilePos, home->getTilePosition(), UnitTypes::Protoss_Photon_Cannon));
+	TilePosition tmp = buildFartherFrom(furtherMineral, home->getTilePosition(), 3, UnitTypes::Protoss_Photon_Cannon);
+	cannons.pos.push_back(tmp);
+	pylons.pos.push_back(buildFartherFrom(tmp, home->getTilePosition(), 3, UnitTypes::Protoss_Pylon));
+    tmp = buildFartherFrom(gasTilePos, home->getTilePosition(), 4, UnitTypes::Protoss_Photon_Cannon);
+	cannons.pos.push_back(tmp);
+	pylons.pos.push_back(buildFartherFrom(tmp, home->getTilePosition(), 3, UnitTypes::Protoss_Pylon));
 }
 
 SimCityBuildingPlacer::SimCityBuildingPlacer()
@@ -370,7 +379,7 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 	makeCluster(cluster_center, 1, vertical);
 
 	/// search places to put cannons behind minerals
-	makeCannons(home);
+	makeCannonsMinerals(home);
 
 
 	/// search places to put cannons at chokes
@@ -438,6 +447,9 @@ void SimCityBuildingPlacer::update(TaskStream* ts)
 	for (list<TilePosition>::const_iterator it = tech.pos.begin();
 		it != tech.pos.end(); ++it)
 		Broodwar->drawBoxMap(it->x()*32, it->y()*32, (it->x()+3)*32, (it->y()+2)*32, Colors::Yellow);
+	for (list<TilePosition>::const_iterator it = cannons.pos.begin();
+		it != cannons.pos.end(); ++it)
+		Broodwar->drawBoxMap(it->x()*32, it->y()*32, (it->x()+2)*32, (it->y()+2)*32, Colors::Yellow);
 	
 	if (Broodwar->getFrameCount()%10 != 0) return;
 

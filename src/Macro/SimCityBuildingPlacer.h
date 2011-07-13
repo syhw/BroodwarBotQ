@@ -54,13 +54,14 @@ private:
 
 	BWAPI::TilePosition buildFartherFrom(const BWAPI::TilePosition& tp,
 		const BWAPI::TilePosition& fartherFrom,
+		int howMuchFarther,
 		const BWAPI::UnitType& ut);
 	BWAPI::TilePosition getBuildLocationNear(BWAPI::Unit* builder,
 		BWAPI::TilePosition position,
 		BWAPI::UnitType type, int buildDist);
 	inline void makeCluster(const BWAPI::TilePosition& center,
 		int nbTechBuildings, bool vertical);
-    inline void makeCannons(BWTA::BaseLocation* home);
+    inline void makeCannonsMinerals(BWTA::BaseLocation* home);
 	bool canBuildHere(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type) const;
 	bool canBuildHereWithSpace(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type, int buildDist) const;
 	bool buildable(BWAPI::Unit* builder, int x, int y) const;
