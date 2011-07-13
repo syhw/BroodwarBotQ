@@ -105,6 +105,44 @@ MapManager::MapManager()
 		}
 	}
 
+	/// search the centers of all regions
+	for (std::set<BWTA::Region*>::const_iterator it = allRegions.begin();
+		it != allRegions.end(); ++it)
+	{
+		TilePosition tmpRegionCenter = TilePosition((*it)->getCenter()); // region->getCenter() is bad (can be out of the Region)
+		BWTA::Polygon polygon = (*it)->getPolygon();
+		std::set<TilePosition> out;
+		std::list<TilePosition>in;
+		for (std::vector<Position>::const_iterator it2 = polygon.begin();
+			it2 != polygon.end(); ++it2)
+		{
+			in.push_back(TilePosition(*it2));
+		}
+		while (!out.empty())
+		{
+			if (out.size() == 1)
+			{
+				tmpRegionCenter = *(out.begin());
+				break;
+			}
+			else
+			{
+				std::list<TilePosition> newIn;
+				for (std::list<TilePosition>::const_iterator it2 = in.begin();
+					it2 != in.end(); ++it2)
+				{
+					out.erase(*it2);
+					newIn.push_back(TilePosition(it2->x()+1, it2->y()));
+					newIn.push_back(TilePosition(it2->x(), it2->y()+1));
+					newIn.push_back(TilePosition(it2->x()-1, it2->y()));
+					newIn.push_back(TilePosition(it2->x(), it2->y()-1));
+				}
+				in.swap(newIn);
+			}
+		}
+		regionsInsideCenter.insert(std::make_pair<BWTA::Region*, TilePosition>(*it, tmpRegionCenter));
+	}
+
     // initialization
     for (int x = 0; x < _width; ++x) 
         for (int y = 0; y < _height; ++y) 
