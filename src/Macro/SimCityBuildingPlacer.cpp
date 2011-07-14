@@ -139,32 +139,34 @@ SimCityBuildingPlacer* SimCityBuildingPlacer::getInstance()
 BuildingsCluster SimCityBuildingPlacer::searchForCluster(BWTA::Region* r)
 {
 	BuildingsCluster ret;
+	ret.size = 0;
     int minX = 100000000;
 	int minY = 100000000;
 	int maxX = 0;
 	int maxY = 0;
 	for (vector<Position>::const_iterator it = r->getPolygon().begin();
 		it != r->getPolygon().end(); ++it)
-	{
-		if (it->x() < minX)
-			minX = it->x();
-		if (it->x() > maxX)
-		    maxX = it->x();
-		if (it->y() < minY)
-			minY = it->y();
-		if (it->y() > maxY)
-		    maxY = it->y();
+	{   
+		int tmpX = it->x()/32;
+		int tmpY = it->y()/32;
+		if (tmpX < minX)
+			minX = tmpX;
+		if (tmpX > maxX)
+		    maxX = tmpX;
+		if (tmpY < minY)
+			minY = tmpY;
+		if (tmpY > maxY)
+		    maxY = tmpY;
 	}
 	/// search "for big clusters"
 	int minXClusterDim = UnitTypes::Protoss_Pylon.tileWidth() + 2*UnitTypes::Protoss_Gateway.tileWidth() + 2; // 2 to move around
 	int minYClusterDim = UnitTypes::Protoss_Pylon.tileHeight() + 2*UnitTypes::Protoss_Gateway.tileHeight() + 2;
-	int tmpMaxX = max(maxX - minXClusterDim, Broodwar->mapWidth());
-	int tmpMaxY = max(maxY - minYClusterDim, Broodwar->mapHeight());
-	for (int x = minX; x < tmpMaxX; x += 2)
-		for (int y = minY; y < tmpMaxY; y += 2)
+	int tmpMaxX = min(maxX - minXClusterDim, Broodwar->mapWidth());
+	int tmpMaxY = min(maxY - minYClusterDim, Broodwar->mapHeight());
+	for (int x = minX; x < tmpMaxX; x += 1)
+		for (int y = minY; y < tmpMaxY; y += 1)
 		{
 			TilePosition topLeft(x, y);
-			BWTA::Region * rr = BWTA::getRegion(topLeft);
 			if (BWTA::getRegion(topLeft) != r)
 				continue;
 			TilePosition topRight(x + minXClusterDim, y);
@@ -177,9 +179,10 @@ BuildingsCluster SimCityBuildingPlacer::searchForCluster(BWTA::Region* r)
 			if (BWTA::getRegion(botRight) != r)
 				continue;
 			if (canBuildHere(NULL, topLeft, UnitTypes::Protoss_Gateway)
-				&& canBuildHere(NULL, TilePosition(topRight.x() - UnitTypes::Protoss_Gateway.tileWidth(), topRight.y()), UnitTypes::Protoss_Gateway)
-				&& canBuildHere(NULL, TilePosition(botLeft.x(), botLeft.y() - UnitTypes::Protoss_Gateway.tileHeight()), UnitTypes::Protoss_Gateway)
-				&& canBuildHere(NULL, TilePosition(topRight.x() - UnitTypes::Protoss_Gateway.tileWidth(), topRight.y() - UnitTypes::Protoss_Gateway.tileHeight()), UnitTypes::Protoss_Gateway))
+//				&& canBuildHere(NULL, TilePosition(topRight.x() - UnitTypes::Protoss_Gateway.tileWidth(), topRight.y()), UnitTypes::Protoss_Gateway)
+//				&& canBuildHere(NULL, TilePosition(botLeft.x(), botLeft.y() - UnitTypes::Protoss_Gateway.tileHeight()), UnitTypes::Protoss_Gateway)
+//				&& canBuildHere(NULL, TilePosition(botRight.x() - UnitTypes::Protoss_Gateway.tileWidth(), botRight.y() - UnitTypes::Protoss_Gateway.tileHeight()), UnitTypes::Protoss_Gateway))
+)
 			{
 				ret.center = TilePosition(topLeft.x() + UnitTypes::Protoss_Gateway.tileWidth() + 1, topLeft.y() + 2*UnitTypes::Protoss_Pylon.tileHeight() + 1);
 				ret.vertical = true;
@@ -196,10 +199,10 @@ BuildingsCluster SimCityBuildingPlacer::searchForCluster(BWTA::Region* r)
 	/// search "for small clusters"
 	minXClusterDim = 2*UnitTypes::Protoss_Gateway.tileWidth() + 2; // 2 to move around
 	minYClusterDim = 2*UnitTypes::Protoss_Gateway.tileHeight() + 2;
-	tmpMaxX = max(maxX - minXClusterDim, Broodwar->mapWidth());
-	tmpMaxY = max(maxY - minYClusterDim, Broodwar->mapHeight());
-	for (int x = minX; x < tmpMaxX; x += 2)
-		for (int y = minY; y < tmpMaxY; y += 2)
+	tmpMaxX = min(maxX - minXClusterDim, Broodwar->mapWidth());
+	tmpMaxY = min(maxY - minYClusterDim, Broodwar->mapHeight());
+	for (int x = minX; x < tmpMaxX; x += 1)
+		for (int y = minY; y < tmpMaxY; y += 1)
 		{
 			TilePosition topLeft(x, y);
 			if (BWTA::getRegion(topLeft) != r)
@@ -214,9 +217,10 @@ BuildingsCluster SimCityBuildingPlacer::searchForCluster(BWTA::Region* r)
 			if (BWTA::getRegion(botRight) != r)
 				continue;
 			if (canBuildHere(NULL, topLeft, UnitTypes::Protoss_Gateway)
-				&& canBuildHere(NULL, TilePosition(topRight.x() - UnitTypes::Protoss_Gateway.tileWidth(), topRight.y()), UnitTypes::Protoss_Gateway)
-				&& canBuildHere(NULL, TilePosition(botLeft.x(), botLeft.y() - UnitTypes::Protoss_Gateway.tileHeight()), UnitTypes::Protoss_Gateway)
-				&& canBuildHere(NULL, TilePosition(topRight.x() - UnitTypes::Protoss_Gateway.tileWidth(), topRight.y() - UnitTypes::Protoss_Gateway.tileHeight()), UnitTypes::Protoss_Gateway))
+//				&& canBuildHere(NULL, TilePosition(topRight.x() - UnitTypes::Protoss_Gateway.tileWidth(), topRight.y()), UnitTypes::Protoss_Gateway)
+//				&& canBuildHere(NULL, TilePosition(botLeft.x(), botLeft.y() - UnitTypes::Protoss_Gateway.tileHeight()), UnitTypes::Protoss_Gateway)
+//				&& canBuildHere(NULL, TilePosition(botRight.x() - UnitTypes::Protoss_Gateway.tileWidth(), botRight.y() - UnitTypes::Protoss_Gateway.tileHeight()), UnitTypes::Protoss_Gateway))
+)
 			{
 				ret.center = TilePosition(topLeft.x() + UnitTypes::Protoss_Gateway.tileWidth() + 1, topLeft.y() + UnitTypes::Protoss_Pylon.tileHeight() + 1);
 				ret.vertical = true;
@@ -276,7 +280,7 @@ int SimCityBuildingPlacer::canBuildCluster(const TilePosition& center, bool vert
 		return 1; // small cluster
 }
 
-void SimCityBuildingPlacer::makeCluster(const TilePosition& center, int nbTechBuildings, bool vertical, int cSize)
+int SimCityBuildingPlacer::makeCluster(const TilePosition& center, int nbTechBuildings, bool vertical, int cSize)
 {
 	++nbClusters;
 	int clusterSize = 0;
@@ -379,6 +383,7 @@ void SimCityBuildingPlacer::makeCluster(const TilePosition& center, int nbTechBu
 			}
 		}
 	}
+	return clusterSize;
 }
 
 void SimCityBuildingPlacer::makeCannonsMinerals(BWTA::BaseLocation* hom)
@@ -497,7 +502,8 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 	dir *= 2*UnitTypes::Protoss_Gateway.tileWidth() + UnitTypes::Protoss_Pylon.tileWidth() + 1;
 	nex = nex.vecTranslate(dir);
 	TilePosition cluster_center(nex.toTilePosition());
-	makeCluster(cluster_center, 1, vertical);
+	if (!makeCluster(cluster_center, 1, vertical))
+		generate();
 
 	/// search places to put cannons behind minerals
 	makeCannonsMinerals(home);

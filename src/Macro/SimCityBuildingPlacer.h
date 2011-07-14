@@ -37,7 +37,7 @@ struct PositionAccountant
 	inline void reservePos(const BWAPI::TilePosition& tp)
 	{
 		pos.push_back(tp);
-		TheReservedMap->reserveTiles(tp, ut);
+		TheReservedMap->reserveTiles(tp, ut, ut.tileWidth(), ut.tileHeight());
 	}
 	PositionAccountant(BWAPI::UnitType type)
 		: ut(type)
@@ -78,7 +78,7 @@ private:
 		BWAPI::UnitType type, int buildDist);
     inline BuildingsCluster searchForCluster(BWTA::Region* r);
 	inline int canBuildCluster(const BWAPI::TilePosition& center, bool vertical);
-	inline void makeCluster(const BWAPI::TilePosition& center,
+	inline int makeCluster(const BWAPI::TilePosition& center,
 		int nbTechBuildings, bool vertical, int cSize=0);
     inline void makeCannonsMinerals(BWTA::BaseLocation* home);
 	inline void generate();

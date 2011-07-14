@@ -17,6 +17,7 @@ ReservedMap::ReservedMap()
   TheReservedMap = this;
   reserveMap.resize(Broodwar->mapWidth(),Broodwar->mapHeight());
   reserveMap.setTo(UnitTypes::None);
+  reserveTiles(Broodwar->self()->getStartLocation(), UnitTypes::Protoss_Nexus, UnitTypes::Protoss_Nexus.tileWidth(), UnitTypes::Protoss_Nexus.tileHeight());
 }
 ReservedMap::~ReservedMap()
 {
