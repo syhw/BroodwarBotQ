@@ -178,10 +178,10 @@ BuildingsCluster SimCityBuildingPlacer::searchForCluster(BWTA::Region* r)
 			TilePosition botRight(x + minXClusterDim, y + minYClusterDim);
 			if (BWTA::getRegion(botRight) != r)
 				continue;
-			if (canBuildHere(NULL, topLeft, UnitTypes::Protoss_Gateway)
-				&& canBuildHere(NULL, TilePosition(topRight.x() - UnitTypes::Protoss_Gateway.tileWidth(), topRight.y()), UnitTypes::Protoss_Gateway)
-				&& canBuildHere(NULL, TilePosition(botLeft.x(), botLeft.y() - UnitTypes::Protoss_Gateway.tileHeight()), UnitTypes::Protoss_Gateway)
-				&& canBuildHere(NULL, TilePosition(botRight.x() - UnitTypes::Protoss_Gateway.tileWidth(), botRight.y() - UnitTypes::Protoss_Gateway.tileHeight()), UnitTypes::Protoss_Gateway))
+			//if (canBuildHere(NULL, topLeft, UnitTypes::Protoss_Gateway)
+				//&& canBuildHere(NULL, TilePosition(topRight.x() - UnitTypes::Protoss_Gateway.tileWidth(), topRight.y()), UnitTypes::Protoss_Gateway)
+				//&& canBuildHere(NULL, TilePosition(botLeft.x(), botLeft.y() - UnitTypes::Protoss_Gateway.tileHeight()), UnitTypes::Protoss_Gateway)
+				//&& canBuildHere(NULL, TilePosition(botRight.x() - UnitTypes::Protoss_Gateway.tileWidth(), botRight.y() - UnitTypes::Protoss_Gateway.tileHeight()), UnitTypes::Protoss_Gateway))
 			{
 				ret.center = TilePosition(topLeft.x() + UnitTypes::Protoss_Gateway.tileWidth() + 1, topLeft.y() + 2*UnitTypes::Protoss_Pylon.tileHeight() + 1);
 				ret.vertical = true;
@@ -215,10 +215,10 @@ BuildingsCluster SimCityBuildingPlacer::searchForCluster(BWTA::Region* r)
 			TilePosition botRight(x + minXClusterDim, y + minYClusterDim);
 			if (BWTA::getRegion(botRight) != r)
 				continue;
-			if (canBuildHere(NULL, topLeft, UnitTypes::Protoss_Gateway)
-				&& canBuildHere(NULL, TilePosition(topRight.x() - UnitTypes::Protoss_Gateway.tileWidth(), topRight.y()), UnitTypes::Protoss_Gateway)
-				&& canBuildHere(NULL, TilePosition(botLeft.x(), botLeft.y() - UnitTypes::Protoss_Gateway.tileHeight()), UnitTypes::Protoss_Gateway)
-				&& canBuildHere(NULL, TilePosition(botRight.x() - UnitTypes::Protoss_Gateway.tileWidth(), botRight.y() - UnitTypes::Protoss_Gateway.tileHeight()), UnitTypes::Protoss_Gateway))
+			//if (canBuildHere(NULL, topLeft, UnitTypes::Protoss_Gateway)
+				//&& canBuildHere(NULL, TilePosition(topRight.x() - UnitTypes::Protoss_Gateway.tileWidth(), topRight.y()), UnitTypes::Protoss_Gateway)
+				//&& canBuildHere(NULL, TilePosition(botLeft.x(), botLeft.y() - UnitTypes::Protoss_Gateway.tileHeight()), UnitTypes::Protoss_Gateway)
+				//&& canBuildHere(NULL, TilePosition(botRight.x() - UnitTypes::Protoss_Gateway.tileWidth(), botRight.y() - UnitTypes::Protoss_Gateway.tileHeight()), UnitTypes::Protoss_Gateway))
 			{
 				ret.center = TilePosition(topLeft.x() + UnitTypes::Protoss_Gateway.tileWidth() + 1, topLeft.y() + UnitTypes::Protoss_Pylon.tileHeight() + 1);
 				ret.vertical = true;
@@ -250,12 +250,12 @@ int SimCityBuildingPlacer::canBuildCluster(const TilePosition& center, bool vert
 		minX = center.x() - UnitTypes::Protoss_Gateway.tileWidth() - 1; // -1 additional tile to move around
 		maxX = center.x() + UnitTypes::Protoss_Pylon.tileWidth() + UnitTypes::Protoss_Gateway.tileWidth() + 1;
 		minY = center.y() - 2*UnitTypes::Protoss_Pylon.tileHeight() - 1;
-		maxY = center.y() + 2*UnitTypes::Protoss_Pylon.tileHeight() + 2;
+		maxY = center.y() + 3*UnitTypes::Protoss_Pylon.tileHeight() + 2;
 	}
 	else // horizontal
 	{
 		minX = center.x() - 2*UnitTypes::Protoss_Pylon.tileWidth() - 1; // -1 additional tile to move around
-		maxX = center.x() + 2*UnitTypes::Protoss_Pylon.tileWidth() + 2;
+		maxX = center.x() + 3*UnitTypes::Protoss_Pylon.tileWidth() + 2;
 		minY = center.y() - UnitTypes::Protoss_Gateway.tileHeight() - 1;
 		maxY = center.y() + UnitTypes::Protoss_Pylon.tileHeight() + UnitTypes::Protoss_Gateway.tileHeight() + 1;
 	}
@@ -273,9 +273,9 @@ int SimCityBuildingPlacer::canBuildCluster(const TilePosition& center, bool vert
 		}
 	}
 	if (canBuildCluster)
-		return 2; // big cluster
+		return 3;
 	else
-		return 1; // small cluster
+		return 2;
 }
 
 int SimCityBuildingPlacer::makeCluster(const TilePosition& center, int nbTechBuildings, bool vertical, int cSize)
@@ -286,100 +286,187 @@ int SimCityBuildingPlacer::makeCluster(const TilePosition& center, int nbTechBui
 		clusterSize = canBuildCluster(center, vertical);
 	else
 		clusterSize = cSize;
-	bool canBuildCluster = false;
-	bool canBuildSmallCluster = false;
-	if (clusterSize > 0)
-		canBuildSmallCluster = true;
-	if (clusterSize > 1)
-		canBuildCluster = true;
+	if (!clusterSize)
+		return 0;
 	int techToPlace = min(4, nbTechBuildings);
-	int techPlaced = 0;
-	if (canBuildSmallCluster)
+	int nbGates = clusterSize*2 - techToPlace;
+	int height = 0;
+	int width = 0;
+	if (vertical)
 	{
-		if (vertical)
+		height = clusterSize * UnitTypes::Protoss_Gateway.tileHeight();
+		if (techToPlace > 1)
+			--height;
+		if (techToPlace > 3)
+			--height;
+		if (height % 2)
+			++height;
+		width = 2*UnitTypes::Protoss_Gateway.tileWidth() + UnitTypes::Protoss_Pylon.tileWidth();
+		/// place pylons
+		int topLeft = center.y();
+		int nbPylons = height / 2; 
+		pylons.addAsSecondPos(center);
+		--nbPylons;
+		int maxi = (nbPylons+1)/2;
+		for (int i = 1; i < maxi; ++i)
 		{
-			pylons.reservePos(TilePosition(center.x(), center.y()));
-			pylons.reservePos(TilePosition(center.x(), center.y() - UnitTypes::Protoss_Pylon.tileHeight()));
-			pylons.reservePos(TilePosition(center.x(), center.y() + UnitTypes::Protoss_Pylon.tileHeight()));
-			int shift = 1;
-			if (canBuildCluster)
+			if (nbPylons)
 			{
-				pylons.reservePos(TilePosition(center.x(), center.y() - 2*UnitTypes::Protoss_Pylon.tileHeight()));
-				pylons.reservePos(TilePosition(center.x(), center.y() + 2*UnitTypes::Protoss_Pylon.tileHeight()));
-				shift = -1;
-				gates.reservePos(TilePosition(center.x() - UnitTypes::Protoss_Gateway.tileWidth(), center.y() + shift + UnitTypes::Protoss_Gateway.tileHeight()));
-				gates.reservePos(TilePosition(center.x() + UnitTypes::Protoss_Pylon.tileWidth(), center.y() + shift + UnitTypes::Protoss_Gateway.tileHeight()));
-			}
-			if (techPlaced < techToPlace)
-			{
-				tech.reservePos(TilePosition(center.x() + UnitTypes::Protoss_Pylon.tileWidth(), center.y() + shift));
-				++techPlaced;
+				topLeft = center.y() - i*UnitTypes::Protoss_Pylon.tileHeight();
+				pylons.addPos(TilePosition(center.x(), topLeft));
+				--nbPylons;
 			}
 			else
-				gates.reservePos(TilePosition(center.x() + UnitTypes::Protoss_Pylon.tileWidth(), center.y() + shift));
-			if (techPlaced < techToPlace)
+				break;
+			if (nbPylons)
 			{
-				tech.reservePos(TilePosition(center.x() - UnitTypes::Protoss_Cybernetics_Core.tileWidth(), center.y() + shift));
-				++techPlaced;
+				pylons.addPos(TilePosition(center.x(), center.y() + i*UnitTypes::Protoss_Pylon.tileHeight()));
+				--nbPylons;
 			}
 			else
-				gates.reservePos(TilePosition(center.x() - UnitTypes::Protoss_Gateway.tileWidth(), center.y() + shift));
-			if (techPlaced < techToPlace)
-			{
-				tech.reservePos(TilePosition(center.x() + UnitTypes::Protoss_Pylon.tileWidth(), center.y() + shift - UnitTypes::Protoss_Gateway.tileHeight()));
-				++techPlaced;
-			}
-			else
-				gates.reservePos(TilePosition(center.x() + UnitTypes::Protoss_Pylon.tileWidth(), center.y() + shift - UnitTypes::Protoss_Gateway.tileHeight()));
-			if (techPlaced < techToPlace)
-			{
-				tech.reservePos(TilePosition(center.x() - UnitTypes::Protoss_Cybernetics_Core.tileWidth(), center.y() + shift - UnitTypes::Protoss_Gateway.tileHeight()));
-				++techPlaced;
-			}
-			else
-				gates.reservePos(TilePosition(center.x() - UnitTypes::Protoss_Gateway.tileWidth(), center.y() + shift - UnitTypes::Protoss_Gateway.tileHeight()));
+				break;
 		}
-		else
+		/// place tech buildings (left to right)
+		multimap<unsigned int, TilePosition> techBuildings;
+		maxi = (techToPlace+1)/2;
+		int topRight = topLeft;
+		for (int i = 0; i < maxi; ++i)
 		{
-			pylons.reservePos(TilePosition(center.x(), center.y()));
-			pylons.reservePos(TilePosition(center.x() + UnitTypes::Protoss_Pylon.tileWidth(), center.y()));
-			pylons.reservePos(TilePosition(center.x() - UnitTypes::Protoss_Pylon.tileWidth(), center.y()));
-			int shift = 1;
-			if (canBuildCluster)
-				shift = 0;
-			if (techPlaced < techToPlace)
+			if (techToPlace)
 			{
-				tech.reservePos(TilePosition(center.x() + shift - UnitTypes::Protoss_Gateway.tileWidth(), center.y() - UnitTypes::Protoss_Cybernetics_Core.tileHeight()));
-				++techPlaced;
+				techBuildings.insert(make_pair<unsigned int, TilePosition>(abs(topLeft-center.y()), TilePosition(center.x() - UnitTypes::Protoss_Cybernetics_Core.tileWidth(), topLeft)));
+				topLeft += UnitTypes::Protoss_Cybernetics_Core.tileHeight();
+				--techToPlace;
 			}
 			else
-				gates.reservePos(TilePosition(center.x() + shift - UnitTypes::Protoss_Gateway.tileWidth(), center.y() - UnitTypes::Protoss_Gateway.tileHeight()));
-			if (techPlaced < techToPlace)
+				break;
+			if (techToPlace)
 			{
-				++techPlaced;
+				techBuildings.insert(make_pair<unsigned int, TilePosition>(abs(topRight-center.y()), TilePosition(center.x() + UnitTypes::Protoss_Pylon.tileWidth(), topRight)));
+				topRight += UnitTypes::Protoss_Cybernetics_Core.tileHeight();
+				--techToPlace;
 			}
 			else
-				gates.reservePos(TilePosition(center.x() + shift - UnitTypes::Protoss_Gateway.tileWidth(), center.y() + UnitTypes::Protoss_Pylon.tileHeight()));
-			if (techPlaced < techToPlace)
-			{
-				++techPlaced;
-			}
-			else
-				gates.reservePos(TilePosition(center.x() + shift, center.y() - UnitTypes::Protoss_Gateway.tileHeight()));
-			if (techPlaced < techToPlace)
-			{
-				++techPlaced;
-			}
-			else
-				gates.reservePos(TilePosition(center.x() + shift, center.y() + UnitTypes::Protoss_Pylon.tileHeight()));
-			if (canBuildCluster)
-			{
-				gates.reservePos(TilePosition(center.x() + UnitTypes::Protoss_Gateway.tileWidth(), center.y() - UnitTypes::Protoss_Gateway.tileHeight()));
-				gates.reservePos(TilePosition(center.x() + UnitTypes::Protoss_Gateway.tileWidth(), center.y() + UnitTypes::Protoss_Pylon.tileHeight()));
-				pylons.reservePos(TilePosition(center.x() - 2*UnitTypes::Protoss_Pylon.tileWidth(), center.y()));
-				pylons.reservePos(TilePosition(center.x() + 2*UnitTypes::Protoss_Pylon.tileWidth(), center.y()));
-			}
+				break;
 		}
+		for (multimap<unsigned int, TilePosition>::const_iterator it = techBuildings.begin();
+			it != techBuildings.end(); ++it)
+			tech.addPos(it->second);
+		/// place gates (RIGHT to left, to complement and odd number of tech buildings)
+		multimap<unsigned int, TilePosition> gatesBuildings;
+		maxi = (nbGates+1)/2;
+		for (int i = 0; i < maxi; ++i)
+		{
+			if (nbGates)
+			{
+				gatesBuildings.insert(make_pair<unsigned int, TilePosition>(abs(topRight-center.y()), TilePosition(center.x() + UnitTypes::Protoss_Pylon.tileWidth(), topRight)));
+				topRight += UnitTypes::Protoss_Gateway.tileHeight();
+				--nbGates;
+			}
+			else
+				break;
+			if (nbGates)
+			{
+				gatesBuildings.insert(make_pair<unsigned int, TilePosition>(abs(topLeft-center.y()), TilePosition(center.x() - UnitTypes::Protoss_Gateway.tileWidth(), topLeft)));
+				topLeft += UnitTypes::Protoss_Gateway.tileHeight();
+				--nbGates;
+			}
+			else
+				break;
+		}
+		for (multimap<unsigned int, TilePosition>::const_iterator it = gatesBuildings.begin();
+			it != gatesBuildings.end(); ++it)
+			gates.addPos(it->second);
+	}
+	else
+	{
+		width = clusterSize * UnitTypes::Protoss_Gateway.tileWidth();
+		if (techToPlace > 1)
+			--width;
+		if (techToPlace > 3)
+			--width;
+		if (width % 2)
+			++width;
+		height = 2*UnitTypes::Protoss_Gateway.tileHeight() + UnitTypes::Protoss_Pylon.tileHeight();
+		/// place pylons
+		int leftTop = center.x();
+		int nbPylons = width / 2;
+		pylons.addAsSecondPos(center);
+		--nbPylons;
+		int maxi = (nbPylons+1)/2;
+		for (int i = 1; i < maxi; ++i)
+		{
+			if (nbPylons)
+			{
+				leftTop = center.x() - i*UnitTypes::Protoss_Pylon.tileWidth();
+				pylons.addPos(TilePosition(leftTop, center.y()));
+				--nbPylons;
+			}
+			else
+				break;
+			if (nbPylons)
+			{
+				pylons.addPos(TilePosition(center.x() + i*UnitTypes::Protoss_Pylon.tileWidth(), center.y()));
+				--nbPylons;
+			}
+			else
+				break;
+		}
+		/// place tech buildings (top to bottom)
+		multimap<unsigned int, TilePosition> techBuildings;
+		maxi = (techToPlace+1)/2;
+		int leftBot = leftTop;
+		for (int i = 0; i < maxi; ++i)
+		{
+			if (techToPlace)
+			{
+				techBuildings.insert(make_pair<unsigned int, TilePosition>(abs(leftTop-center.x()), TilePosition(leftTop,
+					center.y() - UnitTypes::Protoss_Cybernetics_Core.tileHeight())));
+				leftTop += UnitTypes::Protoss_Cybernetics_Core.tileWidth();
+				--techToPlace;
+			}
+			else
+				break;
+			if (techToPlace)
+			{
+				techBuildings.insert(make_pair<unsigned int, TilePosition>(abs(leftBot-center.x()), TilePosition(leftBot,
+					center.y() + UnitTypes::Protoss_Pylon.tileHeight())));
+				leftBot += UnitTypes::Protoss_Cybernetics_Core.tileWidth();
+				--techToPlace;
+			}
+			else
+				break;
+		}
+		for (multimap<unsigned int, TilePosition>::const_iterator it = techBuildings.begin();
+			it != techBuildings.end(); ++it)
+			tech.addPos(it->second);
+		/// place gates (BOTTOM to top, to complement and odd number of tech buildings)
+		multimap<unsigned int, TilePosition> gatesBuildings;
+		maxi = (nbGates+1)/2;
+		for (int i = 0; i < maxi; ++i)
+		{
+			if (nbGates)
+			{
+				gatesBuildings.insert(make_pair<unsigned int, TilePosition>(abs(leftBot-center.x()), TilePosition(leftBot,
+					center.y() + UnitTypes::Protoss_Pylon.tileHeight())));
+				leftBot += UnitTypes::Protoss_Gateway.tileWidth();
+				--nbGates;
+			}
+			else
+				break;
+			if (nbGates)
+			{
+				gatesBuildings.insert(make_pair<unsigned int, TilePosition>(abs(leftTop-center.x()), TilePosition(leftTop,
+					center.y() - UnitTypes::Protoss_Gateway.tileHeight())));
+				leftTop += UnitTypes::Protoss_Gateway.tileWidth();
+				--nbGates;
+			}
+			else
+				break;
+		}
+		for (multimap<unsigned int, TilePosition>::const_iterator it = gatesBuildings.begin();
+			it != gatesBuildings.end(); ++it)
+			gates.addPos(it->second);
 	}
 	return clusterSize;
 }
@@ -459,10 +546,10 @@ void SimCityBuildingPlacer::makeCannonsMinerals(BWTA::BaseLocation* hom)
 				dist2b = tmpd2;
 			}
 		}
-	cannons.reservePos(cannon1);
-	pylons.reservePos(pylon1);
-	cannons.reservePos(cannon2);
-	pylons.reservePos(pylon2);
+	cannons.addPos(cannon1);
+	pylons.addPos(pylon1);
+	cannons.addPos(cannon2);
+	pylons.addPos(pylon2);
 }
 
 SimCityBuildingPlacer::SimCityBuildingPlacer()
@@ -661,21 +748,15 @@ BWAPI::TilePosition SimCityBuildingPlacer::getBuildLocationNear(BWAPI::Unit* bui
 
 	if (type == UnitTypes::Protoss_Pylon)
 	{
-		if (!pylons.empty())
-			return pylons.reservePos();
-		else
-		{
+		if (pylons.pos.size() < 2)
 			generate();
-		}
+		return pylons.reservePos();
 	}
 	else if (type == UnitTypes::Protoss_Gateway || type == UnitTypes::Protoss_Stargate)
 	{
-		if (!gates.empty())
-			return gates.reservePos();
-		else
-		{
+		if (gates.pos.size() < 2)
 			generate();
-		}
+		return gates.reservePos();
 	}
 	else if (type.isRefinery())
 	{
@@ -689,21 +770,15 @@ BWAPI::TilePosition SimCityBuildingPlacer::getBuildLocationNear(BWAPI::Unit* bui
 	}
 	else if (type == UnitTypes::Protoss_Photon_Cannon)
 	{
-		if (!cannons.empty())
-			return cannons.reservePos();
-		else
-		{
-			// GENERATE
-		}
+		//if (cannons.pos.size() < 2)
+			// TODO
+		return cannons.reservePos();
 	}
 	else
 	{
-		if (!tech.empty())
-			return tech.reservePos();
-		else
-		{
+		if (tech.pos.size() < 2)
 			generate();
-		}
+		return tech.reservePos();
 	}
 	return BWAPI::TilePositions::None;
 }

@@ -34,9 +34,20 @@ struct PositionAccountant
 	{
 		return pos.empty();
 	}
-	inline void reservePos(const BWAPI::TilePosition& tp)
+	inline void addPos(const BWAPI::TilePosition& tp)
 	{
 		pos.push_back(tp);
+		TheReservedMap->reserveTiles(tp, ut, ut.tileWidth(), ut.tileHeight());
+	}
+	inline void addAsSecondPos(const BWAPI::TilePosition& tp)
+	{
+		if (pos.empty())
+			pos.push_front(tp);
+		else
+		{
+			std::list<BWAPI::TilePosition>::const_iterator it = pos.begin();
+			pos.insert(++it, tp); // put in second position
+		}
 		TheReservedMap->reserveTiles(tp, ut, ut.tileWidth(), ut.tileHeight());
 	}
 	PositionAccountant(BWAPI::UnitType type)
