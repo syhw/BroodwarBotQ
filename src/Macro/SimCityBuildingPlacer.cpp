@@ -113,7 +113,7 @@ void SimCityBuildingPlacer::generate()
 	{
 		bc = searchForCluster(home->getRegion());
 	}
-	if (bc.size)
+	if (!bc.size)
 	{
 		for (set<MacroBase*>::const_iterator it = TheMacroBaseManager->getActiveBases().begin();
 			it != TheMacroBaseManager->getActiveBases().end(); ++it)
@@ -158,7 +158,7 @@ BuildingsCluster SimCityBuildingPlacer::searchForCluster(BWTA::Region* r)
 		if (tmpY > maxY)
 		    maxY = tmpY;
 	}
-	/// search "for big clusters"
+	/// search for "big clusters"
 	int minXClusterDim = UnitTypes::Protoss_Pylon.tileWidth() + 2*UnitTypes::Protoss_Gateway.tileWidth() + 2; // 2 to move around
 	int minYClusterDim = UnitTypes::Protoss_Pylon.tileHeight() + 2*UnitTypes::Protoss_Gateway.tileHeight() + 2;
 	int tmpMaxX = min(maxX - minXClusterDim, Broodwar->mapWidth());
@@ -179,10 +179,9 @@ BuildingsCluster SimCityBuildingPlacer::searchForCluster(BWTA::Region* r)
 			if (BWTA::getRegion(botRight) != r)
 				continue;
 			if (canBuildHere(NULL, topLeft, UnitTypes::Protoss_Gateway)
-//				&& canBuildHere(NULL, TilePosition(topRight.x() - UnitTypes::Protoss_Gateway.tileWidth(), topRight.y()), UnitTypes::Protoss_Gateway)
-//				&& canBuildHere(NULL, TilePosition(botLeft.x(), botLeft.y() - UnitTypes::Protoss_Gateway.tileHeight()), UnitTypes::Protoss_Gateway)
-//				&& canBuildHere(NULL, TilePosition(botRight.x() - UnitTypes::Protoss_Gateway.tileWidth(), botRight.y() - UnitTypes::Protoss_Gateway.tileHeight()), UnitTypes::Protoss_Gateway))
-)
+				&& canBuildHere(NULL, TilePosition(topRight.x() - UnitTypes::Protoss_Gateway.tileWidth(), topRight.y()), UnitTypes::Protoss_Gateway)
+				&& canBuildHere(NULL, TilePosition(botLeft.x(), botLeft.y() - UnitTypes::Protoss_Gateway.tileHeight()), UnitTypes::Protoss_Gateway)
+				&& canBuildHere(NULL, TilePosition(botRight.x() - UnitTypes::Protoss_Gateway.tileWidth(), botRight.y() - UnitTypes::Protoss_Gateway.tileHeight()), UnitTypes::Protoss_Gateway))
 			{
 				ret.center = TilePosition(topLeft.x() + UnitTypes::Protoss_Gateway.tileWidth() + 1, topLeft.y() + 2*UnitTypes::Protoss_Pylon.tileHeight() + 1);
 				ret.vertical = true;
@@ -196,7 +195,7 @@ BuildingsCluster SimCityBuildingPlacer::searchForCluster(BWTA::Region* r)
 					return ret;
 			}
 		}
-	/// search "for small clusters"
+	/// search for "small clusters"
 	minXClusterDim = 2*UnitTypes::Protoss_Gateway.tileWidth() + 2; // 2 to move around
 	minYClusterDim = 2*UnitTypes::Protoss_Gateway.tileHeight() + 2;
 	tmpMaxX = min(maxX - minXClusterDim, Broodwar->mapWidth());
@@ -217,10 +216,9 @@ BuildingsCluster SimCityBuildingPlacer::searchForCluster(BWTA::Region* r)
 			if (BWTA::getRegion(botRight) != r)
 				continue;
 			if (canBuildHere(NULL, topLeft, UnitTypes::Protoss_Gateway)
-//				&& canBuildHere(NULL, TilePosition(topRight.x() - UnitTypes::Protoss_Gateway.tileWidth(), topRight.y()), UnitTypes::Protoss_Gateway)
-//				&& canBuildHere(NULL, TilePosition(botLeft.x(), botLeft.y() - UnitTypes::Protoss_Gateway.tileHeight()), UnitTypes::Protoss_Gateway)
-//				&& canBuildHere(NULL, TilePosition(botRight.x() - UnitTypes::Protoss_Gateway.tileWidth(), botRight.y() - UnitTypes::Protoss_Gateway.tileHeight()), UnitTypes::Protoss_Gateway))
-)
+				&& canBuildHere(NULL, TilePosition(topRight.x() - UnitTypes::Protoss_Gateway.tileWidth(), topRight.y()), UnitTypes::Protoss_Gateway)
+				&& canBuildHere(NULL, TilePosition(botLeft.x(), botLeft.y() - UnitTypes::Protoss_Gateway.tileHeight()), UnitTypes::Protoss_Gateway)
+				&& canBuildHere(NULL, TilePosition(botRight.x() - UnitTypes::Protoss_Gateway.tileWidth(), botRight.y() - UnitTypes::Protoss_Gateway.tileHeight()), UnitTypes::Protoss_Gateway))
 			{
 				ret.center = TilePosition(topLeft.x() + UnitTypes::Protoss_Gateway.tileWidth() + 1, topLeft.y() + UnitTypes::Protoss_Pylon.tileHeight() + 1);
 				ret.vertical = true;
