@@ -154,6 +154,7 @@ void BattleBroodAI::onUnitDestroy(BWAPI::Unit* unit)
 void BattleBroodAI::onUnitShow(BWAPI::Unit* unit)
 {
 	intelligence->onUnitShow(unit);
+	micro->onUnitShow(unit);
 }
 
 void BattleBroodAI::onUnitHide(BWAPI::Unit* unit)

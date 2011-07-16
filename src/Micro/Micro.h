@@ -14,5 +14,6 @@ public:
 	WarManager* warManager;
 	void update();
 	void onUnitCreate(BWAPI::Unit* unit);
+	void onUnitShow(BWAPI::Unit* unit);
 	void onUnitDestroy(BWAPI::Unit* unit);
 };

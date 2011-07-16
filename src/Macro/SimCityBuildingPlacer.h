@@ -95,6 +95,7 @@ private:
 	inline void generate();
 	bool canBuildHere(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type) const;
 	bool canBuildHereWithSpace(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type, int buildDist) const;
+	bool fullCanBuildHere(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type) const;
 	bool buildable(BWAPI::Unit* builder, int x, int y) const;
 	struct data
 	{

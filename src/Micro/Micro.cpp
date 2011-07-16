@@ -20,6 +20,11 @@ void Micro::update()
 
 void Micro::onUnitCreate(BWAPI::Unit *unit)
 {
+	//warManager->onUnitCreate(unit);
+}
+
+void Micro::onUnitShow(BWAPI::Unit *unit)
+{
 	warManager->onUnitCreate(unit);
 }
 
