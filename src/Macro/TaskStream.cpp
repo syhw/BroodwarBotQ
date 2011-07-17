@@ -164,12 +164,14 @@ void TaskStream::computeStatus()
           tp.x()+=4;
           tp.y()++;
         }
-        bool canBuildHere = Broodwar->canBuildHere(NULL,tp,ut);
+		bool canBuildHere = false;
         if (workerReady)
           canBuildHere = Broodwar->canBuildHere(worker,tp,ut);
+		else
+		  canBuildHere = Broodwar->canBuildHere(NULL,tp,ut);
         if (!canBuildHere) //doesn't work for blocked addons!
         {
-          status = Error_Location_Blocked;
+          status = Error_Location_Blocked; /// TODO look there
           return;
         }
       }

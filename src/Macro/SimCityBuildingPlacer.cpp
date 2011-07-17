@@ -391,7 +391,6 @@ int SimCityBuildingPlacer::canBuildCluster(const TilePosition& center, bool vert
 
 int SimCityBuildingPlacer::makeCluster(const TilePosition& center, int nbTechBuildings, bool vertical, int cSize)
 {
-	++nbClusters;
 	int clusterSize = 0;
 	if (!cSize)
 		clusterSize = canBuildCluster(center, vertical);
@@ -399,6 +398,10 @@ int SimCityBuildingPlacer::makeCluster(const TilePosition& center, int nbTechBui
 		clusterSize = cSize;
 	if (!clusterSize)
 		return 0;
+	if (clusterSize > 3)
+	{
+		Broodwar->printf("WHAT THE FUCK???");
+	}
 	int techToPlace = min(4, nbTechBuildings);
 	int nbGates = clusterSize*2 - techToPlace;
 	int height = 0;
@@ -421,7 +424,7 @@ int SimCityBuildingPlacer::makeCluster(const TilePosition& center, int nbTechBui
 		int maxi = (nbPylons+1)/2;
 		for (int i = 1; i <= maxi; ++i)
 		{
-			if (nbPylons)
+			if (nbPylons > 0)
 			{
 				topLeft = center.y() - i*UnitTypes::Protoss_Pylon.tileHeight();
 				pylons.addPos(TilePosition(center.x(), topLeft));
@@ -429,7 +432,7 @@ int SimCityBuildingPlacer::makeCluster(const TilePosition& center, int nbTechBui
 			}
 			else
 				break;
-			if (nbPylons)
+			if (nbPylons > 0)
 			{
 				pylons.addPos(TilePosition(center.x(), center.y() + i*UnitTypes::Protoss_Pylon.tileHeight()));
 				--nbPylons;
@@ -579,6 +582,7 @@ int SimCityBuildingPlacer::makeCluster(const TilePosition& center, int nbTechBui
 			it != gatesBuildings.end(); ++it)
 			gates.addPos(it->second);
 	}
+	++nbClusters;
 	return clusterSize;
 }
 
@@ -727,15 +731,18 @@ void SimCityBuildingPlacer::detached(TaskStream* ts)
 void SimCityBuildingPlacer::newStatus(TaskStream* ts)
 {
 	// TODO cancel
-	/*UnitType type = ts->getTask(0).getUnit();
-	if (type == UnitTypes::Protoss_Pylon)
+	if (ts->getStatus() != TaskStream::Executing_Task)
 	{
-		pylons.freePos(ts->getTask(0).getTilePosition());
+		UnitType type = ts->getTask(0).getUnit();
+		if (type == UnitTypes::Protoss_Pylon)
+		{
+			pylons.freePos(ts->getTask(0).getTilePosition());
+		}
+		else if (type == UnitTypes::Protoss_Gateway || type == UnitTypes::Protoss_Cybernetics_Core)
+		{
+			gates.freePos(ts->getTask(0).getTilePosition());
+		}
 	}
-	else if (type == UnitTypes::Protoss_Gateway || type == UnitTypes::Protoss_Cybernetics_Core)
-	{
-		gates.freePos(ts->getTask(0).getTilePosition());
-	}*/
 }
 
 void SimCityBuildingPlacer::completedTask(TaskStream* ts, const Task &t)
@@ -743,18 +750,18 @@ void SimCityBuildingPlacer::completedTask(TaskStream* ts, const Task &t)
 	TheReservedMap->freeTiles(taskStreams[ts].reservePosition,taskStreams[ts].reserveWidth,taskStreams[ts].reserveHeight);
 	taskStreams[ts].reserveWidth  = 0;
 	taskStreams[ts].reserveHeight = 0;
-	if (t.getType() == TaskTypes::Unit && t.getUnit() == UnitTypes::Protoss_Pylon)
+	if (t.getUnit() == UnitTypes::Protoss_Pylon)
 	{
 		existingPylons.push_back(t.getTilePosition());
 		pylons.usedPos(t.getTilePosition());
 	}
 	else if (t.getUnit() == UnitTypes::Protoss_Gateway || t.getUnit() == UnitTypes::Protoss_Stargate)
 	{
-		tech.usedPos(t.getTilePosition());
+		gates.usedPos(t.getTilePosition());
 	}
 	else if (t.getUnit() != UnitTypes::Protoss_Photon_Cannon)
 	{
-		gates.usedPos(t.getTilePosition());
+		tech.usedPos(t.getTilePosition());
 	}
 }
 

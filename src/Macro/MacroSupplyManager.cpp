@@ -63,7 +63,7 @@ void MacroSupplyManager::update()
           if (Broodwar->self()->getRace()==Races::Protoss)
           {
             ts->attach(SimCityBuildingPlacer::getInstance(),false);
-            SimCityBuildingPlacer::getInstance()->setBuildDistance(ts,4);
+            // SimCityBuildingPlacer::getInstance()->setBuildDistance(ts,4); // TODO redo
           }
           else
             ts->attach(SimCityBuildingPlacer::getInstance(),false);

@@ -82,6 +82,11 @@ void BattleBroodAI::onFrame()
 		Broodwar->getScreenPosition().x() + Broodwar->getMousePosition().x(), 
 		Broodwar->getScreenPosition().y() + Broodwar->getMousePosition().y());
     Broodwar->drawTextMouse(12, 0, mousePos);
+	char mouseTilePos[100];
+	sprintf_s(mouseTilePos, "%d, %d", 
+		(Broodwar->getScreenPosition().x() + Broodwar->getMousePosition().x())/32, 
+		(Broodwar->getScreenPosition().y() + Broodwar->getMousePosition().y())/32);
+    Broodwar->drawTextMouse(12, 16, mouseTilePos);
 #endif
 
     //timeManager->update();
