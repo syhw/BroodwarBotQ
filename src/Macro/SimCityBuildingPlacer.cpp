@@ -128,6 +128,8 @@ void SimCityBuildingPlacer::generate()
 		bc.center.makeValid();
 	if (bc.size)
 		makeCluster(bc.center, 2, bc.vertical, bc.size);
+	else
+		Broodwar->printf("Could not generate a cluster");
 }
 
 SimCityBuildingPlacer* instance = NULL;
