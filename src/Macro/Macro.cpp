@@ -1,5 +1,6 @@
 #include <PrecompiledHeader.h>
 #include "Macro.h"
+#include "BWSAL.h"
 
 using namespace BWAPI;
 
@@ -71,18 +72,18 @@ void Macro::update()
 	if (!expands && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 2)
 	{
 		++expands;
-		TheMacroBaseManager->expandWhenPossible();
+		TheBasesManager->expand();
 		//buildOrderAdd(UnitTypes::Protoss_Assimilator);
 	}
 	else if (expands == 1 && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Observer))
 	{
 		++expands;
-		TheMacroBaseManager->expandWhenPossible();
+		TheBasesManager->expand();
 		//buildOrderAdd(UnitTypes::Protoss_Assimilator);
 	}
 	if (addedGates < 3 && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 1)
 	{
-		buildOrderAdd(UnitTypes::Protoss_Gateway);
+		//buildOrderAdd(UnitTypes::Protoss_Gateway);
 		++addedGates;
 	}
 	
@@ -116,8 +117,8 @@ void Macro::onUnitDestroy(BWAPI::Unit* unit)
 {
   TheArbitrator->onRemoveObject(unit);
   TheInformationManager->onUnitDestroy(unit);
-  TheMacroBaseManager->onUnitDestroy(unit);
-  TheMacroWorkerManager->onRemoveUnit(unit);
+  TheBasesManager->onUnitDestroy(unit);
+  TheWorkerManager->onRemoveUnit(unit);
 }
 
 void Macro::onUnitMorph(BWAPI::Unit* unit)

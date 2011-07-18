@@ -504,23 +504,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\BaseManager.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Macro\BasesManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\BasicTaskExecutor.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\BasicWorkerFinder.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\BFSBuildingPlacer.cpp"
 					>
 				</File>
 				<File
@@ -532,23 +516,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\BuildingPlacer.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\BuildManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\BuildOrderManager.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Macro\BWSAL.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\ConstructionManager.cpp"
 					>
 				</File>
 				<File
@@ -564,51 +532,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\LarvaTimeline.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Macro\Macro.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\MacroBase.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\MacroBaseManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\MacroDependencyResolver.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\MacroManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\MacroSupplyManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\MacroWorkerManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\MetaUnit.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\MorphManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\ProductionManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\PylonBuildingPlacer.cpp"
 					>
 				</File>
 				<File
@@ -624,10 +548,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\ResourceTimeline.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Macro\ScoutManager.cpp"
 					>
 				</File>
@@ -636,43 +556,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\SpiralBuildingPlacer.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Macro\SupplyManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\Task.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\TaskStream.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\TechManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\TechTimeline.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\TerminateIfEmpty.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\TerminateIfWorkerLost.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\UnitCompositionProducer.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\UnitCountTimeline.cpp"
 					>
 				</File>
 				<File
@@ -684,31 +568,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\UnitItem.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\UnitPump.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\UnitReadyTimeCalculator.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\UpgradeManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\UpgradeTimeline.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Macro\WorkerManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\WorkerTaskTimeline.cpp"
 					>
 				</File>
 			</Filter>
@@ -978,23 +838,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\BaseManager.h"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Macro\BasesManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\BasicTaskExecutor.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\BasicWorkerFinder.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\BFSBuildingPlacer.h"
 					>
 				</File>
 				<File
@@ -1006,23 +850,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\BuildingPlacer.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\BuildManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\BuildOrderManager.h"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Macro\BWSAL.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\ConstructionManager.h"
 					>
 				</File>
 				<File
@@ -1046,42 +874,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\MacroBaseManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\MacroBuildOrderManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\MacroDependencyResolver.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\MacroManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\MacroSupplyManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\MacroWorkerManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\MorphManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\ProductionManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\PylonBuildingPlacer.h"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Macro\RectangleArray.h"
 					>
 				</File>
@@ -1098,10 +890,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\ResourceTimeline.h"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Macro\ScoutManager.h"
 					>
 				</File>
@@ -1110,39 +898,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\SpiralBuildingPlacer.h"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Macro\SupplyManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\Task.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\TechManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\TechTimeline.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\TerminateIfEmpty.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\TerminateIfWorkerLost.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\UnitCompositionProducer.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\UnitCountTimeline.h"
 					>
 				</File>
 				<File
@@ -1154,15 +910,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\UnitPump.h"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Macro\UpgradeManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\UpgradeTimeline.h"
 					>
 				</File>
 				<File
@@ -1178,74 +926,6 @@
 					</File>
 					<File
 						RelativePath="..\src\Macro\Arbitrator\Controller.h"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="BaseManager"
-					>
-					<File
-						RelativePath="..\src\Macro\BaseManager\Base.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\BaseManager\BaseManager.h"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="BuildOrderManager"
-					>
-					<File
-						RelativePath="..\src\Macro\BuildOrderManager\BuildOrderManager.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\BuildOrderManager\TechItem.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\BuildOrderManager\UnitItem.h"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="MacroBaseManager"
-					>
-					<File
-						RelativePath="..\src\Macro\MacroBaseManager\MacroBase.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\MacroBaseManager\MacroBaseManager.h"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="MacroManager"
-					>
-					<File
-						RelativePath="..\src\Macro\MacroManager\LarvaTimeline.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\MacroManager\MacroManager.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\MacroManager\TaskStream.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\MacroManager\TaskStreamObserver.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\MacroManager\UnitReadyTimeCalculator.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\MacroManager\WorkerTaskTimeline.h"
 						>
 					</File>
 				</Filter>

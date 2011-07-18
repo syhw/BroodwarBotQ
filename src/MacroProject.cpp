@@ -258,7 +258,7 @@ void BattleBroodAI::onSendText(std::string text)
         this->showManagerAssignments=true;
         return;
     }
-    if (type!=UnitTypes::Unknown)
+    /*if (type!=UnitTypes::Unknown)
     {
 		macro->buildOrderAdd(type);
     }
@@ -279,7 +279,7 @@ void BattleBroodAI::onSendText(std::string text)
             else
                 Broodwar->printf("You typed '%s'!",text.c_str());
         }
-    }
+    }*/
     return;
 }
 

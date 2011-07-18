@@ -1,8 +1,8 @@
 #include <PrecompiledHeader.h>
 #include "Defines.h"
 #include "Intelligence/ScoutController.h"
-#include "Macro/MacroManager.h"
 #include "Macro/UnitGroupManager.h"
+#include "Macro/BWSAL.h"
 
 using namespace BWAPI;
 

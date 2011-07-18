@@ -1,45 +1,46 @@
 #include <PrecompiledHeader.h>
-#include "Macro/MacroWorkerManager.h"
-#include "Macro/MacroBaseManager.h"
+#include "Macro/WorkerManager.h"
+#include "Macro/BasesManager.h"
 #include "Macro/RectangleArray.h"
-#include "Macro/MacroManager.h"
 #include "Macro/UnitGroupManager.h"
 #include "Utils/Util.h"
+#include "BWSAL.h"
 using namespace BWAPI;
 using namespace std;
 using namespace Util;
 
-MacroWorkerManager* TheMacroWorkerManager = NULL;
+WorkerManager* TheWorkerManager = NULL;
 
-MacroWorkerManager* MacroWorkerManager::create()
+WorkerManager* WorkerManager::create()
 {
-  if (TheMacroWorkerManager) return TheMacroWorkerManager;
-  return new MacroWorkerManager();
-}
-void MacroWorkerManager::destroy()
-{
-  if (TheMacroWorkerManager)
-    delete TheMacroWorkerManager;
+  if (TheWorkerManager) return TheWorkerManager;
+  TheWorkerManager = new WorkerManager();
+  return TheWorkerManager;
 }
 
-
-MacroWorkerManager::MacroWorkerManager()
+void WorkerManager::destroy()
 {
-  TheMacroWorkerManager   = this;
-  this->lastSCVBalance    = 0;
-  this->WorkersPerGas     = 3;
-  this->mineralRate       = 0;
-  this->gasRate           = 0;
-  this->autoBuild         = false;
-  this->autoBuildPriority = 80;
+  if (TheWorkerManager)
+    delete TheWorkerManager;
 }
 
-MacroWorkerManager::~MacroWorkerManager()
+WorkerManager::WorkerManager()
+: lastSCVBalance(0)
+, WorkersPerGas(3)
+, mineralRate(0)
+, gasRate(0)
+, autoBuild(false)
+, autoBuildPriority(80)
 {
-  TheMacroWorkerManager = NULL;
+  TheWorkerManager   = this;
 }
 
-void MacroWorkerManager::onOffer(set<Unit*> units)
+WorkerManager::~WorkerManager()
+{
+  TheWorkerManager = NULL;
+}
+
+void WorkerManager::onOffer(set<Unit*> units)
 {
   for(set<Unit*>::iterator u = units.begin(); u != units.end(); u++)
   {
@@ -57,12 +58,12 @@ void MacroWorkerManager::onOffer(set<Unit*> units)
       TheArbitrator->decline(this, *u, 0);
   }
 }
-void MacroWorkerManager::onRevoke(Unit* unit, double bid)
+void WorkerManager::onRevoke(Unit* unit, double bid)
 {
   this->onRemoveUnit(unit);
 }
 
-void MacroWorkerManager::updateWorkerAssignments()
+void WorkerManager::updateWorkerAssignments()
 {
   //determine current worker assignments
   //also workers that are mining from resources that dont belong to any of our bases will be set to free
@@ -146,7 +147,7 @@ void MacroWorkerManager::updateWorkerAssignments()
 
 bool mineralCompare (const pair<Unit*, int> i, const pair<Unit*, int> j) { return (i.second>j.second); }
 
-void MacroWorkerManager::rebalanceWorkers()
+void WorkerManager::rebalanceWorkers()
 {
   mineralOrder.clear();
   desiredWorkerCount.clear();
@@ -156,7 +157,7 @@ void MacroWorkerManager::rebalanceWorkers()
   optimalWorkerCount = 0;
   
   // iterate over all the resources of each active base
-  for(set<MacroBase*>::iterator b = this->basesCache.begin(); b != this->basesCache.end(); b++)
+  for(set<Base*>::iterator b = this->basesCache.begin(); b != this->basesCache.end(); b++)
   {
     set<Unit*> baseMinerals = (*b)->getMinerals();
     vector< std::pair<Unit*,int> > baseMineralOrder;
@@ -225,7 +226,7 @@ void MacroWorkerManager::rebalanceWorkers()
   }
 }
 
-void MacroWorkerManager::update()
+void WorkerManager::update()
 {
   //bid a constant value of 10 on all completed workers
   set<Unit*> w = SelectAll()(isCompleted)(isWorker);
@@ -233,7 +234,7 @@ void MacroWorkerManager::update()
     TheArbitrator->setBid(this, u, 10);
 
   //rebalance workers when necessary
-  set<MacroBase*> bases = TheMacroBaseManager->getActiveBases();
+  set<Base*> bases = TheBasesManager->getActiveBases();
   if (Broodwar->getFrameCount() > lastSCVBalance + 5*24 || bases != this->basesCache || lastSCVBalance == 0)
   {
     this->basesCache = bases;
@@ -272,8 +273,8 @@ void MacroWorkerManager::update()
       if (i->getOrder() == Orders::ReturnGas || i->getOrder() == Orders::ReturnMinerals ||  (i->getOrder() == Orders::PlayerGuard && BWAPI::Broodwar->getFrameCount()>u->second.lastFrameSpam+BWAPI::Broodwar->getLatency()*2))
       {
         u->second.lastFrameSpam=BWAPI::Broodwar->getFrameCount();
-        MacroBase* b=TheMacroBaseManager->getBase(BWTA::getNearestBaseLocation(i->getPosition()));
-        if (b!=NULL)
+        Base* b=TheBasesManager->getBase(BWTA::getNearestBaseLocation(i->getPosition()));
+        if (b != NULL)
         {
           Unit* center = b->getResourceDepot();
           if (i->getTarget()==NULL || !i->getTarget()->exists() || i->getTarget()!=center || (center->isCompleted() &&  i->getOrder() == Orders::PlayerGuard))
@@ -283,17 +284,17 @@ void MacroWorkerManager::update()
     }
   }
 }
-string MacroWorkerManager::getName() const
+string WorkerManager::getName() const
 {
   return "Worker Manager";
 }
 
-string MacroWorkerManager::getShortName() const
+string WorkerManager::getShortName() const
 {
   return "Work";
 }
 
-void MacroWorkerManager::onRemoveUnit(Unit* unit)
+void WorkerManager::onRemoveUnit(Unit* unit)
 {
   if (unit->getType().isWorker())
     workers.erase(unit);
@@ -316,31 +317,31 @@ void MacroWorkerManager::onRemoveUnit(Unit* unit)
   }
 }
 
-void MacroWorkerManager::setWorkersPerGas(int count)
+void WorkerManager::setWorkersPerGas(int count)
 {
   this->WorkersPerGas=count;
 }
-double MacroWorkerManager::getMineralRate() const
+double WorkerManager::getMineralRate() const
 {
   return this->mineralRate;
 }
-double MacroWorkerManager::getGasRate() const
+double WorkerManager::getGasRate() const
 {
   return this->gasRate;
 }
-int MacroWorkerManager::getOptimalWorkerCount() const
+int WorkerManager::getOptimalWorkerCount() const
 {
   return this->optimalWorkerCount;
 }
-void MacroWorkerManager::enableAutoBuild()
+void WorkerManager::enableAutoBuild()
 {
   this->autoBuild=true;
 }
-void MacroWorkerManager::disableAutoBuild()
+void WorkerManager::disableAutoBuild()
 {
   this->autoBuild=false;
 }
-void MacroWorkerManager::setAutoBuildPriority(int priority)
+void WorkerManager::setAutoBuildPriority(int priority)
 {
   this->autoBuildPriority = priority;
 }

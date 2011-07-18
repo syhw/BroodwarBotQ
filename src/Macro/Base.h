@@ -6,7 +6,7 @@
 class Base
 {
 public:
-	static Base* CreateBase(BWTA::BaseLocation* b, bool getGas = true);
+	Base(BWTA::BaseLocation* b);
 	void Base::onUnitDestroy(BWAPI::Unit* u);
 	BWTA::BaseLocation* getBaseLocation() const;
 	BWAPI::Unit* getResourceDepot() const;
@@ -22,14 +22,11 @@ public:
 private:
 	void buildCenter();
 	void buildGas();
-	Base(BWTA::BaseLocation* b);
 	BWTA::BaseLocation* baseLocation;
 	BWAPI::Unit* resourceDepot;
 	BWAPI::Unit* refinery;
 	bool ready;
 	bool paused;
-	bool active;
-	bool activeGas;
 	bool centerInConstruction;
 	bool gasInConstruction;
 };

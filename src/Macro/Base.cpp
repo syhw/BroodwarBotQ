@@ -5,6 +5,26 @@ using namespace BWAPI;
 
 std::set<Unit*> emptySet;
 
+Base::Base(BWTA::BaseLocation* b)
+: baseLocation(b)
+, resourceDepot(NULL)
+, refinery(NULL)
+, ready(false)
+, centerInConstruction(false)
+, gasInConstruction(false)
+{
+	buildCenter();
+	buildGas();
+}
+
+void Base::onUnitDestroy(BWAPI::Unit* u)
+{
+	if (u == refinery)
+		refinery = NULL;
+	if (u == resourceDepot)
+		resourceDepot = NULL;
+}
+
 BWTA::BaseLocation* Base::getBaseLocation() const
 {
 	return baseLocation;
@@ -87,15 +107,7 @@ void Base::update()
 	}
 	if (refinery == NULL && !gasInConstruction)
 		buildGas();
-	ready = (resourceDepot && resourceDepot->exists() && (resourceDepot->isCompleted() || resourceDepot->getRemainingBuildTime()<300));
-}
-
-void Base::onUnitDestroy(BWAPI::Unit* u)
-{
-	if (u == refinery)
-		refinery = NULL;
-	if (u == resourceDepot)
-		resourceDepot = NULL;
+	ready = (resourceDepot && resourceDepot->exists() && (resourceDepot->isCompleted() || resourceDepot->getRemainingBuildTime()<300)); // 300 frames before completion
 }
 
 void Base::buildCenter()
@@ -110,19 +122,4 @@ void Base::buildGas()
 		it != baseLocation->getGeysers().end(); ++it)
 		TheBuilder->build(Broodwar->self()->getRace().getRefinery(), (*it)->getTilePosition());
     gasInConstruction = true;
-}
-
-Base::Base(BWTA::BaseLocation* b)
-: baseLocation(b)
-, resourceDepot(NULL)
-, refinery(NULL)
-, active(false)
-, ready(false)
-, activeGas(false)
-, centerInConstruction(false)
-, gasInConstruction(false)
-{
-	buildCenter();
-	if (getGas)
-		buildGas();
 }

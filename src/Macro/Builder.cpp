@@ -6,6 +6,8 @@
 using namespace BWAPI;
 using namespace std;
 
+SimCityBuildingPlacer* Task::buildingPlacer = NULL;
+
 Task::Task(BWAPI::Unit* w, BWAPI::TilePosition tp, BWAPI::UnitType ut)
 	: worker(w)
 	, tilePosition(tp)
@@ -68,6 +70,7 @@ void Task::buildIt()
 	if (Broodwar->getFrameCount() > lastOrder + 47)
 	{
 		worker->build(tilePosition, type);
+		lastOrder = Broodwar->getFrameCount();
 	}
 }
 

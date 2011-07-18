@@ -5,6 +5,7 @@
 using namespace BWAPI;
 
 BasesManager* TheBasesManager = NULL;
+
 BasesManager* BasesManager::create()
 {
 	if (TheBasesManager)
@@ -21,7 +22,7 @@ void BasesManager::destroy()
 
 BasesManager::BasesManager()
 {
-	TheBasesManager=this;
+	TheBasesManager = this;
 }
 
 BasesManager::~BasesManager()
@@ -31,56 +32,57 @@ BasesManager::~BasesManager()
 
 void BasesManager::update()
 {
-	for each(Base* mb in allBases)
+	for each(Base mb in allBases)
 	{
-		mb->update();
-		if (mb->isActive())
-			activeBases.insert(mb);
+		mb.update();
+		if (mb.isActive())
+			activeBases.insert(&mb);
 		else
-			activeBases.erase(mb);
-		if (mb->isReady())
-			readyBases.insert(mb);
+			activeBases.erase(&mb);
+		if (mb.isReady())
+			readyBases.insert(&mb);
 		else
-			readyBases.erase(mb);
+			readyBases.erase(&mb);
 	}
 }
 
 Base* BasesManager::getBase(BWTA::BaseLocation* location)
 {
-	std::map<BWTA::BaseLocation*,Base*>::iterator i=location2base.find(location);
-	if (i==location2base.end())
+	std::map<BWTA::BaseLocation*, Base*>::iterator i = location2base.find(location);
+	if (i == location2base.end())
 		return NULL;
 	return i->second;
 }
 
-Base* BasesManager::expand(BWTA::BaseLocation* location, bool getGas)
+void BasesManager::expand(BWTA::BaseLocation* location)
 {
 	if (location == NULL)
 	{
 		// Find closer expand location not taken
-		BWTA::BaseLocation* home=BWTA::getStartLocation(BWAPI::Broodwar->self());
+		BWTA::BaseLocation* home = BWTA::getStartLocation(BWAPI::Broodwar->self());
 		double minDist = -1;
 		for(std::set<BWTA::BaseLocation*>::const_iterator i = BWTA::getBaseLocations().begin();
 			i != BWTA::getBaseLocations().end(); i++)
 		{
-			double dist=home->getGroundDistance(*i);
-			if (dist>0 && getBase(*i)==NULL)
+			double dist = home->getGroundDistance(*i);
+			if (dist > 0 && getBase(*i) == NULL)
 			{
-				if (minDist < 0 || dist<minDist)
+				if (minDist < 0 || dist < minDist)
 				{
-					minDist=dist;
-					location=*i;
+					minDist = dist;
+					location = *i;
 				}
 			}
 		}
 	}
-	if (location == NULL) return NULL;
+#ifdef __DEBUG__
+	if (location == NULL)
+		Broodwar->printf("CANNOT EXPAND");
+#endif
 
-	Base* mb = Base::CreateBaseNow(location, getGas);
-	location2base[location] = mb;
-	allBases.insert(mb);
+	allBases.push_back(Base(location));
+	location2base[location] = & allBases.back();
 	TheBorderManager->addMyBase(location);
-	return mb;
 }
 
 const std::set<Base*>& BasesManager::getActiveBases() const
@@ -93,7 +95,7 @@ const std::set<Base*>& BasesManager::getReadyBases() const
 	return readyBases;
 }
 
-const std::set<Base*>& BasesManager::getAllBases() const
+const std::list<Base>& BasesManager::getAllBases() const
 {
 	return allBases;
 }
@@ -110,9 +112,9 @@ std::string BasesManager::getName()
 
 void BasesManager::onUnitDestroy(BWAPI::Unit* unit)
 {
-	for each(Base* b in allBases)
+	for each(Base b in allBases)
 	{
-		b->onUnitDestroy(unit);
+		b.onUnitDestroy(unit);
 	}
 }
 
