@@ -1,83 +1,128 @@
 #include <PrecompiledHeader.h>
-#include "Macro/BaseManager.h"
-Base::Base(BWTA::BaseLocation* location)
-{
-  this->baseLocation     = location;
-  this->resourceDepot    = NULL;
-  this->refinery         = NULL;
-  this->active           = false;
-  this->activeGas        = false;
-  this->beingConstructed = false;
-}
+#include <Macro/Base.h>
+#include <Macro/Builder.h>
+using namespace BWAPI;
+
+std::set<Unit*> emptySet;
 
 BWTA::BaseLocation* Base::getBaseLocation() const
 {
-  return this->baseLocation;
+	return baseLocation;
 }
 
 BWAPI::Unit* Base::getResourceDepot() const
 {
-  return this->resourceDepot;
+	return resourceDepot;
 }
 
 BWAPI::Unit* Base::getRefinery() const
 {
-  return this->refinery;
+	return refinery;
 }
 
-std::set<BWAPI::Unit*> Base::getMinerals() const
+const std::set<BWAPI::Unit*>& Base::getMinerals() const
 {
-  return this->baseLocation->getMinerals();
+	if (baseLocation == NULL)
+		return emptySet;
+	return baseLocation->getMinerals();
 }
 
-std::set<BWAPI::Unit*> Base::getGeysers() const
+const std::set<BWAPI::Unit*>& Base::getGeysers() const
 {
-  return this->baseLocation->getGeysers();
+	if (baseLocation == NULL)
+		return emptySet;
+	return baseLocation->getGeysers();
+}
+
+void Base::setPaused(bool paused)
+{
+	this->paused = paused;
+}
+
+bool Base::isPaused() const
+{
+	return paused;
+}
+
+bool Base::isReady() const
+{
+	return ready;
 }
 
 bool Base::isActive() const
 {
-  return this->active;
+	return !paused && ready;
 }
 
-bool Base::isActiveGas() const
+void Base::update()
 {
-  return this->activeGas;
+	if (resourceDepot == NULL)
+	{
+		std::set<Unit*> tmp = Broodwar->getUnitsOnTile(baseLocation->getTilePosition().x(), baseLocation->getTilePosition().y());
+		for (std::set<Unit*>::const_iterator it = tmp.begin();
+			it != tmp.end(); ++it)
+		{
+			if ((*it)->getType() == Broodwar->self()->getRace().getCenter())
+				resourceDepot = *it;
+		}
+	}
+	if (resourceDepot == NULL && !centerInConstruction)
+		buildCenter();
+	if (refinery == NULL)
+	{	
+		for (std::set<Unit*>::const_iterator it = baseLocation->getGeysers().begin();
+		it != baseLocation->getGeysers().end(); ++it)
+		{
+			std::set<Unit*> tmp = Broodwar->getUnitsOnTile((*it)->getTilePosition.x(), (*it)->getTilePosition().y());
+			for (std::set<Unit*>::const_iterator it2 = tmp->begin();
+				it2 != tmp.end(); ++it2)
+			{
+				if ((*it2)->getType() == Broodwar->self()->getRace().getRefinery())
+				{
+					refinery = *it2;
+					break;
+				}
+			}
+		}
+	}
+	if (refinery == NULL && !gasInConstruction)
+		buildGas();
+	ready = (resourceDepot && resourceDepot->exists() && (resourceDepot->isCompleted() || resourceDepot->getRemainingBuildTime()<300));
 }
 
-bool Base::isBeingConstructed() const
+void Base::onUnitDestroy(BWAPI::Unit* u)
 {
-  return this->beingConstructed;
+	if (u == refinery)
+		refinery = NULL;
+	if (u == resourceDepot)
+		resourceDepot = NULL;
 }
 
-bool Base::hasGas() const
+void Base::buildCenter()
 {
-  bool gas = false;
-
-  //if Baselocation has a vespene geyser
-  if(!(this->getBaseLocation()->isMineralOnly()))
-  {
-    gas = true;
-  }
-  return gas;
+	TheBuilder->build(Broodwar->self()->getRace().getCenter(), baseLocation->getTilePosition());
+	centerInConstruction = true;
 }
 
-void Base::setResourceDepot(BWAPI::Unit* unit)
+void Base::buildGas()
 {
-  this->resourceDepot = unit;
+	for (std::set<Unit*>::const_iterator it = baseLocation->getGeysers().begin();
+		it != baseLocation->getGeysers().end(); ++it)
+		TheBuilder->build(Broodwar->self()->getRace().getRefinery(), (*it)->getTilePosition);
+    gasInConstruction = true;
 }
 
-void Base::setRefinery(BWAPI::Unit* unit)
+Base::Base(BWTA::BaseLocation* b)
+: baseLocation(location)
+, resourceDepot(NULL)
+, refinery(NULL)
+, active(false)
+, ready(false)
+, activeGas(false)
+, centerInConstruction(false)
+, gasInConstruction(false)
 {
-  this->refinery = unit;
-}
-
-void Base::setActive(bool active)
-{
-  this->active = active;
-}
-
-void Base::setActiveGas(bool active)
-{
-  this->activeGas = active;
+	buildCenter();
+	if (getGas)
+		buildGas();
 }

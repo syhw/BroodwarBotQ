@@ -1,23 +1,14 @@
 #pragma once
 #include <Utils/CSingleton.h>
-#include "Macro/BasicTaskExecutor.h"
-#include "Macro/SpiralBuildingPlacer.h"
-#include "Macro/SimCityBuildingPlacer.h"
-#include "Macro/UnitPump.h"
-#include "Macro/TerminateIfWorkerLost.h"
-#include "Macro/TerminateIfEmpty.h"
-#include "Macro/BasicWorkerFinder.h"
-#include "Macro/UnitCompositionProducer.h"
-#include "Macro/MacroManager.h"
 #include "Macro/ResourceRates.h"
-#include "Macro/MacroSupplyManager.h"
-#include "Macro/MacroDependencyResolver.h"
+//#include "Macro/SupplyManager.h"
 #include "Macro/InformationManager.h"
 #include "Macro/BorderManager.h"
-#include "Macro/MacroBaseManager.h"
+#include "Macro/BasesManager.h"
 #include "Macro/UnitGroupManager.h"
-#include "Macro/MacroWorkerManager.h"
+#include "Macro/WorkerManager.h"
 #include "Macro/ReservedMap.h"
+#include "Macro/Builder.h"
 
 class Macro: public CSingleton<Macro>
 {

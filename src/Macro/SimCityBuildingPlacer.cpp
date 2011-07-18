@@ -3,7 +3,7 @@
 #include "Macro/Heap.h"
 #include "Utils/Vec.h"
 #include "Regions/MapManager.h"
-#include "MacroBaseManager.h"
+#include "Macro/BasesManager.h"
 
 using namespace std;
 using namespace BWAPI;
@@ -76,22 +76,6 @@ inline bool existsInnerPath(const TilePosition& tp1,
 	return false;
 }
 
-TilePosition PositionAccountant::reservePos(Task& task)
-{
-	for (list<BWAPI::TilePosition>::const_iterator it = pos.begin();
-		it != pos.end(); ++it)
-	{
-		if (!givenPos.count(*it))
-		{
-			givenPos.erase(task.getTilePosition());
-			givenPos.insert(*it);
-			task.setTilePosition(*it);
-			return *it;
-		}
-	}
-	return TilePositions::None;
-}
-
 TilePosition PositionAccountant::reservePos()
 {
 	for (list<BWAPI::TilePosition>::const_iterator it = pos.begin();
@@ -115,8 +99,8 @@ void SimCityBuildingPlacer::generate()
 	}
 	if (!bc.size)
 	{
-		for (set<MacroBase*>::const_iterator it = TheMacroBaseManager->getActiveBases().begin();
-			it != TheMacroBaseManager->getActiveBases().end(); ++it)
+		for (set<Base*>::const_iterator it = TheBasesManager->getActiveBases().begin();
+			it != TheBasesManager->getActiveBases().end(); ++it)
 		{
 			if ((*it)->getBaseLocation()->getRegion() != home->getRegion())
 				bc = searchForCluster((*it)->getBaseLocation()->getRegion());
@@ -130,14 +114,6 @@ void SimCityBuildingPlacer::generate()
 		makeCluster(bc.center, 2, bc.vertical, bc.size);
 	else
 		Broodwar->printf("Could not generate a cluster");
-}
-
-SimCityBuildingPlacer* instance = NULL;
-SimCityBuildingPlacer* SimCityBuildingPlacer::getInstance()
-{
-	if (instance==NULL)
-		instance = new SimCityBuildingPlacer();
-	return instance;
 }
 
 BuildingsCluster SimCityBuildingPlacer::searchForCluster(BWTA::Region* r)
@@ -712,60 +688,7 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 	// TODO
 }
 
-void SimCityBuildingPlacer::attached(TaskStream* ts)
-{
-	if (ts->getTask(0).getTilePosition().isValid()==false)
-		ts->getTask(0).setTilePosition(Broodwar->self()->getStartLocation());
-	taskStreams[ts].isRelocatable   = true;
-	taskStreams[ts].buildDistance   = 1;
-	taskStreams[ts].reservePosition = ts->getTask(0).getTilePosition();
-	taskStreams[ts].reserveWidth    = 0;
-	taskStreams[ts].reserveHeight   = 0;
-}
-
-void SimCityBuildingPlacer::detached(TaskStream* ts)
-{
-	taskStreams.erase(ts);
-}
-
-void SimCityBuildingPlacer::newStatus(TaskStream* ts)
-{
-	// TODO cancel
-	if (ts->getStatus() != TaskStream::Executing_Task)
-	{
-		UnitType type = ts->getTask(0).getUnit();
-		if (type == UnitTypes::Protoss_Pylon)
-		{
-			pylons.freePos(ts->getTask(0).getTilePosition());
-		}
-		else if (type == UnitTypes::Protoss_Gateway || type == UnitTypes::Protoss_Cybernetics_Core)
-		{
-			gates.freePos(ts->getTask(0).getTilePosition());
-		}
-	}
-}
-
-void SimCityBuildingPlacer::completedTask(TaskStream* ts, const Task &t)
-{
-	TheReservedMap->freeTiles(taskStreams[ts].reservePosition,taskStreams[ts].reserveWidth,taskStreams[ts].reserveHeight);
-	taskStreams[ts].reserveWidth  = 0;
-	taskStreams[ts].reserveHeight = 0;
-	if (t.getUnit() == UnitTypes::Protoss_Pylon)
-	{
-		existingPylons.push_back(t.getTilePosition());
-		pylons.usedPos(t.getTilePosition());
-	}
-	else if (t.getUnit() == UnitTypes::Protoss_Gateway || t.getUnit() == UnitTypes::Protoss_Stargate)
-	{
-		gates.usedPos(t.getTilePosition());
-	}
-	else if (t.getUnit() != UnitTypes::Protoss_Photon_Cannon)
-	{
-		tech.usedPos(t.getTilePosition());
-	}
-}
-
-void SimCityBuildingPlacer::update(TaskStream* ts)
+void SimCityBuildingPlacer::update()
 {
 #ifdef __DEBUG__
 	for (list<TilePosition>::const_iterator it = pylons.pos.begin();
@@ -781,124 +704,8 @@ void SimCityBuildingPlacer::update(TaskStream* ts)
 		it != cannons.pos.end(); ++it)
 		Broodwar->drawBoxMap(it->x()*32, it->y()*32, (it->x()+2)*32, (it->y()+2)*32, Colors::Yellow);
 #endif
-	
-	if (Broodwar->getFrameCount()%10 != 0) return;
-
-	if (ts->getTask(0).getType() != TaskTypes::Unit) return;
-
-	UnitType type = ts->getTask(0).getUnit();
-	std::string tmpS = type.getName();
-
-	// don't look for a build location if this building requires power and we have no pylons
-	if (type.requiresPsi() && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Pylon) == 0) return;
-	// add-ons need their main building
-	if (type.isAddon()) type = type.whatBuilds().first;
-
-	int width = ts->getTask(0).getUnit().tileWidth();
-
-	/// Something blocks construction
-	if (ts->getStatus()==TaskStream::Error_Location_Blocked || ts->getStatus()==TaskStream::Error_Location_Not_Specified)
-	{
-		if (ts->getTask(0).getTilePosition().isValid()==false)
-			ts->getTask(0).setTilePosition(Broodwar->self()->getStartLocation());
-		/// Move it if we can
-		if (taskStreams[ts].isRelocatable)
-		{
-			TilePosition tp(ts->getTask(0).getTilePosition());
-			int bd = taskStreams[ts].buildDistance;
-			TilePosition newtp = TilePositions::None;
-			newtp = getBuildLocationNear(ts->getWorker(), tp, type, bd);
-			if (type == UnitTypes::Protoss_Pylon)
-				pylons.freePos(ts->getTask(0).getTilePosition());
-			else if (type == UnitTypes::Protoss_Gateway || type == UnitTypes::Protoss_Stargate)
-				gates.freePos(ts->getTask(0).getTilePosition());
-			else if (type == UnitTypes::Protoss_Photon_Cannon)
-				cannons.freePos(ts->getTask(0).getTilePosition());
-			else
-				tech.freePos(ts->getTask(0).getTilePosition());
-			if (newtp != TilePositions::None)
-			{
-				ts->getTask(0).setTilePosition(newtp);
-			}
-		}
-	}
-
-	if (type==BWAPI::UnitTypes::Terran_Command_Center ||
-		type==BWAPI::UnitTypes::Terran_Factory || 
-		type==BWAPI::UnitTypes::Terran_Starport ||
-		type==BWAPI::UnitTypes::Terran_Science_Facility)
-	{
-		width+=2;
-	}
-
-	if (taskStreams[ts].reserveWidth    != width ||
-		taskStreams[ts].reserveHeight   != ts->getTask(0).getUnit().tileHeight() ||
-		taskStreams[ts].reservePosition != ts->getTask(0).getTilePosition())
-	{
-		TheReservedMap->freeTiles(taskStreams[ts].reservePosition,taskStreams[ts].reserveWidth,taskStreams[ts].reserveHeight);
-		taskStreams[ts].reserveWidth    = width;
-		taskStreams[ts].reserveHeight   = ts->getTask(0).getUnit().tileHeight();
-		taskStreams[ts].reservePosition = ts->getTask(0).getTilePosition();
-		TheReservedMap->reserveTiles(taskStreams[ts].reservePosition,type,taskStreams[ts].reserveWidth,taskStreams[ts].reserveHeight);
-	}
-}
-
-void SimCityBuildingPlacer::setTilePosition(TaskStream* ts, BWAPI::TilePosition p)
-{
-	ts->getTask(0).setTilePosition(p);
-}
-
-void SimCityBuildingPlacer::setRelocatable(TaskStream* ts, bool isRelocatable)
-{
-	taskStreams[ts].isRelocatable = isRelocatable;
-}
-
-void SimCityBuildingPlacer::setBuildDistance(TaskStream* ts, int distance)
-{
-	taskStreams[ts].buildDistance = distance;
-}
-
-BWAPI::TilePosition SimCityBuildingPlacer::getBuildLocationNear(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type, int buildDist)
-{
-	/// Returns a valid build location near the specified tile position.
-	std::string tmpS = type.getName();
-	if (type.isAddon()) type = type.whatBuilds().first;
-
-	if (type == UnitTypes::Protoss_Pylon)
-	{
-		if (pylons.pos.size() < 2)
-			generate();
-		return pylons.reservePos();
-	}
-	else if (type == UnitTypes::Protoss_Gateway || type == UnitTypes::Protoss_Stargate)
-	{
-		if (gates.pos.size() < 2)
-			generate();
-		return gates.reservePos();
-	}
-	else if (type.isRefinery())
-	{
-		set<Unit*>::const_iterator it = home->getGeysers().begin();
-		if (canBuildHere(NULL, (*it)->getTilePosition(), type))
-			return ((*it)->getTilePosition());
-		else
-		{
-			// TODO other gas
-		}
-	}
-	else if (type == UnitTypes::Protoss_Photon_Cannon)
-	{
-		//if (cannons.pos.size() < 2)
-			// TODO
-		return cannons.reservePos();
-	}
-	else
-	{
-		if (tech.pos.size() < 2)
-			generate();
-		return tech.reservePos();
-	}
-	return BWAPI::TilePositions::None;
+	if (pylons.pos.size() < 2 || gates.pos.size() < 2 || tech.pos.size() < 2)
+		generate();
 }
 
 bool SimCityBuildingPlacer::canBuildHere(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type) const
@@ -931,79 +738,57 @@ bool SimCityBuildingPlacer::fullCanBuildHere(BWAPI::Unit* builder, BWAPI::TilePo
 			}
 		}
 	return true;
+}	
+
+TilePosition SimCityBuildingPlacer::getTilePosition(const UnitType& ut)
+{
+	if (ut == UnitTypes::Protoss_Pylon)
+	{
+		if (!pylons.pos.size())
+			generate();
+		return pylons.reservePos();
+	}
+	else if (ut == UnitTypes::Protoss_Gateway || ut == UnitTypes::Protoss_Stargate)
+	{
+		if (!gates.pos.size())
+			generate();
+		return gates.reservePos();
+	}
+	else if (ut == UnitTypes::Protoss_Photon_Cannon)
+	{
+		if (!cannons.pos.size())
+			generate();
+		return cannons.reservePos();
+	}
+	else
+	{
+		if (!tech.pos.size())
+			generate();
+		return tech.reservePos();
+	}
+	return TilePositions::None; // def
 }
 
-bool SimCityBuildingPlacer::canBuildHereWithSpace(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type, int buildDist) const
+void SimCityBuildingPlacer::releaseTilePosition(const TilePosition& tp, const UnitType& ut)
 {
-	if (type.isAddon()) type=type.whatBuilds().first;
-	//returns true if we can build this type of unit here with the specified amount of space.
-	//space value is stored in this->buildDistance.
-
-	//if we can't build here, we of course can't build here with space
-	if (!this->canBuildHere(builder,position, type))
-		return false;
-	if (type.isRefinery())
-		return true;
-
-	int width=type.tileWidth();
-	int height=type.tileHeight();
-
-	//make sure we leave space for add-ons. These types of units can have addons:
-	if (type==BWAPI::UnitTypes::Terran_Command_Center ||
-		type==BWAPI::UnitTypes::Terran_Factory || 
-		type==BWAPI::UnitTypes::Terran_Starport ||
-		type==BWAPI::UnitTypes::Terran_Science_Facility)
-	{
-		width+=2;
-	}
-	int startx = position.x() - buildDist;
-	if (startx<0) return false;
-	int starty = position.y() - buildDist;
-	if (starty<0) return false;
-	int endx = position.x() + width + buildDist;
-	if (endx>BWAPI::Broodwar->mapWidth()) return false;
-	int endy = position.y() + height + buildDist;
-	if (endy>BWAPI::Broodwar->mapHeight()) return false;
-
-	for(int x = startx; x < endx; x++)
-		for(int y = starty; y < endy; y++)
-			if (!buildable(builder, x, y) || TheReservedMap->isReserved(x,y))
-				return false;
-
-	if (position.x()>3)
-	{
-		int startx2=startx-2;
-		if (startx2<0) startx2=0;
-		for(int x = startx2; x < startx; x++)
-			for(int y = starty; y < endy; y++)
-			{
-				std::set<BWAPI::Unit*> units = BWAPI::Broodwar->getUnitsOnTile(x, y);
-				for(std::set<BWAPI::Unit*>::iterator i = units.begin(); i != units.end(); i++)
-				{
-					if (!(*i)->isLifted() && *i != builder)
-					{
-						BWAPI::UnitType type=(*i)->getType();
-						if (type==BWAPI::UnitTypes::Terran_Command_Center ||
-							type==BWAPI::UnitTypes::Terran_Factory || 
-							type==BWAPI::UnitTypes::Terran_Starport ||
-							type==BWAPI::UnitTypes::Terran_Science_Facility)
-						{
-							return false;
-						}
-					}
-				}
-			}
-	}
-	return true;
+	if (ut == UnitTypes::Protoss_Pylon)
+		pylons.freePos(tp);
+	else if (ut == UnitTypes::Protoss_Gateway || ut == UnitTypes::Protoss_Stargate)
+		gates.freePos(tp);
+	else if (ut == UnitTypes::Protoss_Photon_Cannon)
+		cannons.freePos(tp);
+	else
+		tech.freePos(tp);
 }
 
-bool SimCityBuildingPlacer::buildable(BWAPI::Unit* builder, int x, int y) const
+void SimCityBuildingPlacer::usedTilePosition(const TilePosition& tp, const UnitType& ut)
 {
-	//returns true if this tile is currently buildable, takes into account units on tile
-	if (!BWAPI::Broodwar->isBuildable(x,y)) return false;
-	std::set<BWAPI::Unit*> units = BWAPI::Broodwar->getUnitsOnTile(x, y);
-	for(std::set<BWAPI::Unit*>::iterator i = units.begin(); i != units.end(); i++)
-		if ((*i)->getType().isBuilding() && !(*i)->isLifted() && !(*i)->getType().isFlyer() && *i != builder)
-			return false;
-	return true;
+	if (ut == UnitTypes::Protoss_Pylon)
+		pylons.usedPos(tp);
+	else if (ut == UnitTypes::Protoss_Gateway || ut == UnitTypes::Protoss_Stargate)
+		gates.usedPos(tp);
+	else if (ut == UnitTypes::Protoss_Photon_Cannon)
+		cannons.usedPos(tp);
+	else
+		tech.usedPos(tp);
 }

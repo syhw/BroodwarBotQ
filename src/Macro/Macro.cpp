@@ -3,61 +3,32 @@
 
 using namespace BWAPI;
 
-UnitCompositionProducer* infantryProducer = NULL; // TODO remove
-
 Macro::Macro()
 : expands(0)
 , addedGates(0)
 {
 	TheArbitrator = & arbitrator;
-	MacroManager::create();
-	MacroSupplyManager::create();
-	MacroDependencyResolver::create();
+	Builder::create();
+	//Producer::create();
+	//Upgrader::create();
+	//SupplyManager::create();
 	ResourceRates::create();
 	InformationManager::create();
 	BorderManager::create();
-	MacroBaseManager::create();
+	BasesManager::create();
 	UnitGroupManager::create();
-	MacroWorkerManager::create();
+	WorkerManager::create();
 	ReservedMap::create();
 
-	TaskStream* ts = new TaskStream();
-	TheMacroManager->taskStreams.push_back(ts);
-	Unit* worker = NULL;
-	for each(Unit* u in Broodwar->self()->getUnits())
-	{
-		if (u->getType().isResourceDepot())
-			worker = u;
-	}
-	ts->setWorker(worker);
-	ts->attach(BasicTaskExecutor::getInstance(),false);
-	ts->attach(new UnitPump(Broodwar->self()->getRace().getWorker()),true);
-	ts->attach(new TerminateIfWorkerLost(),true);
 	if (Broodwar->self()->getRace() == Races::Protoss)
 	{
-		buildOrderAdd(UnitTypes::Protoss_Gateway);
-		buildOrderAdd(UnitTypes::Protoss_Cybernetics_Core);
-		buildOrderAdd(UnitTypes::Protoss_Assimilator);
-		buildOrderAdd(UnitTypes::Protoss_Gateway);
-		addedGates = 2;
-		infantryProducer = new UnitCompositionProducer(UnitTypes::Protoss_Gateway);
-		infantryProducer->setUnitWeight(UnitTypes::Protoss_Dragoon, 3.0);
-		infantryProducer->setUnitWeight(UnitTypes::Protoss_Zealot, 1.0);
-		upgradeAdd(UpgradeTypes::Singularity_Charge);
+		TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 8);
+		TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 10);
+		TheBuilder->buildOrder(UnitTypes::Protoss_Assimilator, 12);
+		TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 14);
+		//TheUpgrader->upgrade(UpgradeTypes::Singularity_Charge);
 	}
-	else if (Broodwar->self()->getRace() == Races::Terran)
-	{
-		buildOrderAdd(UnitTypes::Terran_Supply_Depot);
-		buildOrderAdd(UnitTypes::Terran_Barracks);
-		buildOrderAdd(UnitTypes::Terran_Refinery);
-		buildOrderAdd(UnitTypes::Terran_Academy);
-		buildOrderAdd(UnitTypes::Terran_Barracks);
-		buildOrderAdd(UnitTypes::Terran_Barracks);
-		infantryProducer = new UnitCompositionProducer(UnitTypes::Terran_Barracks);
-		infantryProducer->setUnitWeight(UnitTypes::Terran_Marine, 3.0);
-		infantryProducer->setUnitWeight(UnitTypes::Terran_Medic, 1.0);
-		techAdd(TechTypes::Stim_Packs);
-	}
+	else
 	{
 		Broodwar->printf("Race not implemented");
 	}
@@ -65,55 +36,36 @@ Macro::Macro()
 
 Macro::~Macro()
 {
-	MacroManager::destroy();
-	MacroSupplyManager::destroy();
-	MacroDependencyResolver::destroy();
+	Builder::destroy();
+	//Producer::destroy();
+	//Upgrader::destroy();
+	//SupplyManager::destroy();
 	ResourceRates::destroy();
 	InformationManager::destroy();
 	BorderManager::destroy();
-	MacroBaseManager::destroy();
+	BasesManager::destroy();
 	UnitGroupManager::destroy();
-	MacroWorkerManager::destroy();
+	WorkerManager::destroy();
 	ReservedMap::destroy();
-}
-
-void Macro::buildOrderAdd(UnitType type)
-{
-	TaskStream* ts = new TaskStream(Task(type));
-	TheMacroManager->taskStreams.push_back(ts);
-	ts->attach(new BasicWorkerFinder(),true);
-	ts->attach(BasicTaskExecutor::getInstance(),false);
-	ts->attach(new TerminateIfEmpty(),true);
-	ts->attach(SimCityBuildingPlacer::getInstance(),false);
-}
-
-void Macro::techAdd(TechType type)
-{
-	TaskStream* ts = new TaskStream(Task(type));
-	TheMacroManager->taskStreams.push_back(ts);
-	ts->attach(new BasicWorkerFinder(),true);
-	ts->attach(BasicTaskExecutor::getInstance(),false);
-	ts->attach(new TerminateIfEmpty(),true);
-	ts->attach(SimCityBuildingPlacer::getInstance(),false);
-}
-
-void Macro::upgradeAdd(UpgradeType type)
-{
-	TaskStream* ts = new TaskStream(Task(type));
-	TheMacroManager->taskStreams.push_back(ts);
-	ts->attach(new BasicWorkerFinder(),true);
-	ts->attach(BasicTaskExecutor::getInstance(),false);
-	ts->attach(new TerminateIfEmpty(),true);
-	ts->attach(SimCityBuildingPlacer::getInstance(),false);
 }
 
 void Macro::update()
 {
-	TheMacroSupplyManager->update();
+	// TODO PRODUCTION
+	//TheProducer->update();
+	//TheUpgrader->update();
+	TheBuilder->update();
+
+	//TheSupplyManager->update();
+
 	TheResourceRates->update();
+
 	TheBorderManager->update();
-	TheMacroBaseManager->update();
-	TheMacroWorkerManager->update();
+
+	TheBasesManager->update();
+
+	TheWorkerManager->update();
+
 	TheArbitrator->update();
 
 	if (!expands && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 2)

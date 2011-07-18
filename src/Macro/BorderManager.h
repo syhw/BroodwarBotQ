@@ -1,6 +1,7 @@
 #pragma once
 #include <BWAPI.h>
 #include <BWTA.h>
+
 class BorderManager
 {
   public:
