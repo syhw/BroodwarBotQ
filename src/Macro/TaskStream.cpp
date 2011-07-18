@@ -171,7 +171,7 @@ void TaskStream::computeStatus()
 		  canBuildHere = Broodwar->canBuildHere(NULL,tp,ut);
         if (!canBuildHere) //doesn't work for blocked addons!
         {
-          status = Error_Location_Blocked; /// TODO look there
+          status = Error_Location_Blocked;
           return;
         }
       }

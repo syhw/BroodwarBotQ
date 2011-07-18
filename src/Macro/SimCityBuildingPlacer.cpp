@@ -192,7 +192,7 @@ BuildingsCluster SimCityBuildingPlacer::searchForCluster(BWTA::Region* r)
 				ret.size = canBuildCluster(ret.center, ret.vertical);
 				if (ret.size > 2)
 					return ret;
-				ret.center = TilePosition(topLeft.x() + 2*UnitTypes::Protoss_Pylon.tileWidth() + 1, topLeft.y() + UnitTypes::Protoss_Gateway.tileHeight() + 1);
+				ret.center = TilePosition(topLeft.x() + 3*UnitTypes::Protoss_Pylon.tileWidth() + 1, topLeft.y() + UnitTypes::Protoss_Gateway.tileHeight() + 1);
 				ret.vertical = false;
 				ret.size = canBuildCluster(ret.center, ret.vertical);
 				if (ret.size > 2)
@@ -229,7 +229,7 @@ BuildingsCluster SimCityBuildingPlacer::searchForCluster(BWTA::Region* r)
 				ret.size = canBuildCluster(ret.center, ret.vertical);
 				if (ret.size > 1) // return as soon as a small cluster is found
 					return ret;
-				ret.center = TilePosition(topLeft.x() + UnitTypes::Protoss_Pylon.tileWidth() + 1, topLeft.y() + UnitTypes::Protoss_Gateway.tileHeight() + 1);
+				ret.center = TilePosition(topLeft.x() + 2*UnitTypes::Protoss_Pylon.tileWidth() + 1, topLeft.y() + UnitTypes::Protoss_Gateway.tileHeight() + 1);
 				ret.vertical = false;
 				ret.size = canBuildCluster(ret.center, ret.vertical);
 				if (ret.size > 1) // return as soon as a small cluster is found

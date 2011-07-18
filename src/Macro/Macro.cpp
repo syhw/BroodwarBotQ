@@ -123,7 +123,6 @@ void Macro::update()
 	{
 		++expands;
 		TheMacroBaseManager->expandWhenPossible();
-		buildOrderAdd(UnitTypes::Protoss_Gateway);
 		++addedGates;
 		//buildOrderAdd(UnitTypes::Protoss_Assimilator);
 	}
@@ -133,13 +132,15 @@ void Macro::update()
 		TheMacroBaseManager->expandWhenPossible();
 		//buildOrderAdd(UnitTypes::Protoss_Assimilator);
 	}
+	if (addedGates < 3 && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 1)
+		buildOrderAdd(UnitTypes::Protoss_Gateway);
 	
-	if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Nexus) > 1)
+	/*if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Nexus) > 1)
 	{
 		buildOrderAdd(UnitTypes::Protoss_Observatory);
 		upgradeAdd(UpgradeTypes::Protoss_Ground_Weapons);
 		upgradeAdd(UpgradeTypes::Protoss_Ground_Armor);
-	}
+	}*/
 	/*
 	if (Broodwar->self()->minerals() > 500 && addedGates < 8)
 	{
