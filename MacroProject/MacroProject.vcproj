@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="MacroProject"
 	ProjectGUID="{F39C7417-770D-4635-8A47-77BD9CDDCD71}"
 	RootNamespace="MacroProject"
@@ -508,6 +508,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Macro\BasesManager.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Macro\BasicTaskExecutor.cpp"
 					>
 				</File>
@@ -970,7 +974,15 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Macro\Base.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Macro\BaseManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\BasesManager.h"
 					>
 				</File>
 				<File

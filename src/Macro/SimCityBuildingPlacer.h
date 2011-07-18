@@ -58,8 +58,8 @@ class SimCityBuildingPlacer
 public:
 	SimCityBuildingPlacer();
 	BWAPI::TilePosition getTilePosition(const BWAPI::UnitType& ut);
-	void releaseTilePosition(const BWAPI::TilePosition& tp, BWAPI::UnitType ut);
-	void usedTilePosition(const BWAPI::TilePosition& tp, BWAPI::UnitType ut);
+	void releaseTilePosition(const BWAPI::TilePosition& tp, const BWAPI::UnitType& ut);
+	void usedTilePosition(const BWAPI::TilePosition& tp, const BWAPI::UnitType& ut);
 	void update();
 private:
 	std::list<BWAPI::TilePosition> existingPylons;

@@ -7,6 +7,7 @@ class Base
 {
 public:
 	static Base* CreateBase(BWTA::BaseLocation* b, bool getGas = true);
+	void Base::onUnitDestroy(BWAPI::Unit* u);
 	BWTA::BaseLocation* getBaseLocation() const;
 	BWAPI::Unit* getResourceDepot() const;
 	BWAPI::Unit* getRefinery() const;

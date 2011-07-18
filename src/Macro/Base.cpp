@@ -73,8 +73,8 @@ void Base::update()
 		for (std::set<Unit*>::const_iterator it = baseLocation->getGeysers().begin();
 		it != baseLocation->getGeysers().end(); ++it)
 		{
-			std::set<Unit*> tmp = Broodwar->getUnitsOnTile((*it)->getTilePosition.x(), (*it)->getTilePosition().y());
-			for (std::set<Unit*>::const_iterator it2 = tmp->begin();
+			std::set<Unit*> tmp = Broodwar->getUnitsOnTile((*it)->getTilePosition().x(), (*it)->getTilePosition().y());
+			for (std::set<Unit*>::const_iterator it2 = tmp.begin();
 				it2 != tmp.end(); ++it2)
 			{
 				if ((*it2)->getType() == Broodwar->self()->getRace().getRefinery())
@@ -108,12 +108,12 @@ void Base::buildGas()
 {
 	for (std::set<Unit*>::const_iterator it = baseLocation->getGeysers().begin();
 		it != baseLocation->getGeysers().end(); ++it)
-		TheBuilder->build(Broodwar->self()->getRace().getRefinery(), (*it)->getTilePosition);
+		TheBuilder->build(Broodwar->self()->getRace().getRefinery(), (*it)->getTilePosition());
     gasInConstruction = true;
 }
 
 Base::Base(BWTA::BaseLocation* b)
-: baseLocation(location)
+: baseLocation(b)
 , resourceDepot(NULL)
 , refinery(NULL)
 , active(false)
