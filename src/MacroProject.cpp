@@ -26,7 +26,7 @@ void BattleBroodAI::onStart()
     //Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
 #ifdef __DEBUG__
     Broodwar->enableFlag(Flag::UserInput);
-    Broodwar->setLocalSpeed(0);
+    //Broodwar->setLocalSpeed(0);
 #endif
 	Broodwar->setLatCom(false);
 	Broodwar->setCommandOptimizationLevel(1);
@@ -110,6 +110,7 @@ void BattleBroodAI::onFrame()
 
 #ifdef __DEBUG__
     std::set<Unit*> units=Broodwar->self()->getUnits();
+    this->showManagerAssignments=true;
     if (this->showManagerAssignments)
     {
         for(std::set<Unit*>::iterator i=units.begin();i!=units.end();i++)
@@ -172,7 +173,8 @@ void BattleBroodAI::onUnitDiscover(BWAPI::Unit* unit)
 	macro->onUnitDiscover(unit);
 }
 
-void BattleBroodAI::onUnitEvade(BWAPI::Unit* unit){
+void BattleBroodAI::onUnitEvade(BWAPI::Unit* unit)
+{
 	macro->onUnitEvade(unit);
 }
 
@@ -251,8 +253,6 @@ void BattleBroodAI::onSendText(std::string text)
                 }
         }
     }
-
-    UnitType type=UnitTypes::getUnitType(text);
     if (text=="debug")
     {
         this->showManagerAssignments=true;

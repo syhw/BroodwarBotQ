@@ -32,6 +32,22 @@ BasesManager::~BasesManager()
 
 void BasesManager::update()
 {
+	//check to see if any new base locations need to be added
+	for each(BWTA::BaseLocation* location in BWTA::getBaseLocations())
+	{
+		if (location2base.find(location) == location2base.end())
+		{
+			TilePosition tile = location->getTilePosition();
+			for each(Unit* u in Broodwar->getUnitsOnTile(tile.x(), tile.y()))
+				if (u->getPlayer() == Broodwar->self() && u->getType().isResourceDepot())
+				{
+					allBases.push_back(Base(location, u));
+					location2base[location] = & allBases.back();
+					TheBorderManager->addMyBase(location);
+				}
+		}
+	}
+
 	for each(Base mb in allBases)
 	{
 		mb.update();

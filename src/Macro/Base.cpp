@@ -1,20 +1,22 @@
 #include <PrecompiledHeader.h>
 #include <Macro/Base.h>
 #include <Macro/Builder.h>
+
 using namespace BWAPI;
 
 std::set<Unit*> emptySet;
 
-Base::Base(BWTA::BaseLocation* b)
+Base::Base(BWTA::BaseLocation* b, Unit* center)
 : baseLocation(b)
-, resourceDepot(NULL)
+, resourceDepot(center)
 , refinery(NULL)
 , ready(false)
+, paused(false)
+, activeGas(false)
 , centerInConstruction(false)
 , gasInConstruction(false)
 {
 	buildCenter();
-	buildGas();
 }
 
 void Base::onUnitDestroy(BWAPI::Unit* u)
@@ -54,6 +56,11 @@ const std::set<BWAPI::Unit*>& Base::getGeysers() const
 	return baseLocation->getGeysers();
 }
 
+void Base::setActiveGas(bool gas)
+{
+	this->activeGas = gas;
+}
+
 void Base::setPaused(bool paused)
 {
 	this->paused = paused;
@@ -82,7 +89,7 @@ void Base::update()
 		for (std::set<Unit*>::const_iterator it = tmp.begin();
 			it != tmp.end(); ++it)
 		{
-			if ((*it)->getType() == Broodwar->self()->getRace().getCenter())
+			if ((*it)->getPlayer() == Broodwar->self() && (*it)->getType() == Broodwar->self()->getRace().getCenter())
 				resourceDepot = *it;
 		}
 	}
@@ -105,7 +112,7 @@ void Base::update()
 			}
 		}
 	}
-	if (refinery == NULL && !gasInConstruction)
+	if (activeGas && refinery == NULL && !gasInConstruction)
 		buildGas();
 	ready = (resourceDepot && resourceDepot->exists() && (resourceDepot->isCompleted() || resourceDepot->getRemainingBuildTime()<300)); // 300 frames before completion
 }

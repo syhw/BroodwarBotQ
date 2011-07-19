@@ -1,6 +1,7 @@
 #include <PrecompiledHeader.h>
 #include "Macro/Builder.h"
 #include "BWSAL.h"
+#include "Macro/ReservedMap.h"
 #include "Macro/UnitGroupManager.h"
 
 using namespace BWAPI;
@@ -13,6 +14,7 @@ Task::Task(BWAPI::Unit* w, BWAPI::TilePosition tp, BWAPI::UnitType ut)
 	, tilePosition(tp)
 	, type(ut)
 	, lastOrder(0)
+	, finished(false)
 {
 }
 
@@ -67,7 +69,7 @@ void Task::askWorker()
 
 void Task::buildIt()
 {
-	if (Broodwar->getFrameCount() > lastOrder + 47)
+	if (Broodwar->getFrameCount() > lastOrder + 47 && worker && worker->exists())
 	{
 		worker->build(tilePosition, type);
 		lastOrder = Broodwar->getFrameCount();
@@ -92,11 +94,28 @@ void Task::update()
 		askWorker();
 	else
 		buildIt();
+	for (set<Unit*>::const_iterator it = Broodwar->getUnitsOnTile(tilePosition.x(), tilePosition.y()).begin();
+		it != Broodwar->getUnitsOnTile(tilePosition.x(), tilePosition.y()).end(); ++it)
+	{
+		if ((*it)->getType() == type)
+		{
+			TheArbitrator->removeBid(this, worker);
+			finished = true;
+			return;
+		}
+	}
+}
+
+bool Task::isFinished()
+{
+	return finished;
 }
 
 Builder* TheBuilder = NULL;
+
 Builder* Builder::create()
 {
+	TheReservedMap = ReservedMap::create();
 	if (TheBuilder)
 		return TheBuilder;
 	TheBuilder = new Builder();
@@ -105,6 +124,7 @@ Builder* Builder::create()
 
 void Builder::destroy()
 {
+	ReservedMap::destroy();
 	if (TheBuilder)
 		delete TheBuilder;
 }
@@ -151,6 +171,12 @@ void Builder::update()
 	}
 	/// Perform tasks
 	for (list<Task>::iterator it = tasks.begin();
-		it != tasks.end(); ++it)
-		it->update();
+		it != tasks.end();)
+	{
+		list<Task>::iterator tmp = it++;
+		if (tmp->isFinished())
+			tasks.erase(tmp);
+		else
+			tmp->update();
+	}
 }

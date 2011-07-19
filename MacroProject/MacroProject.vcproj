@@ -536,6 +536,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Macro\Producer.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Macro\ReservedMap.cpp"
 					>
 				</File>
@@ -871,6 +875,10 @@
 				</File>
 				<File
 					RelativePath="..\src\Macro\Macro.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\Producer.h"
 					>
 				</File>
 				<File

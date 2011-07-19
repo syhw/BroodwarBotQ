@@ -30,7 +30,6 @@ public:
 private:
 	BasesManager();
 	~BasesManager();
-	BorderManager* borderManager;
 	std::list<Base> allBases;
 	std::map<BWTA::BaseLocation*, Base*> location2base;
 	std::set<Base*> activeBases;

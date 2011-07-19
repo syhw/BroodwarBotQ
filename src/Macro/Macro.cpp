@@ -53,9 +53,9 @@ Macro::~Macro()
 void Macro::update()
 {
 	// TODO PRODUCTION
-	//TheProducer->update();
+	//TheBuilder->update();
 	//TheUpgrader->update();
-	TheBuilder->update();
+	//TheProducer->update();
 
 	//TheSupplyManager->update();
 

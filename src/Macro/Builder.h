@@ -1,7 +1,6 @@
 #pragma once
 #include "Macro/Arbitrator.h"
 #include "Macro/SimCityBuildingPlacer.h"
-#include "Macro/Arbitrator.h"
 #include <BWAPI.h>
 #include <list>
 
@@ -11,6 +10,7 @@ class Task : public Arbitrator::Controller<BWAPI::Unit*, double>
 	BWAPI::TilePosition tilePosition;
 	BWAPI::UnitType type;
 	int lastOrder;
+	bool finished;
 public:
 	static SimCityBuildingPlacer* buildingPlacer;
 	Task(BWAPI::Unit* w, BWAPI::TilePosition tp, BWAPI::UnitType ut);
@@ -20,6 +20,7 @@ public:
 	inline void buildIt();
 	virtual std::string getName() const;
 	virtual void update();
+	bool isFinished();
 };
 
 class Builder
