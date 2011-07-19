@@ -86,47 +86,56 @@ void Macro::update()
 		//buildOrderAdd(UnitTypes::Protoss_Gateway);
 		++addedGates;
 	}
-	
+
 	/*if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Nexus) > 1)
 	{
-		buildOrderAdd(UnitTypes::Protoss_Observatory);
-		upgradeAdd(UpgradeTypes::Protoss_Ground_Weapons);
-		upgradeAdd(UpgradeTypes::Protoss_Ground_Armor);
+	buildOrderAdd(UnitTypes::Protoss_Observatory);
+	upgradeAdd(UpgradeTypes::Protoss_Ground_Weapons);
+	upgradeAdd(UpgradeTypes::Protoss_Ground_Armor);
 	}*/
 	/*
 	if (Broodwar->self()->minerals() > 500 && addedGates < 8)
 	{
-        ++addedGates;
-		buildOrderAdd(UnitTypes::Protoss_Gateway);
+	++addedGates;
+	buildOrderAdd(UnitTypes::Protoss_Gateway);
 	}*/
 }
 
 void Macro::onUnitDiscover(BWAPI::Unit* unit)
 {
-  TheInformationManager->onUnitDiscover(unit);
-  TheUnitGroupManager->onUnitDiscover(unit);
+	TheInformationManager->onUnitDiscover(unit);
+	TheUnitGroupManager->onUnitDiscover(unit);
 }
 
 void Macro::onUnitEvade(BWAPI::Unit* unit)
 {
-  TheInformationManager->onUnitEvade(unit);
-  TheUnitGroupManager->onUnitEvade(unit);
+	TheInformationManager->onUnitEvade(unit);
+	TheUnitGroupManager->onUnitEvade(unit);
+}
+
+void Macro::onUnitCreate(BWAPI::Unit* unit)
+{
+	//TheProducer->onUnitCreate(unit);
+	//TheUpgrader->onUnitCreate(unit);
 }
 
 void Macro::onUnitDestroy(BWAPI::Unit* unit)
 {
-  TheArbitrator->onRemoveObject(unit);
-  TheInformationManager->onUnitDestroy(unit);
-  TheBasesManager->onUnitDestroy(unit);
-  TheWorkerManager->onRemoveUnit(unit);
+	TheArbitrator->onRemoveObject(unit);
+	TheInformationManager->onUnitDestroy(unit);
+	TheBasesManager->onUnitDestroy(unit);
+	TheWorkerManager->onUnitDestroy(unit);
+	//TheBuilder->onUnitDestroy(unit);
+	//TheProducer->onUnitDestroy(unit);
+	//TheUpgrader->onUnitDestroy(unit);
 }
 
 void Macro::onUnitMorph(BWAPI::Unit* unit)
 {
-  TheUnitGroupManager->onUnitMorph(unit);
+	TheUnitGroupManager->onUnitMorph(unit);
 }
 
 void Macro::onUnitRenegade(BWAPI::Unit* unit)
 {
-  TheUnitGroupManager->onUnitRenegade(unit);
+	TheUnitGroupManager->onUnitRenegade(unit);
 }

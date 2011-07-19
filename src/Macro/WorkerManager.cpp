@@ -229,7 +229,6 @@ void WorkerManager::update()
 	set<Unit*> w = SelectAll()(isCompleted)(isWorker);
 	for each(Unit* u in w)
 		TheArbitrator->setBid(this, u, 10);
-	return;
 
 	//rebalance workers when necessary
 	set<Base*> bases = TheBasesManager->getActiveBases();
@@ -290,6 +289,11 @@ string WorkerManager::getName() const
 string WorkerManager::getShortName() const
 {
 	return "Work";
+}
+
+void WorkerManager::onUnitDestroy(BWAPI::Unit* unit)
+{
+	onRemoveUnit(unit);
 }
 
 void WorkerManager::onRemoveUnit(Unit* unit)

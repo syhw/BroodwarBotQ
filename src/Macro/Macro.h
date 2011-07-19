@@ -9,6 +9,7 @@
 #include "Macro/WorkerManager.h"
 #include "Macro/ReservedMap.h"
 #include "Macro/Builder.h"
+#include "Macro/Producer.h"
 
 class Macro: public CSingleton<Macro>
 {
@@ -25,6 +26,7 @@ public:
 	void update();
 	void onUnitDiscover(BWAPI::Unit* unit);
 	void onUnitEvade(BWAPI::Unit* unit);
+	void onUnitCreate(BWAPI::Unit* unit);
 	void onUnitDestroy(BWAPI::Unit* unit);
 	void onUnitMorph(BWAPI::Unit* unit);
 	void onUnitRenegade(BWAPI::Unit* unit);
