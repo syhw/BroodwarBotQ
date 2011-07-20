@@ -344,5 +344,16 @@ namespace Arbitrator
       }
     }
     this->inUpdate=false;
+
+	// cleanup, CARE!!! TODO
+	std::list<Controller<_Tp, _Val>* > toRemove;
+	for (std::map<Controller<_Tp,_Val>*, std::set<_Tp> >::const_iterator it = objects.begin();
+		it != objects.end(); ++it)
+	{
+		if (it->second.empty())
+			toRemove.push_back(it->first);
+	}
+	for each (Controller<_Tp, _Val>* c in toRemove)
+		objects.erase(c); // CARE TODO (end)
   }
 }

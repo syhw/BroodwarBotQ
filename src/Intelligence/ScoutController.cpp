@@ -40,7 +40,7 @@ ScoutController::ScoutController()
 
 ScoutController::~ScoutController()
 {
-    
+	TheArbitrator->removeAllBids(this);
 }
 
 void ScoutController::update()

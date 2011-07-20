@@ -22,6 +22,7 @@ WarManager::WarManager()
 
 WarManager::~WarManager() 
 {
+	TheArbitrator->removeAllBids(this);
 	//Broodwar->printf("INOUT WarManager::~WarManager()");
 }
 

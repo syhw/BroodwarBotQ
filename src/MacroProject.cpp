@@ -97,16 +97,16 @@ void BattleBroodAI::onFrame()
 	double interval = (double)(time2 - time1)/CLOCKS_PER_SEC;
 	if (interval > 0.040)
 		Broodwar->printf("INTELLIGENCE took %2.5f seconds", interval);
-	macro->update(); // Macro update
+	micro->update(); // Micro update
 	time1 = clock();
 	interval = (double)(time1 - time2)/CLOCKS_PER_SEC;
 	if (interval > 0.040)
-		Broodwar->printf("MACRO took %2.5f seconds", interval);
-	micro->update(); // Micro update
+		Broodwar->printf("MICRO took %2.5f seconds", interval);
+	macro->update(); // Macro update
 	time2 = clock();
 	interval = (double)(time2 - time1)/CLOCKS_PER_SEC;
 	if (interval > 0.040)
-		Broodwar->printf("MICRO took %2.5f seconds", interval);
+		Broodwar->printf("MACRO took %2.5f seconds", interval);
 
 #ifdef __DEBUG__
     std::set<Unit*> units=Broodwar->self()->getUnits();

@@ -10,7 +10,7 @@ Macro::Macro()
 {
 	TheArbitrator = & arbitrator;
 	Builder::create();
-	//Producer::create();
+	Producer::create();
 	//Upgrader::create();
 	//SupplyManager::create();
 	ResourceRates::create();
@@ -38,7 +38,7 @@ Macro::Macro()
 Macro::~Macro()
 {
 	Builder::destroy();
-	//Producer::destroy();
+	Producer::destroy();
 	//Upgrader::destroy();
 	//SupplyManager::destroy();
 	ResourceRates::destroy();
@@ -53,9 +53,8 @@ Macro::~Macro()
 void Macro::update()
 {
 	// TODO PRODUCTION
-	//TheBuilder->update();
 	//TheUpgrader->update();
-	//TheProducer->update();
+	TheProducer->update();
 
 	//TheSupplyManager->update();
 
@@ -67,7 +66,10 @@ void Macro::update()
 
 	TheWorkerManager->update();
 
+	TheBuilder->update(); // last update that moves an unit that should be done
+
 	TheArbitrator->update();
+
 
 	if (!expands && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 2)
 	{
@@ -115,7 +117,7 @@ void Macro::onUnitEvade(BWAPI::Unit* unit)
 
 void Macro::onUnitCreate(BWAPI::Unit* unit)
 {
-	//TheProducer->onUnitCreate(unit);
+	TheProducer->onUnitCreate(unit);
 	//TheUpgrader->onUnitCreate(unit);
 }
 
@@ -126,7 +128,7 @@ void Macro::onUnitDestroy(BWAPI::Unit* unit)
 	TheBasesManager->onUnitDestroy(unit);
 	TheWorkerManager->onUnitDestroy(unit);
 	//TheBuilder->onUnitDestroy(unit);
-	//TheProducer->onUnitDestroy(unit);
+	TheProducer->onUnitDestroy(unit);
 	//TheUpgrader->onUnitDestroy(unit);
 }
 

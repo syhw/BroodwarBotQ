@@ -18,9 +18,22 @@ Task::Task(BWAPI::Unit* w, BWAPI::TilePosition tp, BWAPI::UnitType ut)
 {
 }
 
+Task::~Task()
+{
+	TheArbitrator->removeAllBids(this);
+}
+
 void Task::onOffer(set<Unit*> units)
 {
-	worker = NULL;
+	
+	if (worker != NULL && worker->exists()) // defensive prog
+	{
+		// not sure about that or re-taking a (new) working
+		TheArbitrator->decline(this, units, 0);
+		TheArbitrator->removeBid(this, units);
+		return;
+	}
+
 	if (tilePosition.isValid())
 	{
 		double dist = 100000000.0;
@@ -47,20 +60,26 @@ void Task::onOffer(set<Unit*> units)
 		TheArbitrator->accept(this, worker, 100);
 		for (set<Unit*>::const_iterator it = units.begin();
 			it != units.end(); ++it)
+		{
 			TheArbitrator->decline(this, *it, 0);
+			TheArbitrator->removeBid(this, *it);
+		}
 	}
 }
 
 void Task::onRevoke(BWAPI::Unit* unit, double bid)
 {
+	if (finished)
+		return;
 	if (unit == worker)
-	{
 		askWorker();
-	}
 }
 
 void Task::askWorker()
 {
+	TheArbitrator->removeAllBids(this);
+	if (finished)
+		return;
 	std::set<Unit*> usefulUnits = 
 		SelectAll()(isWorker)(isCompleted)
 		.not(isCarryingMinerals,isCarryingGas,isGatheringGas);
@@ -86,6 +105,11 @@ string Task::getName() const
 	return string(tmp);
 }
 
+string Task::getShortName() const
+{
+	return getName();
+}
+
 void Task::update()
 {
 	if (tilePosition == TilePositions::None)
@@ -97,12 +121,19 @@ void Task::update()
 	for (set<Unit*>::const_iterator it = Broodwar->getUnitsOnTile(tilePosition.x(), tilePosition.y()).begin();
 		it != Broodwar->getUnitsOnTile(tilePosition.x(), tilePosition.y()).end(); ++it)
 	{
-		if ((*it)->getType() == type)
+		if (*it == worker)
+			continue;
+		UnitType tmp = (*it)->getType();
+		if (tmp == type)
 		{
 			TheArbitrator->removeBid(this, worker);
 			finished = true;
 			return;
 		}
+		else if (tmp.canMove())
+			(*it)->move(Position(Broodwar->self()->getStartLocation())); // try and move the unit, TODO will block if the unit doesn't move
+		else
+			tilePosition = buildingPlacer->getTilePosition(type); // really blocked (can't move)
 	}
 }
 
@@ -150,6 +181,9 @@ void Builder::buildOrder(BWAPI::UnitType t, int supplyAsTime, BWAPI::TilePositio
     boTasks.insert(make_pair<int, Task>(supplyAsTime, Task(NULL, seedPosition, t)));
 }
 
+/***
+ * It should be the last update()/onFrame() call (to move "blocking construction" units)
+ */
 void Builder::update()
 {
 	/// Follow the BO
@@ -159,8 +193,11 @@ void Builder::update()
 		for (multimap<int, Task>::iterator it = boTasks.begin();
 			it != boTasks.end(); ++it)
 		{
-			if (it->first <= Broodwar->self()->supplyUsed())
+			if (it->first <= Broodwar->self()->supplyUsed()/2)
 			{
+#ifdef __DEBUG__
+				Broodwar->printf("Building %s pop %d", it->second.getName().c_str(), Broodwar->self()->supplyUsed()/2);
+#endif
 				tasks.push_front(it->second);
 				toRemove.push_back(it->first);
 			}

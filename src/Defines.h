@@ -9,7 +9,7 @@
 #define WALK_TILES_SIZE 8
 
 #ifdef __DEBUG__
-#include <vld.h>
+//#include <vld.h>
 #endif
 
 #ifndef __DEBUG__ // Perf
