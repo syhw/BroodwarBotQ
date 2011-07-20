@@ -126,7 +126,7 @@ void Task::update()
 		UnitType tmp = (*it)->getType();
 		if (tmp == type)
 		{
-			TheArbitrator->removeBid(this, worker);
+			TheArbitrator->removeAllBids(this);
 			finished = true;
 			return;
 		}
