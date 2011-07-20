@@ -27,6 +27,8 @@ BasesManager::BasesManager()
 
 BasesManager::~BasesManager()
 {
+	for each (Base* b in allBases)
+		delete b;
 	TheBasesManager = NULL;
 }
 
@@ -43,24 +45,24 @@ void BasesManager::update()
 			for each(Unit* u in Broodwar->getUnitsOnTile(tile.x(), tile.y()))
 				if (u->getPlayer() == Broodwar->self() && u->getType().isResourceDepot())
 				{
-					allBases.push_back(Base(location, u));
-					location2base[location] = & allBases.back();
+					allBases.push_back(new Base(location, u));
+					location2base[location] = allBases.back();
 					TheBorderManager->addMyBase(location);
 				}
 		}
 	}
 
-	for each(Base mb in allBases)
+	for each(Base* mb in allBases)
 	{
-		mb.update();
-		if (mb.isActive())
-			activeBases.insert(&mb);
+		mb->update();
+		if (mb->isActive())
+			activeBases.insert(mb);
 		else
-			activeBases.erase(&mb);
-		if (mb.isReady())
-			readyBases.insert(&mb);
+			activeBases.erase(mb);
+		if (mb->isReady())
+			readyBases.insert(mb);
 		else
-			readyBases.erase(&mb);
+			readyBases.erase(mb);
 	}
 }
 
@@ -98,8 +100,8 @@ void BasesManager::expand(BWTA::BaseLocation* location)
 		Broodwar->printf("CANNOT EXPAND");
 #endif
 
-	allBases.push_back(Base(location));
-	location2base[location] = & allBases.back();
+	allBases.push_back(new Base(location));
+	location2base[location] = allBases.back();
 	TheBorderManager->addMyBase(location);
 }
 
@@ -113,7 +115,7 @@ const std::set<Base*>& BasesManager::getReadyBases() const
 	return readyBases;
 }
 
-const std::list<Base>& BasesManager::getAllBases() const
+const std::list<Base*>& BasesManager::getAllBases() const
 {
 	return allBases;
 }
@@ -130,9 +132,7 @@ std::string BasesManager::getName()
 
 void BasesManager::onUnitDestroy(BWAPI::Unit* unit)
 {
-	for each(Base b in allBases)
-	{
-		b.onUnitDestroy(unit);
-	}
+	for each(Base* b in allBases)
+		b->onUnitDestroy(unit);
 }
 

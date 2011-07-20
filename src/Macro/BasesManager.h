@@ -19,7 +19,7 @@ public:
 	Base* getBase(BWTA::BaseLocation* location);
 	void expand(BWTA::BaseLocation* location = NULL);
 
-	const std::list<Base>& getAllBases() const;
+	const std::list<Base*>& getAllBases() const;
 	const std::set<Base*>& getActiveBases() const;
 	const std::set<Base*>& getReadyBases() const;
 	const std::set<Base*>& getDestroyedBases() const;
@@ -30,7 +30,7 @@ public:
 private:
 	BasesManager();
 	~BasesManager();
-	std::list<Base> allBases;
+	std::list<Base*> allBases;
 	std::map<BWTA::BaseLocation*, Base*> location2base;
 	std::set<Base*> activeBases;
 	std::set<Base*> readyBases;
