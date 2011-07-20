@@ -33,8 +33,10 @@ BasesManager::~BasesManager()
 void BasesManager::update()
 {
 	//check to see if any new base locations need to be added
-	for each(BWTA::BaseLocation* location in BWTA::getBaseLocations())
+	for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getBaseLocations().begin();
+		it != BWTA::getBaseLocations().end(); ++it)
 	{
+		BWTA::BaseLocation* location = *it;
 		if (location2base.find(location) == location2base.end())
 		{
 			TilePosition tile = location->getTilePosition();

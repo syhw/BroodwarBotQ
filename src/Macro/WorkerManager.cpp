@@ -159,7 +159,7 @@ void WorkerManager::rebalanceWorkers()
 	optimalWorkerCount = 0;
 
 	// iterate over all the resources of each active base
-	for(set<Base*>::iterator b = this->basesCache.begin(); b != this->basesCache.end(); b++)
+	for (set<Base*>::iterator b = this->basesCache.begin(); b != this->basesCache.end(); b++)
 	{
 		set<Unit*> baseMinerals = (*b)->getMinerals();
 		vector< std::pair<Unit*,int> > baseMineralOrder;

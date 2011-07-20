@@ -16,7 +16,18 @@ Base::Base(BWTA::BaseLocation* b, Unit* center)
 , centerInConstruction(false)
 , gasInConstruction(false)
 {
-	buildCenter();
+}
+
+Base::Base(const Base& b)
+: baseLocation(b.baseLocation)
+, resourceDepot(b.resourceDepot)
+, refinery(b.refinery)
+, ready(b.ready)
+, paused(b.paused)
+, activeGas(b.activeGas)
+, centerInConstruction(b.centerInConstruction)
+, gasInConstruction(b.gasInConstruction)
+{
 }
 
 void Base::onUnitDestroy(BWAPI::Unit* u)

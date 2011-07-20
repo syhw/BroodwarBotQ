@@ -7,6 +7,7 @@ class Base
 {
 public:
 	Base(BWTA::BaseLocation* b, BWAPI::Unit* center=NULL);
+    Base(const Base& b);
 	void Base::onUnitDestroy(BWAPI::Unit* u);
 	BWTA::BaseLocation* getBaseLocation() const;
 	BWAPI::Unit* getResourceDepot() const;
