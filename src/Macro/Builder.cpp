@@ -82,7 +82,7 @@ void Task::askWorker()
 		return;
 	std::set<Unit*> usefulUnits = 
 		SelectAll()(isWorker)(isCompleted)
-		.not(isCarryingMinerals,isCarryingGas,isGatheringGas);
+		.not(isCarryingGas,isGatheringGas);
 	TheArbitrator->setBid(this, usefulUnits, 60); // TODO change 60
 }
 
@@ -132,7 +132,7 @@ void Task::update()
 		}
 		else if (tmp.canMove())
 			(*it)->move(Position(Broodwar->self()->getStartLocation())); // try and move the unit, TODO will block if the unit doesn't move
-		else
+		else if (!(tmp == UnitTypes::Resource_Vespene_Geyser && type == Broodwar->self()->getRace().getRefinery()))
 			tilePosition = buildingPlacer->getTilePosition(type); // really blocked (can't move)
 	}
 }

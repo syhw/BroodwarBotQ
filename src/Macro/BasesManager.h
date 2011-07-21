@@ -18,6 +18,7 @@ public:
 
 	Base* getBase(BWTA::BaseLocation* location);
 	void expand(BWTA::BaseLocation* location = NULL);
+	void setFirstGasPop(int pop);
 
 	const std::list<Base*>& getAllBases() const;
 	const std::set<Base*>& getActiveBases() const;
@@ -28,6 +29,7 @@ public:
 	void onUnitDestroy(BWAPI::Unit* unit);
 
 private:
+	int firstGasPop;
 	BasesManager();
 	~BasesManager();
 	std::list<Base*> allBases;

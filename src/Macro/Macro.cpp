@@ -25,7 +25,7 @@ Macro::Macro()
 	{
 		TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 8);
 		TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 10);
-		TheBuilder->buildOrder(UnitTypes::Protoss_Assimilator, 12);
+		TheBasesManager->setFirstGasPop(12);
 		TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 14);
 		//TheUpgrader->upgrade(UpgradeTypes::Singularity_Charge);
 	}
@@ -66,10 +66,9 @@ void Macro::update()
 
 	TheWorkerManager->update();
 
-	TheBuilder->update(); // last update that moves an unit that should be done
+	TheBuilder->update(); // last update which moves an unit that should be done
 
 	TheArbitrator->update();
-
 
 	if (!expands && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 2)
 	{

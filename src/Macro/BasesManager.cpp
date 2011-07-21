@@ -21,6 +21,7 @@ void BasesManager::destroy()
 }
 
 BasesManager::BasesManager()
+: firstGasPop(12)
 {
 	TheBasesManager = this;
 }
@@ -51,6 +52,9 @@ void BasesManager::update()
 				}
 		}
 	}
+
+	if (allBases.front()->getRefinery() == NULL && Broodwar->self()->supplyUsed()/2 >= firstGasPop)
+		allBases.front()->setActiveGas(true);
 
 	for each(Base* mb in allBases)
 	{
@@ -103,6 +107,11 @@ void BasesManager::expand(BWTA::BaseLocation* location)
 	allBases.push_back(new Base(location));
 	location2base[location] = allBases.back();
 	TheBorderManager->addMyBase(location);
+}
+
+void BasesManager::setFirstGasPop(int pop)
+{
+	firstGasPop = pop;
 }
 
 const std::set<Base*>& BasesManager::getActiveBases() const
