@@ -1,4 +1,5 @@
 #include <PrecompiledHeader.h>
+#include "Macro/Macro.h"
 #include "Macro/Builder.h"
 #include "BWSAL.h"
 #include "Macro/ReservedMap.h"
@@ -16,10 +17,16 @@ Task::Task(BWAPI::Unit* w, BWAPI::TilePosition tp, BWAPI::UnitType ut)
 	, lastOrder(0)
 	, finished(false)
 {
+	if (tilePosition == TilePositions::None)
+		tilePosition = buildingPlacer->getTilePosition(type);
+	Macro::Instance().reservedMinerals += type.mineralPrice();
+	Macro::Instance().reservedGas += type.gasPrice();
 }
 
 Task::~Task()
 {
+	Macro::Instance().reservedMinerals -= type.mineralPrice();
+	Macro::Instance().reservedGas -= type.gasPrice();
 	TheArbitrator->removeAllBids(this);
 }
 
@@ -69,6 +76,7 @@ void Task::onOffer(set<Unit*> units)
 
 void Task::onRevoke(BWAPI::Unit* unit, double bid)
 {
+	TheArbitrator->removeAllBids(this);
 	if (finished)
 		return;
 	if (unit == worker)
@@ -112,20 +120,22 @@ string Task::getShortName() const
 
 void Task::update()
 {
-	if (tilePosition == TilePositions::None)
-		tilePosition = buildingPlacer->getTilePosition(type);
-	else if (worker == NULL)
-		askWorker();
-	else
-		buildIt();
-	for (set<Unit*>::const_iterator it = Broodwar->getUnitsOnTile(tilePosition.x(), tilePosition.y()).begin();
+	/// Check if we have finished, or if there are blocking units we can move,
+	/// or if the build TilePosition is really blocked
+    for (set<Unit*>::const_iterator it = Broodwar->getUnitsOnTile(tilePosition.x(), tilePosition.y()).begin();
 		it != Broodwar->getUnitsOnTile(tilePosition.x(), tilePosition.y()).end(); ++it)
 	{
 		if (*it == worker)
 			continue;
 		UnitType tmp = (*it)->getType();
+		if ((*it)->getPlayer() != Broodwar->self() && (*it)->getPlayer() != Broodwar->neutral()) // then we can't move this unit
+		{
+			tilePosition = buildingPlacer->getTilePosition(type);
+		    break;
+		}
 		if (tmp == type)
 		{
+			TheArbitrator->removeBid(this, worker);
 			TheArbitrator->removeAllBids(this);
 			finished = true;
 			return;
@@ -133,8 +143,22 @@ void Task::update()
 		else if (tmp.canMove())
 			(*it)->move(Position(Broodwar->self()->getStartLocation())); // try and move the unit, TODO will block if the unit doesn't move
 		else if (!(tmp == UnitTypes::Resource_Vespene_Geyser && type == Broodwar->self()->getRace().getRefinery()))
+		{
 			tilePosition = buildingPlacer->getTilePosition(type); // really blocked (can't move)
+			break;
+		}
 	}
+	if (Broodwar->self()->minerals() < type.mineralPrice() && Broodwar->self()->gas() < type.gasPrice())
+		return;
+	else if (worker == NULL)
+		askWorker();
+	else
+		buildIt();
+}
+
+const UnitType& Task::getType()
+{
+	return type;
 }
 
 bool Task::isFinished()
@@ -179,6 +203,16 @@ void Builder::build(BWAPI::UnitType t, BWAPI::TilePosition seedPosition)
 void Builder::buildOrder(BWAPI::UnitType t, int supplyAsTime, BWAPI::TilePosition seedPosition)
 {
     boTasks.insert(make_pair<int, Task>(supplyAsTime, Task(NULL, seedPosition, t)));
+}
+
+bool Builder::willBuild(UnitType t) // TODO change impl
+{
+	for each (Task task in tasks)
+	{
+		if (task.getType() == t)
+			return true;
+	}
+	return false;
 }
 
 /***

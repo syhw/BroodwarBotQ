@@ -86,9 +86,9 @@ namespace Arbitrator
       return false;
     if (bids[obj].contains(c)) //check to see if the bid exists
     {
+      bids[obj].erase(c); //if so, remove the bid
       updatedObjects.insert(obj); //insert the object into the updated set
     }
-	bids[obj].erase(c); //if so, remove the bid
     return true;
   }
 
@@ -260,6 +260,7 @@ namespace Arbitrator
       bidders.push_back(bid_heap.top());
       bid_heap.pop();
     }
+	int i = bidders.size();
     return bidders;
   }
 

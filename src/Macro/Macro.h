@@ -19,7 +19,10 @@ class Macro: public CSingleton<Macro>
     Arbitrator::Arbitrator<BWAPI::Unit*,double> arbitrator;
 	int expands;
 	int addedGates;
+
 public:
+	int reservedMinerals;
+	int reservedGas;
 	void buildOrderAdd(BWAPI::UnitType type);
 	void techAdd(BWAPI::TechType type);
 	void upgradeAdd(BWAPI::UpgradeType type);

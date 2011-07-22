@@ -4,14 +4,14 @@
 #include <set>
 #include <map>
 
-typedef std::pair<int, BWAPI::UnitType> ProductionOrder;
-
 class Producer : public Arbitrator::Controller<BWAPI::Unit*, double>
 {
 public:
 	static Producer* create();
 	static void destroy();
-	void produce(int number, BWAPI::UnitType t, int priority=20);
+	inline bool checkCanProduce(BWAPI::UnitType t);
+	void produce(int number, BWAPI::UnitType t, int priority=20, int increment=1);
+	void produceAdditional(int number, BWAPI::UnitType t, int priority=20, int increment=1);
 	void update();
 
 	void onUnitCreate(BWAPI::Unit* unit);
@@ -21,9 +21,11 @@ public:
 	virtual void onRevoke(BWAPI::Unit* unit, double bid);
 	virtual std::string getName() const;
 private:
-	std::multimap<BWAPI::UnitType, BWAPI::Unit*> producingStructures;
-	std::multimap<int, ProductionOrder> prioritizedOrders;
+	std::multimap<BWAPI::UnitType, BWAPI::Unit*> _techStructures;
+	std::multimap<BWAPI::UnitType, BWAPI::Unit*> _producingStructures;
+	std::multimap<int, BWAPI::UnitType> _productionQueue;
 	Producer();
 	~Producer();
 };
+
 extern Producer* TheProducer;

@@ -33,9 +33,8 @@ TilePosition getNearestStartLocation(const TilePosition& tp)
 ScoutController::ScoutController()
 : enemyFound(false)
 , _notSeenStartLocations(BWTA::getBaseLocations())
-, _requestedScouts(false)
 {
-    _seenStartLocations.insert(BWTA::getNearestBaseLocation(Broodwar->self()->getStartLocation()));
+	_seenStartLocations.insert(BWTA::getNearestBaseLocation(Broodwar->self()->getStartLocation()));
 }
 
 ScoutController::~ScoutController()
@@ -46,58 +45,59 @@ ScoutController::~ScoutController()
 void ScoutController::update()
 {
 	/********* Infer enemyStartLocation if possible **********/
-    if (!enemyFound)
-    {
-        if (Broodwar->getStartLocations().size() == 2)
-        {
-            for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getStartLocations().begin(); it != BWTA::getStartLocations().end(); ++it)
-            {
-                if (!Broodwar->isVisible((*it)->getTilePosition()))
-                    enemyStartLocation = (*it)->getTilePosition();
-            }
-        }
-        else if (Broodwar->getStartLocations().size() > 2)
-        {
-            for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getStartLocations().begin(); it != BWTA::getStartLocations().end(); ++it)
-            {
-                if (Broodwar->isVisible((*it)->getTilePosition()))
+	if (!enemyFound)
+	{
+		if (Broodwar->getStartLocations().size() == 2)
+		{
+			for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getStartLocations().begin(); it != BWTA::getStartLocations().end(); ++it)
+			{
+				if (!Broodwar->isVisible((*it)->getTilePosition()))
+					enemyStartLocation = (*it)->getTilePosition();
+			}
+		}
+		else if (Broodwar->getStartLocations().size() > 2)
+		{
+			for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getStartLocations().begin(); it != BWTA::getStartLocations().end(); ++it)
+			{
+				if (Broodwar->isVisible((*it)->getTilePosition()))
 				{
-                    _seenStartLocations.insert(*it);
+					_seenStartLocations.insert(*it);
 					_notSeenStartLocations.erase(*it);
 				}
-            }
-            if (_seenStartLocations.size() == (BWTA::getStartLocations().size() - 1))
-            {
+			}
+			if (_seenStartLocations.size() == (BWTA::getStartLocations().size() - 1))
+			{
 				std::set<BWTA::BaseLocation*>::iterator tmpit = _notSeenStartLocations.begin();
 				enemyStartLocation = (*tmpit)->getTilePosition();
-            }
-        }
-    }
+			}
+		}
+	}
 
 #ifdef __DEBUG__
 	/********* Print enemyStartLocation if known **********/
-    if (enemyStartLocation != TilePositions::None)
-        Broodwar->drawCircleMap(enemyStartLocation.x()*4, enemyStartLocation.y()*4, 30, Colors::Red, true);
+	if (enemyStartLocation != TilePositions::None)
+		Broodwar->drawCircleMap(enemyStartLocation.x()*4, enemyStartLocation.y()*4, 30, Colors::Red, true);
 #endif
 
 	/********* Free units groups that need to be freed and add goals to other *********/
 	for(std::list<UnitsGroup>::iterator it = _unitsGroups.begin(); it != _unitsGroups.end(); ++it )
 	{
-		if (_unitsGroups.empty())
-			break;
 		if (it->isWaiting())
-        {
+		{
 			//If no new goal available release the ug : 
 			if(_awaitingGoals.size() <= 0)
 			{
 				for (std::vector<pBayesianUnit>::const_iterator u = it->units.begin();
 					u != it->units.end(); ++u)
+				{
 					TheArbitrator->removeBid(this, (*u)->unit);
+					_biddedOn.erase((*u)->unit);
+				}
 				_unitsGroups.erase(it);
 			}
 			else
 			{
-			//New goal available : assign it to the ug
+				//New goal available : assign it to the ug
 				it->addGoal(_awaitingGoals.front());
 				_awaitingGoals.pop_front();
 			}
@@ -105,8 +105,8 @@ void ScoutController::update()
 	}
 
 	/********* Ask units if needed *********/
-	if (!_requestedScouts && _awaitingGoals.size() > 0)
-    {
+	if (_awaitingGoals.size() > 0)
+	{
 		requestScout(95);
 	}
 }
@@ -138,15 +138,15 @@ void ScoutController::onOffer(std::set<Unit*> units)
 	/**** Pick the best units for the jobs ****/
 	for (std::list<pGoal>::iterator goal = _awaitingGoals.begin();
 		goal != _awaitingGoals.end(); ++goal)
-    {
+	{
 		//find the closest unit for each goal
 		bestUnit = NULL;
 		for (std::set<Unit*>::iterator unit = remainingUnits.begin();
 			unit != remainingUnits.end(); ++unit)
-        {
+		{
 			int tmp = (*goal)->estimateDistance((*unit)->getPosition());
-            if (tmp < dist)
-            {
+			if (tmp < dist)
+			{
 				bestUnit = *unit;
 				dist = tmp;
 			}
@@ -157,7 +157,7 @@ void ScoutController::onOffer(std::set<Unit*> units)
 		remainingUnits.erase(bestUnit);
 		tmpp.addGoal((*goal));
 		tmpp.switchMode(MODE_SCOUT);
-        tmpp.update();
+		tmpp.update();
 		_unitsGroups.push_back(tmpp);
 		distributedGoals.push_back(*goal);
 	}
@@ -171,8 +171,8 @@ void ScoutController::onOffer(std::set<Unit*> units)
 	{
 		TheArbitrator->decline(this, *it, 0);
 		TheArbitrator->removeBid(this, *it);
+		_biddedOn.erase(*it);
 	}
-	_requestedScouts = false;
 }
 
 
@@ -189,34 +189,34 @@ void ScoutController::findEnemy()
 
 void ScoutController::onUnitShow(BWAPI::Unit* unit)
 {
-    if (unit->getPlayer() != Broodwar->enemy())
-        return;
-    if (!enemyFound && unit->getType() == UnitTypes::Protoss_Nexus 
-        || unit->getType() == UnitTypes::Terran_Command_Center 
-        || unit->getType() == UnitTypes::Zerg_Hatchery
-        || unit->getType() == UnitTypes::Zerg_Lair
-        || unit->getType() == UnitTypes::Zerg_Hive)
-    {
-        for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getStartLocations().begin(); // fuck BaseLocation that we can't build from a (Tile)Position
-            it != BWTA::getStartLocations().end(); ++it)
-        {
-            if ((*it)->getTilePosition() == unit->getTilePosition())
-            {
-                enemyFound = true;
-                enemyStartLocation = unit->getTilePosition();
+	if (unit->getPlayer() != Broodwar->enemy())
+		return;
+	if (!enemyFound && unit->getType() == UnitTypes::Protoss_Nexus 
+		|| unit->getType() == UnitTypes::Terran_Command_Center 
+		|| unit->getType() == UnitTypes::Zerg_Hatchery
+		|| unit->getType() == UnitTypes::Zerg_Lair
+		|| unit->getType() == UnitTypes::Zerg_Hive)
+	{
+		for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getStartLocations().begin(); // fuck BaseLocation that we can't build from a (Tile)Position
+			it != BWTA::getStartLocations().end(); ++it)
+		{
+			if ((*it)->getTilePosition() == unit->getTilePosition())
+			{
+				enemyFound = true;
+				enemyStartLocation = unit->getTilePosition();
 				Broodwar->printf("Found enemy here!");
 				Broodwar->pingMinimap(unit->getPosition());
-                return;
-            }
-        }
-        if (Broodwar->getFrameCount() > 4320) // 4 minutes
-        {
-            enemyFound = true;
-            enemyStartLocation = getNearestStartLocation(unit->getTilePosition());
+				return;
+			}
+		}
+		if (Broodwar->getFrameCount() > 4320) // 4 minutes
+		{
+			enemyFound = true;
+			enemyStartLocation = getNearestStartLocation(unit->getTilePosition());
 			Broodwar->printf("Found enemy here!");
 			Broodwar->pingMinimap(Position(enemyStartLocation));
-        }
-    }
+		}
+	}
 }
 
 void ScoutController::onUnitDestroy(BWAPI::Unit* unit)
@@ -224,17 +224,24 @@ void ScoutController::onUnitDestroy(BWAPI::Unit* unit)
 	for (std::list<UnitsGroup>::iterator it = _unitsGroups.begin();
 		it != _unitsGroups.end(); ++it)
 	{
-	    if (it->removeUnit(unit))
+		if (it->removeUnit(unit))
 			return;
 	}
 }
 
 void ScoutController::requestScout(double bid)
 {
-  // Bid on all completed workers + observers/overlords
-  std::set<Unit*> usefulUnits = 
-	  SelectAll()(isWorker,Overlord,Observer)(isCompleted)
-	  .not(isCarryingMinerals,isCarryingGas,isGatheringGas);
-  TheArbitrator->setBid(this, usefulUnits, bid);
-  _requestedScouts = true;
+	// Bid on all completed workers + observers/overlords
+	std::set<Unit*> usefulUnits = 
+		SelectAll()(isWorker,Overlord,Observer)(isCompleted)
+		.not(isCarryingMinerals,isCarryingGas,isGatheringGas);
+	for (std::set<Unit*>::const_iterator it = usefulUnits.begin();
+		it != usefulUnits.end(); ++it)
+	{
+		if (!_biddedOn.count(*it) && TheArbitrator->getHighestBidder(*it).second < 95)
+		{
+			TheArbitrator->setBid(this, *it, bid);
+			_biddedOn.insert(*it);
+		}
+	}
 }

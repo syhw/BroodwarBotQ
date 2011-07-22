@@ -20,8 +20,8 @@ class ScoutController : public CSingleton<ScoutController>, public Arbitrator::C
 	ScoutController();
 	~ScoutController();
 	std::list<pGoal> _awaitingGoals;
+	std::set<Unit*> _biddedOn;
 	std::list<UnitsGroup> _unitsGroups;
-	bool _requestedScouts;
     std::set<BWTA::BaseLocation*> _seenStartLocations;
 	std::set<BWTA::BaseLocation*> _notSeenStartLocations;
 

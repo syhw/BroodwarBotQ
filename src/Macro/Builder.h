@@ -22,6 +22,7 @@ public:
 	virtual std::string getName() const;
 	virtual std::string getShortName() const;
 	virtual void update();
+	const BWAPI::UnitType& getType();
 	bool isFinished();
 };
 
@@ -32,6 +33,7 @@ public:
 	static void destroy();
 	void build(BWAPI::UnitType t, BWAPI::TilePosition seedPosition=BWAPI::TilePositions::None);
 	void buildOrder(BWAPI::UnitType t, int supplyAsTime, BWAPI::TilePosition seedPosition=BWAPI::TilePositions::None);
+	bool willBuild(BWAPI::UnitType t);
 	void update();
 private:
 	SimCityBuildingPlacer buildingPlacer;

@@ -7,6 +7,8 @@ using namespace BWAPI;
 Macro::Macro()
 : expands(0)
 , addedGates(0)
+, reservedMinerals(0)
+, reservedGas(0)
 {
 	TheArbitrator = & arbitrator;
 	Builder::create();
@@ -23,6 +25,7 @@ Macro::Macro()
 
 	if (Broodwar->self()->getRace() == Races::Protoss)
 	{
+		TheWorkerManager->enableAutoBuild();
 		TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 8);
 		TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 10);
 		TheBasesManager->setFirstGasPop(12);
