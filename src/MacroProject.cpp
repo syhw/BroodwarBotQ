@@ -37,6 +37,7 @@ void BattleBroodAI::onStart()
    
 	this->intelligence = & Intelligence::Instance();
 	this->macro = & Macro::Instance();
+	this->macro->init();
 	this->micro = & Micro::Instance();
     this->timeManager = & TimeManager::Instance();
 }

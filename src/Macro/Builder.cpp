@@ -11,11 +11,11 @@ using namespace std;
 SimCityBuildingPlacer* Task::buildingPlacer = NULL;
 
 Task::Task(BWAPI::Unit* w, BWAPI::TilePosition tp, BWAPI::UnitType ut)
-	: worker(w)
-	, tilePosition(tp)
-	, type(ut)
-	, lastOrder(0)
-	, finished(false)
+: worker(w)
+, tilePosition(tp)
+, type(ut)
+, lastOrder(0)
+, finished(false)
 {
 	if (tilePosition == TilePositions::None)
 		tilePosition = buildingPlacer->getTilePosition(type);
@@ -32,7 +32,7 @@ Task::~Task()
 
 void Task::onOffer(set<Unit*> units)
 {
-	
+
 	if (worker != NULL && worker->exists()) // defensive prog
 	{
 		// not sure about that or re-taking a (new) working
@@ -122,7 +122,7 @@ void Task::update()
 {
 	/// Check if we have finished, or if there are blocking units we can move,
 	/// or if the build TilePosition is really blocked
-    for (set<Unit*>::const_iterator it = Broodwar->getUnitsOnTile(tilePosition.x(), tilePosition.y()).begin();
+	for (set<Unit*>::const_iterator it = Broodwar->getUnitsOnTile(tilePosition.x(), tilePosition.y()).begin();
 		it != Broodwar->getUnitsOnTile(tilePosition.x(), tilePosition.y()).end(); ++it)
 	{
 		if (*it == worker)
@@ -131,7 +131,7 @@ void Task::update()
 		if ((*it)->getPlayer() != Broodwar->self() && (*it)->getPlayer() != Broodwar->neutral()) // then we can't move this unit
 		{
 			tilePosition = buildingPlacer->getTilePosition(type);
-		    break;
+			break;
 		}
 		if (tmp == type)
 		{
@@ -202,7 +202,7 @@ void Builder::build(BWAPI::UnitType t, BWAPI::TilePosition seedPosition)
 
 void Builder::buildOrder(BWAPI::UnitType t, int supplyAsTime, BWAPI::TilePosition seedPosition)
 {
-    boTasks.insert(make_pair<int, Task>(supplyAsTime, Task(NULL, seedPosition, t)));
+	boTasks.insert(make_pair<int, Task>(supplyAsTime, Task(NULL, seedPosition, t)));
 }
 
 bool Builder::willBuild(UnitType t) // TODO change impl
@@ -216,12 +216,12 @@ bool Builder::willBuild(UnitType t) // TODO change impl
 }
 
 /***
- * It should be the last update()/onFrame() call (to move "blocking construction" units)
- */
+* It should be the last update()/onFrame() call (to move "blocking construction" units)
+*/
 void Builder::update()
 {
 	/// Follow the BO
-    if (!boTasks.empty())
+	if (!boTasks.empty())
 	{
 		list<int> toRemove;
 		for (multimap<int, Task>::iterator it = boTasks.begin();

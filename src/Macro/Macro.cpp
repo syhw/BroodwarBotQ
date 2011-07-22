@@ -22,20 +22,6 @@ Macro::Macro()
 	UnitGroupManager::create();
 	WorkerManager::create();
 	ReservedMap::create();
-
-	if (Broodwar->self()->getRace() == Races::Protoss)
-	{
-		TheWorkerManager->enableAutoBuild();
-		TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 8);
-		TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 10);
-		TheBasesManager->setFirstGasPop(12);
-		TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 14);
-		//TheUpgrader->upgrade(UpgradeTypes::Singularity_Charge);
-	}
-	else
-	{
-		Broodwar->printf("Race not implemented");
-	}
 }
 
 Macro::~Macro()
@@ -51,6 +37,24 @@ Macro::~Macro()
 	UnitGroupManager::destroy();
 	WorkerManager::destroy();
 	ReservedMap::destroy();
+}
+
+
+void Macro::init()
+{
+	if (Broodwar->self()->getRace() == Races::Protoss)
+	{
+		TheWorkerManager->enableAutoBuild();
+		TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 8);
+		TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 10);
+		TheBasesManager->setFirstGasPop(12);
+		TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 14);
+		//TheUpgrader->upgrade(UpgradeTypes::Singularity_Charge);
+	}
+	else
+	{
+		Broodwar->printf("Race not implemented");
+	}
 }
 
 void Macro::update()

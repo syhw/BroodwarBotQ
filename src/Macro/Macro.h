@@ -26,6 +26,7 @@ public:
 	void buildOrderAdd(BWAPI::UnitType type);
 	void techAdd(BWAPI::TechType type);
 	void upgradeAdd(BWAPI::UpgradeType type);
+	void init();
 	void update();
 	void onUnitDiscover(BWAPI::Unit* unit);
 	void onUnitEvade(BWAPI::Unit* unit);
