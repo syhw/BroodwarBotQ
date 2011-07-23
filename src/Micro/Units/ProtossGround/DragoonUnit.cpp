@@ -112,7 +112,7 @@ void DragoonUnit::micro()
     /// Dodge storm, drag mine, drag scarab
     if (dodgeStorm() || dragMine() || dragScarab()) 
         return;
-    if (unit->getGroundWeaponCooldown() <= Broodwar->getLatency() + 1)
+    if (unit->getGroundWeaponCooldown() <= Broodwar->getLatencyFrames() + 1)
     {
         updateRangeEnemies();
         updateTargetEnemy();
@@ -122,7 +122,7 @@ void DragoonUnit::micro()
         }
         attackEnemyUnit(targetEnemy);
     }
-    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatency()*2 + 2) // == (Broodwar->getLatency()+1)*2, safety
+    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatencyFrames()*2 + 2) // == (Broodwar->getLatencyFrames()+1)*2, safety
     {
         if (!dodgeStorm() && !dragScarab() && !dragMine() && _fleeing)
         {

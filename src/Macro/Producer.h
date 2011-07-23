@@ -4,6 +4,15 @@
 #include <set>
 #include <map>
 
+struct ProducingUnit
+{
+	int lastAction;
+	BWAPI::Unit* unit;
+	ProducingUnit(BWAPI::Unit* u);
+	BWAPI::Unit* operator->() const;
+	void train(BWAPI::UnitType t);
+};
+
 class Producer : public Arbitrator::Controller<BWAPI::Unit*, double>
 {
 public:
@@ -22,7 +31,7 @@ public:
 	virtual std::string getName() const;
 private:
 	std::multimap<BWAPI::UnitType, BWAPI::Unit*> _techStructures;
-	std::multimap<BWAPI::UnitType, BWAPI::Unit*> _producingStructures;
+	std::multimap<BWAPI::UnitType, ProducingUnit> _producingStructures;
 	std::multimap<int, BWAPI::UnitType> _productionQueue;
 	Producer();
 	~Producer();

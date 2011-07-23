@@ -94,7 +94,7 @@ void MarineUnit::micro()
     if (dodgeStorm() || dragMine() || dragScarab()) 
         return;
 
-    if (unit->getGroundWeaponCooldown() <= Broodwar->getLatency() + 1)
+    if (unit->getGroundWeaponCooldown() <= Broodwar->getLatencyFrames() + 1)
     {
         if (!inRange(targetEnemy))
         {
@@ -109,7 +109,7 @@ void MarineUnit::micro()
             attackEnemyUnit(targetEnemy);
         else
         {
-            if (currentFrame - _lastClickFrame > Broodwar->getLatency())
+            if (currentFrame - _lastClickFrame > Broodwar->getLatencyFrames())
             {
                 unit->attack(_unitsGroup->enemiesCenter);
                 _lastMoveFrame = Broodwar->getFrameCount();
@@ -117,7 +117,7 @@ void MarineUnit::micro()
             }
         }
     }
-    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatency()*2 + 2) // == (Broodwar->getLatency()+1)*2, safety
+    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatencyFrames()*2 + 2) // == (Broodwar->getLatencyFrames()+1)*2, safety
     {
         if (_fleeing)
         {

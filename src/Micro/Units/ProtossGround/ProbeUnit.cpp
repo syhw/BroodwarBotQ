@@ -12,7 +12,7 @@ ProbeUnit::~ProbeUnit()
 
 void ProbeUnit::micro()
 {
-    if (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency())
+    if (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatencyFrames())
     {
         _lastClickFrame = Broodwar->getFrameCount();
         unit->attack(target);

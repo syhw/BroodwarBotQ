@@ -233,7 +233,7 @@ void BayesianUnit::switchMode(unit_mode um)
             break;
         case MODE_SCOUT:
             if (Broodwar->getFrameCount() - _lastClickFrame 
-					> Broodwar->getLatency())
+					> Broodwar->getLatencyFrames())
                 clickTarget();
 #ifdef __DEBUG__
             Broodwar->printf("Switch SCOUT!");
@@ -241,7 +241,7 @@ void BayesianUnit::switchMode(unit_mode um)
             break;
         case MODE_MOVE:
             if (Broodwar->getFrameCount() - _lastClickFrame 
-					> Broodwar->getLatency())
+					> Broodwar->getLatencyFrames())
                 clickTarget();
 #ifdef __DEBUG__
             Broodwar->printf("Switch MOVE!");
@@ -521,7 +521,7 @@ void BayesianUnit::attackEnemyUnit(Unit* u)
     }
     else
     {
-        if (Broodwar->getFrameCount() - _lastMoveFrame > Broodwar->getLatency())
+        if (Broodwar->getFrameCount() - _lastMoveFrame > Broodwar->getLatencyFrames())
         {
             unit->move(u->getPosition());
             _lastMoveFrame = Broodwar->getFrameCount();
@@ -1753,7 +1753,7 @@ int BayesianUnit::fightMove()
     if (targetEnemy != NULL && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected()
         && ((targetEnemy->getType() == UnitTypes::Terran_Siege_Tank_Siege_Mode 
         && targetEnemy->getDistance(_unitPos) > 45.0) || !inRange(targetEnemy) || (_unitsGroup->units.size() > 10 && targetEnemy->getDistance(_unitPos) > 128)) // TODO MICROONLY (_unitsGroup->units.size() > 10 && targetEnemy->getDistance(_unitPos) > 128)
-        && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
+        && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatencyFrames()))
     {
         unit->move(targetEnemy->getPosition());
         _lastClickFrame = Broodwar->getFrameCount();
@@ -1766,7 +1766,7 @@ int BayesianUnit::fightMove()
     if (dist <= 192.0 && // 6 build tiles TOCHANGE
         oorTargetEnemy != NULL && oorTargetEnemy->exists() && oorTargetEnemy->isVisible() && targetEnemy->isDetected()
         && !inRange(oorTargetEnemy)
-        && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
+        && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatencyFrames()))
     {
         //unit->rightClick(oorTargetEnemy->getPosition());
         //_lastRightClick =  oorTargetEnemy->getPosition();
@@ -1778,7 +1778,7 @@ int BayesianUnit::fightMove()
     }
     /// move towards target if we are "far enough from it"
     if ((dist > 192.0 || (_unitsGroup->distToNearestChoke < 128.0 && !unit->getType().isFlyer() && dist > unit->getType().groundWeapon().maxRange() && _unitsGroup->enemiesAltitude > _unitsGroup->groupAltitude))  // 192 == 6 build tiles TOCHANGE
-        && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
+        && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatencyFrames()))
     {
         clickTarget();
         _fightMoving = true;
@@ -1787,7 +1787,7 @@ int BayesianUnit::fightMove()
     /// Or simply move away from our friends and kite if we can
     if (targetEnemy != NULL && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected()
         && outRanges(targetEnemy) // don't kite it we don't outrange
-        && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
+        && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatencyFrames()))
     {
         // TODO TO COMPLETE (with a clickTarget() if dist > threshold)
         updateDir();
@@ -1823,7 +1823,7 @@ int BayesianUnit::fightMove()
         _dirvProb.insert(make_pair(prob, _dirv[i]));
     }
     selectDir(obj);*/
-    /*if (!_fightMoving || Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency())
+    /*if (!_fightMoving || Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatencyFrames())
     {
         // TODO TO COMPLETE (with a clickTarget() if dist > threshold)
         updateDir();
@@ -1888,7 +1888,7 @@ void BayesianUnit::simpleFlee()
         return;
     }
     _fleeing = true;
-    if (Broodwar->getFrameCount() - _lastClickFrame < Broodwar->getLatency())
+    if (Broodwar->getFrameCount() - _lastClickFrame < Broodwar->getLatencyFrames())
         return;
     Vec dirFlee = Vec(0, 0);
     for (std::map<Unit*, Position>::const_iterator it = _unitsGroup->enemies.begin();
@@ -2026,7 +2026,7 @@ void BayesianUnit::update()
         //switchMode(MODE_MOVE);
     if (_mode != MODE_FIGHT_G && _mode != MODE_SCOUT 
         && !_unitsGroup->enemies.empty()
-        && unit->getGroundWeaponCooldown() <= Broodwar->getLatency())
+        && unit->getGroundWeaponCooldown() <= Broodwar->getLatencyFrames())
     {
         this->switchMode(MODE_FIGHT_G);
     }
@@ -2096,7 +2096,7 @@ void BayesianUnit::update()
         Broodwar->drawLineMap(_unitPos.x(), _unitPos.y(), target.x(), target.y(), Colors::Purple);
 #endif
         if ((Broodwar->getFrameCount() - _lastMoveFrame) > 23
-            && (Broodwar->getFrameCount() - _lastClickFrame) > Broodwar->getLatency() + getAttackDuration())
+            && (Broodwar->getFrameCount() - _lastClickFrame) > Broodwar->getLatencyFrames() + getAttackDuration())
         {
             clickTarget();
         }

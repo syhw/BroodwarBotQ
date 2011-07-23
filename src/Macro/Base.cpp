@@ -138,6 +138,9 @@ void Base::buildGas()
 {
 	for (std::set<Unit*>::const_iterator it = baseLocation->getGeysers().begin();
 		it != baseLocation->getGeysers().end(); ++it)
-		TheBuilder->build(Broodwar->self()->getRace().getRefinery(), (*it)->getTilePosition());
+	{
+		if (!TheBuilder->willBuild(Broodwar->self()->getRace().getRefinery())) // TODO correct (we can't build 2 Refineries at once)
+			TheBuilder->build(Broodwar->self()->getRace().getRefinery(), (*it)->getTilePosition());
+	}
     gasInConstruction = true;
 }

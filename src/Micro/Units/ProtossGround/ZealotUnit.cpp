@@ -44,7 +44,7 @@ int ZealotUnit::fightMove()
     if (targetEnemy != NULL && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected()
         && ((targetEnemy->getType() == UnitTypes::Terran_Siege_Tank_Siege_Mode 
         && targetEnemy->getDistance(_unitPos) > 45.0) || !inRange(targetEnemy) || (_unitsGroup->units.size() > 10 && targetEnemy->getDistance(_unitPos) > 128)) // TODO MICROONLY (_unitsGroup->units.size() > 10 && targetEnemy->getDistance(_unitPos) > 128)
-        && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
+        && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatencyFrames()))
     {
         unit->move(targetEnemy->getPosition());
         _lastClickFrame = Broodwar->getFrameCount();
@@ -57,7 +57,7 @@ int ZealotUnit::fightMove()
     if (dist <= 192.0 && // 6 build tiles TOCHANGE
         oorTargetEnemy != NULL && oorTargetEnemy->exists() && oorTargetEnemy->isVisible() && targetEnemy->isDetected()
         && !inRange(oorTargetEnemy)
-        && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatency()))
+        && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatencyFrames()))
     {
         //unit->rightClick(oorTargetEnemy->getPosition());
         //_lastRightClick =  oorTargetEnemy->getPosition();
@@ -241,9 +241,9 @@ void ZealotUnit::micro()
     if (Broodwar->enemy()->getRace() == BWAPI::Races::Zerg ////////////////////////// AttackMove vs Zerg
         || Broodwar->enemy()->getRace() == BWAPI::Races::Protoss) /////////////////// AttackMove vs Protoss
     {
-        if (unit->getGroundWeaponCooldown() > Broodwar->getLatency()
+        if (unit->getGroundWeaponCooldown() > Broodwar->getLatencyFrames()
             && (_unitsGroup->distToNearestChoke < 128.0 && _unitsGroup->enemiesAltitude > _unitsGroup->groupAltitude)
-            && (currentFrame - _lastClickFrame >= Broodwar->getLatency()))
+            && (currentFrame - _lastClickFrame >= Broodwar->getLatencyFrames()))
         {
             clickTarget();
             _fightMoving = true;
@@ -261,7 +261,7 @@ void ZealotUnit::micro()
     else
     {
 
-        if (unit->getGroundWeaponCooldown() <= Broodwar->getLatency() + 1)
+        if (unit->getGroundWeaponCooldown() <= Broodwar->getLatencyFrames() + 1)
         {
             if (!inRange(targetEnemy))
             {
@@ -276,7 +276,7 @@ void ZealotUnit::micro()
                 attackEnemyUnit(targetEnemy);
             else
             {
-                if (currentFrame - _lastClickFrame > Broodwar->getLatency())
+                if (currentFrame - _lastClickFrame > Broodwar->getLatencyFrames())
                 {
                     unit->attack(_unitsGroup->enemiesCenter);
                     _lastMoveFrame = Broodwar->getFrameCount();
@@ -284,7 +284,7 @@ void ZealotUnit::micro()
                 }
             }
         }
-        else if (unit->getGroundWeaponCooldown() > Broodwar->getLatency()*2 + 2) // == (Broodwar->getLatency()+1)*2, safety
+        else if (unit->getGroundWeaponCooldown() > Broodwar->getLatencyFrames()*2 + 2) // == (Broodwar->getLatencyFrames()+1)*2, safety
         {
             if (_fleeing)
             {
@@ -298,7 +298,7 @@ void ZealotUnit::micro()
     }
     return;
 
-    /*if (Broodwar->getFrameCount() - _lastAttackFrame <= Broodwar->getLatency() + 1) //&& Broodwar->getFrameCount() - _lastAttackFrame + Broodwar->getLatency() < unit->getType().groundWeapon().damageCooldown())
+    /*if (Broodwar->getFrameCount() - _lastAttackFrame <= Broodwar->getLatencyFrames() + 1) //&& Broodwar->getFrameCount() - _lastAttackFrame + Broodwar->getLatencyFrames() < unit->getType().groundWeapon().damageCooldown())
     {
         /// ATTACK
         if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() && inRange(targetEnemy))
@@ -312,7 +312,7 @@ void ZealotUnit::micro()
     }*/
     /*
     int hpDiff = _lastTotalHP - (unit->getShields() + unit->getHitPoints()) + 1; // +1 for regen shield
-    if (Broodwar->getFrameCount() - _lastAttackFrame > Broodwar->getLatency() + getAttackDuration())
+    if (Broodwar->getFrameCount() - _lastAttackFrame > Broodwar->getLatencyFrames() + getAttackDuration())
     {
         if (unit->getGroundWeaponCooldown() == 0)
         {
@@ -320,7 +320,7 @@ void ZealotUnit::micro()
             updateTargetEnemy();
             attackEnemyUnit(targetEnemy);
         }
-        else if (unit->getGroundWeaponCooldown() <= Broodwar->getLatency())
+        else if (unit->getGroundWeaponCooldown() <= Broodwar->getLatencyFrames())
         {
             updateRangeEnemies();
             updateTargetEnemy();

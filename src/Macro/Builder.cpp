@@ -197,7 +197,10 @@ Builder::~Builder()
 
 void Builder::build(BWAPI::UnitType t, BWAPI::TilePosition seedPosition)
 {
-	tasks.push_back(Task(NULL, seedPosition, t));
+	//if (t = Broodwar->self()->getRace().getCenter())
+		//TheBasesManager->expand();
+	//else
+		tasks.push_back(Task(NULL, seedPosition, t));
 }
 
 void Builder::buildOrder(BWAPI::UnitType t, int supplyAsTime, BWAPI::TilePosition seedPosition)

@@ -7,6 +7,24 @@
 using namespace BWAPI;
 using namespace std;
 
+ProducingUnit::ProducingUnit(Unit* u)
+: unit(u)
+, lastAction(-24)
+{
+}
+Unit* ProducingUnit::operator->() const
+{
+	return unit;
+}
+void ProducingUnit::train(UnitType t)
+{
+	if (Broodwar->getFrameCount() - lastAction > Broodwar->getLatencyFrames())
+	{
+		lastAction = Broodwar->getFrameCount();
+		unit->train(t);
+	}
+}
+
 Producer* TheProducer = NULL;
 
 Producer* Producer::create()
@@ -40,13 +58,6 @@ Producer::~Producer()
  */
 bool Producer::checkCanProduce(UnitType t)
 {
-	/*UnitType wB = t.whatBuilds().first;
-	if (_producingStructures.find(wB) == _producingStructures.end()) // we don't have the needed producing structures
-	{
-		if (wB.isBuilding() && !TheBuilder->willBuild(wB)) // Archons are produced out of templars (TODO)
-			TheBuilder->build(wB);
-		return false;
-	}*/ // USELESS with what follows
 	map<UnitType, int> needed = t.requiredUnits();
 	bool ret = true;
 	for (map<UnitType, int>::const_iterator it = needed.begin();
@@ -65,7 +76,7 @@ bool Producer::checkCanProduce(UnitType t)
 
 void Producer::produce(int number, BWAPI::UnitType t, int priority, int increment)
 {
-	int add = min(0, number - SelectAll(t).size());
+	int add = max(0, number - SelectAll(t).size());
 	produceAdditional(add, t, priority, increment);
 }
 
@@ -93,11 +104,22 @@ void Producer::produceAdditional(int number, BWAPI::UnitType t, int priority, in
 
 void Producer::update()
 {
-	multimap<UnitType, Unit*> free;
-	for (multimap<UnitType, Unit*>::const_iterator it = _producingStructures.begin();
+	if (_producingStructures.empty()) // hack for the start (to add the first Nexus) because units does not exist in the cstor
+	{
+		UnitType centerType = Broodwar->self()->getRace().getCenter();
+		set<Unit*> centers = SelectAll(centerType);
+		for (set<Unit*>::const_iterator it = centers.begin();
+			it != centers.end(); ++it)
+			_producingStructures.insert(make_pair<UnitType, ProducingUnit>(centerType, *it));
+	}
+
+	multimap<UnitType, ProducingUnit> free;
+	for (multimap<UnitType, ProducingUnit>::const_iterator it = _producingStructures.begin();
 		it != _producingStructures.end(); ++it)
 	{
-		if (it->second->isIdle())
+		if (Broodwar->getFrameCount() - it->second.lastAction > Broodwar->getLatencyFrames()
+			&& (it->second->isIdle() || 
+			(it->second->getRemainingTrainTime() <= Broodwar->getLatencyFrames() && it->second->getTrainingQueue().size() <= 1)))
 			free.insert(*it);
 	}
 	if (free.empty())
@@ -114,15 +136,16 @@ void Producer::update()
 	{
 		if (checkCanProduce(it->second))
 		{
-			multimap<UnitType, Unit*>::const_iterator builder = free.find(it->second.whatBuilds().first);
+			multimap<UnitType, ProducingUnit>::iterator builder = free.find(it->second.whatBuilds().first);
 			if (builder != free.end() // TODO Archons
 				&& minerals - rM >= it->second.mineralPrice()
 				&& gas - rG >= it->second.gasPrice())
 			{
-				builder->second->train(it->second);
+				builder->second.train(it->second);
 				minerals -= it->second.mineralPrice();
 				gas -= it->second.gasPrice();
 				free.erase(builder);
+				toRemove.push_back(it);
 			}
 		}
 	
@@ -150,10 +173,10 @@ void Producer::onUnitCreate(BWAPI::Unit* unit)
 
 void Producer::onUnitDestroy(BWAPI::Unit* unit)
 {
-	for (multimap<UnitType, Unit*>::const_iterator it = _producingStructures.begin();
+	for (multimap<UnitType, ProducingUnit>::const_iterator it = _producingStructures.begin();
 		it != _producingStructures.end(); ++it)
 	{
-		if (it->second == unit)
+		if (it->second.unit == unit)
 		{
 			_producingStructures.erase(it);
 			return;
@@ -178,7 +201,7 @@ void Producer::onOffer(set<Unit*> units)
 		if ((*it)->getType().canProduce())
 		{
 			TheArbitrator->accept(this, *it, 95);
-			_producingStructures.insert(make_pair<UnitType, Unit*>((*it)->getType(), *it));
+			_producingStructures.insert(make_pair<UnitType, ProducingUnit>((*it)->getType(), *it));
 		}
 		else
 			TheArbitrator->decline(this, *it, 0);
@@ -187,10 +210,10 @@ void Producer::onOffer(set<Unit*> units)
 
 void Producer::onRevoke(BWAPI::Unit* unit, double bid)
 {
-	for (multimap<UnitType, Unit*>::iterator it = _producingStructures.begin();
+	for (multimap<UnitType, ProducingUnit>::iterator it = _producingStructures.begin();
 		it != _producingStructures.end(); ++it)
 	{
-		if (it->second == unit)
+		if (it->second.unit == unit)
 		{
 			_producingStructures.erase(it);
 			return;

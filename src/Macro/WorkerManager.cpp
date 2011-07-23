@@ -220,7 +220,7 @@ void WorkerManager::rebalanceWorkers()
 	if (this->autoBuild)
 	{
 		BWAPI::UnitType workerType=BWAPI::Broodwar->self()->getRace().getWorker();
-		TheProducer->produce(optimalWorkerCount,workerType,this->autoBuildPriority);
+		TheProducer->produce(optimalWorkerCount*1.5,workerType,this->autoBuildPriority);
 	}
 }
 
@@ -268,7 +268,7 @@ void WorkerManager::update()
 				i->rightClick(resource);
 		if (i->isCarryingGas() || i->isCarryingMinerals())
 		{
-			if (i->getOrder() == Orders::ReturnGas || i->getOrder() == Orders::ReturnMinerals ||  (i->getOrder() == Orders::PlayerGuard && BWAPI::Broodwar->getFrameCount()>u->second.lastFrameSpam+BWAPI::Broodwar->getLatency()*2))
+			if (i->getOrder() == Orders::ReturnGas || i->getOrder() == Orders::ReturnMinerals ||  (i->getOrder() == Orders::PlayerGuard && BWAPI::Broodwar->getFrameCount()>u->second.lastFrameSpam+BWAPI::Broodwar->getLatencyFrames()*2))
 			{
 				u->second.lastFrameSpam=BWAPI::Broodwar->getFrameCount();
 				Base* b=TheBasesManager->getBase(BWTA::getNearestBaseLocation(i->getPosition()));

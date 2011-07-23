@@ -24,10 +24,10 @@ void HighTemplarUnit::micro()
             return;
     }
     int elapsed = Broodwar->getFrameCount() - _lastStormFrame;
-    if (elapsed <= Broodwar->getLatency() + getAttackDuration())
+    if (elapsed <= Broodwar->getLatencyFrames() + getAttackDuration())
         return;
     if (((!Broodwar->self()->hasResearched(BWAPI::TechTypes::Psionic_Storm) && unit->getEnergy() < 75) || unit->getEnergy() < 20 /* TODO */ || (unit->getEnergy() < 74 && unit->getHitPoints() < 20) 
-        || (unit->getEnergy() < 55 && unit->getShields() < 2)) && elapsed > Broodwar->getLatency() + getAttackDuration())
+        || (unit->getEnergy() < 55 && unit->getShields() < 2)) && elapsed > Broodwar->getLatencyFrames() + getAttackDuration())
     {
         _unitsGroup->signalMerge(unit);
         _mergingFrame = Broodwar->getFrameCount();
@@ -53,7 +53,7 @@ void HighTemplarUnit::micro()
     }
 
     // Try and storm if it has any advantage, otherwise flee or don't stuck
-    if (this->unit->getEnergy() > 75 && elapsed > Broodwar->getLatency() + getAttackDuration())
+    if (this->unit->getEnergy() > 75 && elapsed > Broodwar->getLatencyFrames() + getAttackDuration())
     {   
         Position bestStormPos;
         int bestScore = -1;
@@ -100,7 +100,7 @@ void HighTemplarUnit::micro()
     else
     {
         //fightMove();
-        if (Broodwar->getFrameCount() - _lastClickFrame <= Broodwar->getLatency())
+        if (Broodwar->getFrameCount() - _lastClickFrame <= Broodwar->getLatencyFrames())
             return;
         if (_unitsGroup->distToNearestChoke < 128.0 && _unitsGroup->enemiesAltitude > _unitsGroup->groupAltitude)
         {

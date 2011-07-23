@@ -29,7 +29,7 @@ ReaverUnit::~ReaverUnit()
 
 void ReaverUnit::micro()
 {
-    if (unit->getScarabCount() && (Broodwar->getFrameCount() - _lastAttackFrame) > (Broodwar->getLatency() + getAttackDuration()))
+    if (unit->getScarabCount() && (Broodwar->getFrameCount() - _lastAttackFrame) > (Broodwar->getLatencyFrames() + getAttackDuration()))
     {
         updateRangeEnemies();
         updateTargetEnemy();
