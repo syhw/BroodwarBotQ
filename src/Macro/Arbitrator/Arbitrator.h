@@ -249,7 +249,7 @@ namespace Arbitrator
   {
     //returns all bidders for this object
     std::list< std::pair<Controller<_Tp,_Val>*, _Val> > bidders;
-    if (bids.find(obj)==bids.end())
+    if (bids.find(obj)==bids.end() || bids.find(obj)->second.empty())
       return bidders; //return empty list if we cannot find this object
 
     Heap<Controller<_Tp,_Val>*, _Val> bid_heap=bids.find(obj)->second; //get the bid heap
@@ -355,6 +355,14 @@ namespace Arbitrator
 			toRemove.push_back(it->first);
 	}
 	for each (Controller<_Tp, _Val>* c in toRemove)
-		objects.erase(c); // CARE TODO (end)
+	{
+		for (std::map<_Tp,Heap<Controller<_Tp,_Val>*, _Val> >::iterator it = bids.begin();
+			it != bids.end(); ++it)
+		{
+			if (it->second.contains(c))
+				it->second.erase(c);
+		}
+		objects.erase(c); 
+	} // CARE TODO (end)
   }
 }
