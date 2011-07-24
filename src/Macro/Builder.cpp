@@ -152,7 +152,8 @@ void Task::update()
 			break;
 		}
 	}
-	if (Broodwar->self()->minerals() < type.mineralPrice() && Broodwar->self()->gas() < type.gasPrice())
+	if (Broodwar->self()->minerals() < type.mineralPrice() // TODO complete with rates
+		&& Broodwar->self()->gas() < type.gasPrice())
 		return;
 	else if (worker == NULL)
 		askWorker();

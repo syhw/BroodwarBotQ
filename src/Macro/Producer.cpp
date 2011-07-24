@@ -121,14 +121,10 @@ void Producer::update()
 			_producingStructures.insert(make_pair<UnitType, ProducingUnit>(centerType, *it));
 	}
 
-	Broodwar->printf("Latency frames %d", Broodwar->getLatencyFrames());
-	int currentFrame = Broodwar->getFrameCount();
-
 	multimap<UnitType, ProducingUnit*> free;
 	for (multimap<UnitType, ProducingUnit>::iterator it = _producingStructures.begin();
 		it != _producingStructures.end(); ++it)
 	{
-		Broodwar->printf("Remaining train time: %d", it->second->getRemainingTrainTime());
 		if (Broodwar->getFrameCount() - it->second.lastAction > Broodwar->getLatencyFrames()
 			&& (it->second->isIdle() || 
 			(it->second->getRemainingTrainTime() <= Broodwar->getLatencyFrames() && it->second->getTrainingQueue().size() <= 1)))
@@ -172,7 +168,7 @@ void Producer::onUnitCreate(BWAPI::Unit* unit)
 {
 	if (unit->getPlayer() != Broodwar->self())
 		return;
-	if (unit->getType().canProduce())
+	if (unit->getType().isBuilding() && unit->getType().canProduce())
 		TheArbitrator->setBid(this, unit, 80);
 	else if (unit->getType() == UnitTypes::Protoss_Cybernetics_Core
 		|| unit->getType() == UnitTypes::Protoss_Robotics_Support_Bay

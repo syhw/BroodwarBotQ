@@ -1,8 +1,10 @@
 #include <PrecompiledHeader.h>
 #include "Macro/ResourceRates.h"
-using namespace BWAPI;
-ResourceRates* TheResourceRates = NULL;
+#include "Defines.h"
 
+using namespace BWAPI;
+
+ResourceRates* TheResourceRates = NULL;
 
 ResourceRates* ResourceRates::create()
 {
@@ -25,6 +27,9 @@ ResourceRates::~ResourceRates()
 }
 void ResourceRates::update()
 {
+#ifdef __DEBUG__
+	Broodwar->drawTextScreen(200, 20, "\x11 M/min: %d, G/min: %d", (int)gatherRate.getMinerals(), (int)gatherRate.getGas());
+#endif
   if (Broodwar->isPaused()) return;
   if (Broodwar->getFrameCount()%gatherRateStepSize==0)
   {
