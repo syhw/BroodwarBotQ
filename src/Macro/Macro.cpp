@@ -59,6 +59,11 @@ void Macro::init()
 
 void Macro::update()
 {
+	if (reservedMinerals < 0) // safety
+		reservedMinerals = 0;
+	if (reservedGas < 0)
+		reservedGas = 0;
+
 	// TODO PRODUCTION
 	//TheUpgrader->update();
 	TheProducer->update();

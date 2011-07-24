@@ -9,6 +9,7 @@ struct ProducingUnit
 	int lastAction;
 	BWAPI::Unit* unit;
 	ProducingUnit(BWAPI::Unit* u);
+	explicit ProducingUnit(const ProducingUnit& pu);
 	BWAPI::Unit* operator->() const;
 	void train(BWAPI::UnitType t);
 };

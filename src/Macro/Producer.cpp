@@ -12,15 +12,23 @@ ProducingUnit::ProducingUnit(Unit* u)
 , lastAction(-24)
 {
 }
+
+ProducingUnit::ProducingUnit(const ProducingUnit& pu)
+: unit(pu.unit)
+, lastAction(pu.lastAction)
+{
+}
+
 Unit* ProducingUnit::operator->() const
 {
 	return unit;
 }
+
 void ProducingUnit::train(UnitType t)
 {
-	if (Broodwar->getFrameCount() - lastAction > Broodwar->getLatencyFrames())
+	if (Broodwar->getFrameCount() - lastAction > 2*Broodwar->getLatencyFrames() + 1)
 	{
-		lastAction = Broodwar->getFrameCount();
+		this->lastAction = Broodwar->getFrameCount();
 		unit->train(t);
 	}
 }
@@ -113,14 +121,18 @@ void Producer::update()
 			_producingStructures.insert(make_pair<UnitType, ProducingUnit>(centerType, *it));
 	}
 
-	multimap<UnitType, ProducingUnit> free;
-	for (multimap<UnitType, ProducingUnit>::const_iterator it = _producingStructures.begin();
+	Broodwar->printf("Latency frames %d", Broodwar->getLatencyFrames());
+	int currentFrame = Broodwar->getFrameCount();
+
+	multimap<UnitType, ProducingUnit*> free;
+	for (multimap<UnitType, ProducingUnit>::iterator it = _producingStructures.begin();
 		it != _producingStructures.end(); ++it)
 	{
+		Broodwar->printf("Remaining train time: %d", it->second->getRemainingTrainTime());
 		if (Broodwar->getFrameCount() - it->second.lastAction > Broodwar->getLatencyFrames()
 			&& (it->second->isIdle() || 
 			(it->second->getRemainingTrainTime() <= Broodwar->getLatencyFrames() && it->second->getTrainingQueue().size() <= 1)))
-			free.insert(*it);
+			free.insert(make_pair<UnitType, ProducingUnit*>(it->first, &(it->second)));
 	}
 	if (free.empty())
 		return;
@@ -136,12 +148,13 @@ void Producer::update()
 	{
 		if (checkCanProduce(it->second))
 		{
-			multimap<UnitType, ProducingUnit>::iterator builder = free.find(it->second.whatBuilds().first);
+			multimap<UnitType, ProducingUnit*>::iterator builder = free.find(it->second.whatBuilds().first);
 			if (builder != free.end() // TODO Archons
 				&& minerals - rM >= it->second.mineralPrice()
-				&& gas - rG >= it->second.gasPrice())
+				&& gas - rG >= it->second.gasPrice()
+				&& Broodwar->self()->supplyTotal() - Broodwar->self()->supplyUsed () >= it->second.supplyRequired())
 			{
-				builder->second.train(it->second);
+				builder->second->train(it->second);
 				minerals -= it->second.mineralPrice();
 				gas -= it->second.gasPrice();
 				free.erase(builder);

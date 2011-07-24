@@ -220,7 +220,7 @@ void WorkerManager::rebalanceWorkers()
 	if (this->autoBuild)
 	{
 		BWAPI::UnitType workerType=BWAPI::Broodwar->self()->getRace().getWorker();
-		TheProducer->produce(optimalWorkerCount*1.5,workerType,this->autoBuildPriority);
+		TheProducer->produce((int)(optimalWorkerCount*1.5),workerType,this->autoBuildPriority);
 	}
 }
 

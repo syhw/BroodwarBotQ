@@ -22,6 +22,7 @@ void BasesManager::destroy()
 
 BasesManager::BasesManager()
 : firstGasPop(12)
+, expanding(false)
 {
 	TheBasesManager = this;
 }
@@ -43,7 +44,7 @@ void BasesManager::update()
 		if (location2base.find(location) == location2base.end())
 		{
 			TilePosition tile = location->getTilePosition();
-			for each(Unit* u in Broodwar->getUnitsOnTile(tile.x(), tile.y()))
+			for each (Unit* u in Broodwar->getUnitsOnTile(tile.x(), tile.y()))
 				if (u->getPlayer() == Broodwar->self() && u->getType().isResourceDepot())
 				{
 					allBases.push_back(new Base(location, u));
@@ -67,6 +68,8 @@ void BasesManager::update()
 			readyBases.insert(mb);
 		else
 			readyBases.erase(mb);
+		if (readyBases.size() == allBases.size())
+			expanding = false;
 	}
 }
 
@@ -80,6 +83,10 @@ Base* BasesManager::getBase(BWTA::BaseLocation* location)
 
 void BasesManager::expand(BWTA::BaseLocation* location)
 {
+	if (expanding)
+		return;
+	else
+		expanding = true;
 	if (location == NULL)
 	{
 		// Find closer expand location not taken

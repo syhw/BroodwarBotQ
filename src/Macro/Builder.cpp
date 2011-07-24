@@ -17,10 +17,6 @@ Task::Task(BWAPI::Unit* w, BWAPI::TilePosition tp, BWAPI::UnitType ut)
 , lastOrder(0)
 , finished(false)
 {
-	if (tilePosition == TilePositions::None)
-		tilePosition = buildingPlacer->getTilePosition(type);
-	Macro::Instance().reservedMinerals += type.mineralPrice();
-	Macro::Instance().reservedGas += type.gasPrice();
 }
 
 Task::~Task()
@@ -28,6 +24,14 @@ Task::~Task()
 	Macro::Instance().reservedMinerals -= type.mineralPrice();
 	Macro::Instance().reservedGas -= type.gasPrice();
 	TheArbitrator->removeAllBids(this);
+}
+
+void Task::init()
+{
+	if (tilePosition == TilePositions::None)
+		tilePosition = buildingPlacer->getTilePosition(type);
+	Macro::Instance().reservedMinerals += type.mineralPrice();
+	Macro::Instance().reservedGas += type.gasPrice();
 }
 
 void Task::onOffer(set<Unit*> units)
@@ -197,22 +201,27 @@ Builder::~Builder()
 
 void Builder::build(BWAPI::UnitType t, BWAPI::TilePosition seedPosition)
 {
-	//if (t = Broodwar->self()->getRace().getCenter())
-		//TheBasesManager->expand();
-	//else
-		tasks.push_back(Task(NULL, seedPosition, t));
+	if (t = Broodwar->self()->getRace().getCenter())
+		TheBasesManager->expand();
+	else
+	{
+		pTask tmp(new Task(NULL, seedPosition, t));
+		tmp->init();
+		tasks.push_back(tmp);
+	}
 }
 
 void Builder::buildOrder(BWAPI::UnitType t, int supplyAsTime, BWAPI::TilePosition seedPosition)
 {
-	boTasks.insert(make_pair<int, Task>(supplyAsTime, Task(NULL, seedPosition, t)));
+	pTask tmp(new Task(NULL, seedPosition, t));
+	boTasks.insert(make_pair<int, pTask>(supplyAsTime, tmp));
 }
 
 bool Builder::willBuild(UnitType t) // TODO change impl
 {
-	for each (Task task in tasks)
+	for each (pTask task in tasks)
 	{
-		if (task.getType() == t)
+		if (task->getType() == t)
 			return true;
 	}
 	return false;
@@ -227,15 +236,16 @@ void Builder::update()
 	if (!boTasks.empty())
 	{
 		list<int> toRemove;
-		for (multimap<int, Task>::iterator it = boTasks.begin();
+		for (multimap<int, pTask>::iterator it = boTasks.begin();
 			it != boTasks.end(); ++it)
 		{
 			if (it->first <= Broodwar->self()->supplyUsed()/2)
 			{
 #ifdef __DEBUG__
-				Broodwar->printf("Building %s pop %d", it->second.getName().c_str(), Broodwar->self()->supplyUsed()/2);
+				Broodwar->printf("Building %s pop %d", it->second->getName().c_str(), Broodwar->self()->supplyUsed()/2);
 #endif
 				tasks.push_front(it->second);
+				it->second->init();
 				toRemove.push_back(it->first);
 			}
 		}
@@ -244,13 +254,13 @@ void Builder::update()
 			boTasks.erase(*it);
 	}
 	/// Perform tasks
-	for (list<Task>::iterator it = tasks.begin();
+	for (list<pTask>::iterator it = tasks.begin();
 		it != tasks.end();)
 	{
-		list<Task>::iterator tmp = it++;
-		if (tmp->isFinished())
+		list<pTask>::iterator tmp = it++;
+		if ((*tmp)->isFinished())
 			tasks.erase(tmp);
 		else
-			tmp->update();
+			(*tmp)->update();
 	}
 }

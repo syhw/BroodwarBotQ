@@ -3,6 +3,10 @@
 #include "Macro/SimCityBuildingPlacer.h"
 #include <BWAPI.h>
 #include <list>
+#include <boost/shared_ptr.hpp>
+
+class Task;
+typedef boost::shared_ptr<Task> pTask;
 
 class Task : public Arbitrator::Controller<BWAPI::Unit*, double>
 {
@@ -14,6 +18,7 @@ class Task : public Arbitrator::Controller<BWAPI::Unit*, double>
 public:
 	static SimCityBuildingPlacer* buildingPlacer;
 	Task(BWAPI::Unit* w, BWAPI::TilePosition tp, BWAPI::UnitType ut);
+	void init();
 	~Task();
 	virtual void onOffer(std::set<BWAPI::Unit*> units);
 	virtual void onRevoke(BWAPI::Unit* unit, double bid);
@@ -37,8 +42,8 @@ public:
 	void update();
 private:
 	SimCityBuildingPlacer buildingPlacer;
-	std::list<Task> tasks;
-	std::multimap<int, Task> boTasks;
+	std::list<pTask> tasks;
+	std::multimap<int, pTask> boTasks;
 	Builder();
 	~Builder();
 };

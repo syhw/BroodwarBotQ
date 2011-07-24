@@ -30,6 +30,7 @@ public:
 
 private:
 	int firstGasPop;
+	bool expanding;
 	BasesManager();
 	~BasesManager();
 	std::list<Base*> allBases;
