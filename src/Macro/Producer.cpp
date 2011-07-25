@@ -82,6 +82,9 @@ bool Producer::checkCanProduce(UnitType t)
 	return ret;
 }
 
+/***
+ * Produce the difference between wanted _number_ and existing units
+ */
 void Producer::produce(int number, BWAPI::UnitType t, int priority, int increment)
 {
 	int add = max(0, number - SelectAll(t).size());
@@ -110,6 +113,26 @@ void Producer::produceAdditional(int number, BWAPI::UnitType t, int priority, in
 	}
 }
 
+int Producer::additionalUnitsSupply(int frames)
+{
+	int supply = 0;
+	if (frames > 30*24)
+		return _producingStructures.size() * 4;
+	else
+		return 2;
+	
+	/*std::multimap<BWAPI::UnitType, ProducingUnit> _producingStructures;
+	std::multimap<int, BWAPI::UnitType> _productionQueue;
+	for (multimap<UnitType, ProducingUnit>::const_iterator it = _producingStructures.begin();
+		it != _producingStructures.end(); ++it)
+	{
+		if (it->second->getRemainingTrainTime() < frames)
+		{
+
+		}
+	}*/
+}
+
 void Producer::update()
 {
 	/// hack for the start (to add the first Nexus) because units does not exist in the cstor
@@ -123,7 +146,13 @@ void Producer::update()
 	}
 
 	/// Organize/order supply to avoid supply block
-	//TODO
+	if (Broodwar->getFrameCount() % 27) // TODO change
+	{
+		int frames = UnitTypes::Protoss_Zealot.buildTime() + 5*24; // TODO change
+		if (additionalUnitsSupply(frames) + Broodwar->self()->supplyUsed() > TheBuilder->additionalSupplyNextFrames(frames) + Broodwar->self()->supplyTotal()
+			&& !TheBuilder->willBuild(Broodwar->self()->getRace().getSupplyProvider()))
+			TheBuilder->build(Broodwar->self()->getRace().getSupplyProvider());
+	}
 
     /// Find buildings free to produce units
 	multimap<UnitType, ProducingUnit*> free;

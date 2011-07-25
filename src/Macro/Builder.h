@@ -39,7 +39,8 @@ public:
 	void addTask(BWAPI::UnitType t, BWAPI::TilePosition seedPosition, int lastOrder=0);
 	void build(BWAPI::UnitType t, BWAPI::TilePosition seedPosition=BWAPI::TilePositions::None);
 	void buildOrder(BWAPI::UnitType t, int supplyAsTime, BWAPI::TilePosition seedPosition=BWAPI::TilePositions::None);
-	bool willBuild(BWAPI::UnitType t);
+	int willBuild(BWAPI::UnitType t);
+	int additionalSupplyNextFrames(int frames=30*24); // UnitTypes::Protoss_Pylon.buildTime()
 	void update();
 	const BWAPI::UnitType& nextBuildingType();
 	void onUnitCreate(BWAPI::Unit* unit);

@@ -8,7 +8,8 @@
 using namespace BWAPI;
 using namespace std;
 
-#define  __MIN_HP_CANCEL_BUILDING_IN_CONSTRUCTION__ 50
+#define __MIN_HP_CANCEL_BUILDING_IN_CONSTRUCTION__ 50
+#define __MIN_FRAMES_TO_START_CONSTRUCTION__ 5*24
 
 SimCityBuildingPlacer* Task::buildingPlacer = NULL;
 
@@ -226,14 +227,43 @@ void Builder::buildOrder(BWAPI::UnitType t, int supplyAsTime, BWAPI::TilePositio
 	boTasks.insert(make_pair<int, pTask>(supplyAsTime, tmp));
 }
 
-bool Builder::willBuild(UnitType t) // TODO change impl
+/***
+ * Counts the number of buildings of type _t_ that we will build
+ * (currently in the tasks pipeline).
+ */
+int Builder::willBuild(UnitType t)
 {
+	int number = 0;
 	for each (pTask task in tasks)
 	{
 		if (task->getType() == t)
-			return true;
+			++number;
 	}
-	return false;
+	return number;
+}
+
+/*** 
+ * Computes the number of additional supply that we can hope to have
+ * for _frames_ later
+ */
+int Builder::additionalSupplyNextFrames(int frames)
+{
+	int supply = 0;
+	if (frames > Broodwar->self()->getRace().getSupplyProvider().buildTime() + __MIN_FRAMES_TO_START_CONSTRUCTION__)
+	{
+		for each (pTask task in tasks)
+		{
+			if (task->getType().buildTime() < frames)
+				supply += task->getType().supplyProvided();
+		}
+	}
+	for each (Unit* u in inConstruction)
+	{
+	    if (u->getRemainingBuildTime() > frames)
+			continue;
+		supply += u->getType().supplyProvided();
+	}
+	return supply;
 }
 
 /***

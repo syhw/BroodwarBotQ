@@ -34,6 +34,7 @@ private:
 	std::multimap<BWAPI::UnitType, BWAPI::Unit*> _techStructures;
 	std::multimap<BWAPI::UnitType, ProducingUnit> _producingStructures;
 	std::multimap<int, BWAPI::UnitType> _productionQueue;
+	int additionalUnitsSupply(int frames=30*24); // UnitTypes::Protoss_Pylon.buildTime()
 	Producer();
 	~Producer();
 };

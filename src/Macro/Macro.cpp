@@ -131,6 +131,19 @@ void Macro::onUnitCreate(BWAPI::Unit* unit)
 	TheProducer->onUnitCreate(unit);
 	TheBuilder->onUnitCreate(unit);
 	//TheUpgrader->onUnitCreate(unit);
+
+	if (unit->getPlayer() == Broodwar->self())
+	{
+		if (unit->getType() == UnitTypes::Protoss_Cybernetics_Core)
+		{
+			TheProducer->produce(20, UnitTypes::Protoss_Zealot, 80, 2);
+			TheProducer->produce(40, UnitTypes::Protoss_Dragoon, 80);
+		}
+		else if (unit->getType() == UnitTypes::Protoss_Templar_Archives)
+		{
+			TheProducer->produce(10, UnitTypes::Protoss_High_Templar, 86, 5);
+		}
+	}
 }
 
 void Macro::onUnitDestroy(BWAPI::Unit* unit)
