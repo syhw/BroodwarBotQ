@@ -8,7 +8,7 @@
 using namespace BWAPI;
 using namespace std;
 
-#define  __MIN_HP_CANCEL_BUILDING_IN_CONSTRUCTION__ 20
+#define  __MIN_HP_CANCEL_BUILDING_IN_CONSTRUCTION__ 50
 
 SimCityBuildingPlacer* Task::buildingPlacer = NULL;
 
@@ -201,6 +201,7 @@ Builder::Builder()
 
 Builder::~Builder()
 {
+	tasks.clear();
 	TheBuilder = NULL;
 }
 
@@ -276,12 +277,15 @@ void Builder::update()
 		it != inConstruction.end(); )
 	{
 		list<Unit*>::iterator tmp = it++;
-		if (!(*it)->isBeingConstructed())
-			inConstruction.erase(tmp);
-		if ((*it)->isUnderAttack() && (*it)->getHitPoints() + (*it)->getShields() <= __MIN_HP_CANCEL_BUILDING_IN_CONSTRUCTION__)
+		if (!(*tmp)->isBeingConstructed())
 		{
-			addTask((*it)->getType(), (*it)->getTilePosition(), Broodwar->getFrameCount() + 2*Broodwar->getLatencyFrames() + 1); // TODO check if it works
-			(*it)->cancelConstruction();
+			inConstruction.erase(tmp);
+			continue;
+		}
+		if ((*tmp)->isUnderAttack() && (*tmp)->getHitPoints() + (*tmp)->getShields() <= __MIN_HP_CANCEL_BUILDING_IN_CONSTRUCTION__)
+		{
+			addTask((*tmp)->getType(), (*tmp)->getTilePosition(), Broodwar->getFrameCount() + 2*Broodwar->getLatencyFrames() + 1); // TODO check if tmp works
+			(*tmp)->cancelConstruction();
 		}
 	}
 }
