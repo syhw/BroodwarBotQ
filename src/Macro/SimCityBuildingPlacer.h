@@ -61,6 +61,7 @@ public:
 	void releaseTilePosition(const BWAPI::TilePosition& tp, const BWAPI::UnitType& ut);
 	void usedTilePosition(const BWAPI::TilePosition& tp, const BWAPI::UnitType& ut);
 	void update();
+	void onUnitDestroy(BWAPI::Unit* unit);
 private:
 	std::list<BWAPI::TilePosition> existingPylons;
 	PositionAccountant pylons;
@@ -78,6 +79,8 @@ private:
 		int nbTechBuildings, bool vertical, int cSize=0);
     inline void makeCannonsMinerals(BWTA::BaseLocation* home);
 	inline void generate();
+	inline std::set<BWAPI::Unit*> checkPower(const std::set<BWAPI::Unit*>& buildings);
+	inline bool powerBuildings(const std::set<BWAPI::Unit*>& buildings);
 	bool canBuildHere(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type) const;
 	bool fullCanBuildHere(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type) const; // double checks
 };

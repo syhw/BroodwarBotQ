@@ -129,6 +129,7 @@ void Macro::onUnitEvade(BWAPI::Unit* unit)
 void Macro::onUnitCreate(BWAPI::Unit* unit)
 {
 	TheProducer->onUnitCreate(unit);
+	TheBuilder->onUnitCreate(unit);
 	//TheUpgrader->onUnitCreate(unit);
 }
 
@@ -138,7 +139,7 @@ void Macro::onUnitDestroy(BWAPI::Unit* unit)
 	TheInformationManager->onUnitDestroy(unit);
 	TheBasesManager->onUnitDestroy(unit);
 	TheWorkerManager->onUnitDestroy(unit);
-	//TheBuilder->onUnitDestroy(unit);
+	TheBuilder->onUnitDestroy(unit);
 	TheProducer->onUnitDestroy(unit);
 	//TheUpgrader->onUnitDestroy(unit);
 }

@@ -112,7 +112,8 @@ void Producer::produceAdditional(int number, BWAPI::UnitType t, int priority, in
 
 void Producer::update()
 {
-	if (_producingStructures.empty()) // hack for the start (to add the first Nexus) because units does not exist in the cstor
+	/// hack for the start (to add the first Nexus) because units does not exist in the cstor
+	if (_producingStructures.empty())
 	{
 		UnitType centerType = Broodwar->self()->getRace().getCenter();
 		set<Unit*> centers = SelectAll(centerType);
@@ -121,6 +122,10 @@ void Producer::update()
 			_producingStructures.insert(make_pair<UnitType, ProducingUnit>(centerType, *it));
 	}
 
+	/// Organize/order supply to avoid supply block
+	//TODO
+
+    /// Find buildings free to produce units
 	multimap<UnitType, ProducingUnit*> free;
 	for (multimap<UnitType, ProducingUnit>::iterator it = _producingStructures.begin();
 		it != _producingStructures.end(); ++it)
@@ -132,8 +137,7 @@ void Producer::update()
 	}
 	if (free.empty())
 		return;
-
-	// launch new units productions
+	/// Launch new units productions
     int rM = Macro::Instance().reservedMinerals;
 	int rG = Macro::Instance().reservedGas;
 	int minerals = Broodwar->self()->minerals();
@@ -159,7 +163,7 @@ void Producer::update()
 		}
 	
 	}
-	// remove train orders that have been passed from the _productionQueue
+	/// Remove train orders that have been passed from the _productionQueue
 	for each (multimap<int, UnitType>::const_iterator it in toRemove)
 		_productionQueue.erase(it);
 }

@@ -8,13 +8,15 @@
 using namespace BWAPI;
 using namespace std;
 
+#define  __MIN_HP_CANCEL_BUILDING_IN_CONSTRUCTION__ 20
+
 SimCityBuildingPlacer* Task::buildingPlacer = NULL;
 
-Task::Task(BWAPI::Unit* w, BWAPI::TilePosition tp, BWAPI::UnitType ut)
+Task::Task(BWAPI::Unit* w, BWAPI::TilePosition tp, BWAPI::UnitType ut, int lo)
 : worker(w)
 , tilePosition(tp)
 , type(ut)
-, lastOrder(0)
+, lastOrder(lo)
 , finished(false)
 {
 }
@@ -36,7 +38,6 @@ void Task::init()
 
 void Task::onOffer(set<Unit*> units)
 {
-
 	if (worker != NULL && worker->exists()) // defensive prog
 	{
 		// not sure about that or re-taking a (new) working
@@ -124,6 +125,9 @@ string Task::getShortName() const
 
 void Task::update()
 {
+	if (Broodwar->getFrameCount() <= lastOrder) // delay hack
+		return;
+
 	/// Check if we have finished, or if there are blocking units we can move,
 	/// or if the build TilePosition is really blocked
 	for (set<Unit*>::const_iterator it = Broodwar->getUnitsOnTile(tilePosition.x(), tilePosition.y()).begin();
@@ -200,16 +204,19 @@ Builder::~Builder()
 	TheBuilder = NULL;
 }
 
+void Builder::addTask(UnitType t, TilePosition seedPosition, int lastOrder)
+{
+	pTask tmp(new Task(NULL, seedPosition, t, lastOrder));
+	tmp->init();
+	tasks.push_back(tmp);
+}
+
 void Builder::build(BWAPI::UnitType t, BWAPI::TilePosition seedPosition)
 {
 	if (t = Broodwar->self()->getRace().getCenter())
 		TheBasesManager->expand();
 	else
-	{
-		pTask tmp(new Task(NULL, seedPosition, t));
-		tmp->init();
-		tasks.push_back(tmp);
-	}
+		addTask(t, seedPosition);
 }
 
 void Builder::buildOrder(BWAPI::UnitType t, int supplyAsTime, BWAPI::TilePosition seedPosition)
@@ -264,4 +271,36 @@ void Builder::update()
 		else
 			(*tmp)->update();
 	}
+	/// Check buildings in construction
+	for (list<Unit*>::iterator it = inConstruction.begin();
+		it != inConstruction.end(); )
+	{
+		list<Unit*>::iterator tmp = it++;
+		if (!(*it)->isBeingConstructed())
+			inConstruction.erase(tmp);
+		if ((*it)->isUnderAttack() && (*it)->getHitPoints() + (*it)->getShields() <= __MIN_HP_CANCEL_BUILDING_IN_CONSTRUCTION__)
+		{
+			addTask((*it)->getType(), (*it)->getTilePosition(), Broodwar->getFrameCount() + 2*Broodwar->getLatencyFrames() + 1); // TODO check if it works
+			(*it)->cancelConstruction();
+		}
+	}
+}
+
+const UnitType& Builder::nextBuildingType()
+{
+	if (tasks.empty() && !boTasks.empty())
+		return boTasks.begin()->second->getType();
+	else
+		return tasks.front()->getType();
+}
+
+void Builder::onUnitCreate(Unit* unit)
+{
+	if (unit->getPlayer() == Broodwar->self() && unit->getType().isBuilding() && unit->isBeingConstructed())
+		inConstruction.push_back(unit);
+}
+
+void Builder::onUnitDestroy(Unit* unit)
+{
+	Task::buildingPlacer->onUnitDestroy(unit);
 }

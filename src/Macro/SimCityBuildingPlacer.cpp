@@ -4,9 +4,12 @@
 #include "Utils/Vec.h"
 #include "Regions/MapManager.h"
 #include "Macro/BasesManager.h"
+#include "Macro/Builder.h"
 
 using namespace std;
 using namespace BWAPI;
+
+/// TODO: more consistent/frequent buildings power (pylons coverage) checks (see onUnitDestroy) and convexity/hasPath checks
 
 /***
  * returns true if a (Manhattan, sure) path inside a square of size 
@@ -114,6 +117,97 @@ void SimCityBuildingPlacer::generate()
 		makeCluster(bc.center, 2, bc.vertical, bc.size);
 	else
 		Broodwar->printf("Could not generate a cluster");
+}
+
+set<Unit*> SimCityBuildingPlacer::checkPower(const set<Unit*>& buildings)
+{
+	set<Unit*> ret;
+	for (set<Unit*>::const_iterator it = buildings.begin();
+		it != buildings.end(); ++it)
+	{
+		if ((*it)->isUnpowered())
+			ret.insert(*it);
+	}
+    return ret;
+}
+
+/*** /!\
+ * Dumb heuristic, do not use (currently) elsewhere 
+ * than for "buildings destruction recovery"!!
+ */
+bool SimCityBuildingPlacer::powerBuildings(const set<Unit*>& buildings)
+{
+	if (buildings.empty() || !buildings.size()) // defensive
+		return true;
+	/// TODO dumb heuristic: to change, may not always succeed
+	Vec mid(0,0);
+	for (set<Unit*>::const_iterator it = buildings.begin();
+		it != buildings.end(); ++it)
+		mid += (*it)->getTilePosition();
+	mid /= buildings.size();
+	set<Unit*> tmp = buildings;
+	TilePosition topLeft(max(0, (int)mid.x - 1), max(0, (int)mid.y - 1));
+	TilePosition topRight(min(Broodwar->mapWidth() - 1, (int)mid.x + 1), max(0, (int)mid.y - 1)); // mapWidth() - 1 because the building TilePosition is the top left
+	TilePosition botLeft(max(0, (int)mid.x - 1), min(Broodwar->mapHeight() - 2, (int)mid.y + 1)); // mapHeight() - 2 because the bottom line Tiles are not buildable
+	TilePosition botRight(min(Broodwar->mapWidth() - 1, (int)mid.x + 1), min(Broodwar->mapHeight() - 2, (int)mid.y + 1));
+	TilePosition midTp = mid.toTilePosition();
+	if (midTp.hasPath(TilePosition(home->getTilePosition().x() - 1, home->getTilePosition().y() - 1))
+		&& Broodwar->canBuildHere(NULL, midTp, UnitTypes::Protoss_Pylon)
+		&& Broodwar->canBuildHere(NULL, topLeft, UnitTypes::Protoss_Pylon) // check if we can walk all around
+		&& Broodwar->canBuildHere(NULL, topRight, UnitTypes::Protoss_Pylon)
+		&& Broodwar->canBuildHere(NULL, botLeft, UnitTypes::Protoss_Pylon)
+		&& Broodwar->canBuildHere(NULL, botRight, UnitTypes::Protoss_Pylon))
+	{
+		TheBuilder->build(UnitTypes::Protoss_Pylon, midTp);
+		set<Unit*> inRadius = Broodwar->getUnitsInRadius(mid.toPosition(), 32*6);
+		for (set<Unit*>::const_iterator it = inRadius.begin();
+			it != inRadius.end(); ++it)
+			tmp.erase(*it);
+	}
+	int count = 0;
+	int maxCount = tmp.size();
+	while (tmp.size() && count < maxCount)
+	{
+		// try left
+		int xTp = min(0, (*tmp.begin())->getTilePosition().x() - 1);
+		mid = Vec(xTp, (*tmp.begin())->getTilePosition().y());
+		TilePosition topLeft(max(0, (int)mid.x - 1), max(0, (int)mid.y - 1));
+		TilePosition botLeft(max(0, (int)mid.x - 1), min(Broodwar->mapHeight() - 2, (int)mid.y + 1)); // mapHeight() - 2 because the bottom line Tiles are not buildable
+		midTp = mid.toTilePosition();
+		if (midTp.hasPath(TilePosition(home->getTilePosition().x() - 1, home->getTilePosition().y() - 1))
+			&& Broodwar->canBuildHere(NULL, midTp, UnitTypes::Protoss_Pylon)
+			&& Broodwar->canBuildHere(NULL, topLeft, UnitTypes::Protoss_Pylon) // check if we can walk around
+			&& Broodwar->canBuildHere(NULL, botLeft, UnitTypes::Protoss_Pylon))
+		{
+			TheBuilder->build(UnitTypes::Protoss_Pylon, midTp);
+			set<Unit*> inRadius = Broodwar->getUnitsInRadius(mid.toPosition(), 32*6);
+			for (set<Unit*>::const_iterator it = inRadius.begin();
+				it != inRadius.end(); ++it)
+				tmp.erase(*it);
+		}
+		else
+		{
+			// try right
+			xTp = max(Broodwar->mapWidth(), (*tmp.begin())->getTilePosition().x() + (*tmp.begin())->getType().tileWidth());
+			mid = Vec(xTp, (*tmp.begin())->getTilePosition().y());
+			TilePosition topRight(min(Broodwar->mapWidth() - 1, (int)mid.x + 1), max(0, (int)mid.y - 1)); // mapWidth() - 1 because the building TilePosition is the top left
+			TilePosition botRight(min(Broodwar->mapWidth() - 1, (int)mid.x + 1), min(Broodwar->mapHeight() - 2, (int)mid.y + 1));
+			midTp = mid.toTilePosition();
+			if (midTp.hasPath(TilePosition(home->getTilePosition().x() - 1, home->getTilePosition().y() - 1))
+				&& Broodwar->canBuildHere(NULL, mid.toTilePosition(), UnitTypes::Protoss_Pylon)
+				&& Broodwar->canBuildHere(NULL, topRight, UnitTypes::Protoss_Pylon) // check if we can walk around
+				&& Broodwar->canBuildHere(NULL, botRight, UnitTypes::Protoss_Pylon))
+			{
+				TheBuilder->build(UnitTypes::Protoss_Pylon, midTp);
+				set<Unit*> inRadius = Broodwar->getUnitsInRadius(mid.toPosition(), 32*6);
+				for (set<Unit*>::const_iterator it = inRadius.begin();
+					it != inRadius.end(); ++it)
+					tmp.erase(*it);
+			}
+		}
+		++count;
+	}
+	return tmp.empty();
 }
 
 BuildingsCluster SimCityBuildingPlacer::searchForCluster(BWTA::Region* r)
@@ -706,6 +800,67 @@ void SimCityBuildingPlacer::update()
 #endif
 	if (pylons.pos.size() < 2 || gates.pos.size() < 2 || tech.pos.size() < 2)
 		generate();
+}
+
+void SimCityBuildingPlacer::onUnitDestroy(Unit* unit)
+{
+	if (unit->getPlayer() == Broodwar->self() && unit->getType().isBuilding())
+	{
+		UnitType ut = unit->getType();
+		TilePosition tp = unit->getTilePosition();
+		set<Unit*> closeBuildings = Broodwar->getUnitsInRadius(Position(tp), 8*32);
+		if (tp.hasPath(TilePosition(home->getTilePosition().x() - 1, home->getTilePosition().y() - 1))) // reput this is in the build list
+		{
+			if (ut == UnitTypes::Protoss_Pylon)
+			{
+				set<Unit*> unpoweredBuildings = checkPower(closeBuildings);
+				if (unpoweredBuildings.size())
+					TheBuilder->build(ut, tp);
+				else
+					pylons.addAsSecondPos(tp); // not to wait too much
+			}
+			else if (ut == UnitTypes::Protoss_Gateway || ut == UnitTypes::Protoss_Stargate)
+				gates.addPos(tp);
+			else if (ut == UnitTypes::Protoss_Photon_Cannon)
+				cannons.addPos(tp);
+			else
+				tech.addPos(tp);
+		}
+		else // set rally points in order not to block units
+		{
+			set<Unit*> unpoweredBuildings = checkPower(closeBuildings);
+			if (unpoweredBuildings.size())
+				powerBuildings(unpoweredBuildings);
+			for (set<Unit*>::iterator it = closeBuildings.begin();
+				it != closeBuildings.end(); ++it)
+			{
+				if (ut == UnitTypes::Protoss_Gateway || ut == UnitTypes::Protoss_Robotics_Facility)
+				{
+					Vec tmp((*it)->getTilePosition().x() - tp.x(), (*it)->getTilePosition().y() - tp.y());
+
+					/// precautions w.r.t. a pylon in the middle of gates
+					if (tmp.y > 0 && tmp.y < 6)
+					{
+						tmp.y += 3;
+						tmp.y = max(tmp.y, 7);
+					}
+					else if (tmp.y < 0)
+						tmp.y -= 1;
+					if (tmp.x > 0 && tmp.x < 7)
+					{
+						tmp.x += 4;
+						tmp.y = max(tmp.y, 8);
+					}
+					else if (tmp.x < 0)
+						tmp.x -= 1;
+
+					tmp.translate(Vec(tp.x(), tp.y()));
+					if (tmp.toTilePosition().isValid())
+						(*it)->setRallyPoint(Position(tmp.toTilePosition()));
+				}
+			}
+		}
+	}
 }
 
 bool SimCityBuildingPlacer::canBuildHere(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type) const

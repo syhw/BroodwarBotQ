@@ -15,6 +15,7 @@ struct Vec {
     Vec operator+(const BWAPI::Position& p) { return BWAPI::Position(p.x() + (int)x, p.y() + (int)y); }
     Vec operator+=(const Vec &b) { x += b.x; y += b.y; return *this; }
     Vec operator+=(const BWAPI::Position& p) { x += p.x(); y += p.y(); return *this; }
+    Vec operator+=(const BWAPI::TilePosition& p) { x += p.x(); y += p.y(); return *this; }
     Vec operator-(const Vec &b) const { return Vec(x-b.x,y-b.y); }
     Vec operator*(double b) const { return Vec(x*b,y*b); }
     Vec operator*=(const double b) { x *= b; y *= b; return *this; }
