@@ -36,10 +36,10 @@ class Builder
 public:
 	static Builder* create();
 	static void destroy();
-	void addTask(BWAPI::UnitType t, BWAPI::TilePosition seedPosition, int lastOrder=0);
-	void build(BWAPI::UnitType t, BWAPI::TilePosition seedPosition=BWAPI::TilePositions::None);
-	void buildOrder(BWAPI::UnitType t, int supplyAsTime, BWAPI::TilePosition seedPosition=BWAPI::TilePositions::None);
-	int willBuild(BWAPI::UnitType t);
+	void addTask(const BWAPI::UnitType& t, const BWAPI::TilePosition& seedPosition, int lastOrder=0);
+	void build(const BWAPI::UnitType& t, const BWAPI::TilePosition& seedPosition=BWAPI::TilePositions::None);
+	void buildOrder(const BWAPI::UnitType& t, int supplyAsTime, const BWAPI::TilePosition& seedPosition=BWAPI::TilePositions::None);
+	int willBuild(const BWAPI::UnitType& t);
 	int additionalSupplyNextFrames(int frames=30*24); // UnitTypes::Protoss_Pylon.buildTime()
 	void update();
 	const BWAPI::UnitType& nextBuildingType();

@@ -116,7 +116,7 @@ void Producer::produceAdditional(int number, BWAPI::UnitType t, int priority, in
 int Producer::additionalUnitsSupply(int frames)
 {
 	int supply = 0;
-	if (frames > 30*24)
+	if (frames > 20*24)
 		return _producingStructures.size() * 4;
 	else
 		return 2;

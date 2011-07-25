@@ -206,22 +206,22 @@ Builder::~Builder()
 	TheBuilder = NULL;
 }
 
-void Builder::addTask(UnitType t, TilePosition seedPosition, int lastOrder)
+void Builder::addTask(const UnitType& t, const TilePosition& seedPosition, int lastOrder)
 {
 	pTask tmp(new Task(NULL, seedPosition, t, lastOrder));
 	tmp->init();
 	tasks.push_back(tmp);
 }
 
-void Builder::build(BWAPI::UnitType t, BWAPI::TilePosition seedPosition)
+void Builder::build(const BWAPI::UnitType& t, const BWAPI::TilePosition& seedPosition)
 {
-	if (t = Broodwar->self()->getRace().getCenter())
+	if (t == Broodwar->self()->getRace().getCenter())
 		TheBasesManager->expand();
 	else
 		addTask(t, seedPosition);
 }
 
-void Builder::buildOrder(BWAPI::UnitType t, int supplyAsTime, BWAPI::TilePosition seedPosition)
+void Builder::buildOrder(const BWAPI::UnitType& t, int supplyAsTime, const BWAPI::TilePosition& seedPosition)
 {
 	pTask tmp(new Task(NULL, seedPosition, t));
 	boTasks.insert(make_pair<int, pTask>(supplyAsTime, tmp));
@@ -231,7 +231,7 @@ void Builder::buildOrder(BWAPI::UnitType t, int supplyAsTime, BWAPI::TilePositio
  * Counts the number of buildings of type _t_ that we will build
  * (currently in the tasks pipeline).
  */
-int Builder::willBuild(UnitType t)
+int Builder::willBuild(const UnitType& t)
 {
 	int number = 0;
 	for each (pTask task in tasks)
