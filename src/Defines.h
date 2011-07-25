@@ -9,9 +9,10 @@
 #define WALK_TILES_SIZE 8
 
 #ifdef __DEBUG__
-//#include <vld.h>
+#include <vld.h>
 #endif
 
 #ifndef __DEBUG__ // Perf
+#undef _SECURE_SCL
 #define _SECURE_SCL 0 // remove iterator runtime checks
 #endif

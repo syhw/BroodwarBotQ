@@ -28,7 +28,7 @@ ResourceRates::~ResourceRates()
 void ResourceRates::update()
 {
 #ifdef __DEBUG__
-	Broodwar->drawTextScreen(200, 20, "\x11 M/min: %d, G/min: %d", (int)(Broodwar->getFPS() * 60 * gatherRate.getMinerals()), 
+	Broodwar->drawTextScreen(130, 20, "\x11 M/min: %d, G/min: %d", (int)(Broodwar->getFPS() * 60 * gatherRate.getMinerals()), 
 		(int)(Broodwar->getFPS() * 60 * gatherRate.getGas()));
 #endif
   if (Broodwar->isPaused()) return;

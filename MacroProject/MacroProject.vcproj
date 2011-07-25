@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="MacroProject"
 	ProjectGUID="{F39C7417-770D-4635-8A47-77BD9CDDCD71}"
 	RootNamespace="MacroProject"
@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../src;../../BWAPI_3.6/include;../../BWAPI_3.6/include/BWAPI;../../BWAPI_3.6/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42../src;../../boost_1_42;&quot;C:\Program Files\Visual Leak Detector\include&quot;"
+				AdditionalIncludeDirectories="../src;../../BWAPI_3.6.1/include;../../BWAPI_3.6.1/include/BWAPI;../../BWAPI_3.6.1/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42../src;../../boost_1_42;&quot;C:\Program Files\Visual Leak Detector\include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
@@ -63,7 +63,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="../../BWAPI_3.6/lib/BWAPId.lib ../../BWAPI_3.6/lib/BWTAd.lib ../../BWAPI_3.6/lib/CGAL-vc90-mt-gd.lib ../../BWAPI_3.6/lib/gmp-vc90-mt-gd.lib ../../BWAPI_3.6/lib/libboost_thread-vc90-mt-gd-1_40.lib ../../BWAPI_3.6/lib/mpfr-vc90-mt-gd.lib ../../BWAPI_3.6/lib/tinyxmld.lib ../../boost_1_45_0/stage/lib/libboost_serialization-vc90-mt-gd-1_45.lib"
+				AdditionalDependencies="../../BWAPI_3.6.1/lib/BWAPId.lib ../../BWAPI_3.6.1/lib/BWTAd.lib ../../BWAPI_3.6.1/lib/CGAL-vc90-mt-gd.lib ../../BWAPI_3.6.1/lib/gmp-vc90-mt-gd.lib ../../BWAPI_3.6.1/lib/libboost_thread-vc90-mt-gd-1_40.lib ../../BWAPI_3.6.1/lib/mpfr-vc90-mt-gd.lib ../../BWAPI_3.6.1/lib/tinyxmld.lib ../../boost_1_45_0/stage/lib/libboost_serialization-vc90-mt-gd-1_45.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;C:\Program Files\Visual Leak Detector\lib&quot;"
 				IgnoreDefaultLibraryNames=""
@@ -121,7 +121,7 @@
 				Optimization="3"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="../src;../../BWAPI_3.6/include;../../BWAPI_3.6/include/BWAPI;../../BWAPI_3.6/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
+				AdditionalIncludeDirectories="../src;../../BWAPI_3.6.1/include;../../BWAPI_3.6.1/include/BWAPI;../../BWAPI_3.6.1/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
 				RuntimeLibrary="2"
@@ -145,7 +145,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="&#x0D;&#x0A;"
-				AdditionalDependencies="../../BWAPI_3.6/lib/BWAPI.lib ../../BWAPI_3.6/lib/BWTA.lib ../../BWAPI_3.6/lib/CGAL-vc90-mt.lib ../../BWAPI_3.6/lib/gmp-vc90-mt.lib ../../BWAPI_3.6/lib/libboost_thread-vc90-mt-1_40.lib ../../BWAPI_3.6/lib/mpfr-vc90-mt.lib ../../BWAPI_3.6/lib/tinyxml.lib ../../boost_1_45_0/stage/lib/libboost_serialization-vc90-mt-1_45.lib"
+				AdditionalDependencies="../../BWAPI_3.6.1/lib/BWAPI.lib ../../BWAPI_3.6.1/lib/BWTA.lib ../../BWAPI_3.6.1/lib/CGAL-vc90-mt.lib ../../BWAPI_3.6.1/lib/gmp-vc90-mt.lib ../../BWAPI_3.6.1/lib/libboost_thread-vc90-mt-1_40.lib ../../BWAPI_3.6.1/lib/mpfr-vc90-mt.lib ../../BWAPI_3.6.1/lib/tinyxml.lib ../../boost_1_45_0/stage/lib/libboost_serialization-vc90-mt-1_45.lib"
 				LinkIncremental="0"
 				AdditionalLibraryDirectories=""
 				IgnoreAllDefaultLibraries="false"
@@ -206,7 +206,7 @@
 				Optimization="0"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="../src;../../BWAPI_3.6/include;../../BWAPI_3.6/include/BWAPI;../../BWAPI_3.6/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
+				AdditionalIncludeDirectories="../src;../../BWAPI_3.6.1/include;../../BWAPI_3.6.1/include/BWAPI;../../BWAPI_3.6.1/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42;&quot;C:\Program Files\Visual Leak Detector\include&quot;"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
 				RuntimeLibrary="2"
@@ -229,8 +229,8 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="&#x0D;&#x0A;"
-				AdditionalDependencies="../../BWAPI_3.6/lib/BWAPI.lib ../../BWAPI_3.6/lib/BWTA.lib ../../BWAPI_3.6/lib/CGAL-vc90-mt.lib ../../BWAPI_3.6/lib/gmp-vc90-mt.lib ../../BWAPI_3.6/lib/libboost_thread-vc90-mt-1_40.lib ../../BWAPI_3.6/lib/mpfr-vc90-mt.lib ../../BWAPI_3.6/lib/tinyxml.lib ../../boost_1_45_0/stage/lib/libboost_serialization-vc90-mt-1_45.lib"
-				AdditionalLibraryDirectories=""
+				AdditionalDependencies="../../BWAPI_3.6.1/lib/BWAPI.lib ../../BWAPI_3.6.1/lib/BWTA.lib ../../BWAPI_3.6.1/lib/CGAL-vc90-mt.lib ../../BWAPI_3.6.1/lib/gmp-vc90-mt.lib ../../BWAPI_3.6.1/lib/libboost_thread-vc90-mt-1_40.lib ../../BWAPI_3.6.1/lib/mpfr-vc90-mt.lib ../../BWAPI_3.6.1/lib/tinyxml.lib ../../boost_1_45_0/stage/lib/libboost_serialization-vc90-mt-1_45.lib"
+				AdditionalLibraryDirectories="&quot;C:\Program Files\Visual Leak Detector\lib&quot;"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"

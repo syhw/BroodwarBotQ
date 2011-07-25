@@ -147,6 +147,7 @@ void BattleBroodAI::onFrame()
 void BattleBroodAI::onUnitCreate(BWAPI::Unit* unit)
 {
 	intelligence->onUnitCreate(unit);
+	macro->onUnitCreate(unit);
 	micro->onUnitCreate(unit);
 }
 

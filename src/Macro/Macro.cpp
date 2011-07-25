@@ -11,6 +11,7 @@ Macro::Macro()
 , reservedGas(0)
 {
 	TheArbitrator = & arbitrator;
+	ReservedMap::create();
 	Builder::create();
 	Producer::create();
 	//Upgrader::create();
@@ -21,12 +22,10 @@ Macro::Macro()
 	BasesManager::create();
 	UnitGroupManager::create();
 	WorkerManager::create();
-	ReservedMap::create();
 }
 
 Macro::~Macro()
 {
-	Builder::destroy();
 	Producer::destroy();
 	//Upgrader::destroy();
 	//SupplyManager::destroy();
@@ -37,6 +36,7 @@ Macro::~Macro()
 	UnitGroupManager::destroy();
 	WorkerManager::destroy();
 	ReservedMap::destroy();
+	Builder::destroy();
 }
 
 
