@@ -87,7 +87,7 @@ bool Producer::checkCanProduce(UnitType t)
  */
 void Producer::produce(int number, BWAPI::UnitType t, int priority, int increment)
 {
-	int add = max(0, number - SelectAll(t).size());
+	int add = max(0, number - Broodwar->self()->completedUnitCount(t));
 	produceAdditional(add, t, priority, increment);
 }
 

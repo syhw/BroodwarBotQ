@@ -35,6 +35,18 @@ void Task::init()
 		tilePosition = buildingPlacer->getTilePosition(type);
 	Macro::Instance().reservedMinerals += type.mineralPrice();
 	Macro::Instance().reservedGas += type.gasPrice();
+	map<UnitType, int> rqU = type.requiredUnits();
+	for (map<UnitType, int>::const_iterator it = rqU.begin();
+		it != rqU.end(); ++it)
+	{
+		if (Broodwar->self()->completedUnitCount(it->first) < it->second)
+		{
+			TheBuilder->build(it->first); // could recurse on the last addition to the Task list but it's evil
+			if (!lastOrder)
+				lastOrder += Broodwar->getFrameCount();
+			lastOrder += it->first.buildTime() + __MIN_FRAMES_TO_START_CONSTRUCTION__;
+		}
+	}
 }
 
 void Task::onOffer(set<Unit*> units)
@@ -166,8 +178,8 @@ void Task::update()
 			break;
 		}
 	}
-	if (Broodwar->self()->minerals() < type.mineralPrice() - 32 // TODO complete with rates (distance*rate/speed)
-		&& Broodwar->self()->gas() < type.gasPrice() - 16)
+	if (Broodwar->self()->minerals() < type.mineralPrice() - 26 // TODO complete with rates (distance*rate/speed)
+		&& Broodwar->self()->gas() < type.gasPrice() - 10)
 		return;
 	else if (worker == NULL || !worker->exists())
 		askWorker();
