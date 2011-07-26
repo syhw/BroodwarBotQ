@@ -157,8 +157,8 @@ void Task::update()
 			break;
 		}
 	}
-	if (Broodwar->self()->minerals() < type.mineralPrice() // TODO complete with rates
-		&& Broodwar->self()->gas() < type.gasPrice())
+	if (Broodwar->self()->minerals() < type.mineralPrice() - 40 // TODO complete with rates (distance*rate/speed)
+		&& Broodwar->self()->gas() < type.gasPrice() - 20)
 		return;
 	else if (worker == NULL)
 		askWorker();
@@ -242,9 +242,15 @@ int Builder::willBuild(const UnitType& t)
 	return number;
 }
 
+const list<Unit*>& Builder::getInConstruction()
+{
+	return inConstruction;
+}
+
 /*** 
  * Computes the number of additional supply that we can hope to have
- * for _frames_ later
+ * for _frames_ later.
+ * Should perhaps be done with events (maintaining an "additionalSupply" int)
  */
 int Builder::additionalSupplyNextFrames(int frames)
 {
@@ -271,6 +277,12 @@ int Builder::additionalSupplyNextFrames(int frames)
 */
 void Builder::update()
 {
+	Position p1(1, 1);
+	Position p2(10000, 10000);
+	Broodwar->drawTextScreen(100,100, "dist 1 approx: %d vs precise %5.5f", p1.getApproxDistance(p2),
+		p1.getDistance(p2));
+	//Broodwar->drawTextScreen(100,120, "dist 2 gas approx: %d vs precise %5.5f", tmp1->getPosition().getApproxDistance((*(tmp1->getGeysers().begin()))->getPosition()),
+	//	tmp1->getPosition().getDistance((*(tmp1->getGeysers().begin()))->getPosition()));
 	/// Follow the BO
 	if (!boTasks.empty())
 	{

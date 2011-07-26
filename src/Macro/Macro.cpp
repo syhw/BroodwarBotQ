@@ -59,6 +59,9 @@ void Macro::init()
 
 void Macro::update()
 {
+#ifdef __DEBUG__
+	Broodwar->drawTextScreen(130, 40, "\x11 rM: %d, rG: %d", reservedMinerals, reservedGas);
+#endif
 	if (reservedMinerals < 0) // safety
 		reservedMinerals = 0;
 	if (reservedGas < 0)

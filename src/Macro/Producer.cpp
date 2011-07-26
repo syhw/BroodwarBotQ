@@ -113,24 +113,38 @@ void Producer::produceAdditional(int number, BWAPI::UnitType t, int priority, in
 	}
 }
 
+/***
+ * Quick estimate of how many additional supply we would need for
+ * _frames_ frames later, for at more a production batch.
+ * Should perhaps be done with events (maintaining an "plan" datastructure)
+ */
 int Producer::additionalUnitsSupply(int frames)
 {
 	int supply = 0;
-	if (frames > 20*24)
-		return _producingStructures.size() * 4;
-	else
-		return 2;
-	
-	/*std::multimap<BWAPI::UnitType, ProducingUnit> _producingStructures;
-	std::multimap<int, BWAPI::UnitType> _productionQueue;
+	multimap<int, BWAPI::UnitType>::const_iterator pq = _productionQueue.begin();
 	for (multimap<UnitType, ProducingUnit>::const_iterator it = _producingStructures.begin();
 		it != _producingStructures.end(); ++it)
 	{
-		if (it->second->getRemainingTrainTime() < frames)
+		if (pq == _productionQueue.end())
+			return supply;
+		if (it->second->getRemainingTrainTime() < frames && pq->second.whatBuilds().first == it->second->getType())
 		{
-
+			supply += pq->second.supplyRequired();
+			++pq;
 		}
-	}*/
+	}
+	for (list<Unit*>::const_iterator it = TheBuilder->getInConstruction().begin();
+		it != TheBuilder->getInConstruction().end(); ++it)
+	{
+		if (pq == _productionQueue.end())
+			return supply;
+		if ((*it)->getRemainingBuildTime() < frames && pq->second.whatBuilds().first == (*it)->getType())
+		{
+			supply += pq->second.supplyRequired();
+			++pq;
+		}
+	}
+	return supply;
 }
 
 void Producer::update()
@@ -165,7 +179,10 @@ void Producer::update()
 			free.insert(make_pair<UnitType, ProducingUnit*>(it->first, &(it->second)));
 	}
 	if (free.empty())
+	{
+
 		return;
+	}
 	/// Launch new units productions
     int rM = Macro::Instance().reservedMinerals;
 	int rG = Macro::Instance().reservedGas;
