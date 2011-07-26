@@ -147,6 +147,11 @@ int Producer::additionalUnitsSupply(int frames)
 	return supply;
 }
 
+const UnitType& Producer::mostSaturatedUT()
+{
+	return UnitTypes::None;
+}
+
 void Producer::update()
 {
 	/// hack for the start (to add the first Nexus) because units does not exist in the cstor
@@ -160,12 +165,14 @@ void Producer::update()
 	}
 
 	/// Organize/order supply to avoid supply block
-	if (Broodwar->getFrameCount() % 27 && TheResourceRates->getGatherRate().getMinerals() < 0.00001) // TODO change
+	if (Broodwar->getFrameCount() % 27 && TheResourceRates->getGatherRate().getMinerals() > 0.00001) // TODO change
 	{
-		int frames = max(120*24, Broodwar->self()->getRace().getSupplyProvider().buildTime()
-			+ (int)(Broodwar->self()->getRace().getSupplyProvider().mineralPrice() / (TheResourceRates->getGatherRate().getMinerals()*24)) // important only if we perfectly consume our resources
+		int frames = max(120*24,
+			Broodwar->self()->getRace().getSupplyProvider().buildTime()
+			+ (int)(Broodwar->self()->getRace().getSupplyProvider().mineralPrice() / TheResourceRates->getGatherRate().getMinerals()) // important only if we perfectly consume our resources
 			+ 5*24); // should be the upper bound on the time to start building a pylon
 		if (!TheBuilder->willBuild(Broodwar->self()->getRace().getSupplyProvider()) &&
+			Broodwar->self()->supplyTotal() < 200 &&
 			additionalUnitsSupply(frames) + Broodwar->self()->supplyUsed() > TheBuilder->additionalSupplyNextFrames(frames) + Broodwar->self()->supplyTotal())
 			TheBuilder->build(Broodwar->self()->getRace().getSupplyProvider());
 	}
@@ -182,7 +189,12 @@ void Producer::update()
 	}
 	if (free.empty())
 	{
-// TODO TODO TODO s
+		if (Broodwar->getFrameCount() % 23)
+		{
+			UnitType tmp = mostSaturatedUT();
+			if (tmp != UnitTypes::None)
+				TheBuilder->build(tmp);
+		}
 		return;
 	}
 	/// Launch new units productions

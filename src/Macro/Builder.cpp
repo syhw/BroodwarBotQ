@@ -104,7 +104,16 @@ void Task::buildIt()
 {
 	if (Broodwar->getFrameCount() > lastOrder + 47 && worker && worker->exists())
 	{
-		worker->build(tilePosition, type);
+		if (worker->getPosition().getApproxDistance(Position(tilePosition)) > 4 * TILE_SIZE)
+		{
+			worker->move(Position(tilePosition));
+		}
+		else if (!worker->build(tilePosition, type))
+		{
+#ifdef __DEBUG__
+			Broodwar->printf("Can't build %s", type.getName().c_str());
+#endif
+		}
 		lastOrder = Broodwar->getFrameCount();
 	}
 }
@@ -157,10 +166,10 @@ void Task::update()
 			break;
 		}
 	}
-	if (Broodwar->self()->minerals() < type.mineralPrice() - 40 // TODO complete with rates (distance*rate/speed)
-		&& Broodwar->self()->gas() < type.gasPrice() - 20)
+	if (Broodwar->self()->minerals() < type.mineralPrice() - 32 // TODO complete with rates (distance*rate/speed)
+		&& Broodwar->self()->gas() < type.gasPrice() - 16)
 		return;
-	else if (worker == NULL)
+	else if (worker == NULL || !worker->exists())
 		askWorker();
 	else
 		buildIt();

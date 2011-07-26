@@ -139,12 +139,16 @@ void Macro::onUnitCreate(BWAPI::Unit* unit)
 	{
 		if (unit->getType() == UnitTypes::Protoss_Cybernetics_Core)
 		{
-			TheProducer->produce(20, UnitTypes::Protoss_Zealot, 80, 2);
-			TheProducer->produce(40, UnitTypes::Protoss_Dragoon, 80);
+			TheProducer->produce(8, UnitTypes::Protoss_Zealot, 80, 2);
+			TheProducer->produce(16, UnitTypes::Protoss_Dragoon, 80);
 		}
 		else if (unit->getType() == UnitTypes::Protoss_Templar_Archives)
 		{
-			TheProducer->produce(10, UnitTypes::Protoss_High_Templar, 86, 5);
+			TheProducer->produce(10, UnitTypes::Protoss_High_Templar, 86, 3);
+		}
+		else if (unit->getType() == UnitTypes::Protoss_Gateway && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway))
+		{
+			TheBuilder->build(UnitTypes::Protoss_Forge);
 		}
 	}
 }
