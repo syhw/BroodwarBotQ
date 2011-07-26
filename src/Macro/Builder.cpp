@@ -277,27 +277,6 @@ int Builder::additionalSupplyNextFrames(int frames)
 */
 void Builder::update()
 {
-	Position p1(1, 1);
-	Position p2(10000, 10000);
-
-	clock_t t1 = clock();
-	for (unsigned int i = 0; i < 100000000; ++i)
-	{
-		if (!p1.getApproxDistance(p2))
-			break;
-	}
-	clock_t t2 = clock();
-	for (unsigned int i = 0; i < 100000000; ++i)
-	{
-		if (!p1.getDistance(p2))
-			break;
-	}
-	clock_t t3 = clock();
-	Broodwar->drawTextScreen(100,100, "dist 1 approx: %d vs precise %5.5f", p1.getApproxDistance(p2),
-		p1.getDistance(p2));
-	Broodwar->drawTextScreen(100,118, "time approx %d, time precise: %d", t2-t1, t3-t2);
-	//Broodwar->drawTextScreen(100,120, "dist 2 gas approx: %d vs precise %5.5f", tmp1->getPosition().getApproxDistance((*(tmp1->getGeysers().begin()))->getPosition()),
-	//	tmp1->getPosition().getDistance((*(tmp1->getGeysers().begin()))->getPosition()));
 	/// Follow the BO
 	if (!boTasks.empty())
 	{

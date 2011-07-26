@@ -160,11 +160,13 @@ void Producer::update()
 	}
 
 	/// Organize/order supply to avoid supply block
-	if (Broodwar->getFrameCount() % 27) // TODO change
+	if (Broodwar->getFrameCount() % 27 && TheResourceRates->getGatherRate().getMinerals() < 0.00001) // TODO change
 	{
-		int frames = UnitTypes::Protoss_Zealot.buildTime() + 5*24; // TODO change
-		if (additionalUnitsSupply(frames) + Broodwar->self()->supplyUsed() > TheBuilder->additionalSupplyNextFrames(frames) + Broodwar->self()->supplyTotal()
-			&& !TheBuilder->willBuild(Broodwar->self()->getRace().getSupplyProvider()))
+		int frames = max(120*24, Broodwar->self()->getRace().getSupplyProvider().buildTime()
+			+ (int)(Broodwar->self()->getRace().getSupplyProvider().mineralPrice() / (TheResourceRates->getGatherRate().getMinerals()*24)) // important only if we perfectly consume our resources
+			+ 5*24); // should be the upper bound on the time to start building a pylon
+		if (!TheBuilder->willBuild(Broodwar->self()->getRace().getSupplyProvider()) &&
+			additionalUnitsSupply(frames) + Broodwar->self()->supplyUsed() > TheBuilder->additionalSupplyNextFrames(frames) + Broodwar->self()->supplyTotal())
 			TheBuilder->build(Broodwar->self()->getRace().getSupplyProvider());
 	}
 
@@ -180,7 +182,7 @@ void Producer::update()
 	}
 	if (free.empty())
 	{
-
+// TODO TODO TODO s
 		return;
 	}
 	/// Launch new units productions
