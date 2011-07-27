@@ -344,8 +344,7 @@ namespace Arbitrator
 					decline(i->first,*j,0);
 			}
 		}
-		this->inUpdate=false;
-
+		
 		// cleanup, CARE!!! TODO
 		std::list<Controller<_Tp, _Val>* > toRemove;
 		for (std::map<Controller<_Tp,_Val>*, std::set<_Tp> >::const_iterator it = objects.begin();
@@ -364,5 +363,7 @@ namespace Arbitrator
 			}
 			objects.erase(c); 
 		} // CARE TODO (end)
+
+		this->inUpdate=false;
 	}
 }
