@@ -8,8 +8,8 @@
 
 #define WALK_TILES_SIZE 8
 
-//#define __ARBITRATOR_CLEANUP__ // changes Arbitrator behavior
-#define __ARBITRATOR_REMOVE_BID_CLEANUP__
+#define __ARBITRATOR_CLEANUP__ // changes Arbitrator behavior, but is safe
+#define __ARBITRATOR_REMOVE_BID_CLEANUP__ // doesn't change Arbitrator behavior, but is not safe
 #ifdef __DEBUG__
 //#include <vld.h>
 #endif

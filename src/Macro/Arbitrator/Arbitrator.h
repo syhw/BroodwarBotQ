@@ -36,7 +36,7 @@ namespace Arbitrator
 		std::map<Controller<_Tp,_Val>*, std::set<_Tp> > objects;
 		std::set<_Tp> updatedObjects;
 		std::set<_Tp> objectsCanIncreaseBid;
-		std::set<_Tp> unansweredObjected;
+		std::set<_Tp> unansweredObjects;
 		bool inUpdate;
 		bool inOnOffer;
 		bool inOnRevoke;
@@ -139,7 +139,7 @@ namespace Arbitrator
 		if (bids[obj].top().first != c) //only the top bidder/controller can decline an object
 			return false;
 		updatedObjects.insert(obj);
-		unansweredObjected.erase(obj);
+		unansweredObjects.erase(obj);
 
 		//must decrease bid via decline()
 		if (bids[obj].contains(c) && bid>=bids[obj].get(c))
@@ -176,7 +176,7 @@ namespace Arbitrator
 			return false;
 		if (bids[obj].top().first != c) //only the top bidder/controller can accept an object
 			return false;
-		unansweredObjected.erase(obj);
+		unansweredObjects.erase(obj);
 		if (owner[obj]) //if someone else already own this object, take it away from them
 		{
 			inOnOffer=false;
@@ -212,7 +212,7 @@ namespace Arbitrator
 			return false;
 		if (bids[obj].top().first != c) //only the top bidder/controller can accept an object
 			return false;
-		unansweredObjected.erase(obj);
+		unansweredObjects.erase(obj);
 		if (owner[obj]) //if someone else already own this object, take it away from them
 		{
 			inOnOffer=false;
@@ -348,22 +348,22 @@ namespace Arbitrator
 			for(std::map< Controller<_Tp,_Val>*, std::set<_Tp> >::iterator i = objectsToOffer.begin(); i != objectsToOffer.end(); i++)
 			{
 				objectsCanIncreaseBid=i->second;
-				unansweredObjected=i->second;
+				unansweredObjects=i->second;
 
 				inOnOffer=true;
 				i->first->onOffer(i->second);
 				inOnOffer=false;
 
 				//decline all unanswered objects
-				for(std::set<_Tp>::iterator j=unansweredObjected.begin();j!=unansweredObjected.end();j++)
+				for(std::set<_Tp>::iterator j=unansweredObjects.begin();j!=unansweredObjects.end();j++)
 					decline(i->first,*j,0);
 			}
 		}
 		
 #ifdef __ARBITRATOR_CLEANUP__
-		// cleanup, CARE!!! TODO
-		// cleanup / garbage collection
+		// /!\ cleanup / garbage collection / CARE !! (hotfix/hack)
 		// removing controllers without units from the objects map and from bids
+		// /!\ changes the behavior of the Arbitrator (because units without objects have to re-setBid() to get some)
 		std::list<Controller<_Tp, _Val>* > toRemove;
 		for (std::map<Controller<_Tp,_Val>*, std::set<_Tp> >::const_iterator it = objects.begin();
 			it != objects.end(); ++it)

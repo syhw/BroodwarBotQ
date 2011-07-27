@@ -347,6 +347,12 @@ void Builder::update()
 	}
 #ifdef __DEBUG__
 	Task::buildingPlacer->update();
+	int dy = 0;
+	for each (pTask t in tasks)
+	{
+		Broodwar->drawTextScreen(320, 460 - dy, "%s", t->getName().c_str());
+		dy += 16;
+	}
 #endif
 }
 
