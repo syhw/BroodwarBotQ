@@ -84,8 +84,8 @@ public:
     const std::map<BWAPI::Bullet*, BWAPI::Position> & getTrackedStorms();
     BWAPI::Position closestWalkabableSameRegionOrConnected(BWAPI::Position p);
     BWAPI::TilePosition closestWalkabableSameRegionOrConnected(BWAPI::TilePosition tp);
-	inline bool isBTWalkable(int x, int y);
-	inline bool isBTWalkable(BWAPI::TilePosition tp);
+	bool isBTWalkable(int x, int y);
+	bool isBTWalkable(const BWAPI::TilePosition& tp);
     void drawBuildings();           // debug
     void drawBuildingsStrict();     // debug
     void drawWalkability();         // debug

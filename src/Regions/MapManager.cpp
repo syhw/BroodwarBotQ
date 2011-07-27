@@ -909,7 +909,7 @@ bool MapManager::isBTWalkable(int x, int y)
 		   && !buildings[x + y*Broodwar->mapWidth()];
 }
 
-bool MapManager::isBTWalkable(TilePosition tp)
+bool MapManager::isBTWalkable(const TilePosition& tp)
 {
 	return lowResWalkability[tp.x() + tp.y()*Broodwar->mapWidth()] 
 		   && !buildings[tp.x() + tp.y()*Broodwar->mapWidth()];

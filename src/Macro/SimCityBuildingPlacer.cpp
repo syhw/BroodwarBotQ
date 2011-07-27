@@ -36,16 +36,16 @@ inline bool existsInnerPath(const TilePosition& tp1,
 			it != from1.end(); ++it)
 		{
 			TilePosition tmp = TilePosition(it->x()+1, it->y());
-			if (mm->isBTWalkable(tmp) && !occupied.count(tmp))
+			if (mm->isBTWalkable(tmp) && !occupied.count(tmp) && !TheReservedMap->isReserved(tmp))
 				tmp1.insert(tmp);
 			tmp = TilePosition(it->x(), it->y()+1);
-			if (mm->isBTWalkable(tmp) && !occupied.count(tmp))
+			if (mm->isBTWalkable(tmp) && !occupied.count(tmp) && !TheReservedMap->isReserved(tmp))
 				tmp1.insert(tmp);
 			tmp = TilePosition(it->x()-1, it->y());
-			if (mm->isBTWalkable(tmp) && !occupied.count(tmp))
+			if (mm->isBTWalkable(tmp) && !occupied.count(tmp) && !TheReservedMap->isReserved(tmp))
 				tmp1.insert(tmp);
 			tmp = TilePosition(it->x(), it->y()-1);
-			if (mm->isBTWalkable(tmp) && !occupied.count(tmp))
+			if (mm->isBTWalkable(tmp) && !occupied.count(tmp) && !TheReservedMap->isReserved(tmp))
 				tmp1.insert(tmp);
 		}
 		tmp1.swap(from1);
@@ -56,22 +56,22 @@ inline bool existsInnerPath(const TilePosition& tp1,
 			TilePosition tmp = TilePosition(it->x()+1, it->y());
 			if (from1.count(tmp))
 				return true;
-			if (mm->isBTWalkable(tmp) && !occupied.count(tmp))
+			if (mm->isBTWalkable(tmp) && !occupied.count(tmp) && !TheReservedMap->isReserved(tmp))
 				tmp2.insert(tmp);
 			tmp = TilePosition(it->x(), it->y()+1);
 			if (from1.count(tmp))
 				return true;
-			if (mm->isBTWalkable(tmp) && !occupied.count(tmp))
+			if (mm->isBTWalkable(tmp) && !occupied.count(tmp) && !TheReservedMap->isReserved(tmp))
 				tmp2.insert(tmp);
 			tmp = TilePosition(it->x()-1, it->y());
 			if (from1.count(tmp))
 				return true;
-			if (mm->isBTWalkable(tmp) && !occupied.count(tmp))
+			if (mm->isBTWalkable(tmp) && !occupied.count(tmp) && !TheReservedMap->isReserved(tmp))
 				tmp2.insert(tmp);
 			tmp = TilePosition(it->x(), it->y()-1);
 			if (from1.count(tmp))
 				return true;
-			if (mm->isBTWalkable(tmp) && !occupied.count(tmp))
+			if (mm->isBTWalkable(tmp) && !occupied.count(tmp) && !TheReservedMap->isReserved(tmp))
 				tmp2.insert(tmp);
 		}
 		tmp2.swap(from2);
@@ -656,7 +656,156 @@ int SimCityBuildingPlacer::makeCluster(const TilePosition& center, int nbTechBui
 	return clusterSize;
 }
 
-void SimCityBuildingPlacer::makeCannonsMinerals(BWTA::BaseLocation* hom)
+
+/***
+ * As inefficient as possible
+ */
+TilePosition SimCityBuildingPlacer::closestBuildableSameRegion(const TilePosition& tp)
+{
+	BWTA::Region* r = BWTA::getRegion(tp);
+	for (int searchDim = 1; searchDim < 10; ++searchDim)
+		for (int x = -searchDim; x <= searchDim; ++x)
+			for (int y = -searchDim; y <= searchDim; ++y)
+			{
+				TilePosition tmp(tp.x() + x, tp.y() + y);
+				if (BWTA::getRegion(tmp) != r)
+					continue;
+				if (canBuildHere(NULL, tmp, UnitTypes::Protoss_Pylon))
+					return tmp;
+			}
+	return TilePositions::None;
+}
+
+/***
+ * As copy/pasted as possible
+ */
+TilePosition SimCityBuildingPlacer::closestBuildableSameRegionNotTP2(const TilePosition& tp, const TilePosition& tp2)
+{
+	BWTA::Region* r = BWTA::getRegion(tp);
+	for (int searchDim = 1; searchDim < 10; ++searchDim)
+		for (int x = -searchDim; x <= searchDim; ++x)
+			for (int y = -searchDim; y <= searchDim; ++y)
+			{
+				TilePosition tmp(tp.x() + x, tp.y() + y);
+				if (BWTA::getRegion(tmp) != r)
+					continue;
+				if (tmp == tp2)
+					continue;
+				if (canBuildHere(NULL, tmp, UnitTypes::Protoss_Pylon))
+					return tmp;
+			}
+	return TilePositions::None;
+}
+
+/*** /!\ SHITTY HEURISTIC
+ * If "quick", it puts the pylon quicker (second position of pylons)
+ */
+void SimCityBuildingPlacer::makeCannonChoke(BWTA::Region* inter, BWTA::Chokepoint* chok, bool quick)
+{
+	BWTA::Region* exter = chok->getRegions().first == inter ? chok->getRegions().second : chok->getRegions().first;
+	Position side1 = chok->getSides().first;
+	Position side2 = chok->getSides().second;
+	Vec dir(side1.x() - side2.x(), side1.y() - side2.y());
+	Vec parallel(dir); // save direction parallel to the choke
+	// rotate 90 deg CW
+	double tmp = dir.x;
+	dir.x = dir.y;
+	dir.y = -tmp;
+	dir = dir.normalize();
+	dir *= 2 * TILE_SIZE;
+	Position interP = Positions::None;
+	Position exterP = Positions::None;
+	/// Find two valid Positions for interP and exterP
+	while ((interP == Positions::None || exterP == Positions::None) && dir.norm() < 5 * chok->getWidth())
+	{
+		dir *= 2;
+		Position p1 = dir.translate(chok->getCenter());
+		Vec tmp(- dir.x, - dir.y);
+		Position p2 = tmp.translate(chok->getCenter());
+		interP = BWTA::getRegion(TilePosition(p1)) == inter ? p1 : p2;
+		exterP = BWTA::getRegion(TilePosition(p1)) == exter ? p1 : p2;
+	}
+	if (interP == Positions::None || exterP == Positions::None)
+	{
+		// we failed to determine internal and external Positions
+#ifdef __DEBUG__
+		Broodwar->printf("makeCannonChoke failed to determine internal and external positions of the choke");
+#endif
+		return;
+	}
+	/// Find an interTP seed TilePosition to build from
+	TilePosition interTP(interP);
+	TilePosition exterTP(exterP);
+	if (!canBuildHere(NULL, interTP, UnitTypes::Protoss_Pylon))
+		interTP = closestBuildableSameRegion(interTP);
+	if (interTP == TilePositions::None)
+	{
+		// failed again! :P
+#ifdef __DEBUG__
+		Broodwar->printf("makeCannonChoke failed to determine a buildable interTP tile");
+#endif
+		return;
+	}
+	Vec simpleDirPara = abs(parallel.x) > abs(parallel.y) ? Vec(parallel.x, 0) : Vec(0, parallel.y);
+	simpleDirPara = simpleDirPara.normalize() * 2; // cannon and pylons are 2 tiles high and large
+	Vec fromInterToExter(exterTP.x() - interTP.x(), exterTP.y() - interTP.y());
+	fromInterToExter = fromInterToExter.normalize();
+	fromInterToExter *= 1.6; // > sqrt(2) && < 2
+	Vec fromExterToInter(-exterTP.x() + interTP.x(), -exterTP.y() + interTP.y());
+	fromExterToInter = fromExterToInter.normalize();
+	fromExterToInter *= 1.6; // > sqrt(2) && < 2
+	TilePosition inner((Vec(interTP.x(), interTP.y()) + fromExterToInter + simpleDirPara).toTilePosition());
+	if (!canBuildHere(NULL, inner, UnitTypes::Protoss_Pylon))
+		inner = closestBuildableSameRegion(inner);
+
+	TilePosition pylon(interTP);
+	TilePosition cannon((simpleDirPara+Vec(interTP.x(), interTP.y())).toTilePosition());
+	if (!canBuildHere(NULL, cannon, UnitTypes::Protoss_Pylon))
+		cannon = closestBuildableSameRegionNotTP2(cannon, pylon);
+
+	set<TilePosition> tmpSet;
+	tmpSet.insert(pylon);
+	tmpSet.insert(cannon);
+	/// TODO see if blocked and if so try to move around the seed (interTP)
+	/*while (!existsInnerPath(inner, exterTP, tmpSet) && pylon.getDistance(interTP) < 3)
+	{
+		tmpSet.clear();
+		tmpSet.insert(pylon);
+		tmpSet.insert(cannon);
+	}*/
+
+	/*if (!existsInnerPath(inner, exterTP, tmpSet))
+	{
+		/// Try exterior then... (simpler)
+		pylon = exterTP;
+		cannon = ((simpleDirPara+Vec(exterTP.x(), exterTP.y())).toTilePosition());
+		tmpSet.clear();
+		tmpSet.insert(pylon);
+		tmpSet.insert(cannon);
+		TilePosition exxer((Vec(exterTP.x(), exterTP.y()) + fromInterToExter + simpleDirPara).toTilePosition());
+		if (!existsInnerPath(inner, exxer, tmpSet))
+		{
+			pylon = TilePositions::None;
+			cannon = TilePositions::None;
+		}
+	}*/
+
+	/// If not none and canBuild, then add at last...
+	if (pylon != TilePositions::None && cannon != TilePositions::None && canBuildHere(NULL, pylon, UnitTypes::Protoss_Pylon))
+	{
+		if (quick)
+			pylons.addAsSecondPos(pylon);
+		else
+			pylons.addPos(pylon);
+		if (canBuildHere(NULL, cannon, UnitTypes::Protoss_Pylon)) // voluntary Protoss_Pylon other canBuildHere takes powering into account
+			cannons.addPos(cannon);
+	}
+}
+
+/***
+ * If "quick", it puts the pylon quicker (second position of pylons)
+ */
+void SimCityBuildingPlacer::makeCannonsMinerals(BWTA::BaseLocation* hom, bool quick)
 {
 	int x = 0;
 	int y = 0;
@@ -731,10 +880,18 @@ void SimCityBuildingPlacer::makeCannonsMinerals(BWTA::BaseLocation* hom)
 				dist2b = tmpd2;
 			}
 		}
+	if (quick)
+	{
+		pylons.addAsSecondPos(pylon2); // order voluntary
+		pylons.addAsSecondPos(pylon1);
+	}
+	else
+	{
+		pylons.addPos(pylon1);
+		pylons.addPos(pylon2);
+	}
 	cannons.addPos(cannon1);
-	pylons.addPos(pylon1);
 	cannons.addPos(cannon2);
-	pylons.addPos(pylon2);
 }
 
 SimCityBuildingPlacer::SimCityBuildingPlacer()
@@ -775,11 +932,11 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 	if (!makeCluster(cluster_center, 1, vertical))
 		generate();
 
+	/// search places to put cannons at chokes
+	makeCannonChoke(home->getRegion(), frontChoke);
+
 	/// search places to put cannons behind minerals
 	makeCannonsMinerals(home);
-
-	/// search places to put cannons at chokes
-	// TODO
 }
 
 void SimCityBuildingPlacer::update()
@@ -811,6 +968,7 @@ void SimCityBuildingPlacer::onUnitDestroy(Unit* unit)
 		set<Unit*> closeBuildings = Broodwar->getUnitsInRadius(Position(tp), 8*32);
 		if (tp.hasPath(TilePosition(home->getTilePosition().x() - 1, home->getTilePosition().y() - 1))) // reput this is in the build list
 		{
+			TheReservedMap->freeTiles(tp, ut.tileWidth(), ut.tileHeight());
 			if (ut == UnitTypes::Protoss_Pylon)
 			{
 				set<Unit*> unpoweredBuildings = checkPower(closeBuildings);

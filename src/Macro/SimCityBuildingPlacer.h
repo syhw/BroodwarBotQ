@@ -77,7 +77,10 @@ private:
 	inline int canBuildCluster(const BWAPI::TilePosition& center, bool vertical);
 	inline int makeCluster(const BWAPI::TilePosition& center,
 		int nbTechBuildings, bool vertical, int cSize=0);
-    inline void makeCannonsMinerals(BWTA::BaseLocation* home);
+	BWAPI::TilePosition closestBuildableSameRegion(const BWAPI::TilePosition& tp);
+	BWAPI::TilePosition closestBuildableSameRegionNotTP2(const BWAPI::TilePosition& tp, const BWAPI::TilePosition& tp2);
+	inline void makeCannonChoke(BWTA::Region* inter, BWTA::Chokepoint* chok, bool quick=false);
+    inline void makeCannonsMinerals(BWTA::BaseLocation* home, bool quick=false);
 	inline void generate();
 	inline std::set<BWAPI::Unit*> checkPower(const std::set<BWAPI::Unit*>& buildings);
 	inline bool powerBuildings(const std::set<BWAPI::Unit*>& buildings);
