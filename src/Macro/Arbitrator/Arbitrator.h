@@ -2,6 +2,7 @@
 #include <list>
 #include <set>
 #include <map>
+#include "Defines.h"
 #include "Macro/Heap.h"
 #include "Controller.h"
 namespace Arbitrator
@@ -107,8 +108,23 @@ namespace Arbitrator
 	bool Arbitrator<_Tp,_Val>::removeAllBids(Controller<_Tp,_Val>* c)
 	{
 		if (objects.find(c)==objects.end())
-			return false;
-		return removeBid(c,objects[c]);
+			return false;	
+#ifdef __ARBITRATOR_REMOVE_BID_CLEANUP__
+		bool ret = removeBid(c,objects[c]);
+		objects.erase(c);
+		std::list<std::map<_Tp,Controller<_Tp,_Val>* >::iterator > toRemove;
+		for (std::map<_Tp,Controller<_Tp,_Val>* >::iterator it = owner.begin();
+			it != owner.end(); ++it)
+		{
+			if (it->second == c)
+				toRemove.push_back(it);
+		}
+		for each (std::map<_Tp,Controller<_Tp,_Val>* >::iterator it in toRemove)
+			owner.erase(it);
+		return ret;
+#else
+		return removeBid(c, objects[c]);
+#endif
 	}
 
 	template <class _Tp,class _Val>
@@ -260,7 +276,6 @@ namespace Arbitrator
 			bidders.push_back(bid_heap.top());
 			bid_heap.pop();
 		}
-		int i = bidders.size();
 		return bidders;
 	}
 
@@ -345,6 +360,7 @@ namespace Arbitrator
 			}
 		}
 		
+#ifdef __ARBITRATOR_CLEANUP__
 		// cleanup, CARE!!! TODO
 		// cleanup / garbage collection
 		// removing controllers without units from the objects map and from bids
@@ -364,7 +380,8 @@ namespace Arbitrator
 					it->second.erase(c);
 			}
 			objects.erase(c); 
-		} // CARE TODO (end)
+		}
+#endif
 
 		this->inUpdate=false;
 	}

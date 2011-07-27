@@ -8,8 +8,10 @@
 
 #define WALK_TILES_SIZE 8
 
+//#define __ARBITRATOR_CLEANUP__ // changes Arbitrator behavior
+#define __ARBITRATOR_REMOVE_BID_CLEANUP__
 #ifdef __DEBUG__
-#include <vld.h>
+//#include <vld.h>
 #endif
 
 #ifndef __DEBUG__ // Perf

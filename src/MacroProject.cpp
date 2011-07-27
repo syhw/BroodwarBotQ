@@ -111,7 +111,6 @@ void BattleBroodAI::onFrame()
 
 #ifdef __DEBUG__
     std::set<Unit*> units=Broodwar->self()->getUnits();
-    this->showManagerAssignments=true;
     if (this->showManagerAssignments)
     {
         for(std::set<Unit*>::iterator i=units.begin();i!=units.end();i++)
@@ -121,6 +120,8 @@ void BattleBroodAI::onFrame()
                 int x=(*i)->getPosition().x();
                 int y=(*i)->getPosition().y();
                 std::list< std::pair< Arbitrator::Controller<BWAPI::Unit*,double>*, double> > bids=TheArbitrator->getAllBidders(*i);
+				if (bids.empty())
+					continue;
                 int y_off=0;
                 bool first = false;
                 const char activeColor = '\x07', inactiveColor = '\x16';

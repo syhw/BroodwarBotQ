@@ -9,7 +9,7 @@ using namespace BWAPI;
 using namespace std;
 
 #define __MIN_HP_CANCEL_BUILDING_IN_CONSTRUCTION__ 50
-#define __MIN_FRAMES_TO_START_CONSTRUCTION__ 5*24
+#define __MIN_FRAMES_TO_START_CONSTRUCTION__ 10*24
 
 SimCityBuildingPlacer* Task::buildingPlacer = NULL;
 
