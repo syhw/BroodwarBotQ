@@ -178,8 +178,8 @@ void Task::update()
 			break;
 		}
 	}
-	if (Broodwar->self()->minerals() < type.mineralPrice() - 26 // TODO complete with rates (distance*rate/speed)
-		&& Broodwar->self()->gas() < type.gasPrice() - 10)
+	if (Broodwar->self()->minerals() < type.mineralPrice() - 30 // TODO complete with rates (distance*rate/speed)
+		&& Broodwar->self()->gas() < type.gasPrice() - 15)
 		return;
 	else if (worker == NULL || !worker->exists())
 		askWorker();
@@ -345,6 +345,9 @@ void Builder::update()
 			(*tmp)->cancelConstruction();
 		}
 	}
+#ifdef __DEBUG__
+	Task::buildingPlacer->update();
+#endif
 }
 
 const UnitType& Builder::nextBuildingType()

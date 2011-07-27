@@ -45,7 +45,7 @@ void Macro::init()
 	if (Broodwar->self()->getRace() == Races::Protoss)
 	{
 		TheWorkerManager->enableAutoBuild();
-		TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 8);
+		TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 7);
 		TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 10);
 		TheBasesManager->setFirstGasPop(12);
 		TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 14);

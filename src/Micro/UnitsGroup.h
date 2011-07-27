@@ -77,10 +77,12 @@ private:
     double evaluateForces();
     void displayTargets();  // debug purpose
 public:
+	inline void dispatchCompleteUnit(pBayesianUnit bu);
     void takeControl(BWAPI::Unit* u);
     void giveUpControl(BWAPI::Unit* u);
 	bool isWaiting(); //Return if the 1st goal is accomplished && no other goals
 	pGoal getLastGoal();
+    std::list<pBayesianUnit> incompleteUnits;
     std::list<pBayesianUnit> arrivingUnits;
     std::vector<BWAPI::Position> ppath;
     std::map<BWAPI::Unit*, BWAPI::Position> enemies;
@@ -127,6 +129,7 @@ public:
     virtual void onUnitShow(BWAPI::Unit* u);
     virtual void onUnitHide(BWAPI::Unit* u);
 
+	inline void updateGroupStrengh(BWAPI::Unit* u);
     int getTotalHP() const;
     std::vector<pBayesianUnit>* getUnits();
 

@@ -30,8 +30,6 @@ int round(double a)
     return int(a + 0.5);
 }
 
-#define __ARRIVING__UNITS__
-
 using namespace BWAPI;
 
 #define __MAX_DISTANCE_TO_GROUP__ 512
@@ -155,7 +153,7 @@ void align(std::vector<Position>& from, std::vector<Position>& to, std::vector<u
         std::vector<i_dist> temp;
         for(unsigned int ind_to = 0; ind_to < to.size(); ind_to++)
         {
-            temp.push_back(i_dist(ind_to, (*f).getDistance(to[ind_to])));
+            temp.push_back(i_dist(ind_to, (*f).getApproxDistance(to[ind_to])));
         }
         //temp.sort();
         sort(temp.begin(), temp.end(), comp_i_dist); // [0]: further, [size()-1]: closer
@@ -270,7 +268,19 @@ void UnitsGroup::update()
 		accomplishGoal();
 		return;
     }
-#ifdef __ARRIVING__UNITS__
+
+	for (std::list<pBayesianUnit>::iterator it = incompleteUnits.begin();
+		it != incompleteUnits.end(); )
+	{
+		if ((*it)->unit->isCompleted())
+		{
+			dispatchCompleteUnit(*it);
+			incompleteUnits.erase(it++);
+		}
+		else
+			++it;
+	}
+
     if (!arrivingUnits.empty())
     {
         if (units.size() <= 3)
@@ -287,9 +297,10 @@ void UnitsGroup::update()
             for (std::list<pBayesianUnit>::iterator it = arrivingUnits.begin();
                 it != arrivingUnits.end(); )
             {
-                if ((*it)->unit->getPosition().getDistance(center) < __MAX_DISTANCE_TO_GROUP__)
+                if ((*it)->unit->getPosition().getApproxDistance(center) < __MAX_DISTANCE_TO_GROUP__)
                 {
                     units.push_back(*it);
+					updateGroupStrengh((*it)->unit);
                     //goals.front()->achieve();
                     arrivingUnits.erase(it++);
                 }
@@ -302,7 +313,6 @@ void UnitsGroup::update()
             }
         }
     }
-#endif
 
     updateCenter();
     leadingUnit = units.front();
@@ -585,29 +595,34 @@ pBayesianUnit UnitsGroup::addUnit(Unit* u)
 	return tmp;
 }
 
-void UnitsGroup::takeControl(Unit* u)
+void UnitsGroup::dispatchCompleteUnit(pBayesianUnit bu)
 {
-	pBayesianUnit tmp = addUnit(u);
-#ifdef __ARRIVING__UNITS__
-    if (u->getDistance(center) < __MAX_DISTANCE_TO_GROUP__ || !units.size())
+	if (bu->unit->getPosition().getApproxDistance(center) < __MAX_DISTANCE_TO_GROUP__ || !units.size())
     {
-#endif
-		if (tmp.get() != NULL)
-            this->units.push_back(tmp);
-#ifdef __ARRIVING__UNITS__
+		units.push_back(bu);
+		updateGroupStrengh(bu->unit);
     }
     else
     {
-        u->attack(center);
-        if (tmp.get() != NULL)
-            this->arrivingUnits.push_back(tmp);
+        bu->unit->attack(center);
+        arrivingUnits.push_back(bu);
     }
+}
+
+void UnitsGroup::takeControl(Unit* u)
+{
+	pBayesianUnit tmp = addUnit(u);
+	if (tmp.get() == NULL)
+	{
+#ifdef __DEBUG__
+		Broodwar->printf("Took control of a unit I can't build a BayesianUnit from: %s", u->getType().getName().c_str());
 #endif
-    if (u->getType() == UnitTypes::Protoss_Observer)
-        _hasDetection = true;
-    totalMinPrice += u->getType().mineralPrice();
-    totalGazPrice += u->getType().gasPrice();
-    totalSupply += u->getType().supplyRequired();
+		return;
+	}
+	if (!u->isCompleted())
+		incompleteUnits.push_back(tmp);
+	else 
+		dispatchCompleteUnit(tmp);
 }
 
 bool BasicUnitsGroup::removeUnit(Unit* u)
@@ -648,6 +663,16 @@ bool BasicUnitsGroup::emptyGoals()
     return goals.empty();
 }
 
+void UnitsGroup::updateGroupStrengh(Unit* u)
+{
+	if (u->getType() == UnitTypes::Protoss_Observer)
+		_hasDetection = true;
+	totalMinPrice += u->getType().mineralPrice();
+	totalGazPrice += u->getType().gasPrice();
+	totalSupply += u->getType().supplyRequired();
+}
+
+
 int UnitsGroup::getTotalHP() const
 {
     return totalHP;
@@ -665,7 +690,7 @@ void UnitsGroup::updateNearbyEnemyUnitsFromFilter(BWAPI::Position p, double radi
     for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = _eUnitsFilter->getViewedUnits().begin();
         it != _eUnitsFilter->getViewedUnits().end(); ++it)
     {
-        if (it->second.position.getDistance(p) <= radius)
+        if (it->second.position.getApproxDistance(p) <= radius)
             enemies.insert(std::make_pair<Unit*, Position>(it->first, it->second.position));
     }
 }
@@ -688,7 +713,7 @@ void UnitsGroup::display()
         //Broodwar->drawCircle( CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), unit->getType().groundWeapon()->maxRange(), Colors::Red);
 
         // Target
-        if( true)//unit->getPosition().getDistance( target) < 200)
+        if( true)//unit->getPosition().getApproxDistance( target) < 200)
         {
             Broodwar->drawCircle( CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), 5, Colors::Cyan, true);
             Broodwar->drawLine( CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), target.x(), target.y(), Colors::Cyan);
@@ -732,7 +757,7 @@ void UnitsGroup::updateCenter()
     center.y() /= units.size();
     groupAltitude = round((double)groupAltitude / units.size());
     if (nearestChoke)
-        distToNearestChoke = nearestChoke->getCenter().getDistance(center);
+        distToNearestChoke = nearestChoke->getCenter().getApproxDistance(center);
     if (!nearestChoke || distToNearestChoke > 256)
     {
         nearestChoke = BWTA::getNearestChokepoint(center);
@@ -743,7 +768,7 @@ void UnitsGroup::updateCenter()
     double sum = 0.0;
     for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
     {
-        double dist = center.getDistance((*it)->unit->getPosition());
+        double dist = center.getApproxDistance((*it)->unit->getPosition());
         if (dist > maxRadius)
             maxRadius = dist;
         sum += (dist * dist);
