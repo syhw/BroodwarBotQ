@@ -346,6 +346,8 @@ namespace Arbitrator
 		}
 		
 		// cleanup, CARE!!! TODO
+		// cleanup / garbage collection
+		// removing controllers without units from the objects map and from bids
 		std::list<Controller<_Tp, _Val>* > toRemove;
 		for (std::map<Controller<_Tp,_Val>*, std::set<_Tp> >::const_iterator it = objects.begin();
 			it != objects.end(); ++it)
