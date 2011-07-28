@@ -37,7 +37,7 @@ private:
 	std::list<BWAPI::Unit*> _techStructuresInConstruction;
 	std::list<BWAPI::Unit*> _producingStructuresInConstruction;
 	std::multimap<int, BWAPI::UnitType> _productionQueue;
-	std::map<BWAPI::UnitType, int> _neededProductionBuildings;
+	std::set<BWAPI::UnitType> _neededProductionBuildings;
 	int additionalUnitsSupply(int frames=30*24); // UnitTypes::Protoss_Pylon.buildTime()
 	const BWAPI::UnitType& mostSaturatedUT();
 	Producer();

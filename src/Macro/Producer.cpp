@@ -157,6 +157,7 @@ int Producer::additionalUnitsSupply(int frames)
 		+ (int)(TheResourceRates->getGatherRate().getMinerals()*frames); // pessimistic interpolation (without economic growth)
 	int gas = Broodwar->self()->gas() - Macro::Instance().reservedGas 
 		+ (int)(TheResourceRates->getGatherRate().getGas()*frames);
+	list<multimap<int, UnitType>::const_iterator > toRem;
 	for (multimap<int, UnitType>::const_iterator it = pq.begin();
 		it != pq.end(); ++it)
 	{
@@ -169,15 +170,33 @@ int Producer::additionalUnitsSupply(int frames)
 			minerals -= it->second.mineralPrice();
 			gas -= it->second.gasPrice();
 			if (it->second.buildTime() < 
-				(frames - max(builder->second->getRemainingBuildTime(), builder->second->getRemainingTrainTime()))) // just a second unit, then it's too far in the future
+				(frames - max(builder->second->getRemainingBuildTime(), builder->second->getRemainingTrainTime()))) // just a second one of the same unit, then it's too far in the future
 			{
 				supply += it->second.supplyRequired();
 				minerals -= it->second.mineralPrice();
 				gas -= it->second.gasPrice();
 			}
 			free.erase(builder);
+			toRem.push_back(it);
 		}
 	}
+	for each (multimap<int, UnitType>::const_iterator it in toRem)
+		pq.erase(it);
+	/// If, after all that, we have minerals left, we should build more production buildings
+	multimap<int, UnitType>::const_iterator it = pq.begin();
+	UnitType ut = it->second.whatBuilds().first;
+	while (minerals >= ut.mineralPrice() && gas >= ut.gasPrice() && it != pq.end())
+	{
+		ut = it->second.whatBuilds().first;
+		if (!TheBuilder->willBuild(ut))
+		{
+			_neededProductionBuildings.insert(ut);
+			minerals -= ut.mineralPrice();
+			gas -= ut.gasPrice();
+		}
+		++it;
+	}
+	
 #ifdef __DEBUG__
 	Broodwar->drawTextScreen(130, 56, "\x11 addS: %d,", supply);
 #endif
@@ -242,6 +261,22 @@ void Producer::update()
 			TheBuilder->build(Broodwar->self()->getRace().getSupplyProvider());
 	}
 
+	int minerals = Broodwar->self()->minerals() - Macro::Instance().reservedMinerals;
+	int gas = Broodwar->self()->gas() - Macro::Instance().reservedGas;
+	/// Build more producing structures
+	list<UnitType> noLongerNeededProdBuildings;
+	for (set<BWAPI::UnitType>::iterator it = _neededProductionBuildings.begin();
+		it != _neededProductionBuildings.end(); ++it)
+	{
+		if (minerals > it->mineralPrice() && gas > it->gasPrice())
+		{
+			TheBuilder->build(*it);
+			noLongerNeededProdBuildings.push_back(*it);
+		}
+	}
+	for each (UnitType ut in noLongerNeededProdBuildings)
+		_neededProductionBuildings.erase(ut);
+
     /// Find buildings free to produce units
 	multimap<UnitType, ProducingUnit*> free;
 	for (multimap<UnitType, ProducingUnit>::iterator it = _producingStructures.begin();
@@ -262,9 +297,10 @@ void Producer::update()
 		}
 		return;
 	}
+
 	/// Launch new units productions
-	int minerals = Broodwar->self()->minerals() - Macro::Instance().reservedMinerals;
-	int gas = Broodwar->self()->gas() - Macro::Instance().reservedGas;
+	minerals = Broodwar->self()->minerals() - Macro::Instance().reservedMinerals;
+	gas = Broodwar->self()->gas() - Macro::Instance().reservedGas;
 	list<multimap<int, UnitType>::const_iterator> toRemove;
 	for (multimap<int, UnitType>::const_iterator it = _productionQueue.begin();
 		it != _productionQueue.end(); ++it)
@@ -281,10 +317,10 @@ void Producer::update()
 				{
 					minerals -= it->second.mineralPrice();
 					gas -= it->second.gasPrice();
-					free.erase(builder);
-				// erase builder from free in all cases (train or not)?
 					toRemove.push_back(it);
 				}
+				// erase builder from free in all cases (train or not)
+				free.erase(builder);
 			}
 		}
 	
