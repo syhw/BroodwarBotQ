@@ -258,7 +258,7 @@ void BattleBroodAI::onSendText(std::string text)
     }
     if (text=="debug")
     {
-        this->showManagerAssignments=true;
+        showManagerAssignments = !showManagerAssignments;
         return;
     }
     /*if (type!=UnitTypes::Unknown)

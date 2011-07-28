@@ -82,12 +82,22 @@ bool Producer::checkCanProduce(UnitType t)
 	return ret;
 }
 
+int Producer::willProduce(UnitType t)
+{
+	int count = 0;
+	for (multimap<int, UnitType>::const_iterator it = _productionQueue.begin();
+		it != _productionQueue.end(); ++it)
+		if (it->second == t)
+			++count;
+	return count;
+}
+
 /***
  * Produce the difference between wanted _number_ and existing units
  */
 void Producer::produce(int number, BWAPI::UnitType t, int priority, int increment)
 {
-	int add = max(0, number - Broodwar->self()->completedUnitCount(t));
+	int add = max(0, number - Broodwar->self()->completedUnitCount(t) - willProduce(t));
 	produceAdditional(add, t, priority, increment);
 }
 
@@ -114,36 +124,60 @@ void Producer::produceAdditional(int number, BWAPI::UnitType t, int priority, in
 }
 
 /***
- * Quick estimate of how many additional supply we would need for
+ * Quick/gross estimate of how many additional supply we would need for
  * _frames_ frames later, for at more a production batch.
+ * + side effect on _neededProductionBuildings
  * Should perhaps be done with events (maintaining an "plan" datastructure)
  */
 int Producer::additionalUnitsSupply(int frames)
 {
 	int supply = 0;
-	multimap<int, BWAPI::UnitType>::const_iterator pq = _productionQueue.begin();
+
+	/// see which buildings can/may produce in the future time _frames_
+	multimap<UnitType, Unit*> free;
 	for (multimap<UnitType, ProducingUnit>::const_iterator it = _producingStructures.begin();
 		it != _producingStructures.end(); ++it)
 	{
-		if (pq == _productionQueue.end())
-			return supply;
-		if (it->second->getRemainingTrainTime() < frames && pq->second.whatBuilds().first == it->second->getType())
-		{
-			supply += pq->second.supplyRequired();
-			++pq;
-		}
+		if (it->second->isIdle() || it->second->getRemainingTrainTime() <= frames)
+			free.insert(make_pair<UnitType, Unit*>(it->first, it->second.unit));
 	}
 	for (list<Unit*>::const_iterator it = TheBuilder->getInConstruction().begin();
 		it != TheBuilder->getInConstruction().end(); ++it)
 	{
-		if (pq == _productionQueue.end())
-			return supply;
-		if ((*it)->getRemainingBuildTime() < frames && pq->second.whatBuilds().first == (*it)->getType())
+		if ((*it)->getRemainingBuildTime() < frames && (*it)->getType().canProduce())
+			free.insert(make_pair<UnitType, Unit*>((*it)->getType(), (*it)));
+	}
+
+	/// Simulate building units from our _productionQueue
+	multimap<int, BWAPI::UnitType> pq = _productionQueue; // copy because we're going to damage it :)
+	int minerals = Broodwar->self()->minerals() - Macro::Instance().reservedMinerals 
+		+ (int)(TheResourceRates->getGatherRate().getMinerals()*frames); // pessimistic interpolation (without economic growth)
+	int gas = Broodwar->self()->gas() - Macro::Instance().reservedGas 
+		+ (int)(TheResourceRates->getGatherRate().getGas()*frames);
+	for (multimap<int, UnitType>::const_iterator it = pq.begin();
+		it != pq.end(); ++it)
+	{
+		multimap<UnitType, Unit*>::iterator builder = free.find(it->second.whatBuilds().first);
+		if (builder != free.end()
+			&& minerals >= it->second.mineralPrice()
+			&& gas >= it->second.gasPrice())
 		{
-			supply += pq->second.supplyRequired();
-			++pq;
+			supply += it->second.supplyRequired();
+			minerals -= it->second.mineralPrice();
+			gas -= it->second.gasPrice();
+			if (it->second.buildTime() < 
+				(frames - max(builder->second->getRemainingBuildTime(), builder->second->getRemainingTrainTime()))) // just a second unit, then it's too far in the future
+			{
+				supply += it->second.supplyRequired();
+				minerals -= it->second.mineralPrice();
+				gas -= it->second.gasPrice();
+			}
+			free.erase(builder);
 		}
 	}
+#ifdef __DEBUG__
+	Broodwar->drawTextScreen(130, 56, "\x11 addS: %d,", supply);
+#endif
 	return supply;
 }
 
@@ -165,9 +199,13 @@ void Producer::update()
 	}
 
 	/// Organize/order supply to avoid supply block
-	if (Broodwar->getFrameCount() % 27 && TheResourceRates->getGatherRate().getMinerals() > 0.00001) // TODO change
+	if (Broodwar->getFrameCount() % 27 
+#ifdef __CONTROL_BO_UNTIL_SECOND_PYLON__
+		&& (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Pylon) > 1 || Broodwar->getFrameCount() > 5000) // so that we can drive the early BO
+#endif
+		&& TheResourceRates->getGatherRate().getMinerals() > 0.00001) // TODO change
 	{
-		int frames = max(120*24,
+		int frames = max(180*24,
 			Broodwar->self()->getRace().getSupplyProvider().buildTime()
 			+ (int)(Broodwar->self()->getRace().getSupplyProvider().mineralPrice() / TheResourceRates->getGatherRate().getMinerals()) // important only if we perfectly consume our resources
 			+ 5*24); // should be the upper bound on the time to start building a pylon
@@ -198,10 +236,8 @@ void Producer::update()
 		return;
 	}
 	/// Launch new units productions
-    int rM = Macro::Instance().reservedMinerals;
-	int rG = Macro::Instance().reservedGas;
-	int minerals = Broodwar->self()->minerals();
-	int gas = Broodwar->self()->gas();
+	int minerals = Broodwar->self()->minerals() - Macro::Instance().reservedMinerals;
+	int gas = Broodwar->self()->gas() - Macro::Instance().reservedGas;
 	list<multimap<int, UnitType>::const_iterator> toRemove;
 	for (multimap<int, UnitType>::const_iterator it = _productionQueue.begin();
 		it != _productionQueue.end(); ++it)
@@ -210,8 +246,8 @@ void Producer::update()
 		{
 			multimap<UnitType, ProducingUnit*>::iterator builder = free.find(it->second.whatBuilds().first);
 			if (builder != free.end() // TODO Archons
-				&& minerals - rM >= it->second.mineralPrice()
-				&& gas - rG >= it->second.gasPrice()
+				&& minerals >= it->second.mineralPrice()
+				&& gas >= it->second.gasPrice()
 				&& Broodwar->self()->supplyTotal() - Broodwar->self()->supplyUsed () >= it->second.supplyRequired())
 			{
 				builder->second->train(it->second);

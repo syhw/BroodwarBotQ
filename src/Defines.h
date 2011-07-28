@@ -9,7 +9,10 @@
 #define WALK_TILES_SIZE 8
 
 #define __ARBITRATOR_CLEANUP__ // changes Arbitrator behavior, but is safe
+#ifndef __ARBITRATOR_CLEANUP__ // XOR between these two
 #define __ARBITRATOR_REMOVE_BID_CLEANUP__ // doesn't change Arbitrator behavior, but is not safe
+#endif
+#define __CONTROL_BO_UNTIL_SECOND_PYLON__
 #ifdef __DEBUG__
 //#include <vld.h>
 #endif

@@ -45,11 +45,21 @@ void Macro::init()
 	if (Broodwar->self()->getRace() == Races::Protoss)
 	{
 		TheWorkerManager->enableAutoBuild();
-		TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 8);
-		TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 10);
-		TheBasesManager->setFirstGasPop(12);
-		TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 14);
-		//TheUpgrader->upgrade(UpgradeTypes::Singularity_Charge);
+		if (Broodwar->enemy()->getRace() == Races::Zerg)
+		{
+		}
+		else if (Broodwar->enemy()->getRace() == Races::Terran)
+		{
+		}
+		else
+		{
+			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 8);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 10);
+			TheBasesManager->setFirstGasPop(12);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 16);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 18);
+			//TheUpgrader->upgrade(UpgradeTypes::Singularity_Charge);
+		}
 	}
 	else
 	{
@@ -60,7 +70,7 @@ void Macro::init()
 void Macro::update()
 {
 #ifdef __DEBUG__
-	Broodwar->drawTextScreen(130, 40, "\x11 rM: %d, rG: %d", reservedMinerals, reservedGas);
+	Broodwar->drawTextScreen(130, 38, "\x11 rM: %d, rG: %d", reservedMinerals, reservedGas);
 #endif
 	if (reservedMinerals < 0) // safety
 		reservedMinerals = 0;
@@ -137,18 +147,37 @@ void Macro::onUnitCreate(BWAPI::Unit* unit)
 
 	if (unit->getPlayer() == Broodwar->self())
 	{
-		if (unit->getType() == UnitTypes::Protoss_Cybernetics_Core)
+		if (unit->getType() == UnitTypes::Protoss_Cybernetics_Core && Broodwar->getFrameCount() < 12000)
 		{
-			TheProducer->produce(8, UnitTypes::Protoss_Zealot, 80, 2);
-			TheProducer->produce(16, UnitTypes::Protoss_Dragoon, 80);
+			/// Built the (first) core
+			if (Broodwar->enemy()->getRace() == Races::Zerg)
+			{
+				TheProducer->produce(6, UnitTypes::Protoss_Zealot, 49, 2);
+				TheProducer->produce(16, UnitTypes::Protoss_Dragoon, 50);
+			}
+			else if (Broodwar->enemy()->getRace() == Races::Terran)
+			{
+				TheProducer->produce(16, UnitTypes::Protoss_Dragoon, 50);
+			}
+			else
+			{
+				TheProducer->produce(16, UnitTypes::Protoss_Dragoon, 50);
+			}
 		}
 		else if (unit->getType() == UnitTypes::Protoss_Templar_Archives)
 		{
-			TheProducer->produce(10, UnitTypes::Protoss_High_Templar, 86, 3);
+			/// Built templar archives
+			TheProducer->produce(10, UnitTypes::Protoss_High_Templar, 54, 3);
 		}
-		else if (unit->getType() == UnitTypes::Protoss_Gateway && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway))
+		else if (unit->getType() == UnitTypes::Protoss_Gateway)
 		{
-			TheBuilder->build(UnitTypes::Protoss_Forge);
+			/// 1st Gateway (in a "< 19 supply" sense)
+			if (Broodwar->self()->supplyUsed() < 40)
+				TheProducer->produce(2, UnitTypes::Protoss_Zealot, 50);
+			/// 3rd Gateway
+			if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway) > 2
+				&& !Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Forge))
+				TheBuilder->build(UnitTypes::Protoss_Forge);
 		}
 	}
 }

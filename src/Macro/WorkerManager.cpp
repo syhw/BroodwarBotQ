@@ -141,10 +141,18 @@ void WorkerManager::updateWorkerAssignments()
 		//use assignment
 		for(map<int,int>::iterator a=assignment.begin();a!=assignment.end();a++)
 		{
-			Unit* worker=workerUnit[a->first];
-			Unit* resource=taskUnit[a->second];
-			workers[worker].newResource = resource;
-			currentWorkers[resource].insert(worker);
+			Unit* worker=NULL;
+			if (a->first < (int)workerUnit.size())
+				worker=workerUnit[a->first];
+			Unit* resource=NULL;
+			if (a->second < (int)taskUnit.size())
+				resource=taskUnit[a->second];
+			if (worker != NULL)
+			{
+				workers[worker].newResource = resource;
+				if (resource != NULL)
+					currentWorkers[resource].insert(worker);
+			}
 		}
 }
 
@@ -220,7 +228,7 @@ void WorkerManager::rebalanceWorkers()
 	if (this->autoBuild)
 	{
 		BWAPI::UnitType workerType=BWAPI::Broodwar->self()->getRace().getWorker();
-		TheProducer->produce((int)(optimalWorkerCount*1.5), workerType, autoBuildPriority);
+		TheProducer->produce((int)(optimalWorkerCount*1.2), workerType, autoBuildPriority);
 	}
 }
 

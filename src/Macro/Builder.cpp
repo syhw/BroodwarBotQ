@@ -114,7 +114,7 @@ void Task::askWorker()
 
 void Task::buildIt()
 {
-	if (Broodwar->getFrameCount() > lastOrder + 47 && worker && worker->exists())
+	if (Broodwar->getFrameCount() > lastOrder + 27 + Broodwar->getLatencyFrames() && worker && worker->exists())
 	{
 		if (worker->getPosition().getApproxDistance(Position(tilePosition)) > 4 * TILE_SIZE)
 		{
@@ -290,6 +290,9 @@ int Builder::additionalSupplyNextFrames(int frames)
 			continue;
 		supply += u->getType().supplyProvided();
 	}
+#ifdef __DEBUG__
+	Broodwar->drawTextScreen(190, 56, "\x11 incS: %d", supply);
+#endif
 	return supply;
 }
 
@@ -350,9 +353,11 @@ void Builder::update()
 	int dy = 0;
 	for each (pTask t in tasks)
 	{
-		Broodwar->drawTextScreen(320, 460 - dy, "%s", t->getName().c_str());
+		Broodwar->drawTextScreen(196, 325 - dy, "\x1f %s", t->getName().c_str());
 		dy += 16;
 	}
+	if (!tasks.empty())
+		Broodwar->drawBoxScreen(190, 325 - dy + 10, 360, 346, Colors::Cyan);
 #endif
 }
 

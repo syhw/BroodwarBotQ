@@ -6,10 +6,7 @@
 #include "Intelligence/ScoutController.h"
 #include "Macro/BWSAL.h"
 
-using std::map;
-using std::set;
-using std::vector;
-using std::list;
+using namespace std;
 using namespace BWAPI;
 using namespace BWTA;
 
@@ -23,19 +20,10 @@ WarManager::WarManager()
 WarManager::~WarManager() 
 {
 	TheArbitrator->removeAllBids(this);
-	//Broodwar->printf("INOUT WarManager::~WarManager()");
 }
 
 void WarManager::update()
 {
-	/*
-	int count = 0;
-	for (std::list<UnitsGroup *>::const_iterator it = this->unitsGroups.begin();
-		it != unitsGroups.end(); ++it)
-		count += (*it)->getUnits()->size();
-	Broodwar->printf("I have: %d units groups and %d units total", unitsGroups.size(), count);
-	*/
-
 //    if (!ScoutController::Instance().enemyFound && Broodwar->getFrameCount() > 4320)
 //    {
 //        for (std::list<UnitsGroup*>::iterator it = unitsGroups.begin();
@@ -54,7 +42,6 @@ void WarManager::update()
                 continue;
             this->remove(*ug);
             (*ug)->idle();	//Set target of units to their position so that they are now idling
-            delete (*ug); // @merge
             // @merge ug->~UnitsGroup();
         }
         promptedRemove.clear();
@@ -124,13 +111,16 @@ void WarManager::onUnitCreate(BWAPI::Unit* unit)
 
 void WarManager::onUnitDestroy(BWAPI::Unit* unit)
 {
-	for (std::list<UnitsGroup*>::iterator it = unitsGroups.begin(); it != unitsGroups.end(); ++it)
+	for (std::list<UnitsGroup*>::iterator it = unitsGroups.begin(); it != unitsGroups.end(); )
 	{
 		(*it)->giveUpControl(unit);
-		if( (*it)->emptyUnits() )
+		if ((*it)->emptyUnits())
 		{
-			this->promptRemove(*it);
+			delete (*it);
+			unitsGroups.erase(it++);
 		}
+		else
+			++it;
 	}
 }
 

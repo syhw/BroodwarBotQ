@@ -1060,7 +1060,7 @@ void BayesianUnit::updateTargetEnemy()
             continue;
         UnitType testType = it->second->getType();
         if (testType.isBuilding() 
-            && testType != BWAPI::UnitTypes::Protoss_Pylon
+            //&& testType != BWAPI::UnitTypes::Protoss_Pylon
             && testType != BWAPI::UnitTypes::Protoss_Photon_Cannon
             && testType != BWAPI::UnitTypes::Terran_Bunker
             && testType != BWAPI::UnitTypes::Terran_Missile_Turret
@@ -1105,7 +1105,7 @@ void BayesianUnit::updateTargetEnemy()
             if (testType == BWAPI::UnitTypes::Protoss_Interceptor)
                 continue;
             if (testType.isBuilding() 
-                && testType != BWAPI::UnitTypes::Protoss_Pylon
+                //&& testType != BWAPI::UnitTypes::Protoss_Pylon
                 && testType != BWAPI::UnitTypes::Protoss_Photon_Cannon
                 && testType != BWAPI::UnitTypes::Terran_Bunker
                 && testType != BWAPI::UnitTypes::Terran_Missile_Turret
@@ -1130,7 +1130,7 @@ void BayesianUnit::updateTargetEnemy()
                 continue;
             UnitType testType = it->second->getType();
             if (testType.isBuilding() 
-                && testType != BWAPI::UnitTypes::Protoss_Pylon
+                //&& testType != BWAPI::UnitTypes::Protoss_Pylon
                 && testType != BWAPI::UnitTypes::Protoss_Photon_Cannon
                 && testType != BWAPI::UnitTypes::Terran_Bunker
                 && testType != BWAPI::UnitTypes::Terran_Missile_Turret
@@ -1170,7 +1170,7 @@ void BayesianUnit::updateTargetEnemy()
             continue;
         UnitType testType = it->second->getType();
         if (testType.isBuilding() 
-            && testType != BWAPI::UnitTypes::Protoss_Pylon
+            //&& testType != BWAPI::UnitTypes::Protoss_Pylon
             && testType != BWAPI::UnitTypes::Protoss_Photon_Cannon
             && testType != BWAPI::UnitTypes::Terran_Bunker
             && testType != BWAPI::UnitTypes::Terran_Missile_Turret
@@ -1210,7 +1210,7 @@ void BayesianUnit::updateTargetEnemy()
             continue;
         UnitType testType = it->second->getType();
         if (testType.isBuilding() 
-            && testType != BWAPI::UnitTypes::Protoss_Pylon
+            //&& testType != BWAPI::UnitTypes::Protoss_Pylon
             && testType != BWAPI::UnitTypes::Protoss_Photon_Cannon
             && testType != BWAPI::UnitTypes::Terran_Bunker
             && testType != BWAPI::UnitTypes::Terran_Missile_Turret
@@ -1265,7 +1265,7 @@ void BayesianUnit::updateTargetEnemy()
 				it->second->getEnergy() < 60)
                 continue;
             if (testType.isBuilding() 
-                && testType != BWAPI::UnitTypes::Protoss_Pylon
+                //&& testType != BWAPI::UnitTypes::Protoss_Pylon
                 && testType != BWAPI::UnitTypes::Protoss_Photon_Cannon
                 && testType != BWAPI::UnitTypes::Terran_Bunker
                 && testType != BWAPI::UnitTypes::Terran_Missile_Turret
@@ -1315,7 +1315,7 @@ void BayesianUnit::updateTargetEnemy()
 				&& it->second->getEnergy() < 60)
                 continue;
             if (testType.isBuilding() 
-                && testType != BWAPI::UnitTypes::Protoss_Pylon
+                //&& testType != BWAPI::UnitTypes::Protoss_Pylon
                 && testType != BWAPI::UnitTypes::Protoss_Photon_Cannon
                 && testType != BWAPI::UnitTypes::Terran_Bunker
                 && testType != BWAPI::UnitTypes::Terran_Missile_Turret
@@ -1354,7 +1354,7 @@ void BayesianUnit::updateTargetEnemy()
 				&& it->second->getEnergy() < 60)
                 continue;
             if (testType.isBuilding() 
-                && testType != BWAPI::UnitTypes::Protoss_Pylon
+                //&& testType != BWAPI::UnitTypes::Protoss_Pylon
                 && testType != BWAPI::UnitTypes::Protoss_Photon_Cannon
                 && testType != BWAPI::UnitTypes::Terran_Bunker
                 && testType != BWAPI::UnitTypes::Terran_Missile_Turret
