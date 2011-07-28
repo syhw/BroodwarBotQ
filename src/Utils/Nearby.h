@@ -2,6 +2,10 @@
 #include <BWAPI.h>
 #include "Macro/UnitGroupManager.h"
 
+/*********
+DO NOT USE: BWAPI IS NOW USING QUADTREES FOR THAT (== BWAPI IS BETTER)
+*********/
+
 std::set<BWAPI::Unit*> nearbyUnits(BWAPI::Unit* unit, double radius = 400.0)
 {
     return AllUnits().inRadius(radius, unit->getPosition());

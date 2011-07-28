@@ -39,6 +39,8 @@ public:
 	void addTask(const BWAPI::UnitType& t, const BWAPI::TilePosition& seedPosition, int lastOrder=0);
 	void build(const BWAPI::UnitType& t, const BWAPI::TilePosition& seedPosition=BWAPI::TilePositions::None);
 	void buildOrder(const BWAPI::UnitType& t, int supplyAsTime, const BWAPI::TilePosition& seedPosition=BWAPI::TilePositions::None);
+	int numberInFutureTasks(const BWAPI::UnitType& t);
+	int numberInConstruction(const BWAPI::UnitType& t);
 	int willBuild(const BWAPI::UnitType& t);      // Dumb helper functions that should be replaced by a better datastructure
 	const std::list<BWAPI::Unit*>& getInConstruction();
 	int additionalSupplyNextFrames(int frames=30*24); // UnitTypes::Protoss_Pylon.buildTime()

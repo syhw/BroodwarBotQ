@@ -11,7 +11,7 @@ struct ProducingUnit
 	ProducingUnit(BWAPI::Unit* u);
 	explicit ProducingUnit(const ProducingUnit& pu);
 	BWAPI::Unit* operator->() const;
-	void train(BWAPI::UnitType t);
+	bool train(BWAPI::UnitType t);
 };
 
 class Producer : public Arbitrator::Controller<BWAPI::Unit*, double>
@@ -34,6 +34,8 @@ public:
 private:
 	std::multimap<BWAPI::UnitType, BWAPI::Unit*> _techStructures;
 	std::multimap<BWAPI::UnitType, ProducingUnit> _producingStructures;
+	std::list<BWAPI::Unit*> _techStructuresInConstruction;
+	std::list<BWAPI::Unit*> _producingStructuresInConstruction;
 	std::multimap<int, BWAPI::UnitType> _productionQueue;
 	std::map<BWAPI::UnitType, int> _neededProductionBuildings;
 	int additionalUnitsSupply(int frames=30*24); // UnitTypes::Protoss_Pylon.buildTime()

@@ -24,13 +24,16 @@ Unit* ProducingUnit::operator->() const
 	return unit;
 }
 
-void ProducingUnit::train(UnitType t)
+bool ProducingUnit::train(UnitType t)
 {
-	if (Broodwar->getFrameCount() - lastAction > 2*Broodwar->getLatencyFrames() + 1)
+	if (Broodwar->getFrameCount() - lastAction > 2*Broodwar->getLatencyFrames() + 1
+		&& unit->canIssueCommand(UnitCommand::train(unit, t)))
 	{
 		this->lastAction = Broodwar->getFrameCount();
 		unit->train(t);
+		return true;
 	}
+	return false;
 }
 
 Producer* TheProducer = NULL;
@@ -141,8 +144,8 @@ int Producer::additionalUnitsSupply(int frames)
 		if (it->second->isIdle() || it->second->getRemainingTrainTime() <= frames)
 			free.insert(make_pair<UnitType, Unit*>(it->first, it->second.unit));
 	}
-	for (list<Unit*>::const_iterator it = TheBuilder->getInConstruction().begin();
-		it != TheBuilder->getInConstruction().end(); ++it)
+	for (list<Unit*>::const_iterator it = _producingStructuresInConstruction.begin();
+		it != _producingStructuresInConstruction.end(); ++it)
 	{
 		if ((*it)->getRemainingBuildTime() < frames && (*it)->getType().canProduce())
 			free.insert(make_pair<UnitType, Unit*>((*it)->getType(), (*it)));
@@ -198,6 +201,30 @@ void Producer::update()
 			_producingStructures.insert(make_pair<UnitType, ProducingUnit>(centerType, *it));
 	}
 
+	/// Filter out all producing/tech structures in construction that just finished
+	for (list<Unit*>::const_iterator it = _producingStructuresInConstruction.begin();
+		it != _producingStructuresInConstruction.end(); )
+	{
+		if ((*it)->isCompleted())
+		{
+			_producingStructures.insert(make_pair<UnitType, ProducingUnit>((*it)->getType(), *it));
+			_producingStructuresInConstruction.erase(it++);
+		}
+		else
+			++it;
+	}
+	for (list<Unit*>::const_iterator it = _techStructuresInConstruction.begin();
+		it != _techStructuresInConstruction.end(); )
+	{
+		if ((*it)->isCompleted())
+		{
+			_techStructures.insert(make_pair<UnitType, Unit*>((*it)->getType(), *it));
+			_techStructuresInConstruction.erase(it++);
+		}
+		else
+			++it;
+	}
+
 	/// Organize/order supply to avoid supply block
 	if (Broodwar->getFrameCount() % 27 
 #ifdef __CONTROL_BO_UNTIL_SECOND_PYLON__
@@ -209,7 +236,7 @@ void Producer::update()
 			Broodwar->self()->getRace().getSupplyProvider().buildTime()
 			+ (int)(Broodwar->self()->getRace().getSupplyProvider().mineralPrice() / TheResourceRates->getGatherRate().getMinerals()) // important only if we perfectly consume our resources
 			+ 5*24); // should be the upper bound on the time to start building a pylon
-		if (!TheBuilder->willBuild(Broodwar->self()->getRace().getSupplyProvider()) &&
+		if (!TheBuilder->numberInFutureTasks(Broodwar->self()->getRace().getSupplyProvider()) &&
 			Broodwar->self()->supplyTotal() < 200 &&
 			additionalUnitsSupply(frames) + Broodwar->self()->supplyUsed() > TheBuilder->additionalSupplyNextFrames(frames) + Broodwar->self()->supplyTotal())
 			TheBuilder->build(Broodwar->self()->getRace().getSupplyProvider());
@@ -250,11 +277,14 @@ void Producer::update()
 				&& gas >= it->second.gasPrice()
 				&& Broodwar->self()->supplyTotal() - Broodwar->self()->supplyUsed () >= it->second.supplyRequired())
 			{
-				builder->second->train(it->second);
-				minerals -= it->second.mineralPrice();
-				gas -= it->second.gasPrice();
-				free.erase(builder);
-				toRemove.push_back(it);
+				if (builder->second->train(it->second))
+				{
+					minerals -= it->second.mineralPrice();
+					gas -= it->second.gasPrice();
+					free.erase(builder);
+				// erase builder from free in all cases (train or not)?
+					toRemove.push_back(it);
+				}
 			}
 		}
 	
@@ -277,7 +307,7 @@ void Producer::onUnitCreate(BWAPI::Unit* unit)
 		|| unit->getType() == UnitTypes::Protoss_Templar_Archives
 		|| unit->getType() == UnitTypes::Protoss_Observatory
 		|| unit->getType() == UnitTypes::Protoss_Arbiter_Tribunal)
-		_techStructures.insert(make_pair<UnitType, Unit*>(unit->getType(), unit));
+		_techStructuresInConstruction.push_back(unit);
 }
 
 void Producer::onUnitDestroy(BWAPI::Unit* unit)
@@ -300,6 +330,8 @@ void Producer::onUnitDestroy(BWAPI::Unit* unit)
 			return;
 		}
 	}
+	_producingStructuresInConstruction.remove(unit);
+	_techStructuresInConstruction.remove(unit);
 }
 
 void Producer::onOffer(set<Unit*> units)
@@ -310,7 +342,10 @@ void Producer::onOffer(set<Unit*> units)
 		if ((*it)->getType().canProduce())
 		{
 			TheArbitrator->accept(this, *it, 95);
-			_producingStructures.insert(make_pair<UnitType, ProducingUnit>((*it)->getType(), *it));
+			if ((*it)->isCompleted())
+				_producingStructures.insert(make_pair<UnitType, ProducingUnit>((*it)->getType(), *it));
+			else
+				_producingStructuresInConstruction.push_back(*it);
 		}
 		else
 			TheArbitrator->decline(this, *it, 0);
@@ -328,6 +363,7 @@ void Producer::onRevoke(BWAPI::Unit* unit, double bid)
 			return;
 		}
 	}
+	_producingStructuresInConstruction.remove(unit);
 }
 
 string Producer::getName() const

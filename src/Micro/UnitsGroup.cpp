@@ -23,7 +23,6 @@
 #include "Micro/Units/ZergFlying/MutaliskUnit.h"
 #include <stack>
 #include <typeinfo>
-#include "Utils/Nearby.h"
 
 int round(double a)
 {

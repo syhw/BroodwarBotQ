@@ -950,6 +950,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Utils\QuadTree.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Utils\RandomGenerators.h"
 					>
 				</File>

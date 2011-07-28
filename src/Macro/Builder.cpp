@@ -248,19 +248,31 @@ void Builder::buildOrder(const BWAPI::UnitType& t, int supplyAsTime, const BWAPI
 	boTasks.insert(make_pair<int, pTask>(supplyAsTime, tmp));
 }
 
-/***
- * Counts the number of buildings of type _t_ that we will build
- * (currently in the tasks pipeline).
- */
-int Builder::willBuild(const UnitType& t)
+int Builder::numberInFutureTasks(const UnitType& t)
 {
 	int number = 0;
 	for each (pTask task in tasks)
-	{
 		if (task->getType() == t)
 			++number;
-	}
 	return number;
+}
+
+int Builder::numberInConstruction(const UnitType& t)
+{
+	int number = 0;
+	for each (Unit* u in inConstruction)
+		if (u->getType() == t)
+			++number;
+	return number;
+}
+
+/***
+ * Counts the number of buildings of type _t_ that we will be built
+ * (currently in the tasks pipeline or in construction)
+ */
+int Builder::willBuild(const UnitType& t)
+{
+	return numberInFutureTasks(t) + numberInConstruction(t);
 }
 
 const list<Unit*>& Builder::getInConstruction()
