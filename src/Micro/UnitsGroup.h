@@ -49,7 +49,7 @@ struct i_dist
 class BasicUnitsGroup
 {
 protected:
-	std::list<pGoal> goals;
+	Goal* goal;
 public:
 	std::vector<pBayesianUnit> units;
 	virtual void update();
@@ -74,7 +74,9 @@ private:
     bool _hasDetection;
     inline void updateNearbyEnemyUnitsFromFilter(BWAPI::Position p, double radius = 400.0);
     double evaluateForces();
+#ifdef __DEBUG__
     void displayTargets();  // debug purpose
+#endif
 public:
 	inline void dispatchCompleteUnit(pBayesianUnit bu);
     void takeControl(BWAPI::Unit* u);
@@ -106,11 +108,6 @@ public:
 
 	// Units interface
     pBayesianUnit addUnit(BWAPI::Unit* u);
-
-	// Goals interface
-	void setGoals(std::list<pGoal>& goals);
-	void addGoal(pGoal goal);
-    void addGoalFront(pGoal goal);
 
 	virtual void attack(int x, int y);
 	virtual void attack(BWAPI::Position& p);

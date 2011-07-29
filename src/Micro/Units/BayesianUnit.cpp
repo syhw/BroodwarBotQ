@@ -1726,6 +1726,53 @@ void BayesianUnit::clickTarget()
     _lastMoveFrame = Broodwar->getFrameCount();
 }
 
+pBayesianUnit BayesianUnit::newBayesianUnit(Unit* u)
+{
+    pBayesianUnit tmp;
+    if (u->getType() == BWAPI::UnitTypes::Protoss_Arbiter)
+        tmp = pBayesianUnit(new ArbiterUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Protoss_Archon)
+        tmp = pBayesianUnit(new ArchonUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Protoss_Carrier)
+        tmp = pBayesianUnit(new CarrierUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Protoss_Corsair)
+        tmp = pBayesianUnit(new CorsairUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Protoss_Dark_Archon)
+        tmp = pBayesianUnit(new DarkArchonUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Protoss_Dark_Templar)
+        tmp = pBayesianUnit(new DarkTemplarUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Protoss_Dragoon)
+        tmp = pBayesianUnit(new DragoonUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Protoss_High_Templar)
+        tmp = pBayesianUnit(new HighTemplarUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Protoss_Observer)
+        tmp = pBayesianUnit(new ObserverUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Protoss_Probe)
+        tmp = pBayesianUnit(new ProbeUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Protoss_Reaver)
+        tmp = pBayesianUnit(new ReaverUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Protoss_Scout)
+        tmp = pBayesianUnit(new ScoutUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Protoss_Shuttle)
+        tmp = pBayesianUnit(new ShuttleUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Protoss_Zealot)
+        tmp = pBayesianUnit(new ZealotUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Zerg_Mutalisk)
+        tmp = pBayesianUnit(new MutaliskUnit(u, this));
+    else if (u->getType() == BWAPI::UnitTypes::Zerg_Scourge)
+        tmp = pBayesianUnit(new ScourgeUnit(u, this));
+	else if (u->getType() == BWAPI::UnitTypes::Terran_Marine)
+		tmp = pBayesianUnit(new MarineUnit(u, this));
+	else if (u->getType() == BWAPI::UnitTypes::Terran_Medic)
+		tmp = pBayesianUnit(new MedicUnit(u, this));
+    else
+	{
+        Broodwar->printf("This race/unit is not implemented");
+		return tmp;
+	}
+	return tmp;
+}
+
 void BayesianUnit::move(BWAPI::Position p)
 {
     unit->move(p);

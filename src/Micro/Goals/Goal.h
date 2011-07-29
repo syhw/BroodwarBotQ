@@ -1,14 +1,19 @@
 #pragma once
 #include <boost/shared_ptr.hpp>
+
+#ifndef GOAL_SMART_POINTER
+#define GOAL_SMART_POINTER
 class Goal;
 typedef boost::shared_ptr<Goal> pGoal;
+#endif
 
+#include "Macro/Arbitrator.h"
+#include "Micro/UnitsGroup.h"
 #include "Subgoal.h"
 #include <BWAPI.h>
 #include <BWTA.h>
-#include <windows.h>
-#include "Micro/Formations.h"
 #include <list>
+#include <map>
 
 class BasicUnitsGroup;
 class Subgoal;
@@ -24,35 +29,38 @@ typedef enum
 
 class Goal : Arbitrator::Controller<BWAPI::Unit*, double>
 {
+	friend class UnitsGroup;
 protected:
 	/// Units it can use
-	UnitsGroup unitsGroup;
+	UnitsGroup _unitsGroup;
 	/// Preconditions
-	std::map<UnitType, int> neededUnits;
-    int firstFrame;
+	std::map<UnitType, int> _neededUnits;
+    int _firstFrame;
 	/// Subgoals
-	std::list<pSubgoal> subgoals;   //The subgoals cannot be shared
+	std::list<pSubgoal> _subgoals;   //The subgoals cannot be shared
     /// Status
-	GoalStatus status;
+	GoalStatus _status;
 
 public:
-	void setUnitsGroup(UnitsGroup * ug);
-
-	//Constructors
-	Goal();//Don't forget to set the unitsGroup
-	Goal(UnitsGroup * ug);
-    Goal(UnitsGroup * ug, pSubgoal s);
+	Goal();
+	Goal(int firstFrame = 0);
+	Goal(pSubgoal s);
+	Goal(pSubgoal s, int firstFrame = 0);
+	Goal(const std::map<BWAPI::UnitType, int>& nU, pSubGoal s);
+	Goal(const std::map<BWAPI::UnitType, int>& nU, pSubGoal s, int firstFrame = 0);
 	virtual ~Goal();
 	
-	virtual void achieve();//Start the goal
+	void update();
+	virtual void achieve();
+	virtual void achieve();
+	virtual void check();
 
-	virtual void checkAchievement();//Check if accomplished
-	//(Check if all subgoals are accomplished)
-
-	//Mutators
 	void addSubgoal(pSubgoal s);
+	void addNeededUnits(const std::map<BWAPI::UnitType, int>& neededUnits);
+	void setFirstFrame(int firstFrame);
+	
 	void setStatus(GoalStatus s);
-	virtual int estimateDistance(BWAPI::Position);
-	//Accessors
 	GoalStatus getStatus() const;
+	virtual int estimateDistance(BWAPI::Position);
+
 };

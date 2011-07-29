@@ -21,7 +21,7 @@ typedef boost::shared_ptr<BayesianUnit> pBayesianUnit;
 
 // #define PROBT 1
 // #define WITH_FLOCKING 1
-//#define __HEIGHTS_ATTRACTION__
+// #define __HEIGHTS_ATTRACTION__
 
 // TODO, this class has to be derived to take Flying/Ground/Special Units 
 // (templars, tanks, lurkers, etc.) into account
@@ -201,6 +201,8 @@ protected:
     std::set<Unit*> _targetingMe;
     void updateTargetingMe();
 public:
+	static pBayesianUnit newBayesianUnit(BWAPI::Unit* u);
+
     void move(BWAPI::Position p); // debug purposes
 	void switchMode(unit_mode um);
     unit_mode getMode();

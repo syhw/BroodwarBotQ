@@ -3,7 +3,6 @@
 
 using namespace BWAPI;
 GoalManager::GoalManager()
-: _warManager(& WarManager::Instance())
 {
 }
 
@@ -11,43 +10,50 @@ GoalManager::~GoalManager()
 {
 }
 
-void GoalManager::insert(UnitsGroup * ug, pGoal g)
+void GoalManager::update()
 {
-	//Search if the ug is already in
-	std::map<UnitsGroup *, std::list<pGoal> >::iterator it = this->attributedGoals.find(ug);
-	if (it != attributedGoals.end()) {
-		//The ug is already stored
-		it->second.push_back(g);
-
-	} else {
-		//Must create the pair ug,list
-		std::list<pGoal> l;
-		l.push_back(g);
-		this->attributedGoals.insert(std::make_pair(ug, l));//TODO
+	/// Check is units in training are completed and create BayesianUnits if so
+	for (list<Unit*>::const_iterator it = _inTrainingUnits.begin();
+		it != _inTrainingUnits.end(); )
+	{
+		if (u->isCompleted())
+		{
+			pBayesianUnit tmp = BayesianUnit::newBayesianUnit(*it);
+			if (tmp.get() != NULL)
+				_completedUnits.insert(make_pair<Unit*, pBayesianUnit>(*it, tmp));
+			_inTrainingUnits.erase(it++);
+		}
+		else
+			++it;
 	}
-
+	/// Update all goals
+	for each (pGoal g in _goals)
+		g->update();
 }
 
-bool GoalManager::remove(UnitsGroup * ug, pGoal g){
-	//Search if the ug is in
-	std::map<UnitsGroup *, std::list<pGoal> >::iterator it = this->attributedGoals.find(ug);
-	if(it != attributedGoals.end()){
-		//ug exists search the goal in the list
-		for (std::list<pGoal>::iterator it_l = it->second.begin(); it_l != it->second.end(); it_l++){
-			if((*it_l)==g){
-				it->second.erase(it_l);
-				return true;
-			}
+void GoalManager::addGoal(pGoal g)
+{
+	_goals.push_back(g);
+}
+
+/// Add all units not building
+void GoalManager::onUnitCreate(Unit* u)
+{
+	if (!u->isBuilding()) // yup, even workers
+		_inTrainingUnits.push_back(u);
+}
+
+/// Remove from _completedUnits or _inTrainingUnits
+void GoalManager::onUnitDestroy(Unit* u)
+{
+	for (map<Unit*, pBayesianUnit>::const_iterator it = _completedUnits.begin();
+		it != _completedUnits.end(); ++it)
+	{
+		if (it->first == u)
+		{
+			_completedUnits.erase(it);
+			return;
 		}
 	}
-	return false;
-}
-
-bool GoalManager::clean(UnitsGroup * ug){
-	std::map<UnitsGroup *, std::list<pGoal> >::iterator it = this->attributedGoals.find(ug);
-	if(it != attributedGoals.end()){
-		attributedGoals.erase(it);
-		return true;
-	}
-	return false;
+	_inTrainingUnits.remove(u);
 }

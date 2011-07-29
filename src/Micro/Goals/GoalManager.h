@@ -11,13 +11,14 @@ class GoalManager : public CSingleton<GoalManager>
 {
 	friend class CSingleton<GoalManager>;
 private:
-	std::list<pGoal> goals;
+	std::list<pGoal> _goals;
 	GoalManager();
 	~GoalManager();
-	std::map<BWAPI::Unit*, pBayesianUnit> militaryUnits;
-	std::list<BWAPI::Unit*> inTrainingUnits;
+	std::map<BWAPI::Unit*, pBayesianUnit> _completedUnits;
+	std::list<BWAPI::Unit*> _inTrainingUnits;
 public:
 	void update();
 	void addGoal(pGoal g);
-
+	void onUnitCreate(BWAPI::Unit* u);
+	void onUnitDestroy(BWAPI::Unit* u);
 };

@@ -169,6 +169,7 @@ void align(std::vector<Position>& from, std::vector<Position>& to, std::vector<u
     }
 }
 
+#ifdef __DEBUG__
 void UnitsGroup::displayTargets()
 {
     for each(pBayesianUnit u in units)
@@ -193,6 +194,7 @@ void UnitsGroup::displayTargets()
         }
     }
 }
+#endif
 
 double UnitsGroup::evaluateForces()
 {
@@ -547,53 +549,6 @@ double UnitsGroup::getDistance(BWAPI::Unit* u) const
     return Vec(center - u->getPosition()).norm();
 }
 
-pBayesianUnit UnitsGroup::addUnit(Unit* u)
-{
-    pBayesianUnit tmp;
-    if (u->getType() == BWAPI::UnitTypes::Protoss_Arbiter)
-        tmp = pBayesianUnit(new ArbiterUnit(u, this));
-    else if (u->getType() == BWAPI::UnitTypes::Protoss_Archon)
-        tmp = pBayesianUnit(new ArchonUnit(u, this));
-    else if (u->getType() == BWAPI::UnitTypes::Protoss_Carrier)
-        tmp = pBayesianUnit(new CarrierUnit(u, this));
-    else if (u->getType() == BWAPI::UnitTypes::Protoss_Corsair)
-        tmp = pBayesianUnit(new CorsairUnit(u, this));
-    else if (u->getType() == BWAPI::UnitTypes::Protoss_Dark_Archon)
-        tmp = pBayesianUnit(new DarkArchonUnit(u, this));
-    else if (u->getType() == BWAPI::UnitTypes::Protoss_Dark_Templar)
-        tmp = pBayesianUnit(new DarkTemplarUnit(u, this));
-    else if (u->getType() == BWAPI::UnitTypes::Protoss_Dragoon)
-        tmp = pBayesianUnit(new DragoonUnit(u, this));
-    else if (u->getType() == BWAPI::UnitTypes::Protoss_High_Templar)
-        tmp = pBayesianUnit(new HighTemplarUnit(u, this));
-    else if (u->getType() == BWAPI::UnitTypes::Protoss_Observer)
-        tmp = pBayesianUnit(new ObserverUnit(u, this));
-    else if (u->getType() == BWAPI::UnitTypes::Protoss_Probe)
-        tmp = pBayesianUnit(new ProbeUnit(u, this));
-    else if (u->getType() == BWAPI::UnitTypes::Protoss_Reaver)
-        tmp = pBayesianUnit(new ReaverUnit(u, this));
-    else if (u->getType() == BWAPI::UnitTypes::Protoss_Scout)
-        tmp = pBayesianUnit(new ScoutUnit(u, this));
-    else if (u->getType() == BWAPI::UnitTypes::Protoss_Shuttle)
-        tmp = pBayesianUnit(new ShuttleUnit(u, this));
-    else if (u->getType() == BWAPI::UnitTypes::Protoss_Zealot)
-        tmp = pBayesianUnit(new ZealotUnit(u, this));
-    else if (u->getType() == BWAPI::UnitTypes::Zerg_Mutalisk)
-        tmp = pBayesianUnit(new MutaliskUnit(u, this));
-    else if (u->getType() == BWAPI::UnitTypes::Zerg_Scourge)
-        tmp = pBayesianUnit(new ScourgeUnit(u, this));
-	else if (u->getType() == BWAPI::UnitTypes::Terran_Marine)
-		tmp = pBayesianUnit(new MarineUnit(u, this));
-	else if (u->getType() == BWAPI::UnitTypes::Terran_Medic)
-		tmp = pBayesianUnit(new MedicUnit(u, this));
-    else
-	{
-        Broodwar->printf("This race/unit is not implemented");
-		return tmp;
-	}
-	return tmp;
-}
-
 void UnitsGroup::dispatchCompleteUnit(pBayesianUnit bu)
 {
 	if (bu->unit->getPosition().getApproxDistance(center) < __MAX_DISTANCE_TO_GROUP__ || !units.size())
@@ -608,21 +563,6 @@ void UnitsGroup::dispatchCompleteUnit(pBayesianUnit bu)
     }
 }
 
-void UnitsGroup::takeControl(Unit* u)
-{
-	pBayesianUnit tmp = addUnit(u);
-	if (tmp.get() == NULL)
-	{
-#ifdef __DEBUG__
-		Broodwar->printf("Took control of a unit I can't build a BayesianUnit from: %s", u->getType().getName().c_str());
-#endif
-		return;
-	}
-	if (!u->isCompleted())
-		incompleteUnits.push_back(tmp);
-	else 
-		dispatchCompleteUnit(tmp);
-}
 
 bool BasicUnitsGroup::removeUnit(Unit* u)
 {
@@ -793,16 +733,8 @@ void UnitsGroup::selectedUnits(std::set<pBayesianUnit>& u)
 
 
 void BasicUnitsGroup::accomplishGoal()
-{	
-	if(goals.size() > 0){
-		if (goals.front()->getStatus() != GS_ACHIEVED) {
-			goals.front()->achieve();
-		} else {
-			if(goals.size() > 1 ){
-				goals.pop_front();
-			}
-		}
-	}
+{
+
 }
 
 void UnitsGroup::switchMode(unit_mode um){
