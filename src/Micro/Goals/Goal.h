@@ -15,24 +15,28 @@ class Subgoal;
 
 typedef enum
 {
-	GS_ND_STATUS           = 0,
-	GS_ACHIEVED            = 0,
-	GS_IN_PROGRESS         = 1, //When attributed
-	GS_NOT_ATTRIBUTED      = 2,
-	GS_NOT_ENOUGH_UNITS    = 3
+	GS_WAIT_PRECONDITION   = 0,
+	GS_IN_PROGRESS         = 1,
+	GS_IN_CANCEL           = 2,
+	GS_CANCELED            = 3,
+	GS_ACHIEVED            = 4
 } GoalStatus;
 
-class Goal
+class Goal : Arbitrator::Controller<BWAPI::Unit*, double>
 {
 protected:
-	UnitsGroup * unitsGroup;   //Use setUnitsGroup
-	std::list<pSubgoal> subgoals;   //The subgoals cannot be shared
-	GoalStatus status;              /**< status of the goal */
+	/// Units it can use
+	UnitsGroup unitsGroup;
+	/// Preconditions
+	std::map<UnitType, int> neededUnits;
     int firstFrame;
+	/// Subgoals
+	std::list<pSubgoal> subgoals;   //The subgoals cannot be shared
+    /// Status
+	GoalStatus status;
 
 public:
 	void setUnitsGroup(UnitsGroup * ug);
-	
 
 	//Constructors
 	Goal();//Don't forget to set the unitsGroup

@@ -7,21 +7,17 @@
 #include "Micro/WarManager.h"
 #include "../Formations/Formation.h"
 
-//TOCHANGE AT least the class name
-
 class GoalManager : public CSingleton<GoalManager>
 {
 	friend class CSingleton<GoalManager>;
 private:
-	WarManager * _warManager;
-	std::map<UnitsGroup *, std::list<pGoal> > attributedGoals;
+	std::list<pGoal> goals;
 	GoalManager();
 	~GoalManager();
-
+	std::map<BWAPI::Unit*, pBayesianUnit> militaryUnits;
+	std::list<BWAPI::Unit*> inTrainingUnits;
 public:
+	void update();
+	void addGoal(pGoal g);
 
-	void setDependencies();
-	void insert(UnitsGroup * ug, pGoal g);
-	bool remove(UnitsGroup * ug, pGoal g);//Return true if the deletion is accomplished, false in the other case
-	bool clean(UnitsGroup * ug); //Remove the pair that uses this ug as key in attributedGoals
 };

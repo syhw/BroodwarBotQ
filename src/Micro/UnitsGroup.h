@@ -29,7 +29,6 @@ struct Dmg
     int hp;
     BWAPI::Unit* unit;
     bool operator<(const Dmg& d) const { return ((this->hp - this->dmg) < (d.hp - d.dmg) || (this->hp - this->dmg == d.hp - d.dmg) && this->unit < d.unit); }
-    //bool operator<(const Dmg& d) const { return (this->dmg > d.dmg || this->dmg == d.dmg && this->unit < d.unit); }
     Dmg operator-=(int i) { this->dmg -= i; return *this; }
     Dmg operator+=(int i) { this->dmg += i; return *this; }
 };
@@ -82,7 +81,6 @@ public:
     void giveUpControl(BWAPI::Unit* u);
 	bool isWaiting(); //Return if the 1st goal is accomplished && no other goals
 	pGoal getLastGoal();
-    std::list<pBayesianUnit> incompleteUnits;
     std::list<pBayesianUnit> arrivingUnits;
     std::vector<BWAPI::Position> ppath;
     std::map<BWAPI::Unit*, BWAPI::Position> enemies;
