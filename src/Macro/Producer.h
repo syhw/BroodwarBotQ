@@ -43,7 +43,8 @@ private:
 	Producer();
 	~Producer();
 
-	void mergeArchons();
+	inline void mergeArchons();
+	inline void freeMerging();
     int _nbArchons;
 	int _nbDarkArchons;
 	std::map<BWAPI::Unit*, int> _htsMerging;

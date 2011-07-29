@@ -253,25 +253,7 @@ void Producer::update()
 	if ((_nbArchons || _nbDarkArchons) && Broodwar->getFrameCount() % 41)
 		mergeArchons();
 	/// Free merging archons if merged or taking too long
-	list<map<Unit*, int>::const_iterator> toRemHT;
-	for (map<Unit*, int>::const_iterator it = _htsMerging.begin();
-		it != _htsMerging.end(); ++it)
-	{
-		if (!it->first || !it->first->exists() || it->second > 30*24) // 30 seconds to merge
-			toRemHT.push_back(it);
-	}
-	for each (map<Unit*, int>::const_iterator it in toRemHT)
-		_htsMerging.erase(it);
-	list<map<Unit*, int>::const_iterator> toRemDT;
-	for (map<Unit*, int>::const_iterator it = _dtsMerging.begin();
-		it != _dtsMerging.end(); ++it)
-	{
-		if (!it->first || !it->first->exists() || it->second > 30*24) // 30 seconds to merge
-			toRemDT.push_back(it);
-	}
-	for each (map<Unit*, int>::const_iterator it in toRemDT)
-		_dtsMerging.erase(it);
-
+	freeMerging();
 
 	/// Filter out all producing/tech structures in construction that just finished
 	for (list<Unit*>::const_iterator it = _producingStructuresInConstruction.begin();
@@ -517,4 +499,30 @@ void Producer::mergeArchons()
 			&& p.second != NULL && p.second->exists())
 			p.first->useTech(TechTypes::Archon_Warp, p.second);
 	}
+}
+
+void Producer::freeMerging()
+{
+	list<map<Unit*, int>::const_iterator> toRemHT;
+	for (map<Unit*, int>::const_iterator it = _htsMerging.begin();
+		it != _htsMerging.end(); ++it)
+	{
+		if (!it->first || !it->first->exists() || it->second > 30*24) // 30 seconds to merge
+			toRemHT.push_back(it);
+		else
+			_htsMerging[it->first] += 1;
+	}
+	for each (map<Unit*, int>::const_iterator it in toRemHT)
+		_htsMerging.erase(it);
+	list<map<Unit*, int>::const_iterator> toRemDT;
+	for (map<Unit*, int>::const_iterator it = _dtsMerging.begin();
+		it != _dtsMerging.end(); ++it)
+	{
+		if (!it->first || !it->first->exists() || it->second > 30*24) // 30 seconds to merge
+			toRemDT.push_back(it);
+		else
+			_dtsMerging[it->first] += 1;
+	}
+	for each (map<Unit*, int>::const_iterator it in toRemDT)
+		_dtsMerging.erase(it);
 }
