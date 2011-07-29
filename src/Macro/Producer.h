@@ -42,6 +42,14 @@ private:
 	const BWAPI::UnitType& mostSaturatedUT();
 	Producer();
 	~Producer();
+
+	void mergeArchons();
+    int _nbArchons;
+	int _nbDarkArchons;
+	std::map<BWAPI::Unit*, int> _htsMerging;
+	std::map<BWAPI::Unit*, int> _dtsMerging;
+	std::list<BWAPI::Unit*> _hts;
+	std::list<BWAPI::Unit*> _dts;
 };
 
 extern Producer* TheProducer;

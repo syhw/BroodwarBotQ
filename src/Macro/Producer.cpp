@@ -53,6 +53,8 @@ void Producer::destroy()
 }
 
 Producer::Producer()
+: _nbArchons(0)
+, _nbDarkArchons(0)
 {
 	TheProducer = this;
 }
@@ -69,6 +71,11 @@ Producer::~Producer()
  */
 bool Producer::checkCanProduce(UnitType t)
 {
+	if (t == UnitTypes::Protoss_Archon)
+		return checkCanProduce(UnitTypes::Protoss_High_Templar);
+	else if (t == UnitTypes::Protoss_Dark_Archon)
+		return checkCanProduce(UnitTypes::Protoss_Dark_Templar);
+
 	map<UnitType, int> needed = t.requiredUnits();
 	bool ret = true;
 	for (map<UnitType, int>::const_iterator it = needed.begin();
@@ -119,10 +126,29 @@ void Producer::produceAdditional(int number, BWAPI::UnitType t, int priority, in
 		return;
 	int p = 100 - priority; // (multi)maps are order by increasing order
 	increment = max(1, increment); // safety
-	for (int i = 0; i < number*increment; i += increment)
+	checkCanProduce(t);
+	if (t == UnitTypes::Protoss_Archon)
 	{
-		checkCanProduce(t);
-		_productionQueue.insert(make_pair<int, UnitType>(p + i, t));
+		_nbArchons += number;
+		for (int i = 0; i < number*increment; i += increment)
+		{
+			_productionQueue.insert(make_pair<int, UnitType>(p + i, UnitTypes::Protoss_High_Templar));
+			_productionQueue.insert(make_pair<int, UnitType>(p + i, UnitTypes::Protoss_High_Templar));
+		}
+	}
+	else if (t == UnitTypes::Protoss_Dark_Archon)
+	{
+		_nbDarkArchons += number;
+		for (int i = 0; i < number*increment; i += increment)
+		{
+			_productionQueue.insert(make_pair<int, UnitType>(p + i, UnitTypes::Protoss_Dark_Templar));
+			_productionQueue.insert(make_pair<int, UnitType>(p + i, UnitTypes::Protoss_Dark_Templar));
+		}
+	}
+	else
+	{
+		for (int i = 0; i < number*increment; i += increment)
+			_productionQueue.insert(make_pair<int, UnitType>(p + i, t));
 	}
 }
 
@@ -222,6 +248,30 @@ void Producer::update()
 			it != centers.end(); ++it)
 			_producingStructures.insert(make_pair<UnitType, ProducingUnit>(centerType, *it));
 	}
+
+	/// Produce Archons if needed
+	if ((_nbArchons || _nbDarkArchons) && Broodwar->getFrameCount() % 41)
+		mergeArchons();
+	/// Free merging archons if merged or taking too long
+	list<map<Unit*, int>::const_iterator> toRemHT;
+	for (map<Unit*, int>::const_iterator it = _htsMerging.begin();
+		it != _htsMerging.end(); ++it)
+	{
+		if (!it->first || !it->first->exists() || it->second > 30*24) // 30 seconds to merge
+			toRemHT.push_back(it);
+	}
+	for each (map<Unit*, int>::const_iterator it in toRemHT)
+		_htsMerging.erase(it);
+	list<map<Unit*, int>::const_iterator> toRemDT;
+	for (map<Unit*, int>::const_iterator it = _dtsMerging.begin();
+		it != _dtsMerging.end(); ++it)
+	{
+		if (!it->first || !it->first->exists() || it->second > 30*24) // 30 seconds to merge
+			toRemDT.push_back(it);
+	}
+	for each (map<Unit*, int>::const_iterator it in toRemDT)
+		_dtsMerging.erase(it);
+
 
 	/// Filter out all producing/tech structures in construction that just finished
 	for (list<Unit*>::const_iterator it = _producingStructuresInConstruction.begin();
@@ -347,6 +397,10 @@ void Producer::onUnitCreate(BWAPI::Unit* unit)
 		|| unit->getType() == UnitTypes::Protoss_Observatory
 		|| unit->getType() == UnitTypes::Protoss_Arbiter_Tribunal)
 		_techStructuresInConstruction.push_back(unit);
+	else if (_nbArchons > 0 && unit->getType() == UnitTypes::Protoss_High_Templar)
+		TheArbitrator->setBid(this, unit, 96);
+	else if (_nbDarkArchons > 0 && unit->getType() == UnitTypes::Protoss_Dark_Templar)
+		TheArbitrator->setBid(this, unit, 96);
 }
 
 void Producer::onUnitDestroy(BWAPI::Unit* unit)
@@ -386,6 +440,16 @@ void Producer::onOffer(set<Unit*> units)
 			else
 				_producingStructuresInConstruction.push_back(*it);
 		}
+		else if ((*it)->getType() == UnitTypes::Protoss_High_Templar)
+		{
+			TheArbitrator->accept(this, *it, 96);
+			_hts.push_back(*it);
+		}
+		else if ((*it)->getType() == UnitTypes::Protoss_Dark_Templar)
+		{
+			TheArbitrator->accept(this, *it, 96);
+			_dts.push_back(*it);
+		}
 		else
 			TheArbitrator->decline(this, *it, 0);
 	}
@@ -393,19 +457,64 @@ void Producer::onOffer(set<Unit*> units)
 
 void Producer::onRevoke(BWAPI::Unit* unit, double bid)
 {
-	for (multimap<UnitType, ProducingUnit>::iterator it = _producingStructures.begin();
-		it != _producingStructures.end(); ++it)
+	if (unit->getType().isBuilding())
 	{
-		if (it->second.unit == unit)
+		for (multimap<UnitType, ProducingUnit>::iterator it = _producingStructures.begin();
+			it != _producingStructures.end(); ++it)
 		{
-			_producingStructures.erase(it);
-			return;
+			if (it->second.unit == unit)
+			{
+				_producingStructures.erase(it);
+				return;
+			}
 		}
+		_producingStructuresInConstruction.remove(unit);
 	}
-	_producingStructuresInConstruction.remove(unit);
+
+	if (unit->getType() == UnitTypes::Protoss_High_Templar
+		|| unit->getType() == UnitTypes::Protoss_Dark_Archon)
+	{
+		_hts.remove(unit);
+		_dts.remove(unit);
+		_htsMerging.erase(unit);
+		_dtsMerging.erase(unit);
+	}
 }
 
 string Producer::getName() const
 {
 	return "Producer";
+}
+
+void Producer::mergeArchons()
+{
+	list<pair<Unit*, Unit*> > toMerge;
+	/// Create pair of DTs/HTs
+	while (_nbArchons > 0 && _hts.size() >= 2)
+	{
+		Unit* tmp = _hts.front();
+		_hts.pop_front();
+		toMerge.push_back(make_pair<Unit*, Unit*>(_hts.front(), tmp));
+		_htsMerging.insert(make_pair<Unit*, int>(tmp, 0));
+		_htsMerging.insert(make_pair<Unit*, int>(_hts.front(), 0));
+		_hts.pop_front();
+		--_nbArchons;
+	}
+	while (_nbDarkArchons > 0 && _dts.size() >= 2)
+	{
+		Unit* tmp = _dts.front();
+		_dts.pop_front();
+		toMerge.push_back(make_pair<Unit*, Unit*>(_dts.front(), tmp));
+		_dtsMerging.insert(make_pair<Unit*, int>(tmp, 0));
+		_dtsMerging.insert(make_pair<Unit*, int>(_dts.front(), 0));
+		_dts.pop_front();
+		--_nbDarkArchons;
+	}
+	/// Merge each pair
+	for each (pair<Unit*, Unit*> p in toMerge)
+	{
+		if (p.first != NULL && p.first->exists()
+			&& p.second != NULL && p.second->exists())
+			p.first->useTech(TechTypes::Archon_Warp, p.second);
+	}
 }
