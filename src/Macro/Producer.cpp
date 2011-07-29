@@ -184,17 +184,20 @@ int Producer::additionalUnitsSupply(int frames)
 		pq.erase(it);
 	/// If, after all that, we have minerals left, we should build more production buildings
 	multimap<int, UnitType>::const_iterator it = pq.begin();
-	UnitType ut = it->second.whatBuilds().first;
-	while (minerals >= ut.mineralPrice() && gas >= ut.gasPrice() && it != pq.end())
+	if (it != pq.end())
 	{
-		ut = it->second.whatBuilds().first;
-		if (!TheBuilder->willBuild(ut))
+		UnitType ut = it->second.whatBuilds().first;
+		while (minerals >= ut.mineralPrice() && gas >= ut.gasPrice() && it != pq.end())
 		{
-			_neededProductionBuildings.insert(ut);
-			minerals -= ut.mineralPrice();
-			gas -= ut.gasPrice();
+			ut = it->second.whatBuilds().first;
+			if (!TheBuilder->willBuild(ut))
+			{
+				_neededProductionBuildings.insert(ut);
+				minerals -= ut.mineralPrice();
+				gas -= ut.gasPrice();
+			}
+			++it;
 		}
-		++it;
 	}
 	
 #ifdef __DEBUG__
@@ -251,10 +254,10 @@ void Producer::update()
 #endif
 		&& TheResourceRates->getGatherRate().getMinerals() > 0.00001) // TODO change
 	{
-		int frames = max(180*24,
+		int frames = min(180*24,
 			Broodwar->self()->getRace().getSupplyProvider().buildTime()
-			+ (int)(Broodwar->self()->getRace().getSupplyProvider().mineralPrice() / TheResourceRates->getGatherRate().getMinerals()) // important only if we perfectly consume our resources
-			+ 5*24); // should be the upper bound on the time to start building a pylon
+			+ max((int)(Broodwar->self()->getRace().getSupplyProvider().mineralPrice() / TheResourceRates->getGatherRate().getMinerals()) // important only if we perfectly consume our resources
+			, 10*24)); // should be the upper bound on the time to start building a pylon
 		if (!TheBuilder->numberInFutureTasks(Broodwar->self()->getRace().getSupplyProvider()) &&
 			Broodwar->self()->supplyTotal() < 200 &&
 			additionalUnitsSupply(frames) + Broodwar->self()->supplyUsed() > TheBuilder->additionalSupplyNextFrames(frames) + Broodwar->self()->supplyTotal())
