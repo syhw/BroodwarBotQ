@@ -201,4 +201,12 @@ void Macro::onUnitMorph(BWAPI::Unit* unit)
 void Macro::onUnitRenegade(BWAPI::Unit* unit)
 {
 	TheUnitGroupManager->onUnitRenegade(unit);
+	// the following is experimental
+	if (unit->getPlayer() != Broodwar->self())
+	{
+		TheArbitrator->onRemoveObject(unit);
+		TheWorkerManager->onRemoveUnit(unit);
+		TheInformationManager->onUnitDestroy(unit);
+		TheInformationManager->onUnitDiscover(unit);
+	}
 }

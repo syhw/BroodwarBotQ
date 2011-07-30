@@ -1,8 +1,11 @@
 #include <PrecompiledHeader.h>
 #include <algorithm>
 #include "Micro/Goals/Goal.h"
+#include "Macro/BWSAL.h"
+#include "Macro/UnitGroupManager.h"
 
 using namespace std;
+using namespace BWAPI;
 
 Goal::~Goal()
 {
@@ -35,8 +38,8 @@ Goal::Goal(pSubgoal s, int priority, int firstFrame)
 		_firstFrame = Broodwar->getFrameCount();
 }
 
-Goal::Goal(const std::<UnitType, int>& nU, pSubgoal s,
-		   int priority, int firstFrame);
+Goal::Goal(const map<UnitType, int>& nU, pSubgoal s,
+		   int priority, int firstFrame)
 : _status(GS_WAIT_PRECONDITION)
 , _priority(priority)
 , _firstFrame(firstFrame)
@@ -63,30 +66,40 @@ void Goal::bidOnUnitType(const UnitType& ut)
 	}
 }
 
-virtual void Goal::onOffer(set<Unit*> objects)
+void Goal::onOffer(set<Unit*> objects)
 {
+	GoalManager* gm = & GoalManager::Instance();
 	if (_status == GS_WAIT_PRECONDITION || _status == GS_IN_PROGRESS)
 	{
         for each (Unit* u in objects)
 		{
-		if (GoalManager::Instance()._
-		TheArbitrator->accept(this, objects, 95);
+			if (gm->getCompletedUnits().find(u) != gm->getCompletedUnits().end())
+			{
+				TheArbitrator->accept(this, objects, _priority);
+				if (_neededUnits.find(u->getType()) != _neededUnits.end())
+					_neededUnits[u->getType()] -= 1;
+				_unitsGroup.dispatchCompleteUnit(gm->getCompletedUnit(u));
+			}
 		}
 	}
 	else
 	{
 		TheArbitrator->decline(this, objects, 0);
-		TheArbitrator->removeBid(this, object);
+		TheArbitrator->removeBid(this, objects);
         for each (Unit* u in objects)
 			_biddedOn.erase(u);
 	}
 }
 
-virtual void Goal::onRevoke(Unit* u, double bid);
+void Goal::onRevoke(Unit* u, double bid)
 {
+	_unitsGroup.giveUpControl(u);
+	if (_neededUnits.find(u->getType()) != _neededUnits.end())
+		_neededUnits[u->getType()] += 1;
+	///// TODO
 }
 
-virtual string Goal::getName() const
+string Goal::getName() const
 {
 	return "Goal";
 }
@@ -96,7 +109,7 @@ void Goal::update()
 	if (_status == GS_WAIT_PRECONDITION)
 	{
 		/// Wait for the first frame trigger (if existing)
-		if (Broodwar->getFrameCount() < firstFrame)
+		if (Broodwar->getFrameCount() < _firstFrame)
 			return;
 		/// Request needed units
 		bool gotAllUnits = true;
@@ -118,25 +131,25 @@ void Goal::update()
 		this->cancel();
 	//else if (_status == GS_CANCELED || _status == GS_ACHIEVED)
 	else
-		TheArbitrator->removeAllBids();
+		TheArbitrator->removeAllBids(this);
 }
 
 void Goal::achieve()
 {
-	if (_status == GS_WAIT_PRECONDITION)
+	if (_status != GS_IN_PROGRESS) // defensive
 		return;
 	check();
 	if (_status == GS_ACHIEVED)
 		return;
-	double test;
+	/// Select the Subgoal which is faster to realize 
 	pSubgoal selected;
 	double min = DBL_MAX;			
-	for (list<pSubgoal>::const_iterator it = subgoals.begin();
-		it != subgoals.end(); ++it)
+	for (list<pSubgoal>::const_iterator it = _subgoals.begin();
+		it != _subgoals.end(); ++it)
 	{
 		if (!(*it)->isRealized())
 		{
-			test = (*it)->distanceToRealize();
+			double test = (*it)->distanceToRealize();
 			if (test >= 0 && test < min)
 			{
 				min = test;
@@ -147,32 +160,37 @@ void Goal::achieve()
 	if (min > 0 && min < DBL_MAX)
 	{
 		selected->tryToRealize();
-	} else {
+	} 
+	else 
+	{
 		Broodwar->printf("no selected SubGoal but goal not achieved");
-		//TODO
+		// Bug if here
 	}
 }
 
+/***
+ * Check for achievement:
+ * All the _subgoals are tested (there can be a SL_OR true)
+ */
 void Goal::check()
 {
-	if (this->status == GS_ACHIEVED)
+	if (_status == GS_ACHIEVED || _status == GS_CANCELED)
 		return;
-	//All the subgoals are tested because the check function might validate
-	//some subgoals
-	bool res_and=true;
-	bool res_or=false;
-
-	for (std::list<pSubgoal>::iterator p = subgoals.begin(); p != subgoals.end(); )
+	bool and_goals = false;
+	bool res_and = true;
+	bool res_or = false;
+	for (list<pSubgoal>::iterator p = _subgoals.begin(); p != _subgoals.end(); )
 	{
 		if ((*p)->getLogic() == SL_AND)
 		{
 			//AND case 
 			if (!(*p)->isRealized())
 			{
-				res_and=false;
+				res_and = false;
 				++p;
-			} else
-				subgoals.erase(p++);
+			} 
+			else
+				_subgoals.erase(p++);
 		} else {
 			//OR case
 			if ((*p)->isRealized())
@@ -181,56 +199,30 @@ void Goal::check()
 		}
 	}
 
-	if(res_and || res_or)
+	if(res_or || res_and)
 	{
 		_status= GS_ACHIEVED;
 #ifdef __DEBUG__
-		BWAPI::Broodwar->printf("\x13 \x04 goal finished in ~ %d seconds", (BWAPI::Broodwar->getFrameCount() - firstFrame)/24);
+		BWAPI::Broodwar->printf("\x13 \x04 goal finished in ~ %d seconds", (BWAPI::Broodwar->getFrameCount() - _firstFrame)/24);
 #endif
 	}
 }
 
-void Goal::addSubgoal(pSubgoal s)
+void Goal::cancel()
 {
-	if (this->status != GS_NOT_ATTRIBUTED)
-	{
-		s->setUnitsGroup(unitsGroup);
-	}
-	this->subgoals.push_back(s);
 }
 
-GoalStatus Goal::getStatus() const
+void Goal::addSubgoal(pSubgoal s)
 {
-	return status;
+	_subgoals.push_back(s);
 }
 
 void Goal::setStatus(GoalStatus s)
 {
-	status = s;
+	_status = s;
 }
 
-
-
-void Goal::setUnitsGroup(UnitsGroup * ug)
+GoalStatus Goal::getStatus() const
 {
-	this->status = GS_IN_PROGRESS;
-	for (std::list<pSubgoal>::iterator it = this->subgoals.begin(); it != subgoals.end(); ++it)
-	{
-		(*it)->setUnitsGroup(ug);
-	}
-	this->unitsGroup = ug;
-}
-
-
-int Goal::estimateDistance(BWAPI::Position p)
-{
-
-	for (std::list<pSubgoal>::iterator it = this->subgoals.begin(); it != this->subgoals.end(); ++it)
-	{
-		if ((*it)->distanceToRealize(p) > 0)
-		{
-			return (int)(*it)->distanceToRealize(p);
-		}
-	}
-	return -1;
+	return _status;
 }

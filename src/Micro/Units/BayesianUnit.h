@@ -214,10 +214,6 @@ public:
     ~BayesianUnit();
     BWAPI::UnitType getType();
 
-    virtual void onUnitDestroy(BWAPI::Unit* u);
-    virtual void onUnitShow(BWAPI::Unit* u);
-    virtual void onUnitHide(BWAPI::Unit* u);
-
     void update();
     virtual void attack(const BWAPI::Position& p);
 

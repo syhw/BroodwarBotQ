@@ -36,10 +36,10 @@ using namespace BWAPI;
 UnitsGroup::UnitsGroup()
 : defaultTargetEnemy(NULL)
 , nearestChoke(NULL)
-, totalHP(0)
-, totalMinPrice(0)
-, totalGazPrice(0)
-, totalSupply(0)
+, _totalHP(0)
+, _totalMinPrice(0)
+, _totalGazPrice(0)
+, _totalSupply(0)
 , _hasDetection(0)
 , enemiesCenter(Position(0, 0))
 {
@@ -239,19 +239,18 @@ double UnitsGroup::evaluateForces()
         }
     }
     // trying a simple rule: 100 minerals == 4 pop == 75 gaz == 100 pts
-    double ourScore = totalMinPrice + (4/3)*totalGazPrice + 25*totalSupply;
+    double ourScore = _totalMinPrice + (4/3)*_totalGazPrice + 25*_totalSupply;
     double theirScore = theirMinPrice + (4/3)*theirGazPrice + 25*theirSupply;
     if (enemiesAltitude > groupAltitude)
         theirScore *= 1.5;
     if (onlyInvisibles && !_hasDetection)
-        return 0.1;
+        return 0.01;
     else
         return ourScore/theirScore;
 }
 
 void BasicUnitsGroup::update()
 {
-    accomplishGoal();
 	for (std::vector<pBayesianUnit>::const_iterator it = units.begin();
 		it != units.end(); ++it)
 	    (*it)->update();
@@ -259,28 +258,11 @@ void BasicUnitsGroup::update()
 
 void UnitsGroup::update()
 {
-	if (this == NULL) /// WHAT
-		return;  /// THE FUCK?
 #ifdef __DEBUG__
     clock_t start = clock();
 #endif
 	if (units.empty())
-    {
-		accomplishGoal();
 		return;
-    }
-
-	for (std::list<pBayesianUnit>::iterator it = incompleteUnits.begin();
-		it != incompleteUnits.end(); )
-	{
-		if ((*it)->unit->isCompleted())
-		{
-			dispatchCompleteUnit(*it);
-			incompleteUnits.erase(it++);
-		}
-		else
-			++it;
-	}
 
     if (!arrivingUnits.empty())
     {
@@ -302,7 +284,6 @@ void UnitsGroup::update()
                 {
                     units.push_back(*it);
 					updateGroupStrengh((*it)->unit);
-                    //goals.front()->achieve();
                     arrivingUnits.erase(it++);
                 }
                 else
@@ -334,7 +315,7 @@ void UnitsGroup::update()
             ppath = leadingUnit->getPPath();
     }
 
-    this->totalHP = 0;
+    this->_totalHP = 0;
     double maxRange = -1.0;
     /*** TODO BUG IN SquareFormation TODO TODO TODO volatile bool contactUnits = false; // why do I need volatile to make it work not erratically? */
     for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
@@ -344,9 +325,9 @@ void UnitsGroup::update()
             || (*it)->unit->getType() == UnitTypes::Protoss_Archon)
             contactUnits = true;
         */
-        totalHP += (*it)->unit->getHitPoints();
+        _totalHP += (*it)->unit->getHitPoints();
 		if (Broodwar->self()->getRace() == Races::Protoss)
-			totalHP += (*it)->unit->getShields();
+			_totalHP += (*it)->unit->getShields();
         double tmp_max = max(max((*it)->unit->getType().groundWeapon().maxRange(), (*it)->unit->getType().airWeapon().maxRange()), 
             (*it)->unit->getType().sightRange()); // TODO: upgrades
         if (tmp_max > maxRange)
@@ -502,49 +483,27 @@ void UnitsGroup::setGoals(std::list<pGoal>& goals)
 		this->goals.front()->achieve();
 }
 
-void UnitsGroup::addGoal(pGoal goal)
-{
-    this->goals.push_back(goal);
-	goal->setUnitsGroup(this);
-}
-
-void UnitsGroup::addGoalFront(pGoal goal)
-{
-    this->goals.push_front(goal);
-    goal->setUnitsGroup(this);
-    goals.front()->achieve();
-}
-
-
 void UnitsGroup::onUnitDestroy(Unit* u)
 {
-    if (u->getPlayer() != Broodwar->self())
-        for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
-            (*it)->onUnitDestroy(u);
+    if (u->getPlayer() == Broodwar->self())
+	    unitDamages.left.erase(u);
     else
-    {
         giveUpControl(u);
-    }
-    unitDamages.left.erase(u);
 }
 
 void UnitsGroup::onUnitShow(Unit* u)
 {
-    for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
-        (*it)->onUnitShow(u);
     if (u->getPlayer() == Broodwar->enemy() && u->isDetected()) //(!u->getType().isBuilding())
         unitDamages.insert(UnitDmg(u, Dmg(0, u, u->getHitPoints() + u->getShields())));
 }
 
 void UnitsGroup::onUnitHide(Unit* u)
 {    
-    for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
-        (*it)->onUnitHide(u);
 }
 
 double UnitsGroup::getDistance(BWAPI::Unit* u) const
 {
-    return Vec(center - u->getPosition()).norm();
+    return u->getDistance(center);
 }
 
 void UnitsGroup::dispatchCompleteUnit(pBayesianUnit bu)
@@ -561,7 +520,6 @@ void UnitsGroup::dispatchCompleteUnit(pBayesianUnit bu)
     }
 }
 
-
 bool BasicUnitsGroup::removeUnit(Unit* u)
 {
     for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
@@ -573,9 +531,21 @@ bool BasicUnitsGroup::removeUnit(Unit* u)
 	return false;
 }
 
+bool BasicUnitsGroup::removeArrivingUnit(Unit* u)
+{
+    for (std::vector<pBayesianUnit>::const_iterator it = arrivingUnits.begin(); it != arrivingUnits.end(); ++it)
+        if ((*it)->unit == u)
+        {
+            arrivingUnits.erase(it);
+			return true;
+        }
+	return false;
+}
+
 void UnitsGroup::giveUpControl(Unit* u)
 {
-	removeUnit(u);
+	if (removeArrivingUnits(u))
+		removeUnit(u);
     if (u->getType() == UnitTypes::Protoss_Observer)
     {
         _hasDetection = false;
@@ -586,9 +556,9 @@ void UnitsGroup::giveUpControl(Unit* u)
                 break;
             }
     }
-    totalMinPrice -= u->getType().mineralPrice();
-    totalGazPrice -= u->getType().gasPrice();
-    totalSupply -= u->getType().supplyRequired();
+    _totalMinPrice -= u->getType().mineralPrice();
+    _totalGazPrice -= u->getType().gasPrice();
+    _totalSupply -= u->getType().supplyRequired();
 }
 
 bool BasicUnitsGroup::emptyUnits()
@@ -604,15 +574,15 @@ void UnitsGroup::updateGroupStrengh(Unit* u)
 {
 	if (u->getType() == UnitTypes::Protoss_Observer)
 		_hasDetection = true;
-	totalMinPrice += u->getType().mineralPrice();
-	totalGazPrice += u->getType().gasPrice();
-	totalSupply += u->getType().supplyRequired();
+	_totalMinPrice += u->getType().mineralPrice();
+	_totalGazPrice += u->getType().gasPrice();
+	_totalSupply += u->getType().supplyRequired();
 }
 
 
 int UnitsGroup::getTotalHP() const
 {
-    return totalHP;
+    return _totalHP;
 }
 
 std::vector<pBayesianUnit>* UnitsGroup::getUnits()
@@ -638,9 +608,9 @@ const BayesianUnit& UnitsGroup::operator[](ptrdiff_t i)
     return *(units[i]);
 }
 
+#ifndef __RELEASE_OPTIM__
 void UnitsGroup::display()
 {
-	
     Broodwar->drawCircle(CoordinateType::Map, center.x(), center.y(), 8, Colors::Green);
     for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); it++)
     {
@@ -672,6 +642,7 @@ void UnitsGroup::display()
 //    }
 	
 }
+#endif
 
 int BasicUnitsGroup::size() const
 {
@@ -730,12 +701,6 @@ void UnitsGroup::selectedUnits(std::set<pBayesianUnit>& u)
 }
 #endif
 
-
-void BasicUnitsGroup::accomplishGoal()
-{
-
-}
-
 void UnitsGroup::switchMode(unit_mode um){
 	for(std::vector<pBayesianUnit>::iterator it = getUnits()->begin(); it != getUnits()->end(); ++it){
 		(*it)->switchMode(um);
@@ -746,17 +711,6 @@ void UnitsGroup::idle(){
 	for(std::vector<pBayesianUnit>::iterator it = getUnits()->begin(); it != getUnits()->end(); ++it){
 		(*it)->target = (*it)->unit->getPosition();
 	}
-}
-
-pGoal UnitsGroup::getLastGoal(){
-	return this->goals.front();
-}
-
-bool UnitsGroup::isWaiting(){
-	if(goals.size() <= 0)
-		//Problematic situation
-		return true;
-	return goals.size() == 1 && (*goals.front()).getStatus() == GS_ACHIEVED ;
 }
 
 void UnitsGroup::signalMerge(Unit* u)

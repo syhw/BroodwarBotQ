@@ -45,13 +45,18 @@ void DarkArchonUnit::micro()
 	if (dodgeStorm() || dragMine())
         return;
 	updateRangeEnemies();
-    if (this->unit->getEnergy() > 149)
+	if (Broodwar->self()->hasResearched(TechTypes::Mind_Control)
+		&& unit->getEnergy() > 149)
 	{
 		for (multimap<double, Unit*>::const_iterator it = _rangeEnemies.begin();
 			it != _rangeEnemies.end(); ++it)
 		{
 			if (setPrio.count(it->second->getType())
-				&& it->second->getHitPoints()+it->second->getShields() > 80)
+				&& it->second->getHitPoints()+it->second->getShields() > 80
+				&& !it->second->isHallucination()
+				&& !it->second->isLockedDown()
+				&& !it->second->isMaelstrommed()
+				&& !it->second->isStasised())
 			{
 				unit->useTech(TechTypes::Mind_Control, it->second);
 				_lastCastFrame = Broodwar->getFrameCount();
@@ -59,7 +64,7 @@ void DarkArchonUnit::micro()
 			}
 		}
 	}
-    if (this->unit->getEnergy() > 49)
+    if (unit->getEnergy() > 49)
 	{
 		for (multimap<double, Unit*>::const_iterator it = _rangeEnemies.begin();
 			it != _rangeEnemies.end(); ++it)
@@ -73,14 +78,20 @@ void DarkArchonUnit::micro()
 			}
 		}
 	}
-    if (this->unit->getEnergy() > 99)
+	if (Broodwar->self()->hasResearched(TechTypes::Maelstrom)
+		&& unit->getEnergy() > 99)
 	{
 		for (multimap<double, Unit*>::const_iterator it = _rangeEnemies.begin();
 			it != _rangeEnemies.end(); ++it)
 		{
 			if (it->second->getHitPoints() > 40 
 				&& (setPrio.count(it->second->getType())
-				    || it->second->getType() == UnitTypes::Zerg_Mutalisk))
+				    || it->second->getType() == UnitTypes::Zerg_Mutalisk)
+				&& !it->second->isDefenseMatrixed()
+				&& !it->second->isHallucination()
+				&& !it->second->isLockedDown()
+				&& !it->second->isMaelstrommed()
+				&& !it->second->isStasised()
 			{
 				unit->useTech(TechTypes::Maelstrom, it->second);
 				_lastCastFrame = Broodwar->getFrameCount();
@@ -94,7 +105,7 @@ void DarkArchonUnit::micro()
 			it != _rangeEnemies.end(); ++it)
 		{
 			if (casters.count(it->second->getType()
-				&& it->second->getEnergy() > 50))
+				&& it->second->getEnergy() > 60))
 			{
 				unit->useTech(TechTypes::Feedback, it->second);
 				_lastCastFrame = Broodwar->getFrameCount();

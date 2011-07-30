@@ -191,6 +191,7 @@ void BattleBroodAI::onUnitRenegade(BWAPI::Unit* unit)
 {
 	intelligence->onUnitRenegade(unit);
 	macro->onUnitRenegade(unit);
+	micro->onUnitRenegade(unit);
 }
 
 void BattleBroodAI::onPlayerLeft(BWAPI::Player* player)

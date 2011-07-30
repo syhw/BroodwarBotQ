@@ -501,15 +501,3 @@ void BattleUnit::quickPathFind(std::vector<TilePosition>& btpath,
         btpath.push_back(*it);
     return;
 }
-
-void BattleUnit::onUnitDestroy(Unit* u)
-{
-}
-
-void BattleUnit::onUnitShow(Unit* u)
-{
-}
-
-void BattleUnit::onUnitHide(Unit* u)
-{
-}

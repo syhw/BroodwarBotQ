@@ -31,6 +31,14 @@ void GoalManager::update()
 	/// Update all goals
 	for each (pGoal g in _goals)
 		g->update();
+	for (list<pGoal>::const_iterator it = _goals.begin();
+		it != _goals.end();)
+	{
+		if ((*it)->getStatus() == GS_ACHIEVED || (*it)->getStatus() == GS_CANCELED)
+			_goals.erase(it++);
+		else
+			++it;
+	}
 }
 
 void GoalManager::addGoal(pGoal g)
@@ -65,3 +73,7 @@ const map<Unit*, pBayesianUnit>& GoalManager::getCompletedUnits() const
 	return _completedUnits;
 }
 
+pBayesianUnit GoalManager::getCompletedUnit(Unit* u)
+{
+	return _completedUnits[u];
+}

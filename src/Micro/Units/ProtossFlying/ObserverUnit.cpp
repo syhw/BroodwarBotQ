@@ -17,7 +17,7 @@ ObserverUnit::~ObserverUnit()
 
 void ObserverUnit::micro()
 {
-    if (Broodwar->getFrameCount() - _lastClickFrame < Broodwar->getLatencyFrames())
+    if (Broodwar->getFrameCount() - _lastClickFrame <= Broodwar->getLatencyFrames())
         return;
     Position invisPos = Positions::None;
     double minDist = 100000.0;

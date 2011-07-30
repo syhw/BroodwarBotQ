@@ -65,24 +65,22 @@ public:
 class UnitsGroup : public BasicUnitsGroup
 {
 private:
-	int totalHP;
-    int totalMinPrice;
-    int totalGazPrice;
-    int totalSupply;
+	int _totalHP;
+    int _totalMinPrice;
+    int _totalGazPrice;
+    int _totalSupply;
     EUnitsFilter* _eUnitsFilter;
     std::set<BWAPI::Unit*> _mergersHT;
     bool _hasDetection;
     inline void updateNearbyEnemyUnitsFromFilter(BWAPI::Position p, double radius = 400.0);
     double evaluateForces();
+    bool removeArrivingUnit(BWAPI::Unit* u);
 #ifdef __DEBUG__
     void displayTargets();  // debug purpose
 #endif
 public:
-	inline void dispatchCompleteUnit(pBayesianUnit bu);
-    void takeControl(BWAPI::Unit* u);
+	void dispatchCompleteUnit(pBayesianUnit bu);
     void giveUpControl(BWAPI::Unit* u);
-	bool isWaiting(); //Return if the 1st goal is accomplished && no other goals
-	pGoal getLastGoal();
     std::list<pBayesianUnit> arrivingUnits;
     std::vector<BWAPI::Position> ppath;
     std::map<BWAPI::Unit*, BWAPI::Position> enemies;
@@ -103,15 +101,18 @@ public:
     Vec centerSpeed;
 	std::map<BWAPI::UnitSizeType, int> sizes;
 
-	virtual void update();
-	virtual void display();
+	void update();
+
+#ifndef __RELEASE_OPTIM__
+	void display();
+#endif
 
 	// Units interface
     pBayesianUnit addUnit(BWAPI::Unit* u);
 
-	virtual void attack(int x, int y);
-	virtual void attack(BWAPI::Position& p);
-	virtual void move(BWAPI::Position& p);
+	void attack(int x, int y);
+	void attack(BWAPI::Position& p);
+	void move(BWAPI::Position& p);
 
 	virtual void formation(pFormation f);
 	

@@ -1684,6 +1684,10 @@ void BayesianUnit::drawDir()
 
 void BayesianUnit::clickDir()
 {
+	//////// TODO EXPERIMENTAL
+	if (unit->isStuck())
+		return;
+	//////// /TODO EXPERIMENTAL
     double dist = _unitPos.getDistance(target);
     if ((_mode == MODE_SCOUT || _mode == MODE_MOVE) && (dir == Vec(0,0) || dist < 1.1))
     {
@@ -1893,18 +1897,6 @@ void BayesianUnit::drawArrow(Vec& v)
     double v_y = yto-yfrom;
     Broodwar->drawLine(CoordinateType::Map, xfrom, yfrom, (int)xto, (int)yto, Colors::Orange);
     Broodwar->drawTriangle(CoordinateType::Map, (int)(xto - 0.1*v_y), (int)(yto + 0.1*v_x), (int)(xto + 0.1*v_y), (int)(yto - 0.1*v_x), (int)(xto + 0.1*v_x), (int)(yto + 0.1*v_y), Colors::Orange); // 0.1, magic number
-}
-
-void BayesianUnit::onUnitDestroy(Unit* u)
-{
-}
-
-void BayesianUnit::onUnitShow(Unit* u)
-{
-}
-
-void BayesianUnit::onUnitHide(Unit* u)
-{
 }
 
 bool BayesianUnit::decideToFlee()

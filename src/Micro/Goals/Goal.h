@@ -13,6 +13,7 @@ typedef boost::shared_ptr<Subgoal> pSubgoal;
 #endif
 #include "Macro/Arbitrator.h"
 #include "Micro/UnitsGroup.h"
+#include "Micro/Goals/GoalManager.h"
 #include "Defines.h"
 #include <BWAPI.h>
 #include <BWTA.h>
@@ -31,6 +32,9 @@ typedef enum
 	GS_ACHIEVED            = 4
 } GoalStatus;
 
+/***
+ * Simple Goal class without canceling check in check()
+ */
 class Goal : Arbitrator::Controller<BWAPI::Unit*, double>
 {
 	friend class UnitsGroup;
@@ -43,10 +47,10 @@ protected:
     int _priority;
     int _firstFrame;
 	/// Subgoals
-	std::list<pSubgoal> _subgoals;   //The subgoals cannot be shared
+	std::list<pSubgoal> _subgoals;
     /// Status
 	GoalStatus _status;
-	void bidOnUnit(const BWAPI::UnitType& ut);
+	void bidOnUnitType(const BWAPI::UnitType& ut);
 public:
 	Goal(int priority = 50);
 	Goal(pSubgoal s, int priority = 50, int firstFrame = 0);
@@ -56,18 +60,17 @@ public:
 	
 	virtual void onOffer(std::set<BWAPI::Unit*> objects);
 	virtual void onRevoke(BWAPI::Unit* u, double bid);
+	void onUnitDestroy(BWAPI::Unit* unit);
     virtual std::string getName() const;
 	virtual void update();
 	virtual void achieve();
 	virtual void check();
+	virtual void cancel();
 
 	void addSubgoal(pSubgoal s);
 	void addNeededUnits(const std::map<BWAPI::UnitType, int>& neededUnits);
 	void setFirstFrame(int firstFrame);
 	void setPriority(int priority);
-	
 	void setStatus(GoalStatus s);
 	GoalStatus getStatus() const;
-	virtual int estimateDistance(BWAPI::Position);
-
 };

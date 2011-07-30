@@ -26,4 +26,5 @@ public:
 	void onUnitCreate(BWAPI::Unit* u);
 	void onUnitDestroy(BWAPI::Unit* u);
 	const std::map<BWAPI::Unit*, pBayesianUnit>& getCompletedUnits() const;
+	pBayesianUnit getCompletedUnit(BWAPI::Unit* u);
 };

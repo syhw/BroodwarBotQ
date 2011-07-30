@@ -160,7 +160,17 @@ void Task::update()
 		UnitType tmp = (*it)->getType();
 		if ((*it)->getPlayer() != Broodwar->self() && (*it)->getPlayer() != Broodwar->neutral()) // then we can't move this unit
 		{
-			tilePosition = buildingPlacer->getTilePosition(type);
+			if (tmp == UnitTypes::Protoss_Assimilator || tmp == UnitTypes::Zerg_Extractor || tmp == UnitTypes::Terran_Refinery)
+			{
+				/// Retry in a few seconds because the fucker stole our gas
+				TheArbitrator->removeBid(this, worker);
+				TheArbitrator->removeAllBids(this);
+				worker = NULL;
+				lastOrder = Broodwar->getFrameCount() + 14*24; // retry every 14 seconds
+				return;
+			}
+			else
+				tilePosition = buildingPlacer->getTilePosition(type);
 			break;
 		}
 		if (tmp == type)
