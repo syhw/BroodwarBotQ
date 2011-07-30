@@ -2,25 +2,35 @@
 #include "Micro/Goals/ExploreGoal.h"
 
 using namespace BWAPI;
-
-somewhere	unitsGroup->switchMode(MODE_SCOUT);
+using namespace std;
 	
-ExploreGoal::ExploreGoal(TilePosition tp) 
-: Goal()
+void ExploreGoal::needAScoutingUnit()
+{	
+	if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Observer) > 0)
+		_neededUnits.insert(make_pair<UnitType, int>(UnitTypes::Protoss_Observer, 1));
+	else
+		_neededUnits.insert(make_pair<UnitType, int>(UnitTypes::Protoss_Probe, 1));
+}
+
+ExploreGoal::ExploreGoal(TilePosition tp, int priority) 
+: Goal(priority)
 {
 	if (Broodwar->isVisible(tp))
 	{
-		status = GS_ACHIEVED;
+		_status = GS_ACHIEVED;
 		return;
 	}
-	subgoals.push_back(pSubgoal(new SeeSubgoal(SL_AND, Position(tp))));
+	needAScoutingUnit();
+	_subgoals.push_back(pSubgoal(new SeeSubgoal(SL_AND, Position(tp))));
 }
 
-ExploreGoal::ExploreGoal(BWTA::Region* region) 
-: Goal()
+ExploreGoal::ExploreGoal(BWTA::Region* region, int priority) 
+: Goal(priority)
 {
 	if (region != NULL)
 	{
+		needAScoutingUnit();
+
 		BWTA::Polygon polygon = region->getPolygon();
 		std::list<Position> to_see;
 		bool insert=true;
@@ -31,9 +41,8 @@ ExploreGoal::ExploreGoal(BWTA::Region* region)
 		//Add a first position to the subgoals
 		Position prevPos = to_see.front();
 		to_see.pop_front();
-		subgoals.push_back(pSubgoal(new SeeSubgoal(SL_AND, prevPos)));
+		_subgoals.push_back(pSubgoal(new SeeSubgoal(SL_AND, prevPos)));
 
-		
 		Position selectedPos;
 		int size = to_see.size();
 		double curDist;
@@ -42,7 +51,7 @@ ExploreGoal::ExploreGoal(BWTA::Region* region)
 		while(!to_see.empty()){
 			maxDist=0;
 
-			//Select the farest point
+			//Select the furthest point
 			for(it= to_see.begin(); it!= to_see.end(); ++it){
 				curDist = it->getDistance(prevPos);
 				if (curDist > maxDist){
@@ -51,32 +60,27 @@ ExploreGoal::ExploreGoal(BWTA::Region* region)
 				}
 			}
 
-
 			//Create and push the associated Subgoal
-
-			subgoals.push_back(pSubgoal(new SeeSubgoal(SL_AND, selectedPos)));
+			_subgoals.push_back(pSubgoal(new SeeSubgoal(SL_AND, selectedPos)));
 			prevPos = selectedPos;
 
 			//Remove this position from to_see
 			to_see.remove(selectedPos);
 			size --;
-
 		}		
 	}
 }
 
-void ExploreGoal::achieve(){
-
-	checkAchievement();
-	// !!! Accomplish the subgoals in order
-	if(status!=GS_ACHIEVED){
-	
-		for(std::list<pSubgoal>::iterator it = subgoals.begin(); it != subgoals.end(); ++it){
-			if (!((*it)->isRealized()))
-            {
-				(*it)->tryToRealize();
-			}
-		}
+void ExploreGoal::achieve()
+{
+	if (_status != GS_IN_PROGRESS) // defensive
+		return;
+	_unitsGroup.switchMode(MODE_SCOUT);
+	check();
+	/// Realize the subgoals IN ORDER (going though the Region)
+	for(std::list<pSubgoal>::iterator it = _subgoals.begin(); it != _subgoals.end(); ++it){
+		if (!((*it)->isRealized()))
+			(*it)->tryToRealize();
 	}
 }
 

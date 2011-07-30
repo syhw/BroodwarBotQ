@@ -184,6 +184,7 @@ void Goal::check()
 		if ((*p)->getLogic() == SL_AND)
 		{
 			//AND case 
+			and_goals = true; // there is as least one AND goal
 			if (!(*p)->isRealized())
 			{
 				res_and = false;
@@ -199,7 +200,7 @@ void Goal::check()
 		}
 	}
 
-	if(res_or || res_and)
+	if(res_or || (and_goals && res_and))
 	{
 		_status= GS_ACHIEVED;
 #ifdef __DEBUG__

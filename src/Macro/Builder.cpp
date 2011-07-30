@@ -114,12 +114,21 @@ void Task::askWorker()
 
 void Task::buildIt()
 {
-	if (Broodwar->getFrameCount() > lastOrder + 27 + Broodwar->getLatencyFrames() && worker && worker->exists())
+	if (!worker || !worker->exists() || worker->getPlayer() != Broodwar->self())
 	{
+		/// Just in case the worker got killed / captured
+		worker = NULL;
+		askWorker();
+		return;
+	}
+	if (Broodwar->getFrameCount() > lastOrder + 27 + Broodwar->getLatencyFrames())
+	{
+		/// Move closer to the construction site
 		if (worker->getPosition().getApproxDistance(Position(tilePosition)) > 4 * TILE_SIZE)
 		{
 			worker->move(Position(tilePosition));
 		}
+		/// Try and build it if we can
 		else if (!worker->build(tilePosition, type))
 		{
 #ifdef __DEBUG__
