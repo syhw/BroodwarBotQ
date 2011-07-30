@@ -5,8 +5,8 @@ using namespace BWAPI;
 
 std::set<BWAPI::UnitType> CorsairUnit::setPrio;
 
-CorsairUnit::CorsairUnit(BWAPI::Unit* u,UnitsGroup* ug)
-: FlyingUnit(u, ug)
+CorsairUnit::CorsairUnit(BWAPI::Unit* u)
+: FlyingUnit(u)
 {
     if (setPrio.empty())
     {

@@ -12,8 +12,8 @@ int DragoonUnit::attackDuration;
 
 std::set<BWAPI::UnitType> DragoonUnit::setPrio;
 
-DragoonUnit::DragoonUnit(BWAPI::Unit* u,UnitsGroup* ug)
-: GroundUnit(u, ug)
+DragoonUnit::DragoonUnit(BWAPI::Unit* u)
+: GroundUnit(u)
 {
     if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Singularity_Charge))
         addRange = 64;

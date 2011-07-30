@@ -3,8 +3,8 @@
 
 ProbTables FlyingUnit::_sProbTables = ProbTables(-2); // -2 for flying
 
-FlyingUnit::FlyingUnit(BWAPI::Unit* u, UnitsGroup* ug)
-: BayesianUnit(u, ug, &_sProbTables)
+FlyingUnit::FlyingUnit(BWAPI::Unit* u)
+: BayesianUnit(u, &_sProbTables)
 {
 }
 

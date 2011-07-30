@@ -1,8 +1,8 @@
 #include <PrecompiledHeader.h>
 #include "Micro/Units/ProtossGround/ProbeUnit.h"
 
-ProbeUnit::ProbeUnit(BWAPI::Unit* u,UnitsGroup* ug)
-: GroundUnit(u, ug)
+ProbeUnit::ProbeUnit(BWAPI::Unit* u)
+: GroundUnit(u)
 {
 }
 
@@ -17,6 +17,7 @@ void ProbeUnit::micro()
         _lastClickFrame = Broodwar->getFrameCount();
         unit->attack(target);
     }
+	// TODO complete (back with mineral walk)
 }
 
 void ProbeUnit::check()

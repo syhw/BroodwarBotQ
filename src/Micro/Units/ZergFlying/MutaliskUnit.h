@@ -7,9 +7,8 @@ class MutaliskUnit : public FlyingUnit
 {
 protected:
     static std::set<BWAPI::UnitType> setPrio;
-    inline bool decideToFlee();
 public:
-    MutaliskUnit(BWAPI::Unit* u,UnitsGroup* ug);
+    MutaliskUnit(BWAPI::Unit* u);
     ~MutaliskUnit();
     virtual void micro();
     virtual void check();

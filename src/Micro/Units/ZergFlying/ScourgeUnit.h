@@ -9,7 +9,7 @@ protected:
     static std::set<BWAPI::UnitType> setPrio;
     static std::set<BWAPI::Unit*> alreadyTargeted; // hack only for the tournament 1
 public:
-    ScourgeUnit(BWAPI::Unit* u,UnitsGroup* ug);
+    ScourgeUnit(BWAPI::Unit* u);
     ~ScourgeUnit();
     virtual void micro();
     virtual void check();

@@ -9,7 +9,7 @@ protected:
     static std::set<BWAPI::UnitType> setPrio;
     virtual bool decideToFlee();
 public:
-    ArchonUnit(BWAPI::Unit* u, UnitsGroup* ug);
+    ArchonUnit(BWAPI::Unit* u);
     ~ArchonUnit();
     virtual void micro();
     virtual void check();

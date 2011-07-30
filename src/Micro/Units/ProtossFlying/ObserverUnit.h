@@ -7,7 +7,7 @@ class ObserverUnit : public FlyingUnit
 {
     EUnitsFilter* _eUnitsFilter;
 public:
-    ObserverUnit(BWAPI::Unit* u,UnitsGroup* ug);
+    ObserverUnit(BWAPI::Unit* u);
     ~ObserverUnit();
     virtual void micro();
     virtual void check();

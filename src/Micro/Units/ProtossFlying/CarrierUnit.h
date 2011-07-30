@@ -8,7 +8,7 @@ class CarrierUnit : public FlyingUnit
 protected:
     static std::set<BWAPI::UnitType> setPrio;
 public:
-    CarrierUnit(BWAPI::Unit* u,UnitsGroup* ug);
+    CarrierUnit(BWAPI::Unit* u);
     ~CarrierUnit();
     virtual void micro();
     virtual void check();

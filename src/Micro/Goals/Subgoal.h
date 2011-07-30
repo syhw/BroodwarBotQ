@@ -1,16 +1,7 @@
 #pragma once
-
 #include <boost/shared_ptr.hpp>
-#ifndef SUBGOAL_SMART_POINTER
-#define SUBGOAL_SMART_POINTER
-class Subgoal;
-typedef boost::shared_ptr<Subgoal> pSubgoal;
-#endif
-
 #include <BWAPI.h>
-#include "Micro/Formations.h"
 #include "Micro/UnitsGroup.h"
-
 
 typedef enum
 {
@@ -23,7 +14,6 @@ class Subgoal
 public:
     Subgoal(SubgoalLogic l);
     Subgoal(const Subgoal& sg);
-
     ~Subgoal();
     //Accessors
 	SubgoalLogic getLogic() const;
@@ -32,14 +22,12 @@ public:
 	//isRealized can return check(), but some subgoals will need to 
 	//be accomplished only once to complete the goal, others must be valid
 	//all along the goal accomplishment
-
 	virtual void tryToRealize() = 0; //Give suggestions to the UnitsGroup
 	virtual double distanceToRealize() = 0; //Return an estimated distance to accomplish the Subgoal
 	//if the return value is negative, it means that the subgoal cannot give suggestions to the UnitsGroup
-	virtual double distanceToRealize(BWAPI::Position); // Returns distanceToRealize() if not extended
 	void setUnitsGroup(UnitsGroup * ug);
 protected:
 	virtual bool check() = 0; //Function that defines the condition of the subgoal
 	SubgoalLogic logic;
-	UnitsGroup * unitsGroup;
+	UnitsGroup* unitsGroup;
 };

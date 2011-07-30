@@ -18,6 +18,9 @@
 #endif
 
 #ifndef __DEBUG__ // Perf
+#define __RELEASE_OPTIM__
+#ifdef __RELEASE_OPTIM__
 #undef _SECURE_SCL
 #define _SECURE_SCL 0 // remove iterator runtime checks
+#endif
 #endif

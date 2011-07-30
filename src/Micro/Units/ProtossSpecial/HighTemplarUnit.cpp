@@ -4,8 +4,8 @@
 
 int HighTemplarUnit::lastStormableUnitsUpdateFrame;
 
-HighTemplarUnit::HighTemplarUnit(BWAPI::Unit* u,UnitsGroup* ug)
-: SpecialUnit(u, ug)
+HighTemplarUnit::HighTemplarUnit(BWAPI::Unit* u)
+: SpecialUnit(u)
 , _lastStormFrame(0)
 , _mergingFrame(0)
 {
@@ -53,7 +53,7 @@ void HighTemplarUnit::micro()
     }
 
     // Try and storm if it has any advantage, otherwise flee or don't stuck
-    if (this->unit->getEnergy() > 75 && elapsed > Broodwar->getLatencyFrames() + getAttackDuration())
+    if (this->unit->getEnergy() > 74 && elapsed > Broodwar->getLatencyFrames() + getAttackDuration())
     {   
         Position bestStormPos;
         int bestScore = -1;
@@ -83,7 +83,7 @@ void HighTemplarUnit::micro()
         }
         // Storm only if it damages at least 2 units, or at least 1 invisible unit,
         // or there is only one enemy unit around us and we can storm it without collateral damages
-        if (bestScore > 3 || (_unitsGroup->enemies.size() == 1 && bestScore == 3))
+        if (bestScore > 3 || (_unitsGroup->enemies.size() == 1 && bestScore == 3) && elapsed > 36) // elapsed hack to not restorm before the storm has been registered by MapManager
         {       
             unit->useTech(BWAPI::TechTypes::Psionic_Storm, bestStormPos);
             //Broodwar->printf("Frame %d, pos (%d, %d), stormPos size %d", Broodwar->getFrameCount(), bestStormPos.x(), bestStormPos.y(), _mapManager->stormPos.size());

@@ -4,7 +4,7 @@
 std::set<BWAPI::UnitType> ArbiterUnit::setPrio;
 
 ArbiterUnit::ArbiterUnit(BWAPI::Unit* u,UnitsGroup* ug)
-: FlyingUnit(u, ug)
+: FlyingUnit(u)
 {
     if (setPrio.empty())
     {

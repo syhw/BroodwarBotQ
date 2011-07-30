@@ -33,8 +33,7 @@ using namespace BWAPI;
 #define _PROB_GO_OBJ 0.9
 ///#define _PROB_GO_NOT_VISIBLE 0.4
 
-BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug,
-						   const ProbTables* probTables)
+BayesianUnit::BayesianUnit(Unit* u, const ProbTables* probTables)
 : BattleUnit(u)
 , _pathMutex(CreateMutex( 
         NULL,                  // default security attributes
@@ -43,7 +42,7 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug,
 )
 , dir(Vec(unit->getVelocityX(), unit->getVelocityY()))
 , _mode(MODE_MOVE)
-, _unitsGroup(ug)
+, _unitsGroup(NULL)
 , _maxDimension(max(_slarge, _sheight))
 , _minDimension(min(_slarge, _sheight))
 , _maxDiag(sqrt((double)(_slarge*_slarge + _sheight*_sheight)))
@@ -61,7 +60,7 @@ BayesianUnit::BayesianUnit(Unit* u, UnitsGroup* ug,
 , _iThinkImBlocked(false)
 , _lastTotalHP(unit->getHitPoints() + unit->getShields())
 , _sumLostHP(0)
-, _refreshPathFramerate(12)
+, _refreshPathFramerate(22)
 , _maxDistWhileRefreshingPath((int)max(_refreshPathFramerate * _topSpeed,
 							  45.26)) // 45.26 = sqrt(32^2 + 32^2)
 , _newPath(false)
@@ -250,6 +249,11 @@ void BayesianUnit::switchMode(unit_mode um)
         default:
             break;
     }
+}
+
+void BayesianUnit::setUnitsGroup(UnitsGroup* ug)
+{
+	_unitsGroup = ug;
 }
 
 unit_mode BayesianUnit::getMode()
@@ -1730,41 +1734,41 @@ pBayesianUnit BayesianUnit::newBayesianUnit(Unit* u)
 {
     pBayesianUnit tmp;
     if (u->getType() == BWAPI::UnitTypes::Protoss_Arbiter)
-        tmp = pBayesianUnit(new ArbiterUnit(u, this));
+        tmp = pBayesianUnit(new ArbiterUnit(u));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Archon)
-        tmp = pBayesianUnit(new ArchonUnit(u, this));
+        tmp = pBayesianUnit(new ArchonUnit(u));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Carrier)
-        tmp = pBayesianUnit(new CarrierUnit(u, this));
+        tmp = pBayesianUnit(new CarrierUnit(u));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Corsair)
-        tmp = pBayesianUnit(new CorsairUnit(u, this));
+        tmp = pBayesianUnit(new CorsairUnit(u));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Dark_Archon)
-        tmp = pBayesianUnit(new DarkArchonUnit(u, this));
+        tmp = pBayesianUnit(new DarkArchonUnit(u));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Dark_Templar)
-        tmp = pBayesianUnit(new DarkTemplarUnit(u, this));
+        tmp = pBayesianUnit(new DarkTemplarUnit(u));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Dragoon)
-        tmp = pBayesianUnit(new DragoonUnit(u, this));
+        tmp = pBayesianUnit(new DragoonUnit(u));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_High_Templar)
-        tmp = pBayesianUnit(new HighTemplarUnit(u, this));
+        tmp = pBayesianUnit(new HighTemplarUnit(u));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Observer)
-        tmp = pBayesianUnit(new ObserverUnit(u, this));
+        tmp = pBayesianUnit(new ObserverUnit(u));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Probe)
-        tmp = pBayesianUnit(new ProbeUnit(u, this));
+        tmp = pBayesianUnit(new ProbeUnit(u));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Reaver)
-        tmp = pBayesianUnit(new ReaverUnit(u, this));
+        tmp = pBayesianUnit(new ReaverUnit(u));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Scout)
-        tmp = pBayesianUnit(new ScoutUnit(u, this));
+        tmp = pBayesianUnit(new ScoutUnit(u));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Shuttle)
-        tmp = pBayesianUnit(new ShuttleUnit(u, this));
+        tmp = pBayesianUnit(new ShuttleUnit(u));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Zealot)
-        tmp = pBayesianUnit(new ZealotUnit(u, this));
+        tmp = pBayesianUnit(new ZealotUnit(u));
     else if (u->getType() == BWAPI::UnitTypes::Zerg_Mutalisk)
-        tmp = pBayesianUnit(new MutaliskUnit(u, this));
+        tmp = pBayesianUnit(new MutaliskUnit(u));
     else if (u->getType() == BWAPI::UnitTypes::Zerg_Scourge)
-        tmp = pBayesianUnit(new ScourgeUnit(u, this));
+        tmp = pBayesianUnit(new ScourgeUnit(u));
 	else if (u->getType() == BWAPI::UnitTypes::Terran_Marine)
-		tmp = pBayesianUnit(new MarineUnit(u, this));
+		tmp = pBayesianUnit(new MarineUnit(u));
 	else if (u->getType() == BWAPI::UnitTypes::Terran_Medic)
-		tmp = pBayesianUnit(new MedicUnit(u, this));
+		tmp = pBayesianUnit(new MedicUnit(u));
     else
 	{
         Broodwar->printf("This race/unit is not implemented");
@@ -2064,8 +2068,9 @@ bool BayesianUnit::dragScarab()
 void BayesianUnit::update()
 {
     if (!unit || !unit->exists()) return;
-    _unitPos = unit->getPosition();
+	if (_unitsGroup == NULL) return;
 
+    _unitPos = unit->getPosition();
     /// check() for all inherited classes
     check();
 

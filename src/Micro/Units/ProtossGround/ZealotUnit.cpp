@@ -11,8 +11,8 @@ ProbTables ZealotUnit::_sProbTables = ProbTables(BWAPI::UnitTypes::Protoss_Zealo
 std::set<BWAPI::UnitType> ZealotUnit::setPrio;
 std::map<BWAPI::Unit*, int> ZealotUnit::_zealotsOn;
 
-ZealotUnit::ZealotUnit(BWAPI::Unit* u,UnitsGroup* ug)
-: GroundUnit(u, ug, &_sProbTables)
+ZealotUnit::ZealotUnit(BWAPI::Unit* u)
+: GroundUnit(u, &_sProbTables)
 {
     if (setPrio.empty())
     {
@@ -72,7 +72,7 @@ int ZealotUnit::fightMove()
 
 bool ZealotUnit::decideToFlee()
 {
-    if (unit->getShields() < 10)
+    if (unit->getShields() < 5)
 		_fleeing = true;
     return _fleeing;
 }

@@ -13,7 +13,7 @@ protected:
     static int lastStormableUnitsUpdateFrame;
     int _mergingFrame;
 public:
-    HighTemplarUnit(BWAPI::Unit* u,UnitsGroup* ug);
+    HighTemplarUnit(BWAPI::Unit* u);
     ~HighTemplarUnit();
     std::pair<BWAPI::Position, int> bestStormPos();
     virtual void micro();

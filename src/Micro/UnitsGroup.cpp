@@ -458,9 +458,7 @@ void UnitsGroup::attack(BWAPI::Position& p)
 void UnitsGroup::move(BWAPI::Position& p)
 {
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); it++)
-    {
         (*it)->target = p;
-    }
 }
 
 void UnitsGroup::formation(pFormation f)
@@ -624,6 +622,7 @@ std::vector<pBayesianUnit>* UnitsGroup::getUnits()
 
 void UnitsGroup::updateNearbyEnemyUnitsFromFilter(BWAPI::Position p, double radius)
 {
+	// TODO Use a Quadtree (or use BWAPI's getUnitsInRadius, which uses a Quadtree)
     enemies.clear();
     // have units that have been seek like units on cliffs or lurkers before burrowing (for instance)
     for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = _eUnitsFilter->getViewedUnits().begin();

@@ -1,8 +1,6 @@
 #include <PrecompiledHeader.h>
 #include <algorithm>
 #include "Micro/Goals/Goal.h"
-#include "Micro/UnitsGroup.h"
-#include "Defines.h"
 
 using namespace std;
 
@@ -14,8 +12,9 @@ Goal::~Goal()
 	TheArbitrator->removeAllBids(this);
 }
 
-Goal::Goal()
+Goal::Goal(int priority)
 : _status(GS_WAIT_PRECONDITION)
+, _priority(priority)
 , _firstFrame(BWAPI::Broodwar->getFrameCount())
 {
 #ifdef __DEBUG__
@@ -23,41 +22,103 @@ Goal::Goal()
 #endif
 }
 
-Goal::Goal(pSubgoal s)
+Goal::Goal(pSubgoal s, int priority, int firstFrame)
 : _status(GS_WAIT_PRECONDITION)
-, _firstFrame(BWAPI::Broodwar->getFrameCount())
+, _priority(priority)
+, _firstFrame(firstFrame)
 {
 #ifdef __DEBUG__
 	log("created a goal\n");
 #endif
 	addSubgoal(s);
+	if (!firstFrame)
+		_firstFrame = Broodwar->getFrameCount();
 }
 
-Goal::Goal(const std::<UnitType, int>& nU, pSubGoal s);
+Goal::Goal(const std::<UnitType, int>& nU, pSubgoal s,
+		   int priority, int firstFrame);
 : _status(GS_WAIT_PRECONDITION)
-, _firstFrame(BWAPI::Broodwar->getFrameCount())
+, _priority(priority)
+, _firstFrame(firstFrame)
 {
 #ifdef __DEBUG__
 	log("created a goal\n");
 #endif
 	_neededUnits = nU;
 	addSubgoal(s);
+	if (!firstFrame)
+		_firstFrame = Broodwar->getFrameCount();
+}
+
+void Goal::bidOnUnitType(const UnitType& ut)
+{
+	set<Unit*> tmp = SelectAll(Broodwar->self(), ut);
+	for each (Unit* u in tmp)
+	{
+		if (!_biddedOn.count(u))
+		{
+			TheArbitrator->setBid(this, u, _priority);
+			_biddedOn.insert(u);
+		}
+	}
+}
+
+virtual void Goal::onOffer(set<Unit*> objects)
+{
+	if (_status == GS_WAIT_PRECONDITION || _status == GS_IN_PROGRESS)
+	{
+        for each (Unit* u in objects)
+		{
+		if (GoalManager::Instance()._
+		TheArbitrator->accept(this, objects, 95);
+		}
+	}
+	else
+	{
+		TheArbitrator->decline(this, objects, 0);
+		TheArbitrator->removeBid(this, object);
+        for each (Unit* u in objects)
+			_biddedOn.erase(u);
+	}
+}
+
+virtual void Goal::onRevoke(Unit* u, double bid);
+{
+}
+
+virtual string Goal::getName() const
+{
+	return "Goal";
 }
 
 void Goal::update()
 {
 	if (_status == GS_WAIT_PRECONDITION)
 	{
+		/// Wait for the first frame trigger (if existing)
+		if (Broodwar->getFrameCount() < firstFrame)
+			return;
+		/// Request needed units
+		bool gotAllUnits = true;
+		for (map<UnitType, int>::const_iterator it = _neededUnits.begin();
+			it != _neededUnits.end(); ++it)
+		{
+			if (it->second > 0)
+			{
+				gotAllUnits = false;
+				bidOnUnitType(it->first);
+			}
+		}
+		if (gotAllUnits)
+			_status = GS_IN_PROGRESS;
 	}
 	else if (_status == GS_IN_PROGRESS)
 		this->achieve();
 	else if (_status == GS_IN_CANCEL)
 		this->cancel();
-	else if (_status == GS_CANCELED)
-	{
+	//else if (_status == GS_CANCELED || _status == GS_ACHIEVED)
+	else
 		TheArbitrator->removeAllBids();
-
-	}
 }
 
 void Goal::achieve()

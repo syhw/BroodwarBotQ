@@ -5,8 +5,8 @@ using namespace BWAPI;
 
 std::set<BWAPI::UnitType> MutaliskUnit::setPrio;
 
-MutaliskUnit::MutaliskUnit(BWAPI::Unit* u,UnitsGroup* ug)
-: FlyingUnit(u, ug)
+MutaliskUnit::MutaliskUnit(BWAPI::Unit* u)
+: FlyingUnit(u)
 {
     if (setPrio.empty())
     {
@@ -20,12 +20,6 @@ MutaliskUnit::~MutaliskUnit()
 {
     if (Broodwar->getFrameCount() - _lastAttackFrame <= getAttackDuration())
         clearDamages();
-}
-
-bool MutaliskUnit::decideToFlee()
-{
-    // TODO complete conditions
-    return (_lastTotalHP - unit->getHitPoints() > 20);
 }
 
 void MutaliskUnit::micro()

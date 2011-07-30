@@ -11,7 +11,6 @@ using namespace BWAPI;
 
 BattleUnit::BattleUnit(BWAPI::Unit* unit)
 : unit(unit)
-, timeIdle(0)
 , _tick(0)
 , targetEnemy(NULL)
 , oorTargetEnemy(NULL)
@@ -21,9 +20,6 @@ BattleUnit::BattleUnit(BWAPI::Unit* unit)
 , _slarge(unit->getType().dimensionRight() + unit->getType().dimensionLeft())
 , _accel(unit->getType().acceleration())
 , _topSpeed(unit->getType().topSpeed())
-#ifdef UNIT_DEBUG
-, _unitType(unit->getType().getName())
-#endif
 {
 }
 
@@ -50,7 +46,19 @@ bool BattleUnit::operator == (const BattleUnit& bu) const
 	return (unit == bu.unit) && (target == bu.target);
 }
 
-void BattleUnit::drawVelocityArrow()
+
+const std::vector<BWAPI::Position> & BattleUnit::getPPath()
+{
+    return _ppath;
+}
+
+Position BattleUnit::getPPath(unsigned int n)
+{
+    return _ppath[n];
+}
+
+#ifndef __RELEASE_OPTIM__
+void BattleUnit::drawVelocityArrow() const
 {
     int xfrom = unit->getPosition().x();
     int yfrom = unit->getPosition().y();
@@ -67,17 +75,7 @@ void BattleUnit::drawVelocityArrow()
         Colors::White); // 0.1, magic number
 }
 
-const std::vector<BWAPI::Position> & BattleUnit::getPPath()
-{
-    return _ppath;
-}
-
-Position BattleUnit::getPPath(unsigned int n)
-{
-    return _ppath[n];
-}
-
-void BattleUnit::drawPath()
+void BattleUnit::drawPath() const
 {
     if (_path.empty())
         return;
@@ -89,7 +87,7 @@ void BattleUnit::drawPath()
     }
 }
 
-void BattleUnit::drawBTPath()
+void BattleUnit::drawBTPath() const
 {
     if (_btpath.empty())
         return;
@@ -101,7 +99,7 @@ void BattleUnit::drawBTPath()
     }
 }
 
-void BattleUnit::drawPPath()
+void BattleUnit::drawPPath() const
 {
     if (_ppath.empty())
         return;
@@ -112,7 +110,7 @@ void BattleUnit::drawPPath()
     }
 }
 
-void BattleUnit::drawWalkability()
+void BattleUnit::drawWalkability() const
 {
     MapManager* mapm = & MapManager::Instance();
     const int width = Broodwar->mapWidth();
@@ -130,7 +128,7 @@ void BattleUnit::drawWalkability()
     }
 }
 
-void BattleUnit::drawEnclosingBox()
+void BattleUnit::drawEnclosingBox() const
 {
     Position p = unit->getPosition();
     Position top_left = Position(p.x() - unit->getType().dimensionLeft(), 
@@ -141,10 +139,11 @@ void BattleUnit::drawEnclosingBox()
         bot_right.x(), bot_right.y(), Colors::Yellow);
 }
 
-void BattleUnit::drawTarget()
+void BattleUnit::drawTarget() const
 {
     Broodwar->drawCircle(CoordinateType::Map, target.x(), target.y(), 4, Colors::Purple, true);
 }
+#endif
 
 
 /// TODO change this to use geometry (faster) and direct lines. 
@@ -501,25 +500,6 @@ void BattleUnit::quickPathFind(std::vector<TilePosition>& btpath,
         it != temp_path.end(); ++it)
         btpath.push_back(*it);
     return;
-}
-
-/* Hack to do some computations only once every BU_EVAL_FREQ */
-bool BattleUnit::tick()
-{
-    ++_tick;
-    return !(_tick % BU_EVAL_FREQ);
-}
-
-void BattleUnit::update()
-{
-    drawVelocityArrow();
-    if (tick())
-    {
-        //_path = BWTA::getShortestPath(unit->getTilePosition(), target);
-        pathFind(_path, unit->getPosition(), target);
-    }
-    drawPath();
-    // drawUnwalkable();
 }
 
 void BattleUnit::onUnitDestroy(Unit* u)

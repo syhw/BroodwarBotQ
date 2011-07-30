@@ -114,8 +114,8 @@ protected:
     int _lastTotalHP;
     std::list<int> _HPLosts;
     int _sumLostHP;
-    const int _refreshPathFramerate;
-    int _maxDistWhileRefreshingPath;
+    const int _refreshPathFramerate; // should be static TODO
+    int _maxDistWhileRefreshingPath; // not static because dependent on the speed
     bool _newPath;
     Position _inPos;
     bool _fleeing;
@@ -190,8 +190,8 @@ protected:
     inline void selectDir(const Vec& criterium);
     virtual int addRangeGround();
     virtual int addRangeAir();
-    void attackEnemyUnit(BWAPI::Unit* u);
     virtual bool decideToFlee(); // sets _fleeing
+    void attackEnemyUnit(BWAPI::Unit* u);
     void simpleFlee();
     bool dodgeStorm();
     bool dragScarab();
@@ -205,11 +205,12 @@ public:
 
     void move(BWAPI::Position p); // debug purposes
 	void switchMode(unit_mode um);
+	void setUnitsGroup(UnitsGroup* ug);
     unit_mode getMode();
     int getMaxDimension();
     void updatePPath();
     Vec dir, obj; // dir=current direction, obj=pathfinder's direction
-    BayesianUnit(BWAPI::Unit* u, UnitsGroup* ug, const ProbTables* probTables);
+    BayesianUnit(BWAPI::Unit* u, const ProbTables* probTables);
     ~BayesianUnit();
     BWAPI::UnitType getType();
 

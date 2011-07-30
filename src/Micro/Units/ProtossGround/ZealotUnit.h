@@ -15,7 +15,7 @@ protected:
     void clearDamages();
     int fightMove();
 public:
-    ZealotUnit(BWAPI::Unit* u,UnitsGroup* ug);
+    ZealotUnit(BWAPI::Unit* u);
     ~ZealotUnit();
 #ifdef __LEARNING_PROB_TABLES__
 	static void initProbTables();

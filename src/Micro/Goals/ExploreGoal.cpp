@@ -3,6 +3,8 @@
 
 using namespace BWAPI;
 
+somewhere	unitsGroup->switchMode(MODE_SCOUT);
+	
 ExploreGoal::ExploreGoal(TilePosition tp) 
 : Goal()
 {

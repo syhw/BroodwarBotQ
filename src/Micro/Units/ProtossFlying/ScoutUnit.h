@@ -9,7 +9,7 @@ protected:
     static std::set<BWAPI::UnitType> setPrio;
     inline bool decideToFlee();
 public:
-    ScoutUnit(BWAPI::Unit* u,UnitsGroup* ug);
+    ScoutUnit(BWAPI::Unit* u
     ~ScoutUnit();
     virtual void micro();
     virtual void check();

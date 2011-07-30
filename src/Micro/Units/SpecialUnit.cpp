@@ -3,8 +3,8 @@
 
 ProbTables SpecialUnit::_sProbTables = ProbTables(-3); // -3 for special
 
-SpecialUnit::SpecialUnit(BWAPI::Unit* u, UnitsGroup* ug)
-: BayesianUnit(u, ug, &_sProbTables)
+SpecialUnit::SpecialUnit(BWAPI::Unit* u)
+: BayesianUnit(u, &_sProbTables)
 {
 }
 

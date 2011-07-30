@@ -2,6 +2,8 @@
 #include "Micro/Goals/GoalManager.h"
 
 using namespace BWAPI;
+using namespace std;
+
 GoalManager::GoalManager()
 {
 }
@@ -16,7 +18,7 @@ void GoalManager::update()
 	for (list<Unit*>::const_iterator it = _inTrainingUnits.begin();
 		it != _inTrainingUnits.end(); )
 	{
-		if (u->isCompleted())
+		if ((*it)->isCompleted())
 		{
 			pBayesianUnit tmp = BayesianUnit::newBayesianUnit(*it);
 			if (tmp.get() != NULL)
@@ -39,7 +41,7 @@ void GoalManager::addGoal(pGoal g)
 /// Add all units not building
 void GoalManager::onUnitCreate(Unit* u)
 {
-	if (!u->isBuilding()) // yup, even workers
+	if (!u->getType().isBuilding()) // yup, even workers
 		_inTrainingUnits.push_back(u);
 }
 
@@ -57,3 +59,9 @@ void GoalManager::onUnitDestroy(Unit* u)
 	}
 	_inTrainingUnits.remove(u);
 }
+
+const map<Unit*, pBayesianUnit>& GoalManager::getCompletedUnits() const
+{
+	return _completedUnits;
+}
+

@@ -1,15 +1,19 @@
 #pragma once
 #include <boost/shared_ptr.hpp>
-
 #ifndef GOAL_SMART_POINTER
 #define GOAL_SMART_POINTER
 class Goal;
 typedef boost::shared_ptr<Goal> pGoal;
 #endif
-
+#include "Subgoal.h"
+#ifndef SUBGOAL_SMART_POINTER
+#define SUBGOAL_SMART_POINTER
+class Subgoal;
+typedef boost::shared_ptr<Subgoal> pSubgoal;
+#endif
 #include "Macro/Arbitrator.h"
 #include "Micro/UnitsGroup.h"
-#include "Subgoal.h"
+#include "Defines.h"
 #include <BWAPI.h>
 #include <BWTA.h>
 #include <list>
@@ -34,30 +38,33 @@ protected:
 	/// Units it can use
 	UnitsGroup _unitsGroup;
 	/// Preconditions
-	std::map<UnitType, int> _neededUnits;
+	std::map<BWAPI::UnitType, int> _neededUnits;
+	std::set<BWAPI::Unit*> _biddedOn;
+    int _priority;
     int _firstFrame;
 	/// Subgoals
 	std::list<pSubgoal> _subgoals;   //The subgoals cannot be shared
     /// Status
 	GoalStatus _status;
-
+	void bidOnUnit(const BWAPI::UnitType& ut);
 public:
-	Goal();
-	Goal(int firstFrame = 0);
-	Goal(pSubgoal s);
-	Goal(pSubgoal s, int firstFrame = 0);
-	Goal(const std::map<BWAPI::UnitType, int>& nU, pSubGoal s);
-	Goal(const std::map<BWAPI::UnitType, int>& nU, pSubGoal s, int firstFrame = 0);
+	Goal(int priority = 50);
+	Goal(pSubgoal s, int priority = 50, int firstFrame = 0);
+	Goal(const std::map<BWAPI::UnitType, int>& nU, pSubgoal s,
+		int priority = 50, int firstFrame = 0);
 	virtual ~Goal();
 	
-	void update();
-	virtual void achieve();
+	virtual void onOffer(std::set<BWAPI::Unit*> objects);
+	virtual void onRevoke(BWAPI::Unit* u, double bid);
+    virtual std::string getName() const;
+	virtual void update();
 	virtual void achieve();
 	virtual void check();
 
 	void addSubgoal(pSubgoal s);
 	void addNeededUnits(const std::map<BWAPI::UnitType, int>& neededUnits);
 	void setFirstFrame(int firstFrame);
+	void setPriority(int priority);
 	
 	void setStatus(GoalStatus s);
 	GoalStatus getStatus() const;

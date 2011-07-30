@@ -3,8 +3,8 @@
 
 std::set<BWAPI::UnitType> ReaverUnit::setPrio;
 
-ReaverUnit::ReaverUnit(BWAPI::Unit* u,UnitsGroup* ug)
-: GroundUnit(u, ug)
+ReaverUnit::ReaverUnit(BWAPI::Unit* u)
+: GroundUnit(u)
 {
     if (setPrio.empty())
     {
@@ -14,7 +14,6 @@ ReaverUnit::ReaverUnit(BWAPI::Unit* u,UnitsGroup* ug)
         setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode);
         setPrio.insert(BWAPI::UnitTypes::Protoss_Dragoon);
         setPrio.insert(BWAPI::UnitTypes::Protoss_Reaver);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Goliath);
         setPrio.insert(BWAPI::UnitTypes::Terran_SCV);
         setPrio.insert(BWAPI::UnitTypes::Zerg_Drone);
         setPrio.insert(BWAPI::UnitTypes::Protoss_Probe);
@@ -35,10 +34,6 @@ void ReaverUnit::micro()
         updateTargetEnemy();
         unit->attack(targetEnemy);
         _lastAttackFrame = Broodwar->getFrameCount();
-    } else if (!(Broodwar->getFrameCount() % 5))
-    {
-        updateRangeEnemies();
-        updateTargetEnemy();
     }
 }
 
@@ -61,7 +56,7 @@ bool ReaverUnit::inRange(BWAPI::Unit* u)
 
 int ReaverUnit::getAttackDuration()
 {
-    return 60;
+    return 42;
 }
 
 std::set<BWAPI::UnitType> ReaverUnit::getSetPrio()

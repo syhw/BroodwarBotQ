@@ -5,8 +5,9 @@
 
 class DarkArchonUnit : public SpecialUnit
 {
+	int _lastCastFrame;
 public:
-    DarkArchonUnit(BWAPI::Unit* u,UnitsGroup* ug);
+    DarkArchonUnit(BWAPI::Unit* u);
     ~DarkArchonUnit();
     virtual void micro();
     virtual void check();

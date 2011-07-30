@@ -28,15 +28,16 @@ bool SeeSubgoal::check()
 void SeeSubgoal::tryToRealize()
 {
 	unitsGroup->move(pos);
-	unitsGroup->switchMode(MODE_SCOUT);
 }
 
 double SeeSubgoal::distanceToRealize()
 {
-	return unitsGroup->getCenter().getDistance(pos); 
+	/// Does not use pathfinding and so is not very precise
+	return unitsGroup->getCenter().getApproxDistance(pos); 
 }
 
 double SeeSubgoal::distanceToRealize(BWAPI::Position p)
 {
+	/// Does not use pathfinding and so is not very precise
 	return p.getDistance(pos);
 }

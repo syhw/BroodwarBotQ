@@ -4,7 +4,7 @@
 std::set<BWAPI::UnitType> CarrierUnit::setPrio;
 
 CarrierUnit::CarrierUnit(BWAPI::Unit* u,UnitsGroup* ug)
-: FlyingUnit(u, ug)
+: FlyingUnit(u)
 {
     if (setPrio.empty())
     {
@@ -46,7 +46,7 @@ void CarrierUnit::check()
 
 int CarrierUnit::getAttackDuration()
 {
-    return 0;
+    return 9;
 }
 
 std::set<BWAPI::UnitType> CarrierUnit::getSetPrio()
