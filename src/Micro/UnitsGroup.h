@@ -67,68 +67,64 @@ private:
     inline void updateNearbyEnemyUnitsFromFilter(BWAPI::Position p, double radius = 400.0);
     double evaluateForces();
     bool removeArrivingUnit(BWAPI::Unit* u);
-#ifdef __DEBUG__
+#ifndef __RELEASE_OPTIM__
     void displayTargets();  // debug purpose
 #endif
 public:
-	void dispatchCompleteUnit(pBayesianUnit bu);
-    void giveUpControl(BWAPI::Unit* u);
+	/// Units tools / units intercommunication
     std::list<pBayesianUnit> arrivingUnits;
     std::vector<BWAPI::Position> ppath;
-    std::map<BWAPI::Unit*, BWAPI::Position> enemies;
-    BWAPI::Position enemiesCenter;
-    int enemiesAltitude;
     UnitDmgBimap unitDamages;
     pBayesianUnit leadingUnit;
     BWAPI::Unit* defaultTargetEnemy;
-	
-	UnitsGroup();
-	virtual ~UnitsGroup();
-
     BWTA::Chokepoint* nearestChoke;
     double distToNearestChoke;
+    Vec centerSpeed;
+	std::map<BWAPI::UnitSizeType, int> sizes;
+	/// Group recap variables
     BWAPI::Position center;
     int groupAltitude;
     double stdDevRadius, maxRadius;
-    Vec centerSpeed;
-	std::map<BWAPI::UnitSizeType, int> sizes;
-
+	/// Enemies info
+    BWAPI::Position enemiesCenter;
+    int enemiesAltitude;
+    std::map<BWAPI::Unit*, BWAPI::Position> enemies;
+	
+	/// Basic
+	UnitsGroup();
+	virtual ~UnitsGroup();
 	void update();
-
 #ifndef __RELEASE_OPTIM__
 	void display();
 #endif
-
-	// Units interface
-    pBayesianUnit addUnit(BWAPI::Unit* u);
-
+	/// Group interaction/orders
 	void attack(int x, int y);
 	void attack(BWAPI::Position& p);
 	void move(BWAPI::Position& p);
-
 	virtual void formation(pFormation f);
-	
-	inline void updateCenter();
-    virtual BWAPI::Position getCenter() const;
-    inline double getDistance(BWAPI::Unit* u) const;
-
-    // BWAPI interface
+	void switchMode(unit_mode um);
+	void idle();
+	/// Units pool management
+	void dispatchCompleteUnit(pBayesianUnit bu);
+    void giveUpControl(BWAPI::Unit* u);
+    /// AIModule interface
     virtual void onUnitDestroy(BWAPI::Unit* u);
     virtual void onUnitShow(BWAPI::Unit* u);
     virtual void onUnitHide(BWAPI::Unit* u);
-
+	/// Updaters of info
+	inline void updateCenter();
 	inline void updateGroupStrengh(BWAPI::Unit* u);
+	/// Getters
+    virtual BWAPI::Position getCenter() const;
+    inline double getDistance(BWAPI::Unit* u) const;
     int getTotalHP() const;
-    std::vector<pBayesianUnit>* getUnits();
-
+    std::vector<pBayesianUnit>* getUnits(); // a baaad getter, keep an eye
+	const BayesianUnit& operator[](ptrdiff_t i);
+	/// Templas merging
     inline void templarMergingStuff();
     void signalMerge(BWAPI::Unit* u);
-
-#ifdef _UNITS_DEBUG
+#ifndef __RELEASE_OPTIM__
     void selectedUnits(std::set<pBayesianUnit>& u);
 #endif
-	const BayesianUnit& operator[](ptrdiff_t i);
-	void switchMode(unit_mode um);
-	void idle();
 };
 

@@ -379,8 +379,7 @@ void UnitsGroup::update()
         }
         else if (force > 1.5) // TOCHANGE 1.5
         {
-            // we can be offensive, get our goals done
-            accomplishGoal();
+            // we can be offensive, use our goal target
         }
         else // stand our ground or go up the ramp
         {
@@ -403,7 +402,7 @@ void UnitsGroup::update()
     else /// Let's do the goals now 
     {
         defaultTargetEnemy = NULL;
-        accomplishGoal();
+        //accomplishGoal();
     }
 
 #ifdef __DEBUG__
@@ -457,6 +456,8 @@ void UnitsGroup::formation(pFormation f)
     /*** TODO BUG IN SquareFormation TODO TODO TODOif (_alignFormation)
     {*/
         const std::vector<BWAPI::Position>& to = f->end_positions;
+		if (to.size() < units.size())
+			return;
         std::vector<unsigned int> alignment; // alignment[from_pos] = to_pos 
         // align(from, to, alignment);// TODO min crossing || fastest
         // simple_align(from, alignment);
@@ -474,13 +475,6 @@ void UnitsGroup::formation(pFormation f)
         }
     }*/
 
-}
-
-void UnitsGroup::setGoals(std::list<pGoal>& goals)
-{
-    this->goals = goals;
-	if(!this->goals.empty())
-		this->goals.front()->achieve();
 }
 
 void UnitsGroup::onUnitDestroy(Unit* u)
@@ -531,9 +525,10 @@ bool BasicUnitsGroup::removeUnit(Unit* u)
 	return false;
 }
 
-bool BasicUnitsGroup::removeArrivingUnit(Unit* u)
+bool UnitsGroup::removeArrivingUnit(Unit* u)
 {
-    for (std::vector<pBayesianUnit>::const_iterator it = arrivingUnits.begin(); it != arrivingUnits.end(); ++it)
+	for (std::list<pBayesianUnit>::const_iterator it = arrivingUnits.begin();
+		it != arrivingUnits.end(); ++it)
         if ((*it)->unit == u)
         {
             arrivingUnits.erase(it);
@@ -544,7 +539,7 @@ bool BasicUnitsGroup::removeArrivingUnit(Unit* u)
 
 void UnitsGroup::giveUpControl(Unit* u)
 {
-	if (removeArrivingUnits(u))
+	if (removeArrivingUnit(u))
 		removeUnit(u);
     if (u->getType() == UnitTypes::Protoss_Observer)
     {
@@ -623,12 +618,6 @@ void UnitsGroup::display()
             Broodwar->drawLine( CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), target.x(), target.y(), Colors::Cyan);
             Broodwar->drawCircle( CoordinateType::Map, target.x(), target.y(), 5, Colors::Cyan, true);
         }
-
-        // Goal status
-        if( goals.empty() || goals.front()->getStatus() == GS_ACHIEVED)
-            Broodwar->drawTextMap( unit->getPosition().x(), unit->getPosition().y(), "W");
-        if( !goals.empty() && goals.front()->getStatus() == GS_IN_PROGRESS)
-            Broodwar->drawTextMap( unit->getPosition().x(), unit->getPosition().y(), "P");
     }
 
 	//TOUNCOMMENT when formation for all units group accomplished
@@ -686,7 +675,7 @@ Position UnitsGroup::getCenter() const
     return center;
 }
 
-#ifdef _UNITS_DEBUG
+#ifndef __RELEASE_OPTIM__
 void UnitsGroup::selectedUnits(std::set<pBayesianUnit>& u)
 {
     for (std::vector<pBayesianUnit>::iterator i=this->units.begin(); i!=this->units.end(); ++i)
