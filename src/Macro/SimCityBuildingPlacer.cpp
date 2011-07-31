@@ -214,8 +214,8 @@ BuildingsCluster SimCityBuildingPlacer::searchForCluster(BWTA::Region* r)
 {
 	BuildingsCluster ret;
 	ret.size = 0;
-    int minX = 100000000;
-	int minY = 100000000;
+	int minX = INT_MAX:
+	int minY = INT_MAX;
 	int maxX = 0;
 	int maxY = 0;
 	for (vector<Position>::const_iterator it = r->getPolygon().begin();
@@ -837,10 +837,10 @@ void SimCityBuildingPlacer::makeCannonsMinerals(BWTA::BaseLocation* hom, bool qu
 			furtherMineral = (*it)->getTilePosition();
 		}
 	}
-	dist = 1000000.0;
-	double distb = 1000000.0;
-	double dist2 = 1000000.0;
-	double dist2b = 1000000.0;
+	dist = DBL_MAX;
+	double distb = DBL_MAX;
+	double dist2 = DBL_MAX;
+	double dist2b = DBL_MAX;
 	TilePosition cannon1;
 	TilePosition cannon2;
 	TilePosition pylon1;
@@ -904,7 +904,7 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 {
 	/// search and save front and backdoor chokes
 	backdoorChokes = home->getRegion()->getChokepoints();
-	double minDist = 100000000.0;
+	double minDist = DBL_MAX;
 	for (set<BWTA::Chokepoint*>::const_iterator it = backdoorChokes.begin();
 		it != backdoorChokes.end(); ++it)
 	{

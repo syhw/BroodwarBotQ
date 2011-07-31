@@ -45,7 +45,7 @@ struct i_dist
 	//bool operator<(i_dist& ext) { return (ext.dist < dist); }
 };
 
-struct BasicUnitsGroup
+struct BasicUnitsGroup // should derive from vector<pBayesianUnit>
 {
 	std::vector<pBayesianUnit> units;
 	virtual void update();

@@ -15,6 +15,7 @@ class GoalManager : public CSingleton<GoalManager>
 {
 	friend class CSingleton<GoalManager>;
 private:
+	bool _firstPoke; // hack, remove TODO
 	std::list<pGoal> _goals;
 	GoalManager();
 	~GoalManager();
@@ -25,6 +26,7 @@ public:
 	void addGoal(pGoal g);
 	void onUnitCreate(BWAPI::Unit* u);
 	void onUnitDestroy(BWAPI::Unit* u);
+	void onUnitRenegade(BWAPI::Unit* u);
 	const std::map<BWAPI::Unit*, pBayesianUnit>& getCompletedUnits() const;
 	pBayesianUnit getCompletedUnit(BWAPI::Unit* u);
 };

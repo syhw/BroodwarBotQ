@@ -58,11 +58,16 @@ void Goal::bidOnUnitType(const UnitType& ut)
 	set<Unit*> tmp = SelectAll(Broodwar->self(), ut);
 	for each (Unit* u in tmp)
 	{
-		if (!_biddedOn.count(u))
-		{
-			TheArbitrator->setBid(this, u, _priority);
-			_biddedOn.insert(u);
-		}
+		bidOnUnit(u);
+	}
+}
+
+void Goal::bidOnUnit(Unit* u)
+{
+	if (!_biddedOn.count(u))
+	{
+		TheArbitrator->setBid(this, u, _priority);
+		_biddedOn.insert(u);
 	}
 }
 

@@ -1,5 +1,6 @@
 #include <PrecompiledHeader.h>
 #include "Intelligence/Intelligence.h"
+#include "Macro/InformationManager.h" // temporary, or is it?
 
 using namespace BWAPI;
 
@@ -8,7 +9,8 @@ Intelligence::Intelligence()
 	eUnitsFilter = & EUnitsFilter::Instance();
 	eTechEstimator = & ETechEstimator::Instance();
 	mapManager = & MapManager::Instance();
-	scoutController = & ScoutController::Instance();
+	firstScout = & FirstScoutController::Instance();
+	informationManager = InformationManager::create();
 }
 
 Intelligence::~Intelligence()
@@ -16,7 +18,7 @@ Intelligence::~Intelligence()
     ETechEstimator::Destroy();
     EUnitsFilter::Destroy();
     MapManager::Destroy();
-	ScoutController::Destroy();
+	FirstScoutController::Destroy();
 }
 
 void Intelligence::update()

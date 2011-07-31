@@ -50,6 +50,7 @@ public:
 	virtual void onUnitDiscover(BWAPI::Unit* unit);
 	virtual void onUnitEvade(BWAPI::Unit* unit);
 	virtual void onSaveGame(std::stringbuf gameName);
+	virtual void onNukeDetect(BWAPI::Position target)
 
 	//not part of BWAPI::AIModule
 	void drawStats(); 

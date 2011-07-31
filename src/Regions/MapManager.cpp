@@ -69,7 +69,7 @@ MapManager::MapManager()
 					}
 				}
 			}
-			double minDist = 1000000000000.0;
+			double minDist = DBL_MAX;
 			TilePosition centerCandidate = TilePosition((*it)->getCenter());
 			for (std::list<TilePosition>::const_iterator vp = validTilePositions.begin();
 				vp != validTilePositions.end(); ++vp)
@@ -91,6 +91,7 @@ MapManager::MapManager()
 	}
 
 	/// Fill distRegions with the mean distance between each Regions
+	/// -1 is the 2 Regions are not mutualy/inter accessible by ground
 	for (std::set<BWTA::Region*>::const_iterator it = allRegions.begin();
 		it != allRegions.end(); ++it)
 	{

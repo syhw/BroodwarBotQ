@@ -51,6 +51,7 @@ protected:
     /// Status
 	GoalStatus _status;
 	void bidOnUnitType(const BWAPI::UnitType& ut);
+	void bidOnUnit(BWAPI::Unit* u);
 public:
 	Goal(int priority = 50);
 	Goal(pSubgoal s, int priority = 50, int firstFrame = 0);

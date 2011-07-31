@@ -239,24 +239,6 @@ void BattleBroodAI::onSendText(std::string text)
         //  Broodwar->printf("Set Speed %i", x);
         Broodwar->setLocalSpeed(x);
     }
-    else if (text=="/target")
-    {
-        set<pBayesianUnit> tmp;
-        // for (std::list<UnitsGroup*>::iterator it = this->warManager->unitsGroups.begin(); it != this->warManager->unitsGroups.end(); it++) // why HEAD does have a different warManager->unitsGroups? @merge
-        for (std::list<UnitsGroup*>::iterator it = micro->warManager->unitsGroups.begin(); it != micro->warManager->unitsGroups.end(); it++)
-        {
-            set<pBayesianUnit> tmp;
-            (*it)->selectedUnits(tmp);
-            if (tmp.size() == 0)
-                //    Broodwar->printf("No selected units");
-                for (std::set<pBayesianUnit>::const_iterator i = tmp.begin(); i != tmp.end(); ++i)
-                {
-                    //  Broodwar->printf("Target de l'unité : (%i, %i)", (*i)->target.x(), (*i)->target.y());
-                    Position pos(Broodwar->getScreenPosition() + Broodwar->getMousePosition());
-                    // Broodwar->printf("Curseur : (%i, %i)", pos.x(), pos.y());
-                }
-        }
-    }
     if (text=="debug")
     {
         showManagerAssignments = !showManagerAssignments;
@@ -295,6 +277,11 @@ void BattleBroodAI::onReceiveText(BWAPI::Player* player, std::string text)
 void BattleBroodAI::onSaveGame(std::stringbuf gameName)
 {
 	return;
+}
+
+void BattleBroodAI::onNukeDetect(BWAPI::Position target)
+{
+	micro->onNukeDetect();
 }
 
 DWORD WINAPI AnalyzeThread()

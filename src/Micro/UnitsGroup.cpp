@@ -97,7 +97,7 @@ void mid_based_align(const std::vector<Position>& from, const std::vector<Positi
         std::set<unsigned int> done_i;
         while (done_j.size() < to.size()) 
         {
-            double max = -1000000000000000.0; // bad
+            double max = DBL_MIN;
             unsigned int max_i, max_j;
             for (unsigned int i = 0; i < v_from_center.size(); ++i)
             {
@@ -121,7 +121,7 @@ void mid_based_align(const std::vector<Position>& from, const std::vector<Positi
         // non optimal, should have one more loop
         for (unsigned int i = 0; i < v_from_center.size(); ++i)
         {
-            double max = -1000000000000000.0; // bad
+            double max = DBL_MIN;
             unsigned int max_j;
             for (unsigned int j = 0; j < v_to_center.size(); ++j)
             {
@@ -509,7 +509,10 @@ void UnitsGroup::dispatchCompleteUnit(pBayesianUnit bu)
     }
     else
     {
-        bu->unit->attack(center);
+		if (bu->getType().canAttack())
+	        bu->unit->attack(center);
+		else
+	        bu->unit->move(center);
         arrivingUnits.push_back(bu);
     }
 }
@@ -686,16 +689,16 @@ void UnitsGroup::selectedUnits(std::set<pBayesianUnit>& u)
 }
 #endif
 
-void UnitsGroup::switchMode(unit_mode um){
-	for(std::vector<pBayesianUnit>::iterator it = getUnits()->begin(); it != getUnits()->end(); ++it){
+void UnitsGroup::switchMode(unit_mode um)
+{
+	for(std::vector<pBayesianUnit>::iterator it = getUnits()->begin(); it != getUnits()->end(); ++it)
 		(*it)->switchMode(um);
-	}
 }
 
-void UnitsGroup::idle(){
-	for(std::vector<pBayesianUnit>::iterator it = getUnits()->begin(); it != getUnits()->end(); ++it){
+void UnitsGroup::idle()
+{
+	for(std::vector<pBayesianUnit>::iterator it = getUnits()->begin(); it != getUnits()->end(); ++it)
 		(*it)->target = (*it)->unit->getPosition();
-	}
 }
 
 void UnitsGroup::signalMerge(Unit* u)
@@ -712,7 +715,7 @@ void UnitsGroup::templarMergingStuff()
         return;
     Unit* tomerge = NULL;
     Unit* closer = NULL;
-    double distance = 1000000.0;
+    double distance = DBL_MAX; 
     // stupid, suboptimal, heuristic
     for (std::set<Unit*>::iterator it = _mergersHT.begin();
         it != _mergersHT.end(); )

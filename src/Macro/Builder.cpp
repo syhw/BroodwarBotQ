@@ -61,7 +61,7 @@ void Task::onOffer(set<Unit*> units)
 
 	if (tilePosition.isValid())
 	{
-		double dist = 100000000.0;
+		double dist = DBL_MAX;
 		for (set<Unit*>::const_iterator it = units.begin();
 			it != units.end(); ++it)
 		{

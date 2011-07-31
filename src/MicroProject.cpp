@@ -57,7 +57,7 @@ void MicroAIModule::onStart()
             else
 			{
 				if ((*i)->getType() != UnitTypes::Protoss_Archon)
-	                mm->takeControl(*i);
+	                mm->dispatchCompleteUnit(*i);
 			}
         }
 	}

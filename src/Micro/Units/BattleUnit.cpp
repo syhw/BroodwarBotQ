@@ -472,7 +472,7 @@ void BattleUnit::quickPathFind(std::vector<TilePosition>& btpath,
 
     // only 2 regions
     std::set<BWTA::Chokepoint*> chokes = r_begin->getChokepoints();
-    double dmin = 10000000000000000000000.0;
+    double dmin = DBL_MAX;
     TilePosition checkpoint;
     BWTA::Region* r_next;
     for (std::set<BWTA::Chokepoint*>::const_iterator it = chokes.begin();
@@ -487,7 +487,7 @@ void BattleUnit::quickPathFind(std::vector<TilePosition>& btpath,
     }
     btpath = BWTA::getShortestPath(start, checkpoint);
     chokes = r_next->getChokepoints();
-    dmin = 10000000000000000000000.0;
+    dmin = DBL_MAX;
     TilePosition checkpoint2;
     for (std::set<BWTA::Chokepoint*>::const_iterator it = chokes.begin();
         it != chokes.end(); ++it)

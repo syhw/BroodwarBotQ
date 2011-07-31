@@ -1,6 +1,7 @@
 #include <PrecompiledHeader.h>
 #include "Macro/BorderManager.h"
 #include "Macro/InformationManager.h"
+
 BorderManager* TheBorderManager = NULL;
 
 BorderManager* BorderManager::create()

@@ -124,34 +124,7 @@ void WarManager::onUnitDestroy(BWAPI::Unit* unit)
 	}
 }
 
-void WarManager::sendGroupToAttack(UnitsGroup* ug)
-{
-	if (ScoutController::Instance().enemyFound)
-    {
-        ug->addGoal(pGoal(new AttackGoal(ug, ScoutController::Instance().enemyStartLocation)));
-	} 
-	else 
-	{
-		for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getStartLocations().begin();
-			it != BWTA::getStartLocations().end(); ++it)
-		{
-			if (*it != BWTA::getStartLocation(Broodwar->self()))
-				ug->addGoal(pGoal(new AttackGoal(ug, (*it)->getPosition())));
-		}
-	}
-}
 
-void WarManager::sendGroupToDefense(UnitsGroup* ug)
-{
-	if (home->getRegion()->getChokepoints().size() == 1)
-	{
-		ug->addGoal(pGoal(new AttackGoal(ug, (*(home->getRegion()->getChokepoints().begin()))->getCenter())));
-	}
-	else 
-	{
-		// TODO
-	}
-}
 
 
 bool WarManager::remove(UnitsGroup* u)

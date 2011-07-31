@@ -191,7 +191,6 @@ protected:
     virtual int addRangeGround();
     virtual int addRangeAir();
     virtual bool decideToFlee(); // sets _fleeing
-    void attackEnemyUnit(BWAPI::Unit* u);
     void simpleFlee();
     bool dodgeStorm();
     bool dragScarab();
@@ -216,6 +215,7 @@ public:
 
     void update();
     virtual void attack(const BWAPI::Position& p);
+    void attackEnemyUnit(BWAPI::Unit* u);
 
     virtual void micro() = 0;
     virtual void check() = 0;
