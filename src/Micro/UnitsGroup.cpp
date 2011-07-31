@@ -565,10 +565,6 @@ bool BasicUnitsGroup::emptyUnits()
 {
     return units.empty();
 }
-bool BasicUnitsGroup::emptyGoals()
-{
-    return goals.empty();
-}
 
 void UnitsGroup::updateGroupStrengh(Unit* u)
 {

@@ -20,18 +20,18 @@ FormationSubgoal::FormationSubgoal(const FormationSubgoal& fsg)
 
 bool FormationSubgoal::isRealized()
 {
-    if (distanceToRealize() <= sqrt(unitsGroup->size()*unitsGroup->size()*_OK_DISTANCE_)) 
+    if (distanceToRealize() <= sqrt(_unitsGroup->size() * _unitsGroup->size() * _OK_DISTANCE_)) 
         return true;
     return false;
 }
 
 void FormationSubgoal::tryToRealize()
 {
-    unitsGroup->formation(formation);
+    _unitsGroup->formation(formation);
 }
 
 double FormationSubgoal::distanceToRealize()
 {
     Position p = Position((int)formation->mean.x, (int)formation->mean.y);
-    return p.getDistance(unitsGroup->center);
+    return p.getApproxDistance(_unitsGroup->center);
 }

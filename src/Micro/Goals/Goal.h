@@ -11,6 +11,7 @@ typedef boost::shared_ptr<Goal> pGoal;
 class Subgoal;
 typedef boost::shared_ptr<Subgoal> pSubgoal;
 #endif
+class UnitsGroup;
 #include "Macro/Arbitrator.h"
 #include "Micro/UnitsGroup.h"
 #include "Micro/Goals/GoalManager.h"
@@ -20,8 +21,7 @@ typedef boost::shared_ptr<Subgoal> pSubgoal;
 #include <list>
 #include <map>
 
-class BasicUnitsGroup;
-class Subgoal;
+
 
 typedef enum
 {

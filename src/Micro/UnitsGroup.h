@@ -4,7 +4,6 @@
 #include <windows.h>
 #include <math.h>
 #include "Micro/Units/BayesianUnit.h"
-#include "Micro/Goals/Goal.h"
 #include "Micro/Formations.h"
 #include "Utils/Vec.h"
 #include <set>
@@ -46,19 +45,12 @@ struct i_dist
 	//bool operator<(i_dist& ext) { return (ext.dist < dist); }
 };
 
-class BasicUnitsGroup
+struct BasicUnitsGroup
 {
-protected:
-	Goal* goal;
-public:
 	std::vector<pBayesianUnit> units;
 	virtual void update();
-    // Units interface
     bool removeUnit(BWAPI::Unit* u);
-	// Goals interface
-	void accomplishGoal();
 	bool emptyUnits();
-	bool emptyGoals();
     int size() const;
 };
 

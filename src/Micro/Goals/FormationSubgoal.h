@@ -10,7 +10,7 @@ class FormationSubgoal : public Subgoal
 {
     pFormation formation;
 public:
-    FormationSubgoal(SubgoalLogic l, pFormation f);
+    FormationSubgoal(SubgoalLogic l, UnitsGroup* ug, pFormation f);
     FormationSubgoal(const FormationSubgoal& fsg);
 	virtual bool isRealized();
 	virtual void tryToRealize();
