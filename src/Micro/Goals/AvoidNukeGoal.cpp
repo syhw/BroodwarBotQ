@@ -68,8 +68,9 @@ void AvoidNukeGoal::achieve()
 			_status = GS_ACHIEVED;
 		    return;
 		}
-		else if (Broodwar->getFrameCount() > 13*24 + _firstFrame)
+		else if (Broodwar->getFrameCount() > 12*24 + _firstFrame)
 		{
+			/// To late to try and kill the ghost (14 seconds to drop the Nuke)
 			fleeTheNuke();
 		}
 		else
