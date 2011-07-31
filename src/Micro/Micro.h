@@ -15,5 +15,5 @@ public:
 	void onUnitShow(BWAPI::Unit* unit);
 	void onUnitDestroy(BWAPI::Unit* unit);
 	void onUnitRenegade(BWAPI::Unit* unit);
-	void onNukeDetect(BWAPI::Position target)
+	void onNukeDetect(BWAPI::Position target);
 };

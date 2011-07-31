@@ -214,7 +214,7 @@ BuildingsCluster SimCityBuildingPlacer::searchForCluster(BWTA::Region* r)
 {
 	BuildingsCluster ret;
 	ret.size = 0;
-	int minX = INT_MAX:
+	int minX = INT_MAX;
 	int minY = INT_MAX;
 	int maxX = 0;
 	int maxY = 0;

@@ -4,6 +4,7 @@
 #include "Micro/Goals/Goal.h"
 #include "Micro/Goals/FormationSubgoal.h"
 #include "Micro/Goals/AttackGoal.h"
+#include "Macro/BWSAL.h"
 
 #ifdef __LEARNING_PROB_TABLES__
 #include "ZealotUnit.h"
@@ -32,37 +33,14 @@ void MicroAIModule::onStart()
     this->eUnitsFilter = & EUnitsFilter::Instance();
     this->mapManager = & MapManager::Instance();
 	this->unitGroupManager = UnitGroupManager::create();
-	// this->rdmGenerators = & RandomGenerators::Instance();
-
-	mm = new UnitsGroup();
+	micro = & Micro::Instance();
+	TheArbitrator = & arbitrator;
 
     std::string mapName = Broodwar->mapPathName();
     mapName = mapName.substr(mapName.find_last_of("\\") + 1, mapName.length() - mapName.find_last_of("\\") - 1);
     Broodwar->sendText("map name: %s", mapName.c_str());
 
 	std::set<Unit*> allUnits = Broodwar->getAllUnits();
-
-	for (std::set<Unit*>::iterator i=allUnits.begin(); i!=allUnits.end(); i++)
-	{
-        onUnitShow(*i);
-        if ((*i)->getType().isBuilding())
-		{
-			this->buildings.insert(std::make_pair(*i,(*i)->getType()));
-            mapManager->onUnitCreate(*i);
-		} 
-        else 
-        {
-            if ((*i)->getPlayer() != Broodwar->self())
-                continue;
-            else
-			{
-				if ((*i)->getType() != UnitTypes::Protoss_Archon)
-	                mm->dispatchCompleteUnit(*i);
-			}
-        }
-	}
-
-	std::list<pGoal> goals;
 
 	BWAPI::TilePosition mp = Broodwar->self()->getStartLocation();
     for (std::set<BWAPI::TilePosition>::const_iterator it = Broodwar->getStartLocations().begin();
@@ -86,109 +64,37 @@ void MicroAIModule::onStart()
 	pSubgoal tmp_subgoal;
 	pGoal tmp_goal;
 
-    /* LINE IN THE MIDDLE (+/- 64 pixs) */   
-    /*tmp_form = pFormation(new LineFormation(
-        Position(Broodwar->mapWidth()/2*32 + sign*64,(Broodwar->mapHeight()/2 + 4)*32), Vec(1,0)));
-    tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-    tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
-    goals.push_back(tmp_goal);*/
-
-    /* SQUARE IN THE MIDDLE */
-    /*tmp_form = pFormation(new SquareFormation(
-        Position(Broodwar->mapWidth()/2*32, (Broodwar->mapHeight()/2 + 4)*32)));
-    tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-    tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
-    goals.push_back(tmp_goal);*/
-
-//    /* BALL IN THE MIDDLE (+/- 256 pixs) */
-//    goals.push_back(pGoal(new AttackGoal(mm, 
-//        Position(Broodwar->mapWidth()/2*32 - sign*256, (Broodwar->mapHeight()/2 + 4)*32))));
-//
-//    /* ARC IN THE MIDDLE (+/- 256 pixs) */
-//    tmp_form = pFormation(new ArcFormation(
-//        Position(Broodwar->mapWidth()/2*32 - sign*256,(Broodwar->mapHeight()/2 + 4)*32), 
-//        Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
-//    tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-//    tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
-//    goals.push_back(tmp_goal);
-//
-//    /* ARC IN THE MIDDLE (+/- 128 pixs) */
-//    tmp_form = pFormation(new ArcFormation(
-//        Position(Broodwar->mapWidth()/2*32 - sign*128,(Broodwar->mapHeight()/2 + 4)*32), 
-//        Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
-//    tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-//    tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
-//    goals.push_back(tmp_goal);
-//    
-//    /* ARC IN THE MIDDLE */
-//    tmp_form = pFormation(new ArcFormation(
-//        Position(Broodwar->mapWidth()/2*32,(Broodwar->mapHeight()/2 + 4)*32), 
-//        Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
-//    tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-//    tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
-//    goals.push_back(tmp_goal);
-//
-//    /* ARC IN THE MIDDLE (+/- 128 pixs) */
-//    tmp_form = pFormation(new ArcFormation(
-//        Position(Broodwar->mapWidth()/2*32 + sign*128,(Broodwar->mapHeight()/2 + 4)*32), 
-//        Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
-//    tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-//    tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
-//    goals.push_back(tmp_goal);
-//
-//    /* ARC IN THE MIDDLE (+/- 256 pixs) */
-//    tmp_form = pFormation(new ArcFormation(
-//        Position(Broodwar->mapWidth()/2*32 + sign*256,(Broodwar->mapHeight()/2 + 4)*32), 
-//        Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
-//    tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-//    tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
-//    goals.push_back(tmp_goal);
-//
-//    /* ARC IN THE MIDDLE (+/- 312 pixs) */
-//    tmp_form = pFormation(new ArcFormation(
-//        Position(Broodwar->mapWidth()/2*32 + sign*312,(Broodwar->mapHeight()/2 + 4)*32), 
-//        Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
-//    tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-//    tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
-//    goals.push_back(tmp_goal);
-//
-//
-//    /* SQUARE ON THE OTHER SIDE */
-//    tmp_form = pFormation(new SquareFormation(
-//        Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
-//    tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-//    tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
-//    goals.push_back(tmp_goal);
-    
+	list<pGoal> goals;
+		 
     if (mapName == std::string("muta.scm") || mapName == std::string("mutaCOMPUTER.scm"))
     {
         tmp_form = pFormation(new ArcFormation(
             Position(Broodwar->mapWidth()/2*32 + sign*350,(Broodwar->mapHeight()/2 + 4)*32), 
             Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
-        tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-        tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+		tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, NULL, tmp_form));
+        tmp_goal = pGoal(new Goal(tmp_subgoal));
         goals.push_back(tmp_goal);
-        goals.push_back(pGoal(new AttackGoal(mm, 
+        goals.push_back(pGoal(new AttackGoal( 
             Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32))));
-        goals.push_back(pGoal(new AttackGoal(mm, 
+        goals.push_back(pGoal(new AttackGoal( 
             Position(Broodwar->mapWidth()*32 - 128, Broodwar->mapHeight()*32 - 128))));
-        goals.push_back(pGoal(new AttackGoal(mm, 
+        goals.push_back(pGoal(new AttackGoal( 
             Position(Broodwar->mapWidth()*32, 128))));
-        goals.push_back(pGoal(new AttackGoal(mm, 
+        goals.push_back(pGoal(new AttackGoal( 
             Position(128, Broodwar->mapHeight()*32))));
-        goals.push_back(pGoal(new AttackGoal(mm, 
+        goals.push_back(pGoal(new AttackGoal( 
             Position(128, 128))));
-        goals.push_back(pGoal(new AttackGoal(mm, 
+        goals.push_back(pGoal(new AttackGoal( 
             Position(Broodwar->mapWidth()*32 - 128, Broodwar->mapHeight()*32 - 128))));
-        goals.push_back(pGoal(new AttackGoal(mm, 
+        goals.push_back(pGoal(new AttackGoal( 
             Position(Broodwar->mapWidth()*32, 128))));
-        goals.push_back(pGoal(new AttackGoal(mm, 
+        goals.push_back(pGoal(new AttackGoal( 
             Position(128, Broodwar->mapHeight()*32))));
-        goals.push_back(pGoal(new AttackGoal(mm, 
+        goals.push_back(pGoal(new AttackGoal( 
             Position(128, 128))));
-        goals.push_back(pGoal(new AttackGoal(mm, 
-            Position(Broodwar->mapWidth()/2*32, 22*32))));
-        goals.push_back(pGoal(new AttackGoal(mm, 
+        goals.push_back(pGoal(new AttackGoal( 
+            Position(Broodwar->mapWidth()/2*3, 22*32))));
+        goals.push_back(pGoal(new AttackGoal( 
             Position(Broodwar->mapWidth()/2*32, 50*32))));
     }
     else if (mapName == std::string("zealots.scm") || mapName == std::string("zealotsCOMPUTER.scm"))
@@ -196,35 +102,35 @@ void MicroAIModule::onStart()
         tmp_form = pFormation(new ArcFormation(
             Position(Broodwar->mapWidth()/2*32 + sign*350,(Broodwar->mapHeight()/2 + 4)*32), 
             Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
-        tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-        tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+        tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, NULL, tmp_form));
+        tmp_goal = pGoal(new Goal(tmp_subgoal));
         goals.push_back(tmp_goal);
         tmp_form = pFormation(new ArcFormation(
             Position(Broodwar->mapWidth()/2*32 + sign*450,(Broodwar->mapHeight()/2 + 4)*32), 
             Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
-        tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-        tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+        tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, NULL, tmp_form));
+        tmp_goal = pGoal(new Goal(tmp_subgoal));
         goals.push_back(tmp_goal);
-        goals.push_back(pGoal(new AttackGoal(mm, 
+        goals.push_back(pGoal(new AttackGoal(
             Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32))));
         tmp_form = pFormation(new LineFormation(
             Position(Broodwar->mapWidth()/2*32,(Broodwar->mapHeight()/2 + 4)*32), Vec(1,0)));
-        tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-        tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+        tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, NULL, tmp_form));
+        tmp_goal = pGoal(new Goal(tmp_subgoal));
         goals.push_back(tmp_goal);
-        goals.push_back(pGoal(new AttackGoal(mm, 
+        goals.push_back(pGoal(new AttackGoal( 
             Position((Broodwar->mapWidth() - (Broodwar->mapWidth() - mp.x()))*32, (Broodwar->mapHeight()/2 + 4)*32))));
-        goals.push_back(pGoal(new AttackGoal(mm, 
+        goals.push_back(pGoal(new AttackGoal( 
             Position(Broodwar->mapWidth()/2*32, 22*32))));
-        goals.push_back(pGoal(new AttackGoal(mm, 
+        goals.push_back(pGoal(new AttackGoal( 
             Position(Broodwar->mapWidth()/2*32, 50*32))));
     }
 	else if (mapName == std::string("formation.scm"))
 	{
 		tmp_form = pFormation(new SquareFormation(
 			Position(Broodwar->mapWidth()/2*32, (Broodwar->mapHeight()/2 + 4)*32)));
-		tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-		tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+		tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, NULL, tmp_form));
+		tmp_goal = pGoal(new Goal(tmp_subgoal));
 		goals.push_back(tmp_goal);
 	}
     else
@@ -232,81 +138,34 @@ void MicroAIModule::onStart()
         tmp_form = pFormation(new ArcFormation(
             Position(Broodwar->mapWidth()/2*32 + sign*350,(Broodwar->mapHeight()/2 + 4)*32), 
             Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32)));
-        tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-        tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+        tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, NULL, tmp_form));
+        tmp_goal = pGoal(new Goal(tmp_subgoal));
         goals.push_back(tmp_goal);
-        goals.push_back(pGoal(new AttackGoal(mm, 
+        goals.push_back(pGoal(new AttackGoal(
             Position((Broodwar->mapWidth() - mp.x())*32, (Broodwar->mapHeight()/2 + 4)*32))));
         tmp_form = pFormation(new LineFormation(
             Position(Broodwar->mapWidth()/2*32,(Broodwar->mapHeight()/2 + 4)*32), Vec(1,0)));
-        tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-        tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
+        tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, NULL, tmp_form));
+        tmp_goal = pGoal(new Goal(tmp_subgoal));
         goals.push_back(tmp_goal);
-        goals.push_back(pGoal(new AttackGoal(mm, 
+        goals.push_back(pGoal(new AttackGoal( 
             Position((Broodwar->mapWidth() - (Broodwar->mapWidth() - mp.x()))*32, (Broodwar->mapHeight()/2 + 4)*32))));
-        goals.push_back(pGoal(new AttackGoal(mm, 
+        goals.push_back(pGoal(new AttackGoal( 
             Position(Broodwar->mapWidth()/2*32, 22*32))));
-        goals.push_back(pGoal(new AttackGoal(mm, 
+        goals.push_back(pGoal(new AttackGoal( 
             Position(Broodwar->mapWidth()/2*32, 50*32))));
     }
 
-	mm->setGoals(goals);
+	micro->goalManager->addGoals(goals);
 
 }
 
 void MicroAIModule::onFrame()
 {
+	TheArbitrator->update();
+	micro->update();
     if (Broodwar->getLastError() != BWAPI::Errors::None)
         Broodwar->printf("LAST ERROR: %s", Broodwar->getLastError().toString().c_str());
-	if (mm != NULL) 
-        mm->update();
-    // regions->display();
-    if (!enemiesFound && mm->enemies.size())
-    {
-        enemiesFound = true;
-        if (mm->enemiesCenter.getDistance(Position(eStartLocation)) > 128.0)
-        {
-            /// stacking goals
-            /* Attack in their direction */
-            pGoal tmp_goal = pGoal(new AttackGoal(mm, mm->enemiesCenter));
-            mm->addGoalFront(tmp_goal);
-            /* ARC in their direction (- 192 pixs) */
-            Vec direction = Vec(mm->center.x() - mm->enemiesCenter.x(), mm->center.y() - mm->enemiesCenter.y());
-            direction.normalize();
-            direction *= 192;
-            Position arcCenter = direction.translate(mm->enemiesCenter);
-            pFormation tmp_form = pFormation(new ArcFormation(
-                arcCenter, mm->enemiesCenter));
-            pSubgoal tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-            tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
-            mm->addGoalFront(tmp_goal);
-            /* ARC in their direction (- 288 pixs) */
-            direction *= 1.5;
-            arcCenter = direction.translate(mm->enemiesCenter);
-            tmp_form = pFormation(new ArcFormation(
-                arcCenter, mm->enemiesCenter));
-            tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-            tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
-            mm->addGoalFront(tmp_goal);
-            /* ARC in their direction (- 360 pixs) */
-            direction *= 1.25;
-            arcCenter = direction.translate(mm->enemiesCenter);
-            tmp_form = pFormation(new ArcFormation(
-                arcCenter, mm->enemiesCenter));
-            tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-            tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
-            mm->addGoalFront(tmp_goal);
-            /* Line far */
-            direction *= 1.25;
-            arcCenter = direction.translate(mm->enemiesCenter);
-            direction *= -1.0;
-            tmp_form = pFormation(new LineFormation(
-                arcCenter, direction));
-            tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, tmp_form));
-            tmp_goal = pGoal(new Goal(mm, tmp_subgoal));
-            mm->addGoalFront(tmp_goal);
-        }
-    }
     
 #ifdef BW_POS_MOUSE
     char mousePos[100];
@@ -342,12 +201,10 @@ MicroAIModule::MicroAIModule()
 {
 }
 
-
 void MicroAIModule::onEnd(bool isWinner)
 {
     MapManager::Destroy();
-    // regions::Destroy();
-    mm->~UnitsGroup();
+	Micro::Destroy();
 #ifndef __LEARNING_PROB_TABLES__
 	myRestartGame();
 #endif
@@ -379,26 +236,6 @@ void MicroAIModule::onSendText(std::string text)
     } else if (text=="/euf") // eUnitsFilter
     {
         eUnitsFilter->bwOutput();
-    } else if (text.substr(0,3) == "/go")
-    {
-        int x = 0;
-        int y = 0;
-        if (text[3] != ' ')
-            Broodwar->printf("Usage: /go XCOORD YCOORD;\n");
-        int lx = text.find(' ', 4) - 4;
-        int ly = text.find(';') - (4+lx);
-        std::string xx = text.substr(4, 4+lx);
-        x = atoi(xx.c_str());
-        std::string yy = text.substr(4+lx+1, 4+lx+ly);
-        y = atoi(yy.c_str());
-        Broodwar->printf("lx: %d | ly: %d", lx, ly);
-        set<pBayesianUnit> tmp;
-        mm->selectedUnits(tmp);
-        for (set<pBayesianUnit>::iterator it = tmp.begin(); it != tmp.end(); ++it)
-        {
-            (*it)->target = Position(x, y);
-        }
-        Broodwar->printf("We will go in %d, %d\n", x, y);
 	} else
 	{
 		Broodwar->printf("You typed '%s'!",text.c_str());
@@ -409,33 +246,30 @@ void MicroAIModule::onSendText(std::string text)
 void MicroAIModule::onUnitCreate(Unit* unit)
 {
     mapManager->onUnitCreate(unit);
-    // regions->onUnitCreate(unit);
+	micro->onUnitCreate(unit);
 }
 
 void MicroAIModule::onUnitDestroy(Unit* unit)
 {
+	TheArbitrator->onRemoveObject(unit);
+    micro->onUnitDestroy(unit);
     eUnitsFilter->onUnitDestroy(unit);
     mapManager->onUnitDestroy(unit);
-    // regions->onUnitDestroy(unit);
-    mm->onUnitDestroy(unit);
 }
 
 void MicroAIModule::onUnitShow(Unit* unit)
 {
+    micro->onUnitShow(unit);
     eUnitsFilter->onUnitShow(unit);
     mapManager->onUnitShow(unit);
-	// regions->onUnitShow(unit);
     unitGroupManager->onUnitDiscover(unit);
-    mm->onUnitShow(unit);
 }
 
 void MicroAIModule::onUnitHide(Unit* unit)
 {
     eUnitsFilter->onUnitHide(unit);
     mapManager->onUnitHide(unit);
-	// regions->onUnitHide(unit);
     unitGroupManager->onUnitEvade(unit);
-    mm->onUnitHide(unit);
 }
 
 DWORD WINAPI AnalyzeThread()

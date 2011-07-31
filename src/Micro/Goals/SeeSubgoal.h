@@ -13,7 +13,6 @@ public:
 	double distanceToRealize();
 	virtual double distanceToRealize(BWAPI::Position);
 protected:
-	bool check();
-	BWAPI::Position pos;
-	bool achieved;
+	BWAPI::Position _pos;
+	bool _achieved;
 };

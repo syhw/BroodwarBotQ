@@ -5,6 +5,24 @@
 #include "Micro/UnitsGroup.h"
 #include "Utils/Util.h"
 #include <set>
+#include "Micro/Units/ProtossSpecial/ArbiterUnit.h"
+#include "Micro/Units/ProtossSpecial/DarkArchonUnit.h"
+#include "Micro/Units/ProtossSpecial/HighTemplarUnit.h"
+#include "Micro/Units/ProtossFlying/CarrierUnit.h"
+#include "Micro/Units/ProtossFlying/ObserverUnit.h"
+#include "Micro/Units/ProtossFlying/ShuttleUnit.h"
+#include "Micro/Units/ProtossFlying/CorsairUnit.h"
+#include "Micro/Units/ProtossFlying/ScoutUnit.h"
+#include "Micro/Units/ProtossGround/ArchonUnit.h"
+#include "Micro/Units/ProtossGround/ZealotUnit.h"
+#include "Micro/Units/ProtossGround/ReaverUnit.h"
+#include "Micro/Units/ProtossGround/ProbeUnit.h"
+#include "Micro/Units/ProtossGround/DragoonUnit.h"
+#include "Micro/Units/ProtossGround/DarkTemplarUnit.h"
+#include "Micro/Units/TerranGround/MarineUnit.h"
+#include "Micro/Units/TerranGround/MedicUnit.h"
+#include "Micro/Units/ZergFlying/ScourgeUnit.h"
+#include "Micro/Units/ZergFlying/MutaliskUnit.h"
 
 // Copyright 2010-2011 <Gabriel Synnaeve> gabriel.synnaeve@gmail.com
 
@@ -254,6 +272,11 @@ void BayesianUnit::switchMode(unit_mode um)
 void BayesianUnit::setUnitsGroup(UnitsGroup* ug)
 {
 	_unitsGroup = ug;
+}
+
+void BayesianUnit::dettachGroup()
+{
+	_unitsGroup = NULL;
 }
 
 unit_mode BayesianUnit::getMode()
@@ -2059,6 +2082,7 @@ bool BayesianUnit::dragScarab()
 
 void BayesianUnit::update()
 {
+	assert(_unitsGroup != NULL);
     if (!unit || !unit->exists()) return;
 	if (_unitsGroup == NULL) return;
 

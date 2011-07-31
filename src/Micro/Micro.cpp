@@ -5,16 +5,19 @@
 using namespace BWAPI;
 
 Micro::Micro()
+: goalManager(NULL)
 {
 	goalManager = & GoalManager::Instance();
 }
 
 Micro::~Micro()
 {
+	GoalManager::Destroy();
 }
 
 void Micro::update()
 {
+	goalManager->update();
 }
 
 void Micro::onUnitCreate(BWAPI::Unit *unit)
@@ -33,7 +36,7 @@ void Micro::onUnitDestroy(BWAPI::Unit *unit)
 
 void Micro::onUnitRenegade(BWAPI::Unit *unit)
 {
-	goalManager->onUnitRenegade(unit);
+	goalManager->onUnitDestroy(unit); // to test
 }
 
 void Micro::onNukeDetect(BWAPI::Position target)

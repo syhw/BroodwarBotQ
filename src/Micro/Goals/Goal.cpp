@@ -15,14 +15,16 @@ Goal::~Goal()
 	TheArbitrator->removeAllBids(this);
 }
 
-Goal::Goal(int priority)
+Goal::Goal(int priority, int firstFrame)
 : _status(GS_WAIT_PRECONDITION)
 , _priority(priority)
-, _firstFrame(BWAPI::Broodwar->getFrameCount())
+, _firstFrame(firstFrame)
 {
 #ifdef __DEBUG__
 	log("created a goal\n");
 #endif
+	if (!firstFrame)
+		_firstFrame = Broodwar->getFrameCount();
 }
 
 Goal::Goal(pSubgoal s, int priority, int firstFrame)
@@ -49,6 +51,20 @@ Goal::Goal(const map<UnitType, int>& nU, pSubgoal s,
 #endif
 	_neededUnits = nU;
 	addSubgoal(s);
+	if (!firstFrame)
+		_firstFrame = Broodwar->getFrameCount();
+}
+
+Goal::Goal(const std::map<BWAPI::UnitType, int>& nU,
+	 int priority, int firstFrame)
+: _status(GS_WAIT_PRECONDITION)
+, _priority(priority)
+, _firstFrame(firstFrame)
+{
+#ifdef __DEBUG__
+	log("created a goal\n");
+#endif
+	_neededUnits = nU;
 	if (!firstFrame)
 		_firstFrame = Broodwar->getFrameCount();
 }
@@ -80,10 +96,11 @@ void Goal::onOffer(set<Unit*> objects)
 		{
 			if (gm->getCompletedUnits().find(u) != gm->getCompletedUnits().end())
 			{
-				TheArbitrator->accept(this, objects, _priority);
+				TheArbitrator->accept(this, u, _priority);
 				if (_neededUnits.find(u->getType()) != _neededUnits.end())
 					_neededUnits[u->getType()] -= 1;
 				_unitsGroup.dispatchCompleteUnit(gm->getCompletedUnit(u));
+				gm->unassignedUnits.erase(u);
 			}
 		}
 	}
@@ -101,6 +118,7 @@ void Goal::onRevoke(Unit* u, double bid)
 	_unitsGroup.giveUpControl(u);
 	if (_neededUnits.find(u->getType()) != _neededUnits.end())
 		_neededUnits[u->getType()] += 1;
+	GoalManager::Instance().unassignedUnits.insert(u);
 	///// TODO
 }
 
@@ -216,11 +234,25 @@ void Goal::check()
 
 void Goal::cancel()
 {
+	/// Does nothing, to be overwritten in cancelable goals
+}
+
+void Goal::canBidOn(BWAPI::Unit* u)
+{
+	/// Does nothing, to be overwritten in "taking all possible units" goals
+}
+
+/// Simple helper calling the canBidOn(Unit*) of the specialized Goal
+void Goal::canBidOn(const set<BWAPI::Unit*>& setU)
+{
+	for each (Unit* u in setU)
+		canBidOn(u);
 }
 
 void Goal::addSubgoal(pSubgoal s)
 {
 	_subgoals.push_back(s);
+	s->setUnitsGroup(&_unitsGroup);
 }
 
 void Goal::setStatus(GoalStatus s)

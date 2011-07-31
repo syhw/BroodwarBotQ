@@ -3,24 +3,6 @@
 #include "Micro/UnitsGroup.h"
 #include <Position.h>
 #include "Utils/Util.h"
-#include "Micro/Units/ProtossSpecial/ArbiterUnit.h"
-#include "Micro/Units/ProtossSpecial/DarkArchonUnit.h"
-#include "Micro/Units/ProtossSpecial/HighTemplarUnit.h"
-#include "Micro/Units/ProtossFlying/CarrierUnit.h"
-#include "Micro/Units/ProtossFlying/ObserverUnit.h"
-#include "Micro/Units/ProtossFlying/ShuttleUnit.h"
-#include "Micro/Units/ProtossFlying/CorsairUnit.h"
-#include "Micro/Units/ProtossFlying/ScoutUnit.h"
-#include "Micro/Units/ProtossGround/ArchonUnit.h"
-#include "Micro/Units/ProtossGround/ZealotUnit.h"
-#include "Micro/Units/ProtossGround/ReaverUnit.h"
-#include "Micro/Units/ProtossGround/ProbeUnit.h"
-#include "Micro/Units/ProtossGround/DragoonUnit.h"
-#include "Micro/Units/ProtossGround/DarkTemplarUnit.h"
-#include "Micro/Units/TerranGround/MarineUnit.h"
-#include "Micro/Units/TerranGround/MedicUnit.h"
-#include "Micro/Units/ZergFlying/ScourgeUnit.h"
-#include "Micro/Units/ZergFlying/MutaliskUnit.h"
 #include <stack>
 #include <typeinfo>
 
@@ -41,7 +23,13 @@ UnitsGroup::UnitsGroup()
 , _totalGazPrice(0)
 , _totalSupply(0)
 , _hasDetection(0)
-, enemiesCenter(Position(0, 0))
+, centerSpeed(0,0)
+, center(0,0)
+, groupAltitude(0)
+, stdDevRadius(0.0)
+, maxRadius(0.0)
+, enemiesCenter(0,0)
+, enemiesAltitude(0)
 {
     _eUnitsFilter = & EUnitsFilter::Instance();
 }
@@ -500,8 +488,14 @@ double UnitsGroup::getDistance(BWAPI::Unit* u) const
     return u->getDistance(center);
 }
 
+double UnitsGroup::getDistance(BWAPI::Position p) const
+{
+	return center.getApproxDistance(p);
+}
+
 void UnitsGroup::dispatchCompleteUnit(pBayesianUnit bu)
 {
+	bu->setUnitsGroup(this);
 	if (bu->unit->getPosition().getApproxDistance(center) < __MAX_DISTANCE_TO_GROUP__ || !units.size())
     {
 		units.push_back(bu);
@@ -522,6 +516,7 @@ bool BasicUnitsGroup::removeUnit(Unit* u)
     for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
         if ((*it)->unit == u)
         {
+			(*it)->dettachGroup();
             units.erase(it);
 			return true;
         }

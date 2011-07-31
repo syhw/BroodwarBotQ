@@ -22,8 +22,10 @@ private:
 	std::map<BWAPI::Unit*, pBayesianUnit> _completedUnits;
 	std::list<BWAPI::Unit*> _inTrainingUnits;
 public:
+	std::set<BWAPI::Unit*> unassignedUnits;
 	void update();
 	void addGoal(pGoal g);
+	void addGoals(const std::list<pGoal>& l);
 	void onUnitCreate(BWAPI::Unit* u);
 	void onUnitDestroy(BWAPI::Unit* u);
 	void onUnitRenegade(BWAPI::Unit* u);

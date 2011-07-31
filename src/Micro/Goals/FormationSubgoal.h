@@ -15,6 +15,4 @@ public:
 	virtual bool isRealized();
 	virtual void tryToRealize();
 	virtual double distanceToRealize();
-protected:
-	virtual bool check();
 };

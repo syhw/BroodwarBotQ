@@ -7,10 +7,16 @@ typedef enum
 	SL_OR     = 1
 } SubgoalLogic;
 	
+/// Note to self:
+/// This class should _not_ have _unitsGroup (think shortcut Kill subgoals)
+/// but I would like all Subgoals to be able to _do something_ so that they
+/// don't get stuck unrealized. So shortcuts send distanceToRealize() = -1
+/// but _can_ tryToRealize()
 class Subgoal
 {
 public:
     Subgoal(SubgoalLogic l, UnitsGroup* ug);
+    Subgoal(SubgoalLogic l);
     Subgoal(const Subgoal& sg);
     ~Subgoal();
     //Accessors

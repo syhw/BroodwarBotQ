@@ -91,7 +91,6 @@ void BattleBroodAI::onFrame()
 #endif
 
     //timeManager->update();
-	TheArbitrator->update();
     clock_t time1 = clock();
 	intelligence->update(); // Intelligence update
     clock_t time2 = clock();
@@ -157,7 +156,6 @@ void BattleBroodAI::onUnitDestroy(BWAPI::Unit* unit)
 	intelligence->onUnitDestroy(unit);
 	macro->onUnitDestroy(unit);
 	micro->onUnitDestroy(unit);
-	TheArbitrator->onRemoveObject(unit);
 }
 
 void BattleBroodAI::onUnitShow(BWAPI::Unit* unit)
@@ -201,10 +199,11 @@ void BattleBroodAI::onPlayerLeft(BWAPI::Player* player)
 
 void BattleBroodAI::onNukeDetect(BWAPI::Position target)
 {
-    //if (target!=Positions::Unknown)
-    //	Broodwar->printf("Nuclear Launch Detected at (%d,%d)",target.x(),target.y());
-    //else
-    //	Broodwar->printf("Nuclear Launch Detected");
+	micro->onNukeDetect(target);
+    if (target!=Positions::Unknown)
+    	Broodwar->printf("Nuclear Launch Detected at (%d,%d)",target.x(),target.y());
+    else
+    	Broodwar->printf("Nuclear Launch Detected");
 }
 
 void BattleBroodAI::onSendText(std::string text)
@@ -277,11 +276,6 @@ void BattleBroodAI::onReceiveText(BWAPI::Player* player, std::string text)
 void BattleBroodAI::onSaveGame(std::stringbuf gameName)
 {
 	return;
-}
-
-void BattleBroodAI::onNukeDetect(BWAPI::Position target)
-{
-	micro->onNukeDetect();
 }
 
 DWORD WINAPI AnalyzeThread()

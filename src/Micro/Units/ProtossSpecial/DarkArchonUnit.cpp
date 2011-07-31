@@ -26,7 +26,7 @@ DarkArchonUnit::DarkArchonUnit(Unit* u)
         setPrio.insert(UnitTypes::Zerg_Lurker);
 		setPrio.insert(UnitTypes::Zerg_Ultralisk);
         setPrio.insert(UnitTypes::Terran_Siege_Tank_Siege_Mode);
-        setPrio.insert(UnitTypes::Terran_BattleCruiser);
+        setPrio.insert(UnitTypes::Terran_Battlecruiser);
         setPrio.insert(UnitTypes::Protoss_Carrier);
         setPrio.insert(UnitTypes::Protoss_Archon);
         setPrio.insert(UnitTypes::Protoss_Reaver);
@@ -69,7 +69,7 @@ void DarkArchonUnit::micro()
 		for (multimap<double, Unit*>::const_iterator it = _rangeEnemies.begin();
 			it != _rangeEnemies.end(); ++it)
 		{
-			if (casters.count(it->second->getType()
+			if (casters.count(it->second->getType())
 				&& it->second->getEnergy() > it->second->getHitPoints()+it->second->getShields())
 			{
 				unit->useTech(TechTypes::Feedback, it->second);
@@ -91,7 +91,7 @@ void DarkArchonUnit::micro()
 				&& !it->second->isHallucination()
 				&& !it->second->isLockedDown()
 				&& !it->second->isMaelstrommed()
-				&& !it->second->isStasised()
+				&& !it->second->isStasised())
 			{
 				unit->useTech(TechTypes::Maelstrom, it->second);
 				_lastCastFrame = Broodwar->getFrameCount();

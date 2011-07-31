@@ -479,6 +479,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\src\Micro\Goals\RegroupGoal.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\src\Micro\Goals\SeeSubgoal.cpp"
 						>
 					</File>
@@ -810,6 +814,10 @@
 					</File>
 					<File
 						RelativePath="..\src\Micro\Goals\KillSubgoal.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Goals\RegroupGoal.h"
 						>
 					</File>
 					<File

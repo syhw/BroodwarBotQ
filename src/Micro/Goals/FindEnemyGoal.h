@@ -4,7 +4,7 @@
 #include "Micro/Goals/Subgoal.h"
 #include "Micro/Goals/SeeSubgoal.h"
 #include "Micro/Goals/FindSubgoal.h"
-#include "Intelligence/ScoutController.h"
+#include "Intelligence/FirstScoutController.h"
 #include "Micro/WarManager.h"
 class FindEnemyGoal: public Goal
 {

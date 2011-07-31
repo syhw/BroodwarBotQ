@@ -9,6 +9,8 @@ class AttackGoal: public Goal
 private:
 	void createMidSubgoal();
 public:
-	AttackGoal(const std::map<BWAPI::UnitType, int>& miniUnits, BWAPI::Position p);
+	AttackGoal(const std::map<BWAPI::UnitType, int>& miniUnits, 
+		BWAPI::Position p, int priority = 50, int firstFrame = 0);
+	AttackGoal(BWAPI::Position p, int priority = 50, int firstFrame = 0);
 	void achieve();
 };

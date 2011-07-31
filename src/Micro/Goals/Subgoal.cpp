@@ -9,6 +9,12 @@ Subgoal::Subgoal(SubgoalLogic l, UnitsGroup* ug)
 {
 }
 
+Subgoal::Subgoal(SubgoalLogic l)
+: _logic(l)
+, _unitsGroup(NULL)
+{
+}
+
 Subgoal::Subgoal(const Subgoal& sg) 
 : _logic(sg._logic)
 , _unitsGroup(sg._unitsGroup)

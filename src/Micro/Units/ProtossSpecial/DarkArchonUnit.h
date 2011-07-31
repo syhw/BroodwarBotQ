@@ -6,6 +6,8 @@
 class DarkArchonUnit : public SpecialUnit
 {
 	int _lastCastFrame;
+	static std::set<BWAPI::UnitType> casters;
+	static std::set<BWAPI::UnitType> setPrio;
 public:
     DarkArchonUnit(BWAPI::Unit* u);
     ~DarkArchonUnit();

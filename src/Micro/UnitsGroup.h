@@ -117,6 +117,7 @@ public:
 	/// Getters
     virtual BWAPI::Position getCenter() const;
     inline double getDistance(BWAPI::Unit* u) const;
+	double getDistance(BWAPI::Position p) const;
     int getTotalHP() const;
     std::vector<pBayesianUnit>* getUnits(); // a baaad getter, keep an eye
 	const BayesianUnit& operator[](ptrdiff_t i);

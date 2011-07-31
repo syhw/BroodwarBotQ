@@ -7,11 +7,22 @@
 using namespace BWAPI;
 using namespace std;
 
-AttackGoal::AttackGoal(const map<UnitType, int>& miniUnits, BWAPI::Position p)
-: Goal(miniUnits, 
-	   pSubgoal(new FormationSubgoal(SL_OR, 
-	                                 pFormation(new SquareFormation(p)))))
+AttackGoal::AttackGoal(const map<UnitType, int>& miniUnits, BWAPI::Position p,
+					   int priority, int firstFrame)
+: Goal(miniUnits,
+	   priority,
+	   firstFrame)
 {
+	addSubgoal(pSubgoal(new FormationSubgoal(SL_OR, &_unitsGroup,
+	                                 pFormation(new SquareFormation(p)))));
+}
+
+AttackGoal::AttackGoal(BWAPI::Position p, int priority, int firstFrame)
+: Goal(priority,
+	   firstFrame)
+{
+    addSubgoal(pSubgoal(new FormationSubgoal(SL_OR, &_unitsGroup,
+	                                 pFormation(new SquareFormation(p)))));
 }
 
 void AttackGoal::achieve()
@@ -40,5 +51,5 @@ void AttackGoal::createMidSubgoal()
 	tmpPos = MapManager::Instance().regionsPFCenters[r];
 	//Create an intermediate subgoal at half the way of the path of the unitsgroup
     if (r != BWTA::getRegion(TilePosition(_unitsGroup.center)))
-        this->addSubgoal(pSubgoal(new FormationSubgoal(SL_AND,pFormation(new SquareFormation(tmpPos)))));
+        addSubgoal(pSubgoal(new FormationSubgoal(SL_AND, &_unitsGroup, pFormation(new SquareFormation(tmpPos)))));
 }

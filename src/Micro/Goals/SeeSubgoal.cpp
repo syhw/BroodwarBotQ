@@ -3,41 +3,37 @@
 	
 SeeSubgoal::SeeSubgoal(SubgoalLogic l, BWAPI::Position pos)
 : Subgoal(l)
-, achieved(false)
-, pos(pos)
+, _achieved(false)
+, _pos(pos)
 {
 }
 
 SeeSubgoal::SeeSubgoal(const SeeSubgoal &ssg)
-: Subgoal(ssg.logic)
-, achieved(ssg.achieved)
-, pos(ssg.pos)
+: Subgoal(ssg._logic)
+, _achieved(ssg._achieved)
+, _pos(ssg._pos)
 {
 }
 
 bool SeeSubgoal::isRealized()
 {
-	return check();
-}
-
-bool SeeSubgoal::check()
-{
-	return BWAPI::Broodwar->isVisible(pos.x()/32, pos.y()/32);
+    _achieved = _achieved || BWAPI::Broodwar->isVisible(_pos.x()/32, _pos.y()/32);
+	return _achieved;
 }
 
 void SeeSubgoal::tryToRealize()
 {
-	unitsGroup->move(pos);
+	_unitsGroup->move(_pos);
 }
 
 double SeeSubgoal::distanceToRealize()
 {
 	/// Does not use pathfinding and so is not very precise
-	return unitsGroup->getCenter().getApproxDistance(pos); 
+	return _unitsGroup->getDistance(_pos); 
 }
 
 double SeeSubgoal::distanceToRealize(BWAPI::Position p)
 {
 	/// Does not use pathfinding and so is not very precise
-	return p.getDistance(pos);
+	return p.getApproxDistance(_pos);
 }

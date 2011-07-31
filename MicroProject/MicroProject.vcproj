@@ -181,7 +181,15 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\src\Macro\BWSAL.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Regions\MapManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Micro\Micro.cpp"
 				>
 			</File>
 			<File
@@ -368,11 +376,23 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Micro\Goals\AvoidNukeGoal.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Micro\Goals\FormationSubgoal.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\src\Micro\Goals\Goal.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Goals\GoalManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Goals\RegroupGoal.cpp"
 					>
 				</File>
 				<File
@@ -403,6 +423,10 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
+				RelativePath="..\src\Macro\Arbitrator.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Defines.h"
 				>
 			</File>
@@ -412,6 +436,10 @@
 			</File>
 			<File
 				RelativePath="..\src\Regions\MapManager.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Micro\Micro.h"
 				>
 			</File>
 			<File
@@ -582,11 +610,23 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Micro\Goals\AvoidNukeGoal.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Micro\Goals\FormationSubgoal.h"
 					>
 				</File>
 				<File
 					RelativePath="..\src\Micro\Goals\Goal.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Goals\GoalManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Goals\RegroupGoal.h"
 					>
 				</File>
 				<File
@@ -639,6 +679,18 @@
 				</File>
 				<File
 					RelativePath="..\src\Intelligence\EViewedUnit.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Arbitrator"
+				>
+				<File
+					RelativePath="..\src\Macro\Arbitrator\Arbitrator.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\Arbitrator\Controller.h"
 					>
 				</File>
 			</Filter>

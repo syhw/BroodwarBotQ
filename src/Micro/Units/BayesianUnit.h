@@ -205,6 +205,7 @@ public:
     void move(BWAPI::Position p); // debug purposes
 	void switchMode(unit_mode um);
 	void setUnitsGroup(UnitsGroup* ug);
+	void dettachGroup();
     unit_mode getMode();
     int getMaxDimension();
     void updatePPath();
@@ -213,7 +214,9 @@ public:
     ~BayesianUnit();
     BWAPI::UnitType getType();
 
+	/// Should be callable only from a UnitsGroup, maybe enforce it with a pattern (private+friend)
     void update();
+
     virtual void attack(const BWAPI::Position& p);
     void attackEnemyUnit(BWAPI::Unit* u);
 
