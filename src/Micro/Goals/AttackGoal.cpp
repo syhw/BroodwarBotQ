@@ -53,3 +53,8 @@ void AttackGoal::createMidSubgoal()
     if (r != BWTA::getRegion(TilePosition(_unitsGroup.center)))
         addSubgoal(pSubgoal(new FormationSubgoal(SL_AND, &_unitsGroup, pFormation(new SquareFormation(tmpPos)))));
 }
+
+void AttackGoal::canBidOn(Unit* u)
+{
+	bidOnUnit(u);
+}

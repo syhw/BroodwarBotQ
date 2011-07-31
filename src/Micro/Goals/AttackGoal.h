@@ -13,4 +13,5 @@ public:
 		BWAPI::Position p, int priority = 50, int firstFrame = 0);
 	AttackGoal(BWAPI::Position p, int priority = 50, int firstFrame = 0);
 	void achieve();
+	void canBidOn(BWAPI::Unit* u);
 };

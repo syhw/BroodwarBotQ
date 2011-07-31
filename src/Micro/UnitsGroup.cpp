@@ -54,7 +54,7 @@ from and to are required to be of the same size()
 */
 void mid_based_align(const std::vector<Position>& from, const std::vector<Position>& to, std::vector<unsigned int>& alignment)
 {
-    if (!from.size())
+    if (from.empty())
         return;
     assert(from.size() != 0);
     assert(to.size() == from.size());
@@ -86,7 +86,8 @@ void mid_based_align(const std::vector<Position>& from, const std::vector<Positi
         while (done_j.size() < to.size()) 
         {
             double max = DBL_MIN;
-            unsigned int max_i, max_j;
+            unsigned int max_i = 0;
+			unsigned int max_j = 0;
             for (unsigned int i = 0; i < v_from_center.size(); ++i)
             {
                 for (unsigned int j = 0; j < v_to_center.size(); ++j)
