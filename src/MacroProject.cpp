@@ -41,8 +41,8 @@ void BattleBroodAI::onStart()
 void BattleBroodAI::onEnd(bool isWinner)
 {
 	Intelligence::Destroy();
-	Macro::Destroy();
 	Micro::Destroy();
+	Macro::Destroy();
     TimeManager::Destroy();
 
     if (isWinner)
