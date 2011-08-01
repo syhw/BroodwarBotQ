@@ -503,7 +503,7 @@ void UnitsGroup::activeUnit(pBayesianUnit bu)
 void UnitsGroup::dispatchCompleteUnit(pBayesianUnit bu)
 {
 	bu->setUnitsGroup(this);
-	if (bu->unit->getPosition().getApproxDistance(center) < __MAX_DISTANCE_TO_GROUP__ || !units.size())
+	if (bu->unit->getPosition().getApproxDistance(center) < __MAX_DISTANCE_TO_GROUP__ || units.empty())
 		activeUnit(bu);
     else
     {

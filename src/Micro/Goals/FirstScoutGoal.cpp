@@ -119,7 +119,8 @@ void FirstScoutGoal::achieve()
 void FirstScoutGoal::onOffer(set<Unit*> objects)
 {
 	GoalManager* gm = & GoalManager::Instance();
-	if (_status == GS_WAIT_PRECONDITION || _status == GS_IN_PROGRESS)
+	if ((_status == GS_WAIT_PRECONDITION || _status == GS_IN_PROGRESS)
+		&& _unitsGroup.emptyUnits())
 	{
 		Position choke = (*BWTA::getStartLocation(Broodwar->self())->getRegion()->getChokepoints().begin())->getCenter();
 		double minDist = DBL_MAX;
