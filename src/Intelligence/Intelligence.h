@@ -12,11 +12,12 @@ class Intelligence : public CSingleton<Intelligence>
 	friend class CSingleton<Intelligence>;
 	Intelligence();
 	~Intelligence();
+	bool _launchedFirstScoutGoal;
 public:
 	EUnitsFilter* eUnitsFilter;
 	ETechEstimator* eTechEstimator;
 	MapManager* mapManager;
-	FirstScoutController* firstScout;
+	bool enemyRush;
 	void update();
     void onUnitCreate(BWAPI::Unit* u);
     void onUnitDestroy(BWAPI::Unit* u);

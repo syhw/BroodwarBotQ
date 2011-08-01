@@ -167,7 +167,7 @@ void MicroAIModule::onStart()
             Position(Broodwar->mapWidth()/2*32, 50*32), 40)));
     }
 
-	micro->goalManager->addGoals(goals);
+	//micro->goalManager->addGoals(goals);
 
 }
 

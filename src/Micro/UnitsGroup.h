@@ -61,11 +61,13 @@ private:
     int _totalMinPrice;
     int _totalGazPrice;
     int _totalSupply;
+	unit_mode _groupMode;
     EUnitsFilter* _eUnitsFilter;
     std::set<BWAPI::Unit*> _mergersHT;
     bool _hasDetection;
     inline void updateNearbyEnemyUnitsFromFilter(BWAPI::Position p, double radius = 400.0);
     double evaluateForces();
+	inline void activeUnit(pBayesianUnit bu);
     bool removeArrivingUnit(BWAPI::Unit* u);
 #ifndef __RELEASE_OPTIM__
     void displayTargets();  // debug purpose

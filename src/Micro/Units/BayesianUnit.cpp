@@ -2092,6 +2092,8 @@ void BayesianUnit::update()
 
     //if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->getDistance(_unitPos) > 512) // 16buildtiles*32
         //switchMode(MODE_MOVE);
+	
+	/// Switch to fight if we're not fighting already nor scouting and there are enemies (and we can attack)
     if (_mode != MODE_FIGHT_G && _mode != MODE_SCOUT 
         && !_unitsGroup->enemies.empty()
         && unit->getGroundWeaponCooldown() <= Broodwar->getLatencyFrames())

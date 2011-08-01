@@ -127,6 +127,10 @@ string Goal::getName() const
 	return "Goal";
 }
 
+/***
+ * Dispatch bid units / achieve() / cancel() / removeAllBids()
+ * w.r.t. the Goal _status
+ */
 void Goal::update()
 {
 	if (_status == GS_WAIT_PRECONDITION)
@@ -145,7 +149,7 @@ void Goal::update()
 				bidOnUnitType(it->first);
 			}
 		}
-		if (gotAllUnits)
+		if (_unitsGroup.size() && gotAllUnits)
 			_status = GS_IN_PROGRESS;
 	}
 	else if (_status == GS_IN_PROGRESS)
@@ -157,6 +161,11 @@ void Goal::update()
 		TheArbitrator->removeAllBids(this);
 }
 
+/***
+ * Do what it can to achieve the Goal:
+ * first check() for achievement (this can be omitted in overloaded achieve())
+ * [lazy and] takes the shortest distanceToRealize() Subgoal and tryToRealize()
+ */
 void Goal::achieve()
 {
 	if (_status != GS_IN_PROGRESS) // defensive
@@ -189,11 +198,15 @@ void Goal::achieve()
 		Broodwar->printf("no selected SubGoal but goal not achieved");
 		// Bug if here
 	}
+
+	/// Default behavior of the goal is to update the _unitsGroup in achieve/cancel
+	_unitsGroup.update();
 }
 
 /***
  * Check for achievement:
- * All the _subgoals are tested (there can be a SL_OR true)
+ * All the _subgoals are tested 
+ * (there can be either one SL_OR true or all the SR_AND)
  */
 void Goal::check()
 {
@@ -235,6 +248,8 @@ void Goal::check()
 void Goal::cancel()
 {
 	/// Does nothing, to be overwritten in cancelable goals
+	/// Default behavior of the goal is to update the _unitsGroup in achieve/cancel
+	_unitsGroup.update();
 }
 
 void Goal::canBidOn(BWAPI::Unit* u)

@@ -22,6 +22,7 @@ UnitsGroup::UnitsGroup()
 , _totalMinPrice(0)
 , _totalGazPrice(0)
 , _totalSupply(0)
+, _groupMode(MODE_MOVE)
 , _hasDetection(0)
 , centerSpeed(0,0)
 , center(0,0)
@@ -253,6 +254,7 @@ void UnitsGroup::update()
 	if (units.empty())
 		return;
 
+	/// Update arriving units
     if (!arrivingUnits.empty())
     {
         if (units.size() <= 3)
@@ -271,8 +273,7 @@ void UnitsGroup::update()
             {
                 if ((*it)->unit->getPosition().getApproxDistance(center) < __MAX_DISTANCE_TO_GROUP__)
                 {
-                    units.push_back(*it);
-					updateGroupStrengh((*it)->unit);
+					activeUnit(*it);
                     arrivingUnits.erase(it++);
                 }
                 else
@@ -285,7 +286,9 @@ void UnitsGroup::update()
         }
     }
 
-    updateCenter();
+    updateCenter(); // the center will drift towards the arriving units TOFIX TODO
+
+	/// Choose a non flying leadingUnit
     leadingUnit = units.front();
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     { 
@@ -304,6 +307,7 @@ void UnitsGroup::update()
             ppath = leadingUnit->getPPath();
     }
 
+	//// Update maxRange and _totalHP
     this->_totalHP = 0;
     double maxRange = -1.0;
     /*** TODO BUG IN SquareFormation TODO TODO TODO volatile bool contactUnits = false; // why do I need volatile to make it work not erratically? */
@@ -328,9 +332,10 @@ void UnitsGroup::update()
     else
         _alignFormation = true;*/
 
-    //clock_t s = clock();
+	/// Update nearby enemy units from eUnitsFilter (SLOW)
     updateNearbyEnemyUnitsFromFilter(center, maxRadius + maxRange + 92); // possibly hidden units, could be taken from onUnitsShow/View asynchronously for more efficiency
-    // update enemiesCenter
+
+    /// Update enemiesCenter / enemiesAltitude
     if (enemies.size () != 0)
     {
         enemiesCenter = Position(0, 0);
@@ -348,14 +353,8 @@ void UnitsGroup::update()
             enemiesCenter.makeValid();
         enemiesAltitude = round((double)enemiesAltitude / enemies.size());
     }
-    //clock_t f = clock();
-    //double dur = (double)(f - s) / CLOCKS_PER_SEC;
-    //Broodwar->printf( "UnitsGroup::update() took %2.5f seconds\n", dur); 
-#ifdef __DEBUG__
-    Broodwar->drawCircleMap((int)center.x(), (int)center.y(), (int)maxRadius + (int)maxRange +  32, Colors::Yellow);
-#endif
 
-    if (!enemies.empty()) /// We fight, we'll see later for the goals 
+    if (!enemies.empty()) /// We fight, we'll see later for the goals, BayesianUnits switchMode automatically if enemies is not empty()
     {
         double force = evaluateForces();
         if (force < 0.8) // TOCHANGE 0.8
@@ -391,22 +390,22 @@ void UnitsGroup::update()
     else /// Let's do the goals now 
     {
         defaultTargetEnemy = NULL;
-        //accomplishGoal();
     }
 
 #ifdef __DEBUG__
     displayTargets();
-#endif
-
-#ifdef __DEBUG__
     clock_t finish = clock();
     double duration = (double)(finish - start) / CLOCKS_PER_SEC;
     if (duration > 0.040) 
         Broodwar->printf( "UnitsGroup::update() took %2.5f seconds\n", duration);
+    Broodwar->drawCircleMap((int)center.x(), (int)center.y(), (int)maxRadius + (int)maxRange +  32, Colors::Yellow);
 #endif
 
+	/// Update BayesiaUnits
     for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
         (*it)->update();
+
+	/// Merge Templars if needed
     templarMergingStuff();
 }
 
@@ -494,14 +493,18 @@ double UnitsGroup::getDistance(BWAPI::Position p) const
 	return center.getApproxDistance(p);
 }
 
+void UnitsGroup::activeUnit(pBayesianUnit bu)
+{
+	bu->switchMode(_groupMode);
+    units.push_back(bu);
+	updateGroupStrengh(bu->unit);
+}
+
 void UnitsGroup::dispatchCompleteUnit(pBayesianUnit bu)
 {
 	bu->setUnitsGroup(this);
 	if (bu->unit->getPosition().getApproxDistance(center) < __MAX_DISTANCE_TO_GROUP__ || !units.size())
-    {
-		units.push_back(bu);
-		updateGroupStrengh(bu->unit);
-    }
+		activeUnit(bu);
     else
     {
 		if (bu->getType().canAttack())
@@ -687,6 +690,7 @@ void UnitsGroup::selectedUnits(std::set<pBayesianUnit>& u)
 
 void UnitsGroup::switchMode(unit_mode um)
 {
+	_groupMode = um;
 	for(std::vector<pBayesianUnit>::iterator it = getUnits()->begin(); it != getUnits()->end(); ++it)
 		(*it)->switchMode(um);
 }

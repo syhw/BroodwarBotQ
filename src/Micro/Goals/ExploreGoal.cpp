@@ -82,5 +82,6 @@ void ExploreGoal::achieve()
 		if (!((*it)->isRealized()))
 			(*it)->tryToRealize();
 	}
+	_unitsGroup.update();
 }
 

@@ -4,10 +4,6 @@
 #include "Macro/BWSAL.h"
 #include <set>
 
-#define __POOL_TIME_RUSH__ 130 // seconds, 3 workers + 1 pool + 11 seconds
-#define __BBS_TIME_RUSH__ 230 // seconds, 4 workers + 2 barracks + 18 seconds
-#define __GATES_TIME_RUSH__ 190 // seconds, 4 workers + 2 gateways + 18 seconds
-
 using namespace BWAPI;
 using namespace std;
 

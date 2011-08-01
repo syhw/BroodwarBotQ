@@ -83,8 +83,16 @@ void GoalManager::update()
 	}
 }*/
 
+/***
+ * Add the goal is not already present in _goals (O(#goals)), defensive thing
+ */
 void GoalManager::addGoal(pGoal g)
 {
+	for each (pGoal pg in _goals)
+	{
+		if (pg == g)
+			return;
+	}
 	_goals.push_back(g);
 }
 
