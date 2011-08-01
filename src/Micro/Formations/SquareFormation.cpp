@@ -34,6 +34,13 @@ void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnit
 	if (!Broodwar->isWalkable(center.toPosition().x()/8, center.toPosition().y()/8))
 		center = Vec(MapManager::Instance().closestWalkabableSameRegionOrConnected(center.toPosition()));
 
+	if (unwantedSlots >= vUnits.size())
+	{
+		for (unsigned int i = 0; i < vUnits.size(); ++i)
+			end_positions.push_back(Position((int)center.x, (int)center.y));
+		return;
+	}
+
     if (vUnits.size() == 1)
     {
         end_positions.push_back(Position((int)center.x, (int)center.y));

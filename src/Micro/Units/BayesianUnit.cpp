@@ -1059,7 +1059,8 @@ void BayesianUnit::updateRangeEnemies()
 void BayesianUnit::clearDamages()
 {
     // ===== clear old damage =====
-    if (targetEnemy != NULL && _unitsGroup->unitDamages.left.count(targetEnemy))
+	if (targetEnemy != NULL && targetEnemy->exists()
+		&& _unitsGroup != NULL && _unitsGroup->unitDamages.left.count(targetEnemy))
     {
         UnitDmgBimap::left_iterator unitdmgit 
 			= _unitsGroup->unitDamages.left.find(targetEnemy);
@@ -1708,8 +1709,8 @@ void BayesianUnit::drawDir()
 void BayesianUnit::clickDir()
 {
 	//////// TODO EXPERIMENTAL
-	if (unit->isStuck())
-		return;
+	//if (unit->isStuck())
+	//	return;
 	//////// /TODO EXPERIMENTAL
     double dist = _unitPos.getDistance(target);
     if ((_mode == MODE_SCOUT || _mode == MODE_MOVE) && (dir == Vec(0,0) || dist < 1.1))
@@ -2095,8 +2096,7 @@ void BayesianUnit::update()
 	
 	/// Switch to fight if we're not fighting already nor scouting and there are enemies (and we can attack)
     if (_mode != MODE_FIGHT_G && _mode != MODE_SCOUT 
-        && !_unitsGroup->enemies.empty()
-        && unit->getGroundWeaponCooldown() <= Broodwar->getLatencyFrames())
+        && !_unitsGroup->enemies.empty())
     {
         this->switchMode(MODE_FIGHT_G);
     }

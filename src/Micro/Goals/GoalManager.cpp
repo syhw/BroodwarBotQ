@@ -118,22 +118,23 @@ void GoalManager::onUnitCreate(Unit* u)
 /// Remove from _completedUnits and unassignedUnits or from _inTrainingUnits and unassignedUnits
 void GoalManager::onUnitDestroy(Unit* u)
 {
-	if (u->getPlayer() != Broodwar->self())
-		return;
-	for (map<Unit*, pBayesianUnit>::const_iterator it = _completedUnits.begin();
-		it != _completedUnits.end(); ++it)
+	if (u->getPlayer() == Broodwar->self())
 	{
-		if (it->first == u)
+		for (map<Unit*, pBayesianUnit>::const_iterator it = _completedUnits.begin();
+			it != _completedUnits.end(); ++it)
 		{
-			_completedUnits.erase(it);
-			unassignedUnits.erase(u);
-			return;
+			if (it->first == u)
+			{
+				_completedUnits.erase(it);
+				unassignedUnits.erase(u);
+				break;
+			}
 		}
+		_inTrainingUnits.remove(u);
+		unassignedUnits.erase(u);
 	}
-	_inTrainingUnits.remove(u);
-	unassignedUnits.erase(u);
 	for each (pGoal g in _goals)
-		g->onUnitDestroy(u);
+		g->onUnitDestroy(u); // will delete the pBayesianUnit OR will remove enemy units from the bimap
 }
 
 const map<Unit*, pBayesianUnit>& GoalManager::getCompletedUnits() const

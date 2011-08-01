@@ -46,9 +46,20 @@ void FirstScoutGoal::achieve()
 {
 	if (_status != GS_IN_PROGRESS) // defensive
 		return;
-	/// They killed our scout before _knowing_ where they are, we will request another scout
-	if (!_unitsGroup.size() && TheInformationManager->getEnemyBases().empty())  
-		_status = GS_WAIT_PRECONDITION;
+	if (!_unitsGroup.size())
+	{
+		if (_notSeenStartLocations.size() > 1)
+		{
+			/// They killed our scout before _knowing_ where they are, we will request another scout
+			_status = GS_WAIT_PRECONDITION;
+			return;
+		}
+		else // either we found them or at least we know where they are
+		{
+			_status = GS_ACHIEVED;
+			return;
+		}
+	}
 
 	if (!_foundEnemy)
 	{
@@ -67,6 +78,8 @@ void FirstScoutGoal::achieve()
 			if (!_foundEnemy
 				&& _notSeenStartLocations.size()) // defensive
 			{
+				if (_notSeenStartLocations.size() == 1) // infer where the enemy is
+					TheInformationManager->addEnemyBase(*_notSeenStartLocations.begin());
 				_nextBase = getNearestBL(_nextToVisit, _notSeenStartLocations);
 				if (_nextBase != NULL)
 					_nextToVisit = _nextBase->getTilePosition();
@@ -83,12 +96,6 @@ void FirstScoutGoal::achieve()
 		BWAPI::Unit* scoutUnit = NULL;
 		if (_unitsGroup.size())
 			scoutUnit = (*_unitsGroup.units.begin())->unit;
-		else
-		{
-			/// Our scout got killed but we found them
-			_status = GS_ACHIEVED;
-			return;
-		}
 		if (!scoutUnit->exists()) // defensive
 			return;
 

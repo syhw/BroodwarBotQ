@@ -86,7 +86,7 @@ void mid_based_align(const std::vector<Position>& from, const std::vector<Positi
         std::set<unsigned int> done_i;
         while (done_j.size() < to.size()) 
         {
-            double max = DBL_MIN;
+            double max = -DBL_MAX+1;
             unsigned int max_i = 0;
 			unsigned int max_j = 0;
             for (unsigned int i = 0; i < v_from_center.size(); ++i)
@@ -111,7 +111,7 @@ void mid_based_align(const std::vector<Position>& from, const std::vector<Positi
         // non optimal, should have one more loop
         for (unsigned int i = 0; i < v_from_center.size(); ++i)
         {
-            double max = DBL_MIN;
+            double max = -DBL_MAX+1;
             unsigned int max_j;
             for (unsigned int j = 0; j < v_to_center.size(); ++j)
             {
@@ -154,6 +154,11 @@ void align(std::vector<Position>& from, std::vector<Position>& to, std::vector<u
     {
         for(unsigned int j = 0; j < distances[0].size(); j++)
         {
+            // TODO
+            // TODO
+            // TODO
+            // TODO
+            // TODO
             // TODO
         }
     }
@@ -468,9 +473,9 @@ void UnitsGroup::formation(pFormation f)
 void UnitsGroup::onUnitDestroy(Unit* u)
 {
     if (u->getPlayer() == Broodwar->self())
-	    unitDamages.left.erase(u);
-    else
         giveUpControl(u);
+    else
+	    unitDamages.left.erase(u);
 }
 
 void UnitsGroup::onUnitShow(Unit* u)

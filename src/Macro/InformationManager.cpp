@@ -167,6 +167,12 @@ void InformationManager::setBaseEmpty(BWTA::BaseLocation* base)
 	}
 }
 
+/// To be used only when we can infer where the enemy is with > 2 start locations
+void InformationManager::addEnemyBase(BWTA::BaseLocation* base)
+{
+	enemyBases.insert(base);
+}
+
 void InformationManager::updateBuildTime(UnitType type, int time)
 {
 	map<UnitType, int>::iterator i=buildTime.find(type);

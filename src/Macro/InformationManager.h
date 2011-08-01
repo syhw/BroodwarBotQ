@@ -19,6 +19,7 @@ class InformationManager
     int getBuildTime(BWAPI::UnitType type) const;
     const std::set<BWTA::BaseLocation*>& getEnemyBases() const;
     void setBaseEmpty(BWTA::BaseLocation* base);
+	void addEnemyBase(BWTA::BaseLocation* base);
   private:
     InformationManager();
     ~InformationManager();
