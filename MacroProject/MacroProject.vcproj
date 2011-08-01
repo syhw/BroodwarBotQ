@@ -608,10 +608,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Intelligence\FirstScoutController.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Intelligence\Intelligence.cpp"
 					>
 				</File>
@@ -1003,10 +999,6 @@
 				</File>
 				<File
 					RelativePath="..\src\Intelligence\EViewedUnit.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Intelligence\FirstScoutController.h"
 					>
 				</File>
 				<File

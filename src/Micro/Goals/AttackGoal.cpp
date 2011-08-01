@@ -25,6 +25,13 @@ AttackGoal::AttackGoal(BWAPI::Position p, int priority, int firstFrame)
 	                                 pFormation(new SquareFormation(p)))));
 }
 
+AttackGoal::AttackGoal(pSubgoal subgoal, int priority, int firstFrame)
+: Goal(subgoal,
+	   priority,
+	   firstFrame)
+{
+}
+
 void AttackGoal::achieve()
 {
 	//See if we need an intermediate subgoal : 

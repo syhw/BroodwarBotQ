@@ -541,7 +541,7 @@ bool UnitsGroup::removeArrivingUnit(Unit* u)
 
 void UnitsGroup::giveUpControl(Unit* u)
 {
-	if (removeArrivingUnit(u))
+	if (!removeArrivingUnit(u))
 		removeUnit(u);
     if (u->getType() == UnitTypes::Protoss_Observer)
     {
@@ -638,7 +638,12 @@ int BasicUnitsGroup::size() const
 
 void UnitsGroup::updateCenter()
 {
-    if (!units.size())
+	if (this == NULL)
+	{
+		Broodwar->printf("unitsGroup NULL");
+		return;
+	}
+    if (units.empty())
         return;
     // update center
     center = Position(0, 0);
@@ -651,10 +656,14 @@ void UnitsGroup::updateCenter()
     }
     center.x() /= units.size();
     center.y() /= units.size();
+	if (center.isValid())
+	{
+		Broodwar->printf("invalid unitsGroup center");
+	}
     groupAltitude = round((double)groupAltitude / units.size());
     if (nearestChoke)
         distToNearestChoke = nearestChoke->getCenter().getApproxDistance(center);
-    if (!nearestChoke || distToNearestChoke > 256)
+    if ((!nearestChoke || distToNearestChoke > 256) && center.makeValid())
     {
         nearestChoke = BWTA::getNearestChokepoint(center);
     }

@@ -132,6 +132,8 @@ void GoalManager::onUnitDestroy(Unit* u)
 	}
 	_inTrainingUnits.remove(u);
 	unassignedUnits.erase(u);
+	for each (pGoal g in _goals)
+		g->onUnitDestroy(u);
 }
 
 const map<Unit*, pBayesianUnit>& GoalManager::getCompletedUnits() const

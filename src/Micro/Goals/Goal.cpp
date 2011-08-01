@@ -122,6 +122,13 @@ void Goal::onRevoke(Unit* u, double bid)
 	///// TODO
 }
 
+void Goal::onUnitDestroy(BWAPI::Unit* unit)
+{
+	_unitsGroup.onUnitDestroy(unit);
+	if (_status == GS_WAIT_PRECONDITION && _neededUnits.find(unit->getType()) != _neededUnits.end())
+		_neededUnits[unit->getType()] += 1;
+}
+
 string Goal::getName() const
 {
 	return "Goal";
@@ -170,7 +177,9 @@ void Goal::achieve()
 {
 	if (_status != GS_IN_PROGRESS) // defensive
 		return;
+	/// Check for the goal achievement
 	check();
+	//////////////////////////////////
 	if (_status == GS_ACHIEVED)
 		return;
 	/// Select the Subgoal which is faster to realize 
