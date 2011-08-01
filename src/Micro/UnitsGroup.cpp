@@ -638,11 +638,9 @@ int BasicUnitsGroup::size() const
 
 void UnitsGroup::updateCenter()
 {
-	if (this == NULL)
-	{
-		Broodwar->printf("unitsGroup NULL");
-		return;
-	}
+#ifdef __DEBUG__
+	assert(this != NULL);
+#endif
     if (units.empty())
         return;
     // update center
@@ -656,10 +654,9 @@ void UnitsGroup::updateCenter()
     }
     center.x() /= units.size();
     center.y() /= units.size();
-	if (center.isValid())
-	{
-		Broodwar->printf("invalid unitsGroup center");
-	}
+#ifdef __DEBUG__
+	assert(center.isValid());
+#endif
     groupAltitude = round((double)groupAltitude / units.size());
     if (nearestChoke)
         distToNearestChoke = nearestChoke->getCenter().getApproxDistance(center);

@@ -8,6 +8,7 @@ using namespace std;
 /// Either we have detected the ghost(s) from the start and try and kill them
 /// Or we have not and we flee the nuke
 /// We assume that the detected ghost(s) around are responsible for the nuke
+/// /!\ This goal do not call _unitsGroup.update() /!\/
 AvoidNukeGoal::AvoidNukeGoal(Position target)
 : Goal(100) // highest priority
 , _nukePos(target)

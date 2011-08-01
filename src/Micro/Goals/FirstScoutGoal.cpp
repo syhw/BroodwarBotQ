@@ -44,6 +44,8 @@ FirstScoutGoal::FirstScoutGoal(int priority)
 
 void FirstScoutGoal::achieve()
 {
+	if (_status != GS_IN_PROGRESS) // defensive
+		return;
 	/// They killed our scout before _knowing_ where they are, we will request another scout
 	if (!_unitsGroup.size() && TheInformationManager->getEnemyBases().empty())  
 		_status = GS_WAIT_PRECONDITION;
@@ -137,7 +139,7 @@ void FirstScoutGoal::onOffer(set<Unit*> objects)
 		}
 		if (acceptedUnit != NULL)
 		{
-			TheArbitrator->accept(static_cast<Controller<Unit*, double> >(this), acceptedUnit, _priority);
+			TheArbitrator->accept(this, acceptedUnit, _priority);
 			_neededUnits[acceptedUnit->getType()] -= 1;
 			_unitsGroup.dispatchCompleteUnit(gm->getCompletedUnit(acceptedUnit));
 			gm->unassignedUnits.erase(acceptedUnit);

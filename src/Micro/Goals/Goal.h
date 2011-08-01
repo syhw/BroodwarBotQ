@@ -37,7 +37,7 @@ typedef enum
  * and with a dummy canBidOn().
  * neededUnits/preconditions should perhaps be moved into a special Subgoal
  */
-class Goal : Arbitrator::Controller<BWAPI::Unit*, double>
+class Goal : public Arbitrator::Controller<BWAPI::Unit*, double>
 {
 	//friend class UnitsGroup;
 	friend class GoalManager;

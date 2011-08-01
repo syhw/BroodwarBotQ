@@ -5,8 +5,12 @@
 using namespace BWAPI;
 using namespace std;
 
-DropGoal(Position p, const map<UnitType, int>& nU, int priority)
+DropGoal::DropGoal(Position p, const map<UnitType, int>& nU, int priority)
 : Goal(nU, priority)
 , _dropPos(p)
+{
+}
+
+void DropGoal::achieve()
 {
 }
