@@ -362,7 +362,7 @@ void UnitsGroup::update()
     if (!enemies.empty()) /// We fight, we'll see later for the goals, BayesianUnits switchMode automatically if enemies is not empty()
     {
         double force = evaluateForces();
-        if (force < 0.8) // TOCHANGE 0.8
+        if (force < 0.8) // TOCHANGE 0.8 (better micro+compo factor)
         {
             // strategic withdrawal
             for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)

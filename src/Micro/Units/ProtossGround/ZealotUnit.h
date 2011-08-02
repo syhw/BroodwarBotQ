@@ -9,6 +9,7 @@ class ZealotUnit : public GroundUnit
 protected:
     static std::set<BWAPI::UnitType> setPrio;
     bool decideToFlee();
+	void flee();
     void updateTargetEnemy();
     void clearDamages();
     int fightMove();

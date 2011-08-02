@@ -78,13 +78,14 @@ bool ZealotUnit::decideToFlee()
 
 void ZealotUnit::updateTargetEnemy()
 {
-	/// oorTarget = closest in the setPrio not in range
+	/// oorTarget = closest in the setPrio
 	oorTargetEnemy = NULL;
 	double closest = DBL_MAX;
 	for (map<Unit*, Position>::const_iterator it = _unitsGroup->enemies.begin();
 		it != _unitsGroup->enemies.end(); ++it)
 	{
         if (it->first->exists() && it->first->isVisible() && it->first->isDetected()
+			&& !it->first->getType().isFlyer()
 			&& setPrio.count(it->first->getType())
 			&& it->first->getDistance(_unitPos) < closest)
 		{
@@ -101,9 +102,7 @@ void ZealotUnit::updateTargetEnemy()
 		it != _unitsGroup->enemies.end(); ++it)
 	{
 		/// Rule out what we don't want to attack
-        if (!it->first->exists() || !it->first->isVisible() || !it->first->isDetected())
-            continue;
-        if (inRange(it->first))
+		if (!it->first->exists() || !it->first->isVisible() || !it->first->isDetected() || it->first->getType().isFlyer())
             continue;
         UnitType testType = it->first->getType();
         if (testType.isBuilding() 
@@ -132,6 +131,26 @@ void ZealotUnit::updateTargetEnemy()
 		targetEnemy = closestEnemy;
 }
 
+void ZealotUnit::flee()
+{
+	if (_lastTotalHP < 60)
+	{
+		for each (Unit* u in _targetingMe)
+		{
+			if (isOutrangingMe(u))
+				return;
+		}
+	}
+    _fightMoving = false;
+    if (!this->mapManager->groundDamages[_unitPos.x()/32 + _unitPos.y()/32*Broodwar->mapWidth()])
+    {
+        _fleeing = false;
+        return;
+    }
+    _fleeing = true;
+    updateDir();
+    clickDir();
+}
 
 void ZealotUnit::micro()
 {

@@ -216,7 +216,7 @@ void MicroAIModule::onEnd(bool isWinner)
 {
     MapManager::Destroy();
 	Micro::Destroy();
-#ifndef __LEARNING_PROB_TABLES__
+#ifdef __LEARNING_PROB_TABLES__ ////////// Auto restart games
 	myRestartGame();
 #endif
 	logScore(isWinner, Broodwar->mapPathName());

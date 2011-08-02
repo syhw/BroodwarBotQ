@@ -57,7 +57,7 @@ void ReaverUnit::check()
 
 bool ReaverUnit::inRange(BWAPI::Unit* u)
 {
-    return (_unitPos.getDistance(u->getPosition()) <= (double)8*32);
+    return (!u->getType().isFlyer() && _unitPos.getDistance(u->getPosition()) <= (double)8*32);
 }
 
 int ReaverUnit::getAttackDuration()
