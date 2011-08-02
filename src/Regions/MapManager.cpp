@@ -16,9 +16,15 @@ MapManager::MapManager()
 , _width(Broodwar->mapWidth() * 4)
 , _height(Broodwar->mapHeight() * 4)
 , _stormPosMutex(CreateMutex( 
-        NULL,                  // default security attributes
-        FALSE,                 // initially not owned
-        NULL))                  // unnamed mutex
+				 NULL,                  // default security attributes
+				 FALSE,                 // initially not owned
+				 NULL))                  // unnamed mutex
+, _signalLaunchStormUpdate(CreateEvent( 
+						   NULL,
+						   FALSE,
+						   FALSE,
+						   TEXT("LaunchStormPosUpdate")))
+, _stormThread(NULL)
 , _lastStormUpdateFrame(0)
 , _eUnitsFilter(& EUnitsFilter::Instance())
 {
@@ -26,6 +32,11 @@ MapManager::MapManager()
     if (_stormPosMutex == NULL) 
     {
         Broodwar->printf("CreateMutex error: %d\n", GetLastError());
+        return;
+    }
+    if (_signalLaunchStormUpdate == NULL) 
+    {
+        Broodwar->printf("CreateEvent error: %d\n", GetLastError());
         return;
     }
 #endif
@@ -191,7 +202,10 @@ MapManager::~MapManager()
     delete [] airDamages;
     delete [] groundDamagesGrad;
     delete [] airDamagesGrad;
+	TerminateThread(_stormThread, 0);
     CloseHandle(_stormPosMutex);
+    CloseHandle(_signalLaunchStormUpdate);
+    CloseHandle(_stormThread);
 }
 
 void MapManager::modifyBuildings(Unit* u, bool b)
@@ -439,31 +453,31 @@ void MapManager::onUnitHide(Unit* u)
     addBuilding(u);
 }
 
-DWORD WINAPI MapManager::StaticLaunchUpdateStormPos(void* obj)
+unsigned __stdcall MapManager::StaticLaunchUpdateStormPos(void* obj)
 {
     MapManager* This = (MapManager*) obj;
     int buf = This->LaunchUpdateStormPos();
-    ExitThread(buf);
+    _endthreadex(buf);
     return buf;
 }
 
 DWORD MapManager::LaunchUpdateStormPos()
 {
-    DWORD waitResult = WaitForSingleObject(
-        _stormPosMutex,
-        100);
-
-    switch (waitResult) 
-    {
-    case WAIT_OBJECT_0: 
-        updateStormPos();
-        ReleaseMutex(_stormPosMutex);
-        break; 
-
-    case WAIT_ABANDONED:
-        ReleaseMutex(_stormPosMutex);
-        return -1;
-    }
+	while (true)
+	{
+	    DWORD startUpdate = WaitForSingleObject(
+	        _signalLaunchStormUpdate,
+	        INFINITE);
+		if (startUpdate == WAIT_OBJECT_0)
+		{
+		    DWORD waitResult = WaitForSingleObject(
+		        _stormPosMutex,
+		        100); // 100 ms, the game would be really slow if it were at 10 FPS just because of MapManager::update() (storm)
+			if (waitResult == WAIT_OBJECT_0)
+				updateStormPos();
+			ReleaseMutex(_stormPosMutex);
+		}
+	}
     return 0;
 }
 
@@ -750,19 +764,27 @@ void MapManager::update()
                 }
                 _dontReStormBuf = _dontReStorm;
                 // this thread is doing updateStormPos();
-                DWORD threadId;
-                HANDLE thread = CreateThread( 
-                    NULL,                   // default security attributes
-                    0,                      // use default stack size  
-                    &MapManager::StaticLaunchUpdateStormPos,      // thread function name
-                    (void*) this,                   // argument to thread function 
-                    0,                      // use default creation flags 
-                    &threadId);             // returns the thread identifier 
-                if (thread == NULL)
-                {
-                    Broodwar->printf("(mapmanager) error creating thread");
-                }
-                CloseHandle(thread);
+                unsigned threadId;
+				if (_stormThread == NULL)
+				{
+					_stormThread = (HANDLE)_beginthreadex( 
+						NULL,                   // default security attributes
+						0,                      // use default stack size  
+						&MapManager::StaticLaunchUpdateStormPos,      // thread function name
+						(void*) this,                   // argument to thread function 
+						0,                      // use default creation flags 
+						&threadId);             // returns the thread identifier 
+					if (_stormThread == NULL)
+					{
+						Broodwar->printf("(MapManager) error creating thread");
+					}
+				}
+				else
+				{
+					/// Launch the update of storms pos by unlocking the thread (waiting on this mutex)
+					if (!SetEvent(_signalLaunchStormUpdate))
+						Broodwar->printf("(MapManager) error signaling the storm pos update thread");
+				}
             }
             else
             {

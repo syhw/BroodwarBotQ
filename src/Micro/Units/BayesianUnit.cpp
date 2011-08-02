@@ -81,7 +81,7 @@ BayesianUnit::BayesianUnit(Unit* u, const ProbTables* probTables)
 , _iThinkImBlocked(false)
 , _lastTotalHP(unit->getHitPoints() + unit->getShields())
 , _sumLostHP(0)
-, _refreshPathFramerate(22)
+, _refreshPathFramerate(17)
 , _maxDistWhileRefreshingPath((int)max(_refreshPathFramerate * _topSpeed,
 							  45.26)) // 45.26 = sqrt(32^2 + 32^2)
 , _newPath(false)
@@ -113,6 +113,7 @@ BayesianUnit::~BayesianUnit()
         //TerminateThread(thread);
         break;
     }
+    CloseHandle(_thread);
     CloseHandle(_pathMutex);
 }
 
@@ -811,26 +812,28 @@ void BayesianUnit::updatePPath()
             DWORD threadId;
             //Broodwar->printf("creating a thread");
             // Create the thread to begin execution on its own.
-            HANDLE thread = CreateThread( 
-                NULL,                   // default security attributes
-                0,                      // use default stack size  
-                &BayesianUnit::StaticLaunchPathfinding,      // thread function name
-                (void*) this,                   // argument to thread function 
-                0,                      // use default creation flags 
-                &threadId);             // returns the thread identifier 
-            if (thread == NULL) 
-            {
-                Broodwar->printf("(pathfinding) error creating thread");
-            }
-            CloseHandle(thread);
+			//if (_thread == NULL)
+			{
+				_thread = CreateThread( 
+					NULL,                   // default security attributes
+					0,                      // use default stack size  
+					&BayesianUnit::StaticLaunchPathfinding,      // thread function name
+					(void*) this,                   // argument to thread function 
+					0,                      // use default creation flags 
+					&threadId);             // returns the thread identifier 
+				if (_thread == NULL) 
+				{
+					Broodwar->printf("(pathfinding) error creating thread");
+				}
+			}
         }
 
         // remove path points we passed
-        unsigned int count = 0;
-        for (size_t i = 0; i < _ppath.size(); ++i) 
+        size_t count = 0;
+        for (; count < _ppath.size(); ++count) 
         {
-            if (_ppath[i].getDistance(_unitPos) < _maxDistWhileRefreshingPath)
-                count = i;
+            if (_ppath[count].getDistance(_unitPos) > _maxDistWhileRefreshingPath)
+				break;
         }
         for (; count > 0; --count) 
             _ppath.erase(_ppath.begin());

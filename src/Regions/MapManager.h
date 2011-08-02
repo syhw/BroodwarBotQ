@@ -27,6 +27,8 @@ class MapManager: public CSingleton<MapManager>
     std::map<BWAPI::Unit*, BWAPI::Position> _trackedUnits;
     std::map<BWAPI::Bullet*, BWAPI::Position> _trackedStorms;
     HANDLE _stormPosMutex;
+    HANDLE _signalLaunchStormUpdate;
+	HANDLE _stormThread;
     int _lastStormUpdateFrame;
     std::map<Position, int> _stormPosBuf;
     std::map<Position, int> _dontReStorm;
@@ -35,7 +37,7 @@ class MapManager: public CSingleton<MapManager>
     std::map<BWAPI::Unit*, BWAPI::Position> _alliedUnitsPosBuf;
     std::map<BWAPI::Unit*, BWAPI::Position> _enemyUnitsPosBuf;
     std::map<BWAPI::Unit*, std::pair<BWAPI::UnitType, BWAPI::Position> > _invisibleUnitsBuf;
-    static DWORD WINAPI StaticLaunchUpdateStormPos(void* obj);
+    static unsigned __stdcall StaticLaunchUpdateStormPos(void* obj);
     DWORD LaunchUpdateStormPos();
     inline void updateStormPos();
     int _width;

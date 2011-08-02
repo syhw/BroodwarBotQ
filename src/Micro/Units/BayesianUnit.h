@@ -99,6 +99,7 @@ struct ProbTables
 class BayesianUnit : public BattleUnit
 {
 protected:
+    HANDLE _thread;
     HANDLE _pathMutex;
     static DWORD WINAPI StaticLaunchPathfinding(void* obj);
     DWORD LaunchPathfinding();
