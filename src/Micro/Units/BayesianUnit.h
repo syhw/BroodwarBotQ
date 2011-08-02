@@ -99,10 +99,6 @@ struct ProbTables
 class BayesianUnit : public BattleUnit
 {
 protected:
-    HANDLE _thread;
-    HANDLE _pathMutex;
-    static DWORD WINAPI StaticLaunchPathfinding(void* obj);
-    DWORD LaunchPathfinding();
     std::vector<Vec> _dirv;
     int _maxDimension, _minDimension;
     int _lastAttackFrame;
@@ -211,6 +207,7 @@ public:
 	void dettachGroup();
     unit_mode getMode();
     int getMaxDimension();
+	void newPath();
     void updatePPath();
     Vec dir, obj; // dir=current direction, obj=pathfinder's direction
     BayesianUnit(BWAPI::Unit* u, const ProbTables* probTables);

@@ -24,24 +24,13 @@ protected:
     void drawTarget() const;
 #endif
     BWAPI::Position _unitPos;
-    std::vector<BWAPI::TilePosition> _btpath;
     std::vector<WalkTilePosition> _path;
     std::vector<BWAPI::Position> _ppath;
-    static void pathFind(std::vector<WalkTilePosition>& path, 
-        const BWAPI::Position& p_start, const BWAPI::Position& p_end);
-    static void straightLine(std::vector<BWAPI::TilePosition>& btpath, 
-        const BWAPI::TilePosition& start, const BWAPI::TilePosition& end);
     BWAPI::Unit* oldTarget;
 
 public:
+    std::vector<BWAPI::TilePosition> btpath;
 	int _sheight, _slarge;
-    static void buildingsAwarePathFind(std::vector<BWAPI::TilePosition>& btpath, 
-        const BWAPI::TilePosition& start, const BWAPI::TilePosition& end);
-    static void damagesAwarePathFind(std::vector<BWAPI::TilePosition>& btpath, 
-        const BWAPI::TilePosition& start, const BWAPI::TilePosition& end, int* tab);
-    static void quickPathFind(std::vector<BWAPI::TilePosition>& btpath, // works only with correct Regions
-        const BWAPI::TilePosition& start,                               // often not the case on custom maps
-        const BWAPI::TilePosition& end);
     unsigned int _tick;
 	BWAPI::Unit* unit;
     BWAPI::Unit* targetEnemy; // public for debug purpose, __USE__ setTargetEnemy(Unit*)

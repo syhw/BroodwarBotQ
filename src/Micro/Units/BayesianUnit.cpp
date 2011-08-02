@@ -30,11 +30,10 @@
 //using boost::math::normal;
 
 #define __NEW_COMPUTE_REPULSE__
-#define __HEURISTICS_IN_FIGHTMOVE__ 1
+#define __HEURISTICS_IN_FIGHTMOVE__ 1 // level of heuristic(s)
 #define __OUTER_NON_ATOMIC_DIRV__ // accept to do "non atomic w.r.t. Broodwar directions" moves/clicks (BW pathfinder can be called, drama ensues), useful to pass big buildings
 //#define __OUR_PATHFINDER__
 //#define __EXACT_OBJ__
-#define __NOT_IN_RANGE_BY__ 128.1
 #define __SAMPLE_DIR__
 #ifdef __SAMPLE_DIR__
 #include "Utils/RandomGenerators.h"
@@ -56,11 +55,6 @@ using namespace BWAPI;
 
 BayesianUnit::BayesianUnit(Unit* u, const ProbTables* probTables)
 : BattleUnit(u)
-, _pathMutex(CreateMutex( 
-        NULL,                  // default security attributes
-        FALSE,                 // initially not owned
-        NULL)                  // unnamed mutex
-)
 , dir(Vec(unit->getVelocityX(), unit->getVelocityY()))
 , _mode(MODE_MOVE)
 , _unitsGroup(NULL)
@@ -81,21 +75,15 @@ BayesianUnit::BayesianUnit(Unit* u, const ProbTables* probTables)
 , _iThinkImBlocked(false)
 , _lastTotalHP(unit->getHitPoints() + unit->getShields())
 , _sumLostHP(0)
-, _refreshPathFramerate(17)
+, _refreshPathFramerate(max(Broodwar->getFrameCount()%31, Broodwar->getFrameCount()%17 + 14)) // desynchronize pathfinding calls with a minimum of 14 frames
 , _maxDistWhileRefreshingPath((int)max(_refreshPathFramerate * _topSpeed,
 							  45.26)) // 45.26 = sqrt(32^2 + 32^2)
-, _newPath(false)
 , _inPos(Position(0, 0))
 , _fleeing(false)
 , _fightMoving(false)
 , _fleeingDmg(20)
 , _probTables(probTables)
 {
-    if (_pathMutex == NULL) 
-    {
-        Broodwar->printf("CreateMutex error: %d\n", GetLastError());
-        return;
-    }
     updateDirV();
     mapManager = & MapManager::Instance();
     switchMode(_mode);
@@ -104,17 +92,6 @@ BayesianUnit::BayesianUnit(Unit* u, const ProbTables* probTables)
 
 BayesianUnit::~BayesianUnit()
 {
-    DWORD waitResult = WaitForSingleObject(_pathMutex, 10);
-    switch (waitResult) 
-    {
-    case WAIT_OBJECT_0: 
-        break;
-    case WAIT_ABANDONED:
-        //TerminateThread(thread);
-        break;
-    }
-    CloseHandle(_thread);
-    CloseHandle(_pathMutex);
 }
 
 UnitType BayesianUnit::getType()
@@ -660,49 +637,6 @@ void BayesianUnit::drawProbs(multimap<double, Vec>& probs, int number)
     }
 }
 
-DWORD WINAPI BayesianUnit::StaticLaunchPathfinding(void* obj)
-{
-    BayesianUnit* This = (BayesianUnit*) obj;
-    int buf = This->LaunchPathfinding();
-    ExitThread(buf);
-    return buf;
-}
-
-DWORD BayesianUnit::LaunchPathfinding()
-{
-    DWORD waitResult = WaitForSingleObject( 
-        _pathMutex,    // handle to mutex
-        100);          // 100 ms time-out interval, < next pathfinding
-
-    switch (waitResult) 
-    {
-        // The thread got ownership of the mutex
-    case WAIT_OBJECT_0: 
-        if (_mode == MODE_SCOUT)
-        {
-            int* tab;
-            if (unit->getType().isFlyer())
-                tab = mapManager->airDamages;
-            else
-                tab = mapManager->groundDamages;
-            damagesAwarePathFind(_btpath, 
-				TilePosition(_unitPos), _tptarget, tab);
-        }
-        else
-            _btpath = BWTA::getShortestPath(TilePosition(_unitPos), _tptarget);
-        _newPath = true;
-        ReleaseMutex(_pathMutex);
-        break; 
-
-        // The thread got ownership of an abandoned mutex
-        // The database is in an indeterminate state
-    case WAIT_ABANDONED:
-        _newPath = false;
-        ReleaseMutex(_pathMutex);
-        return -1;
-    }
-    return 0;
-}
 
 void BayesianUnit::updateObj()
 {
@@ -753,21 +687,28 @@ void BayesianUnit::updateObj()
     }
 }
 
+void BayesianUnit::newPath()
+{
+    _ppath.clear();
+    for (std::vector<TilePosition>::const_iterator it 
+		= btpath.begin(); it != btpath.end(); ++it)
+        _ppath.push_back(Position(*it));
+}
+
+
 void BayesianUnit::updatePPath()
 {
 #ifndef __OUR_PATHFINDER__
-    if (unit->getHitPoints() + unit->getShields() < 81) // why???
-        return;
     double targetDistance = _unitPos.getDistance(target);
     Position p;
     TilePosition tptarget = TilePosition(target);
-
     if (targetDistance <= 45.26) // sqrt(32^2 + 32^2)
     {
+		/// Do not pathfind for a small distance (1 build tile diagonal)
         _ppath.clear();
-		// dirty hack to click farther than the unit size when really near
         if (targetDistance <= _maxDimension)
         {
+			// dirty hack to click farther than the unit size when really near
             obj = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y());
             obj *= 2;
         }
@@ -776,59 +717,16 @@ void BayesianUnit::updatePPath()
     }
     else 
     {
-        if (WaitForSingleObject(_pathMutex, 0) == WAIT_OBJECT_0 && _newPath)
-        {
-            if (_btpath.size())                
-            {
-                _ppath.clear();
-                for (std::vector<TilePosition>::const_iterator it 
-					= _btpath.begin(); it != _btpath.end(); ++it)
-                    _ppath.push_back(Position(*it));
-            }
-            _newPath = false;
-        }
-        ReleaseMutex(_pathMutex);
-        if (!(Broodwar->getFrameCount() % _refreshPathFramerate))
-        {
-            // new, in test
-			_tptarget = TilePosition(target);
-			if (!mapManager->lowResWalkability[_tptarget.x() 
-				+ _tptarget.y()*Broodwar->mapWidth()])
-            {
-                _tptarget = mapManager->closestWalkabableSameRegionOrConnected(
-					_tptarget);
-                if (_tptarget == TilePositions::None)
-                {
-#ifdef __DEBUG__ 
-                    //Broodwar->printf("_tptarget == TilePositions::None");
-#endif
-                    if (!unit->isMoving()) // hack to deblock
-                        unit->attack(target);
-                    return;
-                }
-            }
+		/// Request a path from the MapManager
+        if (!(Broodwar->getFrameCount() % _refreshPathFramerate)) // only at a certain maximum framerate
+		{
+			if (_mode = MODE_SCOUT)
+				mapManager->threatAwarePathfind(this, TilePosition(_unitPos), TilePosition(target), _fleeingDmg);
+			else
+				mapManager->pathfind(this, TilePosition(_unitPos), TilePosition(target));
+		}
 
-            //BayesianUnit::StaticLaunchPathfinding(this);
-            DWORD threadId;
-            //Broodwar->printf("creating a thread");
-            // Create the thread to begin execution on its own.
-			//if (_thread == NULL)
-			{
-				_thread = CreateThread( 
-					NULL,                   // default security attributes
-					0,                      // use default stack size  
-					&BayesianUnit::StaticLaunchPathfinding,      // thread function name
-					(void*) this,                   // argument to thread function 
-					0,                      // use default creation flags 
-					&threadId);             // returns the thread identifier 
-				if (_thread == NULL) 
-				{
-					Broodwar->printf("(pathfinding) error creating thread");
-				}
-			}
-        }
-
-        // remove path points we passed
+        /// remove path points we passed
         size_t count = 0;
         for (; count < _ppath.size(); ++count) 
         {
@@ -1329,7 +1227,7 @@ void BayesianUnit::updateTargetEnemy()
             it != _rangeEnemies.end(); ++it)
         {
             stopPrio = it;
-            if (it->first > _maxWeaponsRange)// + __NOT_IN_RANGE_BY__)
+            if (it->first > _maxWeaponsRange)
                 break;
             UnitType testType = it->second->getType();
             if (testType == BWAPI::UnitTypes::Protoss_High_Templar &&
@@ -1362,12 +1260,11 @@ void BayesianUnit::updateTargetEnemy()
 				!= BWAPI::WeaponTypes::None &&
                 _unitPos.getDistance(it->second->getPosition()) 
 				< (double)unit->getType().groundWeapon().maxRange() 
-				+ addRangeGround())// + __NOT_IN_RANGE_BY__) 
+				+ addRangeGround())
                 || (testType.isFlyer() && unit->getType().airWeapon() 
 				!= BWAPI::WeaponTypes::None &&
                 _unitPos.getDistance(it->second->getPosition()) 
 				< (double)unit->getType().airWeapon().maxRange() + addRangeAir())
-				// + __NOT_IN_RANGE_BY__)
                 ))
             {
                 setTargetEnemy(it->second);
