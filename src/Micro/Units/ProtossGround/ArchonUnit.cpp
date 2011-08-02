@@ -78,17 +78,18 @@ void ArchonUnit::micro()
     /// Dodge storm, drag mine, drag scarab
     if (dodgeStorm() || dragMine() || dragScarab()) 
         return;
+    updateRangeEnemies();
+    updateTargetEnemy();
     if (unit->getGroundWeaponCooldown() <= Broodwar->getLatencyFrames() + 1)
     {
-        updateRangeEnemies();
-        updateTargetEnemy();
         if (!inRange(targetEnemy))
         {
             clearDamages();
         }
         attackEnemyUnit(targetEnemy);
     }
-    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatencyFrames()*2 + 2) // == (Broodwar->getLatencyFrames()+1)*2, safety
+    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatencyFrames()*2 + 2 // == (Broodwar->getLatencyFrames()+1)*2, safety
+		|| unit->getGroundWeaponCooldown() == unit->getType().groundWeapon().damageCooldown()) // against really laggy games TODO in other units 
     {
         if (!dodgeStorm() && !dragScarab() && !dragMine() && _fleeing)
         {

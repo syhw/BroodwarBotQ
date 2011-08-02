@@ -62,7 +62,7 @@ bool ReaverUnit::inRange(BWAPI::Unit* u)
 
 int ReaverUnit::getAttackDuration()
 {
-    return 42;
+    return 42; // real cooldown is 60 :)
 }
 
 std::set<BWAPI::UnitType> ReaverUnit::getSetPrio()

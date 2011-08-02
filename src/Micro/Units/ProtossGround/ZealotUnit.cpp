@@ -147,10 +147,10 @@ void ZealotUnit::micro()
     if (dodgeStorm() || dragMine() || dragScarab()) 
         return;
     decideToFlee();
+	updateTargetEnemy();
 
     if (unit->getGroundWeaponCooldown() <= Broodwar->getLatencyFrames() + 2)
     {
-        updateTargetEnemy();
 		if (targetEnemy != NULL && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected()) 
 		{
 			// attack enemy unit
@@ -168,7 +168,10 @@ void ZealotUnit::micro()
 #ifdef __SIMPLE_FLEE__
             simpleFlee();
 #else
-			flee();
+			//if (unit->isStuck()) // TODO do something with it
+			//	simpleFlee();
+			//else
+				flee();
 #endif
         }
         else

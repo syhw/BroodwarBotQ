@@ -207,7 +207,7 @@ void BayesianUnit::computeRepulseValues()
                 Vec tmpvit((*it)->getVelocityX(), 
                     (*it)->getVelocityY());
 #ifdef __NEW_COMPUTE_REPULSE__
-                tmpvit *= max(24, tmp.getApproxDistance((*it)->getPosition()) // we foresee / linear interpolate max 1 sec in advance
+                tmpvit *= min(24, tmp.getApproxDistance((*it)->getPosition()) // we foresee / linear interpolate max 1 sec in advance
 					/ (*it)->getType().topSpeed());
 #else
                 tmpvit *= tmp.getDistance((*it)->getPosition()) 
@@ -2041,12 +2041,8 @@ bool BayesianUnit::decideToFlee()
 void BayesianUnit::simpleFlee()
 {
     _fightMoving = false;
-    /*if (!this->mapManager->groundDamages[_unitPos.x()/32 + _unitPos.y()/32*Broodwar->mapWidth()])
-    {
-        _fleeing = false;
-        return;
-    }*/
-    if (_unitsGroup->enemies.size() <= 1 && targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() && !outRanges(targetEnemy)) // TOCHANGE 1
+	/// Don't flee only a single enemy that we don't outrange
+    if (_unitsGroup && _unitsGroup->enemies.size() <= 1 && targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() && !outRanges(targetEnemy)) // TOCHANGE 1
     {
         _fleeing = false;
         return;
@@ -2055,15 +2051,23 @@ void BayesianUnit::simpleFlee()
     if (Broodwar->getFrameCount() - _lastClickFrame < Broodwar->getLatencyFrames())
         return;
     Vec dirFlee = Vec(0, 0);
-    for (std::map<Unit*, Position>::const_iterator it = _unitsGroup->enemies.begin();
-        it != _unitsGroup->enemies.end(); ++it)
-    {
-        if (it->first && it->first->exists() && it->first->isVisible()
-            && (it->first->getTarget() == unit || it->first->getOrderTarget() == unit) && it->first->getType().groundWeapon().maxRange() - it->second.getDistance(_unitPos) < unit->getType().topSpeed()*15)
-        {
-            dirFlee += Vec(_unitPos.x() - it->first->getPosition().x(), _unitPos.y() - it->first->getPosition().y());
-        }
-    }
+	if (_targetingMe.empty())
+	{
+		for (std::map<Unit*, Position>::const_iterator it = _unitsGroup->enemies.begin();
+			it != _unitsGroup->enemies.end(); ++it)
+		{
+			if (it->first && it->first->exists() && it->first->isVisible()
+				&& (it->first->getTarget() == unit || it->first->getOrderTarget() == unit) && it->first->getType().groundWeapon().maxRange() - it->second.getDistance(_unitPos) < unit->getType().topSpeed()*15)
+			{
+				dirFlee += Vec(_unitPos.x() - it->first->getPosition().x(), _unitPos.y() - it->first->getPosition().y());
+			}
+		}
+	}
+	else
+	{
+		for each (Unit* u in _targetingMe)
+			dirFlee += Vec(_unitPos.x() - u->getPosition().x(), _unitPos.y() - u->getPosition().y());
+	}
     if (dirFlee == Vec(0, 0))
         return;
     dirFlee.normalize();
