@@ -173,43 +173,6 @@ void MicroAIModule::onStart()
 
 void MicroAIModule::onFrame()
 {
-	Position tpp(300,300);
-	clock_t t1 = clock();
-	vector<set<Unit*> > vectorlol1;
-	for (unsigned int i = 0; i < 10000; ++i)
-	{
-		set<Unit*> selectedUnits;
-		for each (Unit* u in Broodwar->getAllUnits())
-		{
-			if (u->getDistance(tpp) < 200)
-			{
-				selectedUnits.insert(u);
-			}
-		}
-		vectorlol1.push_back(selectedUnits);
-	}
-	clock_t t2 = clock();
-	vector<set<Unit*> > vectorlol2;
-	for (unsigned int i = 0; i < 10000; ++i)
-	{
-		set<Unit*> selectedUnits = Broodwar->getUnitsInRadius(tpp, 200);
-		vectorlol2.push_back(selectedUnits);
-	}
-	clock_t t3 = clock();
-	vector<set<Unit*> > vectorlol3;
-	for (unsigned int i = 0; i < 10000; ++i)
-	{
-		set<Unit*> selectedUnits = Broodwar->getUnitsInRectangle(100, 100, 500, 500);
-		vectorlol3.push_back(selectedUnits);
-	}
-	clock_t t4 = clock();
-
-	Broodwar->printf("getAllUnits took %f", (double)(t2-t1) / CLOCKS_PER_SEC);
-	Broodwar->printf("getUnitsInRadius took %f", (double)(t3-t2) / CLOCKS_PER_SEC);
-	Broodwar->printf("getUnitsInRECTANGLE took %f", (double)(t4-t3) / CLOCKS_PER_SEC);
-	return;
-	
-
 	TheArbitrator->update();
 	micro->update();
     if (Broodwar->getLastError() != BWAPI::Errors::None)

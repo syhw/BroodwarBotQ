@@ -29,6 +29,7 @@
 //#include <boost/math/distributions/normal.hpp>
 //using boost::math::normal;
 
+//#define __OUTER_NON_ATOMIC_DIRV__ // accept to do "non atomic w.r.t. Broodwar directions" moves/clicks (BW pathfinder can be called, drama ensues), useful to pass big buildings
 //#define __OUR_PATHFINDER__
 //#define __EXACT_OBJ__
 #define __NOT_IN_RANGE_BY__ 128.1
@@ -143,7 +144,7 @@ void BayesianUnit::computeDamageValues()
     }
 }
 
-#ifdef WITH_FLOCKING
+#ifdef __WITH_FLOCKING__
 void BayesianUnit::computeFlockValues()
 {
     _flockValues.clear();
@@ -353,6 +354,12 @@ void BayesianUnit::straightLine(vector<Position>& ppath,
 void BayesianUnit::updateAttractors()
 {
     _occupation.clear();
+#ifdef __WITH_FLOCKING__
+	if (_mode == MODE_FLOCK)
+	{
+		computeFlockValues();
+	}
+#endif
     if (_mode != MODE_SCOUT)
     {
         computeRepulseValues();
@@ -964,6 +971,7 @@ void BayesianUnit::updateDirV()
     WalkTilePosition wtp(p);
  
     int pixs = min(_slarge, _sheight) + 1;
+#ifdef __OUTER_NON_ATOMIC_DIRV__
     int pixs_far = 0; // outer layer of dirvectors
     if (pixs < 32) // 3*pixs < 96
     {
@@ -998,6 +1006,26 @@ void BayesianUnit::updateDirV()
                 _dirv.push_back(v);
             }
         }  
+#else
+    for (int x = -2; x <= 2; ++x)
+        for (int y = -2; y <= 2; ++y)
+        {
+            int xx, yy;
+            xx = x*pixs;
+            yy = y*pixs;
+            Vec v(xx, yy);
+            Position tmp = v.translate(p);
+			// in the map and walkable (statically)
+            if (tmp.x() <= 32*Broodwar->mapWidth() && tmp.y() 
+				<= 32*Broodwar->mapHeight()
+                && tmp.x() >= 0 && tmp.y() >= 0 
+                && (unit->getType().isFlyer() || _mode == MODE_SCOUT 
+					|| Broodwar->isWalkable(tmp.x()/8, tmp.y()/8)))
+            {
+                _dirv.push_back(v);
+            }
+        }  
+#endif
 }
 
 void BayesianUnit::testIfBlocked()
@@ -2105,7 +2133,7 @@ void BayesianUnit::update()
     if (_mode != MODE_FIGHT_G && _mode != MODE_FIGHT_A)
     {
         testIfBlocked();
-        if (_iThinkImBlocked)
+        if (_iThinkImBlocked && unit->isStuck())
         {
             resumeFromBlocked();
             return;
@@ -2128,11 +2156,15 @@ void BayesianUnit::update()
         break;
 
     case MODE_INPOS:       
-        /*if (_unitPos.getDistance(target) > 96)
+        if (_unitPos.getDistance(target) > 96)
         {
+#ifdef __WITH_FLOCKING__
+            this->switchMode(MODE_FLOCK);
+#else
             this->switchMode(MODE_MOVE);
+#endif
             return;
-        }*/
+        }
 		Broodwar->printf("in Pos");
         updateDir();
         clickDir();
@@ -2141,7 +2173,11 @@ void BayesianUnit::update()
     case MODE_FIGHT_G:
         if (_unitsGroup->enemies.empty())
         {
+#ifdef __WITH_FLOCKING__
+            this->switchMode(MODE_FLOCK);
+#else
             this->switchMode(MODE_MOVE);
+#endif
             return;
         }
         micro();
@@ -2150,7 +2186,11 @@ void BayesianUnit::update()
     case MODE_FIGHT_A:
         if (_unitsGroup->enemies.empty())
         {
+#ifdef __WITH_FLOCKING__
+            this->switchMode(MODE_FLOCK);
+#else
             this->switchMode(MODE_MOVE);
+#endif
             return;
         }
         micro();

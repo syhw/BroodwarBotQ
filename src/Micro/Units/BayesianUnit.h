@@ -20,7 +20,7 @@ class BayesianUnit;
 typedef boost::shared_ptr<BayesianUnit> pBayesianUnit;
 
 // #define PROBT 1
-// #define WITH_FLOCKING 1
+//#define __WITH_FLOCKING__
 // #define __HEIGHTS_ATTRACTION__
 
 // TODO, this class has to be derived to take Flying/Ground/Special Units 
@@ -41,7 +41,7 @@ enum unit_mode {
     MODE_FIGHT_G,   // ground
     MODE_FIGHT_A,   // air
     MODE_SCOUT,
-#ifdef WITH_FLOCKING
+#ifdef __WITH_FLOCKING__
     MODE_FLOCK,
 #endif
     MODE_MOVE
@@ -135,7 +135,7 @@ protected:
     This grid because there are only 16 possible directions in Broodwar */
     MapManager* mapManager;
     std::vector<repulse_value> _repulseValues;
-#ifdef WITH_FLOCKING
+#ifdef __WITH_FLOCKING__
     static std::vector<repulse_value> _flockValues;
 #endif
     std::vector<damage_value> _damageValues;
@@ -145,7 +145,7 @@ protected:
     std::multimap<double, Vec> _dirvProb;
 
     inline void computeRepulseValues();
-#ifdef WITH_FLOCKING
+#ifdef __WITH_FLOCKING__
     inline void computeFlockValues();
 #endif
     inline void computeDamageValues();
@@ -178,7 +178,7 @@ protected:
     inline void updateAttractors();
     void drawAttractors();
     void drawRepulseValues();
-#ifdef WITH_FLOCKING
+#ifdef __WITH_FLOCKING__
     void drawFlockValues();
 #endif
     void drawOccupation(int number);
