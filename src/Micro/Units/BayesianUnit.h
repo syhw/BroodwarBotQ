@@ -120,7 +120,7 @@ protected:
     Position _inPos;
     bool _fleeing;
     bool _fightMoving;
-    int _fleeingDmg;
+    int _fleeingDmg; // number of DPS we have to take in to decide to flee, default 20
     //std::multimap<BWAPI::Position, attractor_type> _prox;
     std::vector<occupation_type> _occupation;
     // dirv[attractor] = direction relative to an attractor
@@ -164,6 +164,7 @@ protected:
     int computeDmg(BWAPI::Unit* u);
     bool inRange(BWAPI::Unit* u);
     bool outRanges(BWAPI::Unit* u);
+	bool isOutrangingMe(BWAPI::Unit* u);
     void drawDirV();
     void updateObj();
     void drawObj(int number=0);
@@ -172,6 +173,7 @@ protected:
     inline void clickDir();
     inline void clickScout();
     inline void clickTarget();
+	inline void moveClick(BWAPI::Position p);
     void flee();
     int fightMove();
     void drawArrow(Vec& v);

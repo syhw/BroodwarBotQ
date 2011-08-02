@@ -472,6 +472,8 @@ void UnitsGroup::formation(pFormation f)
 
 void UnitsGroup::onUnitDestroy(Unit* u)
 {
+	if (units.empty())
+		return;
     if (u->getPlayer() == Broodwar->self())
         giveUpControl(u);
     else
@@ -546,8 +548,8 @@ bool UnitsGroup::removeArrivingUnit(Unit* u)
 
 void UnitsGroup::giveUpControl(Unit* u)
 {
-	if (!removeArrivingUnit(u))
-		removeUnit(u);
+	removeArrivingUnit(u);
+	removeUnit(u);
     if (u->getType() == UnitTypes::Protoss_Observer)
     {
         _hasDetection = false;

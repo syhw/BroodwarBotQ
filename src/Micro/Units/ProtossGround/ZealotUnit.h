@@ -10,8 +10,6 @@ protected:
     static std::set<BWAPI::UnitType> setPrio;
     bool decideToFlee();
     void updateTargetEnemy();
-    static std::map<BWAPI::Unit*, int> _zealotsOn;
-    void setTargetEnemy(BWAPI::Unit* u);
     void clearDamages();
     int fightMove();
 public:

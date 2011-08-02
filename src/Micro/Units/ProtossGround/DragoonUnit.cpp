@@ -102,17 +102,17 @@ void DragoonUnit::micro()
             Broodwar->printf("starting attack at frame: %d, distance to target %f", Broodwar->getFrameCount(), targetEnemy->getDistance(unit));
     }
 #endif
-    updateTargetingMe();
-    decideToFlee();
     int currentFrame = Broodwar->getFrameCount();
     if (currentFrame - _lastAttackFrame <= getAttackDuration()) // not interrupting attacks
         return;
+    updateTargetingMe();
+    decideToFlee();
     if (currentFrame - _lastAttackFrame == getAttackDuration() + 1)
         clearDamages();
     /// Dodge storm, drag mine, drag scarab
     if (dodgeStorm() || dragMine() || dragScarab()) 
         return;
-    if (unit->getGroundWeaponCooldown() <= Broodwar->getLatencyFrames() + 1)
+    if (unit->getGroundWeaponCooldown() <= Broodwar->getLatencyFrames() + 2)
     {
         updateRangeEnemies();
         updateTargetEnemy();
@@ -122,9 +122,9 @@ void DragoonUnit::micro()
         }
         attackEnemyUnit(targetEnemy);
     }
-    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatencyFrames()*2 + 2) // == (Broodwar->getLatencyFrames()+1)*2, safety
+    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatencyFrames()*2 + 1) // == (Broodwar->getLatencyFrames()+1)*2, safety
     {
-        if (!dodgeStorm() && !dragScarab() && !dragMine() && _fleeing)
+        if (_fleeing)
         {
 #ifdef __SIMPLE_FLEE__
             simpleFlee();

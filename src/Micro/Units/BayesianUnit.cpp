@@ -29,7 +29,9 @@
 //#include <boost/math/distributions/normal.hpp>
 //using boost::math::normal;
 
-//#define __OUTER_NON_ATOMIC_DIRV__ // accept to do "non atomic w.r.t. Broodwar directions" moves/clicks (BW pathfinder can be called, drama ensues), useful to pass big buildings
+#define __NEW_COMPUTE_REPULSE__
+#define __HEURISTICS_IN_FIGHTMOVE__ 1
+#define __OUTER_NON_ATOMIC_DIRV__ // accept to do "non atomic w.r.t. Broodwar directions" moves/clicks (BW pathfinder can be called, drama ensues), useful to pass big buildings
 //#define __OUR_PATHFINDER__
 //#define __EXACT_OBJ__
 #define __NOT_IN_RANGE_BY__ 128.1
@@ -160,14 +162,22 @@ void BayesianUnit::computeFlockValues()
 void BayesianUnit::computeRepulseValues()
 {
     _repulseValues.clear();
+#ifdef __NEW_COMPUTE_REPULSE__
+	set<Unit*> unitsAround = Broodwar->getUnitsInRadius(_unitPos, max(_slarge, _sheight)*6); // 6 = (2+1) for me + (2+1) for him
+#endif
     for (size_t i = 0; i < _dirv.size(); ++i)
     {
         repulse_value value = REPULSE_NO;
         Position tmp = _dirv[i].translate(this->_unitPos);
         double v = 100000.0;
+#ifdef __NEW_COMPUTE_REPULSE__
+        for (std::set<Unit*>::const_iterator it = unitsAround.begin();
+            it != unitsAround.end(); ++it)
+#else
         for (std::set<Unit*>::const_iterator it 
 			= Broodwar->self()->getUnits().begin();
             it != Broodwar->self()->getUnits().end(); ++it)
+#endif
         {
             if (*it == unit)
                 continue;
@@ -196,8 +206,13 @@ void BayesianUnit::computeRepulseValues()
             {
                 Vec tmpvit((*it)->getVelocityX(), 
                     (*it)->getVelocityY());
+#ifdef __NEW_COMPUTE_REPULSE__
+                tmpvit *= max(24, tmp.getApproxDistance((*it)->getPosition()) // we foresee / linear interpolate max 1 sec in advance
+					/ (*it)->getType().topSpeed());
+#else
                 tmpvit *= tmp.getDistance((*it)->getPosition()) 
 					/ (*it)->getType().topSpeed();
+#endif
                 Position interp_pos = tmpvit.translate((*it)->getPosition());
                 double otherMaxDiag = 1.4143 * 
 					max((*it)->getType().dimensionDown() 
@@ -210,14 +225,23 @@ void BayesianUnit::computeRepulseValues()
                     if (value == REPULSE_NO && (*it)->getType().size()
 						== BWAPI::UnitSizeTypes::Small)
                         value = REPULSE_LOW;
+#ifdef __NEW_COMPUTE_REPULSE__
+					else if ((value > REPULSE_NO || (*it)->getType().size() != UnitSizeTypes::Small)
+						&& value < REPULSE_HIGH)
+#else
                     else if (value < REPULSE_HIGH 
                         && (*it)->getType().size() 
 						!= BWAPI::UnitSizeTypes::Small)
+#endif
                         value = REPULSE_HIGH;
                 }
-                if (!value && tmp.getDistance((*it)->getPosition()) 
+                if (!value && tmp.getDistance((*it)->getPosition()) // repulsion of the non-interpolated unit
 					< max(_maxDiag, otherMaxDiag))
+#ifdef __NEW_COMPUTE_REPULSE__
+                    value = REPULSE_HIGH;
+#else
                     value = REPULSE_LOW;
+#endif
             }
         }
         _repulseValues.push_back(value);
@@ -548,7 +572,7 @@ void BayesianUnit::attackEnemyUnit(Unit* u)
     {
         return;
     }
-    if (inRange(u)) 
+	if (inRange(u)) 
     {
         unit->rightClick(u);
         _lastAttackFrame = Broodwar->getFrameCount();
@@ -1534,24 +1558,21 @@ int BayesianUnit::computeDmg(Unit* u)
 
 bool BayesianUnit::inRange(BWAPI::Unit* u)
 {
-    if (u == NULL || !u->exists() || !u->isVisible() || !u->isDetected()) // I think I have broken something in 30574ffac660d6e2f22077b485c7afaffe791989 TODO
+    if (u == NULL || !u->exists() || !u->isVisible() || !u->isDetected())
         return false;
-    if (unit->getType() == UnitTypes::Protoss_Zealot 
+    /*if (unit->getType() == UnitTypes::Protoss_Zealot 
         || unit->getType() == UnitTypes::Protoss_Dark_Templar)
     {
         double maxEnemyDiag = max(u->getType().dimensionUp() + u->getType().dimensionDown(), u->getType().dimensionRight() + u->getType().dimensionLeft());
         maxEnemyDiag *= 1.414;
-        return u->getDistance(_unitPos) < maxEnemyDiag + _maxDiag;
+        return u->getDistance(_unitPos) < maxEnemyDiag + _maxDiag + 32;
     }
-    if (u != NULL && u->exists() && u->isVisible())
-    {
-        return (!(u->getType().isFlyer()) && unit->getType().groundWeapon() != BWAPI::WeaponTypes::None &&
-            _unitPos.getDistance(u->getPosition()) < (double)unit->getType().groundWeapon().maxRange() + addRangeGround()
-            || (u->getType().isFlyer() && unit->getType().airWeapon() != BWAPI::WeaponTypes::None &&
-            _unitPos.getDistance(u->getPosition()) < (double)unit->getType().airWeapon().maxRange() + addRangeAir()));
-    }
-    else
-        return false;
+	else*/
+    return (!(u->getType().isFlyer()) && unit->getType().groundWeapon() != BWAPI::WeaponTypes::None &&
+        u->getDistance(_unitPos) < (double)unit->getType().groundWeapon().maxRange() + addRangeGround()
+        || (u->getType().isFlyer() && unit->getType().airWeapon() != BWAPI::WeaponTypes::None &&
+        u->getDistance(_unitPos) < (double)unit->getType().airWeapon().maxRange() + addRangeAir()));
+    // return false;
 }
 
 bool BayesianUnit::outRanges(BWAPI::Unit* u)
@@ -1579,6 +1600,34 @@ bool BayesianUnit::outRanges(BWAPI::Unit* u)
         unit->getType().groundWeapon().maxRange() + addRangeGround() > ut.airWeapon().maxRange() + eAddRange)
         || (ut.isFlyer() && unit->getType().airWeapon() != BWAPI::WeaponTypes::None &&
         unit->getType().airWeapon().maxRange() + addRangeAir() > ut.airWeapon().maxRange() + eAddRange));
+    return false;
+}
+
+bool BayesianUnit::isOutrangingMe(BWAPI::Unit* u)
+{
+    UnitType ut = u->getType();
+    int eAddRange = 0;
+    // consider that the enemy has upgrades
+    if (ut == UnitTypes::Protoss_Dragoon)
+        eAddRange = 64;
+    else if (ut == UnitTypes::Terran_Marine)
+        eAddRange = 32;
+    else if (ut == UnitTypes::Zerg_Hydralisk)
+        eAddRange = 32;
+    else if (ut == UnitTypes::Terran_Vulture_Spider_Mine)
+        eAddRange = 64;
+    else if (unit->getType().isFlyer() && ut == UnitTypes::Terran_Goliath)
+        eAddRange = 96;
+    if (!unit->getType().isFlyer())
+        return ((!ut.isFlyer() && (unit->getType().groundWeapon() == BWAPI::WeaponTypes::None ||
+        (unit->getType().groundWeapon().maxRange() + addRangeGround() < ut.groundWeapon().maxRange() + eAddRange)))
+        || ((ut.isFlyer() && (unit->getType().airWeapon() == BWAPI::WeaponTypes::None ||
+        unit->getType().airWeapon().maxRange() + addRangeAir() < ut.groundWeapon().maxRange() + eAddRange))));
+    else
+        return ((!ut.isFlyer() && (unit->getType().groundWeapon() == BWAPI::WeaponTypes::None ||
+        unit->getType().groundWeapon().maxRange() + addRangeGround() < ut.airWeapon().maxRange() + eAddRange))
+        || ((ut.isFlyer() && (unit->getType().airWeapon() == BWAPI::WeaponTypes::None &&
+        unit->getType().airWeapon().maxRange() + addRangeAir() < ut.airWeapon().maxRange() + eAddRange))));
     return false;
 }
 
@@ -1616,80 +1665,87 @@ void BayesianUnit::computeProbs()
 void BayesianUnit::selectDir(const Vec& criterium)
 {
 #ifdef __SAMPLE_DIR__
-	RandomGenerators<0, 1>* rdm = & RandomGenerators<0, 1>::Instance();
-	double sum = 0.0;
-	for (multimap<double, Vec>::const_iterator it = _dirvProb.begin();
-		it != _dirvProb.end(); ++it)
+	if (_unitsGroup != NULL && _unitsGroup->size() > 10)
 	{
-		sum += it->first;
-	}
-	double sample = rdm->uni();
-	double mark = 0.0;
-	for (multimap<double, Vec>::const_iterator it = _dirvProb.begin();
-		it != _dirvProb.end(); ++it)
-	{
-		mark += it->first;
-		if (mark / sum > sample)
+		RandomGenerators<0, 1>* rdm = & RandomGenerators<0, 1>::Instance();
+		double sum = 0.0;
+		for (multimap<double, Vec>::const_iterator it = _dirvProb.begin();
+			it != _dirvProb.end(); ++it)
 		{
-			dir = it->second;
+			sum += it->first;
+		}
+		double sample = rdm->uni();
+		double mark = 0.0;
+		for (multimap<double, Vec>::const_iterator it = _dirvProb.begin();
+			it != _dirvProb.end(); ++it)
+		{
+			mark += it->first;
+			if (mark / sum > sample)
+			{
+				dir = it->second;
+			}
 		}
 	}
-#else
-    multimap<double, Vec>::const_iterator last = _dirvProb.end(); 
-    // I want the right probabilities and not 1-prob in the multimap
-    --last;
-    if (_dirvProb.count(_dirvProb.begin()->first) == 1) 
-    {
-        dir = last->second;
-    }
-    // or the equally most probable and most in the direction of the criterium
-    else
-    {
-        pair<multimap<double, Vec>::const_iterator, multimap<double, Vec>::const_iterator> possible_dirs = _dirvProb.equal_range(last->first);
-        Vec crit = criterium;
-        
-        if (_mode == MODE_INPOS && crit == Vec(0, 0))
-        {
-            // sum on all the possible_directions
-            for (multimap<double, Vec>::const_iterator it = possible_dirs.first; it != possible_dirs.second; ++it)
-            {
-                obj += it->second;
-            }
-            Vec crit = obj;
-        }
-        if ((_mode == MODE_FIGHT_G || _mode == MODE_FIGHT_A) && _fleeing && crit == Vec(0, 0))//&& crit == Vec(0, 0))
-        {
-            Vec tmp = Vec(0, 0);
-            for (multimap<double, Vec>::const_iterator it = possible_dirs.first; it != possible_dirs.second; ++it)
-            {
-                tmp += it->second;
-            }
-            Vec crit = tmp;
-        }
-        
-        double max_dir = -100000.0;
-        double max_norm = -100000.0;
-        crit.normalize();
-        for (multimap<double, Vec>::const_iterator it = possible_dirs.first; it != possible_dirs.second; ++it)
-        {
-            Vec tmpVec = it->second;
-            double direction = crit.dot(tmpVec.normalize());
-            double norm = it->second.norm();
-            if (direction > max_dir || (direction == max_dir && norm > max_norm))
-            {
-                // test if directly (right line) attainable
-                //Vec tmpHalfDir = it->second;
-                //tmpHalfDir /= 2;
-                //Position tmpPosDir = tmpHalfDir.translate(_unitPos);
-                //if (Broodwar->isWalkable(tmpPosDir.x() / 8, tmpPosDir.y() / 8))
-                //{
-                    max_dir = direction;
-                    max_norm = norm;
-                    dir = it->second;
-                //}
-            }
-        }
-    }
+	else
+	{
+#endif
+	    multimap<double, Vec>::const_iterator last = _dirvProb.end(); 
+	    // I want the right probabilities and not 1-prob in the multimap
+	    --last;
+	    if (_dirvProb.count(_dirvProb.begin()->first) == 1) 
+	    {
+	        dir = last->second;
+	    }
+	    // or the equally most probable and most in the direction of the criterium
+	    else
+	    {
+	        pair<multimap<double, Vec>::const_iterator, multimap<double, Vec>::const_iterator> possible_dirs = _dirvProb.equal_range(last->first);
+	        Vec crit = criterium;
+	        
+	        if (_mode == MODE_INPOS && crit == Vec(0, 0))
+	        {
+	            // sum on all the possible_directions
+	            for (multimap<double, Vec>::const_iterator it = possible_dirs.first; it != possible_dirs.second; ++it)
+	            {
+	                obj += it->second;
+	            }
+	            Vec crit = obj;
+	        }
+	        if ((_mode == MODE_FIGHT_G || _mode == MODE_FIGHT_A) && _fleeing && crit == Vec(0, 0))//&& crit == Vec(0, 0))
+	        {
+	            Vec tmp = Vec(0, 0);
+	            for (multimap<double, Vec>::const_iterator it = possible_dirs.first; it != possible_dirs.second; ++it)
+	            {
+	                tmp += it->second;
+	            }
+	            Vec crit = tmp;
+	        }
+	        
+	        double max_dir = -100000.0;
+	        double max_norm = -100000.0;
+	        crit.normalize();
+	        for (multimap<double, Vec>::const_iterator it = possible_dirs.first; it != possible_dirs.second; ++it)
+	        {
+	            Vec tmpVec = it->second;
+	            double direction = crit.dot(tmpVec.normalize());
+	            double norm = it->second.norm();
+	            if (direction > max_dir || (direction == max_dir && norm > max_norm))
+	            {
+	                // test if directly (right line) attainable
+	                //Vec tmpHalfDir = it->second;
+	                //tmpHalfDir /= 2;
+	                //Position tmpPosDir = tmpHalfDir.translate(_unitPos);
+	                //if (Broodwar->isWalkable(tmpPosDir.x() / 8, tmpPosDir.y() / 8))
+	                //{
+	                    max_dir = direction;
+	                    max_norm = norm;
+	                    dir = it->second;
+	                //}
+	            }
+	        }
+	    }
+#ifdef __SAMPLE_DIR__
+	}
 #endif
 }
 
@@ -1786,6 +1842,13 @@ void BayesianUnit::clickTarget()
     _lastMoveFrame = Broodwar->getFrameCount();
 }
 
+void BayesianUnit::moveClick(Position p)
+{
+	unit->move(p);
+	_lastClickFrame = Broodwar->getFrameCount();
+	_lastMoveFrame = Broodwar->getFrameCount();
+}
+
 pBayesianUnit BayesianUnit::newBayesianUnit(Unit* u)
 {
     pBayesianUnit tmp;
@@ -1843,6 +1906,10 @@ void BayesianUnit::move(BWAPI::Position p)
 
 void BayesianUnit::flee()
 {
+	/*for each (Unit* u in _targetingMe)
+	{
+		if (isOutrangingMe(u)) /// flee really or kite?
+	}*/
     _fightMoving = false;
     if (!this->mapManager->groundDamages[_unitPos.x()/32 + _unitPos.y()/32*Broodwar->mapWidth()])
     {
@@ -1856,41 +1923,43 @@ void BayesianUnit::flee()
 
 int BayesianUnit::fightMove()
 {
+    if (Broodwar->getFrameCount() - _lastClickFrame <= Broodwar->getLatencyFrames())
+		return 0;
+#if __HEURISTICS_IN_FIGHTMOVE__ > 0
     /// approach siege tanks or approach our targetEnemy if not in range
     if (targetEnemy != NULL && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected()
         && ((targetEnemy->getType() == UnitTypes::Terran_Siege_Tank_Siege_Mode 
-        && targetEnemy->getDistance(_unitPos) > 45.0) || !inRange(targetEnemy) || (_unitsGroup->units.size() > 10 && targetEnemy->getDistance(_unitPos) > 128)) // TODO MICROONLY (_unitsGroup->units.size() > 10 && targetEnemy->getDistance(_unitPos) > 128)
-        && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatencyFrames()))
+	        && targetEnemy->getDistance(_unitPos) > 45.0) || !inRange(targetEnemy)))
     {
-        unit->move(targetEnemy->getPosition());
-        _lastClickFrame = Broodwar->getFrameCount();
-        _lastMoveFrame = Broodwar->getFrameCount();
+		moveClick(targetEnemy->getPosition());
         _fightMoving = true;
         return 1;
     }
+#endif
+#if __HEURISTICS_IN_FIGHTMOVE__ > 1
     double dist = target.getDistance(_unitPos);
     /// approach out of range target
     if (dist <= 192.0 && // 6 build tiles TOCHANGE
         oorTargetEnemy != NULL && oorTargetEnemy->exists() && oorTargetEnemy->isVisible() && targetEnemy->isDetected()
-        && !inRange(oorTargetEnemy)
-        && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatencyFrames()))
+        && !inRange(oorTargetEnemy))
     {
         //unit->rightClick(oorTargetEnemy->getPosition());
         //_lastRightClick =  oorTargetEnemy->getPosition();
-        unit->move(oorTargetEnemy->getPosition());
-        _lastClickFrame = Broodwar->getFrameCount();
-        _lastMoveFrame = Broodwar->getFrameCount();
+		moveClick(oorTargetEnemy->getPosition());
         _fightMoving = true;
         return 2;
     }
+#endif
+#if __HEURISTICS_IN_FIGHTMOVE__ > 2
     /// move towards target if we are "far enough from it"
-    if ((dist > 192.0 || (_unitsGroup->distToNearestChoke < 128.0 && !unit->getType().isFlyer() && dist > unit->getType().groundWeapon().maxRange() && _unitsGroup->enemiesAltitude > _unitsGroup->groupAltitude))  // 192 == 6 build tiles TOCHANGE
-        && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatencyFrames()))
+    if ((dist > 192.0 || (_unitsGroup->distToNearestChoke < 128.0 && !unit->getType().isFlyer() 
+		&& dist > unit->getType().groundWeapon().maxRange() && _unitsGroup->enemiesAltitude > _unitsGroup->groupAltitude)))  // 192 == 6 build tiles TOCHANGE
     {
         clickTarget();
         _fightMoving = true;
         return 3;
     }
+#endif
     /// Or simply move away from our friends and kite if we can
     if (targetEnemy != NULL && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected()
         && outRanges(targetEnemy) // don't kite it we don't outrange
@@ -2088,11 +2157,10 @@ bool BayesianUnit::dragMine()
 {
     if (Broodwar->enemy()->getRace() != Races::Terran)
         return false;
-    for (std::map<Unit*, Position>::const_iterator it = _unitsGroup->enemies.begin();
-        it != _unitsGroup->enemies.end(); ++it)
-    {
-        if (it->first && it->first->exists() && it->first->isVisible() 
-            && it->first->getType() == UnitTypes::Terran_Vulture_Spider_Mine && (it->first->getTarget() == unit || it->first->getOrderTarget() == unit))
+	for each (Unit* u in _targetingMe)
+	{
+        if (u && u->exists() && u->isVisible()
+            && u->getType() == UnitTypes::Terran_Vulture_Spider_Mine && (u->getTarget() == unit || u->getOrderTarget() == unit))
         {
             Vec dirOut = Vec(_unitPos.x() - _unitsGroup->center.x(), _unitPos.y() - _unitsGroup->center.y());
             unit->move(dirOut.translate(_unitPos));
@@ -2114,6 +2182,7 @@ void BayesianUnit::update()
 	assert(_unitsGroup != NULL);
     if (!unit || !unit->exists()) return;
 	if (_unitsGroup == NULL) return;
+	if (unit->isLoaded()) return; // TODO (loaded units are not focus firing and just displaced as potatoes)
 
     _unitPos = unit->getPosition();
     /// check() for all inherited classes

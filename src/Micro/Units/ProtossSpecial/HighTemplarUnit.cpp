@@ -26,6 +26,8 @@ void HighTemplarUnit::micro()
     int elapsed = Broodwar->getFrameCount() - _lastStormFrame;
     if (elapsed <= Broodwar->getLatencyFrames() + getAttackDuration())
         return;
+    if (Broodwar->getFrameCount() - _lastClickFrame <= Broodwar->getLatencyFrames())
+        return;
     if (((!Broodwar->self()->hasResearched(BWAPI::TechTypes::Psionic_Storm) && unit->getEnergy() < 75) || unit->getEnergy() < 20 /* TODO */ || (unit->getEnergy() < 74 && unit->getHitPoints() < 20) 
         || (unit->getEnergy() < 55 && unit->getShields() < 2)) && elapsed > Broodwar->getLatencyFrames() + getAttackDuration())
     {
@@ -56,13 +58,21 @@ void HighTemplarUnit::micro()
     if (this->unit->getEnergy() > 74 && elapsed > Broodwar->getLatencyFrames() + getAttackDuration())
     {   
         Position bestStormPos;
-        int bestScore = -1;
+        int bestScore = -1000;
+		int bestFartherScore = -1000;
+		Position bestFartherStormPos;
         if (elapsed > 128)
         {
+			// Search the best possible storm
             for (std::map<Position, int>::const_iterator it = _mapManager->stormPos.begin();
                 it != _mapManager->stormPos.end(); ++it)
             {
-                if (it->second > bestScore && _unitPos.getDistance(it->first) < 288.0 && (elapsed > 64 || _lastStormPos.getDistance(it->first) > 46))
+				if (it->second > bestFartherScore && _unitPos.getApproxDistance(it->first) < 512)
+				{
+					bestFartherScore = it->second;
+					bestFartherStormPos = it->first;
+				}
+                if (it->second > bestScore && _unitPos.getApproxDistance(it->first) < 288.0 && _lastStormPos.getDistance(it->first) > 46)
                 {
                     bestScore = it->second;
                     bestStormPos = it->first;
@@ -71,16 +81,25 @@ void HighTemplarUnit::micro()
         } 
         else
         {
+			// Search in reverse
             for (std::map<Position, int>::const_reverse_iterator it = _mapManager->stormPos.rbegin();
                 it != _mapManager->stormPos.rend(); ++it)
             {
-                if (it->second > bestScore && _unitPos.getDistance(it->first) < 288.0 && (elapsed > 64 || _lastStormPos.getDistance(it->first) > 46))
+				if (it->second > bestFartherScore && _unitPos.getApproxDistance(it->first) < 512)
+				{
+					bestFartherScore = it->second;
+					bestFartherStormPos = it->first;
+				}
+                if (it->second > bestScore && _unitPos.getApproxDistance(it->first) < 288.0 && _lastStormPos.getDistance(it->first) > 46)
                 {
                     bestScore = it->second;
                     bestStormPos = it->first;
                 }
             }
         }
+		// Move towards a better storm
+		if (bestFartherScore > 4 && bestFartherStormPos != bestStormPos)
+			target = bestFartherStormPos;
         // Storm only if it damages at least 2 units, or at least 1 invisible unit,
         // or there is only one enemy unit around us and we can storm it without collateral damages
         if (bestScore > 3 || (_unitsGroup->enemies.size() == 1 && bestScore == 3) && elapsed > 36) // elapsed hack to not restorm before the storm has been registered by MapManager
@@ -100,8 +119,6 @@ void HighTemplarUnit::micro()
     else
     {
         //fightMove();
-        if (Broodwar->getFrameCount() - _lastClickFrame <= Broodwar->getLatencyFrames())
-            return;
         if (_unitsGroup->distToNearestChoke < 128.0 && _unitsGroup->enemiesAltitude > _unitsGroup->groupAltitude)
         {
             clickTarget();
@@ -109,12 +126,18 @@ void HighTemplarUnit::micro()
         }
         else if (target == _unitPos)
         {
+			// We don't want our templars far from the units group center
+			_lastClickFrame = Broodwar->getFrameCount();
+			_lastMoveFrame = Broodwar->getFrameCount();
             this->move(_unitsGroup->center);
         }
         else
         {
             if (_unitPos.getDistance(target) > 192.0)
-                this->move(target);
+			{
+				clickTarget();
+                //this->move(target);
+			}
         }
     }
 }
