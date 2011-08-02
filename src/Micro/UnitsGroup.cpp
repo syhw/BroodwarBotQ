@@ -363,40 +363,42 @@ void UnitsGroup::update()
     if (!enemies.empty()) /// We fight, we'll see later for the goals, BayesianUnits switchMode automatically if enemies is not empty()
     {
         double force = evaluateForces();
-        if (force < 0.5) // TOCHANGE 0.75 (better micro+compo factor)
         {
-            // strategic withdrawal
-            for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
-            {
-                (*it)->target = Position(Broodwar->self()->getStartLocation());
-            }
-        }
-        else if (force > 1.5) // TOCHANGE 1.5
-        {
-            // we can be offensive, use our goal target
-        }
-        else // stand our ground or go up the ramp
-        {
-            for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
-            {
-				if (enemiesAltitude > groupAltitude 
-					&& (*it)->unit->getDistance(nearestChoke->getCenter()) < 6*TILE_SIZE)
-                {
-                    const std::pair<BWTA::Region*, BWTA::Region*> regions = nearestChoke->getRegions();
-                    BWTA::Region* higherRegion = 
-						(Broodwar->getGroundHeight(TilePosition(regions.first->getCenter())) > Broodwar->getGroundHeight(TilePosition(regions.second->getCenter())))
-                        ? regions.first : regions.second;
-					(*it)->unit->move(MapManager::Instance().regionsPFCenters[higherRegion]);
-					doNotUpdate.insert(*it);
-                }
-                else
-                    (*it)->target = (*it)->unit->getPosition();
-            }
-        }
-    }
-    else /// Let's do the goals now 
-    {
-        defaultTargetEnemy = NULL;
+			if (force < 0.8) // TOCHANGE 0.75 (better micro+compo factor)
+			{
+				// strategic withdrawal
+				for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+				{
+					(*it)->target = Position(Broodwar->self()->getStartLocation());
+				}
+			}
+			else if (force > 1.5) // TOCHANGE 1.5
+			{
+				// we can be offensive, use our goal target
+			}
+			else // stand our ground or go up the ramp
+			{
+				for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+				{
+					if (enemiesAltitude > groupAltitude 
+						&& (*it)->unit->getDistance(nearestChoke->getCenter()) < 6*TILE_SIZE)
+					{
+						const std::pair<BWTA::Region*, BWTA::Region*> regions = nearestChoke->getRegions();
+						BWTA::Region* higherRegion = 
+							(Broodwar->getGroundHeight(TilePosition(regions.first->getCenter())) > Broodwar->getGroundHeight(TilePosition(regions.second->getCenter())))
+							? regions.first : regions.second;
+						(*it)->unit->move(MapManager::Instance().regionsPFCenters[higherRegion]);
+						doNotUpdate.insert(*it);
+					}
+					else
+						(*it)->target = (*it)->unit->getPosition();
+				}
+			}
+		}
+	}
+	else /// Let's do the goals now 
+	{
+		defaultTargetEnemy = NULL;
     }
 
 #ifdef __DEBUG__

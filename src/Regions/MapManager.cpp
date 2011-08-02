@@ -20,19 +20,19 @@ MapManager::MapManager()
 				 FALSE,                 // initially not owned
 				 NULL))                  // unnamed mutex
 , _signalLaunchStormUpdate(CreateEvent( 
-						   NULL,
-						   FALSE,
-						   FALSE,
+						   NULL, // default sec
+						   FALSE, // manual reset?
+						   FALSE, // initial state
 						   TEXT("LaunchStormPosUpdate")))
 , _stormThread(NULL)
 , _pathfindingMutex(CreateMutex( 
 				 NULL,                  // default security attributes
 				 FALSE,                 // initially not owned
 				 NULL))                  // unnamed mutex
-, _signalLaunchPathfinding(CreateEvent( 
-						   NULL,
-						   FALSE,
-						   FALSE,
+, _signalLaunchPathfinding(CreateEvent(
+						   NULL, // default sec
+						   FALSE, // manual reset?
+						   FALSE, // initial state
 						   TEXT("LaunchPathfinding")))
 , _pathfindingThread(NULL)
 , _lastStormUpdateFrame(0)
@@ -830,10 +830,19 @@ void MapManager::update()
 	if (WaitForSingleObject(_pathfindingMutex, 0) == WAIT_OBJECT_0) // cannot enter when the thread is running
 	{
 		/// Fetch results if there are some
+		if (_currentPathfindWorkAborded)
+			_currentPathfindWork.bunit = NULL;
 		if (!_currentPathfindWorkAborded && _currentPathfindWork.bunit != NULL)
 		{
+			/*if (_currentPathfindWork.btpath.size() > _currentPathfindWork.bunit->btpath.size())
+			{
+				_currentPathfindWork.bunit->btpath.clear();
+				_currentPathfindWork.bunit->btpath.reserve(_currentPathfindWork.btpath.size());
+			}
+			copy(_currentPathfindWork.btpath.begin(), _currentPathfindWork.btpath.end(), _currentPathfindWork.bunit->btpath.begin());*/
 			_currentPathfindWork.bunit->btpath.swap(_currentPathfindWork.btpath);
 			_currentPathfindWork.bunit->newPath();
+			_currentPathfindWork.bunit = NULL;
 		}
 		_currentPathfindWorkAborded = false;
 
@@ -865,7 +874,7 @@ void MapManager::update()
 					(void*) this,                   // argument to thread function 
 					0,                      // use default creation flags 
 					&threadId);             // returns the thread identifier 
-				if (_stormThread == NULL)
+				if (_pathfindingThread == NULL)
 				{
 					Broodwar->printf("(MapManager) error creating thread");
 				}
@@ -1195,23 +1204,27 @@ void MapManager::drawBestStorms()
 
 ////// Pathfinding stuff //////
 
+/// Helper function for registering a building aware pathfinding task
 void MapManager::pathfind(BayesianUnit* ptr, BWAPI::TilePosition start, BWAPI::TilePosition end)
 {
 	registerPathfindWork(ptr, start, end, -1);
 }
 
+/// Helper function for registering a damages aware pathfinding task (NOT buildings aware, perhaps change...)
 void MapManager::threatAwarePathfind(BayesianUnit* ptr, BWAPI::TilePosition start, BWAPI::TilePosition end, int damages)
 {
 	registerPathfindWork(ptr, start, end, damages);
 }
 
+/// Removes all the pathfinding tasks from this unit, being it in the queue or the current task
+/// /!\ It is important to cancelPathfind when a BayesianUnit dies
 void MapManager::cancelPathfind(BayesianUnit* ptr)
 {
 	for (std::list<PathfindWork>::const_iterator it = _pathfindWorks.begin();
 		it != _pathfindWorks.end(); )
 	{
 		if (it->bunit == ptr)
-			_pathfindWorks.erase(it++); // it's defensive not to break
+			_pathfindWorks.erase(it++); // it's defensive not to use break here
 		else
 			++it;
 	}
@@ -1219,6 +1232,7 @@ void MapManager::cancelPathfind(BayesianUnit* ptr)
 		_currentPathfindWorkAborded = true;
 }
 
+/// Fills the PathfindWork struct with the appropriate parameters for the pathfinding thread to work on
 void MapManager::registerPathfindWork(BayesianUnit* ptr, BWAPI::TilePosition start, BWAPI::TilePosition end, int damages)
 {
 	TilePosition target(end);

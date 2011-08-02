@@ -695,7 +695,6 @@ void BayesianUnit::newPath()
         _ppath.push_back(Position(*it));
 }
 
-
 void BayesianUnit::updatePPath()
 {
 #ifndef __OUR_PATHFINDER__
@@ -726,15 +725,18 @@ void BayesianUnit::updatePPath()
 				mapManager->pathfind(this, TilePosition(_unitPos), TilePosition(target));
 		}
 
-        /// remove path points we passed
-        size_t count = 0;
-        for (; count < _ppath.size(); ++count) 
-        {
-            if (_ppath[count].getDistance(_unitPos) > _maxDistWhileRefreshingPath)
-				break;
-        }
-        for (; count > 0; --count) 
-            _ppath.erase(_ppath.begin());
+		if (!_ppath.empty())
+		{
+			/// remove path points we passed
+			size_t count = 0;
+			for (; count < _ppath.size(); ++count) 
+			{
+				if (_ppath[count].getDistance(_unitPos) > _maxDistWhileRefreshingPath)
+					break;
+			}
+			for (; count > 0; --count) 
+				_ppath.erase(_ppath.begin());
+		}
     }
 #else
     /*if (_unitPos.getDistance(target) < WALK_TILES_SIZE/2)
@@ -2087,6 +2089,8 @@ void BayesianUnit::update()
     if (!unit || !unit->exists()) return;
 	if (_unitsGroup == NULL) return;
 	if (unit->isLoaded()) return; // TODO (loaded units are not focus firing and just displaced as potatoes)
+	
+	this->drawBTPath();
 
     _unitPos = unit->getPosition();
     /// check() for all inherited classes
@@ -2106,7 +2110,7 @@ void BayesianUnit::update()
     if (_mode != MODE_FIGHT_G && _mode != MODE_FIGHT_A)
     {
         testIfBlocked();
-        if (_iThinkImBlocked && unit->isStuck())
+        if (_iThinkImBlocked) //&& unit->isStuck())
         {
             resumeFromBlocked();
             return;

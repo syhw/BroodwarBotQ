@@ -173,6 +173,7 @@ void MicroAIModule::onStart()
 
 void MicroAIModule::onFrame()
 {
+    mapManager->update();
 	TheArbitrator->update();
 	micro->update();
     if (Broodwar->getLastError() != BWAPI::Errors::None)
@@ -198,7 +199,6 @@ void MicroAIModule::onFrame()
 	}
 #endif
 
-    mapManager->update();
     //Broodwar->printf("weapons ground upgrade level %d", Broodwar->enemy()->getUpgradeLevel(UpgradeTypes::Protoss_Ground_Weapons));
     //Broodwar->printf("weapons ground upgrade level %d", eUnitsFilter->getViewedUnits().begin()->first->getUpgradeLevel(UpgradeTypes::Protoss_Ground_Weapons));
     //Broodwar->printf("%s", Broodwar->getLastError().toString().c_str());
