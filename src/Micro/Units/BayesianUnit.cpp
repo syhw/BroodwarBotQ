@@ -755,7 +755,7 @@ void BayesianUnit::updateObj()
 void BayesianUnit::updatePPath()
 {
 #ifndef __OUR_PATHFINDER__
-    if (unit->getHitPoints() + unit->getShields() < 81)
+    if (unit->getHitPoints() + unit->getShields() < 81) // why???
         return;
     double targetDistance = _unitPos.getDistance(target);
     Position p;

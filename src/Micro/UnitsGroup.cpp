@@ -359,10 +359,11 @@ void UnitsGroup::update()
         enemiesAltitude = round((double)enemiesAltitude / enemies.size());
     }
 
+	std::set<pBayesianUnit> doNotUpdate;
     if (!enemies.empty()) /// We fight, we'll see later for the goals, BayesianUnits switchMode automatically if enemies is not empty()
     {
         double force = evaluateForces();
-        if (force < 0.8) // TOCHANGE 0.8 (better micro+compo factor)
+        if (force < 0.5) // TOCHANGE 0.75 (better micro+compo factor)
         {
             // strategic withdrawal
             for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
@@ -378,14 +379,15 @@ void UnitsGroup::update()
         {
             for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
             {
-                if (enemiesAltitude > groupAltitude && nearestChoke)
+				if (enemiesAltitude > groupAltitude 
+					&& (*it)->unit->getDistance(nearestChoke->getCenter()) < 6*TILE_SIZE)
                 {
                     const std::pair<BWTA::Region*, BWTA::Region*> regions = nearestChoke->getRegions();
                     BWTA::Region* higherRegion = 
-						(Broodwar->getGroundHeight(TilePosition(regions.first->getCenter()))
-> Broodwar->getGroundHeight(TilePosition(regions.second->getCenter())))
+						(Broodwar->getGroundHeight(TilePosition(regions.first->getCenter())) > Broodwar->getGroundHeight(TilePosition(regions.second->getCenter())))
                         ? regions.first : regions.second;
-					(*it)->target = MapManager::Instance().regionsPFCenters[higherRegion];
+					(*it)->unit->move(MapManager::Instance().regionsPFCenters[higherRegion]);
+					doNotUpdate.insert(*it);
                 }
                 else
                     (*it)->target = (*it)->unit->getPosition();
@@ -406,9 +408,15 @@ void UnitsGroup::update()
     Broodwar->drawCircleMap((int)center.x(), (int)center.y(), (int)maxRadius + (int)maxRange +  32, Colors::Yellow);
 #endif
 
-	/// Update BayesiaUnits
+	/// Update BayesianUnits
     for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
-        (*it)->update();
+	{
+		if (doNotUpdate.count(*it))
+		{
+		}
+		else
+			(*it)->update();
+	}
 
 	/// Merge Templars if needed
     templarMergingStuff();
@@ -667,7 +675,7 @@ void UnitsGroup::updateCenter()
     groupAltitude = round((double)groupAltitude / units.size());
     if (nearestChoke)
         distToNearestChoke = nearestChoke->getCenter().getApproxDistance(center);
-    if ((!nearestChoke || distToNearestChoke > 256) && center.makeValid())
+    if ((!nearestChoke || distToNearestChoke > 8*TILE_SIZE) && center.makeValid())
     {
         nearestChoke = BWTA::getNearestChokepoint(center);
     }
