@@ -197,7 +197,11 @@ void Task::update()
 			break;
 		}
 	}
-	if (Broodwar->self()->minerals() < type.mineralPrice() - 24 // TODO complete with rates (distance*rate/speed)
+	if (
+#ifdef __BUILD_IN_ORDER_OF_INPUT__
+		TheBuilder->nextBuildingType() == type && // build in order
+#endif
+		Broodwar->self()->minerals() < type.mineralPrice() - 20 // TODO complete with rates (distance*rate/speed)
 		&& Broodwar->self()->gas() < type.gasPrice() - 15)
 		return;
 	else if (worker == NULL || !worker->exists())

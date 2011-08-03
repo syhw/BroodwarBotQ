@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include "Micro/UnitsGroup.h"
 #include <BWAPI.h>
-#include "Micro/WarManager.h"
-#include "../Formations/Formation.h"
 
 /***
  * A singleton which tracks count of created (in training / completed)

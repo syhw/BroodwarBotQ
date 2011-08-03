@@ -1,6 +1,10 @@
 #include <PrecompiledHeader.h>
 #include "Intelligence/ETechEstimator.h"	
 #include "enums_name_tables_tt.h"
+#include "Macro/Producer.h"
+#include "Macro/Builder.h"
+#include "Intelligence/Intelligence.h"
+#include "Macro/Macro.h"
 
 #define LEARNED_TIME_LIMIT 1080 // 18 minutes
 
@@ -16,6 +20,7 @@ ETechEstimator::ETechEstimator()
 	/// All code for the learning is here: https://github.com/SnippyHolloW/OpeningTech
 	{
 		// TODO Random case (load all, use the good one)
+		// do __NOT__ use Intelligence::Instance().enemyRace other wise infinite constructors loop and stack overflow and carnage ensues
 		Race enemyRace;
 		for (set<Player*>::const_iterator p = Broodwar->getPlayers().begin();
 			p != Broodwar->getPlayers().end(); ++p)
@@ -66,6 +71,9 @@ void ETechEstimator::onUnitDestroy(Unit* u)
 
 void ETechEstimator::onUnitShow(Unit* u)
 {
+	if (Broodwar->getFrameCount()/24 >= LEARNED_TIME_LIMIT)
+		return;
+
 	if (u->getPlayer()->isEnemy(Broodwar->self()))
 	{
 		int recomputeTime = 0;
@@ -91,7 +99,10 @@ void ETechEstimator::onUnitShow(Unit* u)
 			}
 		}
 		if (recomputeTime)
+		{
 			computeDistribOpenings(recomputeTime);
+			useDistribOpenings();
+		}
 	}
 }
 
@@ -407,6 +418,9 @@ bool ETechEstimator::insertBuilding(Unit* u)
 
 void ETechEstimator::computeDistribOpenings(int time)
 {
+	if (time >= LEARNED_TIME_LIMIT)
+		return;
+	
 	size_t nbXes = st.vector_X.size();
 	list<unsigned int> compatibleXes;
 	for (size_t i = 0; i < nbXes; ++i)
@@ -417,7 +431,7 @@ void ETechEstimator::computeDistribOpenings(int time)
 	long double runningSum = 0.0;
 	for (size_t i = 0; i < openingsProbas.size(); ++i)
 	{
-		long double sumX = 0.0000001;
+		long double sumX = 0.00000000000000000001;
 		for (list<unsigned int>::const_iterator it = compatibleXes.begin();
 			it != compatibleXes.end(); ++it)
 		{
@@ -461,4 +475,143 @@ bool ETechEstimator::testBuildTreePossible(int indBuildTree, const set<int>& set
             return false;
     }
     return true;
+}
+
+size_t indMax(const vector<long double>& t)
+{
+	long double max = -DBL_MAX;
+	size_t ret = 0;
+	for (size_t i = 0; i < t.size(); ++i)
+	{
+		if (t[i] > max)
+		{
+			max = t[i];
+			ret = i;
+		}
+	}
+	return ret;
+}
+
+set<size_t> supTo(const vector<long double>& t, long double minProb)
+{
+	set<size_t> ret;
+	for (size_t i = 0; i < t.size(); ++i)
+	{
+		if (t[i] > minProb)
+			ret.insert(i);
+	}
+	return ret;
+}
+
+/// TODO: move all that in appropriate methods for specific
+/// "reactions to some opening/strat/tactic" in the relevant managers
+/// (Bullshit talk (c))
+void ETechEstimator::useDistribOpenings()
+{
+	if (Broodwar->getFrameCount()/24 >= LEARNED_TIME_LIMIT)
+		return;
+	/// here we should now for sure the enemy's race as we have seen at least a building;
+	Race enemyRace = Intelligence::Instance().enemyRace;
+
+	size_t mostProbable = indMax(openingsProbas);
+	set<size_t> fearThese = supTo(openingsProbas, 0.20);
+#ifdef __BENS_LABELS__
+	int builtCannons = max(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Photon_Cannon), TheBuilder->willBuild(UnitTypes::Protoss_Photon_Cannon));
+	if (enemyRace == Races::Terran)
+	{
+		if (fearThese.count(2)) // VulturesHarass
+		{
+			TheProducer->produce(2, UnitTypes::Protoss_Observer, (int)(openingsProbas[2]*100));
+#ifdef __DEBUG__
+			Broodwar->printf("Producing observers bc of Vultures");
+#endif
+		}
+		if (fearThese.count(3)) // SiegeExpand
+		{
+			if (!Macro::Instance().expands)
+			{
+				TheBasesManager->expand();
+				Macro::Instance().expands += 1;
+			}
+		}
+		if (fearThese.count(5)) // FastDropship
+		{
+			while (builtCannons < 3 + 1*Macro::Instance().expands) 
+			{
+				TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
+				++builtCannons;
+			}
+#ifdef __DEBUG__
+			Broodwar->printf("Building cannons bc of Dropship");
+#endif
+		}
+	}
+	else if (enemyRace == Races::Protoss)
+	{
+		if (fearThese.count(1)) // FastDT
+		{
+			while (builtCannons < 3 + 1*Macro::Instance().expands) 
+			{
+				TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
+				++builtCannons;
+			}
+			TheProducer->produce(2, UnitTypes::Protoss_Observer, (int)(openingsProbas[1]*100));
+#ifdef __DEBUG__
+			Broodwar->printf("Building cannons bc of DTs");
+			Broodwar->printf("Producing observers bc of DTs");
+#endif
+		}
+		if (fearThese.count(3)) // ReaverDrop
+		{
+			while (builtCannons < 3 + 1*Macro::Instance().expands) 
+			{
+				TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
+				++builtCannons;
+			}
+#ifdef __DEBUG__
+			Broodwar->printf("Building cannons bc of ReaverDrop");
+#endif
+		}
+		if (fearThese.count(5)) // FastExpand
+		{
+			if (!Macro::Instance().expands)
+			{
+				TheBasesManager->expand();
+				Macro::Instance().expands += 1;
+			}
+		}
+	}
+	else if (enemyRace == Races::Zerg)
+	{
+		if (fearThese.count(0)) // TwoHatchMuta
+		{
+			while (builtCannons < 3 + 1*Macro::Instance().expands) 
+			{
+				TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
+				++builtCannons;
+			}
+#ifdef __DEBUG__
+			Broodwar->printf("Building cannons bc of 2H Mutas");
+#endif
+		}
+		if (fearThese.count(1)) // TwoHatchMuta
+		{
+			while (builtCannons < 3 + 1*Macro::Instance().expands) 
+			{
+				TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
+				++builtCannons;
+			}
+#ifdef __DEBUG__
+			Broodwar->printf("Building cannons bc of 3H Mutas");
+#endif
+		}
+		if (fearThese.count(5)) // TwoHatchMuta
+		{
+			TheProducer->produce(3, UnitTypes::Protoss_Observer, max((int)(openingsProbas[1]*100*2), 95));
+#ifdef __DEBUG__
+			Broodwar->printf("Producing observers bc of Lurkers");
+#endif
+		}
+	}
+#endif
 }

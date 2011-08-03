@@ -1,11 +1,13 @@
 #pragma once
 #include <PrecompiledHeader.h>
+#include "Defines.h"
 #include "Intelligence/EUnitsFilter.h"
+#ifdef __ETECH_ESTIMATOR__
 #include "Intelligence/ETechEstimator.h"
+#endif
 #include "Macro/InformationManager.h"
 #include "Regions/MapManager.h"
 #include "Intelligence/FirstScoutController.h"
-#include "Defines.h"
 
 class Intelligence : public CSingleton<Intelligence>
 {
@@ -15,9 +17,12 @@ class Intelligence : public CSingleton<Intelligence>
 	bool _launchedFirstScoutGoal;
 public:
 	EUnitsFilter* eUnitsFilter;
+#ifdef __ETECH_ESTIMATOR__
 	ETechEstimator* eTechEstimator;
+#endif
 	MapManager* mapManager;
 	bool enemyRush;
+	BWAPI::Race enemyRace;
 	void update();
     void onUnitCreate(BWAPI::Unit* u);
     void onUnitDestroy(BWAPI::Unit* u);

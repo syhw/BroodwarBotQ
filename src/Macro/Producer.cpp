@@ -67,7 +67,7 @@ Producer::~Producer()
 
 /*** 
  * Check if we can produce the given UnitType w.r.t. producing structures
- * AND tech buildings. Ask TheBuilder to build them otherwise.
+ * AND tech buildings. !!! Ask TheBuilder to build them otherwise. !!!
  */
 bool Producer::checkCanProduce(UnitType t)
 {

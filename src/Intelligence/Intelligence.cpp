@@ -13,15 +13,28 @@ using namespace BWAPI;
 Intelligence::Intelligence()
 : _launchedFirstScoutGoal(false)
 , enemyRush(false)
+, enemyRace(Races::Unknown)
 {
 	eUnitsFilter = & EUnitsFilter::Instance();
+#ifdef __ETECH_ESTIMATOR__
 	eTechEstimator = & ETechEstimator::Instance();
+#endif
 	mapManager = & MapManager::Instance();
+
+	/// This is not so dumb: for when Random will work
+	if (Broodwar->enemy()->getRace() == Races::Protoss)
+		enemyRace = Races::Protoss;
+	else if (Broodwar->enemy()->getRace() == Races::Terran)
+		enemyRace = Races::Terran;
+	else if (Broodwar->enemy()->getRace() == Races::Zerg)
+		enemyRace = Races::Zerg;
 }
 
 Intelligence::~Intelligence()
 {
+#ifdef __ETECH_ESTIMATOR__
     ETechEstimator::Destroy();
+#endif
     EUnitsFilter::Destroy();
     MapManager::Destroy();
 }
@@ -30,8 +43,10 @@ void Intelligence::update()
 {
 	eUnitsFilter->update();
 	mapManager->update();
+#ifdef __ETECH_ESTIMATOR__
 #ifdef __DEBUG__
 	eTechEstimator->onFrame();
+#endif
 #endif
 	if (Broodwar->enemy()->getRace() == Races::Protoss)
 	{
@@ -75,21 +90,30 @@ void Intelligence::onUnitCreate(Unit* u)
 void Intelligence::onUnitDestroy(Unit* u)
 {
 	eUnitsFilter->onUnitDestroy(u);
+#ifdef __ETECH_ESTIMATOR__
 	eTechEstimator->onUnitDestroy(u);
+#endif
 	mapManager->onUnitDestroy(u);
 }
 
 void Intelligence::onUnitShow(Unit* u)
 {
+	if (enemyRace == Races::Unknown && u->getPlayer() == Broodwar->enemy())
+		enemyRace = u->getType().getRace(); // the first enemy unit we see have to be the enemy's race
+
 	eUnitsFilter->onUnitShow(u);
+#ifdef __ETECH_ESTIMATOR__
 	eTechEstimator->onUnitShow(u);
+#endif
 	mapManager->onUnitShow(u);
 }
 
 void Intelligence::onUnitHide(Unit* u)
 {
 	eUnitsFilter->onUnitHide(u);
+#ifdef __ETECH_ESTIMATOR__
 	eTechEstimator->onUnitHide(u);
+#endif
 	mapManager->onUnitHide(u);
 }
 

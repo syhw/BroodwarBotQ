@@ -47,17 +47,30 @@ void Macro::init()
 		TheWorkerManager->enableAutoBuild();
 		if (Broodwar->enemy()->getRace() == Races::Zerg)
 		{
+			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 8);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 10);
+			TheBasesManager->setFirstGasPop(12);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 14);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 16);
+			//TheUpgrader->upgrade(UpgradeTypes::Singularity_Charge);
 		}
 		else if (Broodwar->enemy()->getRace() == Races::Terran)
 		{
+			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 8);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 10);
+			TheBasesManager->setFirstGasPop(12);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 14);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 15);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 17);
+			//TheUpgrader->upgrade(UpgradeTypes::Singularity_Charge);
 		}
 		else
 		{
 			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 8);
 			TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 10);
 			TheBasesManager->setFirstGasPop(12);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 14);
 			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 16);
-			TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 18);
 			//TheUpgrader->upgrade(UpgradeTypes::Singularity_Charge);
 		}
 	}
@@ -95,7 +108,7 @@ void Macro::update()
 
 	TheArbitrator->update();
 
-	if (!expands && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 2)
+	if (!expands && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 6)
 	{
 		++expands;
 		TheBasesManager->expand();
@@ -173,11 +186,17 @@ void Macro::onUnitCreate(BWAPI::Unit* unit)
 		{
 			/// 1st Gateway (in a "< 19 supply" sense)
 			if (Broodwar->self()->supplyUsed() < 40)
-				TheProducer->produce(2, UnitTypes::Protoss_Zealot, 50);
-			/// 3rd Gateway
-			if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway) > 2
+			{
+				if (Broodwar->enemy()->getRace() == Races::Zerg)
+					TheProducer->produce(2, UnitTypes::Protoss_Zealot, 50);
+			}
+			/// 3rd Gateway and oponent not Terran -> forge
+			if (Broodwar->enemy()->getRace() != Races::Terran
+				&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway) > 2
 				&& !Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Forge))
+			{
 				TheBuilder->build(UnitTypes::Protoss_Forge);
+			}
 		}
 	}
 }

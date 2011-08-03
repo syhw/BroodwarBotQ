@@ -10,6 +10,7 @@ class Micro : public CSingleton<Micro>
 	friend class CSingleton<Micro>;
 	Micro();
 	~Micro();
+	bool _launchedFirstPush;
 public:
 	GoalManager* goalManager;
 	std::set<BWTA::Chokepoint*> ourChokes;

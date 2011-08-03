@@ -189,10 +189,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\Micro\Micro.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\src\MicroDll.cpp"
 				>
 				<FileConfiguration
@@ -436,10 +432,6 @@
 			</File>
 			<File
 				RelativePath="..\src\Regions\MapManager.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\Micro\Micro.h"
 				>
 			</File>
 			<File

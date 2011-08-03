@@ -17,10 +17,10 @@ class Macro: public CSingleton<Macro>
 	Macro();
 	~Macro();
     Arbitrator::Arbitrator<BWAPI::Unit*,double> arbitrator;
-	int expands;
 	int addedGates;
 
 public:
+	int expands;
 	int reservedMinerals;
 	int reservedGas;
 	void buildOrderAdd(BWAPI::UnitType type);

@@ -8,8 +8,8 @@
 #include "Regions/MapManager.h"
 #include "Regions/Regions.h"
 #include "Micro/UnitsGroup.h"
+#include "Micro/Goals/GoalManager.h"
 #include "Macro/UnitGroupManager.h"
-#include "Micro/Micro.h"
 #include "Macro/Arbitrator.h"
 
 static bool analyzed;
@@ -26,9 +26,7 @@ public:
     Regions* regions;
     UnitGroupManager * unitGroupManager;
     Arbitrator::Arbitrator<BWAPI::Unit*,double> arbitrator;
-	
-    Micro* micro;
-
+    GoalManager* goalManager;
     bool enemiesFound;
     BWAPI::TilePosition eStartLocation;
     MicroAIModule();

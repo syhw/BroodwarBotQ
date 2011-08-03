@@ -33,7 +33,7 @@ void MicroAIModule::onStart()
     this->eUnitsFilter = & EUnitsFilter::Instance();
     this->mapManager = & MapManager::Instance();
 	this->unitGroupManager = UnitGroupManager::create();
-	micro = & Micro::Instance();
+	goalManager = & GoalManager::Instance();
 	TheArbitrator = & arbitrator;
 
     std::string mapName = Broodwar->mapPathName();
@@ -167,7 +167,7 @@ void MicroAIModule::onStart()
             Position(Broodwar->mapWidth()/2*32, 50*32), 40)));
     }
 
-	micro->goalManager->addGoals(goals);
+	goalManager->addGoals(goals);
 
 }
 
@@ -175,7 +175,7 @@ void MicroAIModule::onFrame()
 {
     mapManager->update();
 	TheArbitrator->update();
-	micro->update();
+	goalManager->update();
     if (Broodwar->getLastError() != BWAPI::Errors::None)
         Broodwar->printf("LAST ERROR: %s", Broodwar->getLastError().toString().c_str());
     
@@ -215,7 +215,7 @@ MicroAIModule::MicroAIModule()
 void MicroAIModule::onEnd(bool isWinner)
 {
     MapManager::Destroy();
-	Micro::Destroy();
+	GoalManager::Destroy();
 #ifdef __LEARNING_PROB_TABLES__ ////////// Auto restart games
 	myRestartGame();
 #endif
@@ -257,20 +257,19 @@ void MicroAIModule::onSendText(std::string text)
 void MicroAIModule::onUnitCreate(Unit* unit)
 {
     mapManager->onUnitCreate(unit);
-	micro->onUnitCreate(unit);
+	goalManager->onUnitCreate(unit);
 }
 
 void MicroAIModule::onUnitDestroy(Unit* unit)
 {
 	TheArbitrator->onRemoveObject(unit);
-    micro->onUnitDestroy(unit);
+    goalManager->onUnitDestroy(unit);
     eUnitsFilter->onUnitDestroy(unit);
     mapManager->onUnitDestroy(unit);
 }
 
 void MicroAIModule::onUnitShow(Unit* unit)
 {
-    micro->onUnitShow(unit);
     eUnitsFilter->onUnitShow(unit);
     mapManager->onUnitShow(unit);
     unitGroupManager->onUnitDiscover(unit);
