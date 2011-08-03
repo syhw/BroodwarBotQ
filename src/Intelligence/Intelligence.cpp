@@ -51,6 +51,12 @@ void Intelligence::update()
 			&& eUnitsFilter->getNumbersType(UnitTypes::Zerg_Spawning_Pool))
 				enemyRush = true;
 	}
+#ifdef __DEBUG__
+	if (enemyRush)
+		Broodwar->drawTextScreen(585, 20, "RUSH");
+	else
+		Broodwar->drawTextScreen(585, 20, "safe");
+#endif
 }
 
 void Intelligence::onUnitCreate(Unit* u)
