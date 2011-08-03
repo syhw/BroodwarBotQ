@@ -30,7 +30,7 @@
 //using boost::math::normal;
 
 #define __NEW_COMPUTE_REPULSE__
-#define __HEURISTICS_IN_FIGHTMOVE__ 0 // level of heuristic(s)
+#define __HEURISTICS_IN_FIGHTMOVE__ 1 // level of heuristic(s)
 #define __OUTER_NON_ATOMIC_DIRV__ // accept to do "non atomic w.r.t. Broodwar directions" moves/clicks (BW pathfinder can be called, drama ensues), useful to pass big buildings
 //#define __OUR_PATHFINDER__
 //#define __EXACT_OBJ__
