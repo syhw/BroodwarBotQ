@@ -13,10 +13,14 @@ int round(double a)
 
 using namespace BWAPI;
 
+//#define __LEADING_UNIT_BY_SIZE_HP__
 #define __MAX_DISTANCE_TO_GROUP__ 512
 
 UnitsGroup::UnitsGroup()
-: defaultTargetEnemy(NULL)
+: nonFlyers(0)
+, defaultTargetEnemy(NULL)
+, groupTargetPosition(Positions::None)
+, distToTarget(-1.0)
 , nearestChoke(NULL)
 , _totalHP(0)
 , _totalMinPrice(0)
@@ -253,15 +257,8 @@ void BasicUnitsGroup::update()
 	    (*it)->update();
 }
 
-void UnitsGroup::update()
+void UnitsGroup::updateArrivingUnits()
 {
-#ifdef __DEBUG__
-    clock_t start = clock();
-#endif
-	if (units.empty())
-		return;
-
-	/// Update arriving units
     if (!arrivingUnits.empty())
     {
         if (units.size() <= 3)
@@ -285,27 +282,78 @@ void UnitsGroup::update()
                 }
                 else
                 {
-                    (*it)->target = center;
-                    (*it)->update();
+					// we want them to merge with us, not to go alone to the groupTargetPosition
+					// but they can interpolate our position a little before tracking
+					// very dumb small heuristic (could be a real interpolation)
+					if (groupTargetPosition != Positions::None)
+					{
+						if ((*it)->unit->getType().isFlyer())
+						{
+							if (center.getApproxDistance(groupTargetPosition) > (*it)->unit->getDistance(groupTargetPosition)) // do not go before the group
+								(*it)->target = center;
+							else // fully interpolate (without even taking any speed into account, because at worst we will arrive at the case above)
+								(*it)->target = groupTargetPosition;
+						}
+						else // by ground, a little more complicated
+						{
+							BWTA::Region* r1 = BWTA::getRegion((*it)->unit->getTilePosition());
+							BWTA::Region* r2 = BWTA::getRegion(TilePosition(groupTargetPosition));
+							if (r1 && r2)
+							{
+								double tmpDist = MapManager::Instance().distRegions[r1][r2];
+								if (tmpDist < distToTarget) // we want to come from behind the group)
+									(*it)->target = center;
+								else
+								{
+									// see the max lookup we can do in the path of the unitsgroup (to come from behind him, path-wise)
+									// without taking the geometry of the path into account
+									double diff = distToTarget - tmpDist;
+									size_t lookup = (size_t)(diff / 32);
+									while (!(ppath.size() > lookup) && lookup > 0)
+										--lookup;
+									if (!lookup)
+										(*it)->target = center;
+									else
+										(*it)->target = ppath[lookup - 1];
+								}
+							}
+							else
+								(*it)->target = center;
+						}
+					}
+					else
+						(*it)->target = center;
+					(*it)->update();
                     ++it;
                 }
             }
         }
     }
+}
 
-    updateCenter(); // the center will drift towards the arriving units TOFIX TODO
-
-	/// Choose a non flying leadingUnit
+void UnitsGroup::chooseLeadingUnit()
+{
     leadingUnit = units.front();
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     { 
-        if ((*it)->unit->getType().isFlyer())
+		UnitType ut = (*it)->unit->getType();
+		if (ut.isFlyer() || !ut.canAttack())
             continue;
-        if ((leadingUnit->unit->getType().size() < (*it)->unit->getType().size() 
-            || ( leadingUnit->unit->getType().size() == (*it)->unit->getType().size() && 
+#ifdef __LEADING_UNIT_BY_SIZE_HP__
+        if ((leadingUnit->unit->getType().size() < ut.size() 
+            || ( leadingUnit->unit->getType().size() == ut.size() && 
                  leadingUnit->unit->getDistance(center) > (*it)->unit->getDistance(center) )) && (leadingUnit->unit->getHitPoints() + leadingUnit->unit->getShields() > 100)
             )
             leadingUnit = *it;
+#else
+		/// take the closest unit to the target which has the closest attack range
+		if (((ppath.size() > 2 && (*it)->unit->getDistance(ppath[2]) < leadingUnit->unit->getDistance(ppath[2]))
+			|| (ppath.size() > 1 && (*it)->unit->getDistance(ppath[1]) < leadingUnit->unit->getDistance(ppath[1]))
+		    || (!ppath.empty() && (*it)->unit->getDistance(ppath[0]) < leadingUnit->unit->getDistance(ppath[0]))
+			|| (ppath.empty() && (*it)->unit->getDistance(groupTargetPosition) < leadingUnit->unit->getDistance(groupTargetPosition)))
+			&& ut.groundWeapon().maxRange() <= leadingUnit->unit->getType().groundWeapon().maxRange())
+			leadingUnit = *it;
+#endif
     }
     if (leadingUnit != NULL && leadingUnit->unit->exists()) // defensive prog
     {
@@ -313,11 +361,29 @@ void UnitsGroup::update()
         if (!leadingUnit->getPPath().empty())
             ppath = leadingUnit->getPPath();
     }
+}
+
+void UnitsGroup::update()
+{
+#ifdef __DEBUG__
+    clock_t start = clock();
+#endif
+	if (units.empty())
+		return;
+
+	/// Update arriving units
+	updateArrivingUnits();
+
+	/// Update the center of the group
+    updateCenter(); // the center will drift towards the arriving units TOFIX TODO
+
+	/// Choose a non flying leadingUnit
+	chooseLeadingUnit();
 
 	//// Update maxRange and _totalHP
     this->_totalHP = 0;
     double maxRange = -1.0;
-    /*** TODO BUG IN SquareFormation TODO TODO TODO volatile bool contactUnits = false; // why do I need volatile to make it work not erratically? */
+    /*** TODO BUG IN SquareFormation, check it ***/
     for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     {
         /*** TODO BUG IN SquareFormation TODO TODO TODO
@@ -343,23 +409,7 @@ void UnitsGroup::update()
     updateNearbyEnemyUnitsFromFilter(center, maxRadius + maxRange + 92); // possibly hidden units, could be taken from onUnitsShow/View asynchronously for more efficiency
 
     /// Update enemiesCenter / enemiesAltitude
-    if (enemies.size () != 0)
-    {
-        enemiesCenter = Position(0, 0);
-        enemiesAltitude = 0;
-        for (std::map<Unit*, Position>::const_iterator it = enemies.begin();
-            it != enemies.end(); ++it)
-        {
-            enemiesCenter += it->second;
-            if (!(it->first->getType().isFlyer()))
-                enemiesAltitude += BWAPI::Broodwar->getGroundHeight(TilePosition(it->second));
-        }
-        enemiesCenter.x() /= enemies.size();
-        enemiesCenter.y() /= enemies.size();
-        if (!enemiesCenter.isValid())
-            enemiesCenter.makeValid();
-        enemiesAltitude = round((double)enemiesAltitude / enemies.size());
-    }
+	updateEnemiesCenter();
 
 	std::set<pBayesianUnit> doNotUpdate;
     if (!enemies.empty()) /// We fight, we'll see later for the goals, BayesianUnits switchMode automatically if enemies is not empty()
@@ -389,8 +439,8 @@ void UnitsGroup::update()
 						BWTA::Region* higherRegion = 
 							(Broodwar->getGroundHeight(TilePosition(regions.first->getCenter())) > Broodwar->getGroundHeight(TilePosition(regions.second->getCenter())))
 							? regions.first : regions.second;
-						(*it)->unit->move(MapManager::Instance().regionsPFCenters[higherRegion]);
-						doNotUpdate.insert(*it);
+						//(*it)->unit->move(MapManager::Instance().regionsPFCenters[higherRegion]);
+						//doNotUpdate.insert(*it);
 					}
 					else
 						(*it)->target = (*it)->unit->getPosition();
@@ -398,10 +448,6 @@ void UnitsGroup::update()
 			}
 		}
 	}
-	else /// Let's do the goals now 
-	{
-		defaultTargetEnemy = NULL;
-    }
 
 #ifdef __DEBUG__
     displayTargets();
@@ -420,22 +466,9 @@ void UnitsGroup::update()
     templarMergingStuff();
 }
 
-void UnitsGroup::attack(int x, int y)
-{
-    attack(Position(x, y));
-}
-
-void UnitsGroup::attack(BWAPI::Position& p)
-{
-    for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); it++)
-    {
-        (*it)->target = p;
-        //(*it)->attack(p); // TODO, for the moment, each unit keeps a path, needs to be 1 unit per UnitsGroup + flocking
-    }
-}
-
 void UnitsGroup::move(BWAPI::Position& p)
 {
+	groupTargetPosition = p;
     for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); it++)
         (*it)->target = p;
 }
@@ -444,6 +477,7 @@ void UnitsGroup::formation(pFormation f)
 {
     if (units.empty())
         return;
+	groupTargetPosition = f->center.toPosition();
     std::vector<BWAPI::Position> from;
     for(std::vector<pBayesianUnit>::iterator it = units.begin(); it != units.end(); it++)
     {
@@ -516,6 +550,8 @@ void UnitsGroup::activeUnit(pBayesianUnit bu)
 void UnitsGroup::dispatchCompleteUnit(pBayesianUnit bu)
 {
 	bu->setUnitsGroup(this);
+	if (!bu->getType().isFlyer()) // ugly
+		++nonFlyers;
 	if (bu->unit->getPosition().getApproxDistance(center) < __MAX_DISTANCE_TO_GROUP__ || units.empty())
 		activeUnit(bu);
     else
@@ -528,13 +564,15 @@ void UnitsGroup::dispatchCompleteUnit(pBayesianUnit bu)
     }
 }
 
-bool BasicUnitsGroup::removeUnit(Unit* u)
+bool UnitsGroup::removeUnit(Unit* u)
 {
     for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
         if ((*it)->unit == u)
         {
 			(*it)->dettachGroup();
             units.erase(it);
+			if (!u->getType().isFlyer()) // ugly
+				--nonFlyers;
 			return true;
         }
 	return false;
@@ -547,6 +585,8 @@ bool UnitsGroup::removeArrivingUnit(Unit* u)
         if ((*it)->unit == u)
         {
             arrivingUnits.erase(it);
+			if (!u->getType().isFlyer()) // ugly
+				--nonFlyers;
 			return true;
         }
 	return false;
@@ -689,6 +729,42 @@ void UnitsGroup::updateCenter()
         sum += (dist * dist);
     }
     stdDevRadius = sqrt((1/units.size()) * sum); // 1/(units.size() - 1) for the sample std dev
+
+	/// update the distToTarget with the new center by using precomputer pathfinding distances
+	if (groupTargetPosition == TilePositions::None)
+		return;
+	if (!nonFlyers)
+		distToTarget = center.getApproxDistance(groupTargetPosition);
+	else
+	{
+		BWTA::Region* r1 = BWTA::getRegion(TilePosition(center));
+		BWTA::Region* r2 = BWTA::getRegion(TilePosition(groupTargetPosition));
+		if (r1 && r2 && r1 != r2)
+			distToTarget = MapManager::Instance().distRegions[r1][r2]; // Note: distToTarget = -1 if we can't go by group from r1 to r2
+		else
+			distToTarget = center.getApproxDistance(groupTargetPosition); // same regions, or regions fucked up
+	}
+}
+
+void UnitsGroup::updateEnemiesCenter()
+{
+    if (enemies.size () != 0)
+    {
+        enemiesCenter = Position(0, 0);
+        enemiesAltitude = 0;
+        for (std::map<Unit*, Position>::const_iterator it = enemies.begin();
+            it != enemies.end(); ++it)
+        {
+            enemiesCenter += it->second;
+            if (!(it->first->getType().isFlyer()))
+                enemiesAltitude += BWAPI::Broodwar->getGroundHeight(TilePosition(it->second));
+        }
+        enemiesCenter.x() /= enemies.size();
+        enemiesCenter.y() /= enemies.size();
+        if (!enemiesCenter.isValid())
+            enemiesCenter.makeValid();
+        enemiesAltitude = round((double)enemiesAltitude / enemies.size());
+    }
 }
 
 Position UnitsGroup::getCenter() const

@@ -28,7 +28,10 @@ void SeeSubgoal::tryToRealize()
 
 double SeeSubgoal::distanceToRealize()
 {
-	/// Does not use pathfinding and so is not very precise
+	if (!_unitsGroup)
+		return -1.0;
+	if (_unitsGroup->distToTarget > 0.0) // _unitsGroup not in the same region as its target and distToTarget has been initialized
+		return _unitsGroup->distToTarget;
 	return _unitsGroup->getDistance(_pos); 
 }
 

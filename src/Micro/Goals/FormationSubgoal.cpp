@@ -32,6 +32,11 @@ void FormationSubgoal::tryToRealize()
 
 double FormationSubgoal::distanceToRealize()
 {
+	if (!_unitsGroup)
+		return -1.0;
+	if (_unitsGroup->distToTarget > 0.0) // _unitsGroup not in the same region as its target and distToTarget has been initialized
+		return _unitsGroup->distToTarget;
+	// else
     Position p = Position((int)formation->mean.x, (int)formation->mean.y);
-    return p.getApproxDistance(_unitsGroup->center);
+	return _unitsGroup->getDistance(p);
 }

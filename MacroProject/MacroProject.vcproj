@@ -459,6 +459,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\src\Micro\Goals\DropGoal.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\src\Micro\Goals\ExploreGoal.cpp"
 						>
 					</File>
@@ -794,6 +798,10 @@
 					</File>
 					<File
 						RelativePath="..\src\Micro\Goals\AvoidNukeGoal.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Goals\DropGoal.h"
 						>
 					</File>
 					<File

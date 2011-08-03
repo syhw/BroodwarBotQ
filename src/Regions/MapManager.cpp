@@ -119,7 +119,7 @@ MapManager::MapManager()
 	}
 
 	/// Fill distRegions with the mean distance between each Regions
-	/// -1 is the 2 Regions are not mutualy/inter accessible by ground
+	/// -1 if the 2 Regions are not mutualy/inter accessible by ground
 	for (std::set<BWTA::Region*>::const_iterator it = allRegions.begin();
 		it != allRegions.end(); ++it)
 	{
@@ -134,7 +134,8 @@ MapManager::MapManager()
 		}
 	}
 
-	/// search the centers of all regions
+	/// Search the "flooding" centers of all the regions
+	/// by flooding from polygon edges
 	for (std::set<BWTA::Region*>::const_iterator it = allRegions.begin();
 		it != allRegions.end(); ++it)
 	{

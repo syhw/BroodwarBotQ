@@ -125,7 +125,7 @@ void DragoonUnit::micro()
     else if (unit->getGroundWeaponCooldown() > Broodwar->getLatencyFrames()*2 + 1 // == (Broodwar->getLatencyFrames()+1)*2, safety
 		|| unit->getGroundWeaponCooldown() == unit->getType().groundWeapon().damageCooldown()) // against really laggy games TODO in other units
     {
-		if (currentFrame - _lastClickFrame <= Broodwar->getLatencyFrames() + 1) /// HACK TODO remove/change
+		if (currentFrame - _lastClickFrame <= Broodwar->getLatencyFrames() + 3) /// HACK TODO remove/change
 			return;                                                             /// HACK TODO remove/change
         if (_fleeing)
         {

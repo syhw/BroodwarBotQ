@@ -9,7 +9,8 @@ class DropGoal: public Goal
 {
 private:
 	void createMidSubgoal();
+	BWAPI::Position _dropPos;
 public:
-	DropGoal(BWAPI::Position p, const std::map<BWAPI::UnitType, int>& nU, int priority)
+	DropGoal(BWAPI::Position p, const std::map<BWAPI::UnitType, int>& nU, int priority);
 	void achieve();
 };

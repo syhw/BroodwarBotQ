@@ -39,7 +39,7 @@ FirstScoutGoal::FirstScoutGoal(int priority)
 	_nextBase = getNearestBL(Broodwar->self()->getStartLocation(), _notSeenStartLocations);
 	if (_nextBase != NULL)
 		_nextToVisit = _nextBase->getTilePosition();
-	_unitsGroup.switchMode(MODE_SCOUT);
+	_unitsGroup.switchMode(MODE_SCOUT); // will use the scouting unit as leading units and update its path with threat aware pathfinding
 }
 
 void FirstScoutGoal::achieve()

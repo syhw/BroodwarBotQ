@@ -21,9 +21,12 @@ double KillSubgoal::distanceToRealize()
 void KillSubgoal::tryToRealize()
 {
 	/// If we call tryToRealize on a "-1" distanceToRealize Subgoal
-	/// it should be the last and only Subgoal
+	/// it should be the last and only Subgoal of the Goal
 	if (_target->isVisible())
-		_unitsGroup->attack(_target->getPosition());
+	{
+		_unitsGroup->move(_target->getPosition());
+		_unitsGroup->defaultTargetEnemy = _target;
+	}
 	else
-		_unitsGroup->attack(TheInformationManager->getLastPosition(_target));
+		_unitsGroup->move(TheInformationManager->getLastPosition(_target));
 }

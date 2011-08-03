@@ -162,8 +162,7 @@ void BayesianUnit::computeRepulseValues()
                 continue;
             if ((*it)->getType().isBuilding())
                 continue;
-            if (_mode == MODE_FIGHT_A)
-			/// repulse on actual units positions (against splash damage)
+            if (_mode == MODE_FIGHT_A) /// repulse on actual units positions (against splash damage)
             { // dumb/quickfix
                 double otherMaxDiag = 1.4143 * 
 					max((*it)->getType().dimensionDown() 
@@ -254,9 +253,9 @@ void BayesianUnit::switchMode(unit_mode um)
             //unit->holdPosition();
             break;
         case MODE_SCOUT:
-            if (Broodwar->getFrameCount() - _lastClickFrame 
+            /*if (Broodwar->getFrameCount() - _lastClickFrame 
 					> Broodwar->getLatencyFrames())
-                clickTarget();
+                clickTarget();*/
 #ifdef __DEBUG__
             Broodwar->printf("Switch SCOUT!");
 #endif
@@ -367,18 +366,18 @@ void BayesianUnit::updateAttractors()
 #endif
     if (_mode != MODE_SCOUT)
     {
-        computeRepulseValues();
+        computeRepulseValues(); // other units
         //drawRepulseValues();
     }
     if (_mode != MODE_INPOS)
     {
-        computeDamageValues();
+        computeDamageValues(); // damage map influence
     }
 
     if (unit->getType().isFlyer())
         return;
 
-    // buildings and blocking attraction (repulsion)
+    // buildings and blocking attraction (repulsion), only for ground units
     const int width = Broodwar->mapWidth();
     Position up = _unitPos;
     for (size_t i = 0; i < _dirv.size(); ++i)
@@ -666,7 +665,7 @@ void BayesianUnit::updateObj()
     {
         if (_fleeing) /// fleeing gradient influence
         {
-			// the damage maps / gradients are BuildTile resolution, too big
+			// the damage maps / gradients are BuildTile resolution, too big for small units to use
             if (unit->getType().size() == UnitSizeTypes::Small)
             {
                 obj = Vec(0, 0);
@@ -680,10 +679,19 @@ void BayesianUnit::updateObj()
         }
         else /// target influence
         {
-            if (unit->isMoving() && _fightMoving) //& _lastRightClick == target)
+            if (unit->isMoving() && _fightMoving) //& _lastRightClick == target) // steering
                 obj = Vec(unit->getVelocityX(), unit->getVelocityY());
             else if (_unitPos.getDistance(target) < 1.0)
                 obj = Vec(0, 0);
+			else if (_unitsGroup && !_unitsGroup->ppath.empty())
+			{
+				if (_unitsGroup->ppath.size() > 2)
+					obj = Vec(_unitsGroup->ppath[2].x() - _unitPos.x(), _unitsGroup->ppath[2].y() - _unitPos.y());
+				if (_unitsGroup->ppath.size() > 1)
+					obj = Vec(_unitsGroup->ppath[1].x() - _unitPos.x(), _unitsGroup->ppath[1].y() - _unitPos.y());
+				else
+					obj = Vec(_unitsGroup->ppath[0].x() - _unitPos.x(), _unitsGroup->ppath[0].y() - _unitPos.y());
+			}
             else
                 obj = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y());
         }
@@ -2125,16 +2133,16 @@ void BayesianUnit::update()
     switch (_mode)
     {
     case MODE_SCOUT:
-        if (_unitsGroup->enemies.empty())
+        /*if (_unitsGroup->enemies.empty())
         {
             if (_lastRightClick != target || Broodwar->getFrameCount() - _lastClickFrame > 47)
                 clickTarget();
         }
         else
-        {
+        {*/
             updateDir();
             clickScout();
-        }
+        //}
         break;
 
     case MODE_INPOS:       
@@ -2162,7 +2170,7 @@ void BayesianUnit::update()
             return;
         }
         micro();
-        break;
+        break;;
 
     case MODE_FIGHT_A:
         if (_unitsGroup->enemies.empty())

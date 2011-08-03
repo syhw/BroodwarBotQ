@@ -49,7 +49,6 @@ struct BasicUnitsGroup // should derive from vector<pBayesianUnit>
 {
 	std::vector<pBayesianUnit> units;
 	virtual void update();
-    bool removeUnit(BWAPI::Unit* u);
 	bool emptyUnits();
     int size() const;
 };
@@ -68,17 +67,21 @@ private:
     inline void updateNearbyEnemyUnitsFromFilter(BWAPI::Position p, double radius = 400.0);
     double evaluateForces();
 	inline void activeUnit(pBayesianUnit bu);
+    bool removeUnit(BWAPI::Unit* u);
     bool removeArrivingUnit(BWAPI::Unit* u);
 #ifndef __RELEASE_OPTIM__
     void displayTargets();  // debug purpose
 #endif
 public:
 	/// Units tools / units intercommunication
+	int nonFlyers;
     std::list<pBayesianUnit> arrivingUnits;
     std::vector<BWAPI::Position> ppath;
     UnitDmgBimap unitDamages;
     pBayesianUnit leadingUnit;
     BWAPI::Unit* defaultTargetEnemy;
+	BWAPI::Position groupTargetPosition;
+	double distToTarget;
     BWTA::Chokepoint* nearestChoke;
     double distToNearestChoke;
     Vec centerSpeed;
@@ -100,8 +103,6 @@ public:
 	void display();
 #endif
 	/// Group interaction/orders
-	void attack(int x, int y);
-	void attack(BWAPI::Position& p);
 	void move(BWAPI::Position& p);
 	virtual void formation(pFormation f);
 	void switchMode(unit_mode um);
@@ -114,7 +115,10 @@ public:
     virtual void onUnitShow(BWAPI::Unit* u);
     virtual void onUnitHide(BWAPI::Unit* u);
 	/// Updaters of info
+	inline void updateArrivingUnits();
+	inline void chooseLeadingUnit();
 	inline void updateCenter();
+	inline void updateEnemiesCenter();
 	inline void updateGroupStrengh(BWAPI::Unit* u);
 	/// Getters
     virtual BWAPI::Position getCenter() const;
