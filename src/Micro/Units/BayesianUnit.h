@@ -104,6 +104,7 @@ protected:
     int _lastAttackFrame;
     int _lastMoveFrame;
     int _lastClickFrame;
+    int _lastRefreshPathRequest;
     double _maxDiag;
     int _maxWeaponsRange;
     BWAPI::Position _lastRightClick, _posAtMost13FramesAgo, _posAtMost23FramesAgo;

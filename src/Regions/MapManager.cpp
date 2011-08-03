@@ -59,6 +59,7 @@ MapManager::MapManager()
 #endif
     _lowResWalkability = new bool[Broodwar->mapWidth() * Broodwar->mapHeight()]; // Build Tiles resolution
     buildings = new bool[Broodwar->mapWidth() * Broodwar->mapHeight()];         // [_width * _height / 16];
+    _buildingsBuf = new bool[Broodwar->mapWidth() * Broodwar->mapHeight()];
     groundDamages = new int[Broodwar->mapWidth() * Broodwar->mapHeight()];
     _groundDamagesBuf = new int[Broodwar->mapWidth() * Broodwar->mapHeight()];
     airDamages = new int[Broodwar->mapWidth() * Broodwar->mapHeight()];

@@ -109,6 +109,8 @@ void GoalManager::onUnitCreate(Unit* u)
 		return;
 	if (!u->getType().isBuilding()) // yup, even workers, we want to create BayesianUnits in case they have to fight
 	{
+		if (u->getType() == UnitTypes::Protoss_Scarab || u->getType() == UnitTypes::Protoss_Interceptor)
+			return;
 		_inTrainingUnits.push_back(u);
 		if (!u->getType().isWorker()) // military units only, because we won't propose workers, only specials goals will bid on them
 			unassignedUnits.insert(u); // we are sure that is it unassigned to a goal

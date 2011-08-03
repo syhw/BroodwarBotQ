@@ -30,7 +30,7 @@
 //using boost::math::normal;
 
 #define __NEW_COMPUTE_REPULSE__
-#define __HEURISTICS_IN_FIGHTMOVE__ 1 // level of heuristic(s)
+#define __HEURISTICS_IN_FIGHTMOVE__ 0 // level of heuristic(s)
 #define __OUTER_NON_ATOMIC_DIRV__ // accept to do "non atomic w.r.t. Broodwar directions" moves/clicks (BW pathfinder can be called, drama ensues), useful to pass big buildings
 //#define __OUR_PATHFINDER__
 //#define __EXACT_OBJ__
@@ -67,6 +67,7 @@ BayesianUnit::BayesianUnit(Unit* u, const ProbTables* probTables)
 , _lastAttackFrame(-100)
 , _lastClickFrame(-100)
 , _lastMoveFrame(-100)
+, _lastRefreshPathRequest(-100)
 , _posAtMost13FramesAgo(Position(unit->getPosition().x() + 1, 
 						unit->getPosition().y() + 1))
 						// we don't want posAtMost13FramesAgo  
@@ -75,7 +76,7 @@ BayesianUnit::BayesianUnit(Unit* u, const ProbTables* probTables)
 , _iThinkImBlocked(false)
 , _lastTotalHP(unit->getHitPoints() + unit->getShields())
 , _sumLostHP(0)
-, _refreshPathFramerate(max(Broodwar->getFrameCount()%31, Broodwar->getFrameCount()%17 + 14)) // desynchronize pathfinding calls with a minimum of 14 frames
+, _refreshPathFramerate(23)
 , _maxDistWhileRefreshingPath((int)max(_refreshPathFramerate * _topSpeed,
 							  45.26)) // 45.26 = sqrt(32^2 + 32^2)
 , _inPos(Position(0, 0))
@@ -228,6 +229,7 @@ void BayesianUnit::computeRepulseValues()
 
 void BayesianUnit::switchMode(unit_mode um)
 {
+#undef __DEBUG__
     if (_mode == um)
         return;
     _mode = um;
@@ -270,6 +272,7 @@ void BayesianUnit::switchMode(unit_mode um)
         default:
             break;
     }
+#define __DEBUG__
 }
 
 void BayesianUnit::setUnitsGroup(UnitsGroup* ug)
@@ -716,13 +719,14 @@ void BayesianUnit::updatePPath()
     }
     else 
     {
-		/// Request a path from the MapManager
-        if (!(Broodwar->getFrameCount() % _refreshPathFramerate)) // only at a certain maximum framerate
+		/// Request a path from the MapManager (without spamming it)
+		if (Broodwar->getFrameCount() - _lastRefreshPathRequest < _refreshPathFramerate)
 		{
 			if (_mode = MODE_SCOUT)
-				mapManager->threatAwarePathfind(this, TilePosition(_unitPos), TilePosition(target), _fleeingDmg);
+				mapManager->threatAwarePathfind(this, unit->getTilePosition(), tptarget, _fleeingDmg);
 			else
-				mapManager->pathfind(this, TilePosition(_unitPos), TilePosition(target));
+				mapManager->pathfind(this, unit->getTilePosition(), tptarget);
+			_lastRefreshPathRequest = Broodwar->getFrameCount();
 		}
 
 		if (!_ppath.empty())
@@ -1015,7 +1019,8 @@ void BayesianUnit::clearDamages()
 {
     // ===== clear old damage =====
 	if (targetEnemy != NULL && targetEnemy->exists()
-		&& _unitsGroup != NULL && _unitsGroup->unitDamages.left.count(targetEnemy))
+		&& _unitsGroup != NULL 
+		&& _unitsGroup->unitDamages.left.count(targetEnemy))
     {
         UnitDmgBimap::left_iterator unitdmgit 
 			= _unitsGroup->unitDamages.left.find(targetEnemy);
@@ -2110,7 +2115,7 @@ void BayesianUnit::update()
     if (_mode != MODE_FIGHT_G && _mode != MODE_FIGHT_A)
     {
         testIfBlocked();
-        if (_iThinkImBlocked) //&& unit->isStuck())
+        if (_iThinkImBlocked && unit->isStuck())
         {
             resumeFromBlocked();
             return;
@@ -2142,7 +2147,6 @@ void BayesianUnit::update()
 #endif
             return;
         }
-		Broodwar->printf("in Pos");
         updateDir();
         clickDir();
         break;

@@ -37,6 +37,8 @@ UnitsGroup::UnitsGroup()
 
 UnitsGroup::~UnitsGroup()
 {
+	for each (pBayesianUnit bu in units)
+		bu->setUnitsGroup(NULL);
 }
 
 bool comp_i_dist(const i_dist& l, const i_dist& r) { return (r.dist < l.dist); }
@@ -412,13 +414,7 @@ void UnitsGroup::update()
 
 	/// Update BayesianUnits
     for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
-	{
-		if (doNotUpdate.count(*it))
-		{
-		}
-		else
 			(*it)->update();
-	}
 
 	/// Merge Templars if needed
     templarMergingStuff();
