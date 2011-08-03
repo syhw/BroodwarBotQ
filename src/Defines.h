@@ -8,8 +8,9 @@
 
 #define WALK_TILES_SIZE 8
 
-#define __DO_NOT_HARASS_SCOUT__
-#define __CONTROL_BO_UNTIL_SECOND_PYLON__
+#define __DO_NOT_HARASS_SCOUT__ // will not compile the harassing part in the FirstScoutGoal (to play against the built-in AI)
+#define __CONTROL_BO_UNTIL_SECOND_PYLON__ // no supply management before the second pylon, if you don't place it in the BO, you're locked
+#define __BENS_LABELS__ // use Ben Weber's openings/strategies labels in the ETechEstimator
 
 #ifdef __DEBUG__
 //#include <vld.h>

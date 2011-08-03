@@ -10,13 +10,12 @@ using namespace std;
 ETechEstimator::ETechEstimator()
 : notFirstOverlord(false)
 {
-	return;
 	/// Load the learned prob tables (uniforms + bell shapes) for the right match up
 	/// This is not obfuscation, the learning of these tables is described in the CIG 2011 Paper
 	/// A Bayesian Model for Opening Prediction in RTS Games with Application to StarCraft, Gabriel Synnaeve, Pierre Bessière, CIG (IEEE) 2011
 	/// All code for the learning is here: https://github.com/SnippyHolloW/OpeningTech
 	{
-		// TODO Random case!!
+		// TODO Random case (load all, use the good one)
 		Race enemyRace;
 		for (set<Player*>::const_iterator p = Broodwar->getPlayers().begin();
 			p != Broodwar->getPlayers().end(); ++p)
@@ -29,11 +28,23 @@ ETechEstimator::ETechEstimator()
 		}
 		string serializedTablesFileName("C:\\StarCraft\\AI\\BroodwarBotQ\\data\\tables\\");
 		if (enemyRace == Races::Terran || !enemyRace.getName().compare("Terran"))
+#ifdef __BENS_LABELS__
 			serializedTablesFileName.append("TvP.table");
+#else
+			serializedTablesFileName.append("TvPx.table");
+#endif
 		else if (enemyRace == Races::Protoss || !enemyRace.getName().compare("Protoss"))
+#ifdef __BENS_LABELS__
 			serializedTablesFileName.append("PvP.table");
+#else
+			serializedTablesFileName.append("PvPx.table");
+#endif
 		else if (enemyRace == Races::Zerg || !enemyRace.getName().compare("Zerg"))
+#ifdef __BENS_LABELS__
 			serializedTablesFileName.append("ZvP.table");
+#else
+			serializedTablesFileName.append("ZvPx.table");
+#endif
 		std::ifstream ifs(serializedTablesFileName.c_str());
 		boost::archive::text_iarchive ia(ifs);
 		ia >> st;
@@ -396,7 +407,6 @@ bool ETechEstimator::insertBuilding(Unit* u)
 
 void ETechEstimator::computeDistribOpenings(int time)
 {
-	return;
 	size_t nbXes = st.vector_X.size();
 	list<unsigned int> compatibleXes;
 	for (size_t i = 0; i < nbXes; ++i)
@@ -422,9 +432,10 @@ void ETechEstimator::computeDistribOpenings(int time)
 	for (size_t i = 0; i < openingsProbas.size(); ++i)
 	{
 		openingsProbas[i] /= runningSum;
-		if (openingsProbas[i] == openingsProbas[i] // test for NaN / 1#IND
-		    || openingsProbas[i] < 0.000001)         // min proba
-			openingsProbas[i] = 0.000001;
+		if (openingsProbas[i] != openingsProbas[i] // test for NaN / 1#IND
+		    //|| openingsProbas[i] < 0.00000000000000000001         // min proba
+		)
+			openingsProbas[i] = 0.00000000000000000001;
 		verifSum += openingsProbas[i];
 	}
 	if (verifSum < 0.99 || verifSum > 1.01)
