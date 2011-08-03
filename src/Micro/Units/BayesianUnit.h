@@ -114,6 +114,7 @@ protected:
     int _sumLostHP;
     const int _refreshPathFramerate; // should be static TODO
     int _maxDistWhileRefreshingPath; // not static because dependent on the speed
+    int _maxDistInOneClick; // not static because dependent on the speed
     Position _inPos;
     bool _fleeing;
     bool _fightMoving;

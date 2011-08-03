@@ -77,8 +77,8 @@ BayesianUnit::BayesianUnit(Unit* u, const ProbTables* probTables)
 , _lastTotalHP(unit->getHitPoints() + unit->getShields())
 , _sumLostHP(0)
 , _refreshPathFramerate(23)
-, _maxDistWhileRefreshingPath((int)max(_refreshPathFramerate * _topSpeed,
-							  45.26)) // 45.26 = sqrt(32^2 + 32^2)
+, _maxDistWhileRefreshingPath((int)(_refreshPathFramerate * _topSpeed))
+, _maxDistInOneClick((int)(Broodwar->getLatencyFrames() * _topSpeed)) // TODO change for a macro?
 , _inPos(Position(0, 0))
 , _fleeing(false)
 , _fightMoving(false)
@@ -656,10 +656,12 @@ void BayesianUnit::updateObj()
             obj = Vec(unit->getVelocityX(), unit->getVelocityY());
 			obj += (Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y())); // steering
 		}
-        else if (_ppath.size() > 3)
-            obj = Vec(_ppath[3].x() - _unitPos.x(), _ppath[3].y() - _unitPos.y());
-        else if (_ppath.size() > 2)
+        else if (_ppath.size() > 2 && _ppath[2].getApproxDistance(_unitPos) <= _maxDistInOneClick)
             obj = Vec(_ppath[2].x() - _unitPos.x(), _ppath[2].y() - _unitPos.y());
+        else if (_ppath.size() > 1 && _ppath[1].getApproxDistance(_unitPos) <= _maxDistInOneClick)
+            obj = Vec(_ppath[1].x() - _unitPos.x(), _ppath[1].y() - _unitPos.y());
+        else if (_ppath.size() > 0)
+            obj = Vec(_ppath[0].x() - _unitPos.x(), _ppath[0].y() - _unitPos.y());
 		else
             obj = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y());
     }
@@ -745,10 +747,10 @@ void BayesianUnit::updatePPath()
 			size_t count = 0;
 			for (; count < _ppath.size(); ++count) 
 			{
-				if (_ppath[count].getDistance(_unitPos) > _maxDistWhileRefreshingPath)
+				if (_ppath[count].getDistance(_unitPos) >= _maxDistWhileRefreshingPath)
 					break;
 			}
-			for (; count > 1; --count) 
+			for (; count > 0; --count) 
 				_ppath.erase(_ppath.begin());
 		}
     }
@@ -941,7 +943,7 @@ void BayesianUnit::updateDirV()
             if (tmp.x() <= 32*Broodwar->mapWidth() && tmp.y() 
 				<= 32*Broodwar->mapHeight()
                 && tmp.x() >= 0 && tmp.y() >= 0 
-                && (unit->getType().isFlyer() || _mode == MODE_SCOUT 
+                && (unit->getType().isFlyer()
 					|| Broodwar->isWalkable(tmp.x()/8, tmp.y()/8)))
             {
                 _dirv.push_back(v);
@@ -960,7 +962,7 @@ void BayesianUnit::updateDirV()
             if (tmp.x() <= 32*Broodwar->mapWidth() && tmp.y() 
 				<= 32*Broodwar->mapHeight()
                 && tmp.x() >= 0 && tmp.y() >= 0 
-                && (unit->getType().isFlyer() || _mode == MODE_SCOUT 
+                && (unit->getType().isFlyer()
 					|| Broodwar->isWalkable(tmp.x()/8, tmp.y()/8)))
             {
                 _dirv.push_back(v);
@@ -2126,12 +2128,14 @@ void BayesianUnit::update()
 			if (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatencyFrames())
 			{
 				Position p = target;
-				if (_ppath.size() > 3)
+				if (_ppath.size() > 3 && _ppath[3].getApproxDistance(_unitPos) <= _maxDistInOneClick)
 					p = _ppath[3];
-				else if (_ppath.size() > 2)
+				else if (_ppath.size() > 2 && _ppath[2].getApproxDistance(_unitPos) <= _maxDistInOneClick)
 					p = _ppath[2];
-				else if (_ppath.size() > 1)
+				else if (_ppath.size() > 1 && _ppath[1].getApproxDistance(_unitPos) <= _maxDistInOneClick)
 					p = _ppath[1];
+				else if (_ppath.size() > 0)
+					p = _ppath[0];
 				move(p);
 			}
 		}

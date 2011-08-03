@@ -12,7 +12,7 @@ protected:
     virtual bool decideToFlee();
 public:
     DragoonUnit(BWAPI::Unit* u);
-    ~DragoonUnit();
+    virtual ~DragoonUnit();
     virtual int addRangeGround();
     virtual int addRangeAir();
     static double getMaxRange();

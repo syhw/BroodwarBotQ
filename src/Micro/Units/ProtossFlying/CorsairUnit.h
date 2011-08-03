@@ -10,7 +10,7 @@ protected:
     inline bool decideToFlee();
 public:
     CorsairUnit(BWAPI::Unit* u);
-    ~CorsairUnit();
+    virtual ~CorsairUnit();
     virtual void micro();
     virtual void check();
     virtual int getAttackDuration();

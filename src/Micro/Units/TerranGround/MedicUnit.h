@@ -12,7 +12,7 @@ protected:
     int fightMove();
 public:
     MedicUnit(BWAPI::Unit* u);
-    ~MedicUnit();
+    virtual ~MedicUnit();
 #ifdef __LEARNING_PROB_TABLES__
 	static void initProbTables();
 #endif

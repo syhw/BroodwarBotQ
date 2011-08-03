@@ -9,7 +9,7 @@ protected:
     static std::set<BWAPI::UnitType> setPrio;
 public:
     DarkTemplarUnit(BWAPI::Unit* u);
-    ~DarkTemplarUnit();
+    virtual ~DarkTemplarUnit();
     virtual void micro();
     virtual void check();
     virtual int getAttackDuration();

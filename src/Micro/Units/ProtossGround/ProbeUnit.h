@@ -7,7 +7,7 @@ class ProbeUnit : public GroundUnit
 {
 public:
     ProbeUnit(BWAPI::Unit* u);
-    ~ProbeUnit();
+    virtual ~ProbeUnit();
     virtual void micro();
     virtual void check();
     virtual int getAttackDuration();

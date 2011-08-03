@@ -7,7 +7,7 @@ class ShuttleUnit : public FlyingUnit
 {
 public:
     ShuttleUnit(BWAPI::Unit* u);
-    ~ShuttleUnit();
+    virtual ~ShuttleUnit();
     virtual void micro();
     virtual void check();
     virtual int getAttackDuration();

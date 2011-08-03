@@ -10,7 +10,7 @@ protected:
     virtual bool decideToFlee();
 public:
     ArchonUnit(BWAPI::Unit* u);
-    ~ArchonUnit();
+    virtual ~ArchonUnit();
     virtual void micro();
     virtual void check();
     virtual int getAttackDuration();

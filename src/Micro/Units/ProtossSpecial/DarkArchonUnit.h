@@ -10,7 +10,7 @@ class DarkArchonUnit : public SpecialUnit
 	static std::set<BWAPI::UnitType> setPrio;
 public:
     DarkArchonUnit(BWAPI::Unit* u);
-    ~DarkArchonUnit();
+    virtual ~DarkArchonUnit();
     virtual void micro();
     virtual void check();
     virtual int getAttackDuration();

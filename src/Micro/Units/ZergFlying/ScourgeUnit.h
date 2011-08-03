@@ -10,7 +10,7 @@ protected:
     static std::set<BWAPI::Unit*> alreadyTargeted; // hack only for the tournament 1
 public:
     ScourgeUnit(BWAPI::Unit* u);
-    ~ScourgeUnit();
+    virtual ~ScourgeUnit();
     virtual void micro();
     virtual void check();
     virtual int getAttackDuration();

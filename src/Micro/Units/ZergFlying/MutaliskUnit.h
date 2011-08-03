@@ -9,7 +9,7 @@ protected:
     static std::set<BWAPI::UnitType> setPrio;
 public:
     MutaliskUnit(BWAPI::Unit* u);
-    ~MutaliskUnit();
+    virtual ~MutaliskUnit();
     virtual void micro();
     virtual void check();
     virtual int getAttackDuration();

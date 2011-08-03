@@ -15,7 +15,7 @@ protected:
     int fightMove();
 public:
     ZealotUnit(BWAPI::Unit* u);
-    ~ZealotUnit();
+    virtual ~ZealotUnit();
 #ifdef __LEARNING_PROB_TABLES__
 	static void initProbTables();
 #endif

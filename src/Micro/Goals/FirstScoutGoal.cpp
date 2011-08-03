@@ -5,6 +5,7 @@
 #include <BWTA.h>
 #include "Subgoal.h"
 #include "Intelligence/Intelligence.h"
+#include "Regions/MapManager.h"
 #include "Micro/Micro.h"
 #include "Defines.h"
 
@@ -18,8 +19,8 @@ inline BWTA::BaseLocation* getNearestBL(const TilePosition& tp, const set<BWTA::
 	for (std::set<BWTA::BaseLocation*>::const_iterator it = s.begin(); 
 		it != s.end(); ++it)
 	{
-		double tmp = BWTA::getGroundDistance((*it)->getTilePosition(), tp);
-		if (tmp < min)
+		double tmp = MapManager::Instance().distRegions[(*it)->getRegion()][BWTA::getRegion(tp)];
+		if (tmp > 0 && tmp < min)
 		{
 			min = tmp;
 			ret = *it;

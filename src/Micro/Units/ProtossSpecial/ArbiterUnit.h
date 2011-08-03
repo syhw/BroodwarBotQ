@@ -9,7 +9,7 @@ protected:
     static std::set<BWAPI::UnitType> setPrio;
 public:
     ArbiterUnit(BWAPI::Unit* u);
-    ~ArbiterUnit();
+    virtual ~ArbiterUnit();
     virtual void micro();
     virtual void check();
     virtual int getAttackDuration();

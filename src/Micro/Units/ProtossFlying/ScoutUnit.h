@@ -10,7 +10,7 @@ protected:
     inline bool decideToFlee();
 public:
     ScoutUnit(BWAPI::Unit* u);
-    ~ScoutUnit();
+    virtual ~ScoutUnit();
     virtual void micro();
     virtual void check();
     virtual int getAttackDuration();

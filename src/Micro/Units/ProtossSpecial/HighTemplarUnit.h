@@ -14,7 +14,7 @@ protected:
     int _mergingFrame;
 public:
     HighTemplarUnit(BWAPI::Unit* u);
-    ~HighTemplarUnit();
+    virtual ~HighTemplarUnit();
     std::pair<BWAPI::Position, int> bestStormPos();
     virtual void micro();
     virtual void check();

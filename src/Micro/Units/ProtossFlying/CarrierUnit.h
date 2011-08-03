@@ -9,7 +9,7 @@ protected:
     static std::set<BWAPI::UnitType> setPrio;
 public:
     CarrierUnit(BWAPI::Unit* u);
-    ~CarrierUnit();
+    virtual ~CarrierUnit();
     virtual void micro();
     virtual void check();
     virtual int getAttackDuration();

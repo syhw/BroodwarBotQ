@@ -11,7 +11,7 @@ protected:
     bool decideToFlee();
 public:
     MarineUnit(BWAPI::Unit* u);
-    ~MarineUnit();
+    virtual ~MarineUnit();
 #ifdef __LEARNING_PROB_TABLES__
 	static void initProbTables();
 #endif
