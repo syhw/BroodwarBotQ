@@ -18,7 +18,7 @@ public:
     Subgoal(SubgoalLogic l, UnitsGroup* ug);
     Subgoal(SubgoalLogic l);
     Subgoal(const Subgoal& sg);
-    ~Subgoal();
+    virtual ~Subgoal();
     //Accessors
 	SubgoalLogic getLogic() const;
 	void setUnitsGroup(UnitsGroup * ug);
