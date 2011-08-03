@@ -858,7 +858,10 @@ void MapManager::update()
 				if (_currentPathfindWork.bunit->unit->getType().isFlyer())
 					memcpy(_airDamagesBuf, airDamages, Broodwar->mapWidth() * Broodwar->mapHeight());
 				else
+				{
 					memcpy(_groundDamagesBuf, groundDamages, Broodwar->mapWidth() * Broodwar->mapHeight());
+					memcpy(_buildingsBuf, buildings, Broodwar->mapWidth() * Broodwar->mapHeight());
+				}
 			}
 			else
 			{
@@ -901,6 +904,7 @@ void MapManager::update()
     //this->drawAirDamagesGrad();
     //this->drawAirDamages();
     this->drawBestStorms();
+	this->drawWalkability();
 #endif
 }
 
@@ -1562,7 +1566,7 @@ void MapManager::damagesAwarePathFindAir(std::vector<TilePosition>& btpath,
     return;
 }
 
-/// This is _NOT_ buildings aware on top of damages
+/// Buildings and damages aware pathfinding
 void MapManager::damagesAwarePathFindGround(std::vector<TilePosition>& btpath, 
                           const TilePosition& start, const TilePosition& end,
 						  int damagesThreshold)
@@ -1605,12 +1609,19 @@ void MapManager::damagesAwarePathFindGround(std::vector<TilePosition>& btpath,
             {
                 if (!_lowResWalkability[x + y*width]) continue;
 				if (_groundDamagesBuf[x + y*width] > damagesThreshold) continue;                // damagesAware
+                if (_buildingsBuf[x + y*width]) continue;        // buildingsAware
                 if (p.x() != x && p.y() != y && 
                     !_lowResWalkability[p.x() + y*width] 
                     && !_lowResWalkability[x + p.y()*width]
                     && _groundDamagesBuf[p.x() + y*width] > damagesThreshold                    // damagesAware
                     && _groundDamagesBuf[x + p.y()*width] > damagesThreshold)                   // damagesAware
-                    continue;
+					continue;
+                if (p.x() != x && p.y() != y && 
+                    !_lowResWalkability[p.x() + y*width] 
+                    && !_lowResWalkability[x + p.y()*width]
+                    && _buildingsBuf[p.x() + y*width]            // buildingsAware
+                    && _buildingsBuf[x + p.y()*width])           // buildingsAware
+						continue;
 
                 TilePosition t(x,y);
                 if (closedTiles.find(t) != closedTiles.end()) continue;

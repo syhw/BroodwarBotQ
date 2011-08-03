@@ -26,7 +26,7 @@ Task::~Task()
 {
 	Macro::Instance().reservedMinerals -= type.mineralPrice();
 	Macro::Instance().reservedGas -= type.gasPrice();
-	TheArbitrator->removeAllBids(this);
+	TheArbitrator->removeController(this);
 }
 
 void Task::init()

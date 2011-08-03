@@ -13,6 +13,11 @@ private:
 	BWAPI::TilePosition _nextToVisit;
 	BWTA::BaseLocation* _nextBase;
 	std::set<BWTA::BaseLocation*> _notSeenStartLocations;
+	bool _stealingGas;
+	bool _mannerPylon;
+	bool _canHarassWorkers;
+	std::set<Unit*> _unitsAround;
+	inline void goHome();
 public:
 	FirstScoutGoal(int priority=90);
 	void achieve();

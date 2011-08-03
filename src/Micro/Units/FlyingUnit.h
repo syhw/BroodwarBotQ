@@ -6,7 +6,7 @@ class FlyingUnit : public BayesianUnit
 {
 public:
 	FlyingUnit(BWAPI::Unit* u);
-	~FlyingUnit();
+	virtual ~FlyingUnit();
 	virtual void micro() = 0;
 	virtual void check() = 0;
 	virtual int getAttackDuration() = 0;

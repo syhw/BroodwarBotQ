@@ -3,6 +3,7 @@
 #include "Micro/Goals/AvoidNukeGoal.h"
 
 using namespace BWAPI;
+using namespace std;
 
 Micro::Micro()
 : goalManager(NULL)

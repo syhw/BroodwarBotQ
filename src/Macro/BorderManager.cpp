@@ -1,6 +1,7 @@
 #include <PrecompiledHeader.h>
 #include "Macro/BorderManager.h"
 #include "Macro/InformationManager.h"
+#include "Defines.h"
 
 BorderManager* TheBorderManager = NULL;
 
@@ -51,13 +52,17 @@ void BorderManager::update()
   {
     BWAPI::Position point1=(*c)->getSides().first;
     BWAPI::Position point2=(*c)->getSides().second;
+#ifdef __DEBUG__
     BWAPI::Broodwar->drawLineMap(point1.x(),point1.y(),point2.x(),point2.y(),BWAPI::Colors::Red);
+#endif
   }
   for(std::set<BWTA::Chokepoint*>::const_iterator c=enemyBorder.begin();c!=enemyBorder.end();c++)
   {
     BWAPI::Position point1=(*c)->getSides().first;
     BWAPI::Position point2=(*c)->getSides().second;
+#ifdef __DEBUG__
     BWAPI::Broodwar->drawLineMap(point1.x(),point1.y(),point2.x(),point2.y(),BWAPI::Colors::Orange);
+#endif
   }
 }
 

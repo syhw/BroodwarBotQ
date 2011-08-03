@@ -40,7 +40,7 @@ public:
     BWAPI::Position BattleUnit::getPPath(unsigned int n);
 
 	BattleUnit(BWAPI::Unit* unit);
-    ~BattleUnit();
+    virtual ~BattleUnit();
     void attack(const BWAPI::Position& p);
     bool operator == (const BattleUnit& bu) const;
     virtual void update() = 0;

@@ -5,6 +5,7 @@
 #include "Regions/MapManager.h"
 #include "Macro/BasesManager.h"
 #include "Macro/Builder.h"
+#include "Micro/Micro.h"
 
 using namespace std;
 using namespace BWAPI;
@@ -905,18 +906,27 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 	/// search and save front and backdoor chokes
 	backdoorChokes = home->getRegion()->getChokepoints();
 	double minDist = DBL_MAX;
+	set<BWTA::BaseLocation*> startLocs = BWTA::getStartLocations();
+	startLocs.erase(BWTA::getStartLocation(Broodwar->self()));
+#ifdef __DEBUG__
+	assert(!startLocs.empty()); // 1 player map ? :D
+#endif
+	TilePosition otherStartLocation((*startLocs.begin())->getTilePosition());
 	for (set<BWTA::Chokepoint*>::const_iterator it = backdoorChokes.begin();
 		it != backdoorChokes.end(); ++it)
 	{
 		double tmpDist = BWTA::getGroundDistance(TilePosition((*it)->getCenter()), 
-			TilePosition(Broodwar->mapHeight()/2, Broodwar->mapWidth()/2));
+			otherStartLocation); // problem with island maps...
 		if (tmpDist < minDist)
 		{
 			minDist = tmpDist;
 			frontChoke = *it;
 		}
 	}
+	Micro::Instance().ourChokes = backdoorChokes; // TODO change/remove
+	Micro::Instance().frontChoke = frontChoke;    // TODO change/remove
 	backdoorChokes.erase(frontChoke);
+
 
 	TilePosition nexus = home->getTilePosition();
 	TilePosition front = TilePosition(frontChoke->getCenter());

@@ -60,7 +60,6 @@ private:
     int _totalMinPrice;
     int _totalGazPrice;
     int _totalSupply;
-	unit_mode _groupMode;
     EUnitsFilter* _eUnitsFilter;
     std::set<BWAPI::Unit*> _mergersHT;
     bool _hasDetection;
@@ -74,7 +73,6 @@ private:
 #endif
 public:
 	/// Units tools / units intercommunication
-	int nonFlyers;
     std::list<pBayesianUnit> arrivingUnits;
     std::vector<BWAPI::Position> ppath;
     UnitDmgBimap unitDamages;
@@ -87,6 +85,8 @@ public:
     Vec centerSpeed;
 	std::map<BWAPI::UnitSizeType, int> sizes;
 	/// Group recap variables
+	int nonFlyers;
+	unit_mode groupMode;
     BWAPI::Position center;
     int groupAltitude;
     double stdDevRadius, maxRadius;

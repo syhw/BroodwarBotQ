@@ -17,8 +17,7 @@ using namespace BWAPI;
 #define __MAX_DISTANCE_TO_GROUP__ 512
 
 UnitsGroup::UnitsGroup()
-: nonFlyers(0)
-, defaultTargetEnemy(NULL)
+: defaultTargetEnemy(NULL)
 , groupTargetPosition(Positions::None)
 , distToTarget(-1.0)
 , nearestChoke(NULL)
@@ -26,7 +25,8 @@ UnitsGroup::UnitsGroup()
 , _totalMinPrice(0)
 , _totalGazPrice(0)
 , _totalSupply(0)
-, _groupMode(MODE_MOVE)
+, nonFlyers(0)
+, groupMode(MODE_MOVE)
 , _hasDetection(0)
 , centerSpeed(0,0)
 , center(0,0)
@@ -406,16 +406,16 @@ void UnitsGroup::update()
         _alignFormation = true;*/
 
 	/// Update nearby enemy units from eUnitsFilter (SLOW)
-    updateNearbyEnemyUnitsFromFilter(center, maxRadius + maxRange + 92); // possibly hidden units, could be taken from onUnitsShow/View asynchronously for more efficiency
+	updateNearbyEnemyUnitsFromFilter(center, maxRadius + maxRange + 92); // possibly hidden units, could be taken from onUnitsShow/View asynchronously for more efficiency
 
-    /// Update enemiesCenter / enemiesAltitude
+	/// Update enemiesCenter / enemiesAltitude
 	updateEnemiesCenter();
 
-	std::set<pBayesianUnit> doNotUpdate;
-    if (!enemies.empty()) /// We fight, we'll see later for the goals, BayesianUnits switchMode automatically if enemies is not empty()
-    {
-        double force = evaluateForces();
-        {
+	/// All the things to do when we have to fight
+	if (!enemies.empty() && groupMode != MODE_SCOUT) /// We fight, we'll see later for the goals, BayesianUnits switchMode automatically if enemies is not empty()
+	{
+		double force = evaluateForces();
+		{
 			if (force < 0.8) // TOCHANGE 0.75 (better micro+compo factor)
 			{
 				// strategic withdrawal
@@ -439,8 +439,7 @@ void UnitsGroup::update()
 						BWTA::Region* higherRegion = 
 							(Broodwar->getGroundHeight(TilePosition(regions.first->getCenter())) > Broodwar->getGroundHeight(TilePosition(regions.second->getCenter())))
 							? regions.first : regions.second;
-						//(*it)->unit->move(MapManager::Instance().regionsPFCenters[higherRegion]);
-						//doNotUpdate.insert(*it);
+						(*it)->target = (MapManager::Instance().regionsPFCenters[higherRegion]);
 					}
 					else
 						(*it)->target = (*it)->unit->getPosition();
@@ -542,7 +541,7 @@ double UnitsGroup::getDistance(BWAPI::Position p) const
 
 void UnitsGroup::activeUnit(pBayesianUnit bu)
 {
-	bu->switchMode(_groupMode);
+	bu->switchMode(groupMode);
     units.push_back(bu);
 	updateGroupStrengh(bu->unit);
 }
@@ -785,7 +784,7 @@ void UnitsGroup::selectedUnits(std::set<pBayesianUnit>& u)
 
 void UnitsGroup::switchMode(unit_mode um)
 {
-	_groupMode = um;
+	groupMode = um;
 	for(std::vector<pBayesianUnit>::iterator it = getUnits()->begin(); it != getUnits()->end(); ++it)
 		(*it)->switchMode(um);
 }

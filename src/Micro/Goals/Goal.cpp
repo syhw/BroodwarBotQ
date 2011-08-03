@@ -12,7 +12,7 @@ Goal::~Goal()
 #ifdef __DEBUG__
 	log("deleted a goal\n");
 #endif
-	TheArbitrator->removeAllBids(this);
+	TheArbitrator->removeController(this);
 }
 
 Goal::Goal(int priority, int firstFrame)

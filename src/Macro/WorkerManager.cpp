@@ -39,7 +39,7 @@ WorkerManager::WorkerManager()
 
 WorkerManager::~WorkerManager()
 {
-	TheArbitrator->removeAllBids(this);
+	TheArbitrator->removeController(this);
 	TheWorkerManager = NULL;
 }
 

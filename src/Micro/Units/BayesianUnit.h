@@ -114,7 +114,6 @@ protected:
     int _sumLostHP;
     const int _refreshPathFramerate; // should be static TODO
     int _maxDistWhileRefreshingPath; // not static because dependent on the speed
-    bool _newPath;
     Position _inPos;
     bool _fleeing;
     bool _fightMoving;
@@ -169,7 +168,6 @@ protected:
     void updateDir();
     void drawDir();
     inline void clickDir();
-    inline void clickScout();
     inline void clickTarget();
 	inline void moveClick(BWAPI::Position p);
     void flee();
@@ -212,7 +210,7 @@ public:
     void updatePPath();
     Vec dir, obj; // dir=current direction, obj=pathfinder's direction
     BayesianUnit(BWAPI::Unit* u, const ProbTables* probTables);
-    ~BayesianUnit();
+    virtual ~BayesianUnit();
     BWAPI::UnitType getType();
 
 	/// Should be callable only from a UnitsGroup, maybe enforce it with a pattern (private+friend)

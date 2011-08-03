@@ -16,8 +16,10 @@
 #ifdef __DEBUG__
 //#include <vld.h>
 #endif
+#define __DO_NOT_HARASS_SCOUT__
 
 #ifndef __DEBUG__ // Perf
+#undef __DO_NOT_HARASS_SCOUT__
 #define __RELEASE_OPTIM__
 #ifdef __RELEASE_OPTIM__
 #undef _SECURE_SCL

@@ -61,7 +61,7 @@ Producer::Producer()
 
 Producer::~Producer()
 {
-	TheArbitrator->removeAllBids(this);
+	TheArbitrator->removeController(this);
 	TheProducer = NULL;
 }
 

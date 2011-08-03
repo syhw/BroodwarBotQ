@@ -253,9 +253,9 @@ void BayesianUnit::switchMode(unit_mode um)
             //unit->holdPosition();
             break;
         case MODE_SCOUT:
-            /*if (Broodwar->getFrameCount() - _lastClickFrame 
+            if (Broodwar->getFrameCount() - _lastClickFrame 
 					> Broodwar->getLatencyFrames())
-                clickTarget();*/
+                clickTarget();
 #ifdef __DEBUG__
             Broodwar->printf("Switch SCOUT!");
 #endif
@@ -385,27 +385,27 @@ void BayesianUnit::updateAttractors()
         Position tmp = _dirv[i].translate(up);
         
         // TODO optimize/clean this
-        Position hG = Position(tmp.x() - this->unit->getType().dimensionUp(),
-			tmp.y() - this->unit->getType().dimensionLeft());
-        Position hD = Position(tmp.x() - this->unit->getType().dimensionUp(),
-			tmp.y() + this->unit->getType().dimensionRight());
-        Position bG = Position(tmp.x() + this->unit->getType().dimensionDown(),
-			tmp.y() - this->unit->getType().dimensionLeft());
-        Position bD = Position(tmp.x() + this->unit->getType().dimensionDown(),
-			tmp.y() + this->unit->getType().dimensionRight());
+        Position hG = Position(min(0, tmp.x() - this->unit->getType().dimensionUp()),
+			min(0, tmp.y() - this->unit->getType().dimensionLeft()));
+        Position hD = Position(min(0, tmp.x() - this->unit->getType().dimensionUp()),
+			max(Broodwar->mapHeight()*TILE_SIZE + 31, tmp.y() + this->unit->getType().dimensionRight()));
+		Position bG = Position(max(Broodwar->mapWidth()*TILE_SIZE + 31, tmp.x() + this->unit->getType().dimensionDown()),
+			min(0, tmp.y() - this->unit->getType().dimensionLeft()));
+		Position bD = Position(max(Broodwar->mapWidth()*TILE_SIZE + 31, tmp.x() + this->unit->getType().dimensionDown()),
+			max(Broodwar->mapHeight()*TILE_SIZE + 31, tmp.y() + this->unit->getType().dimensionRight()));
         
-        if (mapManager->buildings_wt[tmp.x()/8 + (tmp.y()/8)*4*width])
+        /*if (mapManager->buildings_wt[tmp.x()/8 + (tmp.y()/8)*4*width])
             _occupation.push_back(OCCUP_BUILDING);
         else if (!mapManager->walkability[tmp.x()/8 + (tmp.y()/8)*4*width])
-            _occupation.push_back(OCCUP_BLOCKING);
-		/*else if (!mapManager->walkability[hG.x()/8 + (hG.y()/8)*4*width])
+            _occupation.push_back(OCCUP_BLOCKING);*/
+		if (!mapManager->walkability[hG.x()/8 + (hG.y()/8)*4*width])
             _occupation.push_back(OCCUP_BLOCKING);
         else if (!mapManager->walkability[bG.x()/8 + (bG.y()/8)*4*width])
             _occupation.push_back(OCCUP_BLOCKING);
         else if (!mapManager->walkability[hD.x()/8 + (hD.y()/8)*4*width])
             _occupation.push_back(OCCUP_BLOCKING);
         else if (!mapManager->walkability[bD.x()/8 + (bD.y()/8)*4*width])
-            _occupation.push_back(OCCUP_BLOCKING);*/
+            _occupation.push_back(OCCUP_BLOCKING);
 
         //else if (0/*TODO TEST SI Y A UNE UNITE QUI BLOQUE en TMP*/)
         //    _occupation.push_back(OCCUP_UNIT);
@@ -639,7 +639,6 @@ void BayesianUnit::drawProbs(multimap<double, Vec>& probs, int number)
     }
 }
 
-
 void BayesianUnit::updateObj()
 {
     if (_mode == MODE_INPOS)
@@ -653,13 +652,16 @@ void BayesianUnit::updateObj()
     else if (_mode == MODE_SCOUT)
     {
         if (_ppath.empty() && unit->isMoving())
+		{
             obj = Vec(unit->getVelocityX(), unit->getVelocityY());
-        else if (_ppath.empty())
-            obj = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y());
+			obj += (Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y())); // steering
+		}
+        else if (_ppath.size() > 3)
+            obj = Vec(_ppath[3].x() - _unitPos.x(), _ppath[3].y() - _unitPos.y());
         else if (_ppath.size() > 2)
-            obj = _ppath[2];
-        else if (_ppath.size() > 1)
-            obj = _ppath[1];
+            obj = Vec(_ppath[2].x() - _unitPos.x(), _ppath[2].y() - _unitPos.y());
+		else
+            obj = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y());
     }
     else if (_mode == MODE_FIGHT_G || _mode == MODE_FIGHT_A)
     {
@@ -728,7 +730,7 @@ void BayesianUnit::updatePPath()
     else 
     {
 		/// Request a path from the MapManager (without spamming it)
-		if (Broodwar->getFrameCount() - _lastRefreshPathRequest < _refreshPathFramerate)
+		if (Broodwar->getFrameCount() - _lastRefreshPathRequest > _refreshPathFramerate)
 		{
 			if (_mode = MODE_SCOUT)
 				mapManager->threatAwarePathfind(this, unit->getTilePosition(), tptarget, _fleeingDmg);
@@ -746,7 +748,7 @@ void BayesianUnit::updatePPath()
 				if (_ppath[count].getDistance(_unitPos) > _maxDistWhileRefreshingPath)
 					break;
 			}
-			for (; count > 0; --count) 
+			for (; count > 1; --count) 
 				_ppath.erase(_ppath.begin());
 		}
     }
@@ -976,7 +978,7 @@ void BayesianUnit::testIfBlocked()
     if (!(Broodwar->getFrameCount() % 11))
     {
         if (!(_iThinkImBlocked && Broodwar->getFrameCount() - _lastClickFrame 
-			< 12))
+			< 12 + Broodwar->getLatencyFrames()))
             _iThinkImBlocked = (_posAtMost13FramesAgo == _unitPos 
 				&& _posAtMost23FramesAgo == _unitPos) ? true : false;    
     }
@@ -1733,22 +1735,6 @@ void BayesianUnit::clickDir()
     _lastMoveFrame = Broodwar->getFrameCount();
 }
 
-void BayesianUnit::clickScout()
-{
-    Vec currentdir = Vec(unit->getVelocityX(), unit->getVelocityY());
-    currentdir.normalize();
-    Vec tmpdir = dir;
-    tmpdir.normalize();
-    //if (currentdir.dot(tmpdir) < 0.75) // divergence
-    //{
-        clickDir();
-    //}
-    //else if (Broodwar->getFrameCount() - _lastMoveFrame > 23)
-    //{
-    //    clickTarget();
-    //}
-}
-
 void BayesianUnit::clickTarget()
 {
     unit->move(target);
@@ -2098,12 +2084,14 @@ bool BayesianUnit::dragScarab()
 
 void BayesianUnit::update()
 {
+#ifdef __DEBUG__
 	assert(_unitsGroup != NULL);
+#endif
     if (!unit || !unit->exists()) return;
 	if (_unitsGroup == NULL) return;
 	if (unit->isLoaded()) return; // TODO (loaded units are not focus firing and just displaced as potatoes)
 	
-	this->drawBTPath();
+	this->drawPPath();
 
     _unitPos = unit->getPosition();
     /// check() for all inherited classes
@@ -2120,7 +2108,7 @@ void BayesianUnit::update()
     }
 
     // failsafe: resume from blocking when moving
-    if (_mode != MODE_FIGHT_G && _mode != MODE_FIGHT_A)
+    if (_mode != MODE_FIGHT_A) // && _mode != MODE_FIGHT_G
     {
         testIfBlocked();
         if (_iThinkImBlocked && unit->isStuck())
@@ -2133,16 +2121,28 @@ void BayesianUnit::update()
     switch (_mode)
     {
     case MODE_SCOUT:
-        /*if (_unitsGroup->enemies.empty())
-        {
-            if (_lastRightClick != target || Broodwar->getFrameCount() - _lastClickFrame > 47)
-                clickTarget();
-        }
-        else
-        {*/
-            updateDir();
-            clickScout();
-        //}
+		if (_unitsGroup && _unitsGroup->enemies.empty())
+		{
+			if (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatencyFrames())
+			{
+				Position p = target;
+				if (_ppath.size() > 3)
+					p = _ppath[3];
+				else if (_ppath.size() > 2)
+					p = _ppath[2];
+				else if (_ppath.size() > 1)
+					p = _ppath[1];
+				move(p);
+			}
+		}
+		else
+		{
+			if (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatencyFrames())
+			{
+				updateDir();
+				clickDir();
+			}
+		}
         break;
 
     case MODE_INPOS:       
