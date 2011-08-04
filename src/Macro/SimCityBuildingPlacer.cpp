@@ -106,7 +106,7 @@ TilePosition PositionAccountant::reservePos(TilePosition tp)
 
 void SimCityBuildingPlacer::generate()
 {
-	BuildingsCluster bc;
+	BuildingsCluster bc = BuildingsCluster();
 	if (nbClusters < 3)
 	{
 		bc = searchForCluster(home->getRegion());
@@ -121,8 +121,27 @@ void SimCityBuildingPlacer::generate()
 			if (bc.size)
 				break;
 		}
+		bc = searchForCluster(home->getRegion()); // perhaps a 4th/5th/... cluster at home?
+		if (!bc.size)
+		{
+			map<double, BWTA::Region*> distRegions;
+			for (map<BWTA::Region*, double>::const_iterator it = MapManager::Instance().distRegions[home->getRegion()].begin();
+				it != MapManager::Instance().distRegions[home->getRegion()].end(); ++it)
+			{
+				if (it->first != home->getRegion()
+					&& it->second > 1.0)
+					distRegions.insert(make_pair<double, BWTA::Region*>(it->second, it->first));
+			}
+			for (map<double, BWTA::Region*>::const_iterator it = distRegions.begin();
+				it != distRegions.end(); ++it)
+			{
+				bc = searchForCluster(it->second);
+				if (bc.size)
+					break;
+			}
+		}
 	}
-	if (!bc.center.isValid())
+	if (!bc.center.isValid()) // what/why?
 		bc.center.makeValid();
 	if (bc.size)
 		makeCluster(bc.center, 2, bc.vertical, bc.size);
@@ -959,9 +978,9 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 	makeCannonsMinerals(home);
 }
 
+#ifdef __DEBUG__
 void SimCityBuildingPlacer::update()
 {
-#ifdef __DEBUG__
 	for (list<TilePosition>::const_iterator it = pylons.pos.begin();
 		it != pylons.pos.end(); ++it)
 		Broodwar->drawBoxMap(it->x()*32, it->y()*32, (it->x()+2)*32, (it->y()+2)*32, Colors::Yellow);
@@ -974,10 +993,8 @@ void SimCityBuildingPlacer::update()
 	for (list<TilePosition>::const_iterator it = cannons.pos.begin();
 		it != cannons.pos.end(); ++it)
 		Broodwar->drawBoxMap(it->x()*32, it->y()*32, (it->x()+2)*32, (it->y()+2)*32, Colors::Yellow);
-#endif
-	if (pylons.pos.size() < 2 || gates.pos.size() < 2 || tech.pos.size() < 2)
-		generate();
 }
+#endif
 
 void SimCityBuildingPlacer::onUnitDestroy(Unit* unit)
 {
@@ -1099,6 +1116,8 @@ TilePosition SimCityBuildingPlacer::getTilePosition(const UnitType& ut)
 			generate();
 		return tech.reservePos();
 	}
+	if (pylons.pos.size() < 2 || gates.pos.size() < 2 || tech.pos.size() < 2)
+		generate();
 	return TilePositions::None; // def
 }
 

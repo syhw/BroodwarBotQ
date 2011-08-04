@@ -10,6 +10,9 @@ struct BuildingsCluster
 	BWAPI::TilePosition center;
 	int size;
 	bool vertical;
+	BuildingsCluster()
+		: size(0)
+	{}
 };
 
 struct PositionAccountant
@@ -62,7 +65,9 @@ public:
 	BWAPI::TilePosition getPylonTilePositionCovering(const BWAPI::TilePosition& tp);
 	void releaseTilePosition(const BWAPI::TilePosition& tp, const BWAPI::UnitType& ut);
 	void usedTilePosition(const BWAPI::TilePosition& tp, const BWAPI::UnitType& ut);
+#ifdef __DEBUG__
 	void update();
+#endif
 	void onUnitDestroy(BWAPI::Unit* unit);
 private:
 	std::list<BWAPI::TilePosition> existingPylons;
