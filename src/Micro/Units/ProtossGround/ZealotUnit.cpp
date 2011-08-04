@@ -84,8 +84,13 @@ void ZealotUnit::updateTargetEnemy()
 	for (map<Unit*, Position>::const_iterator it = _unitsGroup->enemies.begin();
 		it != _unitsGroup->enemies.end(); ++it)
 	{
-        if (it->first->exists() && it->first->isVisible() && it->first->isDetected()
-			&& !it->first->getType().isFlyer()
+		if (!it->first->exists() || !it->first->isVisible() || !it->first->isDetected() || it->first->getType().isFlyer())
+            continue;
+		if (it->first->isDefenseMatrixed() 
+			|| it->first->isHallucination()
+			|| it->first->isInvincible())
+			continue;
+        if (!it->first->getType().isFlyer()
 			&& setPrio.count(it->first->getType())
 			&& it->first->getDistance(_unitPos) < closest)
 		{
@@ -104,6 +109,10 @@ void ZealotUnit::updateTargetEnemy()
 		/// Rule out what we don't want to attack
 		if (!it->first->exists() || !it->first->isVisible() || !it->first->isDetected() || it->first->getType().isFlyer())
             continue;
+		if (it->first->isDefenseMatrixed() 
+			|| it->first->isHallucination()
+			|| it->first->isInvincible())
+			continue;
         UnitType testType = it->first->getType();
         if (testType.isBuilding() 
             && testType != BWAPI::UnitTypes::Protoss_Photon_Cannon

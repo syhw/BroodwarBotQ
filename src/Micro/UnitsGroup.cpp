@@ -424,7 +424,7 @@ void UnitsGroup::update()
 					(*it)->target = Position(Broodwar->self()->getStartLocation());
 				}
 			}
-			else if (force > 1.5) // TOCHANGE 1.5
+			else if (force > 2) // TOCHANGE 1.5
 			{
 				// we can be offensive, use our goal target
 			}

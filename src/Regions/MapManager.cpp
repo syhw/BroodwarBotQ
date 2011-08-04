@@ -900,7 +900,7 @@ void MapManager::update()
     if (duration > 0.040) 
         Broodwar->printf("MapManager::update() took: %2.5f seconds\n", duration);
     //this->drawGroundDamagesGrad(); // DRAW
-    this->drawGroundDamages();
+    //this->drawGroundDamages();
     //this->drawAirDamagesGrad();
     //this->drawAirDamages();
     this->drawBestStorms();

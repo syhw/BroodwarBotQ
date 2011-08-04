@@ -1054,10 +1054,15 @@ void BayesianUnit::updateTargetEnemy()
 		= _unitsGroup->unitDamages.right.begin();
         it != _unitsGroup->unitDamages.right.end(); ++it)
     {
-        if (!it->second->exists() || !it->second->isVisible())
+        if (!it->second->exists() || !it->second->isVisible() || !it->second->isDetected())
             continue;
         if (inRange(it->second))
             continue;
+		if (it->second->isDefenseMatrixed() 
+			|| it->second->isHallucination()
+			|| it->second->isInvincible()
+			|| it->second->isUnderDarkSwarm()) // no zealots/DT with this updateTargetEnemy, only ranged units
+			continue;
         UnitType testType = it->second->getType();
         if (testType.isBuilding() 
             //&& testType != BWAPI::UnitTypes::Protoss_Pylon
@@ -1097,10 +1102,15 @@ void BayesianUnit::updateTargetEnemy()
 			= _rangeEnemies.begin();
             it != _rangeEnemies.end(); ++it)
         {
-            if (!it->second->exists() || !it->second->isVisible())
+			if (!it->second->exists() || !it->second->isVisible() || !it->second->isDetected())
                 continue;
             if (inRange(it->second))
                 continue;
+			if (it->second->isDefenseMatrixed() 
+				|| it->second->isHallucination()
+				|| it->second->isInvincible()
+				|| it->second->isUnderDarkSwarm()) // no zealots/DT with this updateTargetEnemy, only ranged units
+				continue;
             UnitType testType = it->second->getType();
             if (testType == BWAPI::UnitTypes::Protoss_Interceptor)
                 continue;
@@ -1126,8 +1136,13 @@ void BayesianUnit::updateTargetEnemy()
 			= _unitsGroup->unitDamages.right.begin();
             it != _unitsGroup->unitDamages.right.end(); ++it)
         {
-            if (!it->second->exists() || !it->second->isVisible())
+			if (!it->second->exists() || !it->second->isVisible() || !it->second->isDetected())
                 continue;
+			if (it->second->isDefenseMatrixed() 
+				|| it->second->isHallucination()
+				|| it->second->isInvincible()
+				|| it->second->isUnderDarkSwarm()) // no zealots/DT with this updateTargetEnemy, only ranged units
+				continue;
             UnitType testType = it->second->getType();
             if (testType.isBuilding() 
                 //&& testType != BWAPI::UnitTypes::Protoss_Pylon
@@ -1166,8 +1181,13 @@ void BayesianUnit::updateTargetEnemy()
     for (it = _unitsGroup->unitDamages.right.begin();
         it != _unitsGroup->unitDamages.right.end(); ++it)
     {
-        if (!it->second->isVisible())
+        if (!it->second->exists() || !it->second->isVisible() || !it->second->isDetected())
             continue;
+		if (it->second->isDefenseMatrixed() 
+			|| it->second->isHallucination()
+			|| it->second->isInvincible()
+			|| it->second->isUnderDarkSwarm()) // no zealots/DT with this updateTargetEnemy, only ranged units
+			continue;
         UnitType testType = it->second->getType();
         if (testType.isBuilding() 
             //&& testType != BWAPI::UnitTypes::Protoss_Pylon
@@ -1206,8 +1226,13 @@ void BayesianUnit::updateTargetEnemy()
     for (it = _unitsGroup->unitDamages.right.begin();
         it != _unitsGroup->unitDamages.right.end(); ++it)
     {
-        if (!it->second->isVisible())
+        if (!it->second->exists() || !it->second->isVisible() || !it->second->isDetected())
             continue;
+		if (it->second->isDefenseMatrixed() 
+			|| it->second->isHallucination()
+			|| it->second->isInvincible()
+			|| it->second->isUnderDarkSwarm()) // no zealots/DT with this updateTargetEnemy, only ranged units
+			continue;
         UnitType testType = it->second->getType();
         if (testType.isBuilding() 
             //&& testType != BWAPI::UnitTypes::Protoss_Pylon
@@ -1228,13 +1253,7 @@ void BayesianUnit::updateTargetEnemy()
             return;
         }
     }
-    /// Keep old target if in range
-    /*if (targetEnemy && targetEnemy->isVisible()
-        && inRange(targetEnemy))
-    {
-        setTargetEnemy(targetEnemy);
-        return;
-    }*/
+
     /// Take a new one
     if (_rangeEnemies.size())
     {
@@ -1245,6 +1264,13 @@ void BayesianUnit::updateTargetEnemy()
 			= _rangeEnemies.begin();
             it != _rangeEnemies.end(); ++it)
         {
+			if (!it->second->exists() || !it->second->isVisible() || !it->second->isDetected())
+				continue;
+			if (it->second->isDefenseMatrixed() 
+				|| it->second->isHallucination()
+				|| it->second->isInvincible()
+				|| it->second->isUnderDarkSwarm()) // no zealots/DT with this updateTargetEnemy, only ranged units
+				continue;
             stopPrio = it;
             if (it->first > _maxWeaponsRange)
                 break;
@@ -1272,8 +1298,7 @@ void BayesianUnit::updateTargetEnemy()
                 && testType != BWAPI::UnitTypes::Zerg_Sunken_Colony
                 && testType != BWAPI::UnitTypes::Zerg_Spore_Colony)
                 continue;
-            if (it->second->exists() && it->second->isVisible()
-                && getSetPrio().count(testType)
+            if (getSetPrio().count(testType)
                 && (
                 (!(testType.isFlyer()) && unit->getType().groundWeapon()
 				!= BWAPI::WeaponTypes::None &&
@@ -1295,6 +1320,13 @@ void BayesianUnit::updateTargetEnemy()
 			= _rangeEnemies.begin();
             it != _rangeEnemies.end(); ++it)
         {
+			if (!it->second->exists() || !it->second->isVisible() || !it->second->isDetected())
+				continue;
+			if (it->second->isDefenseMatrixed() 
+				|| it->second->isHallucination()
+				|| it->second->isInvincible()
+				|| it->second->isUnderDarkSwarm()) // no zealots/DT with this updateTargetEnemy, only ranged units
+				continue;
             if (it->first > _maxWeaponsRange)
                 break;
             UnitType testType = it->second->getType();
@@ -1324,8 +1356,7 @@ void BayesianUnit::updateTargetEnemy()
             if (testType == BWAPI::UnitTypes::Protoss_Interceptor)
                 continue;
             // Not in the priority set
-            if (it->second->exists() && it->second->isVisible()
-                && inRange(it->second))
+            if (inRange(it->second))
             {
                 setTargetEnemy(it->second);
                 return;
@@ -1336,6 +1367,13 @@ void BayesianUnit::updateTargetEnemy()
         for (std::multimap<double, BWAPI::Unit*>::const_iterator it = stopPrio;
             it != _rangeEnemies.end(); ++it)
         {
+			if (!it->second->exists() || !it->second->isVisible() || !it->second->isDetected())
+				continue;
+			if (it->second->isDefenseMatrixed() 
+				|| it->second->isHallucination()
+				|| it->second->isInvincible()
+				|| it->second->isUnderDarkSwarm()) // no zealots/DT with this updateTargetEnemy, only ranged units
+				continue;
             UnitType testType = it->second->getType();
             if (testType == BWAPI::UnitTypes::Protoss_High_Templar 
 				&& it->second->getEnergy() < 60)
@@ -1360,24 +1398,15 @@ void BayesianUnit::updateTargetEnemy()
                 && testType != BWAPI::UnitTypes::Zerg_Sunken_Colony
                 && testType != BWAPI::UnitTypes::Zerg_Spore_Colony)
                 continue;
-            if (it->second->exists() && it->second->isVisible()
-                && getSetPrio().count(testType))
-            {
-                setTargetEnemy(it->second);
-                return;
-            }
-            if (it->second->exists() && it->second->isVisible())
-            {
-                setTargetEnemy(it->second);
-                return;
-            }
+			setTargetEnemy(it->second);
+			return;
         }
         /// Anywhere and not particularly in the priority set OR not defense building
         for (std::multimap<double, BWAPI::Unit*>::const_iterator it 
 			= _rangeEnemies.begin();
             it != _rangeEnemies.end(); ++it)
         {
-            if (it->second->exists() && it->second->isVisible())
+			if (!it->second->exists() || !it->second->isVisible() || !it->second->isDetected())
             {
                 setTargetEnemy(it->second);
                 return;
@@ -2099,6 +2128,7 @@ void BayesianUnit::update()
 		Broodwar->drawTextMap(unit->getPosition().x() - 8, unit->getPosition().y() - 10, "\x07IP");
 	else
 		Broodwar->drawTextMap(unit->getPosition().x() - 8, unit->getPosition().y() - 10, "\x1FMO");
+	Broodwar->drawCircleMap(target.x(), target.y(), 20, Colors::Red, true);
 #endif
     if (!unit || !unit->exists()) return;
 	if (_unitsGroup == NULL) return;
