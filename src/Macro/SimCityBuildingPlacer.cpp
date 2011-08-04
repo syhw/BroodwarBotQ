@@ -522,10 +522,6 @@ int SimCityBuildingPlacer::makeCluster(const TilePosition& center, int nbTechBui
 		clusterSize = cSize;
 	if (!clusterSize)
 		return 0;
-	if (clusterSize > 3)
-	{
-		Broodwar->printf("WHAT THE FUCK???");
-	}
 	int techToPlace = min(4, nbTechBuildings);
 	int nbGates = clusterSize*2 - techToPlace;
 	int height = 0;
@@ -992,12 +988,8 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 	dir *= 2*UnitTypes::Protoss_Gateway.tileWidth() + UnitTypes::Protoss_Pylon.tileWidth() + 1;
 	nex = nex.vecTranslate(dir);
 	TilePosition cluster_center(nex.toTilePosition());
-	if (!makeCluster(cluster_center, 1, vertical))
+	if (!makeCluster(cluster_center, 2, vertical))
 		generate();
-	generate();
-	generate();
-	generate();
-	generate();
 	generate();
 
 	/// search places to put cannons at chokes
