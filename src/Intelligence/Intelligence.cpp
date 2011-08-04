@@ -68,9 +68,9 @@ void Intelligence::update()
 	}
 #ifdef __DEBUG__
 	if (enemyRush)
-		Broodwar->drawTextScreen(585, 20, "RUSH");
+		Broodwar->drawTextScreen(585, 18, "\x08RUSH");
 	else
-		Broodwar->drawTextScreen(585, 20, "safe");
+		Broodwar->drawTextScreen(585, 18, "\x07safe");
 #endif
 }
 

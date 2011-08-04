@@ -2088,12 +2088,22 @@ void BayesianUnit::update()
 {
 #ifdef __DEBUG__
 	assert(_unitsGroup != NULL);
+	assert(unit != NULL);
+	assert(_unitsGroup != NULL);
+	drawPPath();
+	if (_mode == MODE_FIGHT_G || _mode == MODE_FIGHT_A)
+		Broodwar->drawTextMap(unit->getPosition().x() - 8, unit->getPosition().y() - 8, "FI");
+	else if (_mode == MODE_SCOUT)
+		Broodwar->drawTextMap(unit->getPosition().x() - 8, unit->getPosition().y() - 8, "SC");
+	else if (_mode == MODE_INPOS)
+		Broodwar->drawTextMap(unit->getPosition().x() - 8, unit->getPosition().y() - 8, "IP");
+	else
+		Broodwar->drawTextMap(unit->getPosition().x() - 8, unit->getPosition().y() - 8, "MO");
 #endif
     if (!unit || !unit->exists()) return;
 	if (_unitsGroup == NULL) return;
 	if (unit->isLoaded()) return; // TODO (loaded units are not focus firing and just displaced as potatoes)
 	
-	this->drawPPath();
 
     _unitPos = unit->getPosition();
     /// check() for all inherited classes

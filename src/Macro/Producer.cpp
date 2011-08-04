@@ -216,7 +216,8 @@ int Producer::additionalUnitsSupply(int frames)
 		while (minerals >= ut.mineralPrice() && gas >= ut.gasPrice() && it != pq.end())
 		{
 			ut = it->second.whatBuilds().first;
-			if (!TheBuilder->willBuild(ut))
+			if (!TheBuilder->willBuild(ut)
+				&& ut != Broodwar->self()->getRace().getCenter()) // we don't want to be building more Nexuses to produce more probes :D
 			{
 				_neededProductionBuildings.insert(ut);
 				minerals -= ut.mineralPrice();
@@ -237,7 +238,8 @@ const UnitType& Producer::mostSaturatedUT()
 	return UnitTypes::None;
 }
 
-/// Defensive check for it exists
+/// Defensive check for if it exists already
+/// Should not be required if we solve the problem of the first Nexus. Defensive is always good in alpha code anyway...
 void Producer::addToProducingStructures(Unit* u)
 {
 	for (multimap<BWAPI::UnitType, ProducingUnit>::const_iterator it = _producingStructures.begin();
@@ -246,11 +248,21 @@ void Producer::addToProducingStructures(Unit* u)
 		if (it->second.unit == u)
 			return;
 	}
-	_producingStructures.insert(make_pair<UnitType, ProducingUnit>((*it)->getType(), *it));
+	_producingStructures.insert(make_pair<UnitType, ProducingUnit>(u->getType(), u));
 }
 
 void Producer::update()
 {
+	/// hack for the start (to add the first Nexus) because units does not exist in the cstor
+	if (_producingStructures.empty())
+	{
+		UnitType centerType = Broodwar->self()->getRace().getCenter();
+		set<Unit*> centers = SelectAll(centerType);
+		for (set<Unit*>::const_iterator it = centers.begin();
+			it != centers.end(); ++it)
+			_producingStructures.insert(make_pair<UnitType, ProducingUnit>(centerType, *it));
+	}
+
 	/// Produce Archons if needed
 	if ((_nbArchons || _nbDarkArchons) && Broodwar->getFrameCount() % 41)
 		mergeArchons();
@@ -263,7 +275,7 @@ void Producer::update()
 	{
 		if ((*it)->isCompleted())
 		{
-			addToProducingStructure(*it);
+			addToProducingStructures(*it);
 			_producingStructuresInConstruction.erase(it++);
 		}
 		else

@@ -29,24 +29,52 @@ Task::~Task()
 	TheArbitrator->removeController(this);
 }
 
-void Task::init()
+int Task::framesToCompleteRequirements(UnitType type)
 {
-	if (tilePosition == TilePositions::None)
-		tilePosition = buildingPlacer->getTilePosition(type);
-	Macro::Instance().reservedMinerals += type.mineralPrice();
-	Macro::Instance().reservedGas += type.gasPrice();
+	int ret = 0;
 	map<UnitType, int> rqU = type.requiredUnits();
 	for (map<UnitType, int>::const_iterator it = rqU.begin();
 		it != rqU.end(); ++it)
 	{
 		if (Broodwar->self()->completedUnitCount(it->first) < it->second)
 		{
-			TheBuilder->build(it->first); // could recurse on the last addition to the Task list but it's evil
-			if (!lastOrder)
-				lastOrder += Broodwar->getFrameCount();
-			lastOrder += it->first.buildTime() + __MIN_FRAMES_TO_START_CONSTRUCTION__;
+			/// We don't have the requirements
+			/// we will have to delay this construction
+			int delay = 0;
+			if (Broodwar->self()->incompleteUnitCount(it->first) < it->second)
+			{
+				/// We are not building the requirement, get it into the production line
+				if (!TheBuilder->willBuild(it->first))
+					TheBuilder->build(it->first); // could recurse on the last addition to the Task list but it's evil
+				delay += it->first.buildTime() + __MIN_FRAMES_TO_START_CONSTRUCTION__; // not perfect
+			}
+			else
+			{
+				/// We are building this requirement, how much time before completion?
+				for each (Unit* u in TheBuilder->getInConstruction())
+				{
+					if (u->getType() == it->first) // not really accurate (we take the first one and not the min), but not really hapening that 2 requirements are in construction at the same time
+					{
+						delay += u->getRemainingBuildTime();
+						break;
+					}
+				}
+			}
+			ret = max(ret, delay);
 		}
 	}
+	return ret;
+}
+
+void Task::init()
+{
+	if (tilePosition == TilePositions::None)
+		tilePosition = buildingPlacer->getTilePosition(type);
+	Macro::Instance().reservedMinerals += type.mineralPrice();
+	Macro::Instance().reservedGas += type.gasPrice();
+	int delay = Task::framesToCompleteRequirements(type); // launches the requirements
+	if (delay)
+		lastOrder = max(lastOrder, Broodwar->getFrameCount() + delay);
 }
 
 void Task::onOffer(set<Unit*> units)
@@ -121,7 +149,7 @@ void Task::buildIt()
 		askWorker();
 		return;
 	}
-	if (Broodwar->getFrameCount() > lastOrder + 27 + Broodwar->getLatencyFrames())
+	if (Broodwar->getFrameCount() > lastOrder + 21 + Broodwar->getLatencyFrames())
 	{
 		/// Move closer to the construction site
 		if (worker->getPosition().getApproxDistance(Position(tilePosition)) > 4 * TILE_SIZE)
@@ -154,11 +182,11 @@ string Task::getShortName() const
 	return getName();
 }
 
-void Task::update()
-{
+void Task::check()
+{	
 	if (Broodwar->getFrameCount() <= lastOrder) // delay hack
 		return;
-
+	lastOrder = max(lastOrder, Task::framesToCompleteRequirements(type)); 
 	/// Check if we have finished, or if there are blocking units we can move,
 	/// or if the build TilePosition is really blocked
 	for (set<Unit*>::const_iterator it = Broodwar->getUnitsOnTile(tilePosition.x(), tilePosition.y()).begin();
@@ -197,12 +225,17 @@ void Task::update()
 			break;
 		}
 	}
-	if (
-#ifdef __BUILD_IN_ORDER_OF_INPUT__
-		TheBuilder->nextBuildingType() == type && // build in order
-#endif
-		Broodwar->self()->minerals() < type.mineralPrice() - 20 // TODO complete with rates (distance*rate/speed)
-		&& Broodwar->self()->gas() < type.gasPrice() - 15)
+}
+
+void Task::update()
+{
+	if (Broodwar->getFrameCount() <= lastOrder) // delay hack
+		return;
+
+	// TODO complete distance instead of magic number "6" tiles.
+	double timeToGetToSite = ((double)(6*TILE_SIZE) / UnitTypes::Protoss_Probe.topSpeed());
+	if (Broodwar->self()->minerals() < type.mineralPrice() - (TheResourceRates->getGatherRate().getMinerals() * timeToGetToSite)
+		&& Broodwar->self()->gas() < type.gasPrice() - (TheResourceRates->getGatherRate().getGas() * timeToGetToSite))
 		return;
 	else if (worker == NULL || !worker->exists())
 		askWorker();
@@ -210,9 +243,14 @@ void Task::update()
 		buildIt();
 }
 
-const UnitType& Task::getType()
+const UnitType& Task::getType() const
 {
 	return type;
+}
+
+int Task::getLastOrder() const
+{
+	return lastOrder;
 }
 
 bool Task::isFinished()
@@ -250,6 +288,7 @@ Builder::~Builder()
 	TheBuilder = NULL;
 }
 
+// Use with care outside of here
 void Builder::addTask(const UnitType& t, const TilePosition& seedPosition, int lastOrder)
 {
 	pTask tmp(new Task(NULL, seedPosition, t, lastOrder));
@@ -358,6 +397,12 @@ void Builder::update()
 			boTasks.erase(*it);
 	}
 	/// Perform tasks
+	double meanTimeToGetToSite = ((double)(6*TILE_SIZE) / UnitTypes::Protoss_Probe.topSpeed()); // TODO work on this
+	int additionalMinerals = (int)(meanTimeToGetToSite * TheResourceRates->getGatherRate().getMinerals()) + 1;
+	int additionalGas = (int)(meanTimeToGetToSite * TheResourceRates->getGatherRate().getGas()) + 1;
+	int minerals = Broodwar->self()->minerals() + additionalMinerals;
+	int gas = Broodwar->self()->gas() + additionalGas;
+
 	for (list<pTask>::iterator it = tasks.begin();
 		it != tasks.end();)
 	{
@@ -365,7 +410,18 @@ void Builder::update()
 		if ((*tmp)->isFinished())
 			tasks.erase(tmp);
 		else
-			(*tmp)->update();
+		{
+			(*tmp)->check();
+			/// update as much construction tasks as we can afford
+			if (minerals >= (*tmp)->getType().mineralPrice()
+				&& gas >= (*tmp)->getType().gasPrice()
+				&& (*tmp)->getLastOrder() <= Broodwar->getFrameCount()) // if true, it means we are going to build it right now (or very soon)
+			{
+				(*tmp)->update();
+				minerals -= (*tmp)->getType().mineralPrice();
+				gas -= (*tmp)->getType().gasPrice();
+			}
+		}
 	}
 	/// Check buildings in construction
 	for (list<Unit*>::iterator it = inConstruction.begin();

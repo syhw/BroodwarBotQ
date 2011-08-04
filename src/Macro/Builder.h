@@ -17,6 +17,7 @@ class Task : public Arbitrator::Controller<BWAPI::Unit*, double>
 	bool finished;
 public:
 	static SimCityBuildingPlacer* buildingPlacer;
+	static int framesToCompleteRequirements(BWAPI::UnitType type);
 	Task(BWAPI::Unit* w, BWAPI::TilePosition tp, BWAPI::UnitType ut, int lo=0);
 	void init();
 	~Task();
@@ -26,8 +27,10 @@ public:
 	inline void buildIt();
 	virtual std::string getName() const;
 	virtual std::string getShortName() const;
+	void check();
 	virtual void update();
-	const BWAPI::UnitType& getType();
+	const BWAPI::UnitType& getType() const;
+	int getLastOrder() const;
 	bool isFinished();
 };
 

@@ -130,7 +130,7 @@ void Base::update()
 
 void Base::buildCenter()
 {
-	TheBuilder->build(Broodwar->self()->getRace().getCenter(), baseLocation->getTilePosition());
+	TheBuilder->addTask(Broodwar->self()->getRace().getCenter(), baseLocation->getTilePosition());
 	centerInConstruction = true;
 }
 

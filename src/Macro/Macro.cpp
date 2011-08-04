@@ -50,7 +50,7 @@ void Macro::init()
 			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 8);
 			TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 11);
 			TheBasesManager->setFirstGasPop(12);
-			TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 14);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 15);
 			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 16);
 			//TheUpgrader->upgrade(UpgradeTypes::Singularity_Charge);
 		}
@@ -59,8 +59,8 @@ void Macro::init()
 			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 8);
 			TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 11);
 			TheBasesManager->setFirstGasPop(12);
-			TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 14);
-			TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 15);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 15);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 16);
 			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 17);
 			//TheUpgrader->upgrade(UpgradeTypes::Singularity_Charge);
 		}
@@ -69,7 +69,7 @@ void Macro::init()
 			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 8);
 			TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 11);
 			TheBasesManager->setFirstGasPop(12);
-			TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 14);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 15);
 			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 16);
 			//TheUpgrader->upgrade(UpgradeTypes::Singularity_Charge);
 		}
