@@ -734,7 +734,7 @@ void BayesianUnit::updatePPath()
 		/// Request a path from the MapManager (without spamming it)
 		if (Broodwar->getFrameCount() - _lastRefreshPathRequest > _refreshPathFramerate)
 		{
-			if (_mode = MODE_SCOUT)
+			if (_mode == MODE_SCOUT)
 				mapManager->threatAwarePathfind(this, unit->getTilePosition(), tptarget, _fleeingDmg);
 			else
 				mapManager->pathfind(this, unit->getTilePosition(), tptarget);
@@ -2092,18 +2092,17 @@ void BayesianUnit::update()
 	assert(_unitsGroup != NULL);
 	drawPPath();
 	if (_mode == MODE_FIGHT_G || _mode == MODE_FIGHT_A)
-		Broodwar->drawTextMap(unit->getPosition().x() - 8, unit->getPosition().y() - 8, "FI");
+		Broodwar->drawTextMap(unit->getPosition().x() - 8, unit->getPosition().y() - 10, "\x08FI");
 	else if (_mode == MODE_SCOUT)
-		Broodwar->drawTextMap(unit->getPosition().x() - 8, unit->getPosition().y() - 8, "SC");
+		Broodwar->drawTextMap(unit->getPosition().x() - 8, unit->getPosition().y() - 10, "\x1FSC");
 	else if (_mode == MODE_INPOS)
-		Broodwar->drawTextMap(unit->getPosition().x() - 8, unit->getPosition().y() - 8, "IP");
+		Broodwar->drawTextMap(unit->getPosition().x() - 8, unit->getPosition().y() - 10, "\x07IP");
 	else
-		Broodwar->drawTextMap(unit->getPosition().x() - 8, unit->getPosition().y() - 8, "MO");
+		Broodwar->drawTextMap(unit->getPosition().x() - 8, unit->getPosition().y() - 10, "\x1FMO");
 #endif
     if (!unit || !unit->exists()) return;
 	if (_unitsGroup == NULL) return;
 	if (unit->isLoaded()) return; // TODO (loaded units are not focus firing and just displaced as potatoes)
-	
 
     _unitPos = unit->getPosition();
     /// check() for all inherited classes

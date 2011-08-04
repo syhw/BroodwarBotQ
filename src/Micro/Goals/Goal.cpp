@@ -25,6 +25,7 @@ Goal::Goal(int priority, int firstFrame)
 #endif
 	if (!firstFrame)
 		_firstFrame = Broodwar->getFrameCount();
+	_unitsGroup.switchMode(MODE_MOVE);
 }
 
 Goal::Goal(pSubgoal s, int priority, int firstFrame)
@@ -38,6 +39,7 @@ Goal::Goal(pSubgoal s, int priority, int firstFrame)
 	addSubgoal(s);
 	if (!firstFrame)
 		_firstFrame = Broodwar->getFrameCount();
+	_unitsGroup.switchMode(MODE_MOVE);
 }
 
 Goal::Goal(const map<UnitType, int>& nU, pSubgoal s,
@@ -53,6 +55,7 @@ Goal::Goal(const map<UnitType, int>& nU, pSubgoal s,
 	addSubgoal(s);
 	if (!firstFrame)
 		_firstFrame = Broodwar->getFrameCount();
+	_unitsGroup.switchMode(MODE_MOVE);
 }
 
 Goal::Goal(const std::map<BWAPI::UnitType, int>& nU,
@@ -67,6 +70,7 @@ Goal::Goal(const std::map<BWAPI::UnitType, int>& nU,
 	_neededUnits = nU;
 	if (!firstFrame)
 		_firstFrame = Broodwar->getFrameCount();
+	_unitsGroup.switchMode(MODE_MOVE);
 }
 
 void Goal::bidOnUnitType(const UnitType& ut)

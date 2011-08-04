@@ -94,6 +94,16 @@ TilePosition PositionAccountant::reservePos()
 	return TilePositions::None;
 }
 
+TilePosition PositionAccountant::reservePos(TilePosition tp)
+{
+	if (!givenPos.count(tp))
+	{
+		givenPos.insert(tp);
+		return tp;
+	}
+	return TilePositions::None;
+}
+
 void SimCityBuildingPlacer::generate()
 {
 	BuildingsCluster bc;
@@ -1114,4 +1124,51 @@ void SimCityBuildingPlacer::usedTilePosition(const TilePosition& tp, const UnitT
 		cannons.usedPos(tp);
 	else
 		tech.usedPos(tp);
+}
+
+TilePosition SimCityBuildingPlacer::getPylonTilePositionCovering(const TilePosition& tp)
+{
+	TilePosition ret(TilePositions::None);
+	for each (TilePosition t in pylons.pos)
+	{
+		if (t.getDistance(tp) <= 4*TILE_SIZE
+			&& pylons.reservePos(t) != TilePositions::None)
+			return t;
+	}
+	/// stupid (but robust) heuristic
+	TilePosition t(TilePositions::None);
+	TilePosition test1(TilePosition(tp.x() - 2, tp.y()));
+	TilePosition test2(TilePosition(tp.x() + 2, tp.y()));
+	TilePosition test3(TilePosition(tp.x(), tp.y() - 2));
+	TilePosition test4(TilePosition(tp.x(), tp.y() + 2));
+	if (canBuildHere(NULL, test1, UnitTypes::Protoss_Pylon)
+		&& canBuildHere(NULL, TilePosition(test1.x()-1, test1.y()-1), UnitTypes::Protoss_Pylon)
+		&& canBuildHere(NULL, TilePosition(test1.x()-1, test1.y()+1), UnitTypes::Protoss_Pylon)
+		&& canBuildHere(NULL, TilePosition(test1.x(), test1.y()-1), UnitTypes::Protoss_Pylon)
+		&& canBuildHere(NULL, TilePosition(test1.x(), test1.y()+1), UnitTypes::Protoss_Pylon))
+		t = test1;
+	else if (canBuildHere(NULL, test2, UnitTypes::Protoss_Pylon)
+		&& canBuildHere(NULL, TilePosition(test2.x()+1, test2.y()-1), UnitTypes::Protoss_Pylon)
+		&& canBuildHere(NULL, TilePosition(test2.x()+1, test2.y()+1), UnitTypes::Protoss_Pylon)
+		&& canBuildHere(NULL, TilePosition(test2.x(), test2.y()-1), UnitTypes::Protoss_Pylon)
+		&& canBuildHere(NULL, TilePosition(test2.x(), test2.y()+1), UnitTypes::Protoss_Pylon))
+		t = test2;
+	else if (canBuildHere(NULL, test3, UnitTypes::Protoss_Pylon)
+		&& canBuildHere(NULL, TilePosition(test3.x()-1, test3.y()-1), UnitTypes::Protoss_Pylon)
+		&& canBuildHere(NULL, TilePosition(test3.x()-1, test3.y()), UnitTypes::Protoss_Pylon)
+		&& canBuildHere(NULL, TilePosition(test3.x()+1, test3.y()-1), UnitTypes::Protoss_Pylon)
+		&& canBuildHere(NULL, TilePosition(test3.x()+1, test3.y()), UnitTypes::Protoss_Pylon))
+		t = test3;
+	else if (canBuildHere(NULL, test4, UnitTypes::Protoss_Pylon)
+		&& canBuildHere(NULL, TilePosition(test4.x()-1, test4.y()), UnitTypes::Protoss_Pylon)
+		&& canBuildHere(NULL, TilePosition(test4.x()-1, test4.y()+1), UnitTypes::Protoss_Pylon)
+		&& canBuildHere(NULL, TilePosition(test4.x()+1, test4.y()), UnitTypes::Protoss_Pylon)
+		&& canBuildHere(NULL, TilePosition(test4.x()+1, test4.y()+1), UnitTypes::Protoss_Pylon))
+		t = test4;
+	if (t != TilePositions::None)
+	{
+		pylons.addPos(t);
+		ret = pylons.reservePos(t);
+	}
+	return ret;
 }

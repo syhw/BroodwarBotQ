@@ -151,6 +151,23 @@ void Task::buildIt()
 	}
 	if (Broodwar->getFrameCount() > lastOrder + 21 + Broodwar->getLatencyFrames())
 	{
+		/// If it requires psi but there is not, ask for a powering pylon, or cancel if we can't power it
+		if (type.requiresPsi() && !Broodwar->hasPower(tilePosition))
+		{
+			TilePosition pylonTP = buildingPlacer->getPylonTilePositionCovering(tilePosition);
+			if (pylonTP != TilePositions::None)
+			{
+				/// Ask for a powering pylon
+				TheBuilder->build(UnitTypes::Protoss_Pylon, pylonTP);
+				lastOrder = Broodwar->getFrameCount() 
+					+ UnitTypes::Protoss_Pylon.buildTime()
+					+ __MIN_FRAMES_TO_START_CONSTRUCTION__
+					+ (int)(100.0 /TheResourceRates->getGatherRate().getMinerals()); // delay our construction, assume we have no money
+			}
+			else
+				finished = true;
+			return;
+		}
 		/// Move closer to the construction site
 		if (worker->getPosition().getApproxDistance(Position(tilePosition)) > 4 * TILE_SIZE)
 		{

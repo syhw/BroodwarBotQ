@@ -82,6 +82,8 @@ class ETechEstimator : public CSingleton<ETechEstimator>
 	std::set<BWAPI::Unit*> buildingsSeen; 
 	std::set<int> buildingsTypesSeen;
 	bool notFirstOverlord;
+	std::set<BWAPI::UnitType> _alreadySawUnitTypes;
+	inline bool alreadySaw(BWAPI::UnitType ut);
 	bool insertBuilding(BWAPI::Unit* u);
 	bool insertBuilding(BWAPI::UnitType ut);
     void computeDistribOpenings(int time);

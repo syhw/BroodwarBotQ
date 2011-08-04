@@ -74,14 +74,21 @@ void ETechEstimator::onUnitShow(Unit* u)
 	if (Broodwar->getFrameCount()/24 >= LEARNED_TIME_LIMIT)
 		return;
 
-	if (u->getPlayer()->isEnemy(Broodwar->self()))
+	if (u->getPlayer()->isEnemy(Broodwar->self())
+		&& !alreadySaw(u->getType()))
 	{
 		int recomputeTime = 0;
 		if (u->getType().isBuilding() 
 			|| u->getType() == UnitTypes::Zerg_Overlord)
 		{
+			/// We are interested in the time at which the construction began
 			if (insertBuilding(u))
-				recomputeTime = Broodwar->getFrameCount() / 24;
+			{
+				if (u->isCompleted())
+					recomputeTime = (Broodwar->getFrameCount() - u->getType().buildTime()) / 24;
+				else
+					recomputeTime = (Broodwar->getFrameCount() - u->getRemainingBuildTime()) / 24;
+			}
 		} else {
 			/// We infer the buildings needed to produce this unit
 			for (map<UnitType, int>::const_iterator it = u->getType().requiredUnits().begin();
@@ -89,11 +96,13 @@ void ETechEstimator::onUnitShow(Unit* u)
 			{
 				if (insertBuilding(it->first))
 				{
+					/// The later he could have built this building
 					int tmpTime = (Broodwar->getFrameCount()
 						- (it->first.buildTime()
-						// + walktime
+						+ u->getType().buildTime() // minimum build time
+						//+ u->getDistance(enemyStart, u->getPosition()) / u->getType().topSpeed() // TODO minimum walktime 
 						)) / 24;
-					if (!recomputeTime || tmpTime < recomputeTime) // not quite correct
+					if (!recomputeTime || tmpTime > recomputeTime) // we do only one recompute (the final) instead of many, for each buildings
 						recomputeTime = tmpTime;
 				}
 			}
@@ -122,6 +131,14 @@ void ETechEstimator::onFrame()
 		Broodwar->drawTextScreen(500, 170+18*i, "%s ==> %Lg", st.openings[i].c_str(), openingsProbas[i]);
 }
 #endif
+
+bool ETechEstimator::alreadySaw(UnitType ut)
+{
+	bool ret = (_alreadySawUnitTypes.find(ut) != _alreadySawUnitTypes.end());
+	if (!ret)
+		_alreadySawUnitTypes.insert(ut);
+	return ret;
+}
 
 bool ETechEstimator::insertBuilding(UnitType ut)
 {
@@ -572,7 +589,8 @@ void ETechEstimator::useDistribOpenings()
 			Broodwar->printf("Building cannons bc of ReaverDrop");
 #endif
 		}
-		if (fearThese.count(5)) // FastExpand
+		if (fearThese.count(5) // FastExpand
+			&& openingsProbas[5] > 0.5)
 		{
 			if (!Macro::Instance().expands)
 			{

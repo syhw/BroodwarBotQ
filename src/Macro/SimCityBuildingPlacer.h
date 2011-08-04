@@ -18,6 +18,7 @@ struct PositionAccountant
 	std::list<BWAPI::TilePosition> pos;
 	std::set<BWAPI::TilePosition> givenPos;
 	BWAPI::TilePosition reservePos();
+	BWAPI::TilePosition reservePos(BWAPI::TilePosition tp);
 	inline void freePos(const BWAPI::TilePosition& tp)
 	{
 		givenPos.erase(tp);
@@ -58,6 +59,7 @@ class SimCityBuildingPlacer
 public:
 	SimCityBuildingPlacer();
 	BWAPI::TilePosition getTilePosition(const BWAPI::UnitType& ut);
+	BWAPI::TilePosition getPylonTilePositionCovering(const BWAPI::TilePosition& tp);
 	void releaseTilePosition(const BWAPI::TilePosition& tp, const BWAPI::UnitType& ut);
 	void usedTilePosition(const BWAPI::TilePosition& tp, const BWAPI::UnitType& ut);
 	void update();
