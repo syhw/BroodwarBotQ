@@ -82,7 +82,7 @@ bool Producer::checkCanProduce(UnitType t)
 		it != needed.end(); ++it)
 	{
 		if (_techStructures.find(it->first) == _techStructures.end()
-			&& _producingStructures.find(it->first) == _producingStructures.end()) // TODO Archons
+			&& _producingStructures.find(it->first) == _producingStructures.end()) // TODO Archons, or merge with checkHave
 		{
 			if (it->first.isBuilding() && !Broodwar->self()->incompleteUnitCount(it->first) && !TheBuilder->willBuild(it->first))
 				TheBuilder->build(it->first);
@@ -90,6 +90,41 @@ bool Producer::checkCanProduce(UnitType t)
 		}
 	}
 	return ret;
+}
+
+/*** 
+ * Check if we can research the given TechType w.r.t. tech structures
+ * !!! Ask TheBuilder to build them otherwise. !!!
+ */
+bool Producer::checkCanTech(TechType t)
+{
+    return checkHaveTech(t.whatResearches());
+}
+
+/*** 
+ * Check if we can research the given UpgradeType w.r.t. tech structures
+ * !!! Ask TheBuilder to build them otherwise. !!!
+ */
+bool Producer::checkCanUpgrade(UpgradeType t)
+{
+	return checkHaveTech(t.whatsRequired()) && checkHaveTech(t.whatUpgrades());
+}
+
+/***
+ * Check if we have the given TECH UnitType and build it if we don't intend to
+ */
+bool Producer::checkHaveTech(UnitType ut)
+{
+	if (ut == UnitTypes::None)
+		return true;
+	if (_techStructures.find(ut) != _techStructures.end()) // TECH structures only at the moment
+		return true;
+	else
+	{
+		if (!Broodwar->self()->incompleteUnitCount(ut) && !TheBuilder->willBuild(ut))
+			TheBuilder->build(ut);
+		return false;
+	}
 }
 
 int Producer::willProduce(UnitType t)
@@ -103,12 +138,42 @@ int Producer::willProduce(UnitType t)
 }
 
 /***
- * Produce the difference between wanted _number_ and existing units
+ * Produces the difference between wanted _number_ and existing units
  */
 void Producer::produce(int number, BWAPI::UnitType t, int priority, int increment)
 {
 	int add = max(0, number - Broodwar->self()->completedUnitCount(t) - willProduce(t));
 	produceAdditional(add, t, priority, increment);
+}
+
+/***
+ * Researches the TechType t
+ */
+void Producer::researchTech(BWAPI::TechType t)
+{
+	checkCanTech(t);
+	for (list<TechType>::const_iterator it = _techsQueue.begin();
+		it != _techsQueue.end(); ++it)
+	{
+		if (*it == t)
+			return;
+	}
+	_techsQueue.push_back(t);
+}
+
+/***
+ * Researches the UpgradeType t
+ */
+void Producer::researchUpgrade(BWAPI::UpgradeType t)
+{
+	checkCanUpgrade(t);
+	for (list<UpgradeType>::const_iterator it = _upgradesQueue.begin();
+		it != _upgradesQueue.end(); ++it)
+	{
+		if (*it == t)
+			return;
+	}
+	_upgradesQueue.push_back(t);
 }
 
 /***
@@ -312,13 +377,62 @@ void Producer::update()
 
 	int minerals = Broodwar->self()->minerals() - Macro::Instance().reservedMinerals;
 	int gas = Broodwar->self()->gas() - Macro::Instance().reservedGas;
-	/// Build more producing structures
-	if (Broodwar->getFrameCount() % 17
+
+	if (Broodwar->getFrameCount() % 21
 #ifdef __CONTROL_BO_UNTIL_SECOND_PYLON__
 		&& (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Pylon) > 1 || Broodwar->getFrameCount() >= 5000)
 #endif
 		)
 	{
+		/// Research Techs/Upgrades
+		if (!_techsQueue.empty() || !_upgradesQueue.empty())
+		{
+			for (multimap<UnitType, Unit*>::const_iterator it = _techStructures.begin();
+				it != _techStructures.end(); ++it)
+			{
+				if (!it->second->isResearching() && !it->second->isUpgrading())
+				{
+					/// Techs
+					for (list<TechType>::const_iterator itech = _techsQueue.begin();
+						itech != _techsQueue.end(); )
+					{
+						if (itech->whatResearches() == it->first
+							&& checkCanTech(*itech)
+							&& minerals >= itech->mineralPrice()
+							&& gas >= itech->gasPrice())
+						{
+							minerals -= itech->mineralPrice();
+							gas -= itech->gasPrice();
+							_researchingTech.insert(make_pair<Unit*, TechType>(it->second, *itech));
+							it->second->research(*itech);
+							_techsQueue.erase(itech++);
+						}
+						else
+							++itech;
+					}
+					/// Upgrades
+					for (list<UpgradeType>::const_iterator iupg = _upgradesQueue.begin();
+						iupg != _upgradesQueue.end(); )
+					{
+						if (iupg->whatUpgrades() == it->first
+							&& checkCanUpgrade(*iupg)
+							&& minerals >= iupg->mineralPrice()
+							&& gas >= iupg->gasPrice())
+						{
+							minerals -= iupg->mineralPrice();
+							gas -= iupg->gasPrice();
+							_researchingUpgrade.insert(make_pair<Unit*, UpgradeType>(it->second, *iupg));
+							it->second->upgrade(*iupg);
+							_upgradesQueue.erase(iupg++);
+						}
+						else
+							++iupg;
+					}
+				}
+			}
+		}
+
+		/// Build more producing structures
 		list<UnitType> noLongerNeededProdBuildings;
 		for (set<BWAPI::UnitType>::iterator it = _neededProductionBuildings.begin();
 			it != _neededProductionBuildings.end(); ++it)
@@ -390,16 +504,8 @@ void Producer::onUnitCreate(BWAPI::Unit* unit)
 {
 	if (unit->getPlayer() != Broodwar->self())
 		return;
-	if (unit->getType().isBuilding() && unit->getType().canProduce())
+	if (unit->getType().isBuilding())
 		TheArbitrator->setBid(this, unit, 80);
-	else if (unit->getType() == UnitTypes::Protoss_Cybernetics_Core
-		|| unit->getType() == UnitTypes::Protoss_Robotics_Support_Bay
-		|| unit->getType() == UnitTypes::Protoss_Citadel_of_Adun
-		|| unit->getType() == UnitTypes::Protoss_Fleet_Beacon
-		|| unit->getType() == UnitTypes::Protoss_Templar_Archives
-		|| unit->getType() == UnitTypes::Protoss_Observatory
-		|| unit->getType() == UnitTypes::Protoss_Arbiter_Tribunal)
-		_techStructuresInConstruction.push_back(unit);
 	else if (_nbArchons > 0 && unit->getType() == UnitTypes::Protoss_High_Templar)
 		TheArbitrator->setBid(this, unit, 96);
 	else if (_nbDarkArchons > 0 && unit->getType() == UnitTypes::Protoss_Dark_Templar)
@@ -422,6 +528,15 @@ void Producer::onUnitDestroy(BWAPI::Unit* unit)
 	{
 		if (it->second == unit)
 		{
+			if (_researchingTech.find(unit) != _researchingTech.end()
+				&& !Broodwar->self()->hasResearched(_researchingTech[unit]))
+				researchTech(_researchingTech[unit]);
+			else if (_researchingUpgrade.find(unit) != _researchingUpgrade.end()
+				&& (Broodwar->self()->getUpgradeLevel(_researchingUpgrade[unit])
+				< _researchingUpgrade[unit].maxRepeats())) // not exact but will do
+				researchUpgrade(_researchingUpgrade[unit]);
+			_researchingTech.erase(unit);
+			_researchingUpgrade.erase(unit);
 			_techStructures.erase(it);
 			return;
 		}
@@ -443,6 +558,14 @@ void Producer::onOffer(set<Unit*> units)
 			else
 				_producingStructuresInConstruction.push_back(*it);
 		}
+		else if ((*it)->getType().isBuilding())
+		{
+			TheArbitrator->accept(this, *it, 95);
+			if ((*it)->isCompleted())
+				_techStructures.insert(make_pair<UnitType, Unit*>((*it)->getType(), *it));
+			else
+				_techStructuresInConstruction.push_back(*it);
+		}
 		else if ((*it)->getType() == UnitTypes::Protoss_High_Templar)
 		{
 			TheArbitrator->accept(this, *it, 96);
@@ -454,7 +577,10 @@ void Producer::onOffer(set<Unit*> units)
 			_dts.push_back(*it);
 		}
 		else
+		{
 			TheArbitrator->decline(this, *it, 0);
+			TheArbitrator->removeBid(this, *it);
+		}
 	}
 }
 

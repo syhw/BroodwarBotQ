@@ -20,9 +20,14 @@ public:
 	static Producer* create();
 	static void destroy();
 	inline bool checkCanProduce(BWAPI::UnitType t);
+	inline bool checkCanTech(BWAPI::TechType t);
+	inline bool checkCanUpgrade(BWAPI::UpgradeType t);
+	inline bool checkHaveTech(BWAPI::UnitType ut);
 	int willProduce(BWAPI::UnitType t);
 	void produce(int number, BWAPI::UnitType t, int priority=20, int increment=1);
 	void produceAdditional(int number, BWAPI::UnitType t, int priority=20, int increment=1);
+	void researchTech(BWAPI::TechType t);
+	void researchUpgrade(BWAPI::UpgradeType t);
 	void update();
 
 	void onUnitCreate(BWAPI::Unit* unit);
@@ -37,6 +42,10 @@ private:
 	std::list<BWAPI::Unit*> _techStructuresInConstruction;
 	std::list<BWAPI::Unit*> _producingStructuresInConstruction;
 	std::multimap<int, BWAPI::UnitType> _productionQueue;
+	std::list<BWAPI::TechType> _techsQueue;
+	std::list<BWAPI::UpgradeType> _upgradesQueue;
+	std::map<BWAPI::Unit*, BWAPI::TechType> _researchingTech;
+	std::map<BWAPI::Unit*, BWAPI::UpgradeType> _researchingUpgrade;
 	std::set<BWAPI::UnitType> _neededProductionBuildings;
 	int additionalUnitsSupply(int frames=30*24); // UnitTypes::Protoss_Pylon.buildTime()
 	const BWAPI::UnitType& mostSaturatedUT();

@@ -125,6 +125,9 @@ TilePosition PositionAccountant::findClosest(TilePosition seed)
 
 void SimCityBuildingPlacer::generate()
 {
+	if (TheBasesManager == NULL)
+		TheBasesManager = BasesManager::create();
+
 	BuildingsCluster bc = BuildingsCluster();
 	if (nbClusters < 3)
 	{
@@ -281,11 +284,13 @@ BuildingsCluster SimCityBuildingPlacer::searchForCluster(BWTA::Region* r)
 		if (tmpY > maxY)
 		    maxY = tmpY;
 	}
+	++minX;
+	++minY;
 	/// search for "big clusters"
 	int minXClusterDim = UnitTypes::Protoss_Pylon.tileWidth() + 2*UnitTypes::Protoss_Gateway.tileWidth() + 2; // 2 to move around
 	int minYClusterDim = UnitTypes::Protoss_Pylon.tileHeight() + 2*UnitTypes::Protoss_Gateway.tileHeight() + 2;
-	int tmpMaxX = min(maxX - minXClusterDim, Broodwar->mapWidth());
-	int tmpMaxY = min(maxY - minYClusterDim, Broodwar->mapHeight());
+	int tmpMaxX = min(maxX - minXClusterDim, Broodwar->mapWidth() - 1);
+	int tmpMaxY = min(maxY - minYClusterDim, Broodwar->mapHeight() - 2); // the bottom line is not buildable
 	for (int x = minX; x < tmpMaxX; x += 1)
 		for (int y = minY; y < tmpMaxY; y += 1)
 		{
@@ -405,17 +410,17 @@ int SimCityBuildingPlacer::canBuildCluster(const TilePosition& center, bool vert
 	if (vertical)
 	{
 		int minX = center.x() - UnitTypes::Protoss_Gateway.tileWidth() - 1; // -1 additional tile to move around
-		if (minX < 0)
+		if (minX <= 0)
 			return 0;
-		int maxX = center.x() + UnitTypes::Protoss_Pylon.tileWidth() + UnitTypes::Protoss_Gateway.tileWidth();
-		if (maxX >= Broodwar->mapWidth())
+		int maxX = center.x() + UnitTypes::Protoss_Pylon.tileWidth() + UnitTypes::Protoss_Gateway.tileWidth() + 1;
+		if (maxX >= Broodwar->mapWidth() - 1)
 			return 0;
 		// 1 stage of buildings (2 gates or 1 gate 1 tech or 2 tech buildings)
 		int minY1 = center.y() - UnitTypes::Protoss_Pylon.tileHeight() - 1;
-		if (minY1 < 0)
+		if (minY1 <= 0)
 			return 0;
-		int maxY1 = center.y() + UnitTypes::Protoss_Pylon.tileHeight();
-		if (maxY1 >= Broodwar->mapHeight())
+		int maxY1 = center.y() + UnitTypes::Protoss_Pylon.tileHeight() + 1;
+		if (maxY1 >= Broodwar->mapHeight() - 2)
 			return 0;
 		int minY = minY1;
 		int maxY = maxY1;
@@ -425,13 +430,13 @@ int SimCityBuildingPlacer::canBuildCluster(const TilePosition& center, bool vert
 		// 3 stages
 		int minY3 = center.y() - 2*UnitTypes::Protoss_Pylon.tileHeight() - 1;
 		int maxY3 = center.y() + 3*UnitTypes::Protoss_Pylon.tileHeight();
-		if (minY2 < 0 || maxY2 >= Broodwar->mapHeight())
+		if (minY2 <= 0 || maxY2 >= Broodwar->mapHeight() - 2)
 			clusterSize = 1;
 		else
 		{
 			minY = minY2;
 			maxY = maxY2;
-			if (minY3 < 0 || maxY3 >= Broodwar->mapHeight())
+			if (minY3 <= 0 || maxY3 >= Broodwar->mapHeight() -2)
 				clusterSize = 2;
 			else
 			{
@@ -457,33 +462,33 @@ int SimCityBuildingPlacer::canBuildCluster(const TilePosition& center, bool vert
 	else // horizontal
 	{
 		int minY = center.y() - UnitTypes::Protoss_Gateway.tileHeight() - 1; // -1 additional tile to move around
-		if (minY < 0)
+		if (minY <= 0)
 			return 0;
-		int maxY = center.y() + UnitTypes::Protoss_Pylon.tileHeight() + UnitTypes::Protoss_Gateway.tileHeight();
-		if (maxY >= Broodwar->mapHeight())
+		int maxY = center.y() + UnitTypes::Protoss_Pylon.tileHeight() + UnitTypes::Protoss_Gateway.tileHeight() + 1;
+		if (maxY >= Broodwar->mapHeight() - 2)
 			return 0;
 		// 1 stage of buildings (2 gates or 1 gate 1 tech or 2 tech buildings)
 		int minX1 = center.x() - UnitTypes::Protoss_Pylon.tileWidth() - 1;
-		int maxX1 = center.x() + UnitTypes::Protoss_Pylon.tileWidth();
-		if (minX1 < 0)
+		int maxX1 = center.x() + UnitTypes::Protoss_Pylon.tileWidth() + 1;
+		if (minX1 <= 0)
 			return 0;
-		if (maxX1 >= Broodwar->mapWidth())
+		if (maxX1 >= Broodwar->mapWidth() - 1)
 			return 0;
 		int minX = minX1;
 		int maxX = maxX1;
 		// 2 stages
 		int minX2 = center.x() - 2*UnitTypes::Protoss_Pylon.tileWidth() - 1;
-		int maxX2 = center.x() + 2*UnitTypes::Protoss_Pylon.tileWidth();
+		int maxX2 = center.x() + 2*UnitTypes::Protoss_Pylon.tileWidth() + 1;
 		// 3 stages
 		int minX3 = center.x() - 3*UnitTypes::Protoss_Pylon.tileWidth() - 1;
-		int maxX3 = center.x() + 3*UnitTypes::Protoss_Pylon.tileWidth();
-		if (minX2 < 0 || maxX2 >= Broodwar->mapWidth())
+		int maxX3 = center.x() + 3*UnitTypes::Protoss_Pylon.tileWidth() + 1;
+		if (minX2 <= 0 || maxX2 >= Broodwar->mapWidth() - 1)
 			clusterSize = 1;
 		else
 		{
 			minX = minX2;
 			maxX = maxX2;
-			if (minX3 < 0 || maxX3 >= Broodwar->mapWidth())
+			if (minX3 <= 0 || maxX3 >= Broodwar->mapWidth() - 1)
 				clusterSize = 2;
 			else
 			{
@@ -989,6 +994,11 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 	TilePosition cluster_center(nex.toTilePosition());
 	if (!makeCluster(cluster_center, 1, vertical))
 		generate();
+	generate();
+	generate();
+	generate();
+	generate();
+	generate();
 
 	/// search places to put cannons at chokes
 	makeCannonChoke(home->getRegion(), frontChoke);

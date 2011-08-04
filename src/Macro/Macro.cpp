@@ -58,7 +58,6 @@ void Macro::init()
 			TheBasesManager->setFirstGasPop(12);
 			TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 15);
 			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 16);
-			//TheUpgrader->upgrade(UpgradeTypes::Singularity_Charge);
 		}
 		else if (Broodwar->enemy()->getRace() == Races::Terran)
 		{
@@ -68,7 +67,6 @@ void Macro::init()
 			TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 15);
 			TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 16);
 			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 17);
-			//TheUpgrader->upgrade(UpgradeTypes::Singularity_Charge);
 		}
 		else
 		{
@@ -77,7 +75,6 @@ void Macro::init()
 			TheBasesManager->setFirstGasPop(12);
 			TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 15);
 			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 16);
-			//TheUpgrader->upgrade(UpgradeTypes::Singularity_Charge);
 		}
 	}
 	else
@@ -168,6 +165,7 @@ void Macro::onUnitCreate(BWAPI::Unit* unit)
 	{
 		if (unit->getType() == UnitTypes::Protoss_Cybernetics_Core && Broodwar->getFrameCount() < 12000)
 		{
+			TheProducer->researchUpgrade(UpgradeTypes::Singularity_Charge);
 			/// Built the (first) core
 			if (Broodwar->enemy()->getRace() == Races::Zerg)
 			{
