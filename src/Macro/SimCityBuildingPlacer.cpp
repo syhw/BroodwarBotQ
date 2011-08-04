@@ -104,6 +104,25 @@ TilePosition PositionAccountant::reservePos(TilePosition tp)
 	return TilePositions::None;
 }
 
+TilePosition PositionAccountant::findClosest(TilePosition seed)
+{
+	TilePosition ret = TilePositions::None;
+	double dist = DBL_MAX;
+	for each (TilePosition t in pos)
+	{
+		if (!givenPos.count(t)
+			&& t.getDistance(seed) <= dist)
+		{
+			dist = t.getDistance(seed);
+			ret = t;
+		}
+	}
+	if (ret != TilePositions::None)
+		ret = reservePos(ret);
+	return ret;
+}
+
+
 void SimCityBuildingPlacer::generate()
 {
 	BuildingsCluster bc = BuildingsCluster();
@@ -1090,35 +1109,53 @@ bool SimCityBuildingPlacer::fullCanBuildHere(BWAPI::Unit* builder, BWAPI::TilePo
 	return true;
 }	
 
-TilePosition SimCityBuildingPlacer::getTilePosition(const UnitType& ut)
+/***
+ * Gives a buildable TilePosition for the UnitType ut near seed if specified
+ */
+TilePosition SimCityBuildingPlacer::getTilePosition(const UnitType& ut,
+													TilePosition seed)
 {
-	if (ut == UnitTypes::Protoss_Pylon)
+	if (seed == TilePositions::None)
 	{
-		if (!pylons.pos.size())
+		if (ut == UnitTypes::Protoss_Pylon)
+		{
+			if (!pylons.pos.size())
+				generate();
+			return pylons.reservePos();
+		}
+		else if (ut == UnitTypes::Protoss_Gateway || ut == UnitTypes::Protoss_Stargate)
+		{
+			if (!gates.pos.size())
+				generate();
+			return gates.reservePos();
+		}
+		else if (ut == UnitTypes::Protoss_Photon_Cannon)
+		{
+			if (!cannons.pos.size())
+				generate();
+			return cannons.reservePos();
+		}
+		else
+		{
+			if (!tech.pos.size())
+				generate();
+			return tech.reservePos();
+		}
+		if (pylons.pos.size() < 2 || gates.pos.size() < 2 || tech.pos.size() < 2)
 			generate();
-		return pylons.reservePos();
-	}
-	else if (ut == UnitTypes::Protoss_Gateway || ut == UnitTypes::Protoss_Stargate)
-	{
-		if (!gates.pos.size())
-			generate();
-		return gates.reservePos();
-	}
-	else if (ut == UnitTypes::Protoss_Photon_Cannon)
-	{
-		if (!cannons.pos.size())
-			generate();
-		return cannons.reservePos();
+		return TilePositions::None; // def
 	}
 	else
 	{
-		if (!tech.pos.size())
-			generate();
-		return tech.reservePos();
+		if (ut == UnitTypes::Protoss_Pylon)
+			return pylons.findClosest(seed);
+		else if (ut == UnitTypes::Protoss_Gateway || ut == UnitTypes::Protoss_Stargate)
+		    return gates.findClosest(seed);
+		else if (ut == UnitTypes::Protoss_Photon_Cannon)
+			return cannons.findClosest(seed);
+		else
+			return tech.findClosest(seed);
 	}
-	if (pylons.pos.size() < 2 || gates.pos.size() < 2 || tech.pos.size() < 2)
-		generate();
-	return TilePositions::None; // def
 }
 
 void SimCityBuildingPlacer::releaseTilePosition(const TilePosition& tp, const UnitType& ut)

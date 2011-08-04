@@ -47,6 +47,12 @@ void Macro::init()
 		TheWorkerManager->enableAutoBuild();
 		if (Broodwar->enemy()->getRace() == Races::Zerg)
 		{
+			/*TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 8);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Nexus, 15);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Forge, 16);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 16);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Photon_Cannon, 18);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Photon_Cannon, 18);*/
 			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 8);
 			TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 11);
 			TheBasesManager->setFirstGasPop(12);
@@ -228,4 +234,10 @@ void Macro::onUnitRenegade(BWAPI::Unit* unit)
 		TheInformationManager->onUnitDestroy(unit);
 		TheInformationManager->onUnitDiscover(unit);
 	}
+}
+
+void Macro::expand()
+{
+	TheBasesManager->expand();
+	Macro::Instance().expands += 1;
 }

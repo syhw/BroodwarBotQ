@@ -15,6 +15,7 @@ Base::Base(BWTA::BaseLocation* b, Unit* center)
 , activeGas(false)
 , centerInConstruction(false)
 , gasInConstruction(false)
+, cannoned(false)
 {
 }
 
@@ -126,6 +127,13 @@ void Base::update()
 	if (activeGas && refinery == NULL && !gasInConstruction)
 		buildGas();
 	ready = (resourceDepot && resourceDepot->exists() && (resourceDepot->isCompleted() || resourceDepot->getRemainingBuildTime()<300)); // 300 frames before completion
+	if (Broodwar->getFrameCount() > 15*60*24 // after 15 minutes
+		&& !cannoned
+		&& !paused && ready) // active
+	{
+		TheBuilder->buildCannonsMinerals(baseLocation);
+		cannoned = true;
+	}
 }
 
 void Base::buildCenter()

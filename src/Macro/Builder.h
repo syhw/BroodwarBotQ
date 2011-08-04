@@ -42,6 +42,7 @@ public:
 	void addTask(const BWAPI::UnitType& t, const BWAPI::TilePosition& seedPosition, int lastOrder=0);
 	void build(const BWAPI::UnitType& t, const BWAPI::TilePosition& seedPosition=BWAPI::TilePositions::None);
 	void buildOrder(const BWAPI::UnitType& t, int supplyAsTime, const BWAPI::TilePosition& seedPosition=BWAPI::TilePositions::None);
+	void buildCannonsMinerals(BWTA::BaseLocation* b);
 	int numberInFutureTasks(const BWAPI::UnitType& t);
 	int numberInConstruction(const BWAPI::UnitType& t);
 	int willBuild(const BWAPI::UnitType& t);      // Dumb helper functions that should be replaced by a better datastructure

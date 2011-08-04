@@ -327,6 +327,32 @@ void Builder::buildOrder(const BWAPI::UnitType& t, int supplyAsTime, const BWAPI
 	boTasks.insert(make_pair<int, pTask>(supplyAsTime, tmp));
 }
 
+/// Attempts to build 2 pylons + 2 cannons around the minerals
+void Builder::buildCannonsMinerals(BWTA::BaseLocation* b)
+{
+	if (b == NULL)
+		return;
+	Task::buildingPlacer->makeCannonsMinerals(b);
+	// 2 pylons
+	TilePosition tp = Task::buildingPlacer->getTilePosition(UnitTypes::Protoss_Pylon, b->getTilePosition());
+	if (tp == TilePositions::None)
+		return;
+	addTask(UnitTypes::Protoss_Pylon, tp);
+	tp = Task::buildingPlacer->getTilePosition(UnitTypes::Protoss_Pylon, b->getTilePosition());
+	if (tp == TilePositions::None)
+		return;
+	addTask(UnitTypes::Protoss_Pylon, tp);
+	// 2 cannons
+	tp = Task::buildingPlacer->getTilePosition(UnitTypes::Protoss_Photon_Cannon, b->getTilePosition());
+	if (tp == TilePositions::None)
+		return;
+	addTask(UnitTypes::Protoss_Pylon, tp, Broodwar->getFrameCount() + UnitTypes::Protoss_Pylon.buildTime() + __MIN_FRAMES_TO_START_CONSTRUCTION__);
+	tp = Task::buildingPlacer->getTilePosition(UnitTypes::Protoss_Photon_Cannon, b->getTilePosition());
+	if (tp == TilePositions::None)
+		return;
+	addTask(UnitTypes::Protoss_Pylon, tp, Broodwar->getFrameCount() + UnitTypes::Protoss_Pylon.buildTime() + __MIN_FRAMES_TO_START_CONSTRUCTION__);
+}
+
 int Builder::numberInFutureTasks(const UnitType& t)
 {
 	int number = 0;

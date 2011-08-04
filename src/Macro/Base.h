@@ -32,4 +32,5 @@ private:
 	bool activeGas;
 	bool centerInConstruction;
 	bool gasInConstruction;
+	bool cannoned;
 };

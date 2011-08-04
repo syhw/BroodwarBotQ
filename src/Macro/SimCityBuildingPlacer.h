@@ -22,6 +22,7 @@ struct PositionAccountant
 	std::set<BWAPI::TilePosition> givenPos;
 	BWAPI::TilePosition reservePos();
 	BWAPI::TilePosition reservePos(BWAPI::TilePosition tp);
+	BWAPI::TilePosition findClosest(BWAPI::TilePosition seed);
 	inline void freePos(const BWAPI::TilePosition& tp)
 	{
 		givenPos.erase(tp);
@@ -61,7 +62,7 @@ class SimCityBuildingPlacer
 {
 public:
 	SimCityBuildingPlacer();
-	BWAPI::TilePosition getTilePosition(const BWAPI::UnitType& ut);
+	BWAPI::TilePosition getTilePosition(const BWAPI::UnitType& ut, BWAPI::TilePosition seed = BWAPI::TilePositions::None);
 	BWAPI::TilePosition getPylonTilePositionCovering(const BWAPI::TilePosition& tp);
 	void releaseTilePosition(const BWAPI::TilePosition& tp, const BWAPI::UnitType& ut);
 	void usedTilePosition(const BWAPI::TilePosition& tp, const BWAPI::UnitType& ut);
@@ -69,6 +70,7 @@ public:
 	void update();
 #endif
 	void onUnitDestroy(BWAPI::Unit* unit);
+    void makeCannonsMinerals(BWTA::BaseLocation* home, bool quick=false);
 private:
 	std::list<BWAPI::TilePosition> existingPylons;
 	PositionAccountant pylons;
@@ -87,7 +89,6 @@ private:
 	BWAPI::TilePosition closestBuildableSameRegion(const BWAPI::TilePosition& tp);
 	BWAPI::TilePosition closestBuildableSameRegionNotTP2(const BWAPI::TilePosition& tp, const BWAPI::TilePosition& tp2);
 	inline void makeCannonChoke(BWTA::Region* inter, BWTA::Chokepoint* chok, bool quick=false);
-    inline void makeCannonsMinerals(BWTA::BaseLocation* home, bool quick=false);
 	inline void generate();
 	inline std::set<BWAPI::Unit*> checkPower(const std::set<BWAPI::Unit*>& buildings);
 	inline bool powerBuildings(const std::set<BWAPI::Unit*>& buildings);

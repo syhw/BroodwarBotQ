@@ -546,10 +546,7 @@ void ETechEstimator::useDistribOpenings()
 		if (fearThese.count(3)) // SiegeExpand
 		{
 			if (!Macro::Instance().expands)
-			{
-				TheBasesManager->expand();
-				Macro::Instance().expands += 1;
-			}
+				Macro::Instance().expand();
 		}
 		if (fearThese.count(5)) // FastDropship
 		{
@@ -593,10 +590,7 @@ void ETechEstimator::useDistribOpenings()
 			&& openingsProbas[5] > 0.5)
 		{
 			if (!Macro::Instance().expands)
-			{
-				TheBasesManager->expand();
-				Macro::Instance().expands += 1;
-			}
+				Macro::Instance().expand();
 		}
 	}
 	else if (enemyRace == Races::Zerg)
