@@ -6,6 +6,7 @@
 #include "Macro/UnitGroupManager.h"
 #include "Utils/Util.h"
 #include "BWSAL.h"
+#include "Defines.h"
 using namespace BWAPI;
 using namespace std;
 using namespace Util;
@@ -228,7 +229,8 @@ void WorkerManager::rebalanceWorkers()
 	if (this->autoBuild)
 	{
 		BWAPI::UnitType workerType=BWAPI::Broodwar->self()->getRace().getWorker();
-		TheProducer->produce((int)(optimalWorkerCount*1.2), workerType, autoBuildPriority);
+		if (Broodwar->self()->completedUnitCount(workerType) < optimalWorkerCount*__WORKERS_FACTOR__)
+			TheProducer->produce((int)(optimalWorkerCount*__WORKERS_FACTOR__), workerType, autoBuildPriority);
 	}
 }
 

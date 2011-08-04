@@ -84,7 +84,7 @@ bool Producer::checkCanProduce(UnitType t)
 		if (_techStructures.find(it->first) == _techStructures.end()
 			&& _producingStructures.find(it->first) == _producingStructures.end()) // TODO Archons
 		{
-			if (it->first.isBuilding() && !TheBuilder->willBuild(it->first))
+			if (it->first.isBuilding() && !Broodwar->self()->incompleteUnitCount(it->first) && !TheBuilder->willBuild(it->first))
 				TheBuilder->build(it->first);
 			ret = false;
 		}
@@ -237,18 +237,20 @@ const UnitType& Producer::mostSaturatedUT()
 	return UnitTypes::None;
 }
 
+/// Defensive check for it exists
+void Producer::addToProducingStructures(Unit* u)
+{
+	for (multimap<BWAPI::UnitType, ProducingUnit>::const_iterator it = _producingStructures.begin();
+		it != _producingStructures.end(); ++it)
+	{
+		if (it->second.unit == u)
+			return;
+	}
+	_producingStructures.insert(make_pair<UnitType, ProducingUnit>((*it)->getType(), *it));
+}
+
 void Producer::update()
 {
-	/// hack for the start (to add the first Nexus) because units does not exist in the cstor
-	if (_producingStructures.empty())
-	{
-		UnitType centerType = Broodwar->self()->getRace().getCenter();
-		set<Unit*> centers = SelectAll(centerType);
-		for (set<Unit*>::const_iterator it = centers.begin();
-			it != centers.end(); ++it)
-			_producingStructures.insert(make_pair<UnitType, ProducingUnit>(centerType, *it));
-	}
-
 	/// Produce Archons if needed
 	if ((_nbArchons || _nbDarkArchons) && Broodwar->getFrameCount() % 41)
 		mergeArchons();
@@ -261,7 +263,7 @@ void Producer::update()
 	{
 		if ((*it)->isCompleted())
 		{
-			_producingStructures.insert(make_pair<UnitType, ProducingUnit>((*it)->getType(), *it));
+			addToProducingStructure(*it);
 			_producingStructuresInConstruction.erase(it++);
 		}
 		else
@@ -299,18 +301,25 @@ void Producer::update()
 	int minerals = Broodwar->self()->minerals() - Macro::Instance().reservedMinerals;
 	int gas = Broodwar->self()->gas() - Macro::Instance().reservedGas;
 	/// Build more producing structures
-	list<UnitType> noLongerNeededProdBuildings;
-	for (set<BWAPI::UnitType>::iterator it = _neededProductionBuildings.begin();
-		it != _neededProductionBuildings.end(); ++it)
+	if (Broodwar->getFrameCount() % 17
+#ifdef __CONTROL_BO_UNTIL_SECOND_PYLON__
+		&& (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Pylon) > 1 || Broodwar->getFrameCount() >= 5000)
+#endif
+		)
 	{
-		if (minerals > it->mineralPrice() && gas > it->gasPrice())
+		list<UnitType> noLongerNeededProdBuildings;
+		for (set<BWAPI::UnitType>::iterator it = _neededProductionBuildings.begin();
+			it != _neededProductionBuildings.end(); ++it)
 		{
-			TheBuilder->build(*it);
-			noLongerNeededProdBuildings.push_back(*it);
+			if (minerals > it->mineralPrice() && gas > it->gasPrice())
+			{
+				TheBuilder->build(*it);
+				noLongerNeededProdBuildings.push_back(*it);
+			}
 		}
+		for each (UnitType ut in noLongerNeededProdBuildings)
+			_neededProductionBuildings.erase(ut);
 	}
-	for each (UnitType ut in noLongerNeededProdBuildings)
-		_neededProductionBuildings.erase(ut);
 
     /// Find buildings free to produce units
 	multimap<UnitType, ProducingUnit*> free;
@@ -418,7 +427,7 @@ void Producer::onOffer(set<Unit*> units)
 		{
 			TheArbitrator->accept(this, *it, 95);
 			if ((*it)->isCompleted())
-				_producingStructures.insert(make_pair<UnitType, ProducingUnit>((*it)->getType(), *it));
+				addToProducingStructures(*it);
 			else
 				_producingStructuresInConstruction.push_back(*it);
 		}

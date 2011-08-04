@@ -48,7 +48,7 @@ void Macro::init()
 		if (Broodwar->enemy()->getRace() == Races::Zerg)
 		{
 			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 8);
-			TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 10);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 11);
 			TheBasesManager->setFirstGasPop(12);
 			TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 14);
 			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 16);
@@ -57,7 +57,7 @@ void Macro::init()
 		else if (Broodwar->enemy()->getRace() == Races::Terran)
 		{
 			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 8);
-			TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 10);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 11);
 			TheBasesManager->setFirstGasPop(12);
 			TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 14);
 			TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 15);
@@ -67,7 +67,7 @@ void Macro::init()
 		else
 		{
 			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 8);
-			TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 10);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 11);
 			TheBasesManager->setFirstGasPop(12);
 			TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 14);
 			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 16);

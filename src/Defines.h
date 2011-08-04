@@ -13,6 +13,7 @@
 #define __ETECH_ESTIMATOR__ // use the ETechEstimator (or not if undef)
 #define __BENS_LABELS__ // use Ben Weber's openings/strategies labels in the ETechEstimator
 #define __BUILD_IN_ORDER_OF_INPUT__ // build buildings in the order in which they were inputed to TheBuilder
+#define __WORKERS_FACTOR__ 1.2 // how much more workers we want on top of the optimal count (nb workers = optimal * __WORKERS_FACTOR__)
 
 #ifdef __DEBUG__
 //#include <vld.h>

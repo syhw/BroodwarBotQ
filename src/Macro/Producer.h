@@ -43,6 +43,7 @@ private:
 	Producer();
 	~Producer();
 
+	inline void addToProducingStructures(BWAPI::Unit* u);
 	inline void mergeArchons();
 	inline void freeMerging();
     int _nbArchons;
