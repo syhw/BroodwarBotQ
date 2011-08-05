@@ -3,6 +3,7 @@
 #include "Subgoal.h"
 #include "FormationSubgoal.h"
 #include "Micro/Formations.h"
+#include "Macro/BWSAL.h"
 
 using namespace BWAPI;
 using namespace std;
@@ -65,3 +66,27 @@ void AttackGoal::canBidOn(Unit* u)
 {
 	bidOnUnit(u);
 }
+
+/*void AttackGoal::onOffer(set<Unit*> objects)
+{
+	GoalManager* gm = & GoalManager::Instance();
+	if (_status == GS_WAIT_PRECONDITION || _status == GS_IN_PROGRESS)
+	{
+        for each (Unit* u in objects)
+		{
+			TheArbitrator->accept(this, u, _priority);
+			if (_neededUnits.find(u->getType()) != _neededUnits.end())
+				_neededUnits[u->getType()] -= 1;
+			_unitsGroup.dispatchCompleteUnit(gm->getCompletedUnit(u));
+			gm->unassignedUnits.erase(u);
+			}
+		}
+	}
+	else
+	{
+		TheArbitrator->decline(this, objects, 0);
+		TheArbitrator->removeBid(this, objects);
+        for each (Unit* u in objects)
+			_biddedOn.erase(u);
+	}
+}*/

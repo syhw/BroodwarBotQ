@@ -88,7 +88,7 @@ void ArchonUnit::micro()
         }
         attackEnemyUnit(targetEnemy);
     }
-    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatencyFrames()*2
+    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatencyFrames() + 2
 		|| unit->getGroundWeaponCooldown() == unit->getType().groundWeapon().damageCooldown()) // against really laggy games TODO in other units 
     {
         if (_fleeing)

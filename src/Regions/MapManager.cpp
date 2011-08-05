@@ -3,7 +3,7 @@
 #include "Regions/MapManager.h"
 #include "Micro/Units/ProtossSpecial/HighTemplarUnit.h"
 
-#define __MESH_SIZE__ 24 // 16 // 24 // 32 // 48
+#define __MESH_SIZE__ 16 // 16 // 24 // 32 // 48
 #define __STORM_SIZE__ 96
 
 using namespace BWAPI;
@@ -573,18 +573,23 @@ void MapManager::updateStormPos()
                 && eit->second.y() > it->y() - 40 && eit->second.y() < it->y() + 40)
                 tmp += 2;
             // TODO TOCHANGE 8 here, to center, it could be 1 tiles x 32 / 2 = 16 or less
-            if (eit->second.x() > it->x() - 8 && eit->second.x() < it->x() + 8
+            /*if (eit->second.x() > it->x() - 8 && eit->second.x() < it->x() + 8
                 && eit->second.y() > it->y() - 8 && eit->second.y() < it->y() + 8)
-                ++tmp;
+                ++tmp;*/
         }
         for (std::map<BWAPI::Unit*, std::pair<BWAPI::UnitType, BWAPI::Position> >::const_iterator iit = _invisibleUnitsBuf.begin();
             iit != _invisibleUnitsBuf.end(); ++ iit)
         {
-            if (iit->second.first != UnitTypes::Protoss_Observer && iit->second.first != UnitTypes::Zerg_Zergling
-                && iit->second.first != UnitTypes::Terran_Vulture_Spider_Mine
-                && iit->second.second.x() > it->x() - (__STORM_SIZE__ / 2 + 1) && iit->second.second.x() < it->x() + (__STORM_SIZE__ / 2 + 1)
-                && iit->second.second.y() > it->y() - (__STORM_SIZE__ / 2 + 1) && iit->second.second.y() < it->y() + (__STORM_SIZE__ / 2 + 1))
+			if (!(iit->second.second.x() > it->x() - (__STORM_SIZE__ / 2 + 1) && iit->second.second.x() < it->x() + (__STORM_SIZE__ / 2 + 1)
+			    && iit->second.second.y() > it->y() - (__STORM_SIZE__ / 2 + 1) && iit->second.second.y() < it->y() + (__STORM_SIZE__ / 2 + 1)))
+				continue;
+            if (iit->second.first == UnitTypes::Protoss_Reaver 
+				|| iit->second.first == UnitTypes::Terran_Siege_Tank_Siege_Mode
+				|| iit->second.first == UnitTypes::Zerg_Lurker)
                 ++tmp;            
+			else if (iit->second.first == UnitTypes::Protoss_Observer || iit->second.first != UnitTypes::Zerg_Zergling
+				|| iit->second.first != UnitTypes::Terran_Vulture_Spider_Mine || iit->second.first != UnitTypes::Terran_Vulture)
+				--tmp;
         }
         if (tmp > 0)
         {
@@ -838,6 +843,7 @@ void MapManager::update()
 			_currentPathfindWork.bunit = NULL;
 		if (!_currentPathfindWorkAborded 
 			&& _currentPathfindWork.bunit != NULL
+			&& _currentPathfindWork.bunit->unit != NULL && _currentPathfindWork.bunit->unit->exists()
 			&& _currentPathfindWork.btpath.empty())
 		{
 			/*if (_currentPathfindWork.btpath.size() > _currentPathfindWork.bunit->btpath.size())

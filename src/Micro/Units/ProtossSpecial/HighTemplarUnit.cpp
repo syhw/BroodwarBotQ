@@ -62,6 +62,7 @@ void HighTemplarUnit::micro()
             stormableUnits.insert(*it);
     }
     
+	Position move;
     if (_fleeing)
         flee();
     else
@@ -72,20 +73,20 @@ void HighTemplarUnit::micro()
 		{
 			if (_bestFartherStormPos != Positions::None
 				&& _bestFartherStormPos.getApproxDistance(_unitPos) >= 9*TILE_SIZE)
-				this->move(_bestFartherStormPos);
+				move = _bestFartherStormPos;
 			else if (_bestStormPos != Positions::None
 				&& _bestStormPos.getApproxDistance(_unitPos) >= 9*TILE_SIZE)
-				this->move(_bestStormPos);
+				move = _bestStormPos;
 			else
-				this->move(_unitsGroup->center);
+				move - _unitsGroup->center;
 		}
 		else
-			this->move(_unitsGroup->center);
+			move = _unitsGroup->center;
 		_lastClickFrame = Broodwar->getFrameCount();
 		_lastMoveFrame = Broodwar->getFrameCount();
     }
 	// Try and storm if it has any advantage
-	if (this->unit->getEnergy() > 74 && elapsed > Broodwar->getLatencyFrames() + 42) // TODO magic number 42
+	if (this->unit->getEnergy() > 74 && elapsed > Broodwar->getLatencyFrames() + 22) // TODO magic number 22
     {   
         int bestScore = -1000;
 		int bestFartherScore = -1000;
@@ -127,7 +128,9 @@ void HighTemplarUnit::micro()
         }
         // Storm only if it damages at least 2 units, or at least 1 invisible unit,
         // or there is only one enemy unit around us and we can storm it without collateral damages
-        if (bestScore > 4 || (_unitsGroup->enemies.size() == 1 && bestScore == 3))
+		if ((bestScore > 3 && (unit->getEnergy() > 149 || unit->getHitPoints() < _fleeingDmg))
+			|| bestScore > 4
+			|| (_unitsGroup->enemies.size() == 1 && bestScore >= 3))
         {       
             unit->useTech(BWAPI::TechTypes::Psionic_Storm, _bestStormPos);
             //Broodwar->printf("Frame %d, pos (%d, %d), stormPos size %d", Broodwar->getFrameCount(), bestStormPos.x(), bestStormPos.y(), _mapManager->stormPos.size());
@@ -136,6 +139,8 @@ void HighTemplarUnit::micro()
             _lastStormFrame = Broodwar->getFrameCount();
             _lastStormPos = _bestStormPos;
         }
+		else
+			unit->move(move);
     }
 }
 

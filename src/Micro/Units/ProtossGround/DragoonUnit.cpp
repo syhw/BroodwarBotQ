@@ -122,7 +122,7 @@ void DragoonUnit::micro()
         }
         attackEnemyUnit(targetEnemy);
     }
-    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatencyFrames()*2 + 1 // == (Broodwar->getLatencyFrames()+1)*2, safety
+    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatencyFrames()*2 + 2 // (Broodwar->getLatencyFrames()+1)*2, safety
 		|| unit->getGroundWeaponCooldown() == unit->getType().groundWeapon().damageCooldown()) // against really laggy games TODO in other units
     {
 		if (currentFrame - _lastClickFrame <= Broodwar->getLatencyFrames() + 3) /// HACK TODO remove/change
@@ -132,7 +132,7 @@ void DragoonUnit::micro()
 #ifdef __SIMPLE_FLEE__
             simpleFlee();
 #else
-			if (_targetingMe.size() > 3) /// HACK TODO remove/change (unit->isStuck()?)
+			if (unit->isStuck()) /// HACK TODO remove/change (unit->isStuck()?)
 				simpleFlee();
 			else
 				flee();

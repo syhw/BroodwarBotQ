@@ -23,14 +23,13 @@ void Micro::update()
 {
 	if (!_launchedFirstPush
 		&& !TheInformationManager->getEnemyBases().empty()
-		&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 2)
+		&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 1)
 	{
 		Position p(Positions::None);
 		p = (*(TheInformationManager->getEnemyBases().begin()))->getPosition();
 		if (p != Positions::None)
 		{
-			pGoal tmp_goal = pGoal(new AttackGoal(p, 90));
-			goalManager->addGoal(tmp_goal);
+			goalManager->addGoal(pGoal(new AttackGoal(p, 90)));
 			_launchedFirstPush = true;
 		}
 	}

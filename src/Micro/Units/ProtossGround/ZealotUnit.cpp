@@ -142,7 +142,7 @@ void ZealotUnit::updateTargetEnemy()
 
 void ZealotUnit::flee()
 {
-	if (_lastTotalHP < 60)
+	//if (_lastTotalHP < 60)
 	{
 		for each (Unit* u in _targetingMe)
 		{
@@ -189,7 +189,7 @@ void ZealotUnit::micro()
 		else
 			unit->attack(_unitsGroup->enemiesCenter);
     }
-    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatencyFrames()*2 + 2) // == (Broodwar->getLatencyFrames()+1)*2, safety
+    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatencyFrames() + 2) // (Broodwar->getLatencyFrames()+1)*2, safety
     {
         if (_fleeing)
         {

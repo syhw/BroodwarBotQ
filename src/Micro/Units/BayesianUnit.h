@@ -162,6 +162,7 @@ protected:
     int computeDmg(BWAPI::Unit* u);
     bool inRange(BWAPI::Unit* u);
     bool outRanges(BWAPI::Unit* u);
+	bool outRanges(const std::set<Unit*>& units);
 	bool isOutrangingMe(BWAPI::Unit* u);
     void drawDirV();
     void updateObj();

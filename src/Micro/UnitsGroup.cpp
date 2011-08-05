@@ -14,6 +14,7 @@ int round(double a)
 using namespace BWAPI;
 
 //#define __LEADING_UNIT_BY_SIZE_HP__
+//#define __WITH_RETREAT__
 #define __MAX_DISTANCE_TO_GROUP__ 512
 
 UnitsGroup::UnitsGroup()
@@ -221,7 +222,7 @@ double UnitsGroup::evaluateForces()
                 theirMinPrice += 3*(ut.mineralPrice() + 50);
             } else if (ut == UnitTypes::Protoss_Shield_Battery)
             {
-                theirMinPrice += 2*ut.mineralPrice();
+                theirMinPrice += ut.mineralPrice();
             }
             continue;
         }
@@ -526,9 +527,11 @@ void UnitsGroup::update()
 			for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
 			{
 				(*it)->target = Position(Broodwar->self()->getStartLocation());
+#ifdef __WITH_RETREAT__
 				if ((*it)->unit->getDistance((*it)->target) >= 10*TILE_SIZE)
 					(*it)->switchMode(MODE_MOVE);
 				else
+#endif
 				{
 					if ((*it)->getType().isFlyer())
 						(*it)->switchMode(MODE_FIGHT_A);
@@ -570,7 +573,7 @@ void UnitsGroup::update()
 					{
 						if (enemiesAltitude > groupAltitude 
 							&& nearestChoke
-							&& (*it)->unit->getDistance(nearestChoke->getCenter()) < 4*TILE_SIZE)
+							&& (*it)->unit->getDistance(nearestChoke->getCenter()) < 6*TILE_SIZE)
 						{
 							const std::pair<BWTA::Region*, BWTA::Region*> regions = nearestChoke->getRegions();
 							BWTA::Region* higherRegion = 

@@ -49,8 +49,8 @@ using namespace BWAPI;
 #define _PROB_NO_DAMAGE_MOVE 0.9
 #define _PROB_NO_REPULSE_MOVE 0.7
 #define _PROB_NO_WALL_MOVE 0.9999999
-#define _PROB_NO_BUILDING_MOVE 0.99999
-#define _PROB_GO_OBJ 0.9
+#define _PROB_NO_BUILDING_MOVE 0.999
+#define _PROB_GO_OBJ 0.7
 ///#define _PROB_GO_NOT_VISIBLE 0.4
 
 BayesianUnit::BayesianUnit(Unit* u, const ProbTables* probTables)
@@ -444,7 +444,6 @@ double BayesianUnit::computeProb(unsigned int i)
 
     if (_mode == MODE_INPOS) /// Attraction of the obj (== target in INPOS)
     {
-        double prob_obj = _PROB_GO_OBJ;
         if (_dirv[i] != obj) // => tmp.getDistance(tmp_obj) != 0
         {
             Position tmp = _dirv[i].translate(_unitPos);
@@ -476,7 +475,7 @@ double BayesianUnit::computeProb(unsigned int i)
 
     if (_mode == MODE_FIGHT_G || _mode == MODE_FIGHT_A)
     {
-        if (_fleeing) /// fleeing gradient influence
+        if (_fleeing) /// damage map influence
         {
             val *= _probTables->probTablesData._damageProb[_damageValues[i]];
         }
@@ -486,8 +485,8 @@ double BayesianUnit::computeProb(unsigned int i)
             Vec dirvtmp = _dirv[i];
             objnorm.normalize();
             dirvtmp.normalize();
-            const double tmp = dirvtmp.dot(objnorm);
-            val *= (_PROB_GO_OBJ*tmp > 0.1 ? _PROB_GO_OBJ*tmp : 0.1);
+            val *= min(1 - _PROB_GO_OBJ, 
+				(1 - _PROB_GO_OBJ) + (_PROB_GO_OBJ - (1 - _PROB_GO_OBJ))*dirvtmp.dot(objnorm));
         }
     }
 
@@ -510,6 +509,8 @@ double BayesianUnit::computeProb(unsigned int i)
         {
             val *= 1.0-_PROB_NO_UNIT_MOVE;
         }
+		else
+			val *= _PROB_NO_BUILDING_MOVE + _PROB_NO_WALL_MOVE + _PROB_NO_UNIT_MOVE;
     }
 
     return val;
@@ -644,24 +645,41 @@ void BayesianUnit::updateObj()
         {
 			// the damage maps / gradients are BuildTile resolution, too big for small units to use
 			obj = Vec(0, 0);
+			if (outRanges(_targetingMe)) // kiting, should perhaps take targetingMe into account
+			{
+				obj = Vec(0, 0);
+				for each (Unit* u in _targetingMe)
+					obj += Vec(_unitPos.x() - u->getPosition().x(), _unitPos.y() - u->getPosition().y());
+			}
+			// if we don't kite, it will just go to safest cases, but they can be behind the enemy
         }
         else /// target influence
         {
-            if (unit->isMoving() && _fightMoving) //& _lastRightClick == target) // steering
-                obj = Vec(unit->getVelocityX(), unit->getVelocityY());
-            else if (_unitPos.getDistance(target) < 1.0)
-                obj = Vec(0, 0);
-			else if (_unitsGroup && !_unitsGroup->ppath.empty())
+			obj = Vec(0, 0);
+			if (outRanges(_targetingMe)) // kiting, should perhaps take targetingMe into account
 			{
-				if (_unitsGroup->ppath.size() > 2)
-					obj = Vec(_unitsGroup->ppath[2].x() - _unitPos.x(), _unitsGroup->ppath[2].y() - _unitPos.y());
-				if (_unitsGroup->ppath.size() > 1)
-					obj = Vec(_unitsGroup->ppath[1].x() - _unitPos.x(), _unitsGroup->ppath[1].y() - _unitPos.y());
-				else
-					obj = Vec(_unitsGroup->ppath[0].x() - _unitPos.x(), _unitsGroup->ppath[0].y() - _unitPos.y());
+				for each (Unit* u in _targetingMe)
+					obj += Vec(_unitPos.x() - u->getPosition().x(), _unitPos.y() - u->getPosition().y());
 			}
-            else
-                obj = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y());
+			else
+			{
+	            //if (unit->isMoving() && _fightMoving) //& _lastRightClick == target) // steering
+	            //    obj = Vec(unit->getVelocityX(), unit->getVelocityY());
+	            //else if (_unitPos.getDistance(target) < 1.0)
+	            if (_unitPos.getDistance(target) < 1.0)
+	                obj = Vec(0, 0);
+				else if (_unitsGroup && !_unitsGroup->ppath.empty())
+				{
+					if (_unitsGroup->ppath.size() > 2 && _ppath[2].getApproxDistance(_unitPos) <= 2*TILE_SIZE)
+						obj = Vec(_unitsGroup->ppath[2].x() - _unitPos.x(), _unitsGroup->ppath[2].y() - _unitPos.y());
+					if (_unitsGroup->ppath.size() > 1 && _ppath[1].getApproxDistance(_unitPos) <= 2*TILE_SIZE)
+						obj = Vec(_unitsGroup->ppath[1].x() - _unitPos.x(), _unitsGroup->ppath[1].y() - _unitPos.y());
+					else
+						obj = Vec(_unitsGroup->ppath[0].x() - _unitPos.x(), _unitsGroup->ppath[0].y() - _unitPos.y());
+				}
+	            else
+	                obj = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y());
+			}
         }
     }
 }
@@ -1510,6 +1528,16 @@ bool BayesianUnit::outRanges(BWAPI::Unit* u)
     return false;
 }
 
+bool BayesianUnit::outRanges(const std::set<Unit*>& units)
+{
+	for each (Unit* u in units)
+	{
+		if (!outRanges(u))
+			return false;
+	}
+	return true;
+}
+
 bool BayesianUnit::isOutrangingMe(BWAPI::Unit* u)
 {
     UnitType ut = u->getType();
@@ -1853,7 +1881,7 @@ int BayesianUnit::fightMove()
 #endif
     /// Or simply move away from our friends and kite if we can
     if (targetEnemy != NULL && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected()
-        && outRanges(targetEnemy) // don't kite it we don't outrange
+        //&& outRanges(targetEnemy) // don't kite it we don't outrange
         && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatencyFrames()))
     {
         // TODO TO COMPLETE (with a clickTarget() if dist > threshold)
@@ -1933,7 +1961,7 @@ void BayesianUnit::simpleFlee()
 {
     _fightMoving = false;
 	/// Don't flee only a single enemy that we don't outrange
-    if (_unitsGroup && _unitsGroup->enemies.size() <= 1 && targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() && !outRanges(targetEnemy)) // TOCHANGE 1
+    if (_unitsGroup && _unitsGroup->enemies.size() <= 1 && targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() && !outRanges(_targetingMe)) // TOCHANGE 1
     {
         _fleeing = false;
         return;
@@ -2007,7 +2035,7 @@ bool BayesianUnit::dodgeStorm()
     for (std::map<Bullet*, Position>::const_iterator it = storms.begin();
         it != storms.end(); ++it)
     {
-        if (it->second.getApproxDistance(_unitPos) < 67.8)
+        if (it->second.getApproxDistance(_unitPos) < 68.0)
         {
             // update possible directions vector
             updateDirV();
@@ -2180,6 +2208,12 @@ void BayesianUnit::update()
 #endif
             return;
         }
+		/*else if (target != _unitPos
+			&& _unitsGroup->nearestChoke
+			&& _unitsGroup->nearestChoke->getCenter().getApproxDistance(_unitPos) <= 4*TILE_SIZE)
+		{
+			unit->move(target);
+		}*/
         micro();
         break;;
 

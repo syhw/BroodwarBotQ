@@ -14,7 +14,7 @@
 #define __BENS_LABELS__ // use Ben Weber's openings/strategies labels in the ETechEstimator
 #define __WORKERS_FACTOR__ 1.2 // how much more workers we want on top of the optimal count (nb workers = optimal * __WORKERS_FACTOR__)
 #define __MAX_WORKERS__ 75
-#define __MICRO_TESTS_ONLY__ // VERY IMPORTANT TO KICK THAT IN MACRO/FULL GAMES
+//#define __MICRO_TESTS_ONLY__ // VERY IMPORTANT TO KICK THAT IN MACRO/FULL GAMES
 
 #ifdef __DEBUG__
 //#include <vld.h>

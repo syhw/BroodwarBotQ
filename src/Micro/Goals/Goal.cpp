@@ -106,6 +106,8 @@ void Goal::onOffer(set<Unit*> objects)
 				_unitsGroup.dispatchCompleteUnit(gm->getCompletedUnit(u));
 				gm->unassignedUnits.erase(u);
 			}
+			else
+				TheArbitrator->decline(this, objects, 0);
 		}
 	}
 	else

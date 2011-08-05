@@ -60,12 +60,24 @@ void GoalManager::update()
 		_firstPoke = true;
 	}*/ 
 
+#ifdef __DEBUG__
+	int y = 5;
+#endif
 	/// Update all goals
 	for each (pGoal g in _goals)
 	{
 		if (!unassignedUnits.empty())
 			g->canBidOn(unassignedUnits);
 		g->update();
+#ifdef __DEBUG__
+		if (g->getStatus() == GS_WAIT_PRECONDITION)
+			Broodwar->drawTextScreen(5, y, "\x17%s", g->getName().c_str());
+		else if (g->getStatus() == GS_IN_PROGRESS)
+			Broodwar->drawTextScreen(5, y, "\x07%s", g->getName().c_str());
+		else
+			Broodwar->drawTextScreen(5, y, "%s", g->getName().c_str());
+		y += 8;
+#endif
 	}
 	/// Removed finished goals
 	for (list<pGoal>::const_iterator it = _goals.begin();
