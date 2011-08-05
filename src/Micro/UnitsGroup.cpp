@@ -516,6 +516,12 @@ void UnitsGroup::update()
 		readyToAttack = false;
 		suicide = false;
 	}
+	
+	if (groupMode == MODE_SCOUT)
+	{
+		for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+			(*it)->target = groupTargetPosition;
+	}
 
 	/// All the things to do when we have to fight
 	if (!enemies.empty() && groupMode != MODE_SCOUT) /// We fight, we'll see later for the goals, BayesianUnits switchMode automatically if enemies is not empty()

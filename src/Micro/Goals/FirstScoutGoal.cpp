@@ -132,32 +132,29 @@ void FirstScoutGoal::achieve()
 		if (_stealingGas)
 		{
 			/// Check if vespene extractor/assimilator/refinery and if not steal (if we have the money), build only one if 2 geysers...
-			if (!(Broodwar->getFrameCount() % Broodwar->getLatencyFrames()))
+			TilePosition buildGas = TilePositions::None;
+			for each (Unit* gas in _nextBase->getGeysers())
 			{
-				TilePosition buildGas = TilePositions::None;
-				for each (Unit* gas in _nextBase->getGeysers())
+				if (!Broodwar->isVisible(gas->getTilePosition()))
 				{
-					if (!Broodwar->isVisible(gas->getTilePosition()))
-					{
-						scoutUnit->move(gas->getPosition());
-						return;
-					}
-					for each (Unit* u in Broodwar->getUnitsOnTile(gas->getTilePosition().x(), gas->getTilePosition().y()))
-					{
-						if (u->getType().isRefinery())
-							_stealingGas = false;
-					}
-					if (_stealingGas)
-						buildGas = gas->getTilePosition();
-				}
-				if (buildGas != TilePositions::None)
-				{
-					scoutUnit->build(buildGas, Broodwar->self()->getRace().getRefinery());
+					scoutUnit->move(gas->getPosition());
 					return;
 				}
-				else
-					_stealingGas = false;
+				for each (Unit* u in Broodwar->getUnitsOnTile(gas->getTilePosition().x(), gas->getTilePosition().y()))
+				{
+					if (u->getType().isRefinery())
+						_stealingGas = false;
+				}
+				if (_stealingGas)
+					buildGas = gas->getTilePosition();
 			}
+			if (buildGas != TilePositions::None)
+			{
+				scoutUnit->build(buildGas, Broodwar->self()->getRace().getRefinery());
+				return;
+			}
+			else
+				_stealingGas = false;
 			return;
 		}
 
@@ -302,7 +299,6 @@ void FirstScoutGoal::onOffer(set<Unit*> objects)
 			TheArbitrator->accept(this, acceptedUnit, _priority);
 			_neededUnits[acceptedUnit->getType()] -= 1;
 			_unitsGroup.dispatchCompleteUnit(gm->getCompletedUnit(acceptedUnit));
-			gm->unassignedUnits.erase(acceptedUnit);
 		}
 	}
 	else

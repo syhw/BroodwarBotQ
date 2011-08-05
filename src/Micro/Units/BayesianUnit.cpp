@@ -31,7 +31,7 @@
 
 #define __NEW_COMPUTE_REPULSE__
 #define __HEURISTICS_IN_FIGHTMOVE__ 1 // level of heuristic(s)
-#define __OUTER_NON_ATOMIC_DIRV__ // accept to do "non atomic w.r.t. Broodwar directions" moves/clicks (BW pathfinder can be called, drama ensues), useful to pass big buildings
+//#define __OUTER_NON_ATOMIC_DIRV__ // accept to do "non atomic w.r.t. Broodwar directions" moves/clicks (BW pathfinder can be called, drama ensues), useful to pass big buildings
 //#define __OUR_PATHFINDER__
 //#define __EXACT_OBJ__
 #define __SAMPLE_DIR__
@@ -334,7 +334,6 @@ void BayesianUnit::straightLine(vector<Position>& ppath,
 
 void BayesianUnit::updateAttractors()
 {
-    _occupation.clear();
 #ifdef __WITH_FLOCKING__
 	if (_mode == MODE_FLOCK)
 	{
@@ -371,10 +370,8 @@ void BayesianUnit::updateAttractors()
 		Position bD = Position(max(Broodwar->mapWidth()*TILE_SIZE + 31, tmp.x() + this->unit->getType().dimensionDown()),
 			max(Broodwar->mapHeight()*TILE_SIZE + 31, tmp.y() + this->unit->getType().dimensionRight()));
         
-        /*if (mapManager->buildings_wt[tmp.x()/8 + (tmp.y()/8)*4*width])
-            _occupation.push_back(OCCUP_BUILDING);
-        else if (!mapManager->walkability[tmp.x()/8 + (tmp.y()/8)*4*width])
-            _occupation.push_back(OCCUP_BLOCKING);*/
+#ifdef __WITH_OCCUPATION__
+		_occupation.clear();
 		if (!mapManager->buildings_wt[hG.x()/8 + (hG.y()/8)*4*width])
             _occupation.push_back(OCCUP_BUILDING);
         else if (!mapManager->buildings_wt[bG.x()/8 + (bG.y()/8)*4*width])
@@ -391,12 +388,9 @@ void BayesianUnit::updateAttractors()
             _occupation.push_back(OCCUP_BLOCKING);
         else if (!mapManager->walkability[bD.x()/8 + (bD.y()/8)*4*width])
             _occupation.push_back(OCCUP_BLOCKING);
-
-        //else if (0/*TODO TEST SI Y A UNE UNITE QUI BLOQUE en TMP*/)
-        //    _occupation.push_back(OCCUP_UNIT);
-
         else // TODO UNIT/EUNIT
-            _occupation.push_back(OCCUP_NO);
+            _occupation.push_back(OCCUP_NO);*/
+#endif
     }
 }
 
@@ -406,6 +400,7 @@ void BayesianUnit::drawAttractors()
     for (size_t i = 0; i < _dirv.size(); ++i)
     {
         Position p = _dirv[i].translate(up);
+#ifdef __WITH_OCCUPATION__
         if (!_occupation[i])
         {
             continue;
@@ -422,6 +417,7 @@ void BayesianUnit::drawAttractors()
         else if (_occupation[i] == OCCUP_EUNIT)
             Broodwar->drawBox(CoordinateType::Map, p.x() - 2, p.y() - 2,
 			p.x() + 2, p.y() + 2, Colors::Purple, true);
+#endif
     }
 }
 
@@ -495,6 +491,7 @@ double BayesianUnit::computeProb(unsigned int i)
         val *= _probTables->probTablesData._damageProb[_damageValues[i]];
     }
 
+#ifdef __WITH_OCCUPATION__
     if (!(unit->getType().isFlyer()))
     {
         if (_occupation[i] == OCCUP_BUILDING) /// NON-WALKABLE (BUILDING) INFLUENCE
@@ -505,13 +502,14 @@ double BayesianUnit::computeProb(unsigned int i)
         {
             val *= 1.0-_PROB_NO_WALL_MOVE;
         }
-        else if (_occupation[i] == OCCUP_UNIT)
+        else*/ if (_occupation[i] == OCCUP_UNIT)
         {
             val *= 1.0-_PROB_NO_UNIT_MOVE;
         }
 		else
-			val *= _PROB_NO_BUILDING_MOVE + _PROB_NO_WALL_MOVE + _PROB_NO_UNIT_MOVE;
+			val *= _PROB_NO_UNIT_MOVE + _PROB_NO_BUILDING_MOVE + _PROB_NO_WALL_MOVE +
     }
+#endif
 
     return val;
 }
@@ -845,6 +843,7 @@ void BayesianUnit::drawObj(int number)
     }
 }
 
+#ifdef __WITH_OCCUPATION__
 void BayesianUnit::drawOccupation(int number)
 {
     Position up = _unitPos;
@@ -887,6 +886,7 @@ void BayesianUnit::drawOccupation(int number)
         }
     }
 }
+#endif
 
 void BayesianUnit::updateDirV()
 {
@@ -921,12 +921,15 @@ void BayesianUnit::updateDirV()
             Vec v(xx, yy);
 
             Position tmp = v.translate(p);
+			TilePosition tpTmp(tmp);
 			// in the map and walkable (statically)
             if (tmp.x() <= 32*Broodwar->mapWidth() && tmp.y() 
 				<= 32*Broodwar->mapHeight()
                 && tmp.x() >= 0 && tmp.y() >= 0 
                 && (unit->getType().isFlyer()
-					|| Broodwar->isWalkable(tmp.x()/8, tmp.y()/8)))
+					|| (Broodwar->isWalkable(tmp.x()/8, tmp.y()/8)
+					&& !mapManager->buildings_wt[tmp.x()/8 + Broodwar->mapWidth()*4*tmp.y()/8])))
+					
             {
                 _dirv.push_back(v);
             }
@@ -945,7 +948,8 @@ void BayesianUnit::updateDirV()
 				<= 32*Broodwar->mapHeight()
                 && tmp.x() >= 0 && tmp.y() >= 0 
                 && (unit->getType().isFlyer()
-					|| Broodwar->isWalkable(tmp.x()/8, tmp.y()/8)))
+					|| (Broodwar->isWalkable(tmp.x()/8, tmp.y()/8)
+					&& !mapManager->buildings_wt[tmp.x()/8 + Broodwar->mapWidth()*4*tmp.y()/8])))
             {
                 _dirv.push_back(v);
             }
@@ -1891,40 +1895,6 @@ int BayesianUnit::fightMove()
         return 4;
     }
     return 0;
-    /// Or simply move away from our friends
-    /*updateDirV();
-    updateAttractors();
-    obj = Vec(target.x() - _unitPos.x(), target.y() - _unitPos.y());
-    _dirvProb.clear();
-    for (unsigned int i = 0; i < _dirv.size(); ++i)
-    {
-        double prob = 1.0;
-        prob *= _probTables->_probTablesData.repulseProb[_repulseValues[i]]; /// Repulsion of the other units incoming towards us
-        if (!(unit->getType().isFlyer()))
-        {
-            if (_occupation[i] == OCCUP_BUILDING) /// NON-WALKABLE (BUILDING) INFLUENCE
-            {	
-                prob *= 1.0-_PROB_NO_BUILDING_MOVE;
-            }
-            else if (_occupation[i] == OCCUP_BLOCKING) /// NON-WALKABLE INFLUENCE
-            {
-                prob *= 1.0-_PROB_NO_WALL_MOVE;
-            }
-            else if (_occupation[i] == OCCUP_UNIT)
-            {
-                prob *= 1.0-_PROB_NO_UNIT_MOVE;
-            }
-        }
-        _dirvProb.insert(make_pair(prob, _dirv[i]));
-    }
-    selectDir(obj);*/
-    /*if (!_fightMoving || Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatencyFrames())
-    {
-        // TODO TO COMPLETE (with a clickTarget() if dist > threshold)
-        updateDir();
-        clickDir();
-        _fightMoving = true;
-    }*/
 }
 
 void BayesianUnit::drawArrow(Vec& v)
@@ -2163,15 +2133,20 @@ void BayesianUnit::update()
 			if (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatencyFrames())
 			{
 				Position p = target;
-				if (_ppath.size() > 3 && _ppath[3].getApproxDistance(_unitPos) <= _maxDistInOneClick)
-					p = _ppath[3];
-				else if (_ppath.size() > 2 && _ppath[2].getApproxDistance(_unitPos) <= _maxDistInOneClick)
-					p = _ppath[2];
-				else if (_ppath.size() > 1 && _ppath[1].getApproxDistance(_unitPos) <= _maxDistInOneClick)
-					p = _ppath[1];
-				else if (_ppath.size() > 0)
-					p = _ppath[0];
-				move(p);
+				if (unit->getVelocityX() < 0.0001 && unit->getVelocityY() < 0.0001) // stuck
+					move(p);
+				else
+				{
+					if (_ppath.size() > 3 && _ppath[3].getApproxDistance(_unitPos) <= _maxDistInOneClick)
+						p = _ppath[3];
+					else if (_ppath.size() > 2 && _ppath[2].getApproxDistance(_unitPos) <= _maxDistInOneClick)
+						p = _ppath[2];
+					else if (_ppath.size() > 1 && _ppath[1].getApproxDistance(_unitPos) <= _maxDistInOneClick)
+						p = _ppath[1];
+					else if (_ppath.size() > 0)
+						p = _ppath[0];
+					move(p);
+				}
 			}
 		}
 		else

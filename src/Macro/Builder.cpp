@@ -153,7 +153,8 @@ void Task::buildIt()
 	if (Broodwar->getFrameCount() > lastOrder + 21 + Broodwar->getLatencyFrames())
 	{
 		/// If it requires psi but there is not, ask for a powering pylon, or cancel if we can't power it
-		if (type.requiresPsi() && !Broodwar->hasPower(tilePosition))
+		if (type != UnitTypes::Protoss_Pylon && type != UnitTypes::Protoss_Assimilator && type != UnitTypes::Protoss_Nexus
+			&& !Broodwar->hasPower(tilePosition)) // type.requiresPsi()
 		{
 			TilePosition pylonTP = buildingPlacer->getPylonTilePositionCovering(tilePosition);
 			if (pylonTP != TilePositions::None)

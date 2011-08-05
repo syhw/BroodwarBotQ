@@ -844,7 +844,7 @@ void MapManager::update()
 		if (!_currentPathfindWorkAborded 
 			&& _currentPathfindWork.bunit != NULL
 			&& _currentPathfindWork.bunit->unit != NULL && _currentPathfindWork.bunit->unit->exists()
-			&& _currentPathfindWork.btpath.empty())
+			&& !_currentPathfindWork.btpath.empty())
 		{
 			/*if (_currentPathfindWork.btpath.size() > _currentPathfindWork.bunit->btpath.size())
 			{

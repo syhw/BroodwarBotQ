@@ -22,6 +22,7 @@ typedef boost::shared_ptr<BayesianUnit> pBayesianUnit;
 // #define PROBT 1
 //#define __WITH_FLOCKING__
 // #define __HEIGHTS_ATTRACTION__
+// #define __WITH_OCCUPATION__
 
 // TODO, this class has to be derived to take Flying/Ground/Special Units 
 // (templars, tanks, lurkers, etc.) into account
@@ -120,7 +121,9 @@ protected:
     bool _fightMoving;
     int _fleeingDmg; // number of DPS we have to take in to decide to flee, default 20
     //std::multimap<BWAPI::Position, attractor_type> _prox;
+#ifdef __WITH_OCCUPATION__
     std::vector<occupation_type> _occupation;
+#endif
     // dirv[attractor] = direction relative to an attractor
     /* Our Unit is in 12. Here are the indices of the Vec()s.
     ________________
@@ -181,7 +184,9 @@ protected:
 #ifdef __WITH_FLOCKING__
     void drawFlockValues();
 #endif
+#ifdef __WITH_OCCUPATION__
     void drawOccupation(int number);
+#endif
     // TODO:
     // goal direction
     // range enemies
