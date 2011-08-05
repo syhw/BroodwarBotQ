@@ -14,8 +14,6 @@ Macro::Macro()
 	ReservedMap::create();
 	Builder::create();
 	Producer::create();
-	//Upgrader::create();
-	//SupplyManager::create();
 	ResourceRates::create();
 	InformationManager::create();
 	BorderManager::create();
@@ -27,8 +25,6 @@ Macro::Macro()
 Macro::~Macro()
 {
 	Producer::destroy();
-	//Upgrader::destroy();
-	//SupplyManager::destroy();
 	ResourceRates::destroy();
 	InformationManager::destroy();
 	BorderManager::destroy();
@@ -93,11 +89,7 @@ void Macro::update()
 	if (reservedGas < 0)
 		reservedGas = 0;
 
-	// TODO PRODUCTION
-	//TheUpgrader->update();
 	TheProducer->update();
-
-	//TheSupplyManager->update();
 
 	TheResourceRates->update();
 
@@ -159,7 +151,6 @@ void Macro::onUnitCreate(BWAPI::Unit* unit)
 {
 	TheProducer->onUnitCreate(unit);
 	TheBuilder->onUnitCreate(unit);
-	//TheUpgrader->onUnitCreate(unit);
 
 	if (unit->getPlayer() == Broodwar->self())
 	{
@@ -171,14 +162,17 @@ void Macro::onUnitCreate(BWAPI::Unit* unit)
 			{
 				TheProducer->produce(6, UnitTypes::Protoss_Zealot, 49, 2);
 				TheProducer->produce(16, UnitTypes::Protoss_Dragoon, 50);
+				TheProducer->produceAlways(16, UnitTypes::Protoss_Dragoon);
 			}
 			else if (Broodwar->enemy()->getRace() == Races::Terran)
 			{
 				TheProducer->produce(16, UnitTypes::Protoss_Dragoon, 50);
+				TheProducer->produceAlways(16, UnitTypes::Protoss_Dragoon);
 			}
 			else
 			{
 				TheProducer->produce(16, UnitTypes::Protoss_Dragoon, 50);
+				TheProducer->produceAlways(16, UnitTypes::Protoss_Dragoon);
 			}
 		}
 		else if (unit->getType() == UnitTypes::Protoss_Templar_Archives)

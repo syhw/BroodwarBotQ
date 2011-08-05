@@ -71,6 +71,10 @@ void BasesManager::update()
 		if (readyBases.size() == allBases.size())
 			expanding = false;
 	}
+
+	if (Broodwar->self()->minerals() > 1200 // TODO remove
+		&& !expanding)
+		expand();
 }
 
 Base* BasesManager::getBase(BWTA::BaseLocation* location)
@@ -111,9 +115,12 @@ void BasesManager::expand(BWTA::BaseLocation* location)
 		Broodwar->printf("CANNOT EXPAND");
 #endif
 
-	allBases.push_back(new Base(location));
-	location2base[location] = allBases.back();
-	TheBorderManager->addMyBase(location);
+	if (location != NULL)
+	{
+		allBases.push_back(new Base(location));
+		location2base[location] = allBases.back();
+		TheBorderManager->addMyBase(location);
+	}
 }
 
 void BasesManager::setFirstGasPop(int pop)

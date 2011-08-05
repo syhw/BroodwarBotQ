@@ -515,6 +515,7 @@ void Builder::onUnitDestroy(Unit* unit)
 	if (unit->getType().isBuilding())
 	{
 		Task::buildingPlacer->onUnitDestroy(unit);
-		build(unit->getType(), unit->getTilePosition()); // rebuild it
+		if (unit->getType() == UnitTypes::Protoss_Photon_Cannon)
+			build(unit->getType(), unit->getTilePosition()); // rebuild it
 	}
 }

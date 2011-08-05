@@ -7,6 +7,8 @@
 using namespace BWAPI;
 using namespace std;
 
+#define __MAX_INCREMENT__ 40
+
 ProducingUnit::ProducingUnit(Unit* u)
 : unit(u)
 , lastAction(-24)
@@ -339,7 +341,7 @@ void Producer::update()
 	}
 
 	/// Produce Archons if needed
-	if ((_nbArchons || _nbDarkArchons) && Broodwar->getFrameCount() % 41)
+	if ((_nbArchons || _nbDarkArchons) && !(Broodwar->getFrameCount() % 27))
 		mergeArchons();
 	/// Free merging archons if merged or taking too long
 	freeMerging();
@@ -369,7 +371,7 @@ void Producer::update()
 	}
 
 	/// Organize/order supply to avoid supply block
-	if (Broodwar->getFrameCount() % 27 
+	if (true // delay?
 #ifdef __CONTROL_BO_UNTIL_SECOND_PYLON__
 		&& (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Pylon) > 1 || Broodwar->getFrameCount() > 5000) // so that we can drive the early BO
 #endif
@@ -388,7 +390,7 @@ void Producer::update()
 	int minerals = Broodwar->self()->minerals() - Macro::Instance().reservedMinerals;
 	int gas = Broodwar->self()->gas() - Macro::Instance().reservedGas;
 
-	if (Broodwar->getFrameCount() % 21
+	if (true //!(Broodwar->getFrameCount() % 21) // delay?
 #ifdef __CONTROL_BO_UNTIL_SECOND_PYLON__
 		&& (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Pylon) > 1 || Broodwar->getFrameCount() >= 5000)
 #endif
@@ -469,18 +471,16 @@ void Producer::update()
 	}
 	if (free.empty())
 	{
-		if (Broodwar->getFrameCount() % 23)
-		{
-			UnitType tmp = mostSaturatedUT();
-			if (tmp != UnitTypes::None)
-				TheBuilder->build(tmp);
-		}
+		UnitType tmp = mostSaturatedUT();
+		if (tmp != UnitTypes::None)
+			TheBuilder->build(tmp);
 		return;
 	}
 
 	/// Launch new units productions
 	minerals = Broodwar->self()->minerals() - Macro::Instance().reservedMinerals;
 	gas = Broodwar->self()->gas() - Macro::Instance().reservedGas;
+	int supply = Broodwar->self()->supplyTotal() - Broodwar->self()->supplyUsed ();
 	list<multimap<int, UnitType>::const_iterator> toRemove;
 	for (multimap<int, UnitType>::const_iterator it = _productionQueue.begin();
 		it != _productionQueue.end(); ++it)
@@ -491,23 +491,37 @@ void Producer::update()
 			if (builder != free.end() // TODO Archons
 				&& minerals >= it->second.mineralPrice()
 				&& gas >= it->second.gasPrice()
-				&& Broodwar->self()->supplyTotal() - Broodwar->self()->supplyUsed () >= it->second.supplyRequired())
+				&& supply >= it->second.supplyRequired())
 			{
 				if (builder->second->train(it->second))
 				{
 					minerals -= it->second.mineralPrice();
 					gas -= it->second.gasPrice();
+					supply -= it->second.supplyRequired();
 					toRemove.push_back(it);
 				}
 				// erase builder from free in all cases (train or not)
 				free.erase(builder);
 			}
 		}
-	
 	}
 	/// Remove train orders that have been passed from the _productionQueue
 	for each (multimap<int, UnitType>::const_iterator it in toRemove)
 		_productionQueue.erase(it);
+
+	/// Add the default productions
+	if (_productionQueue.empty() && !(Broodwar->getFrameCount() % 23))
+		// as soon as we will have inserted some default productions, it won't be empty anymore, even if we have supply capped
+	{
+		/// Check if we want to produce units from the "always have" numbers asked
+		for (map<UnitType, pair<int, int> >::const_iterator it = _wantedNumbers.begin();
+			it != _wantedNumbers.end(); ++it)
+		{
+			int number = Broodwar->self()->completedUnitCount(it->first);
+			if (number < it->second.first)
+				produceAdditional(number - it->second.first, it->first, 1, it->second.second);
+		}
+	}
 }
 
 void Producer::onUnitCreate(BWAPI::Unit* unit)

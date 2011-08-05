@@ -43,7 +43,7 @@ private:
 	std::list<BWAPI::Unit*> _techStructuresInConstruction;
 	std::list<BWAPI::Unit*> _producingStructuresInConstruction;
 	std::multimap<int, BWAPI::UnitType> _productionQueue;
-	std::map<BWAPI::UnitType, std::pair<int, int> > _wantedNumbers;
+	std::map<BWAPI::UnitType, std::pair<int, int> > _wantedNumbers; // UnitType->(minimum number, increment)
 	std::list<BWAPI::TechType> _techsQueue;
 	std::list<BWAPI::UpgradeType> _upgradesQueue;
 	std::map<BWAPI::Unit*, BWAPI::TechType> _researchingTech;

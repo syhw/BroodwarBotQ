@@ -18,7 +18,7 @@ class Task : public Arbitrator::Controller<BWAPI::Unit*, double>
 public:
 	static SimCityBuildingPlacer* buildingPlacer;
 	static int framesToCompleteRequirements(BWAPI::UnitType type);
-	Task(BWAPI::Unit* w, BWAPI::TilePosition tp, BWAPI::UnitType ut, int lo=0);
+	Task(BWAPI::Unit* w, BWAPI::TilePosition tp=BWAPI::TilePositions::None, BWAPI::UnitType ut=BWAPI::UnitTypes::None, int lo=0);
 	void init();
 	~Task();
 	virtual void onOffer(std::set<BWAPI::Unit*> units);
