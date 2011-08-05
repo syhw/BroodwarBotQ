@@ -21,6 +21,7 @@ public:
 	void setFirstGasPop(int pop);
 
 	const std::list<Base*>& getAllBases() const;
+	std::set<BWTA::Region*> getRegionsBases() const;
 	const std::set<Base*>& getActiveBases() const;
 	const std::set<Base*>& getReadyBases() const;
 	const std::set<Base*>& getDestroyedBases() const;

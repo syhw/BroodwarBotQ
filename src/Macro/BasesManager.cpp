@@ -143,6 +143,14 @@ const std::list<Base*>& BasesManager::getAllBases() const
 	return allBases;
 }
 
+std::set<BWTA::Region*> BasesManager::getRegionsBases() const
+{
+	std::set<BWTA::Region*> ret;
+	for each (Base* b in allBases)
+		ret.insert(b->getBaseLocation()->getRegion());
+	return ret;
+}
+
 const std::set<Base*>& BasesManager::getDestroyedBases() const
 {
 	return destroyedBases;

@@ -122,6 +122,58 @@ TilePosition PositionAccountant::findClosest(TilePosition seed)
 	return ret;
 }
 
+void SimCityBuildingPlacer::generatePylonsPos()
+{
+	if (TheBasesManager == NULL)
+		TheBasesManager = BasesManager::create();
+
+	for each (Base* bb in TheBasesManager->getAllBases())
+	{
+		BWTA::BaseLocation* b = bb->getBaseLocation();
+		if (pylons.pos.size() > 2)
+			return;
+		int minX = b->getTilePosition().x();
+		int minY = b->getTilePosition().y();
+		int maxX = b->getTilePosition().x();
+		int maxY = b->getTilePosition().y();
+		for each (Unit* u in b->getGeysers())
+		{
+			if (u->getTilePosition().x() < minX)
+				minX = u->getTilePosition().x();
+			if (u->getTilePosition().y() < minY)
+				minY = u->getTilePosition().y();
+			if (u->getTilePosition().x() > maxX)
+				maxX = u->getTilePosition().x();
+			if (u->getTilePosition().y() > maxY)
+				maxY = u->getTilePosition().y();
+		}
+		for each (Unit* u in b->getMinerals())
+		{
+			if (u->getTilePosition().x() < minX)
+				minX = u->getTilePosition().x();
+			if (u->getTilePosition().y() < minY)
+				minY = u->getTilePosition().y();
+			if (u->getTilePosition().x() > maxX)
+				maxX = u->getTilePosition().x();
+			if (u->getTilePosition().y() > maxY)
+				maxY = u->getTilePosition().y();
+		}
+		for (int x = max(1, b->getTilePosition().x() - 20);
+			x < min(Broodwar->mapWidth() - 1, b->getTilePosition().x() + 20); ++x)
+			for (int y = max(1, b->getTilePosition().y() - 20);
+				y < min(Broodwar->mapHeight() - 1, b->getTilePosition().y() + 20); ++y)
+			{
+				if (fullCanBuildHere(NULL, TilePosition(x, y), UnitTypes::Protoss_Pylon)
+					&& BWTA::getRegion(x, y) == b->getRegion()
+					&& (x > maxX || x < minX || y > maxY || y < minY) // not in the mineral line
+					&& fullCanBuildHere(NULL, TilePosition(x-1, y-1), UnitTypes::Protoss_Pylon)
+					&& fullCanBuildHere(NULL, TilePosition(x-1, y+1), UnitTypes::Protoss_Pylon)
+					&& fullCanBuildHere(NULL, TilePosition(x+1, y-1), UnitTypes::Protoss_Pylon)
+					&& fullCanBuildHere(NULL, TilePosition(x+1, y+1), UnitTypes::Protoss_Pylon))
+					pylons.addPos(TilePosition(x,y));
+			}
+	}
+}
 
 void SimCityBuildingPlacer::generate()
 {
@@ -129,30 +181,32 @@ void SimCityBuildingPlacer::generate()
 		TheBasesManager = BasesManager::create();
 
 	BuildingsCluster bc = BuildingsCluster();
-	if (nbClusters < 3)
+	if (nbClusters < 5)
 	{
-		bc = searchForCluster(home->getRegion());
+		bc = searchForCluster(home);
+		if (!bc.size)
+			bc = searchForCluster(home->getRegion());
 	}
 	if (!bc.size)
 	{
-		for (set<Base*>::const_iterator it = TheBasesManager->getActiveBases().begin();
-			it != TheBasesManager->getActiveBases().end(); ++it)
+		for (list<Base*>::const_iterator it = TheBasesManager->getAllBases().begin();
+			it != TheBasesManager->getAllBases().end(); ++it)
 		{
 			if ((*it)->getBaseLocation()->getRegion() != home->getRegion())
-				bc = searchForCluster((*it)->getBaseLocation()->getRegion());
+				bc = searchForCluster((*it)->getBaseLocation());
 			if (bc.size)
 				break;
 		}
 		bc = searchForCluster(home->getRegion()); // perhaps a 4th/5th/... cluster at home?
 		if (!bc.size)
 		{
-			/*for each (BWTA::Region* r in home->getRegion()->getReachableRegions()) // BUG in reachable regions ??
+			/*for each (BWTA::Region* r in home->getRegion()->getReachableRegions())
 			{
 				bc = searchForCluster(r);
 				if (bc.size)
 					break;
 			}*/
-			/// Same bug here (with Benzene)
+			// OR
 			map<double, BWTA::Region*> distRegions;
 			map<BWTA::Region*, double> distancesToHome = MapManager::Instance().distRegions[home->getRegion()];
 			for (map<BWTA::Region*, double>::const_iterator it = distancesToHome.begin();
@@ -169,6 +223,7 @@ void SimCityBuildingPlacer::generate()
 				if (bc.size)
 					break;
 			}
+			// OR
 			/*
 			int i = 0;
 			BWTA::Chokepoint* nextChoke = frontChoke;
@@ -191,12 +246,19 @@ void SimCityBuildingPlacer::generate()
 	if (!bc.center.isValid()) // what/why?
 		bc.center.makeValid();
 	if (bc.size)
-		makeCluster(bc.center, 2, bc.vertical, bc.size);
-	else
 	{
-		log("Could not generate a cluster\n");
-		Broodwar->printf("Could not generate a cluster");
+		if (Broodwar->getFrameCount() > 1000)
+		{
+			if (tech.pos.size() > 2 && gates.pos.size() < 4)
+				makeCluster(bc.center, 0, bc.vertical, bc.size);
+			else
+				makeCluster(bc.center, 2, bc.vertical, bc.size);
+		}
+		else
+			makeCluster(bc.center, 2, bc.vertical, bc.size);
 	}
+	else
+		Broodwar->printf("Could not generate a cluster");
 }
 
 set<Unit*> SimCityBuildingPlacer::checkPower(const set<Unit*>& buildings)
@@ -290,10 +352,18 @@ bool SimCityBuildingPlacer::powerBuildings(const set<Unit*>& buildings)
 	return tmp.empty();
 }
 
+BuildingsCluster SimCityBuildingPlacer::searchForCluster(BWTA::BaseLocation* b)
+{
+	int minX = max(1, b->getTilePosition().x() - 20);
+	int minY = max(1, b->getTilePosition().y() - 20);
+	int maxX = min(Broodwar->mapWidth() - 1, b->getTilePosition().x() + 20);
+	int maxY = min(Broodwar->mapHeight() - 2, b->getTilePosition().y() + 20);
+	return searchForCluster(minX, maxX, minY, maxY, b->getRegion());
+}
+
+/// Shitty, searches only in the convex space
 BuildingsCluster SimCityBuildingPlacer::searchForCluster(BWTA::Region* r)
 {
-	BuildingsCluster ret;
-	ret.size = 0;
 	int minX = INT_MAX;
 	int minY = INT_MAX;
 	int maxX = 0;
@@ -314,6 +384,13 @@ BuildingsCluster SimCityBuildingPlacer::searchForCluster(BWTA::Region* r)
 	}
 	++minX;
 	++minY;
+	return searchForCluster(minX, maxX, minY, maxY, r);
+}
+
+BuildingsCluster SimCityBuildingPlacer::searchForCluster(int minX, int maxX, int minY, int maxY, BWTA::Region* r)
+{
+	BuildingsCluster ret;
+	ret.size = 0;
 	/// search for "big clusters"
 	int minXClusterDim = UnitTypes::Protoss_Pylon.tileWidth() + 2*UnitTypes::Protoss_Gateway.tileWidth() + 2; // 2 to move around
 	int minYClusterDim = UnitTypes::Protoss_Pylon.tileHeight() + 2*UnitTypes::Protoss_Gateway.tileHeight() + 2;
@@ -882,6 +959,10 @@ void SimCityBuildingPlacer::makeCannonChoke(BWTA::Region* inter, BWTA::Chokepoin
 		if (canBuildHere(NULL, cannon, UnitTypes::Protoss_Pylon)) // voluntary Protoss_Pylon other canBuildHere takes powering into account
 			cannons.addPos(cannon);
 	}
+	else if (cannon != TilePositions::None && canBuildHere(NULL, pylon, UnitTypes::Protoss_Pylon)) // TODO test
+		cannons.addPos(cannon);
+	else if (pylon != TilePositions::None && canBuildHere(NULL, pylon, UnitTypes::Protoss_Pylon)) 
+		cannons.addPos(pylon);
 }
 
 /***
@@ -1024,16 +1105,17 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 	bool vertical = abs((int)dir.y) > abs((int)dir.x);
 	Vec nex(nexus.x(), nexus.y());
 	dir = dir.normalize();
-	dir *= 2*UnitTypes::Protoss_Gateway.tileWidth() + UnitTypes::Protoss_Pylon.tileWidth() + 1;
+	dir *= 2*UnitTypes::Protoss_Gateway.tileWidth() + UnitTypes::Protoss_Pylon.tileWidth();
 	nex = nex.vecTranslate(dir);
 	TilePosition cluster_center(nex.toTilePosition());
+	/// search places to put cannons at chokes
+	makeCannonChoke(home->getRegion(), frontChoke);
 	if (!makeCluster(cluster_center, 2, vertical))
 		generate();
 	generate();
-
-	/// search places to put cannons at chokes
-	makeCannonChoke(home->getRegion(), frontChoke);
-
+	/// swap hack (before we compute the choke cannons first)
+	pylons.pos.push_back(pylons.pos.front());
+	pylons.pos.pop_front();
 	/// search places to put cannons behind minerals
 	makeCannonsMinerals(home);
 }
@@ -1200,6 +1282,8 @@ TilePosition SimCityBuildingPlacer::getTilePosition(const UnitType& ut,
 		}
 		if (pylons.pos.size() < 2 || gates.pos.size() < 2 || tech.pos.size() < 2)
 			generate();
+		if (pylons.pos.size() && !TheBasesManager->getRegionsBases().count(BWTA::getRegion(pylons.pos.front())))
+			generatePylonsPos();
 		return TilePositions::None; // def
 	}
 	else
