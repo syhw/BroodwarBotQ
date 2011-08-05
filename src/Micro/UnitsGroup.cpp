@@ -275,9 +275,6 @@ std::vector<Position> UnitsGroup::findRangePositions()
 	    && !MapManager::Instance().groundDamages[p2.x()/TILE_SIZE + Broodwar->mapWidth()*p2.y()/TILE_SIZE]
 		&& !MapManager::Instance().groundDamages[p3.x()/TILE_SIZE + Broodwar->mapWidth()*p3.y()/TILE_SIZE]))
 	{
-		dir1 = MapManager::Instance().groundDamagesGrad[p1.x()/TILE_SIZE + Broodwar->mapWidth()*p1.y()/TILE_SIZE];
-		dir2 = MapManager::Instance().groundDamagesGrad[p2.x()/TILE_SIZE + Broodwar->mapWidth()*p2.y()/TILE_SIZE];
-		dir3 = MapManager::Instance().groundDamagesGrad[p3.x()/TILE_SIZE + Broodwar->mapWidth()*p3.y()/TILE_SIZE];
 		dir1.normalize();
 		dir3.normalize();
 		dir2.normalize();
@@ -478,7 +475,7 @@ void UnitsGroup::updateOurStats()
 	/// Hack/Experimental++
 	if (oldTotalHP - _totalHP > 150)
 		readyToAttack = true;
-	if (oldTotalHP - _totalHP > 300)
+	if (suicide || oldTotalHP - _totalHP > 300)
 		suicide = true;
 }
 
@@ -513,6 +510,11 @@ void UnitsGroup::update()
 
 	/// Update enemiesCenter / enemiesAltitude
 	updateEnemiesCenter();
+	if (enemies.empty())
+	{
+		readyToAttack = false;
+		suicide = false;
+	}
 
 	/// All the things to do when we have to fight
 	if (!enemies.empty() && groupMode != MODE_SCOUT) /// We fight, we'll see later for the goals, BayesianUnits switchMode automatically if enemies is not empty()

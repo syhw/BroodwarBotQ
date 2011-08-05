@@ -25,6 +25,7 @@ public:
 	inline bool checkHaveTech(BWAPI::UnitType ut);
 	int willProduce(BWAPI::UnitType t);
 	void produce(int number, BWAPI::UnitType t, int priority=20, int increment=1);
+    void produceAlways(int number, BWAPI::UnitType t, int increment=1);
 	void produceAdditional(int number, BWAPI::UnitType t, int priority=20, int increment=1);
 	void researchTech(BWAPI::TechType t);
 	void researchUpgrade(BWAPI::UpgradeType t);
@@ -42,6 +43,7 @@ private:
 	std::list<BWAPI::Unit*> _techStructuresInConstruction;
 	std::list<BWAPI::Unit*> _producingStructuresInConstruction;
 	std::multimap<int, BWAPI::UnitType> _productionQueue;
+	std::map<BWAPI::UnitType, std::pair<int, int> > _wantedNumbers;
 	std::list<BWAPI::TechType> _techsQueue;
 	std::list<BWAPI::UpgradeType> _upgradesQueue;
 	std::map<BWAPI::Unit*, BWAPI::TechType> _researchingTech;

@@ -147,6 +147,14 @@ void Producer::produce(int number, BWAPI::UnitType t, int priority, int incremen
 }
 
 /***
+ * Try to always keep number units of type t (lowest priority)
+ */
+void Producer::produceAlways(int number, BWAPI::UnitType t, int increment)
+{
+	_wantedNumbers.insert(make_pair<UnitType, pair<int, int> >(t, make_pair<int, int>(number, increment)));
+}
+
+/***
  * Researches the TechType t
  */
 void Producer::researchTech(BWAPI::TechType t)

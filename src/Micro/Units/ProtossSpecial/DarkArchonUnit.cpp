@@ -1,5 +1,6 @@
 #include <PrecompiledHeader.h>
 #include "Micro/Units/ProtossSpecial/DarkArchonUnit.h"
+#include "Micro/UnitsGroup.h"
 
 using namespace std;
 using namespace BWAPI;
@@ -42,7 +43,7 @@ void DarkArchonUnit::micro()
     int elapsed = Broodwar->getFrameCount() - _lastCastFrame;
     if (elapsed <= Broodwar->getLatencyFrames() + getAttackDuration())
         return;
-	if (dodgeStorm() || dragMine())
+	if (dodgeStorm() || dragMine() || dragScarab())
         return;
 	updateRangeEnemies();
 	if (Broodwar->self()->hasResearched(TechTypes::Mind_Control)
@@ -113,7 +114,17 @@ void DarkArchonUnit::micro()
 			}
 		}
 	}
-	fightMove(); // TODO check that / test it
+	decideToFlee();
+    if (_fleeing)
+        flee();
+    else
+    {
+        //fightMove();
+		// We don't want our dark archons far from the units group center
+		move(_unitsGroup->center);
+		_lastClickFrame = Broodwar->getFrameCount();
+		_lastMoveFrame = Broodwar->getFrameCount();
+    }
 }
 
 void DarkArchonUnit::check()

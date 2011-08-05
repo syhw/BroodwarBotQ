@@ -88,12 +88,19 @@ void ArchonUnit::micro()
         }
         attackEnemyUnit(targetEnemy);
     }
-    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatencyFrames()*2 + 2 // == (Broodwar->getLatencyFrames()+1)*2, safety
+    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatencyFrames()*2
 		|| unit->getGroundWeaponCooldown() == unit->getType().groundWeapon().damageCooldown()) // against really laggy games TODO in other units 
     {
-        if (!dodgeStorm() && !dragScarab() && !dragMine() && _fleeing)
+        if (_fleeing)
         {
+#ifdef __SIMPLE_FLEE__
             simpleFlee();
+#else
+			if (_targetingMe.size() > 3) /// HACK TODO remove/change (unit->isStuck()?)
+				simpleFlee();
+			else
+				flee();
+#endif
         }
         else
         {

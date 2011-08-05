@@ -114,7 +114,7 @@ void DragoonUnit::micro()
         return;
     updateRangeEnemies();
     updateTargetEnemy();
-    if (unit->getGroundWeaponCooldown() <= Broodwar->getLatencyFrames())
+    if (unit->getGroundWeaponCooldown() <= Broodwar->getLatencyFrames() + 1)
     {
         if (!inRange(targetEnemy))
         {

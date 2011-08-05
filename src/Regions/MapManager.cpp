@@ -3,7 +3,7 @@
 #include "Regions/MapManager.h"
 #include "Micro/Units/ProtossSpecial/HighTemplarUnit.h"
 
-#define __MESH_SIZE__ 32 // 16 // 24 // 32 // 48
+#define __MESH_SIZE__ 24 // 16 // 24 // 32 // 48
 #define __STORM_SIZE__ 96
 
 using namespace BWAPI;
@@ -361,14 +361,14 @@ void MapManager::removeDmg(UnitType ut, Position p)
         int addRange = additionalRangeGround(ut);
         modifyDamages(this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange() + addRange + ut.dimensionRight() + ut.dimensionLeft(), 
             - ut.groundWeapon().damageAmount() * ut.maxGroundHits());
-        updateDamagesGrad(this->groundDamagesGrad, this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange() + addRange + ut.dimensionRight() + ut.dimensionLeft());
+        //updateDamagesGrad(this->groundDamagesGrad, this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange() + addRange + ut.dimensionRight() + ut.dimensionLeft());
     }
     if (ut.airWeapon() != BWAPI::WeaponTypes::None)
     {
         int addRange = additionalRangeAir(ut);
         modifyDamages(this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange() + addRange + ut.dimensionRight() + ut.dimensionLeft(), 
             - ut.airWeapon().damageAmount() * ut.maxAirHits());
-        updateDamagesGrad(this->airDamagesGrad, this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange() + addRange + ut.dimensionRight() + ut.dimensionLeft());
+        //updateDamagesGrad(this->airDamagesGrad, this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange() + addRange + ut.dimensionRight() + ut.dimensionLeft());
     }
 }
 
@@ -376,8 +376,8 @@ void MapManager::removeDmgStorm(Position p)
 {
     modifyDamages(this->groundDamages, p, 0, 63, -50);
     modifyDamages(this->airDamages, p, 0, 63, -50);
-    updateDamagesGrad(this->groundDamagesGrad, this->groundDamages, p, 0, 63);
-    updateDamagesGrad(this->airDamagesGrad, this->airDamages, p, 0, 63);
+    //updateDamagesGrad(this->groundDamagesGrad, this->groundDamages, p, 0, 63);
+    //updateDamagesGrad(this->airDamagesGrad, this->airDamages, p, 0, 63);
 }
 
 void MapManager::addDmg(UnitType ut, Position p)
@@ -387,14 +387,14 @@ void MapManager::addDmg(UnitType ut, Position p)
         int addRange = additionalRangeGround(ut);
         modifyDamages(this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange() + addRange + ut.dimensionRight() + ut.dimensionLeft(), 
             ut.groundWeapon().damageAmount() * ut.maxGroundHits());
-        updateDamagesGrad(this->groundDamagesGrad, this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange() + addRange);
+        //updateDamagesGrad(this->groundDamagesGrad, this->groundDamages, p, ut.groundWeapon().minRange(), ut.groundWeapon().maxRange() + addRange);
     }
     if (ut.airWeapon() != BWAPI::WeaponTypes::None)
     {
         int addRange = additionalRangeAir(ut);
         modifyDamages(this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange() + addRange + ut.dimensionRight() + ut.dimensionLeft(), 
             ut.airWeapon().damageAmount() * ut.maxAirHits());
-        updateDamagesGrad(this->airDamagesGrad, this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange() + addRange);
+        //updateDamagesGrad(this->airDamagesGrad, this->airDamages, p, ut.airWeapon().minRange(), ut.airWeapon().maxRange() + addRange);
     }
 }
 
@@ -903,8 +903,8 @@ void MapManager::update()
     double duration = (double)(end - start) / CLOCKS_PER_SEC;
     if (duration > 0.040) 
         Broodwar->printf("MapManager::update() took: %2.5f seconds\n", duration);
-    this->drawGroundDamagesGrad(); // DRAW
-    this->drawGroundDamages();
+    //this->drawGroundDamagesGrad(); // DRAW
+    //this->drawGroundDamages();
     //this->drawAirDamagesGrad();
     //this->drawAirDamages();
     this->drawBestStorms();

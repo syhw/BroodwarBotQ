@@ -478,18 +478,6 @@ double BayesianUnit::computeProb(unsigned int i)
     {
         if (_fleeing) /// fleeing gradient influence
         {
-            /*Vec dmgGrad;
-            if (unit->getType().isFlyer())
-                dmgGrad = this->mapManager->airDamagesGrad[_unitPos.x()/32 
-					+ _unitPos.y()/32*Broodwar->mapWidth()];
-            else
-                dmgGrad = this->mapManager->groundDamagesGrad[_unitPos.x()/32 
-					+ _unitPos.y()/32*Broodwar->mapWidth()];
-            Vec dirvtmp = _dirv[i];
-            dmgGrad.normalize();
-            dirvtmp.normalize();
-            const double tmp = dirvtmp.dot(dmgGrad);
-            val *= (_PROB_GO_OBJ*tmp > 0.1 ? _PROB_GO_OBJ*tmp : 0.1);*/
             val *= _probTables->probTablesData._damageProb[_damageValues[i]];
         }
         else /// wanted target influence
@@ -655,17 +643,7 @@ void BayesianUnit::updateObj()
         if (_fleeing) /// fleeing gradient influence
         {
 			// the damage maps / gradients are BuildTile resolution, too big for small units to use
-            if (unit->getType().size() == UnitSizeTypes::Small
-				|| unit->getType().size() == UnitSizeTypes::Medium)
-            {
-                obj = Vec(0, 0);
-            }
-            if (unit->getType().isFlyer())
-                obj = this->mapManager->airDamagesGrad[_unitPos.x()/32 
-				+ _unitPos.y()/32*Broodwar->mapWidth()];
-            else
-                obj = this->mapManager->groundDamagesGrad[_unitPos.x()/32 
-				+ _unitPos.y()/32*Broodwar->mapWidth()];
+			obj = Vec(0, 0);
         }
         else /// target influence
         {
@@ -1355,11 +1333,6 @@ void BayesianUnit::updateTargetEnemy()
         {
 			if (!it->second->exists() || !it->second->isVisible() || !it->second->isDetected())
 				continue;
-			if (it->second->isDefenseMatrixed() 
-				|| it->second->isHallucination()
-				|| it->second->isInvincible()
-				|| it->second->isUnderDarkSwarm()) // no zealots/DT with this updateTargetEnemy, only ranged units
-				continue;
             UnitType testType = it->second->getType();
             if (testType == BWAPI::UnitTypes::Protoss_High_Templar 
 				&& it->second->getEnergy() < 60)
@@ -1781,7 +1754,7 @@ pBayesianUnit BayesianUnit::newBayesianUnit(Unit* u)
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Dark_Archon)
         tmp = pBayesianUnit(new DarkArchonUnit(u));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Dark_Templar)
-        tmp = pBayesianUnit(new DarkTemplarUnit(u));
+        tmp = pBayesianUnit(new ZealotUnit(u));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Dragoon)
         tmp = pBayesianUnit(new DragoonUnit(u));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_High_Templar)
@@ -2094,8 +2067,18 @@ bool BayesianUnit::dragMine()
 
 bool BayesianUnit::dragScarab()
 {
-    //if (Broodwar->enemy()->getRace() != Races::Protoss)
-    //    return false;
+    if (Broodwar->enemy()->getRace() != Races::Protoss)
+        return false;
+	for each (Unit* u in _targetingMe)
+	{
+        if (u && u->exists() && u->isVisible()
+            && u->getType() == UnitTypes::Protoss_Scarab && (u->getTarget() == unit || u->getOrderTarget() == unit))
+        {
+            Vec dirOut = Vec(_unitPos.x() - _unitsGroup->center.x(), _unitPos.y() - _unitsGroup->center.y());
+            unit->move(dirOut.translate(_unitPos));
+            return true;
+        }
+    }
     return false;
 }
 
