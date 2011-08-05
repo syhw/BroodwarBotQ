@@ -81,7 +81,8 @@ bool Producer::checkCanProduce(UnitType t)
 	for (map<UnitType, int>::const_iterator it = needed.begin();
 		it != needed.end(); ++it)
 	{
-		if (_techStructures.find(it->first) == _techStructures.end()
+		if (it->first.isBuilding()
+			&& _techStructures.find(it->first) == _techStructures.end()
 			&& _producingStructures.find(it->first) == _producingStructures.end()) // TODO Archons, or merge with checkHave
 		{
 			if (it->first.isBuilding() && !Broodwar->self()->incompleteUnitCount(it->first) && !TheBuilder->willBuild(it->first))
@@ -121,7 +122,8 @@ bool Producer::checkHaveTech(UnitType ut)
 		return true;
 	else
 	{
-		if (!Broodwar->self()->incompleteUnitCount(ut) && !TheBuilder->willBuild(ut))
+		if (ut.isBuilding()
+			&& !Broodwar->self()->incompleteUnitCount(ut) && !TheBuilder->willBuild(ut))
 			TheBuilder->build(ut);
 		return false;
 	}

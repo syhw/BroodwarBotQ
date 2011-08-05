@@ -107,7 +107,7 @@ void Goal::onOffer(set<Unit*> objects)
 				gm->unassignedUnits.erase(u);
 			}
 			else
-				TheArbitrator->decline(this, objects, 0);
+				TheArbitrator->decline(this, objects, _priority);
 		}
 	}
 	else

@@ -556,14 +556,28 @@ void UnitsGroup::update()
 			}
 			else // position and go
 			{
-				/// find where to place our units around them
 				if (enemyStatic && !readyToAttack)
 				{
+					/// find where to place our units around them
 					std::vector<Position> bestPositions = findRangePositions();
-					for (unsigned int i = 0; i < units.size(); ++i)
+					if (!bestPositions.empty()) // we found where to place ourselves
 					{
-						units[i]->target = bestPositions[i % bestPositions.size()];
-						units[i]->switchMode(MODE_MOVE);
+						for (unsigned int i = 0; i < units.size(); ++i)
+						{
+							units[i]->target = bestPositions[i % bestPositions.size()];
+							units[i]->switchMode(MODE_MOVE);
+						}
+					}
+					else // we didn't found where to place ourselves, stand our ground
+					{
+						for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+						{
+							(*it)->target = (*it)->unit->getPosition();
+							if ((*it)->getType().isFlyer())
+								(*it)->switchMode(MODE_FIGHT_A);
+							else
+								(*it)->switchMode(MODE_FIGHT_G);
+						}
 					}
 				}
 				else

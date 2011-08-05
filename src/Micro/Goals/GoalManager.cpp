@@ -1,6 +1,7 @@
 #include <PrecompiledHeader.h>
 #include "Micro/Goals/GoalManager.h"
 #include "Micro/Goals/RegroupGoal.h"
+#include "Macro/BWSAL.h"
 #include "Defines.h"
 
 using namespace BWAPI;
@@ -137,7 +138,7 @@ void GoalManager::onUnitCreate(Unit* u)
 			return;
 		_inTrainingUnits.push_back(u);
 		if (!u->getType().isWorker()) // military units only, because we won't propose workers, only specials goals will bid on them
-			unassignedUnits.insert(u); // we are sure that is it unassigned to a goal
+			TheArbitrator->setBid(this, u, 1);
 	}
 }
 
@@ -152,7 +153,6 @@ void GoalManager::onUnitDestroy(Unit* u)
 			if (it->first == u)
 			{
 				_completedUnits.erase(it);
-				unassignedUnits.erase(u);
 				break;
 			}
 		}
@@ -171,4 +171,22 @@ const map<Unit*, pBayesianUnit>& GoalManager::getCompletedUnits() const
 pBayesianUnit GoalManager::getCompletedUnit(Unit* u)
 {
 	return _completedUnits[u];
+}
+
+
+/// Controller methods
+void GoalManager::onOffer(std::set<BWAPI::Unit*> objects)
+{
+	for each (Unit* u in objects)
+		unassignedUnits.insert(u);
+}
+
+void GoalManager::onRevoke(BWAPI::Unit* u, double bid)
+{
+	unassignedUnits.erase(u);
+}
+
+std::string GoalManager::getName() const
+{
+	return string("GM");
 }

@@ -62,6 +62,11 @@ void AttackGoal::createMidSubgoal()
         addSubgoal(pSubgoal(new FormationSubgoal(SL_AND, &_unitsGroup, pFormation(new SquareFormation(tmpPos)))));
 }
 
+std::string getName()
+{
+	return "AttackGoal";
+}
+
 void AttackGoal::canBidOn(Unit* u)
 {
 	bidOnUnit(u);

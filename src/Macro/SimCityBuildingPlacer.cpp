@@ -976,9 +976,16 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 	Micro::Instance().frontChoke = frontChoke;    // TODO change/remove
 	backdoorChokes.erase(frontChoke);
 
-
 	TilePosition nexus = home->getTilePosition();
 	TilePosition front = TilePosition(frontChoke->getCenter());
+
+	if (TheReservedMap == NULL)
+		TheReservedMap = ReservedMap::create();
+	for each (BWTA::BaseLocation* b in BWTA::getBaseLocations())
+	{
+		TheReservedMap->reserveTiles(b->getTilePosition(), UnitTypes::Protoss_Nexus, 
+		    UnitTypes::Protoss_Nexus.tileWidth(), UnitTypes::Protoss_Nexus.tileHeight());
+	}
 
 	/// best place to do a pylons/gates cluster
 	Vec dir(front.x() - nexus.x(), front.y() - nexus.y());

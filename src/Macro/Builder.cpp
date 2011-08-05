@@ -41,7 +41,8 @@ int Task::framesToCompleteRequirements(UnitType type)
 			/// We don't have the requirements
 			/// we will have to delay this construction
 			int delay = 0;
-			if (Broodwar->self()->incompleteUnitCount(it->first) < it->second)
+			if (it->first.isBuilding()
+				&& Broodwar->self()->incompleteUnitCount(it->first) < it->second)
 			{
 				/// We are not building the requirement, get it into the production line
 				if (!TheBuilder->willBuild(it->first))
@@ -511,5 +512,9 @@ void Builder::onUnitCreate(Unit* unit)
 
 void Builder::onUnitDestroy(Unit* unit)
 {
-	Task::buildingPlacer->onUnitDestroy(unit);
+	if (unit->getType().isBuilding())
+	{
+		Task::buildingPlacer->onUnitDestroy(unit);
+		build(unit->getType(), unit->getTilePosition()); // rebuild it
+	}
 }

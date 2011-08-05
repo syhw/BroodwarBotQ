@@ -64,11 +64,14 @@ public:
 		int priority = 50, int firstFrame = 0);
 	virtual ~Goal();
 	
+	/// Controller methods
 	virtual void onOffer(std::set<BWAPI::Unit*> objects);
 	virtual void onRevoke(BWAPI::Unit* u, double bid);
-	void onUnitDestroy(BWAPI::Unit* unit);
     virtual std::string getName() const;
 	virtual void update();
+
+	void onUnitDestroy(BWAPI::Unit* unit);
+
 	virtual void achieve();
 	virtual void check();
 	virtual void cancel(); // Does nothing, to be overwritten in cancelable goals
