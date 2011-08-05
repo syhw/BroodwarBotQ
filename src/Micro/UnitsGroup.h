@@ -58,13 +58,15 @@ class UnitsGroup : public BasicUnitsGroup
 private:
 	int _totalHP;
     int _totalMinPrice;
-    int _totalGazPrice;
+    int _totalGasPrice;
     int _totalSupply;
+	double _maxRange;
     EUnitsFilter* _eUnitsFilter;
     std::set<BWAPI::Unit*> _mergersHT;
     bool _hasDetection;
     inline void updateNearbyEnemyUnitsFromFilter(BWAPI::Position p, double radius = 400.0);
     double evaluateForces();
+	inline std::vector<BWAPI::Position> findRangePositions();
 	inline void activeUnit(pBayesianUnit bu);
     bool removeUnit(BWAPI::Unit* u);
     bool removeArrivingUnit(BWAPI::Unit* u);
@@ -84,6 +86,8 @@ public:
     double distToNearestChoke;
     Vec centerSpeed;
 	std::map<BWAPI::UnitSizeType, int> sizes;
+	bool suicide;
+	bool readyToAttack;
 	/// Group recap variables
 	int nonFlyers;
 	unit_mode groupMode;
@@ -92,6 +96,7 @@ public:
     double stdDevRadius, maxRadius;
 	/// Enemies info
     BWAPI::Position enemiesCenter;
+	bool enemyStatic;
     int enemiesAltitude;
     std::map<BWAPI::Unit*, BWAPI::Position> enemies;
 	
@@ -118,6 +123,7 @@ public:
 	inline void updateArrivingUnits();
 	inline void chooseLeadingUnit();
 	inline void updateCenter();
+	inline void updateOurStats();
 	inline void updateEnemiesCenter();
 	inline void updateGroupStrengh(BWAPI::Unit* u);
 	/// Getters

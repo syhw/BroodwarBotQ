@@ -1,6 +1,7 @@
 #include <PrecompiledHeader.h>
 #include "Micro/Goals/GoalManager.h"
 #include "Micro/Goals/RegroupGoal.h"
+#include "Defines.h"
 
 using namespace BWAPI;
 using namespace std;
@@ -16,6 +17,17 @@ GoalManager::~GoalManager()
 
 void GoalManager::update()
 {
+#ifdef __MICRO_TESTS_ONLY__
+	for each (Unit* u in Broodwar->self()->getUnits())
+	{
+		if (_completedUnits.find(u) == _completedUnits.end())
+		{
+			pBayesianUnit tmp = BayesianUnit::newBayesianUnit(u);
+			_completedUnits.insert(make_pair<Unit*, pBayesianUnit>(u, tmp));
+		}
+	}
+#endif
+
 	/// Check if units in training are completed and create BayesianUnits if so
 	for (list<Unit*>::const_iterator it = _inTrainingUnits.begin();
 		it != _inTrainingUnits.end(); )

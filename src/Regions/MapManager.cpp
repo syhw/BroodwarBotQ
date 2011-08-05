@@ -334,6 +334,8 @@ void MapManager::updateDamagesGrad(Vec* grad, int* tab, Position p, int minRadiu
                 int xx = x/32;
                 int yy = y/32;
                 grad[xx + yy*Broodwar->mapWidth()] = Vec(0, 0);
+				if (!tab[xx + yy*Broodwar->mapWidth()])
+					continue;
                 for (int tmpx = xx - 1; tmpx <= xx + 1; ++tmpx)
                     for (int tmpy = yy - 1; tmpy <= yy + 1; ++tmpy)
                     {
@@ -834,7 +836,9 @@ void MapManager::update()
 		/// Fetch results if there are some
 		if (_currentPathfindWorkAborded)
 			_currentPathfindWork.bunit = NULL;
-		if (!_currentPathfindWorkAborded && _currentPathfindWork.bunit != NULL)
+		if (!_currentPathfindWorkAborded 
+			&& _currentPathfindWork.bunit != NULL
+			&& _currentPathfindWork.btpath.empty())
 		{
 			/*if (_currentPathfindWork.btpath.size() > _currentPathfindWork.bunit->btpath.size())
 			{
@@ -899,8 +903,8 @@ void MapManager::update()
     double duration = (double)(end - start) / CLOCKS_PER_SEC;
     if (duration > 0.040) 
         Broodwar->printf("MapManager::update() took: %2.5f seconds\n", duration);
-    //this->drawGroundDamagesGrad(); // DRAW
-    //this->drawGroundDamages();
+    this->drawGroundDamagesGrad(); // DRAW
+    this->drawGroundDamages();
     //this->drawAirDamagesGrad();
     //this->drawAirDamages();
     this->drawBestStorms();

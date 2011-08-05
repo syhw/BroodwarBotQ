@@ -12,6 +12,8 @@ protected:
     BWAPI::Position _lastStormPos;
     static int lastStormableUnitsUpdateFrame;
     int _mergingFrame;
+	BWAPI::Position _bestStormPos;
+	BWAPI::Position _bestFartherStormPos;
 public:
     HighTemplarUnit(BWAPI::Unit* u);
     virtual ~HighTemplarUnit();

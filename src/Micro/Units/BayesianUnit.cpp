@@ -228,50 +228,27 @@ void BayesianUnit::computeRepulseValues()
 
 void BayesianUnit::switchMode(unit_mode um)
 {
-#undef __DEBUG__
     if (_mode == um)
         return;
     _mode = um;
     switch (um) 
     {
         case MODE_INPOS:
-#ifdef __DEBUG__
-            Broodwar->printf("Switch INPOS!");
-#endif
             _inPos = _unitPos;
-            break;
-        case MODE_FIGHT_G:
-#ifdef __DEBUG__
-            Broodwar->printf("Switch FIGHT_G!");
-#endif
-            //unit->holdPosition();
-            break;
-        case MODE_FIGHT_A:
-#ifdef __DEBUG__
-            Broodwar->printf("Switch FIGHT_A!");
-#endif
-            //unit->holdPosition();
             break;
         case MODE_SCOUT:
             if (Broodwar->getFrameCount() - _lastClickFrame 
 					> Broodwar->getLatencyFrames())
                 clickTarget();
-#ifdef __DEBUG__
-            Broodwar->printf("Switch SCOUT!");
-#endif
             break;
         case MODE_MOVE:
             if (Broodwar->getFrameCount() - _lastClickFrame 
 					> Broodwar->getLatencyFrames())
                 clickTarget();
-#ifdef __DEBUG__
-            Broodwar->printf("Switch MOVE!");
-#endif
             break;
         default:
             break;
     }
-#define __DEBUG__
 }
 
 void BayesianUnit::setUnitsGroup(UnitsGroup* ug)
@@ -398,6 +375,14 @@ void BayesianUnit::updateAttractors()
             _occupation.push_back(OCCUP_BUILDING);
         else if (!mapManager->walkability[tmp.x()/8 + (tmp.y()/8)*4*width])
             _occupation.push_back(OCCUP_BLOCKING);*/
+		if (!mapManager->buildings_wt[hG.x()/8 + (hG.y()/8)*4*width])
+            _occupation.push_back(OCCUP_BUILDING);
+        else if (!mapManager->buildings_wt[bG.x()/8 + (bG.y()/8)*4*width])
+            _occupation.push_back(OCCUP_BUILDING);
+        else if (!mapManager->buildings_wt[hD.x()/8 + (hD.y()/8)*4*width])
+            _occupation.push_back(OCCUP_BUILDING);
+        else if (!mapManager->buildings_wt[bD.x()/8 + (bD.y()/8)*4*width])
+            _occupation.push_back(OCCUP_BUILDING);
 		if (!mapManager->walkability[hG.x()/8 + (hG.y()/8)*4*width])
             _occupation.push_back(OCCUP_BLOCKING);
         else if (!mapManager->walkability[bG.x()/8 + (bG.y()/8)*4*width])
@@ -670,7 +655,8 @@ void BayesianUnit::updateObj()
         if (_fleeing) /// fleeing gradient influence
         {
 			// the damage maps / gradients are BuildTile resolution, too big for small units to use
-            if (unit->getType().size() == UnitSizeTypes::Small)
+            if (unit->getType().size() == UnitSizeTypes::Small
+				|| unit->getType().size() == UnitSizeTypes::Medium)
             {
                 obj = Vec(0, 0);
             }
@@ -2128,7 +2114,6 @@ void BayesianUnit::update()
 		Broodwar->drawTextMap(unit->getPosition().x() - 8, unit->getPosition().y() - 10, "\x07IP");
 	else
 		Broodwar->drawTextMap(unit->getPosition().x() - 8, unit->getPosition().y() - 10, "\x1FMO");
-	Broodwar->drawCircleMap(target.x(), target.y(), 20, Colors::Red, true);
 #endif
     if (!unit || !unit->exists()) return;
 	if (_unitsGroup == NULL) return;
@@ -2142,11 +2127,11 @@ void BayesianUnit::update()
         //switchMode(MODE_MOVE);
 	
 	/// Switch to fight if we're not fighting already nor scouting and there are enemies (and we can attack)
-    if (_mode != MODE_FIGHT_G && _mode != MODE_SCOUT 
+    /*if (_mode != MODE_FIGHT_G && _mode != MODE_SCOUT 
         && !_unitsGroup->enemies.empty())
     {
         this->switchMode(MODE_FIGHT_G);
-    }
+    }*/
 
     // failsafe: resume from blocking when moving
     if (_mode != MODE_FIGHT_A) // && _mode != MODE_FIGHT_G
@@ -2227,7 +2212,7 @@ void BayesianUnit::update()
         }
         micro();
         break;
-        
+
     case MODE_MOVE:
         if (_unitPos.getDistance(target) < 1.1)
         {
@@ -2237,11 +2222,8 @@ void BayesianUnit::update()
 #ifdef __DEBUG__
         Broodwar->drawLineMap(_unitPos.x(), _unitPos.y(), target.x(), target.y(), Colors::Purple);
 #endif
-        if ((Broodwar->getFrameCount() - _lastMoveFrame) > 23
-            && (Broodwar->getFrameCount() - _lastClickFrame) > Broodwar->getLatencyFrames() + getAttackDuration())
-        {
+        if (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatencyFrames() + getAttackDuration())
             clickTarget();
-        }
         break;
         
     default:

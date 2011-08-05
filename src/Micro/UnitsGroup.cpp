@@ -20,10 +20,9 @@ UnitsGroup::UnitsGroup()
 : defaultTargetEnemy(NULL)
 , groupTargetPosition(Positions::None)
 , distToTarget(-1.0)
-, nearestChoke(NULL)
 , _totalHP(0)
 , _totalMinPrice(0)
-, _totalGazPrice(0)
+, _totalGasPrice(0)
 , _totalSupply(0)
 , nonFlyers(0)
 , groupMode(MODE_MOVE)
@@ -34,7 +33,11 @@ UnitsGroup::UnitsGroup()
 , stdDevRadius(0.0)
 , maxRadius(0.0)
 , enemiesCenter(0,0)
+, enemyStatic(false)
 , enemiesAltitude(0)
+, suicide(false)
+, readyToAttack(false)
+, nearestChoke(NULL)
 {
     _eUnitsFilter = & EUnitsFilter::Instance();
 }
@@ -201,7 +204,7 @@ double UnitsGroup::evaluateForces()
 {
     bool onlyInvisibles = true;
     int theirMinPrice = 0;
-    int theirGazPrice = 0;
+    int theirGasPrice = 0;
     int theirSupply = 0; // this is double supply: 1 zergling = 1 supply
     for (std::map<Unit*, Position>::const_iterator it = enemies.begin();
         it != enemies.end(); ++it)
@@ -228,26 +231,112 @@ double UnitsGroup::evaluateForces()
             || (ut == UnitTypes::Terran_Wraith || ut == UnitTypes::Terran_Ghost) && !_eUnitsFilter->getInvisibleUnits().count(it->first)))
             onlyInvisibles = false;
         theirMinPrice += ut.mineralPrice();
-        theirGazPrice += ut.gasPrice();
+        theirGasPrice += ut.gasPrice();
         theirSupply += ut.supplyRequired();
         if (ut == UnitTypes::Terran_Siege_Tank_Siege_Mode) // a small boost for sieged tanks
             theirSupply += ut.supplyRequired();
         if (_eUnitsFilter->getInvisibleUnits().count(it->first)) // invisibles not detected count double
         {
             theirMinPrice += ut.mineralPrice();
-            theirGazPrice += ut.gasPrice();
+            theirGasPrice += ut.gasPrice();
             theirSupply += ut.supplyRequired();
         }
     }
     // trying a simple rule: 100 minerals == 4 pop == 75 gaz == 100 pts
-    double ourScore = _totalMinPrice + (4/3)*_totalGazPrice + 25*_totalSupply;
-    double theirScore = theirMinPrice + (4/3)*theirGazPrice + 25*theirSupply;
+    double ourScore = _totalMinPrice + (4/3)*_totalGasPrice + 25*_totalSupply;
+    double theirScore = theirMinPrice + (4/3)*theirGasPrice + 25*theirSupply;
     if (enemiesAltitude > groupAltitude)
         theirScore *= 1.5;
     if (onlyInvisibles && !_hasDetection)
         return 0.01;
     else
         return ourScore/theirScore;
+}
+
+/// completely hacky
+/// first throw
+std::vector<Position> UnitsGroup::findRangePositions()
+{
+	std::vector<Position> ret;
+	Vec dir1(center.x() - enemiesCenter.x(), center.y() - enemiesCenter.y());
+	dir1.normalize();
+	Vec tmp(dir1);
+	dir1 *= 6*32;
+	double ssin = sin(3.14159/6);
+	double ccos = cos(3.14159/6);
+	Vec dir2(ccos*dir1.x - ssin*dir1.y, ssin*dir1.x + ccos*dir1.y); // 30deg rot
+	Vec dir3(ccos*dir1.x + ssin*dir1.y, -ssin*dir1.x + ccos*dir1.y); // -30deg rot
+	Position p1 = dir1.translate(enemiesCenter);
+	Position p2 = dir2.translate(enemiesCenter);
+	Position p3 = dir3.translate(enemiesCenter);
+	int iter = 0;
+	while (iter < 50 &&
+		(!MapManager::Instance().groundDamages[p1.x()/TILE_SIZE + Broodwar->mapWidth()*p1.y()/TILE_SIZE]
+	    && !MapManager::Instance().groundDamages[p2.x()/TILE_SIZE + Broodwar->mapWidth()*p2.y()/TILE_SIZE]
+		&& !MapManager::Instance().groundDamages[p3.x()/TILE_SIZE + Broodwar->mapWidth()*p3.y()/TILE_SIZE]))
+	{
+		dir1 = MapManager::Instance().groundDamagesGrad[p1.x()/TILE_SIZE + Broodwar->mapWidth()*p1.y()/TILE_SIZE];
+		dir2 = MapManager::Instance().groundDamagesGrad[p2.x()/TILE_SIZE + Broodwar->mapWidth()*p2.y()/TILE_SIZE];
+		dir3 = MapManager::Instance().groundDamagesGrad[p3.x()/TILE_SIZE + Broodwar->mapWidth()*p3.y()/TILE_SIZE];
+		dir1.normalize();
+		dir3.normalize();
+		dir2.normalize();
+		dir1 *= 51; // > sqrt(2*TILE_SIZE^2) and < 2*TILE_SIZE
+		dir2 *= 51;
+		dir3 *= 51;
+		p1 = dir1.translate(p1);
+		p2 = dir2.translate(p2);
+		p3 = dir3.translate(p3);
+		++iter;
+	}
+	if (iter < 50)
+	{
+		tmp *= 3*32;
+		p1 = tmp.translate(p1);
+		p2 = tmp.translate(p2);
+		p3 = tmp.translate(p3);
+		TilePosition tp1(p1);
+		TilePosition tp2(p2);
+		TilePosition tp3(p3);
+		if (!MapManager::Instance().isBTWalkable(tp1))
+			tp1 = MapManager::Instance().closestWalkabableSameRegionOrConnected(tp1);
+		if (!MapManager::Instance().isBTWalkable(tp2))
+			tp2 = MapManager::Instance().closestWalkabableSameRegionOrConnected(tp2);
+		if (!MapManager::Instance().isBTWalkable(tp3))
+			tp3 = MapManager::Instance().closestWalkabableSameRegionOrConnected(tp3);
+		if (tp1 != TilePositions::None)
+			ret.push_back(Position(tp1));
+		if (tp2 != TilePositions::None)
+			ret.push_back(Position(tp2));
+		if (tp3 != TilePositions::None)
+			ret.push_back(Position(tp3));
+		Vec test(0, 0);
+		for each (Position p in ret)
+			test += p;
+		test /= ret.size();
+		if (test.toPosition().getApproxDistance(center) <= sqrt((double)units.size()*units.size()*16))
+			readyToAttack = true;
+	}
+	else
+	{
+		if (Broodwar->enemy()->getRace() == Races::Zerg)
+			tmp *= (8+4)*32;
+		else if (Broodwar->enemy()->getRace() == Races::Terran)
+			tmp *= (13+4)*32;
+		else
+			tmp *= (10+4)*32;
+		Position seed = tmp.translate(enemiesCenter);
+		if (Broodwar->isWalkable(seed.x()/8, seed.y()/8))
+			seed = Position(MapManager::Instance().closestWalkabableSameRegionOrConnected(TilePosition(seed)));
+		ret.push_back(seed);
+		if (seed.getApproxDistance(center) <= sqrt((double)units.size()*units.size()*16))
+			readyToAttack = true;
+	}
+#ifdef __DEBUG__
+	for each (Position p in ret)
+		Broodwar->drawBoxMap(p.x()-8,p.y()-8,p.x()+8,p.y()+8,Colors::Green,false);
+#endif
+	return ret;
 }
 
 void BasicUnitsGroup::update()
@@ -363,6 +452,36 @@ void UnitsGroup::chooseLeadingUnit()
     }
 }
 
+void UnitsGroup::updateOurStats()
+{
+	int oldTotalHP = _totalHP;
+
+    _totalHP = 0;
+	_totalMinPrice = 0;
+	_totalGasPrice = 0;
+	_totalSupply = 0;
+    _maxRange = -1.0;
+    for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+    {
+        _totalHP += (*it)->unit->getHitPoints();
+		_totalHP += (*it)->unit->getShields();
+		UnitType ut = (*it)->unit->getType();
+		_totalMinPrice += ut.mineralPrice();
+		_totalGasPrice += ut.gasPrice();
+		_totalSupply += ut.supplyRequired();
+        double tmp_max = max(max(ut.groundWeapon().maxRange(), ut.airWeapon().maxRange()), 
+            ut.sightRange()); // TODO: upgrades
+        if (tmp_max > _maxRange)
+            _maxRange = tmp_max;
+    }
+
+	/// Hack/Experimental++
+	if (oldTotalHP - _totalHP > 150)
+		readyToAttack = true;
+	if (oldTotalHP - _totalHP > 300)
+		suicide = true;
+}
+
 void UnitsGroup::update()
 {
 #ifdef __DEBUG__
@@ -381,24 +500,8 @@ void UnitsGroup::update()
 	chooseLeadingUnit();
 
 	//// Update maxRange and _totalHP
-    this->_totalHP = 0;
-    double maxRange = -1.0;
-    /*** TODO BUG IN SquareFormation, check it ***/
-    for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
-    {
-        /*** TODO BUG IN SquareFormation TODO TODO TODO
-        if ((*it)->unit->getType() == UnitTypes::Protoss_Zealot 
-            || (*it)->unit->getType() == UnitTypes::Protoss_Archon)
-            contactUnits = true;
-        */
-        _totalHP += (*it)->unit->getHitPoints();
-		if (Broodwar->self()->getRace() == Races::Protoss)
-			_totalHP += (*it)->unit->getShields();
-        double tmp_max = max(max((*it)->unit->getType().groundWeapon().maxRange(), (*it)->unit->getType().airWeapon().maxRange()), 
-            (*it)->unit->getType().sightRange()); // TODO: upgrades
-        if (tmp_max > maxRange)
-            maxRange = tmp_max;
-    }
+	if (Broodwar->getFrameCount() % 13)
+		updateOurStats();
     /*** TODO BUG IN SquareFormation TODO TODO TODO
     if (contactUnits)
         _alignFormation = false;
@@ -406,7 +509,7 @@ void UnitsGroup::update()
         _alignFormation = true;*/
 
 	/// Update nearby enemy units from eUnitsFilter (SLOW)
-	updateNearbyEnemyUnitsFromFilter(center, maxRadius + maxRange + 92); // possibly hidden units, could be taken from onUnitsShow/View asynchronously for more efficiency
+	updateNearbyEnemyUnitsFromFilter(center, maxRadius + _maxRange + 92); // possibly hidden units, could be taken from onUnitsShow/View asynchronously for more efficiency
 
 	/// Update enemiesCenter / enemiesAltitude
 	updateEnemiesCenter();
@@ -415,46 +518,86 @@ void UnitsGroup::update()
 	if (!enemies.empty() && groupMode != MODE_SCOUT) /// We fight, we'll see later for the goals, BayesianUnits switchMode automatically if enemies is not empty()
 	{
 		double force = evaluateForces();
+		if (force < 0.75 && !suicide)
 		{
-			if (force < 0.8) // TOCHANGE 0.75 (better micro+compo factor)
+			// strategic withdrawal
+			for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
 			{
-				// strategic withdrawal
-				for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+				(*it)->target = Position(Broodwar->self()->getStartLocation());
+				if ((*it)->unit->getDistance((*it)->target) >= 10*TILE_SIZE)
+					(*it)->switchMode(MODE_MOVE);
+				else
 				{
-					(*it)->target = Position(Broodwar->self()->getStartLocation());
+					if ((*it)->getType().isFlyer())
+						(*it)->switchMode(MODE_FIGHT_A);
+					else
+						(*it)->switchMode(MODE_FIGHT_G);
 				}
 			}
-			else if (force > 2) // TOCHANGE 1.5
+		}
+		else
+		{
+			if (force > 1.5)
 			{
-				// we can be offensive, use our goal target
-			}
-			else // stand our ground or go up the ramp
-			{
+				// we can be offensive, use our goal target and do what we want
 				for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
 				{
-					if (enemiesAltitude > groupAltitude 
-						&& (*it)->unit->getDistance(nearestChoke->getCenter()) < 6*TILE_SIZE)
-					{
-						const std::pair<BWTA::Region*, BWTA::Region*> regions = nearestChoke->getRegions();
-						BWTA::Region* higherRegion = 
-							(Broodwar->getGroundHeight(TilePosition(regions.first->getCenter())) > Broodwar->getGroundHeight(TilePosition(regions.second->getCenter())))
-							? regions.first : regions.second;
-						(*it)->target = (MapManager::Instance().regionsPFCenters[higherRegion]);
-					}
+					// target fixed by the subgoal
+					if ((*it)->getType().isFlyer())
+						(*it)->switchMode(MODE_FIGHT_A);
 					else
-						(*it)->target = (*it)->unit->getPosition();
+						(*it)->switchMode(MODE_FIGHT_G);
+				}
+			}
+			else // position and go
+			{
+				/// find where to place our units around them
+				if (enemyStatic && !readyToAttack)
+				{
+					std::vector<Position> bestPositions = findRangePositions();
+					for (unsigned int i = 0; i < units.size(); ++i)
+					{
+						units[i]->target = bestPositions[i % bestPositions.size()];
+						units[i]->switchMode(MODE_MOVE);
+					}
+				}
+				else
+				{
+					/// ATTACK!!
+					for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+					{
+						if (enemiesAltitude > groupAltitude 
+							&& nearestChoke
+							&& (*it)->unit->getDistance(nearestChoke->getCenter()) < 4*TILE_SIZE)
+						{
+							const std::pair<BWTA::Region*, BWTA::Region*> regions = nearestChoke->getRegions();
+							BWTA::Region* higherRegion = 
+								(Broodwar->getGroundHeight(TilePosition(regions.first->getCenter())) > Broodwar->getGroundHeight(TilePosition(regions.second->getCenter())))
+								? regions.first : regions.second;
+							(*it)->target = (MapManager::Instance().regionsPFCenters[higherRegion]);
+							(*it)->switchMode(MODE_FIGHT_G);
+						}
+						else
+						{	
+							(*it)->target = (*it)->unit->getPosition();
+							if ((*it)->getType().isFlyer())
+								(*it)->switchMode(MODE_FIGHT_A);
+							else
+								(*it)->switchMode(MODE_FIGHT_G);
+						}
+					}
 				}
 			}
 		}
 	}
 
 #ifdef __DEBUG__
-    displayTargets();
-    clock_t finish = clock();
-    double duration = (double)(finish - start) / CLOCKS_PER_SEC;
-    if (duration > 0.040) 
+	displayTargets();
+	clock_t finish = clock();
+	double duration = (double)(finish - start) / CLOCKS_PER_SEC;
+	if (duration > 0.040) 
         Broodwar->printf( "UnitsGroup::update() took %2.5f seconds\n", duration);
-    Broodwar->drawCircleMap((int)center.x(), (int)center.y(), (int)maxRadius + (int)maxRange +  32, Colors::Yellow);
+    Broodwar->drawCircleMap((int)center.x(), (int)center.y(), (int)maxRadius + (int)_maxRange +  32, Colors::Yellow);
 #endif
 
 	/// Update BayesianUnits
@@ -606,7 +749,7 @@ void UnitsGroup::giveUpControl(Unit* u)
             }
     }
     _totalMinPrice -= u->getType().mineralPrice();
-    _totalGazPrice -= u->getType().gasPrice();
+    _totalGasPrice -= u->getType().gasPrice();
     _totalSupply -= u->getType().supplyRequired();
 }
 
@@ -620,7 +763,7 @@ void UnitsGroup::updateGroupStrengh(Unit* u)
 	if (u->getType() == UnitTypes::Protoss_Observer)
 		_hasDetection = true;
 	_totalMinPrice += u->getType().mineralPrice();
-	_totalGazPrice += u->getType().gasPrice();
+	_totalGasPrice += u->getType().gasPrice();
 	_totalSupply += u->getType().supplyRequired();
 }
 
@@ -710,12 +853,10 @@ void UnitsGroup::updateCenter()
 	assert(center.isValid());
 #endif
     groupAltitude = round((double)groupAltitude / units.size());
-    if (nearestChoke)
+    if (nearestChoke != NULL)
         distToNearestChoke = nearestChoke->getCenter().getApproxDistance(center);
-    if ((!nearestChoke || distToNearestChoke > 8*TILE_SIZE) && center.makeValid())
-    {
+    if ((!nearestChoke || distToNearestChoke > 8*TILE_SIZE))
         nearestChoke = BWTA::getNearestChokepoint(center);
-    }
 
     // update stdDevRadius and maxRadius
     maxRadius = -1.0;
@@ -749,6 +890,8 @@ void UnitsGroup::updateEnemiesCenter()
 {
     if (enemies.size () != 0)
     {
+		int staticUnits = 0;
+		int nonStaticUnits = 0;
         enemiesCenter = Position(0, 0);
         enemiesAltitude = 0;
         for (std::map<Unit*, Position>::const_iterator it = enemies.begin();
@@ -757,12 +900,29 @@ void UnitsGroup::updateEnemiesCenter()
             enemiesCenter += it->second;
             if (!(it->first->getType().isFlyer()))
                 enemiesAltitude += BWAPI::Broodwar->getGroundHeight(TilePosition(it->second));
+			if (it->first->getType().isBuilding())
+				++staticUnits;
+			else if (it->first->getType() == UnitTypes::Terran_Siege_Tank_Siege_Mode)
+				++staticUnits;
+			else if (it->first->getType() == UnitTypes::Terran_Siege_Tank_Tank_Mode)
+				++nonStaticUnits;
+			else if (it->first->getType() == UnitTypes::Zerg_Lurker)
+			{
+				if (it->first->isBurrowed())
+					++staticUnits;
+				else
+					++nonStaticUnits;
+			}
         }
         enemiesCenter.x() /= enemies.size();
         enemiesCenter.y() /= enemies.size();
         if (!enemiesCenter.isValid())
             enemiesCenter.makeValid();
         enemiesAltitude = round((double)enemiesAltitude / enemies.size());
+		if (staticUnits > 1)
+			enemyStatic = staticUnits > 2*nonStaticUnits;
+		else
+		    enemyStatic = false;
     }
 }
 

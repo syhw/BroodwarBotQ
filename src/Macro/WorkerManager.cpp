@@ -228,6 +228,7 @@ void WorkerManager::rebalanceWorkers()
 	updateWorkerAssignments();
 	if (this->autoBuild)
 	{
+		optimalWorkerCount = max(__MAX_WORKERS__, optimalWorkerCount); // TODO max on optimalWorkerCount
 		BWAPI::UnitType workerType=BWAPI::Broodwar->self()->getRace().getWorker();
 		if (Broodwar->self()->completedUnitCount(workerType) < optimalWorkerCount*__WORKERS_FACTOR__)
 			TheProducer->produce((int)(optimalWorkerCount*__WORKERS_FACTOR__), workerType, autoBuildPriority);
