@@ -71,6 +71,7 @@ public:
 #endif
 	void onUnitDestroy(BWAPI::Unit* unit);
     void makeCannonsMinerals(BWTA::BaseLocation* home, bool quick=false);
+	void makeCannonChoke(BWTA::Region* inter, BWTA::Chokepoint* chok, bool quick=false);
 private:
 	std::list<BWAPI::TilePosition> existingPylons;
 	PositionAccountant pylons;
@@ -90,7 +91,6 @@ private:
 		int nbTechBuildings, bool vertical, int cSize=0);
 	BWAPI::TilePosition closestBuildableSameRegion(const BWAPI::TilePosition& tp);
 	BWAPI::TilePosition closestBuildableSameRegionNotTP2(const BWAPI::TilePosition& tp, const BWAPI::TilePosition& tp2);
-	inline void makeCannonChoke(BWTA::Region* inter, BWTA::Chokepoint* chok, bool quick=false);
 	inline void generate();
 	inline void generatePylonsPos();
 	inline std::set<BWAPI::Unit*> checkPower(const std::set<BWAPI::Unit*>& buildings);

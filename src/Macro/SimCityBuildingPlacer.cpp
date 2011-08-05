@@ -1108,14 +1108,15 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 	dir *= 2*UnitTypes::Protoss_Gateway.tileWidth() + UnitTypes::Protoss_Pylon.tileWidth();
 	nex = nex.vecTranslate(dir);
 	TilePosition cluster_center(nex.toTilePosition());
-	/// search places to put cannons at chokes
-	makeCannonChoke(home->getRegion(), frontChoke);
-	if (!makeCluster(cluster_center, 2, vertical))
+
+	if (!Broodwar->mapHash().compare("ba2fc0ed637e4ec91cc70424335b3c13e131b75a") // Aztec
+		|| !makeCluster(cluster_center, 2, vertical))
 		generate();
 	generate();
-	/// swap hack (before we compute the choke cannons first)
-	pylons.pos.push_back(pylons.pos.front());
-	pylons.pos.pop_front();
+
+	/// search places to put cannons at chokes
+	makeCannonChoke(home->getRegion(), frontChoke, true);
+
 	/// search places to put cannons behind minerals
 	makeCannonsMinerals(home);
 }
