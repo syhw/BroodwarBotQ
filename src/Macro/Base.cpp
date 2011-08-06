@@ -127,7 +127,7 @@ void Base::update()
 	if (activeGas && refinery == NULL && !gasInConstruction)
 		buildGas();
 	ready = (resourceDepot && resourceDepot->exists() && (resourceDepot->isCompleted() || resourceDepot->getRemainingBuildTime()<300)); // 300 frames before completion
-	if (Broodwar->getFrameCount() > 15*60*24 // after 15 minutes
+	if (Broodwar->getFrameCount() > 12*60*24 // after 12 minutes
 		&& !cannoned
 		&& !paused && ready) // active
 	{

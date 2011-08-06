@@ -34,11 +34,17 @@ FirstScoutGoal::FirstScoutGoal(int priority)
 , _foundEnemy(false)
 , _nextToVisit(TilePositions::None)
 , _nextBase(NULL)
+, _gatheredIntel(false)
 , _stealingGas(true)
 , _mannerPylon(false)
 , _canHarassWorkers(true)
+, _arrivePosition(Positions::None)
+, _mineral(NULL)
 {
-	if (BWTA::getStartLocation(Broodwar->self())->getRegion()->getChokepoints().empty()) // if we're on an island
+	BWTA::BaseLocation* home = BWTA::getStartLocation(Broodwar->self());
+	if (!home->getMinerals().empty())
+		_mineral = *(home->getMinerals().begin());
+	if (home->getRegion()->getChokepoints().empty()) // if we're on an island
 		_status = GS_ACHIEVED;
 	_neededUnits.insert(make_pair<UnitType, int>(Broodwar->self()->getRace().getWorker(), 1));
 	_notSeenStartLocations = BWTA::getStartLocations();
@@ -69,6 +75,13 @@ void FirstScoutGoal::achieve()
 		}
 	}
 
+	/// Set scoutUnit
+	BWAPI::Unit* scoutUnit = NULL;
+	if (_unitsGroup.size())
+		scoutUnit = (*_unitsGroup.units.begin())->unit;
+	if (!scoutUnit->exists()) // defensive
+		return;
+
 	if (!_foundEnemy)
 	{
 		/// We can see the next waypoint (_nextToVisit)
@@ -95,10 +108,12 @@ void FirstScoutGoal::achieve()
 				if (_nextBase != NULL)
 					_nextToVisit = _nextBase->getTilePosition();
 				_unitsGroup.move(Position(_nextToVisit));
+				_arrivePosition = _unitsGroup.getCenter();
 			}
 		}
 		else
 		{
+			/*
 			if (BWTA::getStartLocation(Broodwar->self())->getRegion()
 				== BWTA::getRegion(TilePosition(_unitsGroup.center))
 				&& _unitsGroup.getDistance(Micro::Instance().frontChoke->getCenter()) > 51) // can't base ourselved on the choke's center as the unit will stop while still in our region erratically
@@ -111,6 +126,10 @@ void FirstScoutGoal::achieve()
 			if (_unitsGroup.groupMode != MODE_SCOUT)
 				_unitsGroup.switchMode(MODE_SCOUT);
 			_unitsGroup.update();
+			_arrivePosition = _unitsGroup.getCenter();
+			*/
+			scoutUnit->move(Position(_nextToVisit));
+			_arrivePosition = scoutUnit->getPosition();
 			return;
 		}
 	}
@@ -119,25 +138,70 @@ void FirstScoutGoal::achieve()
 		if (Intelligence::Instance().enemyRush) // we are being rushed
 			goHome();
 
-		/// Set scoutUnit
-		BWAPI::Unit* scoutUnit = NULL;
-		if (_unitsGroup.size())
-			scoutUnit = (*_unitsGroup.units.begin())->unit;
-		if (!scoutUnit->exists()) // defensive
-			return;
-
 #ifdef __DO_NOT_HARASS_SCOUT__
 		goHome();
 #else
+		Broodwar->setLocalSpeed(32); ///////////////////////////////////////////////////////////////////////////// SPEED
+
+		if (!_gatheredIntel)
+		{
+			_unitsAround = Broodwar->getUnitsInRadius(scoutUnit->getPosition(), 10*TILE_SIZE);
+			Position c(Positions::None);
+			for each (Unit* u in _unitsAround)
+			{
+				if (u->getType().isResourceDepot())
+				{
+					c = u->getPosition();
+					break;
+				}
+			}
+			BWTA::BaseLocation* b = NULL;
+			if (!c.isValid() || c == Positions::None)
+				b = BWTA::getNearestBaseLocation(scoutUnit->getPosition());
+			else
+				b = BWTA::getNearestBaseLocation(c);
+			if (b == NULL)
+			{
+				goHome();
+				return;
+			}
+			Vec dir(c.x() - _arrivePosition.x(), c.y() - _arrivePosition.y());
+			dir.normalize();
+			dir *= 5*TILE_SIZE;
+			Position pos(dir.translate(c));
+			if ((Broodwar->enemy()->getRace() == Races::Zerg 
+				&& EUnitsFilter::Instance().getNumbersType(UnitTypes::Zerg_Spawning_Pool))
+				|| (Broodwar->enemy()->getRace() == Races::Terran
+				&& EUnitsFilter::Instance().getNumbersType(UnitTypes::Terran_Barracks))
+				|| (Broodwar->enemy()->getRace() == Races::Protoss
+				&& EUnitsFilter::Instance().getNumbersType(UnitTypes::Protoss_Gateway))
+				|| scoutUnit->getDistance(pos) < 3*TILE_SIZE
+				|| scoutUnit->getHitPoints() < 20) // they cut through shield
+				_gatheredIntel = true;
+			Vec side(0,0);
+			for each (Unit* u in b->getMinerals())
+				side += Vec(c.x() - u->getPosition().x(), c.y() - u->getPosition().y());
+			side.normalize();
+			side *= 5*TILE_SIZE;
+			Position mid(side.translate(c));
+			if (scoutUnit->getDistance(pos) > 11*TILE_SIZE)
+				_unitsGroup.move(mid);
+			else
+				_unitsGroup.move(pos);
+			if (_unitsGroup.groupMode != MODE_SCOUT)
+				_unitsGroup.switchMode(MODE_SCOUT);
+			_unitsGroup.update();
+		}
+
 		if (_stealingGas)
 		{
 			/// Check if vespene extractor/assimilator/refinery and if not steal (if we have the money), build only one if 2 geysers...
 			TilePosition buildGas = TilePositions::None;
 			for each (Unit* gas in _nextBase->getGeysers())
 			{
-				if (!Broodwar->isVisible(gas->getTilePosition()))
+				if (!Broodwar->isVisible(gas->getTilePosition()) && scoutUnit->getDistance(Position(_nextToVisit)) > 4*TILE_SIZE)
 				{
-					scoutUnit->move(gas->getPosition());
+					scoutUnit->move(Position(_nextToVisit));
 					return;
 				}
 				for each (Unit* u in Broodwar->getUnitsOnTile(gas->getTilePosition().x(), gas->getTilePosition().y()))
@@ -185,7 +249,9 @@ void FirstScoutGoal::achieve()
 						_canHarassWorkers = false;
 					if (u->getTarget() == scoutUnit && u->getType().canAttack())
 						attackingMe.insert(u);
-					if (u->getDistance(scoutUnit) < closestDist)
+					if (u->getPlayer() == Broodwar->enemy()
+						&& u->getType().isWorker()
+						&& u->getDistance(scoutUnit) < closestDist)
 					{
 						closestDist = u->getDistance(scoutUnit);
 						closestWorker = u;
@@ -218,7 +284,8 @@ void FirstScoutGoal::achieve()
 					}
 					if (fleeShort)
 					{
-						scoutUnit->move(direction.translate(scoutUnit->getPosition()));
+						if (!(Broodwar->getFrameCount() % Broodwar->getLatencyFrames()))
+							scoutUnit->rightClick(_mineral); //direction.translate(scoutUnit->getPosition()));
 						return;
 					}
 					else
@@ -251,11 +318,13 @@ void FirstScoutGoal::goHome()
 	if (_unitsGroup.groupMode != MODE_SCOUT) // defensive
 		_unitsGroup.switchMode(MODE_SCOUT);
 	Position middle(Broodwar->mapWidth()*TILE_SIZE/2, Broodwar->mapHeight()*TILE_SIZE/2);
-	if (scoutUnit->getDistance(middle) > 13*TILE_SIZE)
+	if (scoutUnit->getDistance(middle) > 20*TILE_SIZE)
 	{
-		// escort our unit to the middle with the threat aware pathfindin
-		_unitsGroup.move(middle);
-		_unitsGroup.update();
+		// escort our unit to the middle with the threat aware pathfinding
+		//_unitsGroup.move(middle);
+		//_unitsGroup.update();
+		if (!(Broodwar->getFrameCount() % Broodwar->getLatencyFrames()))
+			scoutUnit->rightClick(_mineral);
 		return;
 	}
 	else

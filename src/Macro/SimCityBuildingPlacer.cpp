@@ -94,8 +94,6 @@ void PositionAccountant::cleanUp()
 
 TilePosition PositionAccountant::reservePos()
 {
-	cleanUp();
-
 	for (list<BWAPI::TilePosition>::const_iterator it = pos.begin();
 		it != pos.end(); ++it)
 	{
@@ -110,8 +108,6 @@ TilePosition PositionAccountant::reservePos()
 
 TilePosition PositionAccountant::reservePos(TilePosition tp)
 {
-	cleanUp();
-
 	if (!givenPos.count(tp))
 	{
 		givenPos.insert(tp);
@@ -138,6 +134,37 @@ TilePosition PositionAccountant::findClosest(TilePosition seed)
 	return ret;
 }
 
+bool SimCityBuildingPlacer::inMineralLine(BWTA::BaseLocation* b, BWAPI::TilePosition tp)
+{
+	int minX = b->getTilePosition().x();
+	int minY = b->getTilePosition().y();
+	int maxX = b->getTilePosition().x();
+	int maxY = b->getTilePosition().y();
+	for each (Unit* u in b->getGeysers())
+	{
+		if (u->getTilePosition().x() < minX)
+			minX = u->getTilePosition().x();
+		if (u->getTilePosition().y() < minY)
+			minY = u->getTilePosition().y();
+		if (u->getTilePosition().x() > maxX)
+			maxX = u->getTilePosition().x();
+		if (u->getTilePosition().y() > maxY)
+			maxY = u->getTilePosition().y();
+	}
+	for each (Unit* u in b->getMinerals())
+	{
+		if (u->getTilePosition().x() < minX)
+			minX = u->getTilePosition().x();
+		if (u->getTilePosition().y() < minY)
+			minY = u->getTilePosition().y();
+		if (u->getTilePosition().x() > maxX)
+			maxX = u->getTilePosition().x();
+		if (u->getTilePosition().y() > maxY)
+			maxY = u->getTilePosition().y();
+	}
+	return (tp.x() <= maxX && tp.x() >= minX && tp.y() <= maxY && tp.y() >= minY);
+}
+
 void SimCityBuildingPlacer::generatePylonsPos()
 {
 	if (TheBasesManager == NULL)
@@ -145,9 +172,9 @@ void SimCityBuildingPlacer::generatePylonsPos()
 
 	for each (Base* bb in TheBasesManager->getAllBases())
 	{
-		BWTA::BaseLocation* b = bb->getBaseLocation();
 		if (pylons.pos.size() > 2)
 			return;
+		BWTA::BaseLocation* b = bb->getBaseLocation();
 		int minX = b->getTilePosition().x();
 		int minY = b->getTilePosition().y();
 		int maxX = b->getTilePosition().x();
@@ -474,13 +501,11 @@ BuildingsCluster SimCityBuildingPlacer::searchForCluster(int minX, int maxX, int
 				ret.size = canBuildCluster(ret.center, ret.vertical);
 				if (ret.size > 1) // return as soon as a small cluster is found
 					return ret;
-				/*
-				ret.center = TilePosition(topLeft.x() + 2*UnitTypes::Protoss_Pylon.tileWidth() + 1, topLeft.y() + UnitTypes::Protoss_Gateway.tileHeight() + 1);
+				/*ret.center = TilePosition(topLeft.x() + 2*UnitTypes::Protoss_Pylon.tileWidth() + 1, topLeft.y() + UnitTypes::Protoss_Gateway.tileHeight() + 1);
 				ret.vertical = false;
 				ret.size = canBuildCluster(ret.center, ret.vertical);
 				if (ret.size > 1) // return as soon as a small cluster is found
-					return ret;
-					*/
+					return ret;*/
 			}
 		}
 	/// search for 2 buildings clusters (smallest)
@@ -513,13 +538,11 @@ BuildingsCluster SimCityBuildingPlacer::searchForCluster(int minX, int maxX, int
 				ret.size = canBuildCluster(ret.center, ret.vertical);
 				if (ret.size) // return as soon as a small cluster is found
 					return ret;
-				/*
-				ret.center = TilePosition(topLeft.x() + UnitTypes::Protoss_Pylon.tileWidth() + 1, topLeft.y() + UnitTypes::Protoss_Gateway.tileHeight() + 1);
+				/*ret.center = TilePosition(topLeft.x() + UnitTypes::Protoss_Pylon.tileWidth() + 1, topLeft.y() + UnitTypes::Protoss_Gateway.tileHeight() + 1);
 				ret.vertical = false;
 				ret.size = canBuildCluster(ret.center, ret.vertical);
 				if (ret.size) // return as soon as a small cluster is found
-					return ret;
-					*/
+					return ret;*/
 			}
 		}
 	return ret;
@@ -1127,6 +1150,14 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 		generate();
 	generate();
 
+	generate();
+	generate();
+	generate();
+	generate();
+	generate();
+	generate();
+	generate();
+
 	/// search places to put cannons at chokes
 	makeCannonChoke(home->getRegion(), frontChoke, true);
 
@@ -1293,24 +1324,28 @@ TilePosition SimCityBuildingPlacer::getTilePosition(const UnitType& ut,
 	{
 		if (ut == UnitTypes::Protoss_Pylon)
 		{
+			pylons.cleanUp(); // CAN'T BE DONE IN reservePos() (crashes ensues, see uses)
 			if (!pylons.pos.size())
 				generate();
 			return pylons.reservePos();
 		}
 		else if (ut == UnitTypes::Protoss_Gateway || ut == UnitTypes::Protoss_Stargate)
 		{
+			gates.cleanUp();
 			if (!gates.pos.size())
 				generate();
 			return gates.reservePos();
 		}
 		else if (ut == UnitTypes::Protoss_Photon_Cannon)
 		{
+			cannons.cleanUp();
 			if (!cannons.pos.size())
 				generate();
 			return cannons.reservePos();
 		}
 		else
 		{
+			tech.cleanUp();
 			if (!tech.pos.size())
 				generate();
 			return tech.reservePos();

@@ -150,7 +150,7 @@ void Task::buildIt()
 		askWorker();
 		return;
 	}
-	if (Broodwar->getFrameCount() > lastOrder + 21 + Broodwar->getLatencyFrames())
+	if (Broodwar->getFrameCount() > lastOrder + 11 + Broodwar->getLatencyFrames())
 	{
 		/// If it requires psi but there is not, ask for a powering pylon, or cancel if we can't power it
 		if (type != UnitTypes::Protoss_Pylon && type != UnitTypes::Protoss_Assimilator && type != UnitTypes::Protoss_Nexus

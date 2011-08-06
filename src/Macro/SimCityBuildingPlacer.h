@@ -20,7 +20,7 @@ struct PositionAccountant
 	BWAPI::UnitType ut;
 	std::list<BWAPI::TilePosition> pos;
 	std::set<BWAPI::TilePosition> givenPos;
-	inline void cleanUp(); // because maps suck?
+	void cleanUp(); // because maps suck?
 	BWAPI::TilePosition reservePos();
 	BWAPI::TilePosition reservePos(BWAPI::TilePosition tp);
 	BWAPI::TilePosition findClosest(BWAPI::TilePosition seed);
@@ -74,6 +74,7 @@ public:
     void makeCannonsMinerals(BWTA::BaseLocation* home, bool quick=false);
 	void makeCannonChoke(BWTA::Region* inter, BWTA::Chokepoint* chok, bool quick=false);
 	static bool blockedBySomething(BWAPI::TilePosition position, BWAPI::UnitType type);
+	static bool inMineralLine(BWTA::BaseLocation* b, BWAPI::TilePosition tp);
 private:
 	std::list<BWAPI::TilePosition> existingPylons;
 	PositionAccountant pylons;
