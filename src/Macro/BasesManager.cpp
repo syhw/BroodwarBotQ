@@ -61,7 +61,11 @@ void BasesManager::update()
 	{
 		mb->update();
 		if (mb->isActive())
+		{
 			activeBases.insert(mb);
+			if (mb != allBases.front()) // for expands, take gas as soon as they are active
+				mb->setActiveGas(true);
+		}
 		else
 			activeBases.erase(mb);
 		if (mb->isReady())

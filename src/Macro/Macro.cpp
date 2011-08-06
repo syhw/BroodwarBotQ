@@ -162,17 +162,17 @@ void Macro::onUnitCreate(BWAPI::Unit* unit)
 			{
 				TheProducer->produce(6, UnitTypes::Protoss_Zealot, 49, 2);
 				TheProducer->produce(16, UnitTypes::Protoss_Dragoon, 50);
-				TheProducer->produceAlways(16, UnitTypes::Protoss_Dragoon);
+				TheProducer->produceAlways(30, UnitTypes::Protoss_Dragoon);
 			}
 			else if (Broodwar->enemy()->getRace() == Races::Terran)
 			{
 				TheProducer->produce(16, UnitTypes::Protoss_Dragoon, 50);
-				TheProducer->produceAlways(16, UnitTypes::Protoss_Dragoon);
+				TheProducer->produceAlways(30, UnitTypes::Protoss_Dragoon);
 			}
 			else
 			{
 				TheProducer->produce(16, UnitTypes::Protoss_Dragoon, 50);
-				TheProducer->produceAlways(16, UnitTypes::Protoss_Dragoon);
+				TheProducer->produceAlways(30, UnitTypes::Protoss_Dragoon);
 			}
 		}
 		else if (unit->getType() == UnitTypes::Protoss_Templar_Archives)

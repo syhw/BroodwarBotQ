@@ -82,6 +82,8 @@ void FirstScoutGoal::achieve()
 	if (!scoutUnit->exists()) // defensive
 		return;
 
+	/// TODO change the moves for minerals clicks (mineral walking)
+
 	if (!_foundEnemy)
 	{
 		/// We can see the next waypoint (_nextToVisit)
@@ -136,13 +138,17 @@ void FirstScoutGoal::achieve()
 	else /// Found enemy, harass then
 	{
 		if (Intelligence::Instance().enemyRush) // we are being rushed
-			goHome();
+			_stealingGas = false;
+		
+		if (scoutUnit->getDistance(Position(Broodwar->self()->getStartLocation())) < 20*TILE_SIZE)
+		{
+			_status = GS_ACHIEVED;
+			return;
+		}
 
 #ifdef __DO_NOT_HARASS_SCOUT__
-		goHome();
+		goHome(scoutUnit);
 #else
-		Broodwar->setLocalSpeed(32); ///////////////////////////////////////////////////////////////////////////// SPEED
-
 		if (!_gatheredIntel)
 		{
 			_unitsAround = Broodwar->getUnitsInRadius(scoutUnit->getPosition(), 10*TILE_SIZE);
@@ -161,8 +167,9 @@ void FirstScoutGoal::achieve()
 			else
 				b = BWTA::getNearestBaseLocation(c);
 			if (b == NULL)
-			{
-				goHome();
+			{ 
+				// hu?
+				goHome(scoutUnit);
 				return;
 			}
 			Vec dir(c.x() - _arrivePosition.x(), c.y() - _arrivePosition.y());
@@ -196,6 +203,11 @@ void FirstScoutGoal::achieve()
 		if (_stealingGas)
 		{
 			/// Check if vespene extractor/assimilator/refinery and if not steal (if we have the money), build only one if 2 geysers...
+			if (scoutUnit->isUnderAttack() || scoutUnit->getShields() < 2)
+			{
+				micro(scoutUnit);
+				return;
+			}
 			TilePosition buildGas = TilePositions::None;
 			for each (Unit* gas in _nextBase->getGeysers())
 			{
@@ -232,113 +244,66 @@ void FirstScoutGoal::achieve()
 			if (scoutUnit->getHitPoints() < 11)
 			{
 				_canHarassWorkers = false;
-				goHome();
+				goHome(scoutUnit);
 				return;
 			}
-			if (!(Broodwar->getFrameCount() % (3 + Broodwar->getLatencyFrames())))
+			if (!(Broodwar->getFrameCount() % (1 + Broodwar->getLatencyFrames())))
 			{
-				// because we're too hype to update units from filter (UnitsGroup)
-				_unitsAround = Broodwar->getUnitsInRadius(scoutUnit->getPosition(), 192);
-				set<Unit*> attackingMe;
-				Unit* closestWorker = NULL;
-				double closestDist = DBL_MAX;
-				for each (Unit* u in _unitsAround)
-				{
-					if (u->getType().groundWeapon().maxRange() > 51 // > sqrt(2*TILE_SIZE^2) && < 2*TILE_SIZE
-						|| (u->getType() == UnitTypes::Zerg_Zergling && u->getDistance(scoutUnit) < 3*TILE_SIZE))
-						_canHarassWorkers = false;
-					if (u->getTarget() == scoutUnit && u->getType().canAttack())
-						attackingMe.insert(u);
-					if (u->getPlayer() == Broodwar->enemy()
-						&& u->getType().isWorker()
-						&& u->getDistance(scoutUnit) < closestDist)
-					{
-						closestDist = u->getDistance(scoutUnit);
-						closestWorker = u;
-					}
-				}
-				if (attackingMe.empty())
-				{
-					if (closestWorker == NULL)
-						scoutUnit->attack(Position(_nextToVisit));
-					else
-						scoutUnit->attack(closestWorker);
-					return;
-				}
-				else
-				{
-					bool fleeShort = false;
-					Vec direction(0, 0);
-					if (scoutUnit->getShields() < 2)
-					{
-						for each (Unit* at in attackingMe)
-						{
-							if (at->getDistance(scoutUnit) <= at->getType().groundWeapon().maxRange() + TILE_SIZE/2)
-							{
-								fleeShort = true;
-								direction += Vec(scoutUnit->getPosition().x() - at->getPosition().x(), scoutUnit->getPosition().y() - at->getPosition().y());
-							}
-						}
-						direction = direction.normalize();
-						direction *= 51;
-					}
-					if (fleeShort)
-					{
-						if (!(Broodwar->getFrameCount() % Broodwar->getLatencyFrames()))
-							scoutUnit->rightClick(_mineral); //direction.translate(scoutUnit->getPosition()));
-						return;
-					}
-					else
-					{
-						Position middle(Broodwar->mapWidth()*TILE_SIZE/2, Broodwar->mapHeight()*TILE_SIZE/2);
-						_unitsGroup.move(middle);
-						_unitsGroup.update();
-						return;
-					}
-				}
+				micro(scoutUnit);
+				return;
 			}
 		}
 
 		if (!_canHarassWorkers)
-		{
-			goHome();
-		}
+			goHome(scoutUnit);
 #endif
 	}
 }
 
-void FirstScoutGoal::goHome()
+void FirstScoutGoal::micro(Unit* scoutUnit)
 {
-	BWAPI::Unit* scoutUnit = NULL;
-	if (_unitsGroup.size())
-		scoutUnit = (*_unitsGroup.units.begin())->unit;
-	if (!scoutUnit->exists()) // defensive
-		return;
-
-	if (_unitsGroup.groupMode != MODE_SCOUT) // defensive
-		_unitsGroup.switchMode(MODE_SCOUT);
-	Position middle(Broodwar->mapWidth()*TILE_SIZE/2, Broodwar->mapHeight()*TILE_SIZE/2);
-	if (scoutUnit->getDistance(middle) > 20*TILE_SIZE)
+	// because we're too hype to update units from filter (UnitsGroup)
+	_unitsAround = Broodwar->getUnitsInRadius(scoutUnit->getPosition(), 192);
+	set<Unit*> attackingMe;
+	Unit* closestWorker = NULL;
+	double closestDist = DBL_MAX;
+	for each (Unit* u in _unitsAround)
 	{
-		// escort our unit to the middle with the threat aware pathfinding
-		//_unitsGroup.move(middle);
-		//_unitsGroup.update();
-		if (!(Broodwar->getFrameCount() % Broodwar->getLatencyFrames()))
-			scoutUnit->rightClick(_mineral);
+		if (u->getType().groundWeapon().maxRange() > 51 // > sqrt(2*TILE_SIZE^2) && < 2*TILE_SIZE
+			|| (u->getType() == UnitTypes::Zerg_Zergling && u->getDistance(scoutUnit) < 3*TILE_SIZE))
+			_canHarassWorkers = false;
+		if (u->getTarget() == scoutUnit && u->getType().canAttack())
+			attackingMe.insert(u);
+		if (u->getPlayer() == Broodwar->enemy()
+			&& u->getType().isWorker()
+			&& u->getDistance(scoutUnit) < closestDist)
+		{
+			closestDist = u->getDistance(scoutUnit);
+			closestWorker = u;
+		}
+	}
+	if (attackingMe.empty())
+	{
+		if (closestWorker == NULL)
+			scoutUnit->attack(Position(_nextToVisit));
+		else
+			scoutUnit->attack(closestWorker);
 		return;
 	}
 	else
 	{
-		// go back home, goal finished
-		if (!BWTA::getStartLocation(Broodwar->self())->getMinerals().empty())
-		{
-			Unit* rdmMineral = *BWTA::getStartLocation(Broodwar->self())->getMinerals().begin();
-			scoutUnit->rightClick(rdmMineral);
-		}
-		else
-			scoutUnit->rightClick(Position(Broodwar->self()->getStartLocation()));
-		_status = GS_ACHIEVED;
+		scoutUnit->rightClick(_mineral); //direction.translate(scoutUnit->getPosition()));
+		return;
 	}
+}
+
+void FirstScoutGoal::goHome(Unit* scoutUnit)
+{
+	if (_unitsGroup.groupMode != MODE_SCOUT) // defensive
+		_unitsGroup.switchMode(MODE_SCOUT);
+	Position middle(Broodwar->mapWidth()*TILE_SIZE/2, Broodwar->mapHeight()*TILE_SIZE/2);
+	scoutUnit->rightClick(_mineral);
+	_status = GS_ACHIEVED;
 }
 
 void FirstScoutGoal::onOffer(set<Unit*> objects)

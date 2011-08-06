@@ -15,8 +15,10 @@ class Task : public Arbitrator::Controller<BWAPI::Unit*, double>
 	BWAPI::UnitType type;
 	int lastOrder;
 	bool finished;
+	int tries;
 public:
 	static SimCityBuildingPlacer* buildingPlacer;
+	static int reservedMineralsNexus;
 	static int framesToCompleteRequirements(BWAPI::UnitType type);
 	Task(BWAPI::Unit* w, BWAPI::TilePosition tp=BWAPI::TilePositions::None, BWAPI::UnitType ut=BWAPI::UnitTypes::None, int lo=0);
 	void init();

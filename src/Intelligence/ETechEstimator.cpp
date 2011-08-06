@@ -435,7 +435,7 @@ bool ETechEstimator::insertBuilding(Unit* u)
 
 void ETechEstimator::computeDistribOpenings(int time)
 {
-	if (time >= LEARNED_TIME_LIMIT)
+	if (time >= LEARNED_TIME_LIMIT || time <= 0)
 		return;
 	
 	size_t nbXes = st.vector_X.size();
@@ -569,7 +569,7 @@ void ETechEstimator::useDistribOpenings()
 				TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
 				++builtCannons;
 			}
-			TheProducer->produce(2, UnitTypes::Protoss_Observer, (int)(openingsProbas[1]*100));
+			////////// too much things at once TheProducer->produce(2, UnitTypes::Protoss_Observer, (int)(openingsProbas[1]*100));
 #ifdef __DEBUG__
 			Broodwar->printf("Building cannons bc of DTs");
 			Broodwar->printf("Producing observers bc of DTs");

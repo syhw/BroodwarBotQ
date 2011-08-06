@@ -62,7 +62,7 @@ void GoalManager::update()
 	}*/ 
 
 #ifdef __DEBUG__
-	int y = 5;
+	int y = 3;
 #endif
 	/// Update all goals
 	for each (pGoal g in _goals)

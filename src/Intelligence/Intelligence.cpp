@@ -1,6 +1,7 @@
 #include <PrecompiledHeader.h>
 #include "Intelligence/Intelligence.h"
 #include "Macro/InformationManager.h" // temporary, or is it?
+#include "Macro/Producer.h"
 #include "Micro/Goals/Goal.h"
 #include "Micro/Goals/FirstScoutGoal.h"
 
@@ -50,22 +51,30 @@ void Intelligence::update()
 #endif
 	if (Broodwar->enemy()->getRace() == Races::Protoss)
 	{
-		if (Broodwar->getFrameCount() < __GATES_TIME_RUSH__ + 20
+		if (Broodwar->getFrameCount() < 24*__GATES_TIME_RUSH__ + 12
 			&& eUnitsFilter->getNumbersType(UnitTypes::Protoss_Gateway) >= 2)
-				enemyRush = true;
+		{
+			enemyRush = true;
+			TheProducer->produce(1, UnitTypes::Protoss_Zealot, 100);
+		}
 	}
 	else if (Broodwar->enemy()->getRace() == Races::Terran)
 	{
-		if (Broodwar->getFrameCount() < __BBS_TIME_RUSH__
+		if (Broodwar->getFrameCount() < 24*__BBS_TIME_RUSH__
 			&& eUnitsFilter->getNumbersType(UnitTypes::Terran_Barracks) >= 2)
 				enemyRush = true;
 	}
 	else if (Broodwar->enemy()->getRace() == Races::Zerg)
 	{
-		if (Broodwar->getFrameCount() < __POOL_TIME_RUSH__ + 20
+		if (Broodwar->getFrameCount() < 24*__POOL_TIME_RUSH__ + 12
 			&& eUnitsFilter->getNumbersType(UnitTypes::Zerg_Spawning_Pool))
-				enemyRush = true;
+		{
+			enemyRush = true;
+			TheProducer->produce(2, UnitTypes::Protoss_Zealot, 100);
+		}
 	}
+	if (Broodwar->getFrameCount() > 10*60*24)
+		enemyRush = false;
 #ifdef __DEBUG__
 	if (enemyRush)
 		Broodwar->drawTextScreen(585, 18, "\x08RUSH");

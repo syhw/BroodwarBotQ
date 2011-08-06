@@ -3,6 +3,7 @@
 #include "Macro/Macro.h"
 #include "Macro/UnitGroupManager.h"
 #include "BWSAL.h"
+#include "Intelligence/Intelligence.h"
 
 using namespace BWAPI;
 using namespace std;
@@ -146,7 +147,7 @@ int Producer::willProduce(UnitType t)
  */
 void Producer::produce(int number, BWAPI::UnitType t, int priority, int increment)
 {
-	int add = max(0, number - Broodwar->self()->completedUnitCount(t) - willProduce(t));
+	int add = max(0, number - Broodwar->self()->completedUnitCount(t) - willProduce(t)); /// TODO should raise upgrade (or discard willProduce?)
 	produceAdditional(add, t, priority, increment);
 }
 
@@ -373,7 +374,7 @@ void Producer::update()
 	/// Organize/order supply to avoid supply block
 	if (true // delay?
 #ifdef __CONTROL_BO_UNTIL_SECOND_PYLON__
-		&& (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Pylon) > 1 || Broodwar->getFrameCount() > 5000) // so that we can drive the early BO
+		&& (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Pylon) > 1 || Broodwar->getFrameCount() > 600) // so that we can drive the early BO
 #endif
 		&& TheResourceRates->getGatherRate().getMinerals() > 0.00001) // TODO change
 	{
@@ -381,9 +382,10 @@ void Producer::update()
 			Broodwar->self()->getRace().getSupplyProvider().buildTime()
 			+ max((int)(Broodwar->self()->getRace().getSupplyProvider().mineralPrice() / TheResourceRates->getGatherRate().getMinerals()) // important only if we perfectly consume our resources
 			, 10*24)); // should be the upper bound on the time to start building a pylon
+		int addSupply = additionalUnitsSupply(frames);
 		if (!TheBuilder->numberInFutureTasks(Broodwar->self()->getRace().getSupplyProvider()) &&
-			Broodwar->self()->supplyTotal() < 200 &&
-			additionalUnitsSupply(frames) + Broodwar->self()->supplyUsed() > TheBuilder->additionalSupplyNextFrames(frames) + Broodwar->self()->supplyTotal())
+			Broodwar->self()->supplyTotal() < 400 &&
+			addSupply + Broodwar->self()->supplyUsed() > TheBuilder->additionalSupplyNextFrames(frames) + Broodwar->self()->supplyTotal())
 			TheBuilder->build(Broodwar->self()->getRace().getSupplyProvider());
 	}
 
@@ -469,13 +471,13 @@ void Producer::update()
 			(it->second->getRemainingTrainTime() <= Broodwar->getLatencyFrames() && it->second->getTrainingQueue().size() <= 1)))
 			free.insert(make_pair<UnitType, ProducingUnit*>(it->first, &(it->second)));
 	}
-	if (free.empty())
+	/*if (free.empty())
 	{
 		UnitType tmp = mostSaturatedUT();
 		if (tmp != UnitTypes::None)
 			TheBuilder->build(tmp);
 		return;
-	}
+	}*/
 
 	/// Launch new units productions
 	minerals = Broodwar->self()->minerals() - Macro::Instance().reservedMinerals;
@@ -485,6 +487,13 @@ void Producer::update()
 	for (multimap<int, UnitType>::const_iterator it = _productionQueue.begin();
 		it != _productionQueue.end(); ++it)
 	{
+		// TODO workers cut
+		//if (Broodwar->getFrameCount() < 300 
+		//	&& Broodwar->self()->completedUnitCount(Broodwar->self()->getRace().getWorker()) > 13
+		//	&& it->second == Broodwar->self()->getRace().getWorker()
+		//	&& Intelligence::Instance().enemyRush) // before 5 minutes, cut probes if enemy rushes
+		//	continue;
+
 		if (checkCanProduce(it->second))
 		{
 			multimap<UnitType, ProducingUnit*>::iterator builder = free.find(it->second.whatBuilds().first);
@@ -510,16 +519,14 @@ void Producer::update()
 		_productionQueue.erase(it);
 
 	/// Add the default productions
-	if (_productionQueue.empty() && !(Broodwar->getFrameCount() % 23))
+	if (!(Broodwar->getFrameCount() % 23))
 		// as soon as we will have inserted some default productions, it won't be empty anymore, even if we have supply capped
 	{
 		/// Check if we want to produce units from the "always have" numbers asked
 		for (map<UnitType, pair<int, int> >::const_iterator it = _wantedNumbers.begin();
 			it != _wantedNumbers.end(); ++it)
 		{
-			int number = Broodwar->self()->completedUnitCount(it->first);
-			if (number < it->second.first)
-				produceAdditional(number - it->second.first, it->first, 1, it->second.second);
+			produce(it->second.first, it->first, 1, it->second.second);
 		}
 	}
 }

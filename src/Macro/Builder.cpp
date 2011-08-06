@@ -10,8 +10,11 @@ using namespace std;
 
 #define __MIN_HP_CANCEL_BUILDING_IN_CONSTRUCTION__ 50
 #define __MIN_FRAMES_TO_START_CONSTRUCTION__ 10*24
+#define __MAX_TRIES_BUILD_SOMETHING__ 1440 // IN FRAMES, 1 minute here
 
 SimCityBuildingPlacer* Task::buildingPlacer = NULL;
+
+int Task::reservedMineralsNexus = 0; // TODO use that
 
 Task::Task(BWAPI::Unit* w, BWAPI::TilePosition tp, BWAPI::UnitType ut, int lo)
 : worker(w)
@@ -19,11 +22,15 @@ Task::Task(BWAPI::Unit* w, BWAPI::TilePosition tp, BWAPI::UnitType ut, int lo)
 , type(ut)
 , lastOrder(lo)
 , finished(false)
+, tries(0)
 {
 }
 
 Task::~Task()
 {
+	if (type == UnitTypes::Protoss_Nexus)
+		Task::reservedMineralsNexus -= type.mineralPrice();
+
 	Macro::Instance().reservedMinerals -= type.mineralPrice();
 	Macro::Instance().reservedGas -= type.gasPrice();
 	TheArbitrator->removeController(this);
@@ -71,6 +78,15 @@ void Task::init()
 {
 	if (tilePosition == TilePositions::None)
 		tilePosition = buildingPlacer->getTilePosition(type);
+	if (!tilePosition.isValid() || TilePositions::None)
+	{
+		finished = true;
+		return;
+	}
+
+	if (type == UnitTypes::Protoss_Nexus)
+		Task::reservedMineralsNexus += type.mineralPrice();
+
 	Macro::Instance().reservedMinerals += type.mineralPrice();
 	Macro::Instance().reservedGas += type.gasPrice();
 	int delay = Task::framesToCompleteRequirements(type); // launches the requirements
@@ -143,6 +159,14 @@ void Task::askWorker()
 
 void Task::buildIt()
 {
+	if (tries > __MAX_TRIES_BUILD_SOMETHING__)
+	{
+		finished = true;
+#ifdef __DEBUG__
+		Broodwar->printf("\x08 !!! CANCELED Building %s at (%d,%d) !!!", type.getName().c_str(), tilePosition.x(), tilePosition.y());
+#endif
+		return;
+	}
 	if (!worker || !worker->exists() || worker->getPlayer() != Broodwar->self())
 	{
 		/// Just in case the worker got killed / captured
@@ -150,7 +174,10 @@ void Task::buildIt()
 		askWorker();
 		return;
 	}
-	if (Broodwar->getFrameCount() > lastOrder + 11 + Broodwar->getLatencyFrames())
+	++tries;
+	if (!tilePosition.isValid() || tilePosition == TilePositions::None)
+		buildingPlacer->getTilePosition(type);
+	if (Broodwar->getFrameCount() > lastOrder + 17 + Broodwar->getLatencyFrames())
 	{
 		/// If it requires psi but there is not, ask for a powering pylon, or cancel if we can't power it
 		if (type != UnitTypes::Protoss_Pylon && type != UnitTypes::Protoss_Assimilator && type != UnitTypes::Protoss_Nexus
@@ -171,15 +198,14 @@ void Task::buildIt()
 			return;
 		}
 		/// Move closer to the construction site
-		if (worker->getPosition().getApproxDistance(Position(tilePosition)) > 4 * TILE_SIZE)
-		{
+		if (worker->getPosition().getApproxDistance(Position(tilePosition)) > 6 * TILE_SIZE) // 6 > sqrt(biggest^2+biggest^2) (biggest buildings as Protoss are nexus/gates)
 			worker->move(Position(tilePosition));
-		}
+			//worker->move(Position(tilePosition).x() - 1, Position(tilePosition).y() - 1);
 		/// Try and build it if we can
 		else if (!worker->build(tilePosition, type))
 		{
 #ifdef __DEBUG__
-			Broodwar->printf("Can't build %s", type.getName().c_str());
+			Broodwar->printf("Can't build %s at (%d,%d)", type.getName().c_str(), tilePosition.x(), tilePosition.y());
 #endif
 		}
 		lastOrder = Broodwar->getFrameCount();
@@ -206,6 +232,8 @@ void Task::check()
 	if (Broodwar->getFrameCount() <= lastOrder) // delay hack
 		return;
 	lastOrder = max(lastOrder, Task::framesToCompleteRequirements(type)); 
+	if (!tilePosition.isValid() || tilePosition == TilePositions::None)
+		buildingPlacer->getTilePosition(type);
 	/// Check if we have finished, or if there are blocking units we can move,
 	/// or if the build TilePosition is really blocked
 	for (set<Unit*>::const_iterator it = Broodwar->getUnitsOnTile(tilePosition.x(), tilePosition.y()).begin();
@@ -484,6 +512,7 @@ void Builder::update()
 			(*tmp)->cancelConstruction();
 		}
 	}
+
 #ifdef __DEBUG__
 	Task::buildingPlacer->update();
 	int dy = 0;
@@ -495,6 +524,18 @@ void Builder::update()
 	if (!tasks.empty())
 		Broodwar->drawBoxScreen(190, 325 - dy + 10, 360, 346, Colors::Cyan);
 #endif
+
+	/// Default check/defensive for the late game
+	if (Broodwar->self()->supplyUsed() >= 396 && Broodwar->self()->minerals() > 1200 && Broodwar->self()->gas() > 600)
+	{
+		int nbGates = Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway);
+		int nbRobos = Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Robotics_Facility);
+		if (nbGates < 16 && TheBuilder->willBuild(UnitTypes::Protoss_Gateway) + nbGates < 16)
+			TheBuilder->build(UnitTypes::Protoss_Gateway);
+		if (nbRobos < 4 && TheBuilder->willBuild(UnitTypes::Protoss_Robotics_Facility) + nbRobos < 16)
+			TheBuilder->build(UnitTypes::Protoss_Robotics_Facility);
+	}
+
 }
 
 const UnitType& Builder::nextBuildingType()

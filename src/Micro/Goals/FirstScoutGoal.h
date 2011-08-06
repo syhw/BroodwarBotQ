@@ -20,7 +20,8 @@ private:
 	BWAPI::Position _arrivePosition;
 	std::set<Unit*> _unitsAround;
 	BWAPI::Unit* _mineral;
-	inline void goHome();
+	inline void goHome(BWAPI::Unit* scoutUnit);
+	inline void micro(BWAPI::Unit* scoutUnit);
 public:
 	FirstScoutGoal(int priority=90);
 	void achieve();

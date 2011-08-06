@@ -31,7 +31,8 @@
 
 #define __NEW_COMPUTE_REPULSE__
 #define __HEURISTICS_IN_FIGHTMOVE__ 1 // level of heuristic(s)
-//#define __OUTER_NON_ATOMIC_DIRV__ // accept to do "non atomic w.r.t. Broodwar directions" moves/clicks (BW pathfinder can be called, drama ensues), useful to pass big buildings
+#define __OUTER_NON_ATOMIC_DIRV__ // accept to do "non atomic w.r.t. Broodwar directions" moves/clicks (BW pathfinder can be called, drama ensues), useful to pass big buildings
+#define __TILES_AROUND__ 2 // atomic = 2
 //#define __OUR_PATHFINDER__
 //#define __EXACT_OBJ__
 #define __SAMPLE_DIR__
@@ -85,8 +86,8 @@ BayesianUnit::BayesianUnit(Unit* u, const ProbTables* probTables)
 , _fleeingDmg(20)
 , _probTables(probTables)
 {
-    updateDirV();
     mapManager = & MapManager::Instance();
+    updateDirV();
     switchMode(_mode);
     updateAttractors();
 }
@@ -935,8 +936,8 @@ void BayesianUnit::updateDirV()
             }
         }  
 #else
-    for (int x = -2; x <= 2; ++x)
-        for (int y = -2; y <= 2; ++y)
+    for (int x = -__TILES_AROUND__; x <= __TILES_AROUND__; ++x)
+        for (int y = -__TILES_AROUND__; y <= __TILES_AROUND__; ++y)
         {
             int xx, yy;
             xx = x*pixs;
