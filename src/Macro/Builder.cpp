@@ -175,7 +175,7 @@ void Task::buildIt()
 		return;
 	}
 	++tries;
-	if (!tilePosition.isValid() || tilePosition == TilePositions::None)
+	if (tilePosition == TilePositions::None)
 		buildingPlacer->getTilePosition(type);
 	if (Broodwar->getFrameCount() > lastOrder + 17 + Broodwar->getLatencyFrames())
 	{
@@ -199,8 +199,19 @@ void Task::buildIt()
 		}
 		/// Move closer to the construction site
 		if (worker->getPosition().getApproxDistance(Position(tilePosition)) > 6 * TILE_SIZE) // 6 > sqrt(biggest^2+biggest^2) (biggest buildings as Protoss are nexus/gates)
-			worker->move(Position(tilePosition));
+		{
+			if (type == UnitTypes::Protoss_Nexus)
+			{
+				BWTA::BaseLocation* b = BWTA::getNearestBaseLocation(tilePosition);
+				if (b != NULL && !b->getMinerals().empty())
+					worker->rightClick(*(b->getMinerals().begin()));
+				else
+					worker->move(Position(tilePosition));
+			}
+			else
+				worker->move(Position(tilePosition));
 			//worker->move(Position(tilePosition).x() - 1, Position(tilePosition).y() - 1);
+		}
 		/// Try and build it if we can
 		else if (!worker->build(tilePosition, type))
 		{
@@ -232,8 +243,8 @@ void Task::check()
 	if (Broodwar->getFrameCount() <= lastOrder) // delay hack
 		return;
 	lastOrder = max(lastOrder, Task::framesToCompleteRequirements(type)); 
-	if (!tilePosition.isValid() || tilePosition == TilePositions::None)
-		buildingPlacer->getTilePosition(type);
+	//if (tilePosition == TilePositions::None)
+	//	buildingPlacer->getTilePosition(type);
 	/// Check if we have finished, or if there are blocking units we can move,
 	/// or if the build TilePosition is really blocked
 	for (set<Unit*>::const_iterator it = Broodwar->getUnitsOnTile(tilePosition.x(), tilePosition.y()).begin();

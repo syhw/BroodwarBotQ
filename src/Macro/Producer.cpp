@@ -3,7 +3,7 @@
 #include "Macro/Macro.h"
 #include "Macro/UnitGroupManager.h"
 #include "BWSAL.h"
-#include "Intelligence/Intelligence.h"
+#include "Micro/Micro.h"
 
 using namespace BWAPI;
 using namespace std;
@@ -164,6 +164,8 @@ void Producer::produceAlways(int number, BWAPI::UnitType t, int increment)
  */
 void Producer::researchTech(BWAPI::TechType t)
 {
+	if (Broodwar->self()->hasResearched(t))
+		return;
 	checkCanTech(t);
 	for (list<TechType>::const_iterator it = _techsQueue.begin();
 		it != _techsQueue.end(); ++it)
@@ -179,6 +181,8 @@ void Producer::researchTech(BWAPI::TechType t)
  */
 void Producer::researchUpgrade(BWAPI::UpgradeType t)
 {
+	if (Broodwar->self()->getUpgradeLevel(t) >= t.maxRepeats())
+		return;
 	checkCanUpgrade(t);
 	for (list<UpgradeType>::const_iterator it = _upgradesQueue.begin();
 		it != _upgradesQueue.end(); ++it)
@@ -327,6 +331,8 @@ void Producer::addToProducingStructures(Unit* u)
 			return;
 	}
 	_producingStructures.insert(make_pair<UnitType, ProducingUnit>(u->getType(), u));
+	if (u->getType() != UnitTypes::Protoss_Nexus)
+		u->setRallyPoint(Micro::Instance().getDefensePosition());
 }
 
 void Producer::update()
@@ -371,13 +377,18 @@ void Producer::update()
 			++it;
 	}
 
-	/// Organize/order supply to avoid supply block
+	int minerals = Broodwar->self()->minerals() - Macro::Instance().reservedMinerals;
+	int gas = Broodwar->self()->gas() - Macro::Instance().reservedGas;
+
 	if (true // delay?
 #ifdef __CONTROL_BO_UNTIL_SECOND_PYLON__
-		&& (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Pylon) > 1 || Broodwar->getFrameCount() > 600) // so that we can drive the early BO
+		&& (Broodwar->getFrameCount() > 5000 || Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Pylon) > 1) // so that we can drive the early BO
 #endif
-		&& TheResourceRates->getGatherRate().getMinerals() > 0.00001) // TODO change
+		)
 	{
+		/// Organize/order supply to avoid supply block
+		if (TheResourceRates->getGatherRate().getMinerals() > 0.00001) // TODO change
+		{
 		int frames = min(180*24,
 			Broodwar->self()->getRace().getSupplyProvider().buildTime()
 			+ max((int)(Broodwar->self()->getRace().getSupplyProvider().mineralPrice() / TheResourceRates->getGatherRate().getMinerals()) // important only if we perfectly consume our resources
@@ -387,17 +398,8 @@ void Producer::update()
 			Broodwar->self()->supplyTotal() < 400 &&
 			addSupply + Broodwar->self()->supplyUsed() > TheBuilder->additionalSupplyNextFrames(frames) + Broodwar->self()->supplyTotal())
 			TheBuilder->build(Broodwar->self()->getRace().getSupplyProvider());
-	}
+		}
 
-	int minerals = Broodwar->self()->minerals() - Macro::Instance().reservedMinerals;
-	int gas = Broodwar->self()->gas() - Macro::Instance().reservedGas;
-
-	if (true //!(Broodwar->getFrameCount() % 21) // delay?
-#ifdef __CONTROL_BO_UNTIL_SECOND_PYLON__
-		&& (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Pylon) > 1 || Broodwar->getFrameCount() >= 5000)
-#endif
-		)
-	{
 		/// Research Techs/Upgrades
 		if (!_techsQueue.empty() || !_upgradesQueue.empty())
 		{

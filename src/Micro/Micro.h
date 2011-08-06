@@ -21,4 +21,5 @@ public:
 	void onUnitDestroy(BWAPI::Unit* unit);
 	void onUnitRenegade(BWAPI::Unit* unit);
 	void onNukeDetect(BWAPI::Position target);
+	BWAPI::Position getDefensePosition() const;
 };

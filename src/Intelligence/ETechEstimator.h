@@ -91,6 +91,7 @@ class ETechEstimator : public CSingleton<ETechEstimator>
 	inline bool testBuildTreePossible(int indBuildTree,
 		const std::set<int>& setObs);
 public:
+	const std::vector<long double>& getOpeningsProbas() const;
 	void onUnitDestroy(BWAPI::Unit* u);
 	void onUnitShow(BWAPI::Unit* u);
 	void onUnitHide(BWAPI::Unit* u);

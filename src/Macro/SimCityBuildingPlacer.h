@@ -86,6 +86,10 @@ private:
 	std::set<BWTA::Chokepoint*> backdoorChokes;
 	int nbClusters;
 	bool _noMoreClustersAtHome;
+	bool _canNoLongerGenerateClusters;
+	std::set<BWTA::BaseLocation*> _searchedForClustersAtBase;
+	std::set<BWTA::Region*> _searchedForClustersAtRegion;
+	inline void searchedAtBase(BWTA::BaseLocation* b);
 
 	inline BuildingsCluster searchForCluster(BWTA::BaseLocation* b);
     inline BuildingsCluster searchForCluster(BWTA::Region* r);
@@ -97,6 +101,9 @@ private:
 	BWAPI::TilePosition closestBuildableSameRegion(const BWAPI::TilePosition& tp);
 	BWAPI::TilePosition closestBuildableSameRegionNotTP2(const BWAPI::TilePosition& tp, const BWAPI::TilePosition& tp2);
 	inline void generate(int min_size = 1);
+	inline void generateGatesPos();
+	inline void generateTechPos();
+	inline void generateCannonsPos();
 	inline void generatePylonsPos();
 	inline std::set<BWAPI::Unit*> checkPower(const std::set<BWAPI::Unit*>& buildings);
 	inline bool powerBuildings(const std::set<BWAPI::Unit*>& buildings);

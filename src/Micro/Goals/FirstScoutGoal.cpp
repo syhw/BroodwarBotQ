@@ -176,6 +176,7 @@ void FirstScoutGoal::achieve()
 			dir.normalize();
 			dir *= 5*TILE_SIZE;
 			Position pos(dir.translate(c));
+			pos.makeValid();
 			if ((Broodwar->enemy()->getRace() == Races::Zerg 
 				&& EUnitsFilter::Instance().getNumbersType(UnitTypes::Zerg_Spawning_Pool))
 				|| (Broodwar->enemy()->getRace() == Races::Terran
@@ -191,6 +192,7 @@ void FirstScoutGoal::achieve()
 			side.normalize();
 			side *= 5*TILE_SIZE;
 			Position mid(side.translate(c));
+			mid.makeValid();
 			if (scoutUnit->getDistance(pos) > 11*TILE_SIZE)
 				_unitsGroup.move(mid);
 			else

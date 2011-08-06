@@ -20,6 +20,8 @@ class Macro: public CSingleton<Macro>
 	int addedGates;
 
 public:
+	bool stormFirst;
+	bool reaverFirst;
 	int expands;
 	int reservedMinerals;
 	int reservedGas;

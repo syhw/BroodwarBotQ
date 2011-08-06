@@ -5,6 +5,8 @@
 
 class ProbeUnit : public GroundUnit
 {
+	static BWAPI::Unit* backUpMineral;
+	bool decideToFlee();
 public:
     ProbeUnit(BWAPI::Unit* u);
     virtual ~ProbeUnit();

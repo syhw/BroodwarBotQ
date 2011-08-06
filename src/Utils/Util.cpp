@@ -94,3 +94,29 @@ std::vector<double> exponentialDistribution(double lambda, unsigned int bins)
 		r[i] /= sum;
 	return r;
 }
+
+size_t indMax(const std::vector<long double>& t)
+{
+	long double max = -DBL_MAX;
+	size_t ret = 0;
+	for (size_t i = 0; i < t.size(); ++i)
+	{
+		if (t[i] > max)
+		{
+			max = t[i];
+			ret = i;
+		}
+	}
+	return ret;
+}
+
+std::set<size_t> supTo(const std::vector<long double>& t, long double minProb)
+{
+	std::set<size_t> ret;
+	for (size_t i = 0; i < t.size(); ++i)
+	{
+		if (t[i] > minProb)
+			ret.insert(i);
+	}
+	return ret;
+}

@@ -166,6 +166,21 @@ bool SimCityBuildingPlacer::inMineralLine(BWTA::BaseLocation* b, BWAPI::TilePosi
 	return (tp.x() < maxX && tp.x() > minX && tp.y() < maxY && tp.y() > minY);
 }
 
+void SimCityBuildingPlacer::generateGatesPos()
+{
+	// TODO
+}
+
+void SimCityBuildingPlacer::generateTechPos()
+{
+	// TODO
+}
+
+void SimCityBuildingPlacer::generateCannonsPos()
+{
+	// TODO
+}
+
 void SimCityBuildingPlacer::generatePylonsPos()
 {
 	if (TheBasesManager == NULL)
@@ -219,17 +234,35 @@ void SimCityBuildingPlacer::generatePylonsPos()
 	}
 }
 
+void SimCityBuildingPlacer::searchedAtBase(BWTA::BaseLocation* b)
+{
+	_searchedForClustersAtBase.insert(b);
+	_searchedForClustersAtRegion.insert(b->getRegion());
+}
+
 void SimCityBuildingPlacer::generate(int min_size)
 {
 	if (TheBasesManager == NULL)
 		TheBasesManager = BasesManager::create();
 
+	if (_canNoLongerGenerateClusters)
+	{
+		if (pylons.pos.size() < 2)
+			generatePylonsPos();
+		if (gates.pos.size() < 2)
+			generateGatesPos();
+		if (tech.pos.size() < 2)
+			generateTechPos();
+		if (cannons.pos.size() < 2)
+			generateCannonsPos();
+		return;
+	}
+
 	BuildingsCluster bc = BuildingsCluster();
+	/// Search at home
 	if (!_noMoreClustersAtHome && nbClusters < 5)
 	{
 		bc = searchForCluster(home);
-		if (bc.size < min_size)
-			bc = searchForCluster(home->getRegion());
 		if (bc.size < 1)
 			_noMoreClustersAtHome = true;
 	}
@@ -239,8 +272,11 @@ void SimCityBuildingPlacer::generate(int min_size)
 		for (list<Base*>::const_iterator it = TheBasesManager->getAllBases().begin();
 			it != TheBasesManager->getAllBases().end(); ++it)
 		{
-			if ((*it)->getBaseLocation()->getRegion() != home->getRegion())
+			if (!_searchedForClustersAtBase.count((*it)->getBaseLocation())
+				&& (*it)->getBaseLocation()->getRegion() != home->getRegion())
 				bc = searchForCluster((*it)->getBaseLocation());
+			if (bc.size < 1)
+				searchedAtBase((*it)->getBaseLocation());
 			if (bc.size >= min_size)
 				break;
 		}
@@ -255,24 +291,18 @@ void SimCityBuildingPlacer::generate(int min_size)
 			TheInformationManager = InformationManager::create();
 		for each (BWTA::BaseLocation* b in BWTA::getStartLocations())
 		{
-			if (b != home && !TheInformationManager->getEnemyBases().count(b))
+			if (b != home && !_searchedForClustersAtBase.count(b)
+				&& !TheInformationManager->getEnemyBases().count(b))
 			{
 				bc = searchForCluster(b);
-				if (bc.size < min_size)
-					bc = searchForCluster(b->getRegion());
+				if (bc.size < 1)
+					searchedAtBase(b);
 			}
 		}
 	}
 	/// Search in other places if the map has only 2 start locations
-	if (bc.size < min_size && BWTA::getStartLocations().size() < 3 && Broodwar->getFrameCount() > 12*24*60)
+	if (bc.size < min_size && BWTA::getStartLocations().size() < 4 && Broodwar->getFrameCount() > 12*24*60)
 	{
-		/*for each (BWTA::Region* r in home->getRegion()->getReachableRegions())
-		{
-			bc = searchForCluster(r);
-			if (bc.size >= min_size)
-				break;
-		}*/
-		// OR
 		map<double, BWTA::Region*> distRegions;
 		map<BWTA::Region*, double> distancesToHome = MapManager::Instance().distRegions[home->getRegion()];
 		for (map<BWTA::Region*, double>::const_iterator it = distancesToHome.begin();
@@ -285,29 +315,16 @@ void SimCityBuildingPlacer::generate(int min_size)
 		for (map<double, BWTA::Region*>::const_iterator it = distRegions.begin();
 			it != distRegions.end(); ++it)
 		{
+			if (_searchedForClustersAtRegion.count(it->second))
+				continue;
 			bc = searchForCluster(it->second);
+			if (bc.size < 1)
+				_searchedForClustersAtRegion.insert(it->second);
 			if (bc.size >= min_size)
 				break;
 		}
-		// OR
-		/*
-		int i = 0;
-		BWTA::Chokepoint* nextChoke = frontChoke;
-		std::list<BWTA::Region*> openRegions;
-		BWTA::Region* nextRegion = home->getRegion();
-		nextRegion = nextChoke->getRegions().first == nextRegion ? nextChoke->getRegions().second : nextChoke->getRegions().first;
-		openRegions.push_back(nextRegion);
-		while (i < 10 && openRegions.size())
-		{
-			bc = searchForCluster(openRegions.front());
-			if (bc.size >= min_size)
-				break;
-			for each (BWTA::Chokepoint* cp in nextRegion->getChokepoints())
-				openRegions.push_back((openRegions.front() == cp->getRegions().first ? cp->getRegions().second : cp->getRegions().first));
-	        openRegions.pop_front();
-			++i;
-		}
-		*/
+		if (bc.size < 1)
+			_canNoLongerGenerateClusters = true;
 	}
 	if (bc.size >= min_size)
 	{
@@ -413,14 +430,9 @@ bool SimCityBuildingPlacer::powerBuildings(const set<Unit*>& buildings)
 
 BuildingsCluster SimCityBuildingPlacer::searchForCluster(BWTA::BaseLocation* b)
 {
-	int minX = max(1, b->getTilePosition().x() - 40);
-	int minY = max(1, b->getTilePosition().y() - 40);
-	int maxX = min(Broodwar->mapWidth() - 1, b->getTilePosition().x() + 40);
-	int maxY = min(Broodwar->mapHeight() - 2, b->getTilePosition().y() + 40);
-	return searchForCluster(minX, maxX, minY, maxY, b->getRegion());
+	return searchForCluster(b->getRegion());
 }
 
-/// Shitty, searches only in the convex space
 BuildingsCluster SimCityBuildingPlacer::searchForCluster(BWTA::Region* r)
 {
 	int minX = INT_MAX;
@@ -441,22 +453,24 @@ BuildingsCluster SimCityBuildingPlacer::searchForCluster(BWTA::Region* r)
 		if (tmpY > maxY)
 		    maxY = tmpY;
 	}
-	++minX;
-	++minY;
 	return searchForCluster(minX, maxX, minY, maxY, r);
 }
 
 BuildingsCluster SimCityBuildingPlacer::searchForCluster(int minX, int maxX, int minY, int maxY, BWTA::Region* r)
 {
+	int minXs = max(1, minX);
+	int minYs = max(1, minY);
+	int maxXs = min(Broodwar->mapWidth() - 1, maxX);
+	int maxYs = min(Broodwar->mapHeight() - 2, maxY); // the bottom line is not buildable
 	BuildingsCluster ret;
 	ret.size = 0;
 	/// search for "big clusters"
 	int minXClusterDim = UnitTypes::Protoss_Pylon.tileWidth() + 2*UnitTypes::Protoss_Gateway.tileWidth() + 2; // 2 to move around
 	int minYClusterDim = UnitTypes::Protoss_Pylon.tileHeight() + 2*UnitTypes::Protoss_Gateway.tileHeight() + 2;
-	int tmpMaxX = min(maxX - minXClusterDim, Broodwar->mapWidth() - 1);
-	int tmpMaxY = min(maxY - minYClusterDim, Broodwar->mapHeight() - 2); // the bottom line is not buildable
-	for (int x = minX; x < tmpMaxX; x += 1)
-		for (int y = minY; y < tmpMaxY; y += 1)
+	int tmpMaxX = maxXs - minXClusterDim;
+	int tmpMaxY = maxYs - minYClusterDim;
+	for (int x = minXs; x < tmpMaxX; x += 1)
+		for (int y = minYs; y < tmpMaxY; y += 1)
 		{
 			TilePosition topLeft(x, y);
 			if (BWTA::getRegion(topLeft) != r)
@@ -490,10 +504,10 @@ BuildingsCluster SimCityBuildingPlacer::searchForCluster(int minX, int maxX, int
 	/// search for "small clusters"
 	minXClusterDim = 2*UnitTypes::Protoss_Gateway.tileWidth() + 2; // 2 to move around
 	minYClusterDim = 2*UnitTypes::Protoss_Gateway.tileHeight() + 2;
-	tmpMaxX = min(maxX - minXClusterDim, Broodwar->mapWidth());
-	tmpMaxY = min(maxY - minYClusterDim, Broodwar->mapHeight());
-	for (int x = minX; x < tmpMaxX; x += 1)
-		for (int y = minY; y < tmpMaxY; y += 1)
+	tmpMaxX = maxXs - minXClusterDim;
+	tmpMaxY = maxYs - minYClusterDim;
+	for (int x = minXs; x < tmpMaxX; x += 1)
+		for (int y = minYs; y < tmpMaxY; y += 1)
 		{
 			TilePosition topLeft(x, y);
 			if (BWTA::getRegion(topLeft) != r)
@@ -527,10 +541,10 @@ BuildingsCluster SimCityBuildingPlacer::searchForCluster(int minX, int maxX, int
 	/// search for 2 buildings clusters (smallest)
 	minXClusterDim = 2*UnitTypes::Protoss_Pylon.tileWidth() + 2; // 2 to move around
 	minYClusterDim = 2*UnitTypes::Protoss_Pylon.tileHeight() + 2;
-	tmpMaxX = min(maxX - minXClusterDim, Broodwar->mapWidth());
-	tmpMaxY = min(maxY - minYClusterDim, Broodwar->mapHeight());
-	for (int x = minX; x < tmpMaxX; x += 1)
-		for (int y = minY; y < tmpMaxY; y += 1)
+	tmpMaxX = maxXs - minXClusterDim;
+	tmpMaxY = maxYs - minYClusterDim;
+	for (int x = minXs; x < tmpMaxX; x += 1)
+		for (int y = minYs; y < tmpMaxY; y += 1)
 		{
 			TilePosition topLeft(x, y);
 			if (BWTA::getRegion(topLeft) != r)
@@ -859,9 +873,12 @@ TilePosition SimCityBuildingPlacer::closestBuildableSameRegionNotTP2(const TileP
 			for (int y = -searchDim; y <= searchDim; ++y)
 			{
 				TilePosition tmp(tp.x() + x, tp.y() + y);
+				tmp.makeValid();
 				if (BWTA::getRegion(tmp) != r)
 					continue;
 				if (tmp == tp2)
+					continue;
+				if (abs(x-tp2.x() < 2) || abs(y-tp2.y()) < 2)
 					continue;
 				if (canBuildHere(NULL, tmp, UnitTypes::Protoss_Pylon))
 					return tmp;
@@ -1079,6 +1096,7 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 , cannons(UnitTypes::Protoss_Photon_Cannon)
 , tech(UnitTypes::Protoss_Cybernetics_Core)
 , _noMoreClustersAtHome(false)
+, _canNoLongerGenerateClusters(false)
 {
 	/// search and save front and backdoor chokes
 	backdoorChokes = home->getRegion()->getChokepoints();
@@ -1131,10 +1149,13 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 	nex = nex.vecTranslate(dir);
 	TilePosition cluster_center(nex.toTilePosition());
 
-	if (canBuildCluster(cluster_center, vertical) < 2)
+	BuildingsCluster bc; bc.size = 0;
+	bc = searchForCluster(cluster_center.x() - 2, cluster_center.y() - 2, cluster_center.x() + 2, cluster_center.y() + 2, home->getRegion());
+	if (bc.size < 2)
 		generate(2);
 	else
-		makeCluster(cluster_center, 2, vertical);
+		makeCluster(bc.center, 2, bc.vertical, bc.size);
+	generate();
 
 	/// search places to put cannons at chokes
 	makeCannonChoke(home->getRegion(), frontChoke, true);

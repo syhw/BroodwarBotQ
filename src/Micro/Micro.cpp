@@ -3,6 +3,7 @@
 #include "Macro/InformationManager.h"
 #include "Micro/Goals/AvoidNukeGoal.h"
 #include "Micro/Goals/AttackGoal.h"
+#include "Macro/BasesManager.h"
 
 using namespace BWAPI;
 using namespace std;
@@ -59,4 +60,12 @@ void Micro::onUnitRenegade(BWAPI::Unit *unit)
 void Micro::onNukeDetect(BWAPI::Position target)
 {
 	goalManager->addGoal(pGoal(new AvoidNukeGoal(target)));
+}
+
+BWAPI::Position Micro::getDefensePosition() const
+{
+	if (TheBasesManager->getAllBases().size() > 1)
+		return TheBasesManager->getAllBases().back()->getBaseLocation()->getPosition();
+	else
+		return frontChoke->getCenter();
 }

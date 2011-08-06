@@ -5,6 +5,7 @@
 #include "Macro/Builder.h"
 #include "Intelligence/Intelligence.h"
 #include "Macro/Macro.h"
+#include "Utils/Util.h"
 
 #define LEARNED_TIME_LIMIT 1080 // 18 minutes
 
@@ -494,32 +495,6 @@ bool ETechEstimator::testBuildTreePossible(int indBuildTree, const set<int>& set
     return true;
 }
 
-size_t indMax(const vector<long double>& t)
-{
-	long double max = -DBL_MAX;
-	size_t ret = 0;
-	for (size_t i = 0; i < t.size(); ++i)
-	{
-		if (t[i] > max)
-		{
-			max = t[i];
-			ret = i;
-		}
-	}
-	return ret;
-}
-
-set<size_t> supTo(const vector<long double>& t, long double minProb)
-{
-	set<size_t> ret;
-	for (size_t i = 0; i < t.size(); ++i)
-	{
-		if (t[i] > minProb)
-			ret.insert(i);
-	}
-	return ret;
-}
-
 /// TODO: move all that in appropriate methods for specific
 /// "reactions to some opening/strat/tactic" in the relevant managers
 /// (Bullshit talk (c))
@@ -536,6 +511,12 @@ void ETechEstimator::useDistribOpenings()
 	int builtCannons = max(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Photon_Cannon), TheBuilder->willBuild(UnitTypes::Protoss_Photon_Cannon));
 	if (enemyRace == Races::Terran)
 	{
+		if (fearThese.count(0)) // Bio
+		{
+			if (openingsProbas[0] > openingsProbas[1] && openingsProbas[0] > openingsProbas[2])
+				Macro::Instance().stormFirst = true;
+		}
+		
 		if (fearThese.count(2)) // VulturesHarass
 		{
 			TheProducer->produce(2, UnitTypes::Protoss_Observer, (int)(openingsProbas[2]*100));
@@ -543,11 +524,13 @@ void ETechEstimator::useDistribOpenings()
 			Broodwar->printf("Producing observers bc of Vultures");
 #endif
 		}
+
 		if (fearThese.count(3)) // SiegeExpand
 		{
 			if (!Macro::Instance().expands)
 				Macro::Instance().expand();
 		}
+
 		if (fearThese.count(5)) // FastDropship
 		{
 			while (builtCannons < 3 + 1*Macro::Instance().expands) 
@@ -569,12 +552,14 @@ void ETechEstimator::useDistribOpenings()
 				TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
 				++builtCannons;
 			}
-			////////// too much things at once TheProducer->produce(2, UnitTypes::Protoss_Observer, (int)(openingsProbas[1]*100));
+			Macro::Instance().stormFirst = false;
+			Macro::Instance().reaverFirst = false; // will do Obs first then
 #ifdef __DEBUG__
 			Broodwar->printf("Building cannons bc of DTs");
 			Broodwar->printf("Producing observers bc of DTs");
 #endif
 		}
+
 		if (fearThese.count(3)) // ReaverDrop
 		{
 			while (builtCannons < 3 + 1*Macro::Instance().expands) 
@@ -586,8 +571,9 @@ void ETechEstimator::useDistribOpenings()
 			Broodwar->printf("Building cannons bc of ReaverDrop");
 #endif
 		}
+
 		if (fearThese.count(5) // FastExpand
-			&& openingsProbas[5] > 0.5)
+			&& openingsProbas[5] > 0.35)
 		{
 			if (!Macro::Instance().expands)
 				Macro::Instance().expand();
@@ -606,7 +592,8 @@ void ETechEstimator::useDistribOpenings()
 			Broodwar->printf("Building cannons bc of 2H Mutas");
 #endif
 		}
-		if (fearThese.count(1)) // TwoHatchMuta
+		
+		if (fearThese.count(1)) // ThreeHatchMuta
 		{
 			while (builtCannons < 3 + 1*Macro::Instance().expands) 
 			{
@@ -617,8 +604,13 @@ void ETechEstimator::useDistribOpenings()
 			Broodwar->printf("Building cannons bc of 3H Mutas");
 #endif
 		}
-		if (fearThese.count(5)) // TwoHatchMuta
+
+		if (openingsProbas[0] > openingsProbas[5] && openingsProbas[1] > openingsProbas[5]) // storm against mutas, if Mutas > Lurkers
+			Macro::Instance().stormFirst = true;
+
+		if (fearThese.count(5)) // Lurker
 		{
+			Macro::Instance().reaverFirst = false; // we will need obs
 			TheProducer->produce(3, UnitTypes::Protoss_Observer, max((int)(openingsProbas[1]*100*2), 95));
 #ifdef __DEBUG__
 			Broodwar->printf("Producing observers bc of Lurkers");
@@ -626,4 +618,9 @@ void ETechEstimator::useDistribOpenings()
 		}
 	}
 #endif
+}
+
+const std::vector<long double>& ETechEstimator::getOpeningsProbas() const
+{
+	return openingsProbas;
 }

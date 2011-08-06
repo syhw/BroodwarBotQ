@@ -988,6 +988,8 @@ TilePosition MapManager::closestWalkabableSameRegionOrConnected(TilePosition tp)
     if (!tp.isValid())
         tp.makeValid();
     BWTA::Region* r = BWTA::getRegion(tp);
+	if (r == NULL) // defensive
+		return tp;
     int lowerX = (tp.x() - 1) > 0 ? tp.x() - 1 : 0;
     int higherX = (tp.x() + 1) < Broodwar->mapWidth() ? tp.x() + 1 : Broodwar->mapWidth();
     int lowerY = (tp.y() - 1) > 0 ? tp.y() - 1 : 0;
