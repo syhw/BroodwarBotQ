@@ -186,11 +186,16 @@ void SimCityBuildingPlacer::generatePylonsPos()
 	if (TheBasesManager == NULL)
 		TheBasesManager = BasesManager::create();
 
-	for each (Base* bb in TheBasesManager->getAllBases())
+	clock_t start = clock(); // TODO change
+
+	//for each (Base* bb in TheBasesManager->getAllBases())
+	for each (BWTA::BaseLocation* b in BWTA::getStartLocations())
 	{
-		if (pylons.pos.size() > 2)
+		if (TheInformationManager->getEnemyBases().count(b))
 			return;
-		BWTA::BaseLocation* b = bb->getBaseLocation();
+		if (pylons.pos.size() > 1) // at least 2 pylons
+			return;
+		//BWTA::BaseLocation* b = bb->getBaseLocation();
 		int minX = b->getTilePosition().x();
 		int minY = b->getTilePosition().y();
 		int maxX = b->getTilePosition().x();
@@ -217,20 +222,23 @@ void SimCityBuildingPlacer::generatePylonsPos()
 			if (u->getTilePosition().y() > maxY)
 				maxY = u->getTilePosition().y();
 		}
-		for (int x = max(1, b->getTilePosition().x() - 20);
-			x < min(Broodwar->mapWidth() - 1, b->getTilePosition().x() + 20); ++x)
-			for (int y = max(1, b->getTilePosition().y() - 20);
-				y < min(Broodwar->mapHeight() - 1, b->getTilePosition().y() + 20); ++y)
+		for (int x = max(2, b->getTilePosition().x() - 30);
+			x < min(Broodwar->mapWidth() - 2, b->getTilePosition().x() + 30); ++x)
+		{
+			for (int y = max(2, b->getTilePosition().y() - 30);
+				y < min(Broodwar->mapHeight() - 3, b->getTilePosition().y() + 30); ++y)
 			{
-				if (canBuildHere(NULL, TilePosition(x, y), UnitTypes::Protoss_Pylon)
-					&& BWTA::getRegion(x, y) == b->getRegion()
+				if (BWTA::getRegion(x, y) == b->getRegion() // same region as the base
 					&& (x > maxX || x < minX || y > maxY || y < minY) // not in the mineral line
-					&& canBuildHere(NULL, TilePosition(x-1, y-1), UnitTypes::Protoss_Pylon)
+					&& canBuildHere(NULL, TilePosition(x-1, y-1), UnitTypes::Protoss_Pylon) // can walk around
 					&& canBuildHere(NULL, TilePosition(x-1, y+1), UnitTypes::Protoss_Pylon)
 					&& canBuildHere(NULL, TilePosition(x+1, y-1), UnitTypes::Protoss_Pylon)
 					&& canBuildHere(NULL, TilePosition(x+1, y+1), UnitTypes::Protoss_Pylon))
 					pylons.addPos(TilePosition(x,y));
 			}
+			if ((double)(clock() - start)/CLOCKS_PER_SEC > 0.01) // 1 milli second
+				return; // TODO: will always stop at the same point
+		}
 	}
 }
 
@@ -244,6 +252,8 @@ void SimCityBuildingPlacer::generate(int min_size)
 {
 	if (TheBasesManager == NULL)
 		TheBasesManager = BasesManager::create();
+
+	clock_t start = clock(); // TODO change
 
 	if (_canNoLongerGenerateClusters)
 	{
@@ -279,6 +289,9 @@ void SimCityBuildingPlacer::generate(int min_size)
 				searchedAtBase((*it)->getBaseLocation());
 			if (bc.size >= min_size)
 				break;
+
+			if ((double)(clock() - start)/CLOCKS_PER_SEC > 0.01) // 1 milli second
+				goto generate_end; // TODO: remove
 		}
 	}
 	/// Search at home again
@@ -298,6 +311,9 @@ void SimCityBuildingPlacer::generate(int min_size)
 				if (bc.size < 1)
 					searchedAtBase(b);
 			}
+
+			if ((double)(clock() - start)/CLOCKS_PER_SEC > 0.01) // 1 milli second
+				goto generate_end; // TODO: remove
 		}
 	}
 	/// Search in other places if the map has only 2 start locations
@@ -311,6 +327,9 @@ void SimCityBuildingPlacer::generate(int min_size)
 			if (it->first != home->getRegion()
 				&& it->second > 1.0)
 				distRegions.insert(make_pair<double, BWTA::Region*>(it->second, it->first));
+
+			if ((double)(clock() - start)/CLOCKS_PER_SEC > 0.01) // 1 milli second
+				goto generate_end; // TODO: remove
 		}
 		for (map<double, BWTA::Region*>::const_iterator it = distRegions.begin();
 			it != distRegions.end(); ++it)
@@ -322,10 +341,15 @@ void SimCityBuildingPlacer::generate(int min_size)
 				_searchedForClustersAtRegion.insert(it->second);
 			if (bc.size >= min_size)
 				break;
+
+			if ((double)(clock() - start)/CLOCKS_PER_SEC > 0.01) // 1 milli second
+				goto generate_end; // TODO: remove
 		}
 		if (bc.size < 1)
 			_canNoLongerGenerateClusters = true;
 	}
+
+generate_end:
 	if (bc.size >= min_size)
 	{
 		if (tech.pos.size() >= 2 && gates.pos.size() < 4)
@@ -333,8 +357,10 @@ void SimCityBuildingPlacer::generate(int min_size)
 		else
 			makeCluster(bc.center, 2, bc.vertical, bc.size);
 	}
+#ifdef __DEBUG__
 	else
 		Broodwar->printf("Could not generate a cluster of size %d", min_size);
+#endif
 }
 
 set<Unit*> SimCityBuildingPlacer::checkPower(const set<Unit*>& buildings)
@@ -1138,6 +1164,13 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 			TheReservedMap->reserveTiles(u->getTilePosition(), UnitTypes::Resource_Mineral_Field, 
 			    UnitTypes::Resource_Mineral_Field.tileWidth(), UnitTypes::Resource_Mineral_Field.tileHeight());
 				*/
+	}
+	for each (BWTA::BaseLocation* b in BWTA::getStartLocations()) // bug in the previous loop (just above)?
+	{
+		if (TheReservedMap->isReserved(b->getTilePosition()))
+			continue;
+		TheReservedMap->reserveTiles(b->getTilePosition(), UnitTypes::Protoss_Nexus, 
+		    UnitTypes::Protoss_Nexus.tileWidth(), UnitTypes::Protoss_Nexus.tileHeight());
 	}
 
 	/// best place to do a pylons/gates cluster
