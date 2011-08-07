@@ -103,6 +103,16 @@ void Micro::update()
 void Micro::onUnitCreate(BWAPI::Unit *unit)
 {
 	goalManager->onUnitCreate(unit);
+
+	/*if (unit->getPlayer() == Broodwar->self())
+	{
+		Race er = Broodwar->enemy()->getRace();
+		UnitType ut = unit->getType();
+		if (ut == UnitTypes::Protoss_High_Templar)
+		{
+			goalManager->addGoal(pGoal(new AttackGoal
+		}
+	}*/
 }
 
 void Micro::onUnitShow(BWAPI::Unit *unit)

@@ -54,21 +54,28 @@ void CorsairUnit::micro()
         _lastRightClick = whereFlee.toPosition();
         return;
     }
-    if (Broodwar->getFrameCount() - _lastAttackFrame <= getAttackDuration()) // not interrupting attack
+
+	int currentFrame = Broodwar->getFrameCount();
+    if (currentFrame - _lastAttackFrame <= getAttackDuration()) // not interrupting attack
         return;
     if (unit->getAirWeaponCooldown() <= Broodwar->getLatencyFrames() + 1)
     {
         updateTargetEnemy();
         attackEnemyUnit(targetEnemy);
     }
-    else if (_fleeing || decideToFlee())
-    {
-        flee();
-    }
-    else
-    {
-        fightMove();
-    }
+    else if (unit->getAirWeaponCooldown() > Broodwar->getLatencyFrames() + 2) 
+	{
+		if (currentFrame - _lastClickFrame <= Broodwar->getLatencyFrames() + 3) /// HACK TODO remove/change
+			return;  
+		if (_fleeing || decideToFlee())
+		{
+			flee();
+		}
+		else
+		{
+			fightMove();
+		}
+	}
 }
 
 void CorsairUnit::check()

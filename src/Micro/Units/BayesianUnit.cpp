@@ -1793,7 +1793,7 @@ pBayesianUnit BayesianUnit::newBayesianUnit(Unit* u)
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Dark_Archon)
         tmp = pBayesianUnit(new DarkArchonUnit(u));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Dark_Templar)
-        tmp = pBayesianUnit(new ZealotUnit(u));
+        tmp = pBayesianUnit(new ZealotUnit(u)); ///////////////////// ;)
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Dragoon)
         tmp = pBayesianUnit(new DragoonUnit(u));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_High_Templar)

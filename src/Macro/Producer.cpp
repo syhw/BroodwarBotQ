@@ -29,8 +29,6 @@ Unit* ProducingUnit::operator->() const
 
 bool ProducingUnit::train(UnitType t)
 {
-	if (!t.isWorker()) ///////////////////// TODO REMOVE
-		return true;
 	if (Broodwar->getFrameCount() - lastAction > 2*Broodwar->getLatencyFrames() + 1
 		&& unit->canIssueCommand(UnitCommand::train(unit, t)))
 	{

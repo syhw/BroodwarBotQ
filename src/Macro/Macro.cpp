@@ -2,6 +2,7 @@
 #include "Macro.h"
 #include "BWSAL.h"
 #include "Intelligence/ETechEstimator.h"
+#include "Intelligence/EUnitsFilter.h"
 #include "Macro/Producer.h"
 
 using namespace BWAPI;
@@ -204,10 +205,10 @@ Zerg openings, in order (in the vector):
 	TheProducer->onUnitCreate(unit);
 	TheBuilder->onUnitCreate(unit);
 
-	UnitType ut =unit->getType();
-	Race er = Broodwar->enemy()->getRace();
 	if (unit->getPlayer() == Broodwar->self())
 	{
+		UnitType ut =unit->getType();
+		Race er = Broodwar->enemy()->getRace();
 
 		/////////////////// T1 ///////////////////
 		// Core->Singulary, Zealots vs Zerg and always Goons (against all)
@@ -286,14 +287,21 @@ Zerg openings, in order (in the vector):
 				if (wontHave(UnitTypes::Protoss_Forge))
 					TheBuilder->build(UnitTypes::Protoss_Forge);
 			}
-			if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Nexus) > 2) // B3
-			{
-				// TODO
-			}
-			if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Nexus) > 3) // B4
+			if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Nexus) == 3) // B3
 			{
 				if (sumWillHave(UnitTypes::Protoss_Forge) < 2)
 					TheBuilder->build(UnitTypes::Protoss_Forge);
+				if (wontHave(UnitTypes::Protoss_Templar_Archives))
+					TheBuilder->build(UnitTypes::Protoss_Templar_Archives);
+				if (wontHave(UnitTypes::Protoss_Robotics_Facility))
+					TheBuilder->build(UnitTypes::Protoss_Robotics_Facility);
+			}
+			if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Nexus) == 4) // B5
+			{
+				TheProducer->researchUpgrade(UpgradeTypes::Reaver_Capacity);
+				TheProducer->researchUpgrade(UpgradeTypes::Scarab_Damage);
+				if (wontHave(UnitTypes::Protoss_Stargate))
+					TheBuilder->build(UnitTypes::Protoss_Stargate);
 			}
 		}
 		else if (ut == UnitTypes::Protoss_Citadel_of_Adun)
@@ -308,6 +316,7 @@ Zerg openings, in order (in the vector):
 				if (wontHave(UnitTypes::Protoss_Robotics_Support_Bay))
 					TheBuilder->build(UnitTypes::Protoss_Robotics_Support_Bay);
 				TheProducer->produce(1, UnitTypes::Protoss_Shuttle, 85);
+				TheProducer->produceAlways(1, UnitTypes::Protoss_Shuttle, 3);
 			}
 			else
 			{
@@ -322,6 +331,7 @@ Zerg openings, in order (in the vector):
 		{
 			/// Built templar archives
 			TheProducer->researchTech(TechTypes::Psionic_Storm);
+			TheProducer->researchUpgrade(UpgradeTypes::Khaydarin_Amulet);
 			TheProducer->produce(8, UnitTypes::Protoss_High_Templar, 56, 3);
 			TheProducer->produceAlways(12, UnitTypes::Protoss_High_Templar, 3);
 			if (er == Races::Zerg)
@@ -330,10 +340,12 @@ Zerg openings, in order (in the vector):
 		else if (ut == UnitTypes::Protoss_Observatory)
 		{
 			TheProducer->produce(2, UnitTypes::Protoss_Observer, 60, 2);
+			TheProducer->produceAlways(5, UnitTypes::Protoss_Observer, 5);
 		}
 		else if (ut == UnitTypes::Protoss_Robotics_Support_Bay)
 		{
 			TheProducer->produce(1, UnitTypes::Protoss_Reaver, 95);
+			TheProducer->produceAlways(3, UnitTypes::Protoss_Reaver, 5);
 		}
 		else if (ut == UnitTypes::Protoss_Observer)
 		{
@@ -347,6 +359,28 @@ Zerg openings, in order (in the vector):
 				TheProducer->researchUpgrade(UpgradeTypes::Scarab_Damage);
 			if (wontHave(UnitTypes::Protoss_Observatory))
 				TheBuilder->build(UnitTypes::Protoss_Observatory);
+		}
+		else if (ut == UnitTypes::Protoss_Stargate)
+		{
+			if (EUnitsFilter::Instance().getNumbersType(UnitTypes::Zerg_Mutalisk) > 10)
+			{
+				TheProducer->produce(6, UnitTypes::Protoss_Corsair, 80, 2);
+				TheProducer->produceAlways(4, UnitTypes::Protoss_Corsair, 2);
+			}
+			if (wontHave(UnitTypes::Protoss_Fleet_Beacon))
+				TheBuilder->build(UnitTypes::Protoss_Fleet_Beacon);
+			if (wontHave(UnitTypes::Protoss_Arbiter_Tribunal))
+				TheBuilder->build(UnitTypes::Protoss_Arbiter_Tribunal);
+		}
+		else if (ut == UnitTypes::Protoss_Fleet_Beacon)
+		{
+			TheProducer->produce(4, UnitTypes::Protoss_Carrier, 80);
+			TheProducer->produceAlways(4, UnitTypes::Protoss_Carrier, 5);
+		}
+		else if (ut == UnitTypes::Protoss_Arbiter_Tribunal)
+		{
+			TheProducer->produce(2, UnitTypes::Protoss_Arbiter, 80);
+			TheProducer->produceAlways(1, UnitTypes::Protoss_Arbiter, 5);
 		}
 	}
 }
