@@ -17,13 +17,16 @@ bool ProbeUnit::decideToFlee()
 {
 	updateTargetingMe();
 	if (!_targetingMe.empty() &&
-		(unit->getShields() < 2 || unit->getHitPoints() < 6))
+		((unit->getShields() < 2 && unit->getHitPoints() > 15) 
+		    || (unit->getHitPoints() < 12 
+			&& (Broodwar->enemy()->getRace() == Races::Protoss || Broodwar->enemy()->getRace() == Races::Zerg))))
 		return true;
 	return false;
 }
 
 void ProbeUnit::micro()
 {
+	Broodwar->printf("Latency Frames: %d", Broodwar->getLatencyFrames());
 	if (Broodwar->getFrameCount() - _lastClickFrame <= Broodwar->getLatencyFrames() + getAttackDuration())
 		return;
 	if (dodgeStorm() || dragMine() || dragScarab())
@@ -40,9 +43,33 @@ void ProbeUnit::micro()
 	}
 	else
     {
-        _lastClickFrame = Broodwar->getFrameCount();
-		unit->attack(_unitsGroup->center);
-    }
+	    /*_rangeEnemies.clear();
+	    for (std::map<Unit*, Position>::const_iterator it 
+			= _unitsGroup->enemies.begin(); 
+	        it != _unitsGroup->enemies.end(); ++it)
+	    {
+	        _rangeEnemies.insert(std::make_pair<double, Unit*>(
+				_unitPos.getDistance(it->second), it->first));
+	    }*/
+		updateRangeEnemies();
+		if (unit->getGroundWeaponCooldown() > Broodwar->getLatencyFrames() // (Broodwar->getLatencyFrames()+1)*2, safety
+			|| unit->getGroundWeaponCooldown() == unit->getType().groundWeapon().damageCooldown()) // against really lag
+		{
+			if (_rangeEnemies.empty())
+				unit->move(_unitsGroup->center);
+			else
+				unit->move(_rangeEnemies.begin()->second->getPosition());
+		}
+		else
+		{
+			if (_rangeEnemies.empty())
+				unit->attack(_unitsGroup->center);
+			else
+				unit->attack(_rangeEnemies.begin()->second);
+		}
+		_lastClickFrame = Broodwar->getFrameCount();
+		_lastAttackFrame = Broodwar->getFrameCount();
+	}
 }
 
 void ProbeUnit::check()
@@ -62,7 +89,7 @@ void ProbeUnit::check()
 
 int ProbeUnit::getAttackDuration()
 {
-    return 1;
+    return 0;
 }
 
 std::set<BWAPI::UnitType> ProbeUnit::getSetPrio()

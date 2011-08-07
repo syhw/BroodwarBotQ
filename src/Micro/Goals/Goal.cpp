@@ -3,18 +3,28 @@
 #include "Micro/Goals/Goal.h"
 #include "Macro/BWSAL.h"
 #include "Macro/UnitGroupManager.h"
+#include "Defines.h"
 
 using namespace std;
 using namespace BWAPI;
 
 Goal::~Goal()
 {
+#ifdef __DEBUG__
+	clock_t start = clock();
+#endif
 	TheArbitrator->removeController(this);
+#ifdef __DEBUG__
+	clock_t end = clock();
+	double time = (double)(end - start)/CLOCKS_PER_SEC;
+	if (time > 0.01)
+		Broodwar->printf("\x07Goal destructor (removeController) took %f sec", time);
+#endif
 }
 
 Goal::Goal(int priority, int firstFrame)
 : _status(GS_WAIT_PRECONDITION)
-, _priority(priority)
+, _priority(max(priority, 100))
 , _firstFrame(firstFrame)
 {
 	if (!firstFrame)
@@ -24,7 +34,7 @@ Goal::Goal(int priority, int firstFrame)
 
 Goal::Goal(pSubgoal s, int priority, int firstFrame)
 : _status(GS_WAIT_PRECONDITION)
-, _priority(priority)
+, _priority(max(priority, 100))
 , _firstFrame(firstFrame)
 {
 	addSubgoal(s);
@@ -36,7 +46,7 @@ Goal::Goal(pSubgoal s, int priority, int firstFrame)
 Goal::Goal(const map<UnitType, int>& nU, pSubgoal s,
 		   int priority, int firstFrame)
 : _status(GS_WAIT_PRECONDITION)
-, _priority(priority)
+, _priority(max(priority, 100))
 , _firstFrame(firstFrame)
 {
 	_neededUnits = nU;
@@ -49,7 +59,7 @@ Goal::Goal(const map<UnitType, int>& nU, pSubgoal s,
 Goal::Goal(const std::map<BWAPI::UnitType, int>& nU,
 	 int priority, int firstFrame)
 : _status(GS_WAIT_PRECONDITION)
-, _priority(priority)
+, _priority(max(priority, 100))
 , _firstFrame(firstFrame)
 {
 	_neededUnits = nU;
@@ -61,6 +71,15 @@ Goal::Goal(const std::map<BWAPI::UnitType, int>& nU,
 void Goal::bidOnUnitType(const UnitType& ut)
 {
 	set<Unit*> tmp = SelectAll(Broodwar->self(), ut);
+	for each (Unit* u in tmp)
+	{
+		bidOnUnit(u);
+	}
+}
+
+void Goal::bidOnMilitaryUnits()
+{
+	set<Unit*> tmp = SelectAll().not(Broodwar->self()->getRace().getWorker()).not(isBuilding);
 	for each (Unit* u in tmp)
 	{
 		bidOnUnit(u);
@@ -95,7 +114,6 @@ void Goal::onOffer(set<Unit*> objects)
 				else
 					_incompleteUnits.push_back(u);
 			}
-
 		}
 	}
 	else
@@ -109,20 +127,22 @@ void Goal::onOffer(set<Unit*> objects)
 
 void Goal::onRevoke(Unit* u, double bid)
 {
-	_unitsGroup.giveUpControl(u);
-	if (_neededUnits.find(u->getType()) != _neededUnits.end())
-		_neededUnits[u->getType()] += 1;
-	///// TODO
+	onUnitDestroy(u);
 }
 
 void Goal::onUnitDestroy(BWAPI::Unit* unit)
 {
 	_unitsGroup.onUnitDestroy(unit);
 	if (_status == GS_WAIT_PRECONDITION && _neededUnits.find(unit->getType()) != _neededUnits.end())
-		_neededUnits[unit->getType()] += 1;
+		_neededUnits[unit->getType()] += 1; // no effect on the goal if we are not in GS_WAIT_PRECONDITION
 }
 
 string Goal::getName() const
+{
+	return "Goal";
+}
+
+string Goal::getShortName() const
 {
 	return "Goal";
 }
@@ -186,7 +206,7 @@ void Goal::achieve()
 	if (_status != GS_IN_PROGRESS) // defensive
 		return;
 	/// Check for the goal achievement
-	check();
+	check(); // TODO move in update
 	//////////////////////////////////
 	if (_status == GS_ACHIEVED)
 		return;
@@ -267,18 +287,6 @@ void Goal::cancel()
 	/// Does nothing, to be overwritten in cancelable goals
 	/// Default behavior of the goal is to update the _unitsGroup in achieve/cancel
 	_unitsGroup.update();
-}
-
-void Goal::canBidOn(BWAPI::Unit* u)
-{
-	/// Does nothing, to be overwritten in "taking all possible units" goals
-}
-
-/// Simple helper calling the canBidOn(Unit*) of the specialized Goal
-void Goal::canBidOn(const set<BWAPI::Unit*>& setU)
-{
-	for each (Unit* u in setU)
-		canBidOn(u);
 }
 
 void Goal::addSubgoal(pSubgoal s)

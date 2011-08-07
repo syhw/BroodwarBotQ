@@ -1,5 +1,6 @@
 #include <PrecompiledHeader.h>
 #include "Micro/Goals/DropGoal.h"
+#include "Micro/Micro.h"
 #include "Subgoal.h"
 
 using namespace BWAPI;
@@ -15,6 +16,7 @@ DropGoal::DropGoal(BWTA::BaseLocation* b, const std::map<BWAPI::UnitType, int>& 
 : Goal(nU, priority)
 , _base(b)
 {
+	Micro::Instance().drops += 1;
 	_neededUnits.insert(make_pair<UnitType, int>(UnitTypes::Protoss_Shuttle, 1));
 	_dropPos = b->getPosition();
 }
@@ -23,8 +25,14 @@ DropGoal::DropGoal(Position p, const map<UnitType, int>& nU, int priority)
 : Goal(nU, priority)
 , _dropPos(p)
 {
+	Micro::Instance().drops += 1;
 	_neededUnits.insert(make_pair<UnitType, int>(UnitTypes::Protoss_Shuttle, 1));
 	_base = BWTA::getNearestBaseLocation(_dropPos);
+}
+
+DropGoal::~DropGoal()
+{
+	Micro::Instance().drops -= 1;
 }
 
 void DropGoal::achieve()

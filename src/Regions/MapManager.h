@@ -125,6 +125,7 @@ public:
     Vec* airDamagesGrad;        // build tiles
 	std::map<BWTA::Region*, BWAPI::Position> regionsPFCenters; // Pathfinding wise region centers
 	std::map<BWTA::Region*, std::map<BWTA::Region*, double> > distRegions; // distRegions[R1][R2] w.r.t regionsPFCenters
+	std::map<BWTA::Region*, std::map<double, BWTA::Region*> > regionsByDist; // regionsByDust[R] ordered by distance w.r.t. regionsPFCenters too
 	std::map<BWTA::Region*, BWAPI::TilePosition> regionsInsideCenter; // Centers of the regions that are inside
     std::map<Position, int> stormPos;
     void onUnitCreate(BWAPI::Unit* u);

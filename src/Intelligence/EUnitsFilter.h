@@ -34,6 +34,8 @@ public:
     int getNumbersType(BWAPI::UnitType ut);
     const std::map<BWAPI::Unit*, std::pair<BWAPI::UnitType, BWAPI::Position> >& getInvisibleUnits();
     bool empty();
+#ifdef __DEBUG__
     void bwOutput();
+#endif
     virtual void update();
 };

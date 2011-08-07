@@ -121,19 +121,24 @@ MapManager::MapManager()
 
 	/// Fill distRegions with the mean distance between each Regions
 	/// -1 if the 2 Regions are not mutualy/inter accessible by ground
+	/// Fill regionsByDist with the mean distance between each Region
 	for (std::set<BWTA::Region*>::const_iterator it = allRegions.begin();
 		it != allRegions.end(); ++it)
 	{
 		distRegions.insert(std::pair<BWTA::Region*, std::map<BWTA::Region*, double> >(*it,
 			std::map<BWTA::Region*, double>()));
+		regionsByDist.insert(std::pair<BWTA::Region*, std::map<double, BWTA::Region*> >(*it,
+			std::map<double, BWTA::Region*>()));
 		for (std::set<BWTA::Region*>::const_iterator it2 = allRegions.begin();
 			it2 != allRegions.end(); ++it2)
 		{
-			distRegions[*it].insert(std::pair<BWTA::Region*, double>(*it2, 
-				BWTA::getGroundDistance(TilePosition(regionsPFCenters[*it]),
-				TilePosition(regionsPFCenters[*it2]))));
+			double dist = BWTA::getGroundDistance(TilePosition(regionsPFCenters[*it]),
+				TilePosition(regionsPFCenters[*it2]));
+			distRegions[*it].insert(std::pair<BWTA::Region*, double>(*it2, dist));
+			regionsByDist[*it].insert(std::pair<double, BWTA::Region*>(dist, *it2));
 		}
 	}
+
 
 	/// Search the "flooding" centers of all the regions
 	/// by flooding from polygon edges
@@ -458,7 +463,8 @@ int MapManager::additionalRangeAir(UnitType ut)
 
 void MapManager::onUnitCreate(Unit* u)
 {
-    addBuilding(u);
+	if (u->getType().isBuilding())
+		addBuilding(u);
     if (u->getPlayer() == Broodwar->self())
         addAlliedUnit(u);
 }
@@ -479,7 +485,8 @@ void MapManager::onUnitDestroy(Unit* u)
 
 void MapManager::onUnitShow(Unit* u)
 {
-    addBuilding(u);
+	if (u->getType().isBuilding())
+	    addBuilding(u);
     if (u->getPlayer() == Broodwar->self())
         addAlliedUnit(u);
 }

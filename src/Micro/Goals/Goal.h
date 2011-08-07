@@ -34,7 +34,6 @@ typedef enum
 
 /***
  * Simple Goal class without canceling check in check()
- * and with a dummy canBidOn().
  * neededUnits/preconditions should perhaps be moved into a special Subgoal
  */
 class Goal : public Arbitrator::Controller<BWAPI::Unit*, double>
@@ -55,6 +54,7 @@ protected:
     /// Status
 	GoalStatus _status;
 	void bidOnUnitType(const BWAPI::UnitType& ut);
+	void bidOnMilitaryUnits();
 	void bidOnUnit(BWAPI::Unit* u);
 public:
 	Goal(int priority = 50, int firstFrame = 0);
@@ -69,16 +69,15 @@ public:
 	virtual void onOffer(std::set<BWAPI::Unit*> objects);
 	virtual void onRevoke(BWAPI::Unit* u, double bid);
     virtual std::string getName() const;
+	virtual std::string getShortName() const;
 	virtual void update();
 
-	void onUnitDestroy(BWAPI::Unit* unit);
+	virtual void onUnitDestroy(BWAPI::Unit* unit);
 
 	virtual void achieve();
 	virtual void check();
 	virtual void cancel(); // Does nothing, to be overwritten in cancelable goals
-	virtual void canBidOn(BWAPI::Unit* u); // Does nothing, to be overwritten in "taking all possible units" goals
 
-	void canBidOn(const std::set<BWAPI::Unit*>& setU); // Simple helper calling the canBidOn(Unit*) of the specialized Goal
 	void addSubgoal(pSubgoal s);
 	void addNeededUnits(const std::map<BWAPI::UnitType, int>& neededUnits);
 	void setFirstFrame(int firstFrame);

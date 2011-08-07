@@ -1,5 +1,8 @@
 #include <PrecompiledHeader.h>
 #include "Micro/Goals/ExploreGoal.h"
+#include "Intelligence/Intelligence.h"
+#include "Macro/Arbitrator.h"
+#include "Macro/BWSAL.h"
 
 using namespace BWAPI;
 using namespace std;
@@ -12,20 +15,9 @@ void ExploreGoal::needAScoutingUnit()
 		_neededUnits.insert(make_pair<UnitType, int>(UnitTypes::Protoss_Probe, 1));
 }
 
-ExploreGoal::ExploreGoal(TilePosition tp, int priority) 
-: Goal(priority)
-{
-	if (Broodwar->isVisible(tp))
-	{
-		_status = GS_ACHIEVED;
-		return;
-	}
-	needAScoutingUnit();
-	_subgoals.push_back(pSubgoal(new SeeSubgoal(SL_AND, Position(tp))));
-}
-
 ExploreGoal::ExploreGoal(BWTA::Region* region, int priority) 
 : Goal(priority)
+, _region(region)
 {
 	if (region != NULL)
 	{
@@ -66,9 +58,16 @@ ExploreGoal::ExploreGoal(BWTA::Region* region, int priority)
 
 			//Remove this position from to_see
 			to_see.remove(selectedPos);
-			size --;
+			size--;
 		}		
 	}
+	else
+		_status = GS_ACHIEVED;
+}
+
+ExploreGoal::~ExploreGoal()
+{
+	Intelligence::Instance().currentlyExploring.erase(_region);
 }
 
 void ExploreGoal::achieve()

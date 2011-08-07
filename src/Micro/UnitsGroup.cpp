@@ -685,7 +685,7 @@ void UnitsGroup::onUnitDestroy(Unit* u)
     if (u->getPlayer() == Broodwar->self())
         giveUpControl(u);
     else
-	    unitDamages.left.erase(u);
+	    unitDamages.left.erase(u); // remove from the focus fire bimap
 }
 
 void UnitsGroup::onUnitShow(Unit* u)
@@ -869,15 +869,30 @@ void UnitsGroup::updateCenter()
     groupAltitude = 0;
     for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
     {
-        center += (*it)->unit->getPosition();
-        if (!(*it)->unit->getType().isFlyer())
-            groupAltitude += Broodwar->getGroundHeight(TilePosition((*it)->unit->getPosition()));
+		if (groupMode == MODE_FIGHT_G || groupMode == MODE_FIGHT_A)
+		{
+			if ((*it)->isFighting() || center == Position(0, 0))
+			{
+		        center += (*it)->unit->getPosition();
+		        if (!(*it)->unit->getType().isFlyer())
+		            groupAltitude += Broodwar->getGroundHeight(TilePosition((*it)->unit->getPosition()));
+			}
+		}
+		else
+		{
+	        center += (*it)->unit->getPosition();
+	        if (!(*it)->unit->getType().isFlyer())
+	            groupAltitude += Broodwar->getGroundHeight(TilePosition((*it)->unit->getPosition()));
+		}
     }
     center.x() /= units.size();
     center.y() /= units.size();
 #ifdef __DEBUG__
 	assert(center.isValid());
 #endif
+	if (!center.isValid())  // TODO remove
+		center.makeValid(); // TODO remove
+
     groupAltitude = round((double)groupAltitude / units.size());
     if (nearestChoke != NULL)
         distToNearestChoke = nearestChoke->getCenter().getApproxDistance(center);

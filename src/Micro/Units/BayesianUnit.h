@@ -207,6 +207,7 @@ protected:
 public:
 	static pBayesianUnit newBayesianUnit(BWAPI::Unit* u);
 
+	bool isFighting();
     void move(BWAPI::Position p); // debug purposes
 	void switchMode(unit_mode um);
 	void setUnitsGroup(UnitsGroup* ug);

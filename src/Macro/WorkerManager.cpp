@@ -257,6 +257,7 @@ void WorkerManager::update()
 	for(map<Unit*,WorkerData>::iterator u = workers.begin(); u != workers.end(); u++)
 	{
 		Unit* i = u->first;
+
 		if (u->second.resource!=NULL)
 		{
 			if (u->second.resource->getType()==UnitTypes::Resource_Mineral_Field)

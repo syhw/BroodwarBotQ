@@ -121,10 +121,10 @@ void Macro::update()
 
 	TheArbitrator->update();
 
-	if (!expands && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 6)
+	if (!expands && (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 6))
+		//|| Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway) + Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Gateway) >= 3))
 	{
 		expand();
-
 	}
 	else if (expands == 1 && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Observer)
 		&& (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Reaver > 1) || Broodwar->self()->completedUnitCount(UnitTypes::Protoss_High_Templar) > 2))

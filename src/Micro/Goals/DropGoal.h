@@ -14,5 +14,6 @@ private:
 public:
 	DropGoal(BWTA::BaseLocation* b, const std::map<BWAPI::UnitType, int>& nU, int priority=90);
 	DropGoal(BWAPI::Position p, const std::map<BWAPI::UnitType, int>& nU, int priority=90);
+	virtual ~DropGoal();
 	void achieve();
 };

@@ -319,20 +319,8 @@ void SimCityBuildingPlacer::generate(int min_size)
 	/// Search in other places if the map has only 2 start locations
 	if (bc.size < min_size && BWTA::getStartLocations().size() < 4 && Broodwar->getFrameCount() > 12*24*60)
 	{
-		map<double, BWTA::Region*> distRegions;
-		map<BWTA::Region*, double> distancesToHome = MapManager::Instance().distRegions[home->getRegion()];
-		for (map<BWTA::Region*, double>::const_iterator it = distancesToHome.begin();
-			it != distancesToHome.end(); ++it)
-		{
-			if (it->first != home->getRegion()
-				&& it->second > 1.0)
-				distRegions.insert(make_pair<double, BWTA::Region*>(it->second, it->first));
-
-			if ((double)(clock() - start)/CLOCKS_PER_SEC > 0.01) // 1 milli second
-				goto generate_end; // TODO: remove
-		}
-		for (map<double, BWTA::Region*>::const_iterator it = distRegions.begin();
-			it != distRegions.end(); ++it)
+		for (map<double, BWTA::Region*>::const_iterator it = MapManager::Instance().regionsByDist[home->getRegion()].begin();
+			it != MapManager::Instance().regionsByDist[home->getRegion()].end(); ++it)
 		{
 			if (_searchedForClustersAtRegion.count(it->second))
 				continue;

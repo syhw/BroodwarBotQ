@@ -8,8 +8,9 @@
 class ExploreGoal: public Goal
 {
 	inline void needAScoutingUnit();
+	BWTA::Region* _region;
 public:
-	ExploreGoal::ExploreGoal(BWAPI::TilePosition tp, int priority = 50);
 	ExploreGoal(BWTA::Region* region, int priority = 50);
+	virtual ~ExploreGoal();
 	void achieve();
 };

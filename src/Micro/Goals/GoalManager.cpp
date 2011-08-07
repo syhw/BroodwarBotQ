@@ -8,7 +8,8 @@ using namespace BWAPI;
 using namespace std;
 
 GoalManager::GoalManager()
-: _firstPoke(false) // hack, remove TODO
+: _initialized(false)
+, _firstPoke(false) // hack, remove TODO
 {
 }
 
@@ -18,16 +19,19 @@ GoalManager::~GoalManager()
 
 void GoalManager::update()
 {
-#ifdef __MICRO_TESTS_ONLY__
-	for each (Unit* u in Broodwar->self()->getUnits())
+	if (!_initialized)
 	{
-		if (_completedUnits.find(u) == _completedUnits.end())
+		for each (Unit* u in Broodwar->self()->getUnits())
 		{
-			pBayesianUnit tmp = BayesianUnit::newBayesianUnit(u);
-			_completedUnits.insert(make_pair<Unit*, pBayesianUnit>(u, tmp));
+			if (!u->getType().isBuilding()
+				&& _completedUnits.find(u) == _completedUnits.end())
+			{
+				pBayesianUnit tmp = BayesianUnit::newBayesianUnit(u);
+				_completedUnits.insert(make_pair<Unit*, pBayesianUnit>(u, tmp));
+			}
 		}
+		_initialized = true;
 	}
-#endif
 
 	/// Check if units in training are completed and create BayesianUnits if so
 	for (list<Unit*>::const_iterator it = _inTrainingUnits.begin();
@@ -67,8 +71,6 @@ void GoalManager::update()
 	/// Update all goals
 	for each (pGoal g in _goals)
 	{
-		if (!unassignedUnits.empty())
-			g->canBidOn(unassignedUnits);
 		g->update();
 #ifdef __DEBUG__
 		if (g->getStatus() == GS_WAIT_PRECONDITION)
@@ -90,23 +92,6 @@ void GoalManager::update()
 			++it;
 	}
 }
-
-/*void WarManager::sendGroupToAttack(UnitsGroup* ug)
-{
-	if (ScoutController::Instance().enemyFound)
-    {
-        ug->addGoal(pGoal(new AttackGoal(ug, ScoutController::Instance().enemyStartLocation)));
-	} 
-	else 
-	{
-		for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getStartLocations().begin();
-			it != BWTA::getStartLocations().end(); ++it)
-		{
-			if (*it != BWTA::getStartLocation(Broodwar->self()))
-				ug->addGoal(pGoal(new AttackGoal(ug, (*it)->getPosition())));
-		}
-	}
-}*/
 
 /***
  * Add the goal is not already present in _goals (O(#goals)), defensive thing
@@ -137,12 +122,10 @@ void GoalManager::onUnitCreate(Unit* u)
 		if (u->getType() == UnitTypes::Protoss_Scarab || u->getType() == UnitTypes::Protoss_Interceptor)
 			return;
 		_inTrainingUnits.push_back(u);
-		if (!u->getType().isWorker()) // military units only, because we won't propose workers, only specials goals will bid on them
-			TheArbitrator->setBid(this, u, 1);
 	}
 }
 
-/// Remove from _completedUnits and unassignedUnits or from _inTrainingUnits and unassignedUnits
+/// Remove from _completedUnits or from _inTrainingUnits 
 void GoalManager::onUnitDestroy(Unit* u)
 {
 	if (u->getPlayer() == Broodwar->self())
@@ -157,7 +140,6 @@ void GoalManager::onUnitDestroy(Unit* u)
 			}
 		}
 		_inTrainingUnits.remove(u);
-		unassignedUnits.erase(u);
 	}
 	for each (pGoal g in _goals)
 		g->onUnitDestroy(u); // will delete the pBayesianUnit OR will remove enemy units from the bimap
@@ -171,26 +153,4 @@ const map<Unit*, pBayesianUnit>& GoalManager::getCompletedUnits() const
 pBayesianUnit GoalManager::getCompletedUnit(Unit* u)
 {
 	return _completedUnits[u];
-}
-
-/// Controller methods
-void GoalManager::onOffer(std::set<BWAPI::Unit*> objects)
-{
-	for each (Unit* u in objects)
-		unassignedUnits.insert(u);
-}
-
-void GoalManager::onRevoke(BWAPI::Unit* u, double bid)
-{
-	unassignedUnits.erase(u);
-}
-
-std::string GoalManager::getName() const
-{
-	return string("GoalManager");
-}
-
-std::string GoalManager::getShortName() const
-{
-	return string("GM");
 }

@@ -128,12 +128,12 @@ void EUnitsFilter::filter(Unit* u)
     if (_eViewedUnits[u].type.isBuilding()) return; // we consider that buildings don't move
     if (_invisibleUnits.count(u) && (
         (u && u->exists() && ((!u->isCloaked() && !u->isBurrowed()) || u->isDetected())) 
-        || Broodwar->getFrameCount() - _eViewedUnits[u].lastSeen > 216)) // 9 secondes
+        || Broodwar->getFrameCount() - _eViewedUnits[u].lastSeen > 216)) // remove units from invisible if we can see them after 9 secondes
     {
         _invisibleUnits.erase(u);
         return;
     }
-    if (Broodwar->getFrameCount() - _eViewedUnits[u].lastSeen > 5760) // 4 minutes
+    if (Broodwar->getFrameCount() - _eViewedUnits[u].lastSeen > 5760) // we forget units after 4 minutes 
         _eViewedUnits.erase(u);
 }
 
@@ -200,9 +200,11 @@ bool EUnitsFilter::empty()
     return _eViewedUnits.empty();
 }
 
+#ifdef __DEBUG__
 void EUnitsFilter::bwOutput()
 {
     for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = _eViewedUnits.begin(); 
         it != _eViewedUnits.end(); ++it)
         Broodwar->printf("Unit: %i", it->first);
 }
+#endif

@@ -16,6 +16,8 @@ public:
 	GoalManager* goalManager;
 	std::set<BWTA::Chokepoint*> ourChokes;
 	BWTA::Chokepoint* frontChoke;
+	std::set<BWTA::BaseLocation*> needDefense;
+	int drops;
 	void update();
 	void onUnitCreate(BWAPI::Unit* unit);
 	void onUnitShow(BWAPI::Unit* unit);

@@ -1,6 +1,7 @@
 #include <PrecompiledHeader.h>
 #include <Macro/Base.h>
 #include <Macro/Builder.h>
+#include "Defines.h"
 
 using namespace BWAPI;
 
@@ -13,8 +14,8 @@ Base::Base(BWTA::BaseLocation* b, Unit* center)
 , ready(false)
 , paused(false)
 , activeGas(false)
-, centerInConstruction(false)
-, gasInConstruction(false)
+, centerInConstruction(0)
+, gasInConstruction(0)
 , cannoned(false)
 {
 }
@@ -105,7 +106,7 @@ void Base::update()
 				resourceDepot = *it;
 		}
 	}
-	if (resourceDepot == NULL && !centerInConstruction)
+	if (resourceDepot == NULL && (Broodwar->getFrameCount() - centerInConstruction) > __MAX_TRIES_BUILD_SOMETHING__+250) // it has been canced
 		buildCenter();
 	if (refinery == NULL)
 	{	
@@ -124,7 +125,7 @@ void Base::update()
 			}
 		}
 	}
-	if (activeGas && refinery == NULL && !gasInConstruction)
+	if (activeGas && refinery == NULL && (Broodwar->getFrameCount() - gasInConstruction) > __MAX_TRIES_BUILD_SOMETHING__+250)
 		buildGas();
 	ready = (resourceDepot && resourceDepot->exists() && (resourceDepot->isCompleted() || resourceDepot->getRemainingBuildTime()<300)); // 300 frames before completion
 	if (Broodwar->getFrameCount() > 12*60*24 // after 12 minutes
@@ -139,7 +140,7 @@ void Base::update()
 void Base::buildCenter()
 {
 	TheBuilder->addTask(Broodwar->self()->getRace().getCenter(), baseLocation->getTilePosition());
-	centerInConstruction = true;
+	centerInConstruction = Broodwar->getFrameCount();
 }
 
 void Base::buildGas()
@@ -150,5 +151,5 @@ void Base::buildGas()
 		if (!TheBuilder->willBuild(Broodwar->self()->getRace().getRefinery())) // TODO correct (we can't build 2 Refineries at once)
 			TheBuilder->build(Broodwar->self()->getRace().getRefinery(), (*it)->getTilePosition());
 	}
-    gasInConstruction = true;
+    gasInConstruction = Broodwar->getFrameCount();
 }

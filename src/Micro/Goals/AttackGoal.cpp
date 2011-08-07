@@ -4,6 +4,8 @@
 #include "FormationSubgoal.h"
 #include "Micro/Formations.h"
 #include "Macro/BWSAL.h"
+#include "Macro/BorderManager.h"
+#include "Micro/Goals/RegroupGoal.h"
 
 using namespace BWAPI;
 using namespace std;
@@ -35,21 +37,31 @@ AttackGoal::AttackGoal(pSubgoal subgoal, int priority, int firstFrame)
 
 void AttackGoal::achieve()
 {
-	//See if we need an intermediate subgoal : 
-	double min = 99999999.9;
-	for(std::list<pSubgoal>::iterator it = _subgoals.begin(); it != _subgoals.end(); ++it){
-		if ((*it)->distanceToRealize() > 0 && (*it)->distanceToRealize() < min)
-        {
-			min = (*it)->distanceToRealize();
+#ifdef __MID_SUBGOALS__
+	if (_subgoals.size() < 10)
+	{
+		//See if we need an intermediate subgoal : 
+		double min = 99999999.9;
+		for(std::list<pSubgoal>::iterator it = _subgoals.begin(); it != _subgoals.end(); ++it){
+			if ((*it)->distanceToRealize() > 0 && (*it)->distanceToRealize() < min)
+	        {
+				min = (*it)->distanceToRealize();
+			}
 		}
+		if (min > 1337.0)
+			createMidSubgoal();
 	}
-	if (min > 1337.0)
-    {
-		this->createMidSubgoal();
-	}
+#endif
+	bidOnMilitaryUnits();
+
+	/// Cancel if we are getting pwned
+	if (_unitsGroup.force < 0.75)
+		abort();
+
 	Goal::achieve();
 }
 
+#ifdef __MID_SUBGOALS__
 void AttackGoal::createMidSubgoal()
 {
     if (_unitsGroup.ppath.empty())
@@ -61,19 +73,27 @@ void AttackGoal::createMidSubgoal()
     if (r != BWTA::getRegion(TilePosition(_unitsGroup.center)))
         addSubgoal(pSubgoal(new FormationSubgoal(SL_AND, &_unitsGroup, pFormation(new SquareFormation(tmpPos)))));
 }
+#endif
 
-std::string getName()
+std::string AttackGoal::getName()
 {
 	return "AttackGoal";
 }
 
-std::string getShortName()
+std::string AttackGoal::getShortName()
 {
 	return "AttG";
 }
-/// We will bid on units that we are proposed if they are not workers
-void AttackGoal::canBidOn(Unit* u)
+
+/// RegroupGoal in the middle of the map
+void AttackGoal::abort()
 {
-	if (!u->getType().isWorker())
-		bidOnUnit(u);
+	TilePosition mid(Broodwar->mapWidth()/2, Broodwar->mapHeight()/2);
+	if (!Broodwar->isWalkable(mid.x() * 4, mid.y() * 4))
+		mid = MapManager::Instance().closestWalkabableSameRegionOrConnected(mid);
+	if (BWTA::getRegion(mid)->isReachable(BWTA::getRegion(TilePosition(_unitsGroup.center))))
+		GoalManager::Instance().addGoal(pGoal(new RegroupGoal(Position(mid))));
+	else
+		GoalManager::Instance().addGoal(pGoal(new RegroupGoal(BWTA::getStartLocation(Broodwar->self())->getPosition())));
+	_status = GS_ACHIEVED;
 }

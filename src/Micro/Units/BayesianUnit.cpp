@@ -645,7 +645,7 @@ void BayesianUnit::updateObj()
         {
 			// the damage maps / gradients are BuildTile resolution, too big for small units to use
 			obj = Vec(0, 0);
-			if (outRanges(_targetingMe)) // kiting, should perhaps take targetingMe into account
+			if (outRanges(targetEnemy))//outRanges(_targetingMe)) // kiting, should perhaps take targetingMe into account
 			{
 				obj = Vec(0, 0);
 				for each (Unit* u in _targetingMe)
@@ -656,7 +656,7 @@ void BayesianUnit::updateObj()
         else /// target influence
         {
 			obj = Vec(0, 0);
-			if (outRanges(_targetingMe)) // kiting, should perhaps take targetingMe into account
+			if (outRanges(targetEnemy))//outRanges(_targetingMe)) // kiting, should perhaps take targetingMe into account
 			{
 				for each (Unit* u in _targetingMe)
 					obj += Vec(_unitPos.x() - u->getPosition().x(), _unitPos.y() - u->getPosition().y());
@@ -1508,6 +1508,8 @@ bool BayesianUnit::inRange(BWAPI::Unit* u)
 
 bool BayesianUnit::outRanges(BWAPI::Unit* u)
 {
+	if (u == NULL || !u->exists())
+		return true;
     UnitType ut = u->getType();
     int eAddRange = 0;
     // consider that the enemy has upgrades
@@ -1821,6 +1823,13 @@ pBayesianUnit BayesianUnit::newBayesianUnit(Unit* u)
 	return tmp;
 }
 
+bool BayesianUnit::isFighting()
+{
+	if (Broodwar->getFrameCount() - _lastAttackFrame < 100) // 4 sec
+		return true; // high templars and dark archons will never be fighting
+	return false;
+}
+
 void BayesianUnit::move(BWAPI::Position p)
 {
     unit->move(p);
@@ -1831,10 +1840,6 @@ void BayesianUnit::move(BWAPI::Position p)
 
 void BayesianUnit::flee()
 {
-	/*for each (Unit* u in _targetingMe)
-	{
-		if (isOutrangingMe(u)) /// flee really or kite?
-	}*/
     _fightMoving = false;
     if (!this->mapManager->groundDamages[_unitPos.x()/32 + _unitPos.y()/32*Broodwar->mapWidth()])
     {
@@ -1887,7 +1892,6 @@ int BayesianUnit::fightMove()
 #endif
     /// Or simply move away from our friends and kite if we can
     if (targetEnemy != NULL && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected()
-        //&& outRanges(targetEnemy) // don't kite it we don't outrange
         && (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatencyFrames()))
     {
         // TODO TO COMPLETE (with a clickTarget() if dist > threshold)

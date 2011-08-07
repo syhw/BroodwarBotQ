@@ -10,10 +10,11 @@
  * A singleton which tracks count of created (in training / completed)
  * units + maintain a list of goals it dispatches update() to
  */
-class GoalManager : public CSingleton<GoalManager>, public Arbitrator::Controller<BWAPI::Unit*, double>
+class GoalManager : public CSingleton<GoalManager>
 {
 	friend class CSingleton<GoalManager>;
 private:
+	bool _initialized;
 	bool _firstPoke; // hack, remove TODO
 	std::list<pGoal> _goals;
 	GoalManager();
@@ -21,7 +22,6 @@ private:
 	std::map<BWAPI::Unit*, pBayesianUnit> _completedUnits;
 	std::list<BWAPI::Unit*> _inTrainingUnits;
 public:
-	std::set<BWAPI::Unit*> unassignedUnits;
 	void addGoal(pGoal g);
 	void addGoals(const std::list<pGoal>& l);
 	void onUnitCreate(BWAPI::Unit* u);
@@ -30,10 +30,5 @@ public:
 	const std::map<BWAPI::Unit*, pBayesianUnit>& getCompletedUnits() const;
 	pBayesianUnit getCompletedUnit(BWAPI::Unit* u);
 
-	/// Controller methods
-	virtual void onOffer(std::set<BWAPI::Unit*> objects);
-	virtual void onRevoke(BWAPI::Unit* u, double bid);
-    virtual std::string getName() const;
-    virtual std::string getShortName() const;
 	virtual void update();
 };

@@ -4,13 +4,13 @@
 #include "BWSAL.h"
 #include "Macro/ReservedMap.h"
 #include "Macro/UnitGroupManager.h"
+#include "Defines.h"
 
 using namespace BWAPI;
 using namespace std;
 
 #define __MIN_HP_CANCEL_BUILDING_IN_CONSTRUCTION__ 50
 #define __MIN_FRAMES_TO_START_CONSTRUCTION__ 10*24
-#define __MAX_TRIES_BUILD_SOMETHING__ 1440 // IN FRAMES, 1 minute here
 
 SimCityBuildingPlacer* Task::buildingPlacer = NULL;
 
@@ -198,15 +198,22 @@ void Task::buildIt()
 			return;
 		}
 		/// Move closer to the construction site
-		if (worker->getPosition().getApproxDistance(Position(tilePosition)) > 6 * TILE_SIZE) // 6 > sqrt(biggest^2+biggest^2) (biggest buildings as Protoss are nexus/gates)
+		if (worker->getDistance(Position(tilePosition)) > 6 * TILE_SIZE) // 6 > sqrt(biggest^2+biggest^2) (biggest buildings as Protoss are nexus/gates)
 		{
 			if (type == UnitTypes::Protoss_Nexus)
 			{
-				BWTA::BaseLocation* b = BWTA::getNearestBaseLocation(tilePosition);
-				if (b != NULL && !b->getMinerals().empty())
-					worker->rightClick(*(b->getMinerals().begin()));
-				else
+				if (worker->getDistance(Position(tilePosition)) < 8*TILE_SIZE)
+				{
 					worker->move(Position(tilePosition));
+				}
+				else
+				{
+					BWTA::BaseLocation* b = BWTA::getNearestBaseLocation(tilePosition);
+					if (b != NULL && !b->getMinerals().empty())
+						worker->rightClick(*(b->getMinerals().begin()));
+					else
+						worker->move(Position(tilePosition));
+				}
 			}
 			else
 				worker->move(Position(tilePosition));
@@ -356,6 +363,8 @@ void Builder::addTask(const UnitType& t, const TilePosition& seedPosition, int l
 
 void Builder::build(const BWAPI::UnitType& t, const BWAPI::TilePosition& seedPosition)
 {
+	if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Pylon) >= 42) // magic number :)
+		return; // TODO remove
 	if (t == Broodwar->self()->getRace().getCenter())
 		TheBasesManager->expand();
 	else

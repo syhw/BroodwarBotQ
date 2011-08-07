@@ -15,7 +15,9 @@ class Intelligence : public CSingleton<Intelligence>
 	Intelligence();
 	~Intelligence();
 	bool _launchedFirstScoutGoal;
+	std::list<BWTA::BaseLocation*> _enemyBasesOrder;
 public:
+	std::set<BWTA::Region*> currentlyExploring;
 	EUnitsFilter* eUnitsFilter;
 #ifdef __ETECH_ESTIMATOR__
 	ETechEstimator* eTechEstimator;

@@ -30,7 +30,7 @@ private:
 	bool ready;
 	bool paused;
 	bool activeGas;
-	bool centerInConstruction;
-	bool gasInConstruction;
+	int centerInConstruction;
+	int gasInConstruction;
 	bool cannoned;
 };
