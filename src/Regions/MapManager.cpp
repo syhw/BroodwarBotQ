@@ -5,6 +5,7 @@
 
 #define __MESH_SIZE__ 16 // 16 // 24 // 32 // 48
 #define __STORM_SIZE__ 96
+#define __MAX_PATHFINDING_WORKS__ 10
 
 using namespace BWAPI;
 
@@ -37,7 +38,7 @@ MapManager::MapManager()
 , _pathfindingThread(NULL)
 , _lastStormUpdateFrame(0)
 , _eUnitsFilter(& EUnitsFilter::Instance())
-, _currentPathfindWork(NULL, TilePositions::None, TilePositions::None, -1)
+, _currentPathfindWork(NULL, NULL, TilePositions::None, TilePositions::None, -1)
 , _currentPathfindWorkAborded(false)
 {
 #ifdef __DEBUG__
@@ -1253,7 +1254,7 @@ void MapManager::cancelPathfind(BayesianUnit* ptr)
 }
 
 /// Fills the PathfindWork struct with the appropriate parameters for the pathfinding thread to work on
-void MapManager::registerPathfindWork(BayesianUnit* ptr, BWAPI::TilePosition start, BWAPI::TilePosition end, int damages)
+void MapManager::registerPathfindWork(BayesianUnit* ptr, BWAPI::Unit* u, BWAPI::TilePosition start, BWAPI::TilePosition end, int damages)
 {
 	TilePosition target(end);
 	if (!_lowResWalkability[end.x() + end.y()*Broodwar->mapWidth()])
@@ -1267,8 +1268,8 @@ void MapManager::registerPathfindWork(BayesianUnit* ptr, BWAPI::TilePosition sta
 			break;
 		}
 	}
-	_pathfindWorks.push_back(PathfindWork(ptr, start, target, damages));
-	if (_pathfindWorks.size() > 10)
+	_pathfindWorks.push_back(PathfindWork(ptr, u, start, target, damages));
+	if (_pathfindWorks.size() > __MAX_PATHFINDING_WORKS__)
 	{
 		_pathfindWorks.pop_front();
 #ifdef __DEBUG__
