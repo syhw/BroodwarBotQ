@@ -26,7 +26,7 @@ Nicolas Biagianti
 
 ## Install / Serious Stuff ##
 
-1. You need BWAPI 3.5.1, go on the [BWAPI](http://code.google.com/p/bwapi/)
+1. You need BWAPI 3.6.1, go on the [BWAPI](http://code.google.com/p/bwapi/)
      website to install it.
 
 2. Open BattleBroodAI.sln and compile the project as Release.
