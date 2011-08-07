@@ -843,7 +843,9 @@ void MapManager::update()
 			_currentPathfindWork.bunit = NULL;
 		if (!_currentPathfindWorkAborded 
 			&& _currentPathfindWork.bunit != NULL
-			&& _currentPathfindWork.bunit->unit != NULL && _currentPathfindWork.bunit->unit->exists()
+			&& _currentPathfindWork.bunit->unit != NULL
+			&& _currentPathfindWork.bunit->unit == _currentPathfindWork.unit // why do I have to even do this?
+			&& _currentPathfindWork.bunit->unit->exists()
 			&& !_currentPathfindWork.btpath.empty())
 		{
 			/*if (_currentPathfindWork.btpath.size() > _currentPathfindWork.bunit->btpath.size())
@@ -1223,15 +1225,15 @@ void MapManager::drawBestStorms()
 ////// Pathfinding stuff //////
 
 /// Helper function for registering a building aware pathfinding task
-void MapManager::pathfind(BayesianUnit* ptr, BWAPI::TilePosition start, BWAPI::TilePosition end)
+void MapManager::pathfind(BayesianUnit* ptr, BWAPI::Unit* u, BWAPI::TilePosition start, BWAPI::TilePosition end)
 {
-	registerPathfindWork(ptr, start, end, -1);
+	registerPathfindWork(ptr, u, start, end, -1);
 }
 
 /// Helper function for registering a damages aware pathfinding task (NOT buildings aware, perhaps change...)
-void MapManager::threatAwarePathfind(BayesianUnit* ptr, BWAPI::TilePosition start, BWAPI::TilePosition end, int damages)
+void MapManager::threatAwarePathfind(BayesianUnit* ptr, BWAPI::Unit* u, BWAPI::TilePosition start, BWAPI::TilePosition end, int damages)
 {
-	registerPathfindWork(ptr, start, end, damages);
+	registerPathfindWork(ptr, u, start, end, damages);
 }
 
 /// Removes all the pathfinding tasks from this unit, being it in the queue or the current task

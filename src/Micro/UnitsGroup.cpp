@@ -39,6 +39,7 @@ UnitsGroup::UnitsGroup()
 , suicide(false)
 , readyToAttack(false)
 , nearestChoke(NULL)
+, force(1.0)
 {
     _eUnitsFilter = & EUnitsFilter::Instance();
 }
@@ -388,13 +389,13 @@ void UnitsGroup::updateArrivingUnits()
 							if (r1 && r2)
 							{
 								double tmpDist = MapManager::Instance().distRegions[r1][r2];
-								if (tmpDist < distToTarget) // we want to come from behind the group)
+								if (tmpDist <= distToTarget) // we want to come from behind the group)
 									(*it)->target = center;
 								else
 								{
 									// see the max lookup we can do in the path of the unitsgroup (to come from behind him, path-wise)
 									// without taking the geometry of the path into account
-									double diff = distToTarget - tmpDist;
+									double diff = tmpDist - distToTarget;
 									size_t lookup = (size_t)(diff / 32);
 									while (!(ppath.size() > lookup) && lookup > 0)
 										--lookup;
@@ -526,7 +527,7 @@ void UnitsGroup::update()
 	/// All the things to do when we have to fight
 	if (!enemies.empty() && groupMode != MODE_SCOUT) /// We fight, we'll see later for the goals, BayesianUnits switchMode automatically if enemies is not empty()
 	{
-		double force = evaluateForces();
+		force = evaluateForces();
 		if (force < 0.75 && !suicide)
 		{
 			// strategic withdrawal

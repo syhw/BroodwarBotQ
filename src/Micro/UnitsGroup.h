@@ -75,6 +75,7 @@ private:
 #endif
 public:
 	/// Units tools / units intercommunication
+	double force;
     std::list<pBayesianUnit> arrivingUnits;
     std::vector<BWAPI::Position> ppath;
     UnitDmgBimap unitDamages;

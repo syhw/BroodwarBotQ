@@ -34,5 +34,6 @@ public:
 	virtual void onOffer(std::set<BWAPI::Unit*> objects);
 	virtual void onRevoke(BWAPI::Unit* u, double bid);
     virtual std::string getName() const;
+    virtual std::string getShortName() const;
 	virtual void update();
 };

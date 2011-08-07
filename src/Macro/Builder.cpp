@@ -541,9 +541,9 @@ void Builder::update()
 	{
 		int nbGates = Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway);
 		int nbRobos = Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Robotics_Facility);
-		if (nbGates < 16 && TheBuilder->willBuild(UnitTypes::Protoss_Gateway) + nbGates < 16)
+		if (nbGates < 12 && TheBuilder->willBuild(UnitTypes::Protoss_Gateway) + nbGates < 12)
 			TheBuilder->build(UnitTypes::Protoss_Gateway);
-		if (nbRobos < 4 && TheBuilder->willBuild(UnitTypes::Protoss_Robotics_Facility) + nbRobos < 16)
+		if (nbRobos < 3 && TheBuilder->willBuild(UnitTypes::Protoss_Robotics_Facility) + nbRobos < 3)
 			TheBuilder->build(UnitTypes::Protoss_Robotics_Facility);
 	}
 

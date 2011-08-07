@@ -108,6 +108,7 @@ void BayesianUnit::computeDamageValues()
     for (size_t i = 0; i <_dirv.size(); ++i)
     {
         Position tmp = _dirv[i].translate(this->_unitPos);
+		tmp.makeValid();
         if (unit->getType().isFlyer())
             tab = mapManager->airDamages;
         else
@@ -716,9 +717,9 @@ void BayesianUnit::updatePPath()
 		if (Broodwar->getFrameCount() - _lastRefreshPathRequest > _refreshPathFramerate)
 		{
 			if (_mode == MODE_SCOUT)
-				mapManager->threatAwarePathfind(this, unit->getTilePosition(), tptarget, _fleeingDmg);
+				mapManager->threatAwarePathfind(this, unit, unit->getTilePosition(), tptarget, _fleeingDmg);
 			else
-				mapManager->pathfind(this, unit->getTilePosition(), tptarget);
+				mapManager->pathfind(this, unit, unit->getTilePosition(), tptarget);
 			_lastRefreshPathRequest = Broodwar->getFrameCount();
 		}
 

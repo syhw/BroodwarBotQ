@@ -547,9 +547,13 @@ void ETechEstimator::useDistribOpenings()
 	{
 		if (fearThese.count(1)) // FastDT
 		{
+			if (!Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Forge)
+				&& !Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Forge)
+				&& !TheBuilder->willBuild(UnitTypes::Protoss_Forge))
+				TheBuilder->buildOrder(UnitTypes::Protoss_Forge, 20);
 			while (builtCannons < 3 + 1*Macro::Instance().expands) 
 			{
-				TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
+				TheBuilder->buildOrder(UnitTypes::Protoss_Photon_Cannon, 25);
 				++builtCannons;
 			}
 			Macro::Instance().stormFirst = false;

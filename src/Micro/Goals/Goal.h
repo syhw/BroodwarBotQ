@@ -44,6 +44,7 @@ class Goal : public Arbitrator::Controller<BWAPI::Unit*, double>
 protected:
 	/// Units it can use
 	UnitsGroup _unitsGroup;
+	std::list<BWAPI::Unit*> _incompleteUnits;
 	/// Preconditions
 	std::map<BWAPI::UnitType, int> _neededUnits;
 	std::set<BWAPI::Unit*> _biddedOn;

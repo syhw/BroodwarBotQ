@@ -14,13 +14,15 @@ class BayesianUnit;
 struct PathfindWork
 {
 	BayesianUnit* bunit;
+	BWAPI::Unit* unit;
 	BWAPI::TilePosition start;
 	BWAPI::TilePosition end;
 	int damages;
 	bool flyer;
 	std::vector<BWAPI::TilePosition> btpath;
-	PathfindWork(BayesianUnit* ptr, BWAPI::TilePosition s, BWAPI::TilePosition e, int dmg, bool f = false)
+	PathfindWork(BayesianUnit* ptr, BWAPI::Unit* u, BWAPI::TilePosition s, BWAPI::TilePosition e, int dmg, bool f = false)
 		: bunit(ptr)
+		, unit(u)
 		, start(s)
 		, end(e)
 		, damages(dmg)
@@ -87,7 +89,7 @@ class MapManager : public CSingleton<MapManager>
     inline int additionalRangeGround(BWAPI::UnitType ut);
     inline int additionalRangeAir(BWAPI::UnitType ut);
 
-	inline void registerPathfindWork(BayesianUnit* ptr, BWAPI::TilePosition start, BWAPI::TilePosition end, int damages);
+	inline void registerPathfindWork(BayesianUnit* ptr, BWAPI::Unit* u, BWAPI::TilePosition start, BWAPI::TilePosition end, int damages);
 	std::list<PathfindWork> _pathfindWorks;
 	PathfindWork _currentPathfindWork;
 	bool _currentPathfindWorkAborded;
@@ -130,8 +132,8 @@ public:
     void onUnitShow(BWAPI::Unit* u);
     void onUnitHide(BWAPI::Unit* u);
     void justStormed(BWAPI::Position p);
-	void pathfind(BayesianUnit* ptr, BWAPI::TilePosition start, BWAPI::TilePosition end);
-	void threatAwarePathfind(BayesianUnit* ptr, BWAPI::TilePosition start, BWAPI::TilePosition end, int damages);
+	void pathfind(BayesianUnit* ptr, BWAPI::Unit* u, BWAPI::TilePosition start, BWAPI::TilePosition end);
+	void threatAwarePathfind(BayesianUnit* ptr, BWAPI::Unit* u, BWAPI::TilePosition start, BWAPI::TilePosition end, int damages);
 	void cancelPathfind(BayesianUnit* ptr);
     void update();
     const std::map<BWAPI::Unit*, BWAPI::Position> & getOurUnits();

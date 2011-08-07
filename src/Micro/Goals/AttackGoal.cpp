@@ -67,31 +67,13 @@ std::string getName()
 	return "AttackGoal";
 }
 
+std::string getShortName()
+{
+	return "AttG";
+}
+/// We will bid on units that we are proposed if they are not workers
 void AttackGoal::canBidOn(Unit* u)
 {
-	bidOnUnit(u);
+	if (!u->getType().isWorker())
+		bidOnUnit(u);
 }
-
-/*void AttackGoal::onOffer(set<Unit*> objects)
-{
-	GoalManager* gm = & GoalManager::Instance();
-	if (_status == GS_WAIT_PRECONDITION || _status == GS_IN_PROGRESS)
-	{
-        for each (Unit* u in objects)
-		{
-			TheArbitrator->accept(this, u, _priority);
-			if (_neededUnits.find(u->getType()) != _neededUnits.end())
-				_neededUnits[u->getType()] -= 1;
-			_unitsGroup.dispatchCompleteUnit(gm->getCompletedUnit(u));
-			gm->unassignedUnits.erase(u);
-			}
-		}
-	}
-	else
-	{
-		TheArbitrator->decline(this, objects, 0);
-		TheArbitrator->removeBid(this, objects);
-        for each (Unit* u in objects)
-			_biddedOn.erase(u);
-	}
-}*/

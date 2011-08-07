@@ -15,6 +15,7 @@ public:
 	AttackGoal(pSubgoal subgoal, int priority = 50, int firstFrame = 0);
 	void achieve();
 	std::string getName();
+	std::string getShortName();
 	void canBidOn(BWAPI::Unit* u);
 	//virtual void onOffer(std::set<BWAPI::Unit*> objects);
 };

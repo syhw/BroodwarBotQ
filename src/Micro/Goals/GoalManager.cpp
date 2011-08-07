@@ -173,7 +173,6 @@ pBayesianUnit GoalManager::getCompletedUnit(Unit* u)
 	return _completedUnits[u];
 }
 
-
 /// Controller methods
 void GoalManager::onOffer(std::set<BWAPI::Unit*> objects)
 {
@@ -187,6 +186,11 @@ void GoalManager::onRevoke(BWAPI::Unit* u, double bid)
 }
 
 std::string GoalManager::getName() const
+{
+	return string("GoalManager");
+}
+
+std::string GoalManager::getShortName() const
 {
 	return string("GM");
 }

@@ -9,9 +9,6 @@ using namespace BWAPI;
 
 Goal::~Goal()
 {
-#ifdef __DEBUG__
-	log("deleted a goal\n");
-#endif
 	TheArbitrator->removeController(this);
 }
 
@@ -20,9 +17,6 @@ Goal::Goal(int priority, int firstFrame)
 , _priority(priority)
 , _firstFrame(firstFrame)
 {
-#ifdef __DEBUG__
-	log("created a goal\n");
-#endif
 	if (!firstFrame)
 		_firstFrame = Broodwar->getFrameCount();
 	_unitsGroup.switchMode(MODE_MOVE);
@@ -33,9 +27,6 @@ Goal::Goal(pSubgoal s, int priority, int firstFrame)
 , _priority(priority)
 , _firstFrame(firstFrame)
 {
-#ifdef __DEBUG__
-	log("created a goal\n");
-#endif
 	addSubgoal(s);
 	if (!firstFrame)
 		_firstFrame = Broodwar->getFrameCount();
@@ -48,9 +39,6 @@ Goal::Goal(const map<UnitType, int>& nU, pSubgoal s,
 , _priority(priority)
 , _firstFrame(firstFrame)
 {
-#ifdef __DEBUG__
-	log("created a goal\n");
-#endif
 	_neededUnits = nU;
 	addSubgoal(s);
 	if (!firstFrame)
@@ -64,9 +52,6 @@ Goal::Goal(const std::map<BWAPI::UnitType, int>& nU,
 , _priority(priority)
 , _firstFrame(firstFrame)
 {
-#ifdef __DEBUG__
-	log("created a goal\n");
-#endif
 	_neededUnits = nU;
 	if (!firstFrame)
 		_firstFrame = Broodwar->getFrameCount();
@@ -98,16 +83,19 @@ void Goal::onOffer(set<Unit*> objects)
 	{
         for each (Unit* u in objects)
 		{
-			if (gm->getCompletedUnits().find(u) != gm->getCompletedUnits().end())
+			if (!u->getType().isBuilding() && !u->getType().isWorker())
 			{
 				TheArbitrator->accept(this, u, _priority);
-				if (_neededUnits.find(u->getType()) != _neededUnits.end())
-					_neededUnits[u->getType()] -= 1;
-				_unitsGroup.dispatchCompleteUnit(gm->getCompletedUnit(u));
-				gm->unassignedUnits.erase(u);
+				if (gm->getCompletedUnits().find(u) != gm->getCompletedUnits().end())
+				{
+					if (_neededUnits.find(u->getType()) != _neededUnits.end())
+						_neededUnits[u->getType()] -= 1;
+					_unitsGroup.dispatchCompleteUnit(gm->getCompletedUnit(u));
+				}
+				else
+					_incompleteUnits.push_back(u);
 			}
-			else
-				TheArbitrator->decline(this, objects, _priority);
+
 		}
 	}
 	else
@@ -124,7 +112,6 @@ void Goal::onRevoke(Unit* u, double bid)
 	_unitsGroup.giveUpControl(u);
 	if (_neededUnits.find(u->getType()) != _neededUnits.end())
 		_neededUnits[u->getType()] += 1;
-	GoalManager::Instance().unassignedUnits.insert(u);
 	///// TODO
 }
 
@@ -146,6 +133,21 @@ string Goal::getName() const
  */
 void Goal::update()
 {
+	/// Update incomplete units
+	for (list<Unit*>::const_iterator it = _incompleteUnits.begin();
+		it != _incompleteUnits.end(); )
+	{
+		if ((*it)->isCompleted())
+		{	
+			if (_neededUnits.find((*it)->getType()) != _neededUnits.end())
+				_neededUnits[(*it)->getType()] -= 1;
+			_unitsGroup.dispatchCompleteUnit(GoalManager::Instance().getCompletedUnit(*it));
+			_incompleteUnits.erase(it++);
+		}
+		else
+			++it;
+	}
+
 	if (_status == GS_WAIT_PRECONDITION)
 	{
 		/// Wait for the first frame trigger (if existing)
