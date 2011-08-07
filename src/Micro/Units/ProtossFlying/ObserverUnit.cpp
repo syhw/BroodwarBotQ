@@ -41,7 +41,12 @@ void ObserverUnit::micro()
         _lastMoveFrame = Broodwar->getFrameCount();
     } 
     else
-        clickTarget();
+	{
+		_mode = MODE_SCOUT;
+		updateDir();
+		clickDir();
+		_mode = MODE_FIGHT_A;
+	}
 }
 
 void ObserverUnit::check()

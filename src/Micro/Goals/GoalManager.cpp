@@ -19,20 +19,6 @@ GoalManager::~GoalManager()
 
 void GoalManager::update()
 {
-	if (!_initialized)
-	{
-		for each (Unit* u in Broodwar->self()->getUnits())
-		{
-			if (!u->getType().isBuilding()
-				&& _completedUnits.find(u) == _completedUnits.end())
-			{
-				pBayesianUnit tmp = BayesianUnit::newBayesianUnit(u);
-				_completedUnits.insert(make_pair<Unit*, pBayesianUnit>(u, tmp));
-			}
-		}
-		_initialized = true;
-	}
-
 	/// Check if units in training are completed and create BayesianUnits if so
 	for (list<Unit*>::const_iterator it = _inTrainingUnits.begin();
 		it != _inTrainingUnits.end(); )

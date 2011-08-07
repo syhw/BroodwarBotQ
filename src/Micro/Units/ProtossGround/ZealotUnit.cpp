@@ -189,7 +189,7 @@ void ZealotUnit::micro()
 		else
 			unit->attack(_unitsGroup->enemiesCenter);
     }
-    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatencyFrames()) // (Broodwar->getLatencyFrames()+1)*2, safety
+    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatencyFrames() + 2) // (Broodwar->getLatencyFrames()+1)*2, safety
     {
         if (_fleeing)
         {

@@ -518,24 +518,26 @@ double BayesianUnit::computeProb(unsigned int i)
 
 void BayesianUnit::attackEnemyUnit(Unit* u)
 {
-    if (u && u->exists() && u->isVisible() && u->isDetected())
+	BWAPI::Unit* t = u;
+    if (t && u->exists() && t->isVisible() && t->isDetected())
     {
         _lastClickFrame = Broodwar->getFrameCount();
     }
     else
     {
-        return;
+		if (!_rangeEnemies.empty())
+			t = _rangeEnemies.begin()->second;
     }
-	if (inRange(u)) 
+	if (inRange(t)) 
     {
-        unit->rightClick(u);
+        unit->rightClick(t);
         _lastAttackFrame = Broodwar->getFrameCount();
     }
     else
     {
         if (Broodwar->getFrameCount() - _lastMoveFrame > Broodwar->getLatencyFrames())
         {
-            unit->move(u->getPosition());
+            unit->move(t->getPosition());
             _lastMoveFrame = Broodwar->getFrameCount();
         }
     }
@@ -670,9 +672,9 @@ void BayesianUnit::updateObj()
 	                obj = Vec(0, 0);
 				else if (_unitsGroup && !_unitsGroup->ppath.empty())
 				{
-					if (_unitsGroup->ppath.size() > 2 && _ppath[2].getApproxDistance(_unitPos) <= 2*TILE_SIZE)
+					if (_unitsGroup->ppath.size() > 2 && _unitsGroup->ppath[2].getApproxDistance(_unitPos) <= 2*TILE_SIZE)
 						obj = Vec(_unitsGroup->ppath[2].x() - _unitPos.x(), _unitsGroup->ppath[2].y() - _unitPos.y());
-					if (_unitsGroup->ppath.size() > 1 && _ppath[1].getApproxDistance(_unitPos) <= 2*TILE_SIZE)
+					if (_unitsGroup->ppath.size() > 1 && _unitsGroup->ppath[1].getApproxDistance(_unitPos) <= 2*TILE_SIZE)
 						obj = Vec(_unitsGroup->ppath[1].x() - _unitPos.x(), _unitsGroup->ppath[1].y() - _unitPos.y());
 					else
 						obj = Vec(_unitsGroup->ppath[0].x() - _unitPos.x(), _unitsGroup->ppath[0].y() - _unitPos.y());
@@ -1036,6 +1038,7 @@ void BayesianUnit::clearDamages()
 
 void BayesianUnit::updateTargetEnemy()
 {
+	targetEnemy = NULL;
     // ===== update oorTargetEnemy =====
     /// take one in our priority set and in focus fire order
     for (UnitDmgBimap::right_iterator it 

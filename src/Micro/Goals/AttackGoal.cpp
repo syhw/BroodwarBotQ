@@ -18,6 +18,7 @@ AttackGoal::AttackGoal(const map<UnitType, int>& miniUnits, BWAPI::Position p,
 {
 	addSubgoal(pSubgoal(new FormationSubgoal(SL_OR, &_unitsGroup,
 	                                 pFormation(new SquareFormation(p)))));
+	bidOnMilitaryUnits();
 }
 
 AttackGoal::AttackGoal(BWAPI::Position p, int priority, int firstFrame)
@@ -26,6 +27,7 @@ AttackGoal::AttackGoal(BWAPI::Position p, int priority, int firstFrame)
 {
     addSubgoal(pSubgoal(new FormationSubgoal(SL_OR, &_unitsGroup,
 	                                 pFormation(new SquareFormation(p)))));
+	bidOnMilitaryUnits();
 }
 
 AttackGoal::AttackGoal(pSubgoal subgoal, int priority, int firstFrame)
@@ -33,6 +35,7 @@ AttackGoal::AttackGoal(pSubgoal subgoal, int priority, int firstFrame)
 	   priority,
 	   firstFrame)
 {
+	bidOnMilitaryUnits();
 }
 
 void AttackGoal::achieve()

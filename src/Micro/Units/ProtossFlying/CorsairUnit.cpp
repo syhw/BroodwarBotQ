@@ -77,7 +77,7 @@ void CorsairUnit::check()
 
 int CorsairUnit::getAttackDuration()
 {
-    return Broodwar->getLatencyFrames();
+    return 2;
 }
 
 std::set<BWAPI::UnitType> CorsairUnit::getSetPrio()

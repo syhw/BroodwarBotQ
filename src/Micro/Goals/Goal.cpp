@@ -26,6 +26,7 @@ Goal::Goal(int priority, int firstFrame)
 : _status(GS_WAIT_PRECONDITION)
 , _priority(max(priority, 100))
 , _firstFrame(firstFrame)
+, _neededUnits(std::map<UnitType, int>())
 {
 	if (!firstFrame)
 		_firstFrame = Broodwar->getFrameCount();
@@ -36,6 +37,7 @@ Goal::Goal(pSubgoal s, int priority, int firstFrame)
 : _status(GS_WAIT_PRECONDITION)
 , _priority(max(priority, 100))
 , _firstFrame(firstFrame)
+, _neededUnits(std::map<UnitType, int>())
 {
 	addSubgoal(s);
 	if (!firstFrame)
@@ -48,6 +50,7 @@ Goal::Goal(const map<UnitType, int>& nU, pSubgoal s,
 : _status(GS_WAIT_PRECONDITION)
 , _priority(max(priority, 100))
 , _firstFrame(firstFrame)
+, _neededUnits(std::map<UnitType, int>())
 {
 	_neededUnits = nU;
 	addSubgoal(s);
@@ -61,6 +64,7 @@ Goal::Goal(const std::map<BWAPI::UnitType, int>& nU,
 : _status(GS_WAIT_PRECONDITION)
 , _priority(max(priority, 100))
 , _firstFrame(firstFrame)
+, _neededUnits(std::map<UnitType, int>())
 {
 	_neededUnits = nU;
 	if (!firstFrame)
