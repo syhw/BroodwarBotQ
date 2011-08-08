@@ -11,5 +11,4 @@ private:
 public:
 	RegroupGoal(BWAPI::Position p, int priority = 80, int firstFrame = 0);
 	virtual void RegroupGoal::achieve();
-	virtual void canBidOn(BWAPI::Unit* u);
 };

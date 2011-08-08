@@ -94,9 +94,9 @@ void AttackGoal::abort()
 	TilePosition mid(Broodwar->mapWidth()/2, Broodwar->mapHeight()/2);
 	if (!Broodwar->isWalkable(mid.x() * 4, mid.y() * 4))
 		mid = MapManager::Instance().closestWalkabableSameRegionOrConnected(mid);
-	if (BWTA::getRegion(mid)->isReachable(BWTA::getRegion(TilePosition(_unitsGroup.center))))
+	if (BWTA::getRegion(mid)->isReachable(BWTA::getRegion(TilePosition(_unitsGroup.center)))) // could lookup in MapManager
 		GoalManager::Instance().addGoal(pGoal(new RegroupGoal(Position(mid))));
 	else
 		GoalManager::Instance().addGoal(pGoal(new RegroupGoal(BWTA::getStartLocation(Broodwar->self())->getPosition())));
-	_status = GS_ACHIEVED;
+	_status = GS_CANCELED;
 }

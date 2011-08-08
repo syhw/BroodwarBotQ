@@ -26,7 +26,6 @@ bool ProbeUnit::decideToFlee()
 
 void ProbeUnit::micro()
 {
-	Broodwar->printf("Latency Frames: %d", Broodwar->getLatencyFrames());
 	if (Broodwar->getFrameCount() - _lastClickFrame <= Broodwar->getLatencyFrames() + getAttackDuration())
 		return;
 	if (dodgeStorm() || dragMine() || dragScarab())

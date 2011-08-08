@@ -17,12 +17,8 @@ RegroupGoal::RegroupGoal(Position p, int priority, int firstFrame)
 
 void RegroupGoal::achieve()
 {
+	bidOnMilitaryUnits();
 	if (_unitsGroup.groupMode != MODE_MOVE)
 		_unitsGroup.switchMode(MODE_MOVE);
 	Goal::achieve();
-}
-
-void RegroupGoal::canBidOn(Unit* u)
-{
-	bidOnUnit(u);
 }

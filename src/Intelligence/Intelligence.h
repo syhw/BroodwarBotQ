@@ -15,7 +15,7 @@ class Intelligence : public CSingleton<Intelligence>
 	Intelligence();
 	~Intelligence();
 	bool _launchedFirstScoutGoal;
-	std::list<BWTA::BaseLocation*> _enemyBasesOrder;
+	std::list<BWTA::BaseLocation*> _enemyBasesOrder; // to be used
 public:
 	std::set<BWTA::Region*> currentlyExploring;
 	EUnitsFilter* eUnitsFilter;
@@ -25,6 +25,7 @@ public:
 	MapManager* mapManager;
 	bool enemyRush;
 	BWAPI::Race enemyRace;
+	std::list<BWTA::BaseLocation*> enemyBasesOrder; // to be shared
 	void update();
     void onUnitCreate(BWAPI::Unit* u);
     void onUnitDestroy(BWAPI::Unit* u);

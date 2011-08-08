@@ -114,6 +114,7 @@ void Intelligence::update()
 				}
 			}
 		}
+		enemyBasesOrder = _enemyBasesOrder;
 	}
 
 	/*if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Observer) > currentlyExploring.size() + 2

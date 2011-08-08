@@ -277,7 +277,7 @@ void Goal::check()
 		}
 	}
 
-	if(res_or || (and_goals && res_and))
+	if (res_or || (and_goals && res_and))
 	{
 		_status= GS_ACHIEVED;
 #ifdef __DEBUG__

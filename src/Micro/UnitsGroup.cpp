@@ -227,6 +227,8 @@ double UnitsGroup::evaluateForces()
             }
             continue;
         }
+		if (ut == UnitTypes::Zerg_Overlord)
+			continue;
         if (ut != UnitTypes::Zerg_Lurker // complete when !_eUnitsFilter->getInvisibleUnits().count(it->first)
             || ut != UnitTypes::Protoss_Dark_Templar
             || ((ut != UnitTypes::Terran_Wraith && ut != UnitTypes::Terran_Ghost) 
