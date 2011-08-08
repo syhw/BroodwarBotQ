@@ -179,7 +179,7 @@ MapManager::MapManager()
 		regionsInsideCenter.insert(std::make_pair<BWTA::Region*, TilePosition>(*it, tmpRegionCenter));
 	}
 
-    // initialization
+    /// initialization of all the walkability tables
     for (int x = 0; x < _width; ++x) 
         for (int y = 0; y < _height; ++y) 
         {
@@ -210,8 +210,20 @@ MapManager::MapManager()
             groundDamagesGrad[x + y*_width/4] = Vec(0, 0);
             airDamages[x + y*_width/4] = 0;
             airDamagesGrad[x + y*_width/4] = Vec(0, 0);
+            _buildingsBuf[x + y*_width/4] = false; // because we use pathfinding in the init, otherwise no need
         }
     }
+
+	/// Precomputed paths (TODO put in update() and use the PF thread)
+	BWTA::BaseLocation* home = BWTA::getStartLocation(Broodwar->self());
+	for each (BWTA::BaseLocation* b in BWTA::getStartLocations())
+	{
+		if (b == home)
+			continue;
+		std::vector<BWAPI::TilePosition> tmpPath;
+		buildingsAwarePathFind(tmpPath, home->getTilePosition(), b->getTilePosition());
+		_pathsFromHomeToSL.insert(std::make_pair<BWTA::BaseLocation*, std::vector<TilePosition> >(b, tmpPath));
+	}
 }
 
 MapManager::~MapManager()
@@ -1231,6 +1243,11 @@ void MapManager::drawBestStorms()
 }
 
 ////// Pathfinding stuff //////
+
+const std::vector<BWAPI::TilePosition>& MapManager::getPathFromHomeToSL(BWTA::BaseLocation* b)
+{
+	return _pathsFromHomeToSL[b];
+}
 
 /// Helper function for registering a building aware pathfinding task
 void MapManager::pathfind(BayesianUnit* ptr, BWAPI::Unit* u, BWAPI::TilePosition start, BWAPI::TilePosition end)

@@ -25,7 +25,6 @@
 #endif
 
 #ifndef __DEBUG__ // Perf
-#undef __MICRO_TESTS_ONLY__
 #undef __DO_NOT_HARASS_SCOUT__
 #define __RELEASE_OPTIM__
 #ifdef __RELEASE_OPTIM__

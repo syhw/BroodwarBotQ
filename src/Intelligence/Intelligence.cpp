@@ -94,6 +94,7 @@ void Intelligence::update()
 		{
 			if (BWTA::getStartLocations().count(b))
 			{
+				enemyHome = b;
 				_enemyBasesOrder.push_back(b);
 				break;
 			}

@@ -25,6 +25,7 @@ public:
 	MapManager* mapManager;
 	bool enemyRush;
 	BWAPI::Race enemyRace;
+	BWTA::BaseLocation* enemyHome;
 	std::list<BWTA::BaseLocation*> enemyBasesOrder; // to be shared
 	void update();
     void onUnitCreate(BWAPI::Unit* u);

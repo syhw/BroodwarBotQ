@@ -3,6 +3,7 @@
 #include "BWSAL.h"
 #include "Intelligence/ETechEstimator.h"
 #include "Intelligence/EUnitsFilter.h"
+#include "Intelligence/Intelligence.h"
 #include "Macro/Producer.h"
 
 using namespace BWAPI;

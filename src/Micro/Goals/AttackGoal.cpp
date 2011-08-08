@@ -6,6 +6,7 @@
 #include "Macro/BWSAL.h"
 #include "Macro/BorderManager.h"
 #include "Micro/Goals/RegroupGoal.h"
+#include "Intelligence/Intelligence.h"
 
 using namespace BWAPI;
 using namespace std;
@@ -88,15 +89,21 @@ std::string AttackGoal::getShortName()
 	return "AttG";
 }
 
-/// RegroupGoal in the middle of the map
+/// RegroupGoal at the closest, backing point on the path from home to enemy's
 void AttackGoal::abort()
 {
-	TilePosition mid(Broodwar->mapWidth()/2, Broodwar->mapHeight()/2);
-	if (!Broodwar->isWalkable(mid.x() * 4, mid.y() * 4))
-		mid = MapManager::Instance().closestWalkabableSameRegionOrConnected(mid);
-	if (BWTA::getRegion(mid)->isReachable(BWTA::getRegion(TilePosition(_unitsGroup.center)))) // could lookup in MapManager
-		GoalManager::Instance().addGoal(pGoal(new RegroupGoal(Position(mid))));
+	TilePosition tp;
+	BWTA::BaseLocation* eHome = Intelligence::Instance().enemyHome;
+	if (BWTA::getRegion(TilePosition(_unitsGroup.center)) == eHome->getRegion())
+	{
+		std::list<BWTA::BaseLocation*>::const_iterator it = Intelligence::Instance().enemyBasesOrder.begin();
+		++it;
+		tp = (*it)->getTilePosition();
+	}
 	else
-		GoalManager::Instance().addGoal(pGoal(new RegroupGoal(BWTA::getStartLocation(Broodwar->self())->getPosition())));
+	{
+		tp = MapManager::Instance().getPathFromHomeToSL(eHome)[2*MapManager::Instance().getPathFromHomeToSL(eHome).size()/3];
+	}
+	GoalManager::Instance().addGoal(pGoal(new RegroupGoal(Position(tp))));
 	_status = GS_CANCELED;
 }

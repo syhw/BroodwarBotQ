@@ -97,6 +97,7 @@ class MapManager : public CSingleton<MapManager>
     int* _groundDamagesBuf;         // build tiles
     int* _airDamagesBuf;            // build tiles
     bool* _lowResWalkability;       // low res => building tiles
+	std::map<BWTA::BaseLocation*, std::vector<BWAPI::TilePosition> > _pathsFromHomeToSL;
 
     void buildingsAwarePathFind(std::vector<BWAPI::TilePosition>& btpath, 
         const BWAPI::TilePosition& start, const BWAPI::TilePosition& end);
@@ -136,6 +137,7 @@ public:
 	void pathfind(BayesianUnit* ptr, BWAPI::Unit* u, BWAPI::TilePosition start, BWAPI::TilePosition end);
 	void threatAwarePathfind(BayesianUnit* ptr, BWAPI::Unit* u, BWAPI::TilePosition start, BWAPI::TilePosition end, int damages);
 	void cancelPathfind(BayesianUnit* ptr);
+	const std::vector<BWAPI::TilePosition>& getPathFromHomeToSL(BWTA::BaseLocation* b);
     void update();
     const std::map<BWAPI::Unit*, BWAPI::Position> & getOurUnits();
     const std::map<BWAPI::Unit*, BWAPI::Position> & getTrackedUnits();
