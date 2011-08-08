@@ -8,13 +8,14 @@ using namespace BWAPI;
 using namespace std;
 
 GoalManager::GoalManager()
-: _initialized(false)
-, _firstPoke(false) // hack, remove TODO
+: _firstPoke(false) // hack, remove TODO
+, attackGoals(0)
 {
 }
 
 GoalManager::~GoalManager()
 {
+	_goals.clear();
 }
 
 void GoalManager::update()

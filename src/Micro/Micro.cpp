@@ -5,9 +5,11 @@
 #include "Micro/Goals/AttackGoal.h"
 #include "Micro/Goals/DefendGoal.h"
 #include "Micro/Goals/DropGoal.h"
+#include "Micro/Goals/FormationSubgoal.h"
 #include "Macro/BasesManager.h"
 #include "Macro/BorderManager.h"
 #include "Intelligence/EUnitsFilter.h"
+#include "Intelligence/Intelligence.h"
 #include "Defines.h"
 
 using namespace BWAPI;
@@ -37,7 +39,15 @@ void Micro::update()
 		p = (*(TheInformationManager->getEnemyBases().begin()))->getPosition();
 		if (p != Positions::None)
 		{
-			goalManager->addGoal(pGoal(new AttackGoal(p, 60)));
+			pGoal tmp = pGoal(new AttackGoal(p, 60));
+			if (Intelligence::Instance().enemyBasesOrder.size() > 1)
+			{
+				list<BWTA::BaseLocation*>::const_iterator it = Intelligence::Instance().enemyBasesOrder.begin();
+				++it;
+				tmp->addSubgoal(pSubgoal(new FormationSubgoal(SL_AND, NULL, 
+					pFormation(new SquareFormation((*it)->getPosition())))));
+			}
+			goalManager->addGoal(tmp);
 			_launchedFirstPush = true;
 		}
 	}
@@ -55,11 +65,33 @@ void Micro::update()
 
 	/// See if we have to defend somewhere
 	// TODO CHANGE this monstruosity (use EUnitsFilter + units position filtering)
+	/* TODO
+	for each (BWTA::Chokepoint* c in TheBorderManager->getMyBorder())
+	{
+		bool needD = false;
+		set<Unit*> unitsAround = Broodwar->getUnitsInRadius(b->getPosition(), __TILES_RADIUS_DEFEND_BASE__*TILE_SIZE);
+		for each (Unit* u in unitsAround)
+		{
+			if (u->getPlayer() == Broodwar->enemy())
+			{
+				needD = true;
+				break;
+			}
+		}
+		if (needD) // we do not visit bases we have already spawned a DefendGoal on
+		{
+			if (needDefense.count(b))
+				continue; // already spawned a DefendGoal
+			goalManager->addGoal(pGoal(new DefendGoal(b))); // TODO priority w.r.t. importance of the base
+			needDefense.insert(b);
+		}
+		else
+			needDefense.erase(b);
+	}*/
 	for each (Base* bb in TheBasesManager->getAllBases())
 	{
 		BWTA::BaseLocation* b = bb->getBaseLocation();
 		bool needD = false;
-		int eUnits = 0;
 		set<Unit*> unitsAround = Broodwar->getUnitsInRadius(b->getPosition(), __TILES_RADIUS_DEFEND_BASE__*TILE_SIZE);
 		for each (Unit* u in unitsAround)
 		{
@@ -96,6 +128,29 @@ void Micro::update()
 		if (ourForce > 1.5*theirForce)
 			goalManager->
 	}*/
+
+	if (needDefense.empty() && goalManager->attackGoals < 1)
+	{
+		if (TheInformationManager->getEnemyBases().size() > TheBasesManager->getAllBases().size())
+		{
+			bool found = false;
+			for (list<BWTA::BaseLocation*>::const_reverse_iterator it = Intelligence::Instance().enemyBasesOrder.rbegin();
+				it != Intelligence::Instance().enemyBasesOrder.rend(); ++it)
+			{
+				if (TheInformationManager->getEnemyBases().count(*it))
+				{
+					goalManager->addGoal(pGoal(new AttackGoal((*it)->getPosition())));
+					found = true;
+					break;
+				}
+			}
+			/*if (!found) 
+			{
+				for each (BWTA::Region* r in BWTA::getRegions())
+					goalManager->addGoal(pGoal(new ExploreGoal(r)));
+			}*/
+		}
+	}
 
 	goalManager->update();
 }

@@ -12,7 +12,7 @@
 using namespace BWAPI;
 using namespace std;
 
-#define __BAIT_WORKERS_TILES_DISTANCE__ 9
+#define __BAIT_WORKERS_TILES_DISTANCE__ 8
 
 //TODO Refactor
 
@@ -74,7 +74,8 @@ void DefendGoal::check()
 				continue;
 			/// Count how many probes we will be ok to bid and how much force we need
 			UnitType ut = u->getType();
-			if (ut == UnitTypes::Terran_Dropship || ut == UnitTypes::Protoss_Shuttle || ut == UnitTypes::Zerg_Overlord)
+			if (ut == UnitTypes::Terran_Dropship || ut == UnitTypes::Protoss_Shuttle || ut == UnitTypes::Zerg_Overlord
+				|| ut == UnitTypes::Protoss_Dark_Templar || ut == UnitTypes::Zerg_Lurker)
 				; // TODO
 			//_eUnits += 16; // (supply is *2, 2 for a marine for instance)
 			else if ((ut == UnitTypes::Protoss_Probe || ut == UnitTypes::Terran_SCV || ut == UnitTypes::Zerg_Drone)

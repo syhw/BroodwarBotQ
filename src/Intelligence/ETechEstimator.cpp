@@ -32,7 +32,8 @@ ETechEstimator::ETechEstimator()
 				break;
 			}
 		}
-		string serializedTablesFileName("C:\\StarCraft\\AI\\BroodwarBotQ\\data\\tables\\");
+		string serializedTablesFileName("bwapi-data/AI/tables/");
+		//string serializedTablesFileName("C:\\StarCraft\\AI\\BroodwarBotQ\\data\\tables\\");
 		if (enemyRace == Races::Terran || !enemyRace.getName().compare("Terran"))
 #ifdef __BENS_LABELS__
 			serializedTablesFileName.append("TvP.table");
@@ -508,7 +509,8 @@ void ETechEstimator::useDistribOpenings()
 	size_t mostProbable = indMax(openingsProbas);
 	set<size_t> fearThese = supTo(openingsProbas, 0.20);
 #ifdef __BENS_LABELS__
-	int builtCannons = max(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Photon_Cannon), TheBuilder->willBuild(UnitTypes::Protoss_Photon_Cannon));
+	int builtCannons = max(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Photon_Cannon) + Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Photon_Cannon)
+		, TheBuilder->willBuild(UnitTypes::Protoss_Photon_Cannon));
 	if (enemyRace == Races::Terran)
 	{
 		if (fearThese.count(0)) // Bio
@@ -545,15 +547,20 @@ void ETechEstimator::useDistribOpenings()
 	}
 	else if (enemyRace == Races::Protoss)
 	{
+		if (fearThese.empty() && Broodwar->getFrameCount() > 1440)
+		{
+			TheProducer->produce(2, UnitTypes::Protoss_Zealot, 60, 2);
+		}
 		if (fearThese.count(1)) // FastDT
 		{
 			if (!Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Forge)
 				&& !Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Forge)
+				&& !Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Forge)
 				&& !TheBuilder->willBuild(UnitTypes::Protoss_Forge))
-				TheBuilder->buildOrder(UnitTypes::Protoss_Forge, 20);
-			while (builtCannons < 3 + 1*Macro::Instance().expands) 
+				TheBuilder->buildOrder(UnitTypes::Protoss_Forge, 21);
+			while (builtCannons < 3 + 2*Macro::Instance().expands) 
 			{
-				TheBuilder->buildOrder(UnitTypes::Protoss_Photon_Cannon, 25);
+				TheBuilder->buildOrder(UnitTypes::Protoss_Photon_Cannon, 28);
 				++builtCannons;
 			}
 			Macro::Instance().stormFirst = false;

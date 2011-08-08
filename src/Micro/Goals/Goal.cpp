@@ -83,7 +83,7 @@ void Goal::bidOnUnitType(const UnitType& ut)
 
 void Goal::bidOnMilitaryUnits()
 {
-	set<Unit*> tmp = SelectAll().not(Broodwar->self()->getRace().getWorker()).not(isBuilding);
+	set<Unit*> tmp = SelectAll().not(isWorker).not(isBuilding);
 	for each (Unit* u in tmp)
 	{
 		bidOnUnit(u);

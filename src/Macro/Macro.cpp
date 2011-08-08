@@ -122,12 +122,25 @@ void Macro::update()
 	TheBuilder->update(); // last update which moves an unit that should be done
 
 	TheArbitrator->update();
-
-	if (!expands && (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) >= 6
-		|| Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway) + Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Gateway) >= 3)
-		&& !Intelligence::Instance().enemyRush)
+	
+	if (!expands && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 12)
 	{
 		expand();
+	}
+
+	if (!expands && (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 6)
+		//|| Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway) + Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Gateway) >= 2)
+		&& !Intelligence::Instance().enemyRush)
+	{
+		if (Broodwar->enemy()->getRace() != Races::Protoss || ETechEstimator::Instance().getOpeningsProbas().at(1) > 0.18)
+		{
+			if (wontHave(UnitTypes::Protoss_Forge))
+				TheBuilder->build(UnitTypes::Protoss_Forge);
+			while (TheBuilder->willBuild(UnitTypes::Protoss_Photon_Cannon) < 3)
+				TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
+		}
+		else
+			expand();
 	}
 	else if (expands == 1 && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Observer)
 		&& (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Reaver > 1) || Broodwar->self()->completedUnitCount(UnitTypes::Protoss_High_Templar) > 2))
@@ -270,13 +283,15 @@ Zerg openings, in order (in the vector):
 		}
 		else if (ut == UnitTypes::Protoss_Nexus)
 		{
-			if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Nexus) > 1) // it's the first expand then (1 complete + 1 incomplete)
+			if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Nexus) == 2) // it's the first expand then (1 complete + 1 incomplete)
 			{
 				if (!reaverFirst && !stormFirst && wontHave(UnitTypes::Protoss_Observatory))
-					TheBuilder->build(UnitTypes::Protoss_Observatory);
-
-				if (stormFirst && wontHave(UnitTypes::Protoss_Citadel_of_Adun))
-				    TheBuilder->build(UnitTypes::Protoss_Citadel_of_Adun);
+				{
+					if (wontHave(UnitTypes::Protoss_Robotics_Facility))
+						TheBuilder->build(UnitTypes::Protoss_Robotics_Facility);
+					else if (wontHave(UnitTypes::Protoss_Observatory))
+						TheBuilder->build(UnitTypes::Protoss_Observatory);
+				}
 
 				if (reaverFirst)
 				{
@@ -285,6 +300,9 @@ Zerg openings, in order (in the vector):
 					else if (wontHave(UnitTypes::Protoss_Robotics_Support_Bay))
 						TheBuilder->build(UnitTypes::Protoss_Robotics_Facility);
 				}
+				//else 
+				if (stormFirst && wontHave(UnitTypes::Protoss_Citadel_of_Adun))
+				    TheBuilder->build(UnitTypes::Protoss_Citadel_of_Adun);
 
 				if (wontHave(UnitTypes::Protoss_Forge))
 					TheBuilder->build(UnitTypes::Protoss_Forge);

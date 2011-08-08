@@ -18,6 +18,7 @@ public:
 		BWAPI::Position p, int priority = 50, int firstFrame = 0);
 	AttackGoal(BWAPI::Position p, int priority = 50, int firstFrame = 0);
 	AttackGoal(pSubgoal subgoal, int priority = 50, int firstFrame = 0);
+	virtual ~AttackGoal();
 	void achieve();
 	std::string getName();
 	std::string getShortName();

@@ -20,7 +20,8 @@ FormationSubgoal::FormationSubgoal(const FormationSubgoal& fsg)
 
 bool FormationSubgoal::isRealized()
 {
-    if (distanceToRealize() <= sqrt(_unitsGroup->size() * _unitsGroup->size() * _OK_DISTANCE_)) 
+    if (!_unitsGroup->isFighting
+		&& distanceToRealize() <= sqrt(_unitsGroup->size() * _unitsGroup->size() * _OK_DISTANCE_))
         return true;
     return false;
 }

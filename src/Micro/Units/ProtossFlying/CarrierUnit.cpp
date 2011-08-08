@@ -62,6 +62,7 @@ void CarrierUnit::micro()
         _lastRightClick = whereFlee.toPosition();
         return;
     }
+	decideToFlee();
 
 	if (unit->getInterceptorCount() < 8)
 	{
@@ -82,7 +83,7 @@ void CarrierUnit::micro()
 	{
 		if (currentFrame - _lastClickFrame <= Broodwar->getLatencyFrames() + 3) /// HACK TODO remove/change
 			return;  
-		if (_fleeing || decideToFlee())
+		if (_fleeing)
 		{
 			flee();
 		}

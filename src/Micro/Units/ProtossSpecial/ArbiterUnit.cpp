@@ -52,6 +52,7 @@ void ArbiterUnit::micro()
         _lastRightClick = whereFlee.toPosition();
         return;
     }
+	decideToFlee();
 
 	if (!Broodwar->self()->hasResearched(TechTypes::Stasis_Field))
 		TheProducer->researchTech(TechTypes::Stasis_Field);
@@ -82,7 +83,7 @@ void ArbiterUnit::micro()
     } 
 	else if (unit->getAirWeaponCooldown() > Broodwar->getLatencyFrames() + 2) 
 	{	
-		if (_fleeing || decideToFlee())
+		if (_fleeing)
 		{
 			flee();
 		}

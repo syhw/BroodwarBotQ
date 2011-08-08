@@ -22,6 +22,7 @@ public:
 #ifdef __ETECH_ESTIMATOR__
 	ETechEstimator* eTechEstimator;
 #endif
+	int closestOnPath; // HACK TODO remove
 	MapManager* mapManager;
 	bool enemyRush;
 	BWAPI::Race enemyRace;

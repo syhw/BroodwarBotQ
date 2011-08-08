@@ -2,6 +2,7 @@
 #include "Defines.h"
 #include "Regions/MapManager.h"
 #include "Micro/Units/ProtossSpecial/HighTemplarUnit.h"
+#include "Intelligence/Intelligence.h"
 
 #define __MESH_SIZE__ 16 // 16 // 24 // 32 // 48
 #define __STORM_SIZE__ 96
@@ -10,6 +11,18 @@
 using namespace BWAPI;
 
 std::map<BWAPI::Unit*, BWAPI::Position> HighTemplarUnit::stormableUnits;
+
+void drawBTPath(const std::vector<TilePosition>& btpath)
+{
+    if (btpath.empty())
+        return;
+    for (std::vector<TilePosition>::const_iterator it = btpath.begin(); 
+        it != btpath.end(); ++it)
+    {
+        Broodwar->drawBox(CoordinateType::Map, it->x()*32 + 2, it->y()*32 + 2, 
+            it->x()*32 + 30, it->y()*32 + 30, Colors::Yellow);
+    }
+}
 
 MapManager::MapManager()
 : _pix_width(Broodwar->mapWidth() * 32)
@@ -935,6 +948,8 @@ void MapManager::update()
     //this->drawGroundDamages();
     //this->drawAirDamagesGrad();
     //this->drawAirDamages();
+	if (Intelligence::Instance().enemyHome != NULL)
+		drawBTPath(_pathsFromHomeToSL[Intelligence::Instance().enemyHome]);
     this->drawBestStorms();
 	//this->drawWalkability();
 #endif

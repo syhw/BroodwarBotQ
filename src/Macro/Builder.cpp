@@ -200,20 +200,13 @@ void Task::buildIt()
 		/// Move closer to the construction site
 		if (worker->getDistance(Position(tilePosition)) > 6 * TILE_SIZE) // 6 > sqrt(biggest^2+biggest^2) (biggest buildings as Protoss are nexus/gates)
 		{
-			if (type == UnitTypes::Protoss_Nexus)
+			if (type == UnitTypes::Protoss_Nexus && worker->getDistance(Position(tilePosition)) > 9*TILE_SIZE)
 			{
-				if (worker->getDistance(Position(tilePosition)) < 8*TILE_SIZE)
-				{
-					worker->move(Position(tilePosition));
-				}
+				BWTA::BaseLocation* b = BWTA::getNearestBaseLocation(tilePosition);
+				if (b != NULL && !b->getMinerals().empty())
+					worker->rightClick(*(b->getMinerals().begin()));
 				else
-				{
-					BWTA::BaseLocation* b = BWTA::getNearestBaseLocation(tilePosition);
-					if (b != NULL && !b->getMinerals().empty())
-						worker->rightClick(*(b->getMinerals().begin()));
-					else
-						worker->move(Position(tilePosition));
-				}
+					worker->move(Position(tilePosition));
 			}
 			else
 				worker->move(Position(tilePosition));

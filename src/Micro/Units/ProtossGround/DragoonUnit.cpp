@@ -103,10 +103,10 @@ void DragoonUnit::micro()
     }
 #endif
     int currentFrame = Broodwar->getFrameCount();
-    if (currentFrame - _lastAttackFrame <= getAttackDuration()) // not interrupting attacks
-        return;
     updateTargetingMe();
     decideToFlee();
+    if (currentFrame - _lastAttackFrame <= getAttackDuration()) // not interrupting attacks
+        return;
     if (currentFrame - _lastAttackFrame == getAttackDuration() + 1)
         clearDamages();
     /// Dodge storm, drag mine, drag scarab

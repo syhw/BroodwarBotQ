@@ -17,10 +17,10 @@ ObserverUnit::~ObserverUnit()
 
 void ObserverUnit::micro()
 {
-    if (Broodwar->getFrameCount() - _lastClickFrame <= Broodwar->getLatencyFrames())
-        return;
 	if (dodgeStorm())
 		return;
+    if (Broodwar->getFrameCount() - _lastClickFrame <= Broodwar->getLatencyFrames())
+        return;
     Position invisPos = Positions::None;
     double minDist = 100000.0;
     for (std::map<Unit*, Position>::const_iterator it = _unitsGroup->enemies.begin();

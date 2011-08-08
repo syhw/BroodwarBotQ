@@ -18,6 +18,8 @@ Intelligence::Intelligence()
 : _launchedFirstScoutGoal(false)
 , enemyRush(false)
 , enemyRace(Races::Unknown)
+, enemyHome(NULL)
+, closestOnPath(-1)
 {
 	eUnitsFilter = & EUnitsFilter::Instance();
 #ifdef __ETECH_ESTIMATOR__

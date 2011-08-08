@@ -87,6 +87,7 @@ public:
     double distToNearestChoke;
     Vec centerSpeed;
 	std::map<BWAPI::UnitSizeType, int> sizes;
+	bool isFighting;
 	bool suicide;
 	bool readyToAttack;
 	/// Group recap variables

@@ -12,13 +12,43 @@ RegroupGoal::RegroupGoal(Position p, int priority, int firstFrame)
 {
 	addSubgoal(pSubgoal(new FormationSubgoal(SL_OR, &_unitsGroup, 
 		pFormation(new SquareFormation(p)))));
-    // perhaps TODO bid on military units here
+	_status = GS_IN_PROGRESS;
+	bidOnMilitaryUnits();
+	GoalManager::Instance().attackGoals += 1;
+}
+
+RegroupGoal::~RegroupGoal()
+{
+	GoalManager::Instance().attackGoals -= 1;
 }
 
 void RegroupGoal::achieve()
 {
 	bidOnMilitaryUnits();
-	if (_unitsGroup.groupMode != MODE_MOVE)
-		_unitsGroup.switchMode(MODE_MOVE);
-	Goal::achieve();
+	//if (_unitsGroup.groupMode != MODE_MANAGED)
+	//	_unitsGroup.switchMode(MODE_MANAGED);
+	for each (pSubgoal s in _subgoals)
+	{
+		if (s->isRealized())
+		{
+			_status = GS_ACHIEVED;
+			//attackGoalHere();
+			return;
+		}
+		else
+			s->tryToRealize();
+	}
+	if (!(Broodwar->getFrameCount() % 25))
+	{
+		for each (pBayesianUnit bu in _unitsGroup.units)
+		{
+			bu->unit->move(bu->target);
+		}
+	}
 }
+
+/*void RegroupGoal::attackGoalHere()
+{
+	if (Broodwar->isWalkable(_unitsGroup.center.x() / 8, _unitsGroup.center.y() / 8))
+		GoalManager::Instance().addGoal(pGoal(new AttackGoal(_unitsGroup.center)));
+}*/

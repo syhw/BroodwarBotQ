@@ -166,16 +166,16 @@ void ZealotUnit::micro()
     int currentFrame = Broodwar->getFrameCount();
     if (unit->isStartingAttack())
         _lastAttackFrame = currentFrame;
-	if (currentFrame - _lastClickFrame <= Broodwar->getLatencyFrames())
-		return;
-    if (currentFrame - _lastAttackFrame <= getAttackDuration()) // not interrupting attacks
-        return;
     updateTargetingMe();
     /// Dodge storm, drag mine, drag scarab
     if (dodgeStorm() || dragMine() || dragScarab()) 
         return;
     decideToFlee();
 	updateTargetEnemy();
+	if (currentFrame - _lastClickFrame <= Broodwar->getLatencyFrames())
+		return;
+    if (currentFrame - _lastAttackFrame <= getAttackDuration()) // not interrupting attacks
+        return;
 
     if (unit->getGroundWeaponCooldown() <= Broodwar->getLatencyFrames() + 2)
     {

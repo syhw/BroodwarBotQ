@@ -11,6 +11,25 @@
 using namespace BWAPI;
 using namespace std;
 
+int closestOnPath(BWAPI::Position p, const std::vector<BWAPI::TilePosition>& vtp)
+{
+	if (vtp.empty())
+		return -1;
+	int i = 0;
+	int min = 0;
+	double minV = DBL_MAX;
+	for each (TilePosition tp in vtp)
+	{
+		if (p.getApproxDistance(Position(tp)) < minV)
+		{
+			min = i;
+			minV = p.getApproxDistance(Position(tp));
+		}
+		++i;
+	}
+	return min;
+}
+
 AttackGoal::AttackGoal(const map<UnitType, int>& miniUnits, BWAPI::Position p,
 					   int priority, int firstFrame)
 : Goal(miniUnits,
@@ -20,6 +39,7 @@ AttackGoal::AttackGoal(const map<UnitType, int>& miniUnits, BWAPI::Position p,
 	addSubgoal(pSubgoal(new FormationSubgoal(SL_OR, &_unitsGroup,
 	                                 pFormation(new SquareFormation(p)))));
 	bidOnMilitaryUnits();
+	GoalManager::Instance().attackGoals += 1;
 }
 
 AttackGoal::AttackGoal(BWAPI::Position p, int priority, int firstFrame)
@@ -29,6 +49,7 @@ AttackGoal::AttackGoal(BWAPI::Position p, int priority, int firstFrame)
     addSubgoal(pSubgoal(new FormationSubgoal(SL_OR, &_unitsGroup,
 	                                 pFormation(new SquareFormation(p)))));
 	bidOnMilitaryUnits();
+	GoalManager::Instance().attackGoals += 1;
 }
 
 AttackGoal::AttackGoal(pSubgoal subgoal, int priority, int firstFrame)
@@ -37,6 +58,12 @@ AttackGoal::AttackGoal(pSubgoal subgoal, int priority, int firstFrame)
 	   firstFrame)
 {
 	bidOnMilitaryUnits();
+	GoalManager::Instance().attackGoals += 1;
+}
+
+AttackGoal::~AttackGoal()
+{
+	GoalManager::Instance().attackGoals += 1;
 }
 
 void AttackGoal::achieve()
@@ -92,17 +119,32 @@ std::string AttackGoal::getShortName()
 /// RegroupGoal at the closest, backing point on the path from home to enemy's
 void AttackGoal::abort()
 {
+	Broodwar->setLocalSpeed(30); // TODO REMOVE //////////////////////////
+	
+	// Shitload of hacks
 	TilePosition tp;
 	BWTA::BaseLocation* eHome = Intelligence::Instance().enemyHome;
-	if (BWTA::getRegion(TilePosition(_unitsGroup.center)) == eHome->getRegion())
-	{
-		std::list<BWTA::BaseLocation*>::const_iterator it = Intelligence::Instance().enemyBasesOrder.begin();
-		++it;
-		tp = (*it)->getTilePosition();
-	}
+	if (eHome == NULL)
+		tp = BWTA::getStartLocation(Broodwar->self())->getTilePosition();
 	else
 	{
-		tp = MapManager::Instance().getPathFromHomeToSL(eHome)[2*MapManager::Instance().getPathFromHomeToSL(eHome).size()/3];
+		int cOP = closestOnPath(_unitsGroup.center, MapManager::Instance().getPathFromHomeToSL(eHome));
+		/*if (BWTA::getRegion(TilePosition(_unitsGroup.center)) == eHome->getRegion())
+		{
+			std::list<BWTA::BaseLocation*>::const_iterator it = Intelligence::Instance().enemyBasesOrder.begin();
+			++it;
+			tp = (*it)->getTilePosition();
+		}
+		else*/
+		{
+			if (cOP < 0 || cOP >= (int)MapManager::Instance().getPathFromHomeToSL(eHome).size())
+				tp = BWTA::getStartLocation(Broodwar->self())->getTilePosition();
+			else
+			{
+				tp = MapManager::Instance().getPathFromHomeToSL(eHome)[2*cOP/3];
+				Intelligence::Instance().closestOnPath = cOP;
+			}
+		}
 	}
 	GoalManager::Instance().addGoal(pGoal(new RegroupGoal(Position(tp))));
 	_status = GS_CANCELED;

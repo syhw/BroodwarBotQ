@@ -18,7 +18,7 @@ bool ProbeUnit::decideToFlee()
 	updateTargetingMe();
 	if (!_targetingMe.empty() &&
 		((unit->getShields() < 2 && unit->getHitPoints() > 15) 
-		    || (unit->getHitPoints() < 12 
+		    || (unit->getHitPoints() < 12 // 2 glings attack, sucks against zealots though
 			&& (Broodwar->enemy()->getRace() == Races::Protoss || Broodwar->enemy()->getRace() == Races::Zerg))))
 		return true;
 	return false;
