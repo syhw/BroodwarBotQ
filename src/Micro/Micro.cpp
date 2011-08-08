@@ -35,15 +35,18 @@ void Micro::update()
 		&& !TheInformationManager->getEnemyBases().empty())
 	{
 		if ((Broodwar->enemy()->getRace() == Races::Protoss && (
-			(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 2 && ETechEstimator::Instance().getOpeningsProbas()[1] > 0.2) // fast DT
-			|| (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 5))
+			(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 2 && ETechEstimator::Instance().getOpeningsProbas()[1] > 0.2 // fast DT
+			|| TheInformationManager->getEnemyBases().size() > 1 )
+			|| (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 4))
 			) || Broodwar->enemy()->getRace() == Races::Terran && (
-			(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 2 && ETechEstimator::Instance().getOpeningsProbas()[3] > 0.2) // siege expand
+			(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 2 && ETechEstimator::Instance().getOpeningsProbas()[3] > 0.2 // siege expand
+			|| TheInformationManager->getEnemyBases().size() > 1)
 			|| (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 4)
 			) || Broodwar->enemy()->getRace() == Races::Zerg && (
 			(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Zealot) > 3
 			&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 1 && 
-			(ETechEstimator::Instance().getOpeningsProbas()[0] > 0.2 || ETechEstimator::Instance().getOpeningsProbas()[1] > 0.2))
+			(ETechEstimator::Instance().getOpeningsProbas()[0] > 0.2 || ETechEstimator::Instance().getOpeningsProbas()[1] > 0.2 // mutas
+			|| TheInformationManager->getEnemyBases().size() > 1))
 			|| Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 4
 			))
 		{
@@ -54,13 +57,13 @@ void Micro::update()
 				pGoal tmp;
 				if (Intelligence::Instance().enemyBasesOrder.size() > 1)
 				{
-					list<BWTA::BaseLocation*>::const_iterator it = Intelligence::Instance().enemyBasesOrder.begin();
+					map<double, BWTA::BaseLocation*>::const_iterator it = Intelligence::Instance().enemyBasesOrder.begin();
 					++it;
-					tmp = pGoal(new AttackGoal((*it)->getPosition(), 60));
+					tmp = pGoal(new AttackGoal(it->second->getPosition(), 30));
 				}
 				else
 				{
-					tmp = pGoal(new AttackGoal(p, 60));
+					tmp = pGoal(new AttackGoal(p, 30));
 				}
 				goalManager->addGoal(tmp);
 				_launchedFirstPush = true;
@@ -150,12 +153,12 @@ void Micro::update()
 		if (TheInformationManager->getEnemyBases().size() > TheBasesManager->getAllBases().size())
 		{
 			bool found = false;
-			for (list<BWTA::BaseLocation*>::const_reverse_iterator it = Intelligence::Instance().enemyBasesOrder.rbegin();
+			for (map<double, BWTA::BaseLocation*>::const_reverse_iterator it = Intelligence::Instance().enemyBasesOrder.rbegin();
 				it != Intelligence::Instance().enemyBasesOrder.rend(); ++it)
 			{
-				if (TheInformationManager->getEnemyBases().count(*it))
+				if (TheInformationManager->getEnemyBases().count(it->second))
 				{
-					goalManager->addGoal(pGoal(new AttackGoal((*it)->getPosition())));
+					goalManager->addGoal(pGoal(new AttackGoal(it->second->getPosition())));
 					found = true;
 					break;
 				}

@@ -9,7 +9,7 @@ using namespace std;
 	
 void ExploreGoal::needAScoutingUnit()
 {	
-	if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Observer) > 0)
+	if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Observer) > 1)
 		_neededUnits.insert(make_pair<UnitType, int>(UnitTypes::Protoss_Observer, 1));
 	else
 		_neededUnits.insert(make_pair<UnitType, int>(UnitTypes::Protoss_Probe, 1));

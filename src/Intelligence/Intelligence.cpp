@@ -19,7 +19,6 @@ Intelligence::Intelligence()
 , enemyRush(false)
 , enemyRace(Races::Unknown)
 , enemyHome(NULL)
-, enemyFrontChoke(NULL)
 , closestOnPath(-1)
 {
 	eUnitsFilter = & EUnitsFilter::Instance();
@@ -68,7 +67,10 @@ void Intelligence::update()
 	{
 		if (Broodwar->getFrameCount() < 24*__BBS_TIME_RUSH__
 			&& eUnitsFilter->getNumbersType(UnitTypes::Terran_Barracks) >= 2)
-				enemyRush = true; // TODO (something else)
+		{
+			enemyRush = true;
+			// TODO (something else)
+		}
 	}
 	else if (Broodwar->enemy()->getRace() == Races::Zerg)
 	{
@@ -77,10 +79,12 @@ void Intelligence::update()
 		{
 			enemyRush = true;
 			TheProducer->produce(2, UnitTypes::Protoss_Zealot, 100);
+			//if (!TheBasesManager->getAllBases().empty())
+			//	TheBasesManager->getHomeBase()->setActiveGas(false);
 		}
 	}
 
-	if (Broodwar->getFrameCount() > 10*60*24)
+	if (Broodwar->getFrameCount() > 6*60*24)
 		enemyRush = false;
 #ifdef __DEBUG__
 	if (enemyRush)
@@ -98,27 +102,25 @@ void Intelligence::update()
 			if (BWTA::getStartLocations().count(b))
 			{
 				enemyHome = b;
-				_enemyBasesOrder.push_back(b);
+				enemyBasesOrder.insert(std::make_pair<double, BWTA::BaseLocation*>(0.0, b));
 				break;
 			}
 		}
-		std::map<double, BWTA::Region*> rBD = MapManager::Instance().regionsByDist[_enemyBasesOrder.front()->getRegion()];
-		for (std::map<double, BWTA::Region*>::const_iterator it = rBD.begin();
-			it != rBD.end(); ++it)
+		for each (BWTA::BaseLocation* b in BWTA::getBaseLocations())
 		{
-			for each (BWTA::BaseLocation* b in BWTA::getBaseLocations())
+			if (b != enemyHome)
 			{
-				if (b->getRegion() == it->second)
-				{
-					if (it->first < 0)
-						_enemyBasesOrder.push_back(b);
-					else if (it->first > 1)
-						_enemyBasesOrder.push_front(b);
-					break;
-				}
+				double dist = MapManager::Instance().distBaseToBase(enemyHome, b);
+				if (dist > 0.0)
+					enemyBasesOrder.insert(std::make_pair<double, BWTA::BaseLocation*>(dist, b));
+				else
+					enemyBasesOrder.insert(std::make_pair<double, BWTA::BaseLocation*>(DBL_MAX, b));			
 			}
 		}
-		enemyBasesOrder = _enemyBasesOrder;
+		for each (std::pair<double, BWTA::BaseLocation*> it in enemyBasesOrder)
+		{
+			_enemyBasesOrder.push_back(it.second);
+		}
 	}
 
 	/*if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Observer) > currentlyExploring.size() + 2
@@ -130,7 +132,7 @@ void Intelligence::update()
 
 	/// Scout bases if we think they have a hidden one
 	if (!_enemyBasesOrder.empty()
-		&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Observer) > (int)(currentlyExploring.size() + 3) // leave at least 3 observers for the armies + 1 to scout
+		&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Observer) > (int)(currentlyExploring.size() + 2) // leave at least 3 observers for the armies 
 		&& TheInformationManager->getEnemyBases().size() <= TheBasesManager->getAllBases().size())
 	{
 		if (TheInformationManager->getEnemyBases().count(_enemyBasesOrder.front())
@@ -147,6 +149,14 @@ void Intelligence::update()
 			// push_back(front) + pop_front done one frame later by above code
 		}
 	}
+#ifdef __DEBUG__
+	int cc = 0;
+	for each (BWTA::BaseLocation* b in _enemyBasesOrder)
+	{
+		Broodwar->drawCircleMap(b->getPosition().x(), b->getPosition().y(), 30, Colors::Orange, true);
+		Broodwar->drawTextMap(b->getPosition().x() - 8, b->getPosition().y() - 8, "%d", cc++);
+	}
+#endif
 }
 
 void Intelligence::onUnitCreate(Unit* u)

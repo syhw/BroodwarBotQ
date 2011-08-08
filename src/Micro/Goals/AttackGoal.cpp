@@ -7,6 +7,7 @@
 #include "Macro/BorderManager.h"
 #include "Micro/Goals/RegroupGoal.h"
 #include "Intelligence/Intelligence.h"
+#include "Macro/BasesManager.h"
 
 using namespace BWAPI;
 using namespace std;
@@ -86,8 +87,8 @@ void AttackGoal::achieve()
 	bidOnMilitaryUnits();
 
 	/// Cancel if we are getting pwned
-	//if (_unitsGroup.force < 0.75)
-	//	abort();
+	if (_unitsGroup.force < 0.75)
+		abort();
 
 	Goal::achieve();
 }
@@ -138,14 +139,20 @@ void AttackGoal::abort()
 		else*/
 		{
 			if (cOP < 0 || cOP >= (int)MapManager::Instance().getPathFromHomeToSL(eHome).size())
-				tp = BWTA::getStartLocation(Broodwar->self())->getTilePosition();
+			{
+				if (!TheBasesManager->getAllBases().empty())
+					tp = TheBasesManager->getLastExpand()->getBaseLocation()->getTilePosition();
+				else
+					tp = BWTA::getStartLocation(Broodwar->self())->getTilePosition();
+			}
 			else
 			{
-				tp = MapManager::Instance().getPathFromHomeToSL(eHome)[2*cOP/3];
+				tp = MapManager::Instance().getPathFromHomeToSL(eHome)[3*cOP/4];
 				Intelligence::Instance().closestOnPath = cOP;
 			}
 		}
 	}
-	GoalManager::Instance().addGoal(pGoal(new RegroupGoal(Position(tp))));
+	GoalManager::Instance().addGoal(pGoal(new AttackGoal(Position(tp), _priority)));
+	//GoalManager::Instance().addGoal(pGoal(new RegroupGoal(Position(tp))));
 	_status = GS_CANCELED;
 }

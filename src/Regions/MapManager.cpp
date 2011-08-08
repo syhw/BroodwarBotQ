@@ -152,6 +152,17 @@ MapManager::MapManager()
 		}
 	}
 
+	for each (BWTA::BaseLocation* b1 in BWTA::getBaseLocations())
+	{
+		distBaseToBase.insert(std::make_pair<BWTA::BaseLocation*, std::map<BWTA::BaseLocation*, double> >(b1,
+			std::map<BWTA::BaseLocation*, double>()));
+		for each (BWTA::BaseLocation* b2 in BWTA::getBaseLocations())
+		{
+			distBaseToBase[b1].insert(std::make_pair<BWTA::BaseLocation*, double>(b2,
+				BWTA::getGroundDistance(enemyHome->getTilePosition(), b->getTilePosition())));
+		}
+	}
+
 
 	/// Search the "flooding" centers of all the regions
 	/// by flooding from polygon edges
