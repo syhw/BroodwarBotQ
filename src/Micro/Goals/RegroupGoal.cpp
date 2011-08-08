@@ -15,6 +15,8 @@ RegroupGoal::RegroupGoal(Position p, int priority, int firstFrame)
 	_status = GS_IN_PROGRESS;
 	bidOnMilitaryUnits();
 	GoalManager::Instance().attackGoals += 1;
+	//if (_unitsGroup.groupMode != MODE_SCOUT)
+	//	_unitsGroup.switchMode(MODE_SCOUT);
 }
 
 RegroupGoal::~RegroupGoal()
@@ -24,6 +26,8 @@ RegroupGoal::~RegroupGoal()
 
 void RegroupGoal::achieve()
 {
+	//if (_unitsGroup.groupMode != MODE_SCOUT)
+	//		_unitsGroup.switchMode(MODE_SCOUT);
 	bidOnMilitaryUnits();
 	//if (_unitsGroup.groupMode != MODE_MANAGED)
 	//	_unitsGroup.switchMode(MODE_MANAGED);
@@ -38,13 +42,14 @@ void RegroupGoal::achieve()
 		else
 			s->tryToRealize();
 	}
-	if (!(Broodwar->getFrameCount() % 25))
+	_unitsGroup.update();
+	/*if (!(Broodwar->getFrameCount() % 25))
 	{
 		for each (pBayesianUnit bu in _unitsGroup.units)
 		{
 			bu->unit->move(bu->target);
 		}
-	}
+	}*/
 }
 
 /*void RegroupGoal::attackGoalHere()

@@ -537,7 +537,7 @@ void Producer::onUnitCreate(BWAPI::Unit* unit)
 {
 	if (unit->getPlayer() != Broodwar->self())
 		return;
-	if (unit->getType().isBuilding())
+	if (unit->getType().isBuilding() && unit->getType() != UnitTypes::Protoss_Pylon && unit->getType() != UnitTypes::Protoss_Photon_Cannon)
 		TheArbitrator->setBid(this, unit, 80);
 	else if (_nbArchons > 0 && unit->getType() == UnitTypes::Protoss_High_Templar)
 		TheArbitrator->setBid(this, unit, 96);

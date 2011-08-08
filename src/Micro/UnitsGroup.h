@@ -127,7 +127,6 @@ public:
 	inline void updateCenter();
 	inline void updateOurStats();
 	inline void updateEnemiesCenter();
-	inline void updateGroupStrengh(BWAPI::Unit* u);
 	/// Getters
     virtual BWAPI::Position getCenter() const;
     inline double getDistance(BWAPI::Unit* u) const;

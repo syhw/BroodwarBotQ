@@ -24,7 +24,7 @@ Goal::~Goal()
 
 Goal::Goal(int priority, int firstFrame)
 : _status(GS_WAIT_PRECONDITION)
-, _priority(max(priority, 100))
+, _priority(priority)
 , _firstFrame(firstFrame)
 , _neededUnits(std::map<UnitType, int>())
 {
@@ -35,7 +35,7 @@ Goal::Goal(int priority, int firstFrame)
 
 Goal::Goal(pSubgoal s, int priority, int firstFrame)
 : _status(GS_WAIT_PRECONDITION)
-, _priority(max(priority, 100))
+, _priority(priority)
 , _firstFrame(firstFrame)
 , _neededUnits(std::map<UnitType, int>())
 {
@@ -48,7 +48,7 @@ Goal::Goal(pSubgoal s, int priority, int firstFrame)
 Goal::Goal(const map<UnitType, int>& nU, pSubgoal s,
 		   int priority, int firstFrame)
 : _status(GS_WAIT_PRECONDITION)
-, _priority(max(priority, 100))
+, _priority(priority)
 , _firstFrame(firstFrame)
 , _neededUnits(std::map<UnitType, int>())
 {
@@ -62,7 +62,7 @@ Goal::Goal(const map<UnitType, int>& nU, pSubgoal s,
 Goal::Goal(const std::map<BWAPI::UnitType, int>& nU,
 	 int priority, int firstFrame)
 : _status(GS_WAIT_PRECONDITION)
-, _priority(max(priority, 100))
+, _priority(priority)
 , _firstFrame(firstFrame)
 , _neededUnits(std::map<UnitType, int>())
 {

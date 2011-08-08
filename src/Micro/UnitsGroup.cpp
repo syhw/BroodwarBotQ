@@ -466,8 +466,11 @@ void UnitsGroup::updateOurStats()
 	_totalGasPrice = 0;
 	_totalSupply = 0;
     _maxRange = -1.0;
+	_hasDetection = false;
     for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
     {
+		if ((*it)->getType() == UnitTypes::Protoss_Observer)
+			_hasDetection = true;
 		if ((*it)->isFighting())
 			isFighting = true;
         _totalHP += (*it)->unit->getHitPoints();
@@ -731,7 +734,6 @@ void UnitsGroup::activeUnit(pBayesianUnit bu)
 {
 	bu->switchMode(groupMode);
     units.push_back(bu);
-	updateGroupStrengh(bu->unit);
 }
 
 void UnitsGroup::dispatchCompleteUnit(pBayesianUnit bu)
@@ -793,25 +795,12 @@ void UnitsGroup::giveUpControl(Unit* u)
                 break;
             }
     }
-    _totalMinPrice -= u->getType().mineralPrice();
-    _totalGasPrice -= u->getType().gasPrice();
-    _totalSupply -= u->getType().supplyRequired();
 }
 
 bool BasicUnitsGroup::emptyUnits()
 {
     return units.empty();
 }
-
-void UnitsGroup::updateGroupStrengh(Unit* u)
-{
-	if (u->getType() == UnitTypes::Protoss_Observer)
-		_hasDetection = true;
-	_totalMinPrice += u->getType().mineralPrice();
-	_totalGasPrice += u->getType().gasPrice();
-	_totalSupply += u->getType().supplyRequired();
-}
-
 
 int UnitsGroup::getTotalHP() const
 {

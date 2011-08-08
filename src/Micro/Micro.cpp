@@ -129,7 +129,7 @@ void Micro::update()
 			goalManager->
 	}*/
 
-	if (needDefense.empty() && goalManager->attackGoals < 1)
+	if (_launchedFirstPush && needDefense.empty() && goalManager->attackGoals < 1)
 	{
 		if (TheInformationManager->getEnemyBases().size() > TheBasesManager->getAllBases().size())
 		{
