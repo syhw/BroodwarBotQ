@@ -32,23 +32,39 @@ void Micro::update()
 {
 	/// Launch the first push as soon as we have 2 dragoons and we know where the enemy is
 	if (!_launchedFirstPush && needDefense.empty()
-		&& !TheInformationManager->getEnemyBases().empty()
-		&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 1)
+		&& !TheInformationManager->getEnemyBases().empty())
 	{
-		Position p(Positions::None);
-		p = (*(TheInformationManager->getEnemyBases().begin()))->getPosition();
-		if (p != Positions::None)
+		if ((Broodwar->enemy()->getRace() == Races::Protoss && (
+			(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 2 && ETechEstimator::Instance().getOpeningsProbas()[1] > 0.2) // fast DT
+			|| (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 5))
+			) || Broodwar->enemy()->getRace() == Races::Terran && (
+			(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 2 && ETechEstimator::Instance().getOpeningsProbas()[3] > 0.2) // siege expand
+			|| (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 4)
+			) || Broodwar->enemy()->getRace() == Races::Zerg && (
+			(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Zealot) > 3
+			&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 1 && 
+			(ETechEstimator::Instance().getOpeningsProbas()[0] > 0.2 || ETechEstimator::Instance().getOpeningsProbas()[1] > 0.2))
+			|| Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 4
+			))
 		{
-			pGoal tmp = pGoal(new AttackGoal(p, 60));
-			if (Intelligence::Instance().enemyBasesOrder.size() > 1)
+			Position p(Positions::None);
+			p = (*(TheInformationManager->getEnemyBases().begin()))->getPosition();
+			if (p != Positions::None)
 			{
-				list<BWTA::BaseLocation*>::const_iterator it = Intelligence::Instance().enemyBasesOrder.begin();
-				++it;
-				tmp->addSubgoal(pSubgoal(new FormationSubgoal(SL_AND, NULL, 
-					pFormation(new SquareFormation((*it)->getPosition())))));
+				pGoal tmp;
+				if (Intelligence::Instance().enemyBasesOrder.size() > 1)
+				{
+					list<BWTA::BaseLocation*>::const_iterator it = Intelligence::Instance().enemyBasesOrder.begin();
+					++it;
+					tmp = pGoal(new AttackGoal((*it)->getPosition(), 60));
+				}
+				else
+				{
+					tmp = pGoal(new AttackGoal(p, 60));
+				}
+				goalManager->addGoal(tmp);
+				_launchedFirstPush = true;
 			}
-			goalManager->addGoal(tmp);
-			_launchedFirstPush = true;
 		}
 	}
 

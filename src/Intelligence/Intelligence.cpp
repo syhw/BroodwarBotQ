@@ -19,6 +19,7 @@ Intelligence::Intelligence()
 , enemyRush(false)
 , enemyRace(Races::Unknown)
 , enemyHome(NULL)
+, enemyFrontChoke(NULL)
 , closestOnPath(-1)
 {
 	eUnitsFilter = & EUnitsFilter::Instance();

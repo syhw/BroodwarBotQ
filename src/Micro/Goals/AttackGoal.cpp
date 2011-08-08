@@ -86,8 +86,8 @@ void AttackGoal::achieve()
 	bidOnMilitaryUnits();
 
 	/// Cancel if we are getting pwned
-	if (_unitsGroup.force < 0.75)
-		abort();
+	//if (_unitsGroup.force < 0.75)
+	//	abort();
 
 	Goal::achieve();
 }

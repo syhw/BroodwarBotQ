@@ -9,7 +9,7 @@ class RegroupGoal: public Goal
 private:
 	void createMidSubgoal();
 public:
-	RegroupGoal(BWAPI::Position p, int priority = 80, int firstFrame = 0);
+	RegroupGoal(BWAPI::Position p, int priority = 10, int firstFrame = 0);
 	virtual ~RegroupGoal();
 	virtual void RegroupGoal::achieve();
 };

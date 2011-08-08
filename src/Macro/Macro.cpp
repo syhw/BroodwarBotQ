@@ -436,6 +436,6 @@ void Macro::onUnitRenegade(BWAPI::Unit* unit)
 
 void Macro::expand()
 {
-	TheBasesManager->expand();
 	Macro::Instance().expands += 1;
+	TheBasesManager->expand();
 }

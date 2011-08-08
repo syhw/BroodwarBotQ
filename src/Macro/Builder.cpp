@@ -200,7 +200,7 @@ void Task::buildIt()
 		/// Move closer to the construction site
 		if (worker->getDistance(Position(tilePosition)) > 6 * TILE_SIZE) // 6 > sqrt(biggest^2+biggest^2) (biggest buildings as Protoss are nexus/gates)
 		{
-			if (type == UnitTypes::Protoss_Nexus && worker->getDistance(Position(tilePosition)) > 9*TILE_SIZE)
+			if (Macro::Instance().expands == 1 && type == UnitTypes::Protoss_Nexus && worker->getDistance(Position(tilePosition)) > 9*TILE_SIZE)
 			{
 				BWTA::BaseLocation* b = BWTA::getNearestBaseLocation(tilePosition);
 				if (b != NULL && !b->getMinerals().empty())
@@ -347,21 +347,24 @@ Builder::~Builder()
 }
 
 // Use with care outside of here
-void Builder::addTask(const UnitType& t, const TilePosition& seedPosition, int lastOrder)
+void Builder::addTask(const UnitType& t, const TilePosition& seedPosition, bool quick, int lastOrder)
 {
 	pTask tmp(new Task(NULL, seedPosition, t, lastOrder));
 	tmp->init();
-	tasks.push_back(tmp);
+	if (quick)
+		tasks.push_front(tmp);
+	else
+		tasks.push_back(tmp);
 }
 
-void Builder::build(const BWAPI::UnitType& t, const BWAPI::TilePosition& seedPosition)
+void Builder::build(const BWAPI::UnitType& t, const BWAPI::TilePosition& seedPosition, bool quick)
 {
 	if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Pylon) >= 42) // magic number :)
 		return; // TODO remove
 	if (t == Broodwar->self()->getRace().getCenter())
 		TheBasesManager->expand();
 	else
-		addTask(t, seedPosition);
+		addTask(t, seedPosition, quick);
 }
 
 void Builder::buildOrder(const BWAPI::UnitType& t, int supplyAsTime, const BWAPI::TilePosition& seedPosition)
@@ -380,21 +383,23 @@ void Builder::buildCannonsMinerals(BWTA::BaseLocation* b)
 	TilePosition tp = Task::buildingPlacer->getTilePosition(UnitTypes::Protoss_Pylon, b->getTilePosition());
 	if (tp == TilePositions::None)
 		return;
-	addTask(UnitTypes::Protoss_Pylon, tp);
+	addTask(UnitTypes::Protoss_Pylon, tp, true);
 	tp = Task::buildingPlacer->getTilePosition(UnitTypes::Protoss_Pylon, b->getTilePosition());
 	if (tp == TilePositions::None)
 		return;
-	addTask(UnitTypes::Protoss_Pylon, tp);
+	addTask(UnitTypes::Protoss_Pylon, tp, true);
 	// 2 cannons
 	tp = Task::buildingPlacer->getTilePosition(UnitTypes::Protoss_Photon_Cannon, b->getTilePosition());
 	if (tp == TilePositions::None)
 		return;
-	addTask(UnitTypes::Protoss_Pylon, tp, Broodwar->getFrameCount() + UnitTypes::Protoss_Pylon.buildTime() + __MIN_FRAMES_TO_START_CONSTRUCTION__);
+	addTask(UnitTypes::Protoss_Pylon, tp, false, Broodwar->getFrameCount() + UnitTypes::Protoss_Pylon.buildTime() + __MIN_FRAMES_TO_START_CONSTRUCTION__);
 	tp = Task::buildingPlacer->getTilePosition(UnitTypes::Protoss_Photon_Cannon, b->getTilePosition());
 	if (tp == TilePositions::None)
 		return;
-	addTask(UnitTypes::Protoss_Pylon, tp, Broodwar->getFrameCount() + UnitTypes::Protoss_Pylon.buildTime() + __MIN_FRAMES_TO_START_CONSTRUCTION__);
+	addTask(UnitTypes::Protoss_Pylon, tp, false, Broodwar->getFrameCount() + UnitTypes::Protoss_Pylon.buildTime() + __MIN_FRAMES_TO_START_CONSTRUCTION__);
 }
+
+//void Builder::buildCannonsNexus(BWTA::BaseLocation* b) TODO
 
 int Builder::numberInFutureTasks(const UnitType& t)
 {
@@ -521,7 +526,7 @@ void Builder::update()
 		}
 		if ((*tmp)->isUnderAttack() && (*tmp)->getHitPoints() + (*tmp)->getShields() <= __MIN_HP_CANCEL_BUILDING_IN_CONSTRUCTION__)
 		{
-			addTask((*tmp)->getType(), (*tmp)->getTilePosition(), Broodwar->getFrameCount() + 2*Broodwar->getLatencyFrames() + 1); // TODO check if tmp works
+			addTask((*tmp)->getType(), (*tmp)->getTilePosition(), false, Broodwar->getFrameCount() + 2*Broodwar->getLatencyFrames() + 1); // TODO check if tmp works
 			(*tmp)->cancelConstruction();
 		}
 	}

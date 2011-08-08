@@ -24,6 +24,7 @@ DefendGoal::DefendGoal(BWAPI::Position p, int priority, int firstFrame)
 , _base(BWTA::getNearestBaseLocation(_defPos))
 , _eUnits(0) // 1?
 , _nbWorkers(0)
+, _threatMiddle(Positions::None)
 {
 	_status = GS_IN_PROGRESS;
 }
@@ -36,6 +37,7 @@ DefendGoal::DefendGoal(BWTA::Chokepoint* c, int priority, int firstFrame)
 , _base(BWTA::getNearestBaseLocation(_defPos))
 , _eUnits(0) // 1?
 , _nbWorkers(0)
+, _threatMiddle(Positions::None)
 {
 	_status = GS_IN_PROGRESS;
 }
@@ -48,6 +50,7 @@ DefendGoal::DefendGoal(BWTA::BaseLocation* b, int priority, int firstFrame)
 , _base(b)
 , _eUnits(0) // 1?
 , _nbWorkers(0)
+, _threatMiddle(Positions::None)
 {
 	_status = GS_IN_PROGRESS;
 }
@@ -68,10 +71,14 @@ void DefendGoal::check()
 #endif
 		// Perhaps use SelectAll()?
 		_eUnits = 0;
+		Vec tm(0, 0);
+		int nbEnemies = 0;
 		for each (Unit* u in unitsAround)
 		{
 			if (u->getPlayer() != Broodwar->enemy())
 				continue;
+			tm += u->getPosition();
+			nbEnemies += 1;
 			/// Count how many probes we will be ok to bid and how much force we need
 			UnitType ut = u->getType();
 			if (ut == UnitTypes::Terran_Dropship || ut == UnitTypes::Protoss_Shuttle || ut == UnitTypes::Zerg_Overlord
@@ -86,6 +93,7 @@ void DefendGoal::check()
 			else 
 				_eUnits += ut.supplyRequired();
 		}
+		_threatMiddle = Position((int)(tm.x / nbEnemies), (int)(tm.y / nbEnemies));
 		for each (pBayesianUnit bu in _unitsGroup.units)
 		{
 			if (bu->getType().isWorker() && !bu->isFighting())
@@ -135,7 +143,7 @@ void DefendGoal::bidDefUnits()
 	set<Unit*> interestingUnits = SelectAll().not(isBuilding);
 	for each (Unit* u in interestingUnits)
 	{
-		if (!_biddedOn.count(u) && (!u->getType().isWorker() || (u->getDistance(_defPos) < __BAIT_WORKERS_TILES_DISTANCE__*TILE_SIZE && _nbWorkers < _eUnits)))
+		if (!_biddedOn.count(u) && (!u->getType().isWorker() || (u->getDistance(_threatMiddle) < __BAIT_WORKERS_TILES_DISTANCE__*TILE_SIZE && _nbWorkers < _eUnits)))
 		{
 			// units at 20 build tiles will be bidded on at 70, really important goals will have a priority > 90
 			int prio = max(_priority, 90 - (int)(u->getDistance(_defPos)/TILE_SIZE)); 

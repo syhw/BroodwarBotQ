@@ -31,7 +31,7 @@
 
 #define __NEW_COMPUTE_REPULSE__
 #define __HEURISTICS_IN_FIGHTMOVE__ 1 // level of heuristic(s)
-#define __OUTER_NON_ATOMIC_DIRV__ // accept to do "non atomic w.r.t. Broodwar directions" moves/clicks (BW pathfinder can be called, drama ensues), useful to pass big buildings
+//#define __OUTER_NON_ATOMIC_DIRV__ // accept to do "non atomic w.r.t. Broodwar directions" moves/clicks (BW pathfinder can be called, drama ensues), useful to pass big buildings
 #define __TILES_AROUND__ 2 // atomic = 2
 //#define __OUR_PATHFINDER__
 //#define __EXACT_OBJ__
@@ -545,6 +545,8 @@ void BayesianUnit::attackEnemyUnit(Unit* u)
 
 void BayesianUnit::drawProbs(multimap<double, Vec>& probs, int number)
 {
+	if (probs.empty())
+		return;
     //Broodwar->printf("Size: %d\n", probs.size());
     Position up = _unitPos;
     Rainbow colors = Rainbow(Color(12, 12, 255), 51); // 5 colors
@@ -1772,6 +1774,17 @@ void BayesianUnit::clickTarget()
     _lastMoveFrame = Broodwar->getFrameCount();
 }
 
+void BayesianUnit::aMoveTarget()
+{
+	if (unit->getGroundWeaponCooldown() < Broodwar->getLatencyFrames())
+		unit->attack(target);
+	else
+		unit->move(target);
+    _lastRightClick = target;
+    _lastClickFrame = Broodwar->getFrameCount();
+    _lastMoveFrame = Broodwar->getFrameCount();
+}
+
 void BayesianUnit::moveClick(Position p)
 {
 	unit->move(p);
@@ -2117,7 +2130,7 @@ void BayesianUnit::update()
         //switchMode(MODE_MOVE);
 	
 	/// Switch to fight if we're not fighting already nor scouting and there are enemies (and we can attack)
-    /*if (_mode != MODE_FIGHT_G && _mode != MODE_SCOUT 
+    /*if (_mode != MODE_FIGHT_G && _mode != MODE_SCOUT  /////////////////////////////////////////////////////// TODO check
         && !_unitsGroup->enemies.empty())
     {
         this->switchMode(MODE_FIGHT_G);
@@ -2224,7 +2237,8 @@ void BayesianUnit::update()
         Broodwar->drawLineMap(_unitPos.x(), _unitPos.y(), target.x(), target.y(), Colors::Purple);
 #endif
         if (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatencyFrames() + getAttackDuration())
-            clickTarget();
+            aMoveTarget();
+            //clickTarget();
         break;
         
     default:

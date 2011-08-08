@@ -220,10 +220,10 @@ double UnitsGroup::evaluateForces()
             // consider ground defenses only because we have only ground atm
             if (ut == UnitTypes::Protoss_Photon_Cannon || ut == UnitTypes::Terran_Bunker)
             {
-                theirMinPrice += 3*ut.mineralPrice();
+                theirMinPrice += 4*ut.mineralPrice();
             } else if (ut == UnitTypes::Zerg_Sunken_Colony)
             {
-                theirMinPrice += 3*(ut.mineralPrice() + 50);
+                theirMinPrice += 4*(ut.mineralPrice() + 50);
             } else if (ut == UnitTypes::Protoss_Shield_Battery)
             {
                 theirMinPrice += ut.mineralPrice();
@@ -539,7 +539,7 @@ void UnitsGroup::update()
 	if (!enemies.empty() && groupMode != MODE_SCOUT) /// We fight, we'll see later for the goals, BayesianUnits switchMode automatically if enemies is not empty()
 	{
 		force = evaluateForces();
-		if (force < 0.75 && !suicide)
+		if (force < 0.8 && !suicide)
 		{
 			// strategic withdrawal
 			for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
@@ -560,7 +560,15 @@ void UnitsGroup::update()
 		}
 		else
 		{
-			if (force > 1.5)
+			if (center.isValid() && Broodwar->isWalkable(center.x()/8, center.y()/8)
+				&& stdDevRadius > (double)units.size() * (2.0/3.0) * TILE_SIZE)
+			{
+				for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+				{
+					(*it)->target = center;
+				}
+			}
+			else if (force > 1.5)
 			{
 				// we can be offensive, use our goal target and do what we want
 				for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
@@ -600,38 +608,27 @@ void UnitsGroup::update()
 				}
 				else
 				{
-					if (center.isValid() && Broodwar->isWalkable(center.x()/8, center.y()/8)
-						&& stdDevRadius > (double)units.size() * (2.0/3.0) * TILE_SIZE)
+					/// ATTACK!!
+					for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
 					{
-						for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+						if (enemiesAltitude > groupAltitude 
+							&& nearestChoke
+							&& (*it)->unit->getDistance(nearestChoke->getCenter()) < 6*TILE_SIZE)
 						{
-							(*it)->target = center;
+							const std::pair<BWTA::Region*, BWTA::Region*> regions = nearestChoke->getRegions();
+							BWTA::Region* higherRegion = 
+								(Broodwar->getGroundHeight(TilePosition(regions.first->getCenter())) > Broodwar->getGroundHeight(TilePosition(regions.second->getCenter())))
+								? regions.first : regions.second;
+							(*it)->target = (MapManager::Instance().regionsPFCenters[higherRegion]);
+							(*it)->switchMode(MODE_FIGHT_G);
 						}
-					}
-					else
-					{
-						/// ATTACK!!
-						for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
-						{
-							if (enemiesAltitude > groupAltitude 
-								&& nearestChoke
-								&& (*it)->unit->getDistance(nearestChoke->getCenter()) < 6*TILE_SIZE)
-							{
-								const std::pair<BWTA::Region*, BWTA::Region*> regions = nearestChoke->getRegions();
-								BWTA::Region* higherRegion = 
-									(Broodwar->getGroundHeight(TilePosition(regions.first->getCenter())) > Broodwar->getGroundHeight(TilePosition(regions.second->getCenter())))
-									? regions.first : regions.second;
-								(*it)->target = (MapManager::Instance().regionsPFCenters[higherRegion]);
-								(*it)->switchMode(MODE_FIGHT_G);
-							}
+						else
+						{	
+							(*it)->target = (*it)->unit->getPosition();
+							if ((*it)->getType().isFlyer())
+								(*it)->switchMode(MODE_FIGHT_A);
 							else
-							{	
-								(*it)->target = (*it)->unit->getPosition();
-								if ((*it)->getType().isFlyer())
-									(*it)->switchMode(MODE_FIGHT_A);
-								else
-									(*it)->switchMode(MODE_FIGHT_G);
-							}
+								(*it)->switchMode(MODE_FIGHT_G);
 						}
 					}
 				}

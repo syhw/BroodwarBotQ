@@ -17,7 +17,7 @@
 #define __BENS_LABELS__ // use Ben Weber's openings/strategies labels in the ETechEstimator
 #define __WORKERS_FACTOR__ 1.2 // how much more workers we want on top of the optimal count (nb workers = optimal * __WORKERS_FACTOR__)
 #define __MAX_WORKERS__ 75
-#define __TILES_RADIUS_DEFEND_BASE__ 20
+#define __TILES_RADIUS_DEFEND_BASE__ 22
 #define __MAX_TRIES_BUILD_SOMETHING__ 1440 // IN FRAMES, 1 minute here
 
 #ifdef __DEBUG__

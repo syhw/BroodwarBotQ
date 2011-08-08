@@ -41,8 +41,8 @@ class Builder
 public:
 	static Builder* create();
 	static void destroy();
-	void addTask(const BWAPI::UnitType& t, const BWAPI::TilePosition& seedPosition, int lastOrder=0);
-	void build(const BWAPI::UnitType& t, const BWAPI::TilePosition& seedPosition=BWAPI::TilePositions::None);
+	void addTask(const BWAPI::UnitType& t, const BWAPI::TilePosition& seedPosition, bool quick, int lastOrder=0);
+	void build(const BWAPI::UnitType& t, const BWAPI::TilePosition& seedPosition=BWAPI::TilePositions::None, bool quick=false);
 	void buildOrder(const BWAPI::UnitType& t, int supplyAsTime, const BWAPI::TilePosition& seedPosition=BWAPI::TilePositions::None);
 	void buildCannonsMinerals(BWTA::BaseLocation* b);
 	int numberInFutureTasks(const BWAPI::UnitType& t);

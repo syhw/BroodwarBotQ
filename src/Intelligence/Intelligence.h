@@ -27,6 +27,7 @@ public:
 	bool enemyRush;
 	BWAPI::Race enemyRace;
 	BWTA::BaseLocation* enemyHome;
+	BWTA::Chokepoint* enemyFrontChoke;
 	std::list<BWTA::BaseLocation*> enemyBasesOrder; // to be shared
 	void update();
     void onUnitCreate(BWAPI::Unit* u);

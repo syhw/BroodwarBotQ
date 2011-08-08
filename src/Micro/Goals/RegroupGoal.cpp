@@ -15,8 +15,9 @@ RegroupGoal::RegroupGoal(Position p, int priority, int firstFrame)
 	_status = GS_IN_PROGRESS;
 	bidOnMilitaryUnits();
 	GoalManager::Instance().attackGoals += 1;
-	//if (_unitsGroup.groupMode != MODE_SCOUT)
-	//	_unitsGroup.switchMode(MODE_SCOUT);
+	
+	if (_unitsGroup.groupMode != MODE_MOVE)
+		_unitsGroup.switchMode(MODE_MOVE);
 }
 
 RegroupGoal::~RegroupGoal()
@@ -51,9 +52,3 @@ void RegroupGoal::achieve()
 		}
 	}*/
 }
-
-/*void RegroupGoal::attackGoalHere()
-{
-	if (Broodwar->isWalkable(_unitsGroup.center.x() / 8, _unitsGroup.center.y() / 8))
-		GoalManager::Instance().addGoal(pGoal(new AttackGoal(_unitsGroup.center)));
-}*/

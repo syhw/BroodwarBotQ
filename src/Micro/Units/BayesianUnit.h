@@ -174,6 +174,7 @@ protected:
     void drawDir();
     inline void clickDir();
     inline void clickTarget();
+	inline void aMoveTarget();
 	inline void moveClick(BWAPI::Position p);
     void flee();
     int fightMove();

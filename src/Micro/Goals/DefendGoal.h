@@ -15,6 +15,7 @@ class DefendGoal: public Goal
 	int _eUnits;
 	int _nbWorkers;
 	inline void bidDefUnits();
+	BWAPI::Position _threatMiddle;
 public:
 	DefendGoal(BWTA::Chokepoint* c, int priority = 60, int firstFrame = 0);
 	DefendGoal(BWTA::BaseLocation* b, int priority = 60, int firstFrame = 0);

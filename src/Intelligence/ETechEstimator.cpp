@@ -554,13 +554,20 @@ void ETechEstimator::useDistribOpenings()
 		if (fearThese.count(1)) // FastDT
 		{
 			if (!Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Forge)
-				&& !Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Forge)
 				&& !Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Forge)
 				&& !TheBuilder->willBuild(UnitTypes::Protoss_Forge))
-				TheBuilder->buildOrder(UnitTypes::Protoss_Forge, 21);
+				TheBuilder->build(UnitTypes::Protoss_Forge, TilePositions::None, true); // quickly build a forge
+			if ((Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Forge)
+				|| Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Forge))
+				&& builtCannons < 3)
+			{
+				TheBuilder->build(UnitTypes::Protoss_Photon_Cannon, TilePositions::None, true);
+				TheBuilder->build(UnitTypes::Protoss_Photon_Cannon, TilePositions::None, true);
+				builtCannons += 2;
+			}
 			while (builtCannons < 3 + 2*Macro::Instance().expands) 
 			{
-				TheBuilder->buildOrder(UnitTypes::Protoss_Photon_Cannon, 28);
+				TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
 				++builtCannons;
 			}
 			Macro::Instance().stormFirst = false;
@@ -622,6 +629,12 @@ void ETechEstimator::useDistribOpenings()
 		if (fearThese.count(5)) // Lurker
 		{
 			Macro::Instance().reaverFirst = false; // we will need obs
+			if (!Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Robotics_Facility)
+				&& !Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Robotics_Facility)
+				&& !TheBuilder->willBuild(UnitTypes::Protoss_Robotics_Facility))
+			{
+				TheBuilder->build(UnitTypes::Protoss_Robotics_Facility, TilePositions::None, true);
+			}
 			TheProducer->produce(3, UnitTypes::Protoss_Observer, max((int)(openingsProbas[1]*100*2), 95));
 #ifdef __DEBUG__
 			Broodwar->printf("Producing observers bc of Lurkers");
