@@ -14,6 +14,7 @@ using namespace std;
 
 ETechEstimator::ETechEstimator()
 : notFirstOverlord(false)
+, hasInfered(false)
 {
 	/// Load the learned prob tables (uniforms + bell shapes) for the right match up
 	/// This is not obfuscation, the learning of these tables is described in the CIG 2011 Paper
@@ -56,7 +57,7 @@ ETechEstimator::ETechEstimator()
 		boost::archive::text_iarchive ia(ifs);
 		ia >> st;
 	}
-	
+
 	/// Initialize openingsProbas with a uniform distribution
 	size_t nbOpenings = st.openings.size();
 	for (size_t i = 0; i < nbOpenings; ++i)
@@ -439,7 +440,7 @@ void ETechEstimator::computeDistribOpenings(int time)
 {
 	if (time >= LEARNED_TIME_LIMIT || time <= 0)
 		return;
-	
+
 	size_t nbXes = st.vector_X.size();
 	list<unsigned int> compatibleXes;
 	for (size_t i = 0; i < nbXes; ++i)
@@ -455,7 +456,7 @@ void ETechEstimator::computeDistribOpenings(int time)
 			it != compatibleXes.end(); ++it)
 		{
 			sumX += st.tabulated_P_X_Op[(*it) * openingsProbas.size() + i]
-				* st.tabulated_P_Time_X_Op[(*it) * openingsProbas.size() * LEARNED_TIME_LIMIT
+			* st.tabulated_P_Time_X_Op[(*it) * openingsProbas.size() * LEARNED_TIME_LIMIT
 				+ i * LEARNED_TIME_LIMIT + time];
 		}
 		openingsProbas[i] *= sumX;
@@ -466,7 +467,7 @@ void ETechEstimator::computeDistribOpenings(int time)
 	{
 		openingsProbas[i] /= runningSum;
 		if (openingsProbas[i] != openingsProbas[i] // test for NaN / 1#IND
-		    //|| openingsProbas[i] < 0.00000000000000000001         // min proba
+		//|| openingsProbas[i] < 0.00000000000000000001         // min proba
 		)
 			openingsProbas[i] = 0.00000000000000000001;
 		verifSum += openingsProbas[i];
@@ -476,24 +477,25 @@ void ETechEstimator::computeDistribOpenings(int time)
 		for (size_t i = 0; i < openingsProbas.size(); ++i)
 			openingsProbas[i] /= verifSum;
 	}
+	hasInfered = true;
 }
 
 /**
- * Tests if the given build tree (X) value
- * is compatible with obervations (what have been seen)
- * {X ^ observed} covers all observed if X is possible
- * so X is impossible if {observed \ {X ^ observed}} != {}
- * => X is compatible with observations if it covers them fully
- */
+* Tests if the given build tree (X) value
+* is compatible with obervations (what have been seen)
+* {X ^ observed} covers all observed if X is possible
+* so X is impossible if {observed \ {X ^ observed}} != {}
+* => X is compatible with observations if it covers them fully
+*/
 bool ETechEstimator::testBuildTreePossible(int indBuildTree, const set<int>& setObs)
 {
-    for (set<int>::const_iterator it = setObs.begin();
-        it != setObs.end(); ++it)
-    {
-        if (!st.vector_X[indBuildTree].count(*it))
-            return false;
-    }
-    return true;
+	for (set<int>::const_iterator it = setObs.begin();
+		it != setObs.end(); ++it)
+	{
+		if (!st.vector_X[indBuildTree].count(*it))
+			return false;
+	}
+	return true;
 }
 
 /// TODO: move all that in appropriate methods for specific
@@ -518,7 +520,7 @@ void ETechEstimator::useDistribOpenings()
 			if (openingsProbas[0] > openingsProbas[1] && openingsProbas[0] > openingsProbas[2])
 				Macro::Instance().stormFirst = true;
 		}
-		
+
 		if (fearThese.count(2)) // VulturesHarass
 		{
 			TheProducer->produce(2, UnitTypes::Protoss_Observer, (int)(openingsProbas[2]*100));
@@ -551,18 +553,31 @@ void ETechEstimator::useDistribOpenings()
 		{
 			TheProducer->produce(2, UnitTypes::Protoss_Zealot, 60, 2);
 		}
-		if (fearThese.count(1)) // FastDT
+		if (fearThese.count(1) || openingsProbas[1] > 0.18) // FastDT
 		{
 			if (!Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Forge)
 				&& !Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Forge)
 				&& !TheBuilder->willBuild(UnitTypes::Protoss_Forge))
-				TheBuilder->build(UnitTypes::Protoss_Forge, TilePositions::None, true); // quickly build a forge
+			{
+				if (Broodwar->self()->supplyUsed() < 42)
+					TheBuilder->buildOrder(UnitTypes::Protoss_Forge, 21);
+				else
+					TheBuilder->build(UnitTypes::Protoss_Forge, TilePositions::None, true); // quickly build a forge
+			}
 			if ((Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Forge)
 				|| Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Forge))
 				&& builtCannons < 3)
 			{
-				TheBuilder->build(UnitTypes::Protoss_Photon_Cannon, TilePositions::None, true);
-				TheBuilder->build(UnitTypes::Protoss_Photon_Cannon, TilePositions::None, true);
+				if (Broodwar->self()->supplyUsed() < 42)
+				{
+					TheBuilder->build(UnitTypes::Protoss_Photon_Cannon, TilePositions::None, true);
+					TheBuilder->build(UnitTypes::Protoss_Photon_Cannon, TilePositions::None, true);
+				}
+				else
+				{
+					TheBuilder->buildOrder(UnitTypes::Protoss_Photon_Cannon, 25);
+					TheBuilder->buildOrder(UnitTypes::Protoss_Photon_Cannon, 25);
+				}
 				builtCannons += 2;
 			}
 			while (builtCannons < 3 + 2*Macro::Instance().expands) 

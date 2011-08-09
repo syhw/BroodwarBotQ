@@ -12,8 +12,8 @@ ShuttleUnit::~ShuttleUnit()
 
 void ShuttleUnit::micro()
 {
-	if (Broodwar->getFrameCount() - Broodwar->getLatencyFrames() <= _lastClickFrame)
-		return;
+	updateTargetingMe();
+	decideToFlee();
 	/// Emergency drop (not to lose the units)
 	if (unit->getShields() < 2 && unit->getHitPoints() < 40)
 	{
@@ -24,7 +24,8 @@ void ShuttleUnit::micro()
 			return;
 		}
 	}
-	/// TODO complete
+	if (Broodwar->getFrameCount() - Broodwar->getLatencyFrames() <= _lastClickFrame)
+		return;
 	if (unit->getDistance(target) < 51)
 	{
 		for each (Unit* u in unit->getLoadedUnits())
@@ -35,7 +36,12 @@ void ShuttleUnit::micro()
 		}
 	}
 	else
-		clickTarget();
+	{
+		if (_fleeing)
+			flee();
+		else
+			clickTarget();
+	}
 }
 
 void ShuttleUnit::check()

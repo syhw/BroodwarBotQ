@@ -92,6 +92,7 @@ class ETechEstimator : public CSingleton<ETechEstimator>
 		const std::set<int>& setObs);
 public:
 	const std::vector<long double>& getOpeningsProbas() const;
+	bool hasInfered;
 	void onUnitDestroy(BWAPI::Unit* u);
 	void onUnitShow(BWAPI::Unit* u);
 	void onUnitHide(BWAPI::Unit* u);

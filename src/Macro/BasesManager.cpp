@@ -132,17 +132,6 @@ void BasesManager::setFirstGasPop(int pop)
 	firstGasPop = pop;
 }
 
-Base* BasesManager::getHomeBase() const
-{
-	return allBases.front();
-}
-
-Base* BasesManager::getLastExpand() const
-{
-	return allBases.back();
-}
-
-
 const std::set<Base*>& BasesManager::getActiveBases() const
 {
 	return activeBases;

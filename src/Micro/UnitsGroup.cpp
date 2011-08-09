@@ -555,6 +555,10 @@ void UnitsGroup::update()
 						(*it)->switchMode(MODE_FIGHT_A);
 					else
 						(*it)->switchMode(MODE_FIGHT_G);
+#ifdef __DEBUG__
+					Position displayp = (*it)->unit->getPosition();
+					Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Back");
+#endif
 				}
 			}
 		}
@@ -565,7 +569,15 @@ void UnitsGroup::update()
 			{
 				for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
 				{
+#ifdef __DEBUG__
+					Position displayp = (*it)->unit->getPosition();
+					Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Regroup");
+#endif
 					(*it)->target = center;
+					if ((*it)->getType().isFlyer())
+						(*it)->switchMode(MODE_FIGHT_A);
+					else
+						(*it)->switchMode(MODE_FIGHT_G);
 				}
 			}
 			else if (force > 1.5)
@@ -573,6 +585,10 @@ void UnitsGroup::update()
 				// we can be offensive, use our goal target and do what we want
 				for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
 				{
+#ifdef __DEBUG__
+					Position displayp = (*it)->unit->getPosition();
+					Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Offensive");
+#endif
 					// target fixed by the subgoal
 					if ((*it)->getType().isFlyer())
 						(*it)->switchMode(MODE_FIGHT_A);
@@ -592,6 +608,10 @@ void UnitsGroup::update()
 						{
 							units[i]->target = bestPositions[i % bestPositions.size()];
 							units[i]->switchMode(MODE_MOVE);
+#ifdef __DEBUG__
+					Position displayp = units[i]->unit->getPosition();
+					Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Place");
+#endif
 						}
 					}
 					else // we didn't found where to place ourselves, stand our ground
@@ -603,6 +623,10 @@ void UnitsGroup::update()
 								(*it)->switchMode(MODE_FIGHT_A);
 							else
 								(*it)->switchMode(MODE_FIGHT_G);
+#ifdef __DEBUG__
+					Position displayp = (*it)->unit->getPosition();
+					Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Attack");
+#endif
 						}
 					}
 				}
@@ -621,6 +645,10 @@ void UnitsGroup::update()
 								? regions.first : regions.second;
 							(*it)->target = (MapManager::Instance().regionsPFCenters[higherRegion]);
 							(*it)->switchMode(MODE_FIGHT_G);
+#ifdef __DEBUG__
+					Position displayp = (*it)->unit->getPosition();
+					Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Ramp");
+#endif
 						}
 						else
 						{	
@@ -629,6 +657,10 @@ void UnitsGroup::update()
 								(*it)->switchMode(MODE_FIGHT_A);
 							else
 								(*it)->switchMode(MODE_FIGHT_G);
+#ifdef __DEBUG__
+					Position displayp = (*it)->unit->getPosition();
+					Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Attack");
+#endif
 						}
 					}
 				}

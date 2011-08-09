@@ -142,10 +142,20 @@ void Macro::update()
 		else
 			expand();
 	}
-	else if (expands == 1 && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Observer)
-		&& (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Reaver > 1) || Broodwar->self()->completedUnitCount(UnitTypes::Protoss_High_Templar) > 2))
+	else if (expands == 1)
 	{
-		expand();
+		if (wontHave(UnitTypes::Protoss_Robotics_Facility))
+			TheBuilder->build(UnitTypes::Protoss_Robotics_Facility);
+
+		if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Photon_Cannon) + Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Photon_Cannon)
+			+ TheBuilder->willBuild(UnitTypes::Protoss_Photon_Cannon) < 5)
+			TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
+
+		if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Observer)
+			&& (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Reaver > 1) || Broodwar->self()->completedUnitCount(UnitTypes::Protoss_High_Templar) > 2))
+		{
+			expand();
+		}
 	}
 	else if (expands > 1)
 	{

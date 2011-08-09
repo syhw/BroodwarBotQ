@@ -27,6 +27,8 @@ Goal::Goal(int priority, int firstFrame)
 , _priority(priority)
 , _firstFrame(firstFrame)
 , _neededUnits(std::map<UnitType, int>())
+, _unitsGroup(UnitsGroup())
+, _firstActive(0)
 {
 	if (!firstFrame)
 		_firstFrame = Broodwar->getFrameCount();
@@ -38,6 +40,8 @@ Goal::Goal(pSubgoal s, int priority, int firstFrame)
 , _priority(priority)
 , _firstFrame(firstFrame)
 , _neededUnits(std::map<UnitType, int>())
+, _unitsGroup(UnitsGroup())
+, _firstActive(0)
 {
 	addSubgoal(s);
 	if (!firstFrame)
@@ -51,6 +55,8 @@ Goal::Goal(const map<UnitType, int>& nU, pSubgoal s,
 , _priority(priority)
 , _firstFrame(firstFrame)
 , _neededUnits(std::map<UnitType, int>())
+, _unitsGroup(UnitsGroup())
+, _firstActive(0)
 {
 	_neededUnits = nU;
 	addSubgoal(s);
@@ -65,6 +71,8 @@ Goal::Goal(const std::map<BWAPI::UnitType, int>& nU,
 , _priority(priority)
 , _firstFrame(firstFrame)
 , _neededUnits(std::map<UnitType, int>())
+, _unitsGroup(UnitsGroup())
+, _firstActive(0)
 {
 	_neededUnits = nU;
 	if (!firstFrame)
@@ -251,8 +259,12 @@ void Goal::achieve()
  */
 void Goal::check()
 {
+	if (_firstActive && Broodwar->getFrameCount() - _firstActive > 4320) // 3 minutes
+		_status = GS_CANCELED;
 	if (_status == GS_ACHIEVED || _status == GS_CANCELED)
 		return;
+	if (!_firstActive && _status == GS_IN_PROGRESS)
+		_firstActive = Broodwar->getFrameCount();
 	bool and_goals = false;
 	bool res_and = true;
 	bool res_or = false;

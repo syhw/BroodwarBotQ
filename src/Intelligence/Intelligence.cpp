@@ -16,6 +16,7 @@ using namespace BWAPI;
 
 Intelligence::Intelligence()
 : _launchedFirstScoutGoal(false)
+, _launchedFirstExploreGoal(false)
 , enemyRush(false)
 , enemyRace(Races::Unknown)
 , enemyHome(NULL)
@@ -110,7 +111,7 @@ void Intelligence::update()
 		{
 			if (b != enemyHome)
 			{
-				double dist = MapManager::Instance().distBaseToBase(enemyHome, b);
+				double dist = MapManager::Instance().distBaseToBase[enemyHome][b];
 				if (dist > 0.0)
 					enemyBasesOrder.insert(std::make_pair<double, BWTA::BaseLocation*>(dist, b));
 				else
@@ -146,6 +147,7 @@ void Intelligence::update()
 		{
 			GoalManager::Instance().addGoal(pGoal(new ExploreGoal(_enemyBasesOrder.front()->getRegion())));
 			currentlyExploring.insert(_enemyBasesOrder.front()->getRegion());
+			_launchedFirstExploreGoal = true;
 			// push_back(front) + pop_front done one frame later by above code
 		}
 	}
@@ -157,6 +159,14 @@ void Intelligence::update()
 		Broodwar->drawTextMap(b->getPosition().x() - 8, b->getPosition().y() - 8, "%d", cc++);
 	}
 #endif
+
+	if (!_launchedFirstExploreGoal && enemyRush == false && enemyHome != NULL 
+		&& ETechEstimator::Instance().hasInfered
+		&& Broodwar->getFrameCount() > 2500 && maxVector(ETechEstimator::Instance().getOpeningsProbas()) < 0.28)
+	{
+		GoalManager::Instance().addGoal(pGoal(new ExploreGoal(enemyHome->getRegion())));
+		_launchedFirstExploreGoal = true;
+	}
 }
 
 void Intelligence::onUnitCreate(Unit* u)

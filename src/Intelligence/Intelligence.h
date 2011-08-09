@@ -15,6 +15,7 @@ class Intelligence : public CSingleton<Intelligence>
 	Intelligence();
 	~Intelligence();
 	bool _launchedFirstScoutGoal;
+	bool _launchedFirstExploreGoal;
 	std::list<BWTA::BaseLocation*> _enemyBasesOrder; // to be used
 public:
 	std::set<BWTA::Region*> currentlyExploring;

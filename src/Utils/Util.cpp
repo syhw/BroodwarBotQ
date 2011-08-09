@@ -95,6 +95,17 @@ std::vector<double> exponentialDistribution(double lambda, unsigned int bins)
 	return r;
 }
 
+long double maxVector(const std::vector<long double>& t)
+{
+	long double max = -DBL_MAX;
+	for each (long double v in t)
+	{
+		if (v > max)
+			max = v;
+	}
+	return max;
+}
+
 size_t indMax(const std::vector<long double>& t)
 {
 	long double max = -DBL_MAX;

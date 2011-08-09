@@ -49,6 +49,7 @@ protected:
 	std::set<BWAPI::Unit*> _biddedOn;
     int _priority;
     int _firstFrame;
+	int _firstActive;
 	/// Subgoals
 	std::list<pSubgoal> _subgoals;
     /// Status

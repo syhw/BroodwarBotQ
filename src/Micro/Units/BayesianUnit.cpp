@@ -23,6 +23,7 @@
 #include "Micro/Units/TerranGround/MedicUnit.h"
 #include "Micro/Units/ZergFlying/ScourgeUnit.h"
 #include "Micro/Units/ZergFlying/MutaliskUnit.h"
+#include "Macro/BasesManager.h"
 
 // Copyright 2010-2011 <Gabriel Synnaeve> gabriel.synnaeve@gmail.com
 
@@ -31,7 +32,7 @@
 
 #define __NEW_COMPUTE_REPULSE__
 #define __HEURISTICS_IN_FIGHTMOVE__ 1 // level of heuristic(s)
-//#define __OUTER_NON_ATOMIC_DIRV__ // accept to do "non atomic w.r.t. Broodwar directions" moves/clicks (BW pathfinder can be called, drama ensues), useful to pass big buildings
+#define __OUTER_NON_ATOMIC_DIRV__ // accept to do "non atomic w.r.t. Broodwar directions" moves/clicks (BW pathfinder can be called, drama ensues), useful to pass big buildings
 #define __TILES_AROUND__ 2 // atomic = 2
 //#define __OUR_PATHFINDER__
 //#define __EXACT_OBJ__
@@ -1612,6 +1613,8 @@ void BayesianUnit::computeProbs()
 
 void BayesianUnit::selectDir(const Vec& criterium)
 {
+	if (_dirvProb.empty())
+		return;
 #ifdef __SAMPLE_DIR__
 	if (_unitsGroup != NULL && _unitsGroup->size() > 10)
 	{
@@ -2104,6 +2107,16 @@ bool BayesianUnit::dragScarab()
 
 void BayesianUnit::update()
 {
+    if (!unit || !unit->exists()) return;
+	if (unit->isLoaded()) return; // TODO (loaded units are not focus firing and just displaced as potatoes)
+	if (_unitsGroup == NULL)
+	{
+		if (unit->getType().canAttack())
+			unit->attack(TheBasesManager->getAllBases().back()->getBaseLocation()->getPosition());
+		else
+			unit->move(TheBasesManager->getAllBases().back()->getBaseLocation()->getPosition());
+		return;
+	}
 #ifdef __DEBUG__
 	assert(_unitsGroup != NULL);
 	assert(unit != NULL);
@@ -2118,9 +2131,6 @@ void BayesianUnit::update()
 	else
 		Broodwar->drawTextMap(unit->getPosition().x() - 8, unit->getPosition().y() - 10, "\x1FMO");
 #endif
-    if (!unit || !unit->exists()) return;
-	if (_unitsGroup == NULL) return;
-	if (unit->isLoaded()) return; // TODO (loaded units are not focus firing and just displaced as potatoes)
 
     _unitPos = unit->getPosition();
     /// check() for all inherited classes

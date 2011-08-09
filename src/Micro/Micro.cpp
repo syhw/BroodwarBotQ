@@ -163,11 +163,24 @@ void Micro::update()
 					break;
 				}
 			}
-			/*if (!found) 
+		}
+		else
+		{
+			// pushing on his front choke
+			Position toPush = Positions::None;
+			for each (TilePosition tp in MapManager::Instance().getPathFromHomeToSL(Intelligence::Instance().enemyHome))
 			{
-				for each (BWTA::Region* r in BWTA::getRegions())
-					goalManager->addGoal(pGoal(new ExploreGoal(r)));
-			}*/
+				for each (BWTA::Chokepoint* cp in TheBorderManager->getEnemyBorder())
+				{
+					if (cp->getCenter().getApproxDistance(Position(tp)) <= 7*TILE_SIZE)
+					{
+						toPush = Position(tp);
+						break;
+					}
+				}
+			}
+			if (toPush != Positions::None)
+				goalManager->addGoal(pGoal(new AttackGoal(toPush)));
 		}
 	}
 

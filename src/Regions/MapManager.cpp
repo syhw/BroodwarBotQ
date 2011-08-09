@@ -159,7 +159,7 @@ MapManager::MapManager()
 		for each (BWTA::BaseLocation* b2 in BWTA::getBaseLocations())
 		{
 			distBaseToBase[b1].insert(std::make_pair<BWTA::BaseLocation*, double>(b2,
-				BWTA::getGroundDistance(enemyHome->getTilePosition(), b->getTilePosition())));
+				BWTA::getGroundDistance(b1->getTilePosition(), b2->getTilePosition())));
 		}
 	}
 

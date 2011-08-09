@@ -102,7 +102,7 @@ void DefendGoal::check()
 				_biddedOn.erase(bu->unit);
 			}
 		}
-		list<Unit*> toRem;
+		//list<Unit*> toRem;
 		/*while (!_workersOwned.empty()
 			&& (_workersOwned.size() > _eUnits))
 		{
@@ -115,7 +115,7 @@ void DefendGoal::check()
 void DefendGoal::achieve()
 {
 	check(); // TODO mode in update();
-	if (_unitsGroup.getDistance(_defPos) > 40*TILE_SIZE) // TODO 40 magic number
+	/*if (_unitsGroup.getDistance(_threatMiddle) > 40*TILE_SIZE) // TODO 40 magic number
 	{
 		if (_unitsGroup.groupMode != MODE_MOVE)
 			_unitsGroup.switchMode(MODE_MOVE);
@@ -124,8 +124,13 @@ void DefendGoal::achieve()
 	{
 		if (_unitsGroup.groupMode != MODE_FIGHT_G)
 			_unitsGroup.switchMode(MODE_FIGHT_G);
-	}
+	}*/
 	_unitsGroup.update();
+	for each (pBayesianUnit bu in _unitsGroup.units)
+	{
+		if (!bu->isFighting() && bu->unit->getDistance(_threatMiddle) > 15*TILE_SIZE)
+			bu->unit->move(_defPos); // _threatMiddle?
+	}
 }
 
 std::string DefendGoal::getName() const

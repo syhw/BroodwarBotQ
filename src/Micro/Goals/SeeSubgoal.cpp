@@ -1,15 +1,15 @@
 #include <PrecompiledHeader.h>
 #include "SeeSubgoal.h"
 	
-SeeSubgoal::SeeSubgoal(SubgoalLogic l, BWAPI::Position pos)
-: Subgoal(l)
+SeeSubgoal::SeeSubgoal(SubgoalLogic l, UnitsGroup* ug, BWAPI::Position pos)
+: Subgoal(l, ug)
 , _achieved(false)
 , _pos(pos)
 {
 }
 
 SeeSubgoal::SeeSubgoal(const SeeSubgoal &ssg)
-: Subgoal(ssg._logic)
+: Subgoal(ssg._logic, ssg._unitsGroup)
 , _achieved(ssg._achieved)
 , _pos(ssg._pos)
 {

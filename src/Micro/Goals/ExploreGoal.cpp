@@ -18,6 +18,7 @@ void ExploreGoal::needAScoutingUnit()
 ExploreGoal::ExploreGoal(BWTA::Region* region, int priority) 
 : Goal(priority)
 , _region(region)
+, _firstRealized(0)
 {
 	if (region != NULL)
 	{
@@ -33,7 +34,7 @@ ExploreGoal::ExploreGoal(BWTA::Region* region, int priority)
 		//Add a first position to the subgoals
 		Position prevPos = to_see.front();
 		to_see.pop_front();
-		_subgoals.push_back(pSubgoal(new SeeSubgoal(SL_AND, prevPos)));
+		_subgoals.push_back(pSubgoal(new SeeSubgoal(SL_AND, &_unitsGroup, prevPos)));
 
 		Position selectedPos;
 		int size = to_see.size();
@@ -53,7 +54,7 @@ ExploreGoal::ExploreGoal(BWTA::Region* region, int priority)
 			}
 
 			//Create and push the associated Subgoal
-			_subgoals.push_back(pSubgoal(new SeeSubgoal(SL_AND, selectedPos)));
+			_subgoals.push_back(pSubgoal(new SeeSubgoal(SL_AND, &_unitsGroup, selectedPos)));
 			prevPos = selectedPos;
 
 			//Remove this position from to_see
@@ -74,13 +75,57 @@ void ExploreGoal::achieve()
 {
 	if (_status != GS_IN_PROGRESS) // defensive
 		return;
+	if (Intelligence::Instance().enemyRush || (_firstRealized && Broodwar->getFrameCount() - _firstRealized > 1200)) // if we are taking more than 50 sec to explore a region, we're doing it wrong
+	{
+		_status = GS_ACHIEVED;
+		return;
+	}
 	_unitsGroup.switchMode(MODE_SCOUT);
 	check();
 	/// Realize the subgoals IN ORDER (going though the Region)
-	for(std::list<pSubgoal>::iterator it = _subgoals.begin(); it != _subgoals.end(); ++it){
+	for(std::list<pSubgoal>::iterator it = _subgoals.begin(); it != _subgoals.end(); ++it)
+	{
 		if (!((*it)->isRealized()))
 			(*it)->tryToRealize();
+		else if (!_firstRealized) // to unblock/unstuck on bad regions geometry
+			_firstRealized = Broodwar->getFrameCount();
 	}
 	_unitsGroup.update();
 }
 
+
+void ExploreGoal::onOffer(set<Unit*> objects)
+{
+	GoalManager* gm = & GoalManager::Instance();
+	if (_status == GS_WAIT_PRECONDITION || _status == GS_IN_PROGRESS)
+	{
+        for each (Unit* u in objects)
+		{
+			if (_neededUnits.find(u->getType()) != _neededUnits.end()
+				&& _neededUnits[u->getType()] > 0)
+			{
+				_neededUnits[u->getType()] -= 1;
+				TheArbitrator->accept(this, u, _priority);
+				if (gm->getCompletedUnits().find(u) != gm->getCompletedUnits().end())
+				{
+					_unitsGroup.dispatchCompleteUnit(gm->getCompletedUnit(u));
+				}
+				else
+					_incompleteUnits.push_back(u);
+			}
+			else
+			{
+				TheArbitrator->decline(this, u, 0);
+				TheArbitrator->removeBid(this, u);
+				_biddedOn.erase(u);
+			}
+		}
+	}
+	else
+	{
+		TheArbitrator->decline(this, objects, 0);
+		TheArbitrator->removeBid(this, objects);
+        for each (Unit* u in objects)
+			_biddedOn.erase(u);
+	}
+}
