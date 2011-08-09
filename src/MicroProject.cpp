@@ -246,7 +246,9 @@ void MicroAIModule::onSendText(std::string text)
 		return;
     } else if (text=="/euf") // eUnitsFilter
     {
+#ifdef __DEBUG__
         eUnitsFilter->bwOutput();
+#endif
 	} else
 	{
 		Broodwar->printf("You typed '%s'!",text.c_str());

@@ -10,6 +10,7 @@ class BorderManager
     void addMyBase(BWTA::BaseLocation* location);
     void removeMyBase(BWTA::BaseLocation* location);
     const std::set<BWTA::Chokepoint*>& getMyBorder() const;
+    const std::set<BWTA::Region*>& getMyRegions() const;
     const std::set<BWTA::Chokepoint*>& getEnemyBorder() const;
     void update();
   private:

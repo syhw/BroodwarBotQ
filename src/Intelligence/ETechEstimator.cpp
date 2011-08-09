@@ -511,8 +511,8 @@ void ETechEstimator::useDistribOpenings()
 	size_t mostProbable = indMax(openingsProbas);
 	set<size_t> fearThese = supTo(openingsProbas, 0.20);
 #ifdef __BENS_LABELS__
-	int builtCannons = max(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Photon_Cannon) + Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Photon_Cannon)
-		, TheBuilder->willBuild(UnitTypes::Protoss_Photon_Cannon));
+	int builtCannons = Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Photon_Cannon)
+		+ TheBuilder->willBuild(UnitTypes::Protoss_Photon_Cannon); // ~~
 	if (enemyRace == Races::Terran)
 	{
 		if (fearThese.count(0)) // Bio
@@ -553,14 +553,13 @@ void ETechEstimator::useDistribOpenings()
 		{
 			TheProducer->produce(2, UnitTypes::Protoss_Zealot, 60, 2);
 		}
-		if (fearThese.count(1) || openingsProbas[1] > 0.18) // FastDT
+		if (fearThese.count(1) || openingsProbas[1] > 0.15) // FastDT
 		{
 			if (!Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Forge)
-				&& !Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Forge)
 				&& !TheBuilder->willBuild(UnitTypes::Protoss_Forge))
 			{
 				if (Broodwar->self()->supplyUsed() < 42)
-					TheBuilder->buildOrder(UnitTypes::Protoss_Forge, 21);
+					TheBuilder->buildOrder(UnitTypes::Protoss_Forge, 16);
 				else
 					TheBuilder->build(UnitTypes::Protoss_Forge, TilePositions::None, true); // quickly build a forge
 			}
@@ -575,8 +574,8 @@ void ETechEstimator::useDistribOpenings()
 				}
 				else
 				{
-					TheBuilder->buildOrder(UnitTypes::Protoss_Photon_Cannon, 25);
-					TheBuilder->buildOrder(UnitTypes::Protoss_Photon_Cannon, 25);
+					TheBuilder->buildOrder(UnitTypes::Protoss_Photon_Cannon, 19);
+					TheBuilder->buildOrder(UnitTypes::Protoss_Photon_Cannon, 19);
 				}
 				builtCannons += 2;
 			}
@@ -645,7 +644,6 @@ void ETechEstimator::useDistribOpenings()
 		{
 			Macro::Instance().reaverFirst = false; // we will need obs
 			if (!Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Robotics_Facility)
-				&& !Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Robotics_Facility)
 				&& !TheBuilder->willBuild(UnitTypes::Protoss_Robotics_Facility))
 			{
 				TheBuilder->build(UnitTypes::Protoss_Robotics_Facility, TilePositions::None, true);

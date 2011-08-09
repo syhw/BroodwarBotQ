@@ -8,7 +8,7 @@
 
 int round(double a)
 {
-    return int(a + 0.5);
+	return int(a + 0.5);
 }
 
 using namespace BWAPI;
@@ -25,6 +25,8 @@ UnitsGroup::UnitsGroup()
 , _totalMinPrice(0)
 , _totalGasPrice(0)
 , _totalSupply(0)
+, _backFrame(-200)
+, _offensiveFrame(-200)
 , nonFlyers(0)
 , groupMode(MODE_MOVE)
 , _hasDetection(0)
@@ -40,8 +42,9 @@ UnitsGroup::UnitsGroup()
 , readyToAttack(false)
 , nearestChoke(NULL)
 , force(1.0)
+, enemiesDefinedByGoal(false)
 {
-    _eUnitsFilter = & EUnitsFilter::Instance();
+	_eUnitsFilter = & EUnitsFilter::Instance();
 	enemies.clear();
 }
 
@@ -55,10 +58,10 @@ bool comp_i_dist(const i_dist& l, const i_dist& r) { return (r.dist < l.dist); }
 
 void simple_align(std::vector<Position>& from, std::vector<unsigned int>& alignment)
 {
-    for(unsigned int i = 0; i < from.size(); i++)
-    {
-        alignment.push_back(i);
-    }
+	for(unsigned int i = 0; i < from.size(); i++)
+	{
+		alignment.push_back(i);
+	}
 }
 
 /*** 
@@ -67,76 +70,76 @@ from and to are required to be of the same size()
 */
 void mid_based_align(const std::vector<Position>& from, const std::vector<Position>& to, std::vector<unsigned int>& alignment)
 {
-    if (from.empty())
-        return;
-    assert(from.size() != 0);
-    assert(to.size() == from.size());
-    Position from_center;
-    Position to_center;
-    for (unsigned int i = 0; i < to.size(); ++i)
-    {
-        from_center += from[i];
-        to_center += to[i];
-    }
-    from_center.x() /= from.size();
-    from_center.y() /= from.size();
-    to_center.x() /= to.size();
-    to_center.y() /= to.size();
-    std::vector<Vec> v_from_center(from.size(), Vec(0, 0));
-    std::vector<Vec> v_to_center(to.size(), Vec(0, 0));
-    for (unsigned int i = 0; i < to.size(); ++i) 
-    {
-        v_from_center[i] = Vec(from[i] - from_center);
-        v_to_center[i] = Vec(to[i] - to_center);
-    }
+	if (from.empty())
+		return;
+	assert(from.size() != 0);
+	assert(to.size() == from.size());
+	Position from_center;
+	Position to_center;
+	for (unsigned int i = 0; i < to.size(); ++i)
+	{
+		from_center += from[i];
+		to_center += to[i];
+	}
+	from_center.x() /= from.size();
+	from_center.y() /= from.size();
+	to_center.x() /= to.size();
+	to_center.y() /= to.size();
+	std::vector<Vec> v_from_center(from.size(), Vec(0, 0));
+	std::vector<Vec> v_to_center(to.size(), Vec(0, 0));
+	for (unsigned int i = 0; i < to.size(); ++i) 
+	{
+		v_from_center[i] = Vec(from[i] - from_center);
+		v_to_center[i] = Vec(to[i] - to_center);
+	}
 
-    std::set<unsigned int> done_j;
-    if (to.size() < 40) // magic number
-    {
-        for (unsigned int i = 0; i < to.size(); ++i)
-            alignment.push_back(i);
-        std::set<unsigned int> done_i;
-        while (done_j.size() < to.size()) 
-        {
-            double max = -DBL_MAX+1;
-            unsigned int max_i = 0;
+	std::set<unsigned int> done_j;
+	if (to.size() < 40) // magic number
+	{
+		for (unsigned int i = 0; i < to.size(); ++i)
+			alignment.push_back(i);
+		std::set<unsigned int> done_i;
+		while (done_j.size() < to.size()) 
+		{
+			double max = -DBL_MAX+1;
+			unsigned int max_i = 0;
 			unsigned int max_j = 0;
-            for (unsigned int i = 0; i < v_from_center.size(); ++i)
-            {
-                for (unsigned int j = 0; j < v_to_center.size(); ++j)
-                {
-                    if ((done_i.find(i) == done_i.end()) && (done_j.find(j) == done_j.end()) 
-                        && fabs(v_from_center[i].dot(v_to_center[j])) > max)
-                    {
-                        max = v_from_center[i].dot(v_to_center[j]);
-                        max_i = i;
-                        max_j = j;
-                    }
-                }
-            } 
-            alignment[max_i] = max_j;
-            done_i.insert(max_i);
-            done_j.insert(max_j);
-        }
-    } else 
-    {
-        // non optimal, should have one more loop
-        for (unsigned int i = 0; i < v_from_center.size(); ++i)
-        {
-            double max = -DBL_MAX+1;
-            unsigned int max_j;
-            for (unsigned int j = 0; j < v_to_center.size(); ++j)
-            {
-                if ((done_j.find(j) == done_j.end()) && fabs(v_from_center[i].dot(v_to_center[j])) > max)
-                {
-                    max = v_from_center[i].dot(v_to_center[j]);
-                    max_j = j;
-                }
-            }
-            alignment.push_back(max_j);
-            done_j.insert(max_j);
-        } 
-    }
+			for (unsigned int i = 0; i < v_from_center.size(); ++i)
+			{
+				for (unsigned int j = 0; j < v_to_center.size(); ++j)
+				{
+					if ((done_i.find(i) == done_i.end()) && (done_j.find(j) == done_j.end()) 
+						&& fabs(v_from_center[i].dot(v_to_center[j])) > max)
+					{
+						max = v_from_center[i].dot(v_to_center[j]);
+						max_i = i;
+						max_j = j;
+					}
+				}
+			} 
+			alignment[max_i] = max_j;
+			done_i.insert(max_i);
+			done_j.insert(max_j);
+		}
+	} else 
+	{
+		// non optimal, should have one more loop
+		for (unsigned int i = 0; i < v_from_center.size(); ++i)
+		{
+			double max = -DBL_MAX+1;
+			unsigned int max_j;
+			for (unsigned int j = 0; j < v_to_center.size(); ++j)
+			{
+				if ((done_j.find(j) == done_j.end()) && fabs(v_from_center[i].dot(v_to_center[j])) > max)
+				{
+					max = v_from_center[i].dot(v_to_center[j]);
+					max_j = j;
+				}
+			}
+			alignment.push_back(max_j);
+			done_j.insert(max_j);
+		} 
+	}
 }
 
 /***
@@ -144,62 +147,62 @@ void mid_based_align(const std::vector<Position>& from, const std::vector<Positi
 */
 void align(std::vector<Position>& from, std::vector<Position>& to, std::vector<unsigned int>& alignment)
 {
-    std::vector<std::vector<i_dist> > distances;
-    std::vector<std::set<unsigned int> > attempts;
-    std::set<unsigned int> inner_set;
-    for(unsigned int i = 0; i < to.size(); i++) inner_set.insert(i);
-    for(std::vector<BWAPI::Position>::iterator f = from.begin();
-        f != from.end(); f++)
-    {
-        std::vector<i_dist> temp;
-        for(unsigned int ind_to = 0; ind_to < to.size(); ind_to++)
-        {
-            temp.push_back(i_dist(ind_to, (*f).getApproxDistance(to[ind_to])));
-        }
-        //temp.sort();
-        sort(temp.begin(), temp.end(), comp_i_dist); // [0]: further, [size()-1]: closer
+	std::vector<std::vector<i_dist> > distances;
+	std::vector<std::set<unsigned int> > attempts;
+	std::set<unsigned int> inner_set;
+	for(unsigned int i = 0; i < to.size(); i++) inner_set.insert(i);
+	for(std::vector<BWAPI::Position>::iterator f = from.begin();
+		f != from.end(); f++)
+	{
+		std::vector<i_dist> temp;
+		for(unsigned int ind_to = 0; ind_to < to.size(); ind_to++)
+		{
+			temp.push_back(i_dist(ind_to, (*f).getApproxDistance(to[ind_to])));
+		}
+		//temp.sort();
+		sort(temp.begin(), temp.end(), comp_i_dist); // [0]: further, [size()-1]: closer
 
-        distances.push_back(temp);
-        attempts.push_back(inner_set);
-    }
-    for(unsigned int i = 0; i < distances.size(); i++)
-    {
-        for(unsigned int j = 0; j < distances[0].size(); j++)
-        {
-            // TODO
-            // TODO
-            // TODO
-            // TODO
-            // TODO
-            // TODO
-        }
-    }
+		distances.push_back(temp);
+		attempts.push_back(inner_set);
+	}
+	for(unsigned int i = 0; i < distances.size(); i++)
+	{
+		for(unsigned int j = 0; j < distances[0].size(); j++)
+		{
+			// TODO
+			// TODO
+			// TODO
+			// TODO
+			// TODO
+			// TODO
+		}
+	}
 }
 
 #ifdef __DEBUG__
 void UnitsGroup::displayTargets()
 {
-    for each(pBayesianUnit u in units)
-    {
-        if (u->unit->getOrderTarget())
-        {
-            int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
-            int ex = u->unit->getOrderTarget()->getPosition().x(); int ey = u->unit->getOrderTarget()->getPosition().y();
-            BWAPI::Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Orange);
-        
-            if (u->targetEnemy && u->unit->getOrderTarget() != u->targetEnemy)
-            {
-                int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
-                int ex = u->targetEnemy->getPosition().x(); int ey = u->targetEnemy->getPosition().y();
-                BWAPI::Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Blue);
-            }
-            if (u->oorTargetEnemy && u->oorTargetEnemy->exists() && u->oorTargetEnemy->isVisible())
-            {
-                ex = u->oorTargetEnemy->getPosition().x(); int ey = u->oorTargetEnemy->getPosition().y();
-                BWAPI::Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Purple);
-            }
-        }
-    }
+	for each(pBayesianUnit u in units)
+	{
+		if (u->unit->getOrderTarget())
+		{
+			int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
+			int ex = u->unit->getOrderTarget()->getPosition().x(); int ey = u->unit->getOrderTarget()->getPosition().y();
+			BWAPI::Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Orange);
+
+			if (u->targetEnemy && u->unit->getOrderTarget() != u->targetEnemy)
+			{
+				int ux = u->unit->getPosition().x(); int uy = u->unit->getPosition().y();
+				int ex = u->targetEnemy->getPosition().x(); int ey = u->targetEnemy->getPosition().y();
+				BWAPI::Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Blue);
+			}
+			if (u->oorTargetEnemy && u->oorTargetEnemy->exists() && u->oorTargetEnemy->isVisible())
+			{
+				ex = u->oorTargetEnemy->getPosition().x(); int ey = u->oorTargetEnemy->getPosition().y();
+				BWAPI::Broodwar->drawLineMap(ux,uy,ex,ey,Colors::Purple);
+			}
+		}
+	}
 }
 #endif
 
@@ -207,57 +210,57 @@ double UnitsGroup::evaluateForces()
 {
 	if (enemies.empty())
 		return 10000.0;
-    //bool onlyInvisibles = true;
-    int theirMinPrice = 0;
-    int theirGasPrice = 0;
-    int theirSupply = 0; // this is double supply: 1 zergling = 1 supply
-    for (std::map<Unit*, Position>::const_iterator it = enemies.begin();
-        it != enemies.end(); ++it)
-    {
-        UnitType ut = _eUnitsFilter->getViewedUnit(it->first).type;
-        if (ut.isBuilding())
-        {
-            // consider ground defenses only because we have only ground atm
-            if (ut == UnitTypes::Protoss_Photon_Cannon || ut == UnitTypes::Terran_Bunker)
-            {
-                theirMinPrice += 4*ut.mineralPrice();
-            } else if (ut == UnitTypes::Zerg_Sunken_Colony)
-            {
-                theirMinPrice += 4*(ut.mineralPrice() + 50);
-            } else if (ut == UnitTypes::Protoss_Shield_Battery)
-            {
-                theirMinPrice += ut.mineralPrice();
-            }
-            continue;
-        }
+	bool onlyInvisibles = true;
+	int theirMinPrice = 0;
+	int theirGasPrice = 0;
+	int theirSupply = 0; // this is double supply: 1 zergling = 1 supply
+	for (std::map<Unit*, Position>::const_iterator it = enemies.begin();
+		it != enemies.end(); ++it)
+	{
+		UnitType ut = _eUnitsFilter->getViewedUnit(it->first).type;
+		if (ut.isBuilding() && it->first->isCompleted())
+		{
+			// consider ground defenses only because we have only ground atm
+			if (ut == UnitTypes::Protoss_Photon_Cannon || ut == UnitTypes::Terran_Bunker)
+			{
+				theirMinPrice += 4*ut.mineralPrice();
+			} else if (ut == UnitTypes::Zerg_Sunken_Colony)
+			{
+				theirMinPrice += 4*(ut.mineralPrice() + 50);
+			} else if (ut == UnitTypes::Protoss_Shield_Battery)
+			{
+				theirMinPrice += ut.mineralPrice();
+			}
+			continue;
+		}
 		if (ut == UnitTypes::Zerg_Overlord)
 			continue;
-        //if (it->first && it->first->exists() && it->first->isVisible() && it->first->isDetected()
-		//	|| (ut != UnitTypes::Protoss_Dark_Templar && ut != UnitTypes::Zerg_Lurker))
-        //    onlyInvisibles = false;
-        theirMinPrice += ut.mineralPrice();
-        theirGasPrice += ut.gasPrice();
-        theirSupply += ut.supplyRequired();
-        if (ut == UnitTypes::Terran_Siege_Tank_Siege_Mode) // a small boost for sieged tanks
-            theirSupply += ut.supplyRequired();
-        if (_eUnitsFilter->getInvisibleUnits().count(it->first)) // invisibles not detected count double
-        {
-            theirMinPrice += ut.mineralPrice();
-            theirGasPrice += ut.gasPrice();
-            theirSupply += ut.supplyRequired();
-        }
-    }
-    // trying a simple rule: 100 minerals == 4 pop == 75 gaz == 100 pts
-    double ourScore = _totalMinPrice + (4/3)*_totalGasPrice + 25*_totalSupply;
-    double theirScore = theirMinPrice + (4/3)*theirGasPrice + 25*theirSupply;
+		if (it->first && it->first->exists() && it->first->isVisible() && it->first->isDetected()
+			|| (ut != UnitTypes::Protoss_Dark_Templar && ut != UnitTypes::Zerg_Lurker))
+		    onlyInvisibles = false;
+		theirMinPrice += ut.mineralPrice();
+		theirGasPrice += ut.gasPrice();
+		theirSupply += ut.supplyRequired();
+		if (ut == UnitTypes::Terran_Siege_Tank_Siege_Mode) // a small boost for sieged tanks
+			theirSupply += ut.supplyRequired();
+		if (_eUnitsFilter->getInvisibleUnits().count(it->first)) // invisibles not detected count double
+		{
+			theirMinPrice += ut.mineralPrice();
+			theirGasPrice += ut.gasPrice();
+			theirSupply += ut.supplyRequired();
+		}
+	}
+	// trying a simple rule: 100 minerals == 4 pop == 75 gaz == 100 pts
+	double ourScore = _totalMinPrice + (4/3)*_totalGasPrice + 25*_totalSupply;
+	double theirScore = theirMinPrice + (4/3)*theirGasPrice + 25*theirSupply;
 	if (theirScore < 50.0)
 		theirScore = 50.0;
-    if (enemiesAltitude > groupAltitude)
-        theirScore *= 1.5;
-    //if (onlyInvisibles && !_hasDetection)
-    //    return 0.01;
-    //else
-        return ourScore/theirScore;
+	if (enemiesAltitude > groupAltitude)
+		theirScore *= 1.5;
+	if (onlyInvisibles && !_hasDetection)
+	    return 0.01;
+	else
+		return ourScore/theirScore;
 }
 
 /// completely hacky
@@ -279,8 +282,8 @@ std::vector<Position> UnitsGroup::findRangePositions()
 	int iter = 0;
 	while (iter < 50 &&
 		(!MapManager::Instance().groundDamages[p1.x()/TILE_SIZE + Broodwar->mapWidth()*p1.y()/TILE_SIZE]
-	    && !MapManager::Instance().groundDamages[p2.x()/TILE_SIZE + Broodwar->mapWidth()*p2.y()/TILE_SIZE]
-		&& !MapManager::Instance().groundDamages[p3.x()/TILE_SIZE + Broodwar->mapWidth()*p3.y()/TILE_SIZE]))
+	&& !MapManager::Instance().groundDamages[p2.x()/TILE_SIZE + Broodwar->mapWidth()*p2.y()/TILE_SIZE]
+	&& !MapManager::Instance().groundDamages[p3.x()/TILE_SIZE + Broodwar->mapWidth()*p3.y()/TILE_SIZE]))
 	{
 		dir1.normalize();
 		dir3.normalize();
@@ -347,34 +350,34 @@ void BasicUnitsGroup::update()
 {
 	for (std::vector<pBayesianUnit>::const_iterator it = units.begin();
 		it != units.end(); ++it)
-	    (*it)->update();
+		(*it)->update();
 }
 
 void UnitsGroup::updateArrivingUnits()
 {
-    if (!arrivingUnits.empty())
-    {
-        if (units.size() <= 3)
-        {
-            for (std::list<pBayesianUnit>::iterator it = arrivingUnits.begin();
-                it != arrivingUnits.end(); )
-            {
-                units.push_back(*it);
-                arrivingUnits.erase(it++);
-            }
-        }
-        else
-        {
-            for (std::list<pBayesianUnit>::iterator it = arrivingUnits.begin();
-                it != arrivingUnits.end(); )
-            {
-                if ((*it)->unit->getPosition().getApproxDistance(center) < __MAX_DISTANCE_TO_GROUP__)
-                {
+	if (!arrivingUnits.empty())
+	{
+		if (units.size() <= 3)
+		{
+			for (std::list<pBayesianUnit>::iterator it = arrivingUnits.begin();
+				it != arrivingUnits.end(); )
+			{
+				units.push_back(*it);
+				arrivingUnits.erase(it++);
+			}
+		}
+		else
+		{
+			for (std::list<pBayesianUnit>::iterator it = arrivingUnits.begin();
+				it != arrivingUnits.end(); )
+			{
+				if ((*it)->unit->getPosition().getApproxDistance(center) < __MAX_DISTANCE_TO_GROUP__)
+				{
 					activeUnit(*it);
-                    arrivingUnits.erase(it++);
-                }
-                else
-                {
+					arrivingUnits.erase(it++);
+				}
+				else
+				{
 					// we want them to merge with us, not to go alone to the groupTargetPosition
 					// but they can interpolate our position a little before tracking
 					// very dumb small heuristic (could be a real interpolation)
@@ -417,43 +420,43 @@ void UnitsGroup::updateArrivingUnits()
 					else
 						(*it)->target = center;
 					(*it)->update();
-                    ++it;
-                }
-            }
-        }
-    }
+					++it;
+				}
+			}
+		}
+	}
 }
 
 void UnitsGroup::chooseLeadingUnit()
 {
-    leadingUnit = units.front();
-    for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
-    { 
+	leadingUnit = units.front();
+	for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+	{ 
 		UnitType ut = (*it)->unit->getType();
 		if (ut.isFlyer() || !ut.canAttack())
-            continue;
+			continue;
 #ifdef __LEADING_UNIT_BY_SIZE_HP__
-        if ((leadingUnit->unit->getType().size() < ut.size() 
-            || ( leadingUnit->unit->getType().size() == ut.size() && 
-                 leadingUnit->unit->getDistance(center) > (*it)->unit->getDistance(center) )) && (leadingUnit->unit->getHitPoints() + leadingUnit->unit->getShields() > 100)
-            )
-            leadingUnit = *it;
+		if ((leadingUnit->unit->getType().size() < ut.size() 
+			|| ( leadingUnit->unit->getType().size() == ut.size() && 
+			leadingUnit->unit->getDistance(center) > (*it)->unit->getDistance(center) )) && (leadingUnit->unit->getHitPoints() + leadingUnit->unit->getShields() > 100)
+			)
+			leadingUnit = *it;
 #else
 		/// take the closest unit to the target which has the closest attack range
 		if (((ppath.size() > 2 && (*it)->unit->getDistance(ppath[2]) < leadingUnit->unit->getDistance(ppath[2]))
 			|| (ppath.size() > 1 && (*it)->unit->getDistance(ppath[1]) < leadingUnit->unit->getDistance(ppath[1]))
-		    || (!ppath.empty() && (*it)->unit->getDistance(ppath[0]) < leadingUnit->unit->getDistance(ppath[0]))
+			|| (!ppath.empty() && (*it)->unit->getDistance(ppath[0]) < leadingUnit->unit->getDistance(ppath[0]))
 			|| (ppath.empty() && (*it)->unit->getDistance(groupTargetPosition) < leadingUnit->unit->getDistance(groupTargetPosition)))
 			&& ut.groundWeapon().maxRange() <= leadingUnit->unit->getType().groundWeapon().maxRange())
 			leadingUnit = *it;
 #endif
-    }
-    if (leadingUnit != NULL && leadingUnit->unit->exists()) // defensive prog
-    {
-        leadingUnit->updatePPath();
-        if (!leadingUnit->getPPath().empty())
-            ppath = leadingUnit->getPPath();
-    }
+	}
+	if (leadingUnit != NULL && leadingUnit->unit->exists()) // defensive prog
+	{
+		leadingUnit->updatePPath();
+		if (!leadingUnit->getPPath().empty())
+			ppath = leadingUnit->getPPath();
+	}
 }
 
 void UnitsGroup::updateOurStats()
@@ -461,29 +464,29 @@ void UnitsGroup::updateOurStats()
 	int oldTotalHP = _totalHP;
 
 	isFighting = false;
-    _totalHP = 0;
+	_totalHP = 0;
 	_totalMinPrice = 0;
 	_totalGasPrice = 0;
 	_totalSupply = 0;
-    _maxRange = -1.0;
+	_maxRange = -1.0;
 	_hasDetection = false;
-    for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
-    {
+	for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+	{
 		if ((*it)->getType() == UnitTypes::Protoss_Observer)
 			_hasDetection = true;
 		if ((*it)->isFighting())
 			isFighting = true;
-        _totalHP += (*it)->unit->getHitPoints();
+		_totalHP += (*it)->unit->getHitPoints();
 		_totalHP += (*it)->unit->getShields();
 		UnitType ut = (*it)->unit->getType();
 		_totalMinPrice += ut.mineralPrice();
 		_totalGasPrice += ut.gasPrice();
 		_totalSupply += ut.supplyRequired();
-        double tmp_max = max(max(ut.groundWeapon().maxRange(), ut.airWeapon().maxRange()), 
-            ut.sightRange()); // TODO: upgrades
-        if (tmp_max > _maxRange)
-            _maxRange = tmp_max;
-    }
+		double tmp_max = max(max(ut.groundWeapon().maxRange(), ut.airWeapon().maxRange()), 
+			ut.sightRange()); // TODO: upgrades
+		if (tmp_max > _maxRange)
+			_maxRange = tmp_max;
+	}
 
 	/// Hack/Experimental++
 	if (oldTotalHP - _totalHP > 150)
@@ -495,7 +498,7 @@ void UnitsGroup::updateOurStats()
 void UnitsGroup::update()
 {
 #ifdef __DEBUG__
-    clock_t start = clock();
+	clock_t start = clock();
 #endif
 	if (units.empty())
 		return;
@@ -504,7 +507,7 @@ void UnitsGroup::update()
 	updateArrivingUnits();
 
 	/// Update the center of the group
-    updateCenter(); // the center will drift towards the arriving units TOFIX TODO
+	updateCenter(); // the center will drift towards the arriving units TOFIX TODO
 
 	/// Choose a non flying leadingUnit
 	chooseLeadingUnit();
@@ -512,14 +515,17 @@ void UnitsGroup::update()
 	//// Update maxRange and _totalHP
 	if (Broodwar->getFrameCount() % 13)
 		updateOurStats();
-    /*** TODO BUG IN SquareFormation TODO TODO TODO
-    if (contactUnits)
-        _alignFormation = false;
-    else
-        _alignFormation = true;*/
+	/*** TODO BUG IN SquareFormation TODO TODO TODO
+	if (contactUnits)
+	_alignFormation = false;
+	else
+	_alignFormation = true;*/
 
-	/// Update nearby enemy units from eUnitsFilter (SLOW)
-	updateNearbyEnemyUnitsFromFilter(center, maxRadius + _maxRange + 92); // possibly hidden units, could be taken from onUnitsShow/View asynchronously for more efficiency
+	if (!enemiesDefinedByGoal)
+	{
+		/// Update nearby enemy units from eUnitsFilter (SLOW)
+		updateNearbyEnemyUnitsFromFilter(center, maxRadius + _maxRange + 92); // possibly hidden units, could be taken from onUnitsShow/View asynchronously for more efficiency
+	}
 
 	/// Update enemiesCenter / enemiesAltitude
 	updateEnemiesCenter();
@@ -528,7 +534,7 @@ void UnitsGroup::update()
 		readyToAttack = false;
 		suicide = false;
 	}
-	
+
 	if (groupMode == MODE_SCOUT)
 	{
 		for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
@@ -539,8 +545,10 @@ void UnitsGroup::update()
 	if (!enemies.empty() && groupMode != MODE_SCOUT) /// We fight, we'll see later for the goals, BayesianUnits switchMode automatically if enemies is not empty()
 	{
 		force = evaluateForces();
-		if (force < 0.8 && !suicide)
+		if (Broodwar->getFrameCount() - _backFrame < 240 || force < 0.8 && !suicide) // take decisions for 10 seconds, renewable
 		{
+			if (Broodwar->getFrameCount() - _backFrame >= 240)
+				_backFrame = Broodwar->getFrameCount();
 			// strategic withdrawal
 			for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
 			{
@@ -564,24 +572,10 @@ void UnitsGroup::update()
 		}
 		else
 		{
-			if (center.isValid() && Broodwar->isWalkable(center.x()/8, center.y()/8)
-				&& stdDevRadius > (double)units.size() * (2.0/3.0) * TILE_SIZE)
+			if (Broodwar->getFrameCount() - _offensiveFrame < 240 || force > 1.5)
 			{
-				for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
-				{
-#ifdef __DEBUG__
-					Position displayp = (*it)->unit->getPosition();
-					Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Regroup");
-#endif
-					(*it)->target = center;
-					if ((*it)->getType().isFlyer())
-						(*it)->switchMode(MODE_FIGHT_A);
-					else
-						(*it)->switchMode(MODE_FIGHT_G);
-				}
-			}
-			else if (force > 1.5)
-			{
+				if (Broodwar->getFrameCount() - _offensiveFrame >= 240)
+					_offensiveFrame = Broodwar->getFrameCount();
 				// we can be offensive, use our goal target and do what we want
 				for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
 				{
@@ -609,8 +603,8 @@ void UnitsGroup::update()
 							units[i]->target = bestPositions[i % bestPositions.size()];
 							units[i]->switchMode(MODE_MOVE);
 #ifdef __DEBUG__
-					Position displayp = units[i]->unit->getPosition();
-					Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Place");
+							Position displayp = units[i]->unit->getPosition();
+							Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Place");
 #endif
 						}
 					}
@@ -624,8 +618,8 @@ void UnitsGroup::update()
 							else
 								(*it)->switchMode(MODE_FIGHT_G);
 #ifdef __DEBUG__
-					Position displayp = (*it)->unit->getPosition();
-					Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Attack");
+							Position displayp = (*it)->unit->getPosition();
+							Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Attack");
 #endif
 						}
 					}
@@ -646,8 +640,8 @@ void UnitsGroup::update()
 							(*it)->target = (MapManager::Instance().regionsPFCenters[higherRegion]);
 							(*it)->switchMode(MODE_FIGHT_G);
 #ifdef __DEBUG__
-					Position displayp = (*it)->unit->getPosition();
-					Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Ramp");
+							Position displayp = (*it)->unit->getPosition();
+							Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Ramp");
 #endif
 						}
 						else
@@ -658,8 +652,8 @@ void UnitsGroup::update()
 							else
 								(*it)->switchMode(MODE_FIGHT_G);
 #ifdef __DEBUG__
-					Position displayp = (*it)->unit->getPosition();
-					Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Attack");
+							Position displayp = (*it)->unit->getPosition();
+							Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Attack");
 #endif
 						}
 					}
@@ -673,59 +667,60 @@ void UnitsGroup::update()
 	clock_t finish = clock();
 	double duration = (double)(finish - start) / CLOCKS_PER_SEC;
 	if (duration > 0.040) 
-        Broodwar->printf( "UnitsGroup::update() took %2.5f seconds\n", duration);
-    Broodwar->drawCircleMap((int)center.x(), (int)center.y(), (int)maxRadius + (int)_maxRange +  32, Colors::Yellow);
+		Broodwar->printf( "UnitsGroup::update() took %2.5f seconds\n", duration);
+	Broodwar->drawCircleMap((int)center.x(), (int)center.y(), (int)maxRadius + (int)_maxRange +  32, Colors::Yellow);
+	Broodwar->drawCircleMap((int)center.x(), (int)center.y(), (int)stdDevRadius, Colors::Orange);
 #endif
 
 	/// Update BayesianUnits
-    for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
-			(*it)->update();
+	for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
+		(*it)->update();
 
 	/// Merge Templars if needed
-    templarMergingStuff();
+	templarMergingStuff();
 }
 
 void UnitsGroup::move(BWAPI::Position& p)
 {
 	groupTargetPosition = p;
-    for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); it++)
-        (*it)->target = p;
+	for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); it++)
+		(*it)->target = p;
 }
 
 void UnitsGroup::formation(pFormation f)
 {
-    if (units.empty())
-        return;
+	if (units.empty())
+		return;
 	groupTargetPosition = f->center.toPosition();
-    std::vector<BWAPI::Position> from;
-    for(std::vector<pBayesianUnit>::iterator it = units.begin(); it != units.end(); it++)
-    {
-        from.push_back((*it)->unit->getPosition());
-    }
+	std::vector<BWAPI::Position> from;
+	for(std::vector<pBayesianUnit>::iterator it = units.begin(); it != units.end(); it++)
+	{
+		from.push_back((*it)->unit->getPosition());
+	}
 
-    f->computeToPositions(units);
+	f->computeToPositions(units);
 
-    /*** TODO BUG IN SquareFormation TODO TODO TODOif (_alignFormation)
-    {*/
-        const std::vector<BWAPI::Position>& to = f->end_positions;
-		if (to.size() < units.size())
-			return;
-        std::vector<unsigned int> alignment; // alignment[from_pos] = to_pos 
-        // align(from, to, alignment);// TODO min crossing || fastest
-        // simple_align(from, alignment);
-        mid_based_align(from, to, alignment);
-        for (unsigned int i = 0; i < units.size(); i++)
-        {
-            units[i]->target = to[alignment[i]];
-        }
-    /*** TODO BUG IN SquareFormation TODO TODO TODO}
-    else
-    {
-        for (unsigned int i = 0; i < units.size(); i++)
-        {
-            units[i]->target = f->end_positions[i];
-        }
-    }*/
+	/*** TODO BUG IN SquareFormation TODO TODO TODOif (_alignFormation)
+	{*/
+	const std::vector<BWAPI::Position>& to = f->end_positions;
+	if (to.size() < units.size())
+		return;
+	std::vector<unsigned int> alignment; // alignment[from_pos] = to_pos 
+	// align(from, to, alignment);// TODO min crossing || fastest
+	// simple_align(from, alignment);
+	mid_based_align(from, to, alignment);
+	for (unsigned int i = 0; i < units.size(); i++)
+	{
+		units[i]->target = to[alignment[i]];
+	}
+	/*** TODO BUG IN SquareFormation TODO TODO TODO}
+	else
+	{
+	for (unsigned int i = 0; i < units.size(); i++)
+	{
+	units[i]->target = f->end_positions[i];
+	}
+	}*/
 
 }
 
@@ -733,16 +728,16 @@ void UnitsGroup::onUnitDestroy(Unit* u)
 {
 	if (units.empty())
 		return;
-    if (u->getPlayer() == Broodwar->self())
-        giveUpControl(u);
-    else
-	    unitDamages.left.erase(u); // remove from the focus fire bimap
+	if (u->getPlayer() == Broodwar->self())
+		giveUpControl(u);
+	else
+		unitDamages.left.erase(u); // remove from the focus fire bimap
 }
 
 void UnitsGroup::onUnitShow(Unit* u)
 {
-    if (u->getPlayer() == Broodwar->enemy() && u->isDetected()) //(!u->getType().isBuilding())
-        unitDamages.insert(UnitDmg(u, Dmg(0, u, u->getHitPoints() + u->getShields())));
+	if (u->getPlayer() == Broodwar->enemy() && u->isDetected()) //(!u->getType().isBuilding())
+		unitDamages.insert(UnitDmg(u, Dmg(0, u, u->getHitPoints() + u->getShields())));
 }
 
 void UnitsGroup::onUnitHide(Unit* u)
@@ -751,7 +746,7 @@ void UnitsGroup::onUnitHide(Unit* u)
 
 double UnitsGroup::getDistance(BWAPI::Unit* u) const
 {
-    return u->getDistance(center);
+	return u->getDistance(center);
 }
 
 double UnitsGroup::getDistance(BWAPI::Position p) const
@@ -762,136 +757,138 @@ double UnitsGroup::getDistance(BWAPI::Position p) const
 void UnitsGroup::activeUnit(pBayesianUnit bu)
 {
 	bu->switchMode(groupMode);
-    units.push_back(bu);
+	units.push_back(bu);
 }
 
 void UnitsGroup::dispatchCompleteUnit(pBayesianUnit bu)
 {
+	if (bu == NULL || bu->unit == NULL || !bu->unit->exists())
+		return;
 	bu->setUnitsGroup(this);
 	if (!bu->getType().isFlyer()) // ugly
 		++nonFlyers;
 	if (bu->unit->getPosition().getApproxDistance(center) < __MAX_DISTANCE_TO_GROUP__ || units.empty())
 		activeUnit(bu);
-    else
-    {
+	else
+	{
 		if (bu->getType().canAttack())
-	        bu->unit->attack(center);
+			bu->unit->attack(center);
 		else
-	        bu->unit->move(center);
-        arrivingUnits.push_back(bu);
-    }
+			bu->unit->move(center);
+		arrivingUnits.push_back(bu);
+	}
 }
 
 bool UnitsGroup::removeUnit(Unit* u)
 {
-    for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
-        if ((*it)->unit == u)
-        {
+	for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
+		if ((*it)->unit == u)
+		{
 			(*it)->dettachGroup();
-            units.erase(it);
+			units.erase(it);
 			if (!u->getType().isFlyer()) // ugly
 				--nonFlyers;
 			return true;
-        }
-	return false;
+		}
+		return false;
 }
 
 bool UnitsGroup::removeArrivingUnit(Unit* u)
 {
 	for (std::list<pBayesianUnit>::const_iterator it = arrivingUnits.begin();
 		it != arrivingUnits.end(); ++it)
-        if ((*it)->unit == u)
-        {
-            arrivingUnits.erase(it);
+		if ((*it)->unit == u)
+		{
+			arrivingUnits.erase(it);
 			if (!u->getType().isFlyer()) // ugly
 				--nonFlyers;
 			return true;
-        }
-	return false;
+		}
+		return false;
 }
 
 void UnitsGroup::giveUpControl(Unit* u)
 {
 	removeArrivingUnit(u);
 	removeUnit(u);
-    if (u->getType() == UnitTypes::Protoss_Observer)
-    {
-        _hasDetection = false;
-        for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
-            if ((*it)->unit->getType() == UnitTypes::Protoss_Observer)
-            {
-                _hasDetection = true;
-                break;
-            }
-    }
+	if (u->getType() == UnitTypes::Protoss_Observer)
+	{
+		_hasDetection = false;
+		for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
+			if ((*it)->unit->getType() == UnitTypes::Protoss_Observer)
+			{
+				_hasDetection = true;
+				break;
+			}
+	}
 }
 
 bool BasicUnitsGroup::emptyUnits()
 {
-    return units.empty();
+	return units.empty();
 }
 
 int UnitsGroup::getTotalHP() const
 {
-    return _totalHP;
+	return _totalHP;
 }
 
 std::vector<pBayesianUnit>* UnitsGroup::getUnits()
 {
-    return &units;
+	return &units;
 }
 
 void UnitsGroup::updateNearbyEnemyUnitsFromFilter(BWAPI::Position p, double radius)
 {
 	// TODO Use a Quadtree (or use BWAPI's getUnitsInRadius, which uses a Quadtree)
-    enemies.clear();
-    // have units that have been seek like units on cliffs or lurkers before burrowing (for instance)
-    for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = _eUnitsFilter->getViewedUnits().begin();
-        it != _eUnitsFilter->getViewedUnits().end(); ++it)
-    {
-        if (it->second.position.getApproxDistance(p) <= radius)
-            enemies.insert(std::make_pair<Unit*, Position>(it->first, it->second.position));
-    }
+	enemies.clear();
+	// have units that have been seek like units on cliffs or lurkers before burrowing (for instance)
+	for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = _eUnitsFilter->getViewedUnits().begin();
+		it != _eUnitsFilter->getViewedUnits().end(); ++it)
+	{
+		if (it->second.position.getApproxDistance(p) <= radius)
+			enemies.insert(std::make_pair<Unit*, Position>(it->first, it->second.position));
+	}
 }
 
 const BayesianUnit& UnitsGroup::operator[](ptrdiff_t i)
 {
-    return *(units[i]);
+	return *(units[i]);
 }
 
 #ifndef __RELEASE_OPTIM__
 void UnitsGroup::display()
 {
-    Broodwar->drawCircle(CoordinateType::Map, center.x(), center.y(), 8, Colors::Green);
-    for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); it++)
-    {
-        Unit* unit = (*it)->unit;
-        Position target = (*it)->target;
+	Broodwar->drawCircle(CoordinateType::Map, center.x(), center.y(), 8, Colors::Green);
+	for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); it++)
+	{
+		Unit* unit = (*it)->unit;
+		Position target = (*it)->target;
 
-        // Attack range
-        //Broodwar->drawCircle( CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), unit->getType().groundWeapon()->maxRange(), Colors::Red);
+		// Attack range
+		//Broodwar->drawCircle( CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), unit->getType().groundWeapon()->maxRange(), Colors::Red);
 
-        // Target
-        if( true)//unit->getPosition().getApproxDistance( target) < 200)
-        {
-            Broodwar->drawCircle( CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), 5, Colors::Cyan, true);
-            Broodwar->drawLine( CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), target.x(), target.y(), Colors::Cyan);
-            Broodwar->drawCircle( CoordinateType::Map, target.x(), target.y(), 5, Colors::Cyan, true);
-        }
-    }
+		// Target
+		if( true)//unit->getPosition().getApproxDistance( target) < 200)
+		{
+			Broodwar->drawCircle( CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), 5, Colors::Cyan, true);
+			Broodwar->drawLine( CoordinateType::Map, unit->getPosition().x(), unit->getPosition().y(), target.x(), target.y(), Colors::Cyan);
+			Broodwar->drawCircle( CoordinateType::Map, target.x(), target.y(), 5, Colors::Cyan, true);
+		}
+	}
 
 	//TOUNCOMMENT when formation for all units group accomplished
-//    for (std::list<pGoal>::iterator it = goals.begin(); it != goals.end(); it++)
-//    {
-//        Broodwar->drawCircle( CoordinateType::Map, (int)((*it)->formation->center.x), (int)((*it)->formation->center.y), 5, Colors::White, true);
-//    }
-	
+	//    for (std::list<pGoal>::iterator it = goals.begin(); it != goals.end(); it++)
+	//    {
+	//        Broodwar->drawCircle( CoordinateType::Map, (int)((*it)->formation->center.x), (int)((*it)->formation->center.y), 5, Colors::White, true);
+	//    }
+
 }
 #endif
 
 int BasicUnitsGroup::size() const
 {
-    return units.size();
+	return units.size();
 }
 
 void UnitsGroup::updateCenter()
@@ -899,54 +896,54 @@ void UnitsGroup::updateCenter()
 #ifdef __DEBUG__
 	assert(this != NULL);
 #endif
-    if (units.empty())
-        return;
-    // update center
-    center = Position(0, 0);
-    groupAltitude = 0;
-    for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
-    {
+	if (units.empty())
+		return;
+	// update center
+	center = Position(0, 0);
+	groupAltitude = 0;
+	for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
+	{
 		if (groupMode == MODE_FIGHT_G || groupMode == MODE_FIGHT_A)
 		{
 			if ((*it)->isFighting() || center == Position(0, 0))
 			{
-		        center += (*it)->unit->getPosition();
-		        if (!(*it)->unit->getType().isFlyer())
-		            groupAltitude += Broodwar->getGroundHeight(TilePosition((*it)->unit->getPosition()));
+				center += (*it)->unit->getPosition();
+				if (!(*it)->unit->getType().isFlyer())
+					groupAltitude += Broodwar->getGroundHeight(TilePosition((*it)->unit->getPosition()));
 			}
 		}
 		else
 		{
-	        center += (*it)->unit->getPosition();
-	        if (!(*it)->unit->getType().isFlyer())
-	            groupAltitude += Broodwar->getGroundHeight(TilePosition((*it)->unit->getPosition()));
+			center += (*it)->unit->getPosition();
+			if (!(*it)->unit->getType().isFlyer())
+				groupAltitude += Broodwar->getGroundHeight(TilePosition((*it)->unit->getPosition()));
 		}
-    }
-    center.x() /= units.size();
-    center.y() /= units.size();
+	}
+	center.x() /= units.size();
+	center.y() /= units.size();
 #ifdef __DEBUG__
 	assert(center.isValid());
 #endif
 	if (!center.isValid())  // TODO remove
 		center.makeValid(); // TODO remove
 
-    groupAltitude = round((double)groupAltitude / units.size());
-    if (nearestChoke != NULL)
-        distToNearestChoke = nearestChoke->getCenter().getApproxDistance(center);
-    if ((!nearestChoke || distToNearestChoke > 8*TILE_SIZE))
-        nearestChoke = BWTA::getNearestChokepoint(center);
+	groupAltitude = round((double)groupAltitude / units.size());
+	if (nearestChoke != NULL)
+		distToNearestChoke = nearestChoke->getCenter().getApproxDistance(center);
+	if ((!nearestChoke || distToNearestChoke > 8*TILE_SIZE))
+		nearestChoke = BWTA::getNearestChokepoint(center);
 
-    // update stdDevRadius and maxRadius
-    maxRadius = -1.0;
-    double sum = 0.0;
-    for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
-    {
-        double dist = center.getApproxDistance((*it)->unit->getPosition());
-        if (dist > maxRadius)
-            maxRadius = dist;
-        sum += (dist * dist);
-    }
-    stdDevRadius = sqrt((1/units.size()) * sum); // 1/(units.size() - 1) for the sample std dev
+	// update stdDevRadius and maxRadius
+	maxRadius = -1.0;
+	double sum = 0.0;
+	for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
+	{
+		double dist = center.getApproxDistance((*it)->unit->getPosition());
+		if (dist > maxRadius)
+			maxRadius = dist;
+		sum += (dist * dist);
+	}
+	stdDevRadius = sqrt((1/units.size()) * sum); // 1/(units.size() - 1) for the sample std dev
 
 	/// update the distToTarget with the new center by using precomputer pathfinding distances
 	if (groupTargetPosition == TilePositions::None)
@@ -966,21 +963,22 @@ void UnitsGroup::updateCenter()
 
 void UnitsGroup::updateEnemiesCenter()
 {
-    if (enemies.size () != 0)
-    {
+	if (enemies.size () != 0)
+	{
 		int staticUnits = 0;
 		int nonStaticUnits = 0;
-        enemiesCenter = Position(0, 0);
-        enemiesAltitude = 0;
-        for (std::map<Unit*, Position>::const_iterator it = enemies.begin();
-            it != enemies.end(); ++it)
-        {
-            enemiesCenter += it->second;
-            if (!(it->first->getType().isFlyer()))
-                enemiesAltitude += BWAPI::Broodwar->getGroundHeight(TilePosition(it->second));
-			if (it->first->getType().isBuilding())
-				++staticUnits;
-			else if (it->first->getType() == UnitTypes::Terran_Siege_Tank_Siege_Mode)
+		enemiesCenter = Position(0, 0);
+		enemiesAltitude = 0;
+		for (std::map<Unit*, Position>::const_iterator it = enemies.begin();
+			it != enemies.end(); ++it)
+		{
+			enemiesCenter += it->second;
+			if (!(it->first->getType().isFlyer()))
+				enemiesAltitude += BWAPI::Broodwar->getGroundHeight(TilePosition(it->second));
+			//if (it->first->getType().isBuilding())
+			//	++staticUnits;
+			//else 
+			if (it->first->getType() == UnitTypes::Terran_Siege_Tank_Siege_Mode)
 				++staticUnits;
 			else if (it->first->getType() == UnitTypes::Terran_Siege_Tank_Tank_Mode)
 				++nonStaticUnits;
@@ -991,32 +989,32 @@ void UnitsGroup::updateEnemiesCenter()
 				else
 					++nonStaticUnits;
 			}
-        }
-        enemiesCenter.x() /= enemies.size();
-        enemiesCenter.y() /= enemies.size();
-        if (!enemiesCenter.isValid())
-            enemiesCenter.makeValid();
-        enemiesAltitude = round((double)enemiesAltitude / enemies.size());
-		if (staticUnits > 1)
+		}
+		enemiesCenter.x() /= enemies.size();
+		enemiesCenter.y() /= enemies.size();
+		if (!enemiesCenter.isValid())
+			enemiesCenter.makeValid();
+		enemiesAltitude = round((double)enemiesAltitude / enemies.size());
+		if (staticUnits > 1 && nonStaticUnits > 2)
 			enemyStatic = staticUnits > 2*nonStaticUnits;
 		else
-		    enemyStatic = false;
-    }
+			enemyStatic = false; // if there are only static units, we don't want to place but attack right now
+	}
 }
 
 Position UnitsGroup::getCenter() const
 {
-    return center;
+	return center;
 }
 
 #ifndef __RELEASE_OPTIM__
 void UnitsGroup::selectedUnits(std::set<pBayesianUnit>& u)
 {
-    for (std::vector<pBayesianUnit>::iterator i=this->units.begin(); i!=this->units.end(); ++i)
-    {
-        if ((*i)->unit->isSelected())
-            u.insert(*i);
-    }
+	for (std::vector<pBayesianUnit>::iterator i=this->units.begin(); i!=this->units.end(); ++i)
+	{
+		if ((*i)->unit->isSelected())
+			u.insert(*i);
+	}
 }
 #endif
 
@@ -1035,52 +1033,52 @@ void UnitsGroup::idle()
 
 void UnitsGroup::signalMerge(Unit* u)
 {
-    if (u->getType() == UnitTypes::Protoss_High_Templar)
-    {
-        _mergersHT.insert(u);
-    }
+	if (u->getType() == UnitTypes::Protoss_High_Templar)
+	{
+		_mergersHT.insert(u);
+	}
 }
 
 void UnitsGroup::templarMergingStuff()
 {
-    if (_mergersHT.size() < 2)
-        return;
-    Unit* tomerge = NULL;
-    Unit* closer = NULL;
-    double distance = DBL_MAX; 
-    // stupid, suboptimal, heuristic
-    for (std::set<Unit*>::iterator it = _mergersHT.begin();
-        it != _mergersHT.end(); )
-    {
-        if (!(*it)->exists())
-        {
-            _mergersHT.erase(it++);
-            continue;
-        }
-        else if (!tomerge)
-            tomerge = *it;
-        else
-        {
-            double tmp = (*it)->getDistance(tomerge);
-            if (tmp < distance)
-            {
-                closer = *it;
-                distance = tmp;
-            }
-        }
-        ++it;
-    }
-    if (tomerge != NULL)
-    {
-        if (tomerge->exists())
-        {
-            if (closer != NULL)
-            {
-                if (closer->exists())
-                    tomerge->useTech(TechTypes::Archon_Warp, closer);
-            }
-            _mergersHT.erase(closer);
-        }
-        _mergersHT.erase(tomerge);
-    }
+	if (_mergersHT.size() < 2)
+		return;
+	Unit* tomerge = NULL;
+	Unit* closer = NULL;
+	double distance = DBL_MAX; 
+	// stupid, suboptimal, heuristic
+	for (std::set<Unit*>::iterator it = _mergersHT.begin();
+		it != _mergersHT.end(); )
+	{
+		if (!(*it)->exists())
+		{
+			_mergersHT.erase(it++);
+			continue;
+		}
+		else if (!tomerge)
+			tomerge = *it;
+		else
+		{
+			double tmp = (*it)->getDistance(tomerge);
+			if (tmp < distance)
+			{
+				closer = *it;
+				distance = tmp;
+			}
+		}
+		++it;
+	}
+	if (tomerge != NULL)
+	{
+		if (tomerge->exists())
+		{
+			if (closer != NULL)
+			{
+				if (closer->exists())
+					tomerge->useTech(TechTypes::Archon_Warp, closer);
+			}
+			_mergersHT.erase(closer);
+		}
+		_mergersHT.erase(tomerge);
+	}
 }

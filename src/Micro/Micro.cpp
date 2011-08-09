@@ -6,6 +6,7 @@
 #include "Micro/Goals/DefendGoal.h"
 #include "Micro/Goals/DropGoal.h"
 #include "Micro/Goals/FormationSubgoal.h"
+#include "Micro/Goals/KillSubgoal.h"
 #include "Macro/BasesManager.h"
 #include "Macro/BorderManager.h"
 #include "Intelligence/EUnitsFilter.h"
@@ -35,11 +36,11 @@ void Micro::update()
 		&& !TheInformationManager->getEnemyBases().empty())
 	{
 		if ((Broodwar->enemy()->getRace() == Races::Protoss && (
-			(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 2 && ETechEstimator::Instance().getOpeningsProbas()[1] > 0.2 // fast DT
+			(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 1 && ETechEstimator::Instance().getOpeningsProbas()[1] > 0.15 // fast DT
 			|| TheInformationManager->getEnemyBases().size() > 1 )
 			|| (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 4))
 			) || Broodwar->enemy()->getRace() == Races::Terran && (
-			(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 2 && ETechEstimator::Instance().getOpeningsProbas()[3] > 0.2 // siege expand
+			(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 1 && ETechEstimator::Instance().getOpeningsProbas()[3] > 0.2 // siege expand
 			|| TheInformationManager->getEnemyBases().size() > 1)
 			|| (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 4)
 			) || Broodwar->enemy()->getRace() == Races::Zerg && (
@@ -77,9 +78,18 @@ void Micro::update()
 		&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Shuttle)
 		&& !TheInformationManager->getEnemyBases().empty())
 	{
-		map<UnitType, int> tmpNeeded;
-		tmpNeeded.insert(make_pair<UnitType, int>(UnitTypes::Protoss_Reaver, 1));
-		goalManager->addGoal(pGoal(new DropGoal(*(TheInformationManager->getEnemyBases().begin()), tmpNeeded)));
+		BWTA::BaseLocation* eBase = *(TheInformationManager->getEnemyBases().begin());
+		if (eBase != NULL)
+		{
+			map<UnitType, int> tmpNeeded;
+			tmpNeeded.insert(make_pair<UnitType, int>(UnitTypes::Protoss_Reaver, 1));
+			/*Vec tmpV(0, 0);
+			for each (Unit* mineral in eBase->getMinerals())
+				tmpV += mineral->getPosition();
+			BWAPI::Position mineralsMiddle = Position((int)tmpV.x / eBase->getMinerals().size(), (int)tmpV.y / eBase->getMinerals().size());
+			goalManager->addGoal(pGoal(new DropGoal(mineralsMiddle, tmpNeeded)));*/
+			goalManager->addGoal(pGoal(new DropGoal(eBase->getPosition(), tmpNeeded)));
+		}
 	}
 
 	/// See if we have to defend somewhere
@@ -107,29 +117,7 @@ void Micro::update()
 		else
 			needDefense.erase(b);
 	}*/
-	for each (Base* bb in TheBasesManager->getAllBases())
-	{
-		BWTA::BaseLocation* b = bb->getBaseLocation();
-		bool needD = false;
-		set<Unit*> unitsAround = Broodwar->getUnitsInRadius(b->getPosition(), __TILES_RADIUS_DEFEND_BASE__*TILE_SIZE);
-		for each (Unit* u in unitsAround)
-		{
-			if (u->getPlayer() == Broodwar->enemy())
-			{
-				needD = true;
-				break;
-			}
-		}
-		if (needD) // we do not visit bases we have already spawned a DefendGoal on
-		{
-			if (needDefense.count(b))
-				continue; // already spawned a DefendGoal
-			goalManager->addGoal(pGoal(new DefendGoal(b))); // TODO priority w.r.t. importance of the base
-			needDefense.insert(b);
-		}
-		else
-			needDefense.erase(b);
-	}
+
 	// TODO: for each building -> if is under attack
 
 	/// Look if we can push (again)
@@ -158,7 +146,11 @@ void Micro::update()
 			{
 				if (TheInformationManager->getEnemyBases().count(it->second))
 				{
-					goalManager->addGoal(pGoal(new AttackGoal(it->second->getPosition())));
+					pGoal tmp = pGoal(new AttackGoal(it->second->getPosition()));
+					BWAPI::Unit* cc = EUnitsFilter::Instance().getClosestCenter(it->second);
+					if (cc != NULL)
+						tmp->addSubgoal(pSubgoal(new KillSubgoal(SL_AND, NULL, cc)));
+					goalManager->addGoal(tmp);
 					found = true;
 					break;
 				}
@@ -181,6 +173,8 @@ void Micro::update()
 			}
 			if (toPush != Positions::None)
 				goalManager->addGoal(pGoal(new AttackGoal(toPush)));
+			else
+				goalManager->addGoal(pGoal(new AttackGoal(Intelligence::Instance().enemyHome->getPosition())));
 		}
 	}
 

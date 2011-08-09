@@ -32,6 +32,7 @@ public:
     const std::map<BWAPI::Unit*, EViewedUnit>& getViewedUnits();
     EViewedUnit getViewedUnit(BWAPI::Unit* u);
     int getNumbersType(BWAPI::UnitType ut);
+	BWAPI::Unit* getClosestCenter(BWTA::BaseLocation* b);
     const std::map<BWAPI::Unit*, std::pair<BWAPI::UnitType, BWAPI::Position> >& getInvisibleUnits();
     bool empty();
 #ifdef __DEBUG__

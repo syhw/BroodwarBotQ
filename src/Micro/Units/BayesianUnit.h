@@ -119,7 +119,6 @@ protected:
     Position _inPos;
     bool _fleeing;
     bool _fightMoving;
-    int _fleeingDmg; // number of DPS we have to take in to decide to flee, default 20
     //std::multimap<BWAPI::Position, attractor_type> _prox;
 #ifdef __WITH_OCCUPATION__
     std::vector<occupation_type> _occupation;
@@ -206,6 +205,7 @@ protected:
     std::set<Unit*> _targetingMe;
     void updateTargetingMe();
 public:
+    int _fleeingDmg; // number of DPS we have to take in to decide to flee, default 20
 	static pBayesianUnit newBayesianUnit(BWAPI::Unit* u);
 
 	bool isFighting();

@@ -14,7 +14,6 @@ using namespace std;
 
 SimCityBuildingPlacer* Task::buildingPlacer = NULL;
 
-int Task::reservedMineralsNexus = 0; // TODO use that
 
 Task::Task(BWAPI::Unit* w, BWAPI::TilePosition tp, BWAPI::UnitType ut, int lo)
 : worker(w)
@@ -23,14 +22,12 @@ Task::Task(BWAPI::Unit* w, BWAPI::TilePosition tp, BWAPI::UnitType ut, int lo)
 , lastOrder(lo)
 , finished(false)
 , tries(0)
+, initialized(false)
 {
 }
 
 Task::~Task()
 {
-	if (type == UnitTypes::Protoss_Nexus)
-		Task::reservedMineralsNexus -= type.mineralPrice();
-
 	Macro::Instance().reservedMinerals -= type.mineralPrice();
 	Macro::Instance().reservedGas -= type.gasPrice();
 	TheArbitrator->removeController(this);
@@ -43,13 +40,13 @@ int Task::framesToCompleteRequirements(UnitType type)
 	for (map<UnitType, int>::const_iterator it = rqU.begin();
 		it != rqU.end(); ++it)
 	{
-		if (Broodwar->self()->completedUnitCount(it->first) < it->second)
+		if (Broodwar->self()->completedUnitCount(it->first) == 0) //< it->second)
 		{
 			/// We don't have the requirements
 			/// we will have to delay this construction
 			int delay = 0;
 			if (it->first.isBuilding()
-				&& Broodwar->self()->incompleteUnitCount(it->first) < it->second)
+				&& Broodwar->self()->incompleteUnitCount(it->first) == 0)//< it->second)
 			{
 				/// We are not building the requirement, get it into the production line
 				if (!TheBuilder->willBuild(it->first))
@@ -76,6 +73,9 @@ int Task::framesToCompleteRequirements(UnitType type)
 
 void Task::init()
 {
+	Macro::Instance().reservedMinerals += type.mineralPrice();
+	Macro::Instance().reservedGas += type.gasPrice();
+	initialized = true;
 	if (tilePosition == TilePositions::None)
 		tilePosition = buildingPlacer->getTilePosition(type);
 	if (!tilePosition.isValid() || TilePositions::None)
@@ -84,11 +84,6 @@ void Task::init()
 		return;
 	}
 
-	if (type == UnitTypes::Protoss_Nexus)
-		Task::reservedMineralsNexus += type.mineralPrice();
-
-	Macro::Instance().reservedMinerals += type.mineralPrice();
-	Macro::Instance().reservedGas += type.gasPrice();
 	int delay = Task::framesToCompleteRequirements(type); // launches the requirements
 	if (delay)
 		lastOrder = max(lastOrder, Broodwar->getFrameCount() + delay);
@@ -175,8 +170,12 @@ void Task::buildIt()
 		return;
 	}
 	++tries;
-	if (tilePosition == TilePositions::None)
+	if (tilePosition == TilePositions::None || tilePosition == TilePositions::Invalid
+		|| tilePosition == TilePositions::Invalid || tilePosition == TilePosition(0,0))
+	{
 		buildingPlacer->getTilePosition(type);
+		return;
+	}
 	if (Broodwar->getFrameCount() > lastOrder + 17 + Broodwar->getLatencyFrames())
 	{
 		/// If it requires psi but there is not, ask for a powering pylon, or cancel if we can't power it
@@ -287,6 +286,8 @@ void Task::check()
 
 void Task::update()
 {
+	if (!initialized)
+		init();
 	if (Broodwar->getFrameCount() <= lastOrder) // delay hack
 		return;
 
@@ -361,6 +362,10 @@ void Builder::build(const BWAPI::UnitType& t, const BWAPI::TilePosition& seedPos
 {
 	if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Pylon) >= 42) // magic number :)
 		return; // TODO remove
+	//if (!Macro::Instance().expands  // TODO remove (HACK)
+	//	&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway) + Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Gateway) > 2
+	//	&& Broodwar->self()->minerals() < 500)
+	//	return;
 	if (t == Broodwar->self()->getRace().getCenter())
 		TheBasesManager->expand();
 	else
@@ -380,23 +385,23 @@ void Builder::buildCannonsMinerals(BWTA::BaseLocation* b)
 		return;
 	Task::buildingPlacer->makeCannonsMinerals(b);
 	// 2 pylons
-	TilePosition tp = Task::buildingPlacer->getTilePosition(UnitTypes::Protoss_Pylon, b->getTilePosition());
-	if (tp == TilePositions::None)
+	TilePosition tp1 = Task::buildingPlacer->getTilePosition(UnitTypes::Protoss_Pylon, b->getTilePosition());
+	if (tp1 == TilePositions::None)
 		return;
-	addTask(UnitTypes::Protoss_Pylon, tp, true);
-	tp = Task::buildingPlacer->getTilePosition(UnitTypes::Protoss_Pylon, b->getTilePosition());
-	if (tp == TilePositions::None)
+	addTask(UnitTypes::Protoss_Pylon, tp1, true);
+	TilePosition tp2 = Task::buildingPlacer->getTilePosition(UnitTypes::Protoss_Pylon, b->getTilePosition());
+	if (tp2 == TilePositions::None)
 		return;
-	addTask(UnitTypes::Protoss_Pylon, tp, true);
+	addTask(UnitTypes::Protoss_Pylon, tp2, true);
 	// 2 cannons
-	tp = Task::buildingPlacer->getTilePosition(UnitTypes::Protoss_Photon_Cannon, b->getTilePosition());
-	if (tp == TilePositions::None)
+	TilePosition tp3 = Task::buildingPlacer->getTilePosition(UnitTypes::Protoss_Photon_Cannon, tp1);
+	if (tp3 == TilePositions::None)
 		return;
-	addTask(UnitTypes::Protoss_Pylon, tp, false, Broodwar->getFrameCount() + UnitTypes::Protoss_Pylon.buildTime() + __MIN_FRAMES_TO_START_CONSTRUCTION__);
-	tp = Task::buildingPlacer->getTilePosition(UnitTypes::Protoss_Photon_Cannon, b->getTilePosition());
-	if (tp == TilePositions::None)
+	addTask(UnitTypes::Protoss_Photon_Cannon, tp3, false, Broodwar->getFrameCount() + UnitTypes::Protoss_Pylon.buildTime() + __MIN_FRAMES_TO_START_CONSTRUCTION__);
+	tp3 = Task::buildingPlacer->getTilePosition(UnitTypes::Protoss_Photon_Cannon, tp2);
+	if (tp3 == TilePositions::None)
 		return;
-	addTask(UnitTypes::Protoss_Pylon, tp, false, Broodwar->getFrameCount() + UnitTypes::Protoss_Pylon.buildTime() + __MIN_FRAMES_TO_START_CONSTRUCTION__);
+	addTask(UnitTypes::Protoss_Photon_Cannon, tp3, false, Broodwar->getFrameCount() + UnitTypes::Protoss_Pylon.buildTime() + __MIN_FRAMES_TO_START_CONSTRUCTION__);
 }
 
 //void Builder::buildCannonsNexus(BWTA::BaseLocation* b) TODO
@@ -412,11 +417,13 @@ int Builder::numberInFutureTasks(const UnitType& t)
 
 int Builder::numberInConstruction(const UnitType& t)
 {
+	return Broodwar->self()->incompleteUnitCount(t);
+	/*
 	int number = 0;
 	for each (Unit* u in inConstruction)
 		if (u->getType() == t)
 			++number;
-	return number;
+	return number;*/
 }
 
 /***
@@ -478,8 +485,8 @@ void Builder::update()
 #ifdef __DEBUG__
 				Broodwar->printf("Building %s pop %d", it->second->getName().c_str(), Broodwar->self()->supplyUsed()/2);
 #endif
-				tasks.push_front(it->second);
 				it->second->init();
+				tasks.push_front(it->second);
 				toRemove.push_back(it->first);
 			}
 		}

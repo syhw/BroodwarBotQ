@@ -64,7 +64,7 @@ AttackGoal::AttackGoal(pSubgoal subgoal, int priority, int firstFrame)
 
 AttackGoal::~AttackGoal()
 {
-	GoalManager::Instance().attackGoals += 1;
+	GoalManager::Instance().attackGoals -= 1;
 }
 
 void AttackGoal::achieve()
@@ -87,10 +87,28 @@ void AttackGoal::achieve()
 	bidOnMilitaryUnits();
 
 	/// Cancel if we are getting pwned
-	if (_unitsGroup.force < 0.75)
+	if (_unitsGroup.force < 0.75 && Broodwar->getFrameCount() - _firstActive > 10*24)
 		abort();
 
-	Goal::achieve();
+	/// Regroup
+	if (_unitsGroup.center.isValid() && Broodwar->isWalkable(_unitsGroup.center.x()/8, _unitsGroup.center.y()/8)
+		&& _unitsGroup.stdDevRadius > (double)_unitsGroup.size() * TILE_SIZE / 2)
+	{
+		for (std::vector<pBayesianUnit>::iterator it = _unitsGroup.units.begin(); it != _unitsGroup.units.end(); ++it)
+		{
+#ifdef __DEBUG__
+			Position displayp = (*it)->unit->getPosition();
+			Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Regroup");
+#endif
+			(*it)->target = _unitsGroup.center;
+			if ((*it)->getType().isFlyer())
+				(*it)->switchMode(MODE_FIGHT_A);
+			else
+				(*it)->switchMode(MODE_FIGHT_G);
+		}
+	}
+	else /// And go!
+		Goal::achieve();
 }
 
 #ifdef __MID_SUBGOALS__
@@ -120,8 +138,6 @@ std::string AttackGoal::getShortName()
 /// RegroupGoal at the closest, backing point on the path from home to enemy's
 void AttackGoal::abort()
 {
-	Broodwar->setLocalSpeed(30); // TODO REMOVE //////////////////////////
-	
 	// Shitload of hacks
 	TilePosition tp;
 	BWTA::BaseLocation* eHome = Intelligence::Instance().enemyHome;

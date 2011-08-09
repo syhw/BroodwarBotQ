@@ -1,7 +1,7 @@
 #pragma once
 #include "Micro/Goals/Goal.h"
 
-#define __MID_SUBGOALS__
+// #define __MID_SUBGOALS__
 
 /*** 
  * A helper/wrapper on top of Goal to facilitate simple attacks (pushs)

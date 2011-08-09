@@ -169,15 +169,22 @@ void Goal::update()
 	for (list<Unit*>::const_iterator it = _incompleteUnits.begin();
 		it != _incompleteUnits.end(); )
 	{
-		if ((*it)->isCompleted())
-		{	
-			if (_neededUnits.find((*it)->getType()) != _neededUnits.end())
-				_neededUnits[(*it)->getType()] -= 1;
-			_unitsGroup.dispatchCompleteUnit(GoalManager::Instance().getCompletedUnit(*it));
+		if ((*it) == NULL || (*it)->exists())
+		{
 			_incompleteUnits.erase(it++);
 		}
 		else
-			++it;
+		{
+			if ((*it)->isCompleted())
+			{	
+				if (_neededUnits.find((*it)->getType()) != _neededUnits.end())
+					_neededUnits[(*it)->getType()] -= 1;
+				_unitsGroup.dispatchCompleteUnit(GoalManager::Instance().getCompletedUnit(*it));
+				_incompleteUnits.erase(it++);
+			}
+			else
+				++it;
+		}
 	}
 
 	if (_status == GS_WAIT_PRECONDITION)

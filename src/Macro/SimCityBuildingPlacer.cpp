@@ -178,7 +178,13 @@ void SimCityBuildingPlacer::generateTechPos()
 
 void SimCityBuildingPlacer::generateCannonsPos()
 {
-	// TODO
+	for each (BWTA::Chokepoint* cp in TheBorderManager->getMyBorder())
+	{
+		if (TheBorderManager->getMyRegions().count(cp->getRegions().first))
+			makeCannonChoke(cp->getRegions().first, cp, true);
+		else
+			makeCannonChoke(cp->getRegions().second, cp, true);
+	}
 }
 
 void SimCityBuildingPlacer::generatePylonsPos()
@@ -1359,7 +1365,7 @@ TilePosition SimCityBuildingPlacer::getTilePosition(const UnitType& ut,
 		{
 			cannons.cleanUp();
 			if (!cannons.pos.size())
-				generate();
+				generateCannonsPos();
 			return cannons.reservePos();
 		}
 		else

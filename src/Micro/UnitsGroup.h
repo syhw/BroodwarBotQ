@@ -60,6 +60,8 @@ private:
     int _totalMinPrice;
     int _totalGasPrice;
     int _totalSupply;
+	int _backFrame;
+	int _offensiveFrame;
 	double _maxRange;
     EUnitsFilter* _eUnitsFilter;
     std::set<BWAPI::Unit*> _mergersHT;
@@ -76,6 +78,7 @@ private:
 public:
 	/// Units tools / units intercommunication
 	double force;
+	bool enemiesDefinedByGoal;
     std::list<pBayesianUnit> arrivingUnits;
     std::vector<BWAPI::Position> ppath;
     UnitDmgBimap unitDamages;

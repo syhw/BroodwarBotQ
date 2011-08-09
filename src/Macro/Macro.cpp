@@ -15,12 +15,12 @@ inline bool dontHave(BWAPI::UnitType ut)
 
 inline bool wontHave(BWAPI::UnitType ut)
 {
-	return dontHave(ut) && !TheBuilder->willBuild(ut);
+	return dontHave(ut) && !TheBuilder->numberInFutureTasks(ut);
 }
 
 inline int sumWillHave(BWAPI::UnitType ut)
 {
-	return Broodwar->self()->completedUnitCount(ut) + Broodwar->self()->incompleteUnitCount(ut) + TheBuilder->willBuild(ut);
+	return Broodwar->self()->completedUnitCount(ut) + TheBuilder->willBuild(ut);
 }
 
 Macro::Macro()
@@ -128,18 +128,24 @@ void Macro::update()
 		expand();
 	}
 
-	if (!expands && (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 6)
-		//|| Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway) + Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Gateway) >= 2)
-		&& !Intelligence::Instance().enemyRush)
+	if (!expands)
 	{
-		if (Broodwar->enemy()->getRace() != Races::Protoss || ETechEstimator::Instance().getOpeningsProbas().at(1) > 0.18)
+		if ((Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 6)
+			//|| Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway) + Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Gateway) >= 2)
+			&& !Intelligence::Instance().enemyRush)
 		{
-			if (wontHave(UnitTypes::Protoss_Forge))
-				TheBuilder->build(UnitTypes::Protoss_Forge);
-			while (TheBuilder->willBuild(UnitTypes::Protoss_Photon_Cannon) < 3)
-				TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
+			if (Broodwar->enemy()->getRace() != Races::Protoss || ETechEstimator::Instance().getOpeningsProbas().at(1) > 0.18)
+			{
+				/*if (wontHave(UnitTypes::Protoss_Forge))
+					TheBuilder->build(UnitTypes::Protoss_Forge);
+				while (TheBuilder->willBuild(UnitTypes::Protoss_Photon_Cannon) < 3)
+					TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
+					*/
+			}
+			else
+				expand();
 		}
-		else
+		else if (Broodwar->self()->minerals() > 350)
 			expand();
 	}
 	else if (expands == 1)
@@ -147,7 +153,7 @@ void Macro::update()
 		if (wontHave(UnitTypes::Protoss_Robotics_Facility))
 			TheBuilder->build(UnitTypes::Protoss_Robotics_Facility);
 
-		if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Photon_Cannon) + Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Photon_Cannon)
+		if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Photon_Cannon)
 			+ TheBuilder->willBuild(UnitTypes::Protoss_Photon_Cannon) < 5)
 			TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
 
@@ -326,12 +332,19 @@ Zerg openings, in order (in the vector):
 				if (wontHave(UnitTypes::Protoss_Robotics_Facility))
 					TheBuilder->build(UnitTypes::Protoss_Robotics_Facility);
 			}
-			if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Nexus) == 4) // B5
+			if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Nexus) == 4) // B4
 			{
 				TheProducer->researchUpgrade(UpgradeTypes::Reaver_Capacity);
 				TheProducer->researchUpgrade(UpgradeTypes::Scarab_Damage);
 				if (wontHave(UnitTypes::Protoss_Stargate))
 					TheBuilder->build(UnitTypes::Protoss_Stargate);
+				int missingCannons = 3 + Macro::Instance().expands * 3
+					- (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Photon_Cannon) + TheBuilder->willBuild(UnitTypes::Protoss_Photon_Cannon));
+				while (missingCannons > 0)
+				{
+					--missingCannons;
+					TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
+				}
 			}
 		}
 		else if (ut == UnitTypes::Protoss_Citadel_of_Adun)
@@ -345,7 +358,7 @@ Zerg openings, in order (in the vector):
 			{
 				if (wontHave(UnitTypes::Protoss_Robotics_Support_Bay))
 					TheBuilder->build(UnitTypes::Protoss_Robotics_Support_Bay);
-				TheProducer->produce(1, UnitTypes::Protoss_Shuttle, 85);
+				TheProducer->produce(1, UnitTypes::Protoss_Shuttle, 95);
 				TheProducer->produceAlways(1, UnitTypes::Protoss_Shuttle, 3);
 			}
 			else
@@ -370,11 +383,12 @@ Zerg openings, in order (in the vector):
 		else if (ut == UnitTypes::Protoss_Observatory)
 		{
 			TheProducer->produce(2, UnitTypes::Protoss_Observer, 60, 2);
-			TheProducer->produceAlways(5, UnitTypes::Protoss_Observer, 5);
 		}
 		else if (ut == UnitTypes::Protoss_Robotics_Support_Bay)
 		{
 			TheProducer->produce(1, UnitTypes::Protoss_Reaver, 95);
+			if (!Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Shuttle))
+				TheProducer->produce(1, UnitTypes::Protoss_Shuttle, 95);
 			TheProducer->produceAlways(3, UnitTypes::Protoss_Reaver, 5);
 		}
 		else if (ut == UnitTypes::Protoss_Observer)
@@ -389,6 +403,13 @@ Zerg openings, in order (in the vector):
 				TheProducer->researchUpgrade(UpgradeTypes::Scarab_Damage);
 			if (wontHave(UnitTypes::Protoss_Observatory))
 				TheBuilder->build(UnitTypes::Protoss_Observatory);
+			if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Shuttle))
+				TheProducer->produceAlways(5, UnitTypes::Protoss_Observer, 5);
+		}
+		else if (ut == UnitTypes::Protoss_Shuttle)
+		{
+			if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Reaver))
+				TheProducer->produceAlways(5, UnitTypes::Protoss_Observer, 5);
 		}
 		else if (ut == UnitTypes::Protoss_Stargate)
 		{

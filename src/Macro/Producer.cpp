@@ -88,7 +88,7 @@ bool Producer::checkCanProduce(UnitType t)
 			&& _techStructures.find(it->first) == _techStructures.end()
 			&& _producingStructures.find(it->first) == _producingStructures.end()) // TODO Archons, or merge with checkHave
 		{
-			if (it->first.isBuilding() && !Broodwar->self()->incompleteUnitCount(it->first) && !TheBuilder->willBuild(it->first))
+			if (it->first.isBuilding() && !TheBuilder->willBuild(it->first))
 				TheBuilder->build(it->first);
 			ret = false;
 		}
@@ -126,7 +126,7 @@ bool Producer::checkHaveTech(UnitType ut)
 	else
 	{
 		if (ut.isBuilding()
-			&& !Broodwar->self()->incompleteUnitCount(ut) && !TheBuilder->willBuild(ut))
+			&& !TheBuilder->willBuild(ut))
 			TheBuilder->build(ut);
 		return false;
 	}
@@ -298,7 +298,7 @@ int Producer::additionalUnitsSupply(int frames)
 		while (minerals >= ut.mineralPrice() && gas >= ut.gasPrice() && it != pq.end())
 		{
 			ut = it->second.whatBuilds().first;
-			if (!TheBuilder->willBuild(ut)
+			if (!TheBuilder->numberInFutureTasks(ut)
 				&& ut != Broodwar->self()->getRace().getCenter()) // we don't want to be building more Nexuses to produce more probes :D
 			{
 				_neededProductionBuildings.insert(ut);

@@ -20,6 +20,7 @@ public:
 	bool isReady() const;
 	bool isActive() const;
 	void update();
+	bool cannoned;
 
 private:
 	void buildCenter();
@@ -32,5 +33,4 @@ private:
 	bool activeGas;
 	int centerInConstruction;
 	int gasInConstruction;
-	bool cannoned;
 };

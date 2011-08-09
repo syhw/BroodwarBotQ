@@ -17,9 +17,9 @@ class DefendGoal: public Goal
 	inline void bidDefUnits();
 	BWAPI::Position _threatMiddle;
 public:
-	DefendGoal(BWTA::Chokepoint* c, int priority = 60, int firstFrame = 0);
-	DefendGoal(BWTA::BaseLocation* b, int priority = 60, int firstFrame = 0);
-	DefendGoal(BWAPI::Position p, int priority = 60, int firstFrame = 0);
+	DefendGoal(BWTA::Chokepoint* c, int priority = 80, int firstFrame = 0);
+	DefendGoal(BWTA::BaseLocation* b, int priority = 80, int firstFrame = 0);
+	DefendGoal(BWAPI::Position p, int priority = 80, int firstFrame = 0);
 	virtual void achieve(); // overload
 	virtual void check();   // overload
 
