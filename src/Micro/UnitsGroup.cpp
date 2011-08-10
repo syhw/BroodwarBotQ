@@ -1,7 +1,6 @@
 #include <PrecompiledHeader.h>
 #include <Defines.h>
 #include "Micro/UnitsGroup.h"
-#include <Position.h>
 #include "Utils/Util.h"
 #include <stack>
 #include <typeinfo>
