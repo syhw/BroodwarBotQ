@@ -531,7 +531,7 @@ void ETechEstimator::useDistribOpenings()
 
 		if (fearThese.count(3)) // SiegeExpand
 		{
-			if (!Macro::Instance().expands)
+			if (!Macro::Instance().expands && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 4)
 				Macro::Instance().expand();
 		}
 
@@ -607,7 +607,7 @@ void ETechEstimator::useDistribOpenings()
 		if (fearThese.count(5) // FastExpand
 			&& openingsProbas[5] > 0.35)
 		{
-			if (!Macro::Instance().expands)
+			if (!Macro::Instance().expands && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 3)
 				Macro::Instance().expand();
 		}
 	}

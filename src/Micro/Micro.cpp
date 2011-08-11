@@ -48,7 +48,7 @@ void Micro::update()
 			&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 1 && 
 			(ETechEstimator::Instance().getOpeningsProbas()[0] > 0.2 || ETechEstimator::Instance().getOpeningsProbas()[1] > 0.2 // mutas
 			|| TheInformationManager->getEnemyBases().size() > 1))
-			|| Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 4
+			|| Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 3
 			))
 		{
 			Position p(Positions::None);
@@ -177,6 +177,9 @@ void Micro::update()
 				goalManager->addGoal(pGoal(new AttackGoal(Intelligence::Instance().enemyHome->getPosition())));
 		}
 	}
+
+	if (Broodwar->getFrameCount() > 8*24*60)
+		_launchedFirstPush = true;
 
 	goalManager->update();
 }

@@ -1307,8 +1307,13 @@ void MapManager::cancelPathfind(BayesianUnit* ptr)
 void MapManager::registerPathfindWork(BayesianUnit* ptr, BWAPI::Unit* u, BWAPI::TilePosition start, BWAPI::TilePosition end, int damages)
 {
 	TilePosition target(end);
-	if (!_lowResWalkability[end.x() + end.y()*Broodwar->mapWidth()])
-	    target = closestWalkabableSameRegionOrConnected(target);
+	if (!u->getType().isFlyer())
+	{
+		if (!_lowResWalkability[end.x() + end.y()*Broodwar->mapWidth()])
+			target = closestWalkabableSameRegionOrConnected(target);
+	}
+	if (!target.isValid())
+		target.makeValid();
 	for (std::list<PathfindWork>::const_iterator it = _pathfindWorks.begin();
 		it != _pathfindWorks.end(); ++it)
 	{
@@ -1318,7 +1323,7 @@ void MapManager::registerPathfindWork(BayesianUnit* ptr, BWAPI::Unit* u, BWAPI::
 			break;
 		}
 	}
-	_pathfindWorks.push_back(PathfindWork(ptr, u, start, target, damages));
+	_pathfindWorks.push_back(PathfindWork(ptr, u, start, target, damages, u->getType().isFlyer()));
 	if (_pathfindWorks.size() > __MAX_PATHFINDING_WORKS__)
 	{
 		_pathfindWorks.pop_front();

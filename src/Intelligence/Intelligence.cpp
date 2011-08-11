@@ -7,6 +7,7 @@
 #include "Micro/Goals/FirstScoutGoal.h"
 #include "Micro/Goals/ExploreGoal.h"
 #include "BWTA.h"
+#include "Macro/Macro.h"
 
 using namespace BWAPI;
 
@@ -70,7 +71,8 @@ void Intelligence::update()
 			&& eUnitsFilter->getNumbersType(UnitTypes::Terran_Barracks) >= 2)
 		{
 			enemyRush = true;
-			// TODO (something else)
+			TheProducer->produce(3, UnitTypes::Protoss_Dragoon, 100);
+			Macro::Instance().reaverFirst = true;
 		}
 	}
 	else if (Broodwar->enemy()->getRace() == Races::Zerg)

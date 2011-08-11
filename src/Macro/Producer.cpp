@@ -471,7 +471,11 @@ void Producer::update()
 		if (Broodwar->getFrameCount() - it->second.lastAction > Broodwar->getLatencyFrames()
 			&& (it->second->isIdle() || 
 			(it->second->getRemainingTrainTime() <= Broodwar->getLatencyFrames() && it->second->getTrainingQueue().size() <= 1)))
+		{
 			free.insert(make_pair<UnitType, ProducingUnit*>(it->first, &(it->second)));
+			if (it->second->getType() != UnitTypes::Protoss_Nexus)
+				it->second->setRallyPoint(Micro::Instance().getDefensePosition());
+		}
 	}
 	/*if (free.empty())
 	{

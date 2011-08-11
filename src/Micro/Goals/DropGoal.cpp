@@ -51,6 +51,11 @@ void DropGoal::achieve()
 		_status = GS_WAIT_PRECONDITION;
 		return;
 	}
+	if (_dropShipBu->unit->getHitPoints() < 27)
+	{
+		_dropShipBu->unit->unload(_reaverBu->unit);
+		return;
+	}
 	if (_unitsGroup.getDistance(_dropPos) > 8*TILE_SIZE)
 	{
 		/// we go there
@@ -92,6 +97,8 @@ void DropGoal::achieve()
 				_reaverBu->unit->train(UnitTypes::Protoss_Scarab);
 				_dropShipBu->unit->load(_reaverBu->unit);
 			}
+			_reaverBu->switchMode(MODE_FIGHT_G);
+			_reaverBu->update();
 		}
 	}
 	else

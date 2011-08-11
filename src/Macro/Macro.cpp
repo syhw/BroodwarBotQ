@@ -145,7 +145,7 @@ void Macro::update()
 			else
 				expand();
 		}
-		else if (Broodwar->self()->minerals() > 350)
+		else if (Broodwar->self()->minerals() > 400)
 			expand();
 	}
 	else if (expands == 1)
@@ -189,6 +189,9 @@ void Macro::update()
 			TheProducer->researchUpgrade(UpgradeTypes::Protoss_Ground_Weapons);
 		}
 	}
+#ifdef __DEBUG__
+	reaverFirst = true;// TODO REMOVE DEBUG
+#endif
 }
 
 void Macro::onUnitDiscover(BWAPI::Unit* unit)
@@ -244,7 +247,7 @@ Zerg openings, in order (in the vector):
 		/////////////////// T1 ///////////////////
 		// Core->Singulary, Zealots vs Zerg and always Goons (against all)
 
-		if (ut == UnitTypes::Protoss_Cybernetics_Core && Broodwar->getFrameCount() < 8000)
+		if (ut == UnitTypes::Protoss_Cybernetics_Core && Broodwar->getFrameCount() < 16000)
 		{
 			/// Built the (first) core
 			TheProducer->researchUpgrade(UpgradeTypes::Singularity_Charge);

@@ -432,7 +432,7 @@ void UnitsGroup::chooseLeadingUnit()
 	for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
 	{ 
 		UnitType ut = (*it)->unit->getType();
-		if (ut.isFlyer() || !ut.canAttack())
+		if ((nonFlyers && ut.isFlyer()) || ut == UnitTypes::Protoss_High_Templar || (*it)->unit->isLoaded())
 			continue;
 #ifdef __LEADING_UNIT_BY_SIZE_HP__
 		if ((leadingUnit->unit->getType().size() < ut.size() 
@@ -541,9 +541,12 @@ void UnitsGroup::update()
 	}
 
 	/// All the things to do when we have to fight
-	if (!enemies.empty() && groupMode != MODE_SCOUT) /// We fight, we'll see later for the goals, BayesianUnits switchMode automatically if enemies is not empty()
+	if ((!enemies.empty() && groupMode != MODE_SCOUT)
+		|| Broodwar->getFrameCount() - _backFrame < 240
+		|| Broodwar->getFrameCount() - _offensiveFrame < 240)
 	{
 		force = evaluateForces();
+		//if ((Broodwar->getFrameCount() - _backFrame < 240 && Broodwar->getFrameCount() - _offensiveFrame >= 240) || force < 0.8 && !suicide) // take decisions for 10 seconds, renewable
 		if (Broodwar->getFrameCount() - _backFrame < 240 || force < 0.8 && !suicide) // take decisions for 10 seconds, renewable
 		{
 			if (Broodwar->getFrameCount() - _backFrame >= 240)
@@ -571,6 +574,7 @@ void UnitsGroup::update()
 		}
 		else
 		{
+			//if ((Broodwar->getFrameCount() - _offensiveFrame < 240 && Broodwar->getFrameCount() - _backFrame >= 240) || force > 1.5)
 			if (Broodwar->getFrameCount() - _offensiveFrame < 240 || force > 1.5)
 			{
 				if (Broodwar->getFrameCount() - _offensiveFrame >= 240)
@@ -800,7 +804,7 @@ bool UnitsGroup::removeArrivingUnit(Unit* u)
 		{
 			arrivingUnits.erase(it);
 			if (!u->getType().isFlyer()) // ugly
-				--nonFlyers;
+				++nonFlyers;
 			return true;
 		}
 		return false;
