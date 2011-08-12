@@ -23,6 +23,7 @@ Task::Task(BWAPI::Unit* w, BWAPI::TilePosition tp, BWAPI::UnitType ut, int lo)
 , finished(false)
 , tries(0)
 , initialized(false)
+, reserved(false)
 {
 }
 

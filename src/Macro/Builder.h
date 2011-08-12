@@ -17,6 +17,7 @@ class Task : public Arbitrator::Controller<BWAPI::Unit*, double>
 	bool finished;
 	int tries;
 	bool initialized;
+	bool reserved;
 public:
 	static SimCityBuildingPlacer* buildingPlacer;
 	static int framesToCompleteRequirements(BWAPI::UnitType type);

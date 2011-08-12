@@ -4,7 +4,7 @@
 using namespace BWAPI;
 using namespace std;
 
-#define _OK_DISTANCE_ 16.0 // should perhaps be (WALKTILE/2)^2 = 16.0
+#define _OK_DISTANCE_ 32.0 // should perhaps be (WALKTILE/2)^2 = 16.0
 
 FormationSubgoal::FormationSubgoal(SubgoalLogic l, UnitsGroup* ug, pFormation f)
 : Subgoal(l, ug)
