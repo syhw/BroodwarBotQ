@@ -156,7 +156,9 @@ void Producer::produce(int number, BWAPI::UnitType t, int priority, int incremen
  */
 void Producer::produceAlways(int number, BWAPI::UnitType t, int increment)
 {
-	_wantedNumbers.insert(make_pair<UnitType, pair<int, int> >(t, make_pair<int, int>(number, increment)));
+	if (_wantedNumbers.find(t) == _wantedNumbers.end())
+		_wantedNumbers.insert(make_pair<UnitType, pair<int, int> >(t, make_pair<int, int>(number, increment)));
+	else (_wantedNumbers[t] = pair<int, int>(make_pair<int, int>(number, increment)));
 }
 
 /***

@@ -180,6 +180,8 @@ void Macro::update()
 			TheProducer->researchUpgrade(UpgradeTypes::Protoss_Ground_Armor);
 			TheProducer->researchUpgrade(UpgradeTypes::Protoss_Ground_Weapons);
 		}
+		if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Protoss_Ground_Weapons) < 1)
+			TheProducer->researchUpgrade(UpgradeTypes::Protoss_Ground_Weapons);
 	}
 	else if (expands > 2)
 	{
@@ -188,6 +190,14 @@ void Macro::update()
 			TheProducer->researchUpgrade(UpgradeTypes::Protoss_Ground_Armor);
 			TheProducer->researchUpgrade(UpgradeTypes::Protoss_Ground_Weapons);
 		}
+	}
+	if (Broodwar->self()->minerals() > 250 
+		&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Robotics_Support_Bay))
+	{
+		if (!Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Shuttle))
+			TheProducer->produce(1, UnitTypes::Protoss_Shuttle, 90);
+		if (Broodwar->self()->gas() > 150 && !Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Reaver))
+			TheProducer->produce(1, UnitTypes::Protoss_Reaver, 95);
 	}
 #ifdef __DEBUG__
 	reaverFirst = true;// TODO REMOVE DEBUG
@@ -256,16 +266,17 @@ Zerg openings, in order (in the vector):
 				TheProducer->produce(6, UnitTypes::Protoss_Zealot, 49, 2);
 				TheProducer->produce(16, UnitTypes::Protoss_Dragoon, 50);
 				TheProducer->produceAlways(30, UnitTypes::Protoss_Dragoon);
+				TheProducer->produceAlways(6, UnitTypes::Protoss_Zealot, 2);
 			}
 			else if (er == Races::Terran)
 			{
 				TheProducer->produce(16, UnitTypes::Protoss_Dragoon, 50);
-				TheProducer->produceAlways(30, UnitTypes::Protoss_Dragoon);
+				TheProducer->produceAlways(32, UnitTypes::Protoss_Dragoon);
 			}
 			else
 			{
 				TheProducer->produce(16, UnitTypes::Protoss_Dragoon, 50);
-				TheProducer->produceAlways(30, UnitTypes::Protoss_Dragoon);
+				TheProducer->produceAlways(32, UnitTypes::Protoss_Dragoon);
 			}
 		}
 		else if (ut == UnitTypes::Protoss_Gateway)

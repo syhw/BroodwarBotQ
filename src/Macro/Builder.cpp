@@ -29,8 +29,11 @@ Task::Task(BWAPI::Unit* w, BWAPI::TilePosition tp, BWAPI::UnitType ut, int lo)
 
 Task::~Task()
 {
-	Macro::Instance().reservedMinerals -= type.mineralPrice();
-	Macro::Instance().reservedGas -= type.gasPrice();
+	if (reserved)
+	{
+		Macro::Instance().reservedMinerals -= type.mineralPrice();
+		Macro::Instance().reservedGas -= type.gasPrice();
+	}
 	TheArbitrator->removeController(this);
 }
 
@@ -74,8 +77,6 @@ int Task::framesToCompleteRequirements(UnitType type)
 
 void Task::init()
 {
-	Macro::Instance().reservedMinerals += type.mineralPrice();
-	Macro::Instance().reservedGas += type.gasPrice();
 	initialized = true;
 	if (tilePosition == TilePositions::None)
 		tilePosition = buildingPlacer->getTilePosition(type);
@@ -291,6 +292,12 @@ void Task::update()
 		init();
 	if (Broodwar->getFrameCount() <= lastOrder) // delay hack
 		return;
+	if (!reserved)
+	{
+		Macro::Instance().reservedMinerals += type.mineralPrice();
+		Macro::Instance().reservedGas += type.gasPrice();
+		reserved = true;
+	}
 
 	// TODO complete distance instead of magic number "6" tiles.
 	double timeToGetToSite = ((double)(6*TILE_SIZE) / UnitTypes::Protoss_Probe.topSpeed());

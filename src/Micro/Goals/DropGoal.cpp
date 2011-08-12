@@ -20,6 +20,8 @@ DropGoal::DropGoal(BWTA::BaseLocation* b, const std::map<BWAPI::UnitType, int>& 
 	Micro::Instance().drops += 1;
 	_neededUnits.insert(make_pair<UnitType, int>(UnitTypes::Protoss_Shuttle, 1));
 	_dropPos = b->getPosition();
+	for each (pair<UnitType, int> pp in _neededUnits)
+		bidOnUnitType(pp.first);
 }
 
 DropGoal::DropGoal(Position p, const map<UnitType, int>& nU, int priority)
@@ -29,6 +31,8 @@ DropGoal::DropGoal(Position p, const map<UnitType, int>& nU, int priority)
 	Micro::Instance().drops += 1;
 	_neededUnits.insert(make_pair<UnitType, int>(UnitTypes::Protoss_Shuttle, 1));
 	_base = BWTA::getNearestBaseLocation(_dropPos);
+	for each (pair<UnitType, int> pp in _neededUnits)
+		bidOnUnitType(pp.first);
 }
 
 DropGoal::~DropGoal()
