@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="MicroProject"
 	ProjectGUID="{305604F2-9728-4D61-AC29-4658B31533DF}"
 	RootNamespace="MicroProject"
@@ -411,6 +411,10 @@
 					RelativePath="..\src\Intelligence\EViewedUnit.cpp"
 					>
 				</File>
+				<File
+					RelativePath="..\src\Intelligence\Intelligence.cpp"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -671,6 +675,10 @@
 				</File>
 				<File
 					RelativePath="..\src\Intelligence\EViewedUnit.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Intelligence\Intelligence.h"
 					>
 				</File>
 			</Filter>

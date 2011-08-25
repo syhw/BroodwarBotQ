@@ -2109,6 +2109,7 @@ void BayesianUnit::update()
 {
     if (!unit || !unit->exists()) return;
 	if (unit->isLoaded()) return; // TODO (loaded units are not focus firing and just displaced as potatoes)
+#ifndef __MICRO_PROJECT__
 	if (_unitsGroup == NULL)
 	{
 		if (unit->getType().canAttack())
@@ -2117,6 +2118,8 @@ void BayesianUnit::update()
 			unit->move(TheBasesManager->getAllBases().back()->getBaseLocation()->getPosition());
 		return;
 	}
+#endif
+
 #ifdef __DEBUG__
 	assert(_unitsGroup != NULL);
 	assert(unit != NULL);
