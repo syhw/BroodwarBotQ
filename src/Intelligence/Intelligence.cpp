@@ -177,6 +177,7 @@ void Intelligence::update()
 void Intelligence::onUnitCreate(Unit* u)
 {
 	mapManager->onUnitCreate(u);
+#ifndef __MICRO_PROJECT__
 	if (!_launchedFirstScoutGoal 
 		&& u->getPlayer() == Broodwar->self() 
 		&& u->getType() == Broodwar->self()->getRace().getSupplyProvider()) // pylon scout
@@ -185,6 +186,7 @@ void Intelligence::onUnitCreate(Unit* u)
 		GoalManager::Instance().addGoal(tmp);
 		_launchedFirstScoutGoal = true;
 	}
+#endif
 }
 
 void Intelligence::onUnitDestroy(Unit* u)

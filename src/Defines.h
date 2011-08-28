@@ -2,8 +2,6 @@
 
 //our defines
 
-#define __MICRO_PROJECT__
-
 #undef _SECURE_SCL
 #define _SECURE_SCL 0 // remove iterator runtime checkses
 
@@ -25,6 +23,11 @@
 
 #ifdef __DEBUG__
 //#include <vld.h>
+#endif
+
+#define __MICRO_PROJECT__
+#ifdef __MICRO_PROJECT__
+#undef __ETECH_ESTIMATOR__
 #endif
 
 #ifndef __DEBUG__ // Perf
