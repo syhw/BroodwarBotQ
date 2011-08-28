@@ -54,8 +54,10 @@ void ArbiterUnit::micro()
     }
 	decideToFlee();
 
+#ifndef __MICRO_PROJECT__
 	if (!Broodwar->self()->hasResearched(TechTypes::Stasis_Field))
 		TheProducer->researchTech(TechTypes::Stasis_Field);
+#endif
 
 	int currentFrame = Broodwar->getFrameCount();
     if (currentFrame - _lastAttackFrame <= getAttackDuration()) // not interrupting attack

@@ -56,6 +56,8 @@ void Intelligence::update()
 	eTechEstimator->onFrame();
 #endif
 #endif
+
+#ifndef __MICRO_PROJECT__
 	if (Broodwar->enemy()->getRace() == Races::Protoss)
 	{
 		if (Broodwar->getFrameCount() < 24*__GATES_TIME_RUSH__ + 12
@@ -169,6 +171,7 @@ void Intelligence::update()
 		GoalManager::Instance().addGoal(pGoal(new ExploreGoal(enemyHome->getRegion())));
 		_launchedFirstExploreGoal = true;
 	}
+#endif
 }
 
 void Intelligence::onUnitCreate(Unit* u)

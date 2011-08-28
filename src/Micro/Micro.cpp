@@ -220,8 +220,10 @@ void Micro::onNukeDetect(BWAPI::Position target)
 
 BWAPI::Position Micro::getDefensePosition() const
 {
+#ifndef __MICRO_PROJECT__
 	if (TheBasesManager->getAllBases().size() > 1)
 		return TheBasesManager->getAllBases().back()->getBaseLocation()->getPosition();
 	else
+#endif
 		return frontChoke->getCenter();
 }

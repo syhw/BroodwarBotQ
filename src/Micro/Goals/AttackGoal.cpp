@@ -156,9 +156,11 @@ void AttackGoal::abort()
 		{
 			if (cOP < 0 || cOP >= (int)MapManager::Instance().getPathFromHomeToSL(eHome).size())
 			{
+#ifndef __MICRO_PROJECT__
 				if (!TheBasesManager->getAllBases().empty())
 					tp = TheBasesManager->getAllBases().back()->getBaseLocation()->getTilePosition();
 				else
+#endif
 					tp = BWTA::getStartLocation(Broodwar->self())->getTilePosition();
 			}
 			else

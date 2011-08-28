@@ -1,5 +1,8 @@
 #pragma once
-//our defin
+
+//our defines
+
+#define __MICRO_PROJECT__
 
 #undef _SECURE_SCL
 #define _SECURE_SCL 0 // remove iterator runtime checkses

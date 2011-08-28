@@ -158,6 +158,7 @@ void EUnitsFilter::onUnitShow(Unit* u)
 {
     update(u);
 
+#ifndef __MICRO_ONLY__
 	/// Spawn defend goals
 	if (u->getPlayer() == Broodwar->enemy())
 	{
@@ -177,6 +178,7 @@ void EUnitsFilter::onUnitShow(Unit* u)
 			}
 		}
 	}
+#endif
 }
 
 void EUnitsFilter::onUnitHide(Unit* u)

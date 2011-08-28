@@ -12,8 +12,6 @@
 #include "Macro/UnitGroupManager.h"
 #include "Macro/Arbitrator.h"
 
-#define __MICRO_PROJECT__
-
 static bool analyzed;
 static bool analysis_just_finished;
 static BWTA::Region* home;
