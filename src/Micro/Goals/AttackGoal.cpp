@@ -125,12 +125,12 @@ void AttackGoal::createMidSubgoal()
 }
 #endif
 
-std::string AttackGoal::getName()
+std::string AttackGoal::getName() const
 {
 	return "AttackGoal";
 }
 
-std::string AttackGoal::getShortName()
+std::string AttackGoal::getShortName() const
 {
 	return "AttG";
 }

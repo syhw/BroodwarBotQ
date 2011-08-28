@@ -141,7 +141,7 @@ void MicroAIModule::onStart()
 		tmp_form = pFormation(new SquareFormation(
 			Position(Broodwar->mapWidth()/2*32, (Broodwar->mapHeight()/2 + 4)*32)));
 		tmp_subgoal = pSubgoal(new FormationSubgoal(SL_AND, NULL, tmp_form));
-		tmp_goal = pGoal(new Goal(tmp_subgoal));
+		tmp_goal = pGoal(new AttackGoal(tmp_subgoal));
 		goals.push_back(tmp_goal);
 	}
     else

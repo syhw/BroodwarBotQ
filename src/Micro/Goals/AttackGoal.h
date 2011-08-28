@@ -20,8 +20,8 @@ public:
 	AttackGoal(pSubgoal subgoal, int priority = 50, int firstFrame = 0);
 	virtual ~AttackGoal();
 	void achieve();
-	std::string getName();
-	std::string getShortName();
+	virtual std::string getName() const;
+	virtual std::string getShortName() const;
 	void abort();
 	//virtual void onOffer(std::set<BWAPI::Unit*> objects);
 };
