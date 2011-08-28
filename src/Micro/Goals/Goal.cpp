@@ -169,7 +169,7 @@ void Goal::update()
 	for (list<Unit*>::const_iterator it = _incompleteUnits.begin();
 		it != _incompleteUnits.end(); )
 	{
-		if ((*it) == NULL || (*it)->exists())
+		if ((*it) == NULL || !(*it)->exists())
 		{
 			_incompleteUnits.erase(it++);
 		}

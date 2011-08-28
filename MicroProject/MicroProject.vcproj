@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="MicroProject"
 	ProjectGUID="{305604F2-9728-4D61-AC29-4658B31533DF}"
 	RootNamespace="MicroProject"
@@ -248,6 +248,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Micro\Units\ProtossFlying\ShuttleUnit.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Micro\Units\SpecialUnit.cpp"
 					>
 				</File>
@@ -280,10 +284,6 @@
 					</File>
 					<File
 						RelativePath="..\src\Micro\Units\ProtossFlying\ScoutUnit.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Units\ProtossFlying\ShuttleUnit.cpp"
 						>
 					</File>
 				</Filter>
