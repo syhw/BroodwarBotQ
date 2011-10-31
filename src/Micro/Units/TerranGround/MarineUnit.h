@@ -10,8 +10,8 @@ protected:
     static std::set<BWAPI::UnitType> setPrio;
     bool decideToFlee();
 public:
-    MarineUnit(BWAPI::Unit* u,UnitsGroup* ug);
-    ~MarineUnit();
+    MarineUnit(BWAPI::Unit* u);
+    virtual ~MarineUnit();
 #ifdef __LEARNING_PROB_TABLES__
 	static void initProbTables();
 #endif

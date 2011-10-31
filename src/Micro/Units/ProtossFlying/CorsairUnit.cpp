@@ -5,8 +5,8 @@ using namespace BWAPI;
 
 std::set<BWAPI::UnitType> CorsairUnit::setPrio;
 
-CorsairUnit::CorsairUnit(BWAPI::Unit* u,UnitsGroup* ug)
-: FlyingUnit(u, ug)
+CorsairUnit::CorsairUnit(BWAPI::Unit* u)
+: FlyingUnit(u)
 {
     if (setPrio.empty())
     {
@@ -37,7 +37,7 @@ void CorsairUnit::micro()
     {
         if (it->second->isVisible() && it->second->getType() == UnitTypes::Zerg_Scourge && it->second->getTarget() == unit)
         {
-            if (it->first > ((unit->getType().acceleration() + Broodwar->getLatency()) * UnitTypes::Zerg_Scourge.topSpeed() // what the scourge may run during my acceleration time + lag
+            if (it->first > ((unit->getType().acceleration() + Broodwar->getLatencyFrames()) * UnitTypes::Zerg_Scourge.topSpeed() // what the scourge may run during my acceleration time + lag
                 - unit->getType().acceleration() * (unit->getType().topSpeed()/2.1) // what I may run during my acceleration time
                 + _maxDimension/2 - UnitTypes::Zerg_Scourge.dimensionUp() + 0.1))// difference of both sizes
                 whereFlee += Vec(it->second->getVelocityX(), it->second->getVelocityY());
@@ -54,21 +54,29 @@ void CorsairUnit::micro()
         _lastRightClick = whereFlee.toPosition();
         return;
     }
-    if (Broodwar->getFrameCount() - _lastAttackFrame <= getAttackDuration()) // not interrupting attack
+	decideToFlee();
+
+	int currentFrame = Broodwar->getFrameCount();
+    if (currentFrame - _lastAttackFrame <= getAttackDuration()) // not interrupting attack
         return;
-    if (unit->getAirWeaponCooldown() <= Broodwar->getLatency() + 1)
+    if (unit->getAirWeaponCooldown() <= Broodwar->getLatencyFrames() + 1)
     {
         updateTargetEnemy();
         attackEnemyUnit(targetEnemy);
     }
-    else if (_fleeing || decideToFlee())
-    {
-        flee();
-    }
-    else
-    {
-        fightMove();
-    }
+    else if (unit->getAirWeaponCooldown() > Broodwar->getLatencyFrames() + 2) 
+	{
+		if (currentFrame - _lastClickFrame <= Broodwar->getLatencyFrames() + 3) /// HACK TODO remove/change
+			return;  
+		if (_fleeing)
+		{
+			flee();
+		}
+		else
+		{
+			fightMove();
+		}
+	}
 }
 
 void CorsairUnit::check()
@@ -77,7 +85,7 @@ void CorsairUnit::check()
 
 int CorsairUnit::getAttackDuration()
 {
-    return Broodwar->getLatency();
+    return 2;
 }
 
 std::set<BWAPI::UnitType> CorsairUnit::getSetPrio()

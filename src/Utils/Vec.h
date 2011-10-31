@@ -15,6 +15,7 @@ struct Vec {
     Vec operator+(const BWAPI::Position& p) { return BWAPI::Position(p.x() + (int)x, p.y() + (int)y); }
     Vec operator+=(const Vec &b) { x += b.x; y += b.y; return *this; }
     Vec operator+=(const BWAPI::Position& p) { x += p.x(); y += p.y(); return *this; }
+    Vec operator+=(const BWAPI::TilePosition& p) { x += p.x(); y += p.y(); return *this; }
     Vec operator-(const Vec &b) const { return Vec(x-b.x,y-b.y); }
     Vec operator*(double b) const { return Vec(x*b,y*b); }
     Vec operator*=(const double b) { x *= b; y *= b; return *this; }
@@ -29,8 +30,8 @@ struct Vec {
     BWAPI::Position toPosition() const { return BWAPI::Position( (int)x, (int)y);};
     BWAPI::TilePosition toTilePosition() const { return BWAPI::TilePosition( (int)x, (int)y);};
     Vec operator%(Vec&b){return Vec(-y*b.x-x*b.y, x*b.y-y*b.x);}
-    BWAPI::Position translate(const BWAPI::Position& p) const { return BWAPI::Position(p.x() + (int)x, p.y() + (int)y); }
-    BWAPI::Position translate(const Vec& v) const { return BWAPI::Position((int)v.x + (int)x, (int)v.y + (int)y); }
+    BWAPI::Position translate(const BWAPI::Position& p) const { return BWAPI::Position(p.x() + (int)x, p.y() + (int)y); } // sanitize? (map boundaries)
+    BWAPI::Position translate(const Vec& v) const { return BWAPI::Position((int)v.x + (int)x, (int)v.y + (int)y); } // sanitize? (map boundaries)
     Vec vecTranslate(const Vec& v) const { return Vec((int)v.x + (int)x, (int)v.y + (int)y); }
     std::ostream& operator <<(std::ostream& os) const { os << x << " " << y; return os; }
 };

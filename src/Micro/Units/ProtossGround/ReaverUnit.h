@@ -8,8 +8,8 @@ class ReaverUnit : public GroundUnit
 protected:
     static std::set<BWAPI::UnitType> setPrio;
 public:
-    ReaverUnit(BWAPI::Unit* u,UnitsGroup* ug);
-    ~ReaverUnit();
+    ReaverUnit(BWAPI::Unit* u);
+    virtual ~ReaverUnit();
     virtual void micro();
     virtual void check();
     virtual bool inRange(BWAPI::Unit* u);

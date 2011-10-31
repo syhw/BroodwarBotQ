@@ -1,5 +1,6 @@
 #pragma once
 #include <BWAPI.h>
+
 class Resources
 {
   public:
@@ -40,4 +41,5 @@ class Resources
     double gas;
     double supply;
 };
+
 Resources CumulativeResources(BWAPI::Player* player);

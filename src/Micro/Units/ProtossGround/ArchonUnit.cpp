@@ -4,8 +4,8 @@
 
 std::set<BWAPI::UnitType> ArchonUnit::setPrio;
 
-ArchonUnit::ArchonUnit(BWAPI::Unit* u, UnitsGroup* ug)
-: GroundUnit(u, ug)
+ArchonUnit::ArchonUnit(BWAPI::Unit* u)
+: GroundUnit(u)
 {
     if (setPrio.empty())
     {
@@ -68,9 +68,9 @@ bool ArchonUnit::decideToFlee()
 
 void ArchonUnit::micro()
 {
+    int currentFrame = Broodwar->getFrameCount();
     updateTargetingMe();
     decideToFlee();
-    int currentFrame = Broodwar->getFrameCount();
     if (currentFrame - _lastAttackFrame <= getAttackDuration()) // not interrupting attacks
         return;
     if (currentFrame - _lastAttackFrame == getAttackDuration() + 1)
@@ -78,21 +78,29 @@ void ArchonUnit::micro()
     /// Dodge storm, drag mine, drag scarab
     if (dodgeStorm() || dragMine() || dragScarab()) 
         return;
-    if (unit->getGroundWeaponCooldown() <= Broodwar->getLatency() + 1)
+    updateRangeEnemies();
+    updateTargetEnemy();
+    if (unit->getGroundWeaponCooldown() <= Broodwar->getLatencyFrames() + 1)
     {
-        updateRangeEnemies();
-        updateTargetEnemy();
         if (!inRange(targetEnemy))
         {
             clearDamages();
         }
         attackEnemyUnit(targetEnemy);
     }
-    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatency()*2 + 2) // == (Broodwar->getLatency()+1)*2, safety
+    else if (unit->getGroundWeaponCooldown() > Broodwar->getLatencyFrames() + 2
+		|| unit->getGroundWeaponCooldown() == unit->getType().groundWeapon().damageCooldown()) // against really laggy games TODO in other units 
     {
-        if (!dodgeStorm() && !dragScarab() && !dragMine() && _fleeing)
+        if (_fleeing)
         {
+#ifdef __SIMPLE_FLEE__
             simpleFlee();
+#else
+			if (_targetingMe.size() > 3) /// HACK TODO remove/change (unit->isStuck()?)
+				simpleFlee();
+			else
+				flee();
+#endif
         }
         else
         {

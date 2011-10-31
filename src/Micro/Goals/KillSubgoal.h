@@ -1,17 +1,12 @@
 #pragma once
-
-#include "BWAPI.h"
-#include "Subgoal.h"
+#include "Micro/Goals/Subgoal.h"
 
 class KillSubgoal : public Subgoal
 {
 public:
-	//TOFINISH
-	KillSubgoal(SubgoalLogic l, Unit* u);
-	Unit* target;
+	KillSubgoal(SubgoalLogic l, UnitsGroup* ug, BWAPI::Unit* u);
+	Unit* _target;
 	bool isRealized();
-	void tryToRealize(UnitsGroup * ug);
-	double distanceToRealize(UnitsGroup *ug);
-protected:
-	bool check();
+	void tryToRealize();
+	double distanceToRealize();
 };

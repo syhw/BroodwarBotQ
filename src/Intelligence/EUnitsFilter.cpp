@@ -1,5 +1,10 @@
 #include <PrecompiledHeader.h>
 #include "Intelligence/EUnitsFilter.h"
+#include "Defines.h"
+#include "Macro/BasesManager.h"
+#include "Micro/Micro.h"
+#include "Micro/Goals/GoalManager.h"
+#include "Micro/Goals/DefendGoal.h"
 
 using namespace BWAPI;
 using namespace std;
@@ -128,12 +133,12 @@ void EUnitsFilter::filter(Unit* u)
     if (_eViewedUnits[u].type.isBuilding()) return; // we consider that buildings don't move
     if (_invisibleUnits.count(u) && (
         (u && u->exists() && ((!u->isCloaked() && !u->isBurrowed()) || u->isDetected())) 
-        || Broodwar->getFrameCount() - _eViewedUnits[u].lastSeen > 216)) // 9 secondes
+        || Broodwar->getFrameCount() - _eViewedUnits[u].lastSeen > 216)) // remove units from invisible if we can see them after 9 secondes
     {
         _invisibleUnits.erase(u);
         return;
     }
-    if (Broodwar->getFrameCount() - _eViewedUnits[u].lastSeen > 5760) // 4 minutes
+    if (Broodwar->getFrameCount() - _eViewedUnits[u].lastSeen > 5760) // we forget units after 4 minutes 
         _eViewedUnits.erase(u);
 }
 
@@ -152,6 +157,28 @@ void EUnitsFilter::onUnitMorph(Unit* u)
 void EUnitsFilter::onUnitShow(Unit* u)
 {
     update(u);
+
+#ifndef __MICRO_PROJECT__
+	/// Spawn defend goals
+	if (u->getPlayer() == Broodwar->enemy())
+	{
+		for each (Base* bb in TheBasesManager->getAllBases())
+		{
+			BWTA::BaseLocation* b = bb->getBaseLocation();
+			if (Micro::Instance().needDefense.count(b))
+				continue;
+			BWAPI::Position bp = b->getPosition();
+			if (u->getDistance(bp) < __TILES_RADIUS_DEFEND_BASE__*TILE_SIZE
+				|| (u->getTargetPosition() != Positions::None && u->getTargetPosition() != Positions::Invalid
+				&& u->getTargetPosition() != Positions::Unknown && u->getTargetPosition().getApproxDistance(bp) < __TILES_RADIUS_DEFEND_BASE__*TILE_SIZE*0.75) // !!
+				|| (u->getTarget() != NULL && u->getTarget()->exists() && u->getTarget()->getType().isBuilding() && u->getTarget()->getPlayer() == Broodwar->self()))
+			{
+				GoalManager::Instance().addGoal(pGoal(new DefendGoal(b))); // TODO priority w.r.t. importance of the base
+				Micro::Instance().needDefense.insert(b);
+			}
+		}
+	}
+#endif
 }
 
 void EUnitsFilter::onUnitHide(Unit* u)
@@ -200,9 +227,24 @@ bool EUnitsFilter::empty()
     return _eViewedUnits.empty();
 }
 
+BWAPI::Unit* EUnitsFilter::getClosestCenter(BWTA::BaseLocation* b)
+{
+	for each (std::pair<BWAPI::Unit*, EViewedUnit> pp in _eViewedUnits)
+	{
+		if (pp.second.type == Broodwar->enemy()->getRace().getCenter()
+			&& pp.second.position.getApproxDistance(b->getPosition()) < 5*TILE_SIZE)
+		{
+			return pp.first;
+		}
+	}
+	return NULL;
+}
+
+#ifdef __DEBUG__
 void EUnitsFilter::bwOutput()
 {
     for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = _eViewedUnits.begin(); 
         it != _eViewedUnits.end(); ++it)
         Broodwar->printf("Unit: %i", it->first);
 }
+#endif

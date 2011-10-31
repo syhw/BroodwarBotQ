@@ -9,8 +9,8 @@ protected:
     static std::set<BWAPI::UnitType> setPrio;
     virtual bool decideToFlee();
 public:
-    ArchonUnit(BWAPI::Unit* u, UnitsGroup* ug);
-    ~ArchonUnit();
+    ArchonUnit(BWAPI::Unit* u);
+    virtual ~ArchonUnit();
     virtual void micro();
     virtual void check();
     virtual int getAttackDuration();

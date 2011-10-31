@@ -2,7 +2,6 @@
 #include "Utils/CSingleton.h"
 #include <BWTA.h>
 #include <BWAPI.h>
-#include "Macro/BaseManager.h"
 #include "Utils/TimeManager.h"
 #include "Regions/MapManager.h"
 #include <map>

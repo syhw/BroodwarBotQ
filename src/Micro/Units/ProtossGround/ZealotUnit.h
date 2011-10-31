@@ -9,14 +9,13 @@ class ZealotUnit : public GroundUnit
 protected:
     static std::set<BWAPI::UnitType> setPrio;
     bool decideToFlee();
+	void flee();
     void updateTargetEnemy();
-    static std::map<BWAPI::Unit*, int> _zealotsOn;
-    void setTargetEnemy(BWAPI::Unit* u);
     void clearDamages();
     int fightMove();
 public:
-    ZealotUnit(BWAPI::Unit* u,UnitsGroup* ug);
-    ~ZealotUnit();
+    ZealotUnit(BWAPI::Unit* u);
+    virtual ~ZealotUnit();
 #ifdef __LEARNING_PROB_TABLES__
 	static void initProbTables();
 #endif

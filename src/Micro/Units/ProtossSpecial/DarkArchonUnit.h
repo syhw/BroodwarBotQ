@@ -5,9 +5,12 @@
 
 class DarkArchonUnit : public SpecialUnit
 {
+	int _lastCastFrame;
+	static std::set<BWAPI::UnitType> casters;
+	static std::set<BWAPI::UnitType> setPrio;
 public:
-    DarkArchonUnit(BWAPI::Unit* u,UnitsGroup* ug);
-    ~DarkArchonUnit();
+    DarkArchonUnit(BWAPI::Unit* u);
+    virtual ~DarkArchonUnit();
     virtual void micro();
     virtual void check();
     virtual int getAttackDuration();

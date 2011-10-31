@@ -7,8 +7,8 @@ class ObserverUnit : public FlyingUnit
 {
     EUnitsFilter* _eUnitsFilter;
 public:
-    ObserverUnit(BWAPI::Unit* u,UnitsGroup* ug);
-    ~ObserverUnit();
+    ObserverUnit(BWAPI::Unit* u);
+    virtual ~ObserverUnit();
     virtual void micro();
     virtual void check();
     virtual int getAttackDuration();

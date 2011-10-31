@@ -5,8 +5,8 @@ std::set<BWAPI::UnitType> ScourgeUnit::setPrio;
 
 std::set<BWAPI::Unit*> ScourgeUnit::alreadyTargeted;
 
-ScourgeUnit::ScourgeUnit(BWAPI::Unit* u,UnitsGroup* ug)
-: FlyingUnit(u, ug)
+ScourgeUnit::ScourgeUnit(BWAPI::Unit* u)
+: FlyingUnit(u)
 {
     if (setPrio.empty())
     {
@@ -80,9 +80,9 @@ void ScourgeUnit::check()
 int ScourgeUnit::getAttackDuration()
 {
     if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible())
-        return Broodwar->getLatency() + 3; // (targetEnemy->getDistance(_unitPos))/(unit->getType().topSpeed())
+        return Broodwar->getLatencyFrames() + 3; // (targetEnemy->getDistance(_unitPos))/(unit->getType().topSpeed())
     else
-        return Broodwar->getLatency();
+        return Broodwar->getLatencyFrames();
 }
 
 std::set<BWAPI::UnitType> ScourgeUnit::getSetPrio()

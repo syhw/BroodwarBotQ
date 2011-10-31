@@ -24,7 +24,7 @@ void FindEnemyGoal::achieve()
         {
 			double test;
 			pSubgoal selected;
-			double min = 10000000000.0;
+			double min = DBL_MAX;
 			
 			for (std::list<pSubgoal>::iterator it = subgoals.begin(); it != subgoals.end(); ++it)
             {

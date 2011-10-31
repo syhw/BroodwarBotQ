@@ -1,182 +1,486 @@
 #include <PrecompiledHeader.h>
 #include "Macro.h"
+#include "BWSAL.h"
+#include "Intelligence/ETechEstimator.h"
+#include "Intelligence/EUnitsFilter.h"
+#include "Intelligence/Intelligence.h"
+#include "Macro/Producer.h"
 
 using namespace BWAPI;
 
-UnitCompositionProducer* infantryProducer = NULL; // TODO remove
+inline bool dontHave(BWAPI::UnitType ut)
+{
+    return !Broodwar->self()->completedUnitCount(ut) && !Broodwar->self()->incompleteUnitCount(ut);
+}
+
+inline bool wontHave(BWAPI::UnitType ut)
+{
+	return dontHave(ut) && !TheBuilder->numberInFutureTasks(ut);
+}
+
+inline int sumWillHave(BWAPI::UnitType ut)
+{
+	return Broodwar->self()->completedUnitCount(ut) + TheBuilder->willBuild(ut);
+}
 
 Macro::Macro()
 : expands(0)
 , addedGates(0)
+, reservedMinerals(0)
+, reservedGas(0)
+, stormFirst(false)
+, reaverFirst(false)
 {
 	TheArbitrator = & arbitrator;
-	MacroManager::create();
-	MacroSupplyManager::create();
-	MacroDependencyResolver::create();
+	ReservedMap::create();
+	Builder::create();
+	Producer::create();
 	ResourceRates::create();
 	InformationManager::create();
 	BorderManager::create();
-	MacroBaseManager::create();
+	BasesManager::create();
 	UnitGroupManager::create();
-	MacroWorkerManager::create();
-	ReservedMap::create();
+	WorkerManager::create();
+}
 
-	TaskStream* ts = new TaskStream();
-	TheMacroManager->taskStreams.push_back(ts);
-	Unit* worker = NULL;
-	for each(Unit* u in Broodwar->self()->getUnits())
-	{
-		if (u->getType().isResourceDepot())
-			worker = u;
-	}
-	ts->setWorker(worker);
-	ts->attach(BasicTaskExecutor::getInstance(),false);
-	ts->attach(new UnitPump(Broodwar->self()->getRace().getWorker()),true);
-	ts->attach(new TerminateIfWorkerLost(),true);
+Macro::~Macro()
+{
+	Producer::destroy();
+	ResourceRates::destroy();
+	InformationManager::destroy();
+	BorderManager::destroy();
+	BasesManager::destroy();
+	UnitGroupManager::destroy();
+	WorkerManager::destroy();
+	ReservedMap::destroy();
+	Builder::destroy();
+}
+
+void Macro::init()
+{
 	if (Broodwar->self()->getRace() == Races::Protoss)
 	{
-		buildOrderAdd(UnitTypes::Protoss_Gateway);
-		buildOrderAdd(UnitTypes::Protoss_Cybernetics_Core);
-		buildOrderAdd(UnitTypes::Protoss_Assimilator);
-		buildOrderAdd(UnitTypes::Protoss_Gateway);
-		addedGates = 2;
-		infantryProducer = new UnitCompositionProducer(UnitTypes::Protoss_Gateway);
-		infantryProducer->setUnitWeight(UnitTypes::Protoss_Dragoon, 3.0);
-		infantryProducer->setUnitWeight(UnitTypes::Protoss_Zealot, 1.0);
-		upgradeAdd(UpgradeTypes::Singularity_Charge);
+		TheWorkerManager->enableAutoBuild();
+		if (Broodwar->enemy()->getRace() == Races::Zerg)
+		{
+			/*TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 8);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Nexus, 15);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Forge, 16);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 16);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Photon_Cannon, 18);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Photon_Cannon, 18);*/
+			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 8);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 11);
+			TheBasesManager->setFirstGasPop(12);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 15);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 16);
+		}
+		else if (Broodwar->enemy()->getRace() == Races::Terran)
+		{
+			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 8);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 11);
+			TheBasesManager->setFirstGasPop(12);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 15);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 16);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 17);
+		}
+		else
+		{
+			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 8);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 11);
+			TheBasesManager->setFirstGasPop(12);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 15);
+			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 16);
+		}
 	}
-	else if (Broodwar->self()->getRace() == Races::Terran)
-	{
-		buildOrderAdd(UnitTypes::Terran_Supply_Depot);
-		buildOrderAdd(UnitTypes::Terran_Barracks);
-		buildOrderAdd(UnitTypes::Terran_Refinery);
-		buildOrderAdd(UnitTypes::Terran_Academy);
-		buildOrderAdd(UnitTypes::Terran_Barracks);
-		buildOrderAdd(UnitTypes::Terran_Barracks);
-		infantryProducer = new UnitCompositionProducer(UnitTypes::Terran_Barracks);
-		infantryProducer->setUnitWeight(UnitTypes::Terran_Marine, 3.0);
-		infantryProducer->setUnitWeight(UnitTypes::Terran_Medic, 1.0);
-		techAdd(TechTypes::Stim_Packs);
-	}
+	else
 	{
 		Broodwar->printf("Race not implemented");
 	}
 }
 
-Macro::~Macro()
-{
-	MacroManager::destroy();
-	MacroSupplyManager::destroy();
-	MacroDependencyResolver::destroy();
-	ResourceRates::destroy();
-	InformationManager::destroy();
-	BorderManager::destroy();
-	MacroBaseManager::destroy();
-	UnitGroupManager::destroy();
-	MacroWorkerManager::destroy();
-	ReservedMap::destroy();
-}
-
-void Macro::buildOrderAdd(UnitType type)
-{
-	TaskStream* ts = new TaskStream(Task(type));
-	TheMacroManager->taskStreams.push_back(ts);
-	ts->attach(new BasicWorkerFinder(),true);
-	ts->attach(BasicTaskExecutor::getInstance(),false);
-	ts->attach(new TerminateIfEmpty(),true);
-	ts->attach(SimCityBuildingPlacer::getInstance(),false);
-}
-
-void Macro::techAdd(TechType type)
-{
-	TaskStream* ts = new TaskStream(Task(type));
-	TheMacroManager->taskStreams.push_back(ts);
-	ts->attach(new BasicWorkerFinder(),true);
-	ts->attach(BasicTaskExecutor::getInstance(),false);
-	ts->attach(new TerminateIfEmpty(),true);
-	ts->attach(SimCityBuildingPlacer::getInstance(),false);
-}
-
-void Macro::upgradeAdd(UpgradeType type)
-{
-	TaskStream* ts = new TaskStream(Task(type));
-	TheMacroManager->taskStreams.push_back(ts);
-	ts->attach(new BasicWorkerFinder(),true);
-	ts->attach(BasicTaskExecutor::getInstance(),false);
-	ts->attach(new TerminateIfEmpty(),true);
-	ts->attach(SimCityBuildingPlacer::getInstance(),false);
-}
-
 void Macro::update()
 {
-    if (infantryProducer)
-		infantryProducer->update();
-	TheMacroSupplyManager->update();
-	TheMacroManager->update();
-	TheResourceRates->update();
-	TheBorderManager->update();
-	TheMacroBaseManager->update();
-	TheMacroWorkerManager->update();
-	TheArbitrator->update();
+#ifdef __DEBUG__
+	Broodwar->drawTextScreen(130, 38, "\x11 rM: %d, rG: %d", reservedMinerals, reservedGas);
+#endif
+	if (reservedMinerals < 0) // safety
+		reservedMinerals = 0;
+	if (reservedGas < 0)
+		reservedGas = 0;
 
-	if (!expands && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 2)
-	{
-		++expands;
-		TheMacroBaseManager->expandWhenPossible();
-		//buildOrderAdd(UnitTypes::Protoss_Assimilator);
-	}
-	else if (expands == 1 && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Observer))
-	{
-		++expands;
-		TheMacroBaseManager->expandWhenPossible();
-		//buildOrderAdd(UnitTypes::Protoss_Assimilator);
-	}
-	if (addedGates < 3 && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 1)
-	{
-		buildOrderAdd(UnitTypes::Protoss_Gateway);
-		++addedGates;
-	}
+	TheProducer->update();
+
+	TheResourceRates->update();
+
+	TheBorderManager->update();
+
+	TheBasesManager->update();
+
+	TheWorkerManager->update();
+
+	TheBuilder->update(); // last update which moves an unit that should be done
+
+	TheArbitrator->update();
 	
-	/*if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Nexus) > 1)
+	if (!expands && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 12)
 	{
-		buildOrderAdd(UnitTypes::Protoss_Observatory);
-		upgradeAdd(UpgradeTypes::Protoss_Ground_Weapons);
-		upgradeAdd(UpgradeTypes::Protoss_Ground_Armor);
-	}*/
-	/*
-	if (Broodwar->self()->minerals() > 500 && addedGates < 8)
+		expand();
+	}
+
+	if (!expands)
 	{
-        ++addedGates;
-		buildOrderAdd(UnitTypes::Protoss_Gateway);
-	}*/
+		if ((Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 6)
+			//|| Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway) + Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Gateway) >= 2)
+			&& !Intelligence::Instance().enemyRush)
+		{
+			if (Broodwar->enemy()->getRace() != Races::Protoss || ETechEstimator::Instance().getOpeningsProbas().at(1) > 0.18)
+			{
+				/*if (wontHave(UnitTypes::Protoss_Forge))
+					TheBuilder->build(UnitTypes::Protoss_Forge);
+				while (TheBuilder->willBuild(UnitTypes::Protoss_Photon_Cannon) < 3)
+					TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
+					*/
+			}
+			else
+				expand();
+		}
+		else if (Broodwar->self()->minerals() > 400)
+			expand();
+	}
+	else if (expands == 1)
+	{
+		if (wontHave(UnitTypes::Protoss_Robotics_Facility))
+			TheBuilder->build(UnitTypes::Protoss_Robotics_Facility);
+
+		if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Photon_Cannon)
+			+ TheBuilder->willBuild(UnitTypes::Protoss_Photon_Cannon) < 5)
+			TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
+
+		if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Observer)
+			&& (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Reaver > 1) || Broodwar->self()->completedUnitCount(UnitTypes::Protoss_High_Templar) > 2))
+		{
+			expand();
+		}
+	}
+	else if (expands > 1)
+	{
+		if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_High_Templar) > 7)
+		{
+			TheProducer->researchTech(TechTypes::Maelstrom);
+			TheProducer->produce(2, UnitTypes::Protoss_Dark_Archon, 60, 2);
+			TheProducer->produceAlways(2, UnitTypes::Protoss_Dark_Archon, 6);
+		}
+		if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Zealot) > 7)
+		{
+			TheProducer->researchUpgrade(UpgradeTypes::Leg_Enhancements);
+		}
+		if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Protoss_Ground_Armor) < 2)
+		{
+			TheProducer->researchUpgrade(UpgradeTypes::Protoss_Ground_Armor);
+			TheProducer->researchUpgrade(UpgradeTypes::Protoss_Ground_Weapons);
+		}
+		if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Protoss_Ground_Weapons) < 1)
+			TheProducer->researchUpgrade(UpgradeTypes::Protoss_Ground_Weapons);
+	}
+	else if (expands > 2)
+	{
+		if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Protoss_Ground_Armor) < 3)
+		{
+			TheProducer->researchUpgrade(UpgradeTypes::Protoss_Ground_Armor);
+			TheProducer->researchUpgrade(UpgradeTypes::Protoss_Ground_Weapons);
+		}
+	}
+	if (Broodwar->self()->minerals() > 250 
+		&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Robotics_Support_Bay))
+	{
+		if (!Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Shuttle))
+			TheProducer->produce(1, UnitTypes::Protoss_Shuttle, 90);
+		if (Broodwar->self()->gas() > 150 && !Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Reaver))
+			TheProducer->produce(1, UnitTypes::Protoss_Reaver, 95);
+	}
+#ifdef __DEBUG__
+	reaverFirst = true;// TODO REMOVE DEBUG
+#endif
 }
 
 void Macro::onUnitDiscover(BWAPI::Unit* unit)
 {
-  TheInformationManager->onUnitDiscover(unit);
-  TheUnitGroupManager->onUnitDiscover(unit);
+	TheInformationManager->onUnitDiscover(unit);
+	TheUnitGroupManager->onUnitDiscover(unit);
 }
 
 void Macro::onUnitEvade(BWAPI::Unit* unit)
 {
-  TheInformationManager->onUnitEvade(unit);
-  TheUnitGroupManager->onUnitEvade(unit);
+	TheInformationManager->onUnitEvade(unit);
+	TheUnitGroupManager->onUnitEvade(unit);
+}
+
+void Macro::onUnitCreate(BWAPI::Unit* unit)
+{
+/*
+Terran openings, in order (in the vector):
+ - Bio            ==> Storm
+ - TwoFactory     ==> Obs
+ - VultureHarass  ==> Obs
+ - SiegeExpand    ==> Reaver/Drop
+ - Standard       ==> Reaver/Drop
+ - FastDropship   ==> Reaver/Drop
+ - Unknown        ==> Obs
+
+Protoss openings, in order (in the vector):
+ - FastLegs       ==> Obs/Reaver
+ - FastDT         ==> Cannons/Obs
+ - FastObs        ==> Reaver/Drop
+ - ReaverDrop     ==> Reaver/Drop
+ - Carrier        ==> "lol"
+ - FastExpand     ==> Expand/Reave/Drop
+ - Unknown        ==> Obs
+
+Zerg openings, in order (in the vector):
+ - TwoHatchMuta   ==> Storm
+ - ThreeHatchMuta ==> Storm
+ - HydraRush      ==> Goons/ZLegs/Storm/Obs
+ - Standard       ==> ZLegs/Storm/Goons
+ - HydraMass      ==> ZLegs/Storm
+ - Lurker         ==> Obs/Reaver/Drop/Storm
+ - Unknown        ==> Storm
+ */
+	TheProducer->onUnitCreate(unit);
+	TheBuilder->onUnitCreate(unit);
+
+	if (unit->getPlayer() == Broodwar->self())
+	{
+		UnitType ut =unit->getType();
+		Race er = Broodwar->enemy()->getRace();
+
+		/////////////////// T1 ///////////////////
+		// Core->Singulary, Zealots vs Zerg and always Goons (against all)
+
+		if (ut == UnitTypes::Protoss_Cybernetics_Core && Broodwar->getFrameCount() < 16000)
+		{
+			/// Built the (first) core
+			TheProducer->researchUpgrade(UpgradeTypes::Singularity_Charge);
+			if (er == Races::Zerg)
+			{
+				TheProducer->produce(6, UnitTypes::Protoss_Zealot, 49, 2);
+				TheProducer->produce(16, UnitTypes::Protoss_Dragoon, 50);
+				TheProducer->produceAlways(30, UnitTypes::Protoss_Dragoon);
+				TheProducer->produceAlways(6, UnitTypes::Protoss_Zealot, 2);
+			}
+			else if (er == Races::Terran)
+			{
+				TheProducer->produce(16, UnitTypes::Protoss_Dragoon, 50);
+				TheProducer->produceAlways(32, UnitTypes::Protoss_Dragoon);
+			}
+			else
+			{
+				TheProducer->produce(16, UnitTypes::Protoss_Dragoon, 50);
+				TheProducer->produceAlways(32, UnitTypes::Protoss_Dragoon);
+			}
+		}
+		else if (ut == UnitTypes::Protoss_Gateway)
+		{
+			/// 1st Gateway (in a "< 19 supply" sense)
+			if (Broodwar->self()->supplyUsed() < 40)
+			{
+				if (er == Races::Zerg)
+					TheProducer->produce(2, UnitTypes::Protoss_Zealot, 50);
+			}
+			/// 3rd Gateway and oponent not Terran -> forge (for cannons against mutas and DTs, and for +1 attack against Z)
+			if (er != Races::Terran
+				&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway) > 2
+				&& wontHave(UnitTypes::Protoss_Forge))
+			{
+				TheBuilder->build(UnitTypes::Protoss_Forge);
+			}
+		}
+
+		/////////////////// T2+ ///////////////////
+
+		else if (ut == UnitTypes::Protoss_Forge)
+		{
+			if (!Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Forge))
+			{
+				if (er == Races::Zerg)
+					TheProducer->researchUpgrade(UpgradeTypes::Protoss_Ground_Weapons);
+			}
+			else
+			{
+				TheProducer->researchUpgrade(UpgradeTypes::Protoss_Ground_Weapons);
+				TheProducer->researchUpgrade(UpgradeTypes::Protoss_Ground_Armor);
+			}
+		}
+		else if (ut == UnitTypes::Protoss_Nexus)
+		{
+			if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Nexus) == 2) // it's the first expand then (1 complete + 1 incomplete)
+			{
+				if (!reaverFirst && !stormFirst && wontHave(UnitTypes::Protoss_Observatory))
+				{
+					if (wontHave(UnitTypes::Protoss_Robotics_Facility))
+						TheBuilder->build(UnitTypes::Protoss_Robotics_Facility);
+					else if (wontHave(UnitTypes::Protoss_Observatory))
+						TheBuilder->build(UnitTypes::Protoss_Observatory);
+				}
+
+				if (reaverFirst)
+				{
+					if (wontHave(UnitTypes::Protoss_Robotics_Facility))
+						TheBuilder->build(UnitTypes::Protoss_Robotics_Facility);
+					else if (wontHave(UnitTypes::Protoss_Robotics_Support_Bay))
+						TheBuilder->build(UnitTypes::Protoss_Robotics_Facility);
+				}
+				//else 
+				if (stormFirst && wontHave(UnitTypes::Protoss_Citadel_of_Adun))
+				    TheBuilder->build(UnitTypes::Protoss_Citadel_of_Adun);
+
+				if (wontHave(UnitTypes::Protoss_Forge))
+					TheBuilder->build(UnitTypes::Protoss_Forge);
+			}
+			if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Nexus) == 3) // B3
+			{
+				if (sumWillHave(UnitTypes::Protoss_Forge) < 2)
+					TheBuilder->build(UnitTypes::Protoss_Forge);
+				if (wontHave(UnitTypes::Protoss_Templar_Archives))
+					TheBuilder->build(UnitTypes::Protoss_Templar_Archives);
+				if (wontHave(UnitTypes::Protoss_Robotics_Facility))
+					TheBuilder->build(UnitTypes::Protoss_Robotics_Facility);
+			}
+			if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Nexus) == 4) // B4
+			{
+				TheProducer->researchUpgrade(UpgradeTypes::Reaver_Capacity);
+				TheProducer->researchUpgrade(UpgradeTypes::Scarab_Damage);
+				if (wontHave(UnitTypes::Protoss_Stargate))
+					TheBuilder->build(UnitTypes::Protoss_Stargate);
+				int missingCannons = 3 + Macro::Instance().expands * 3
+					- (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Photon_Cannon) + TheBuilder->willBuild(UnitTypes::Protoss_Photon_Cannon));
+				while (missingCannons > 0)
+				{
+					--missingCannons;
+					TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
+				}
+			}
+		}
+		else if (ut == UnitTypes::Protoss_Citadel_of_Adun)
+		{
+			if (wontHave(UnitTypes::Protoss_Templar_Archives))
+				TheBuilder->build(UnitTypes::Protoss_Templar_Archives);
+		}
+		else if (ut == UnitTypes::Protoss_Robotics_Facility)
+		{
+			if (reaverFirst)
+			{
+				if (wontHave(UnitTypes::Protoss_Robotics_Support_Bay))
+					TheBuilder->build(UnitTypes::Protoss_Robotics_Support_Bay);
+				TheProducer->produce(1, UnitTypes::Protoss_Shuttle, 95);
+				TheProducer->produceAlways(1, UnitTypes::Protoss_Shuttle, 3);
+			}
+			else
+			{
+				if (wontHave(UnitTypes::Protoss_Observatory))
+					TheBuilder->build(UnitTypes::Protoss_Observatory);
+			}
+		}
+
+		/////////////////// T3 ///////////////////
+
+		else if (ut == UnitTypes::Protoss_Templar_Archives)
+		{
+			/// Built templar archives
+			TheProducer->researchTech(TechTypes::Psionic_Storm);
+			TheProducer->researchUpgrade(UpgradeTypes::Khaydarin_Amulet);
+			TheProducer->produce(8, UnitTypes::Protoss_High_Templar, 56, 3);
+			TheProducer->produceAlways(12, UnitTypes::Protoss_High_Templar, 3);
+			if (er == Races::Zerg)
+				TheProducer->produce(2, UnitTypes::Protoss_Archon, 50, 3);
+		}
+		else if (ut == UnitTypes::Protoss_Observatory)
+		{
+			TheProducer->produce(2, UnitTypes::Protoss_Observer, 60, 2);
+		}
+		else if (ut == UnitTypes::Protoss_Robotics_Support_Bay)
+		{
+			TheProducer->produce(1, UnitTypes::Protoss_Reaver, 95);
+			if (!Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Shuttle))
+				TheProducer->produce(1, UnitTypes::Protoss_Shuttle, 95);
+			TheProducer->produceAlways(3, UnitTypes::Protoss_Reaver, 5);
+		}
+		else if (ut == UnitTypes::Protoss_Observer)
+		{
+			if (!stormFirst && wontHave(UnitTypes::Protoss_Robotics_Support_Bay))
+				TheBuilder->build(UnitTypes::Protoss_Robotics_Support_Bay);
+		}
+		else if (ut == UnitTypes::Protoss_Reaver)
+		{
+			TheProducer->researchUpgrade(UpgradeTypes::Gravitic_Drive);
+			if (er == Races::Terran) // to one shot SCVs
+				TheProducer->researchUpgrade(UpgradeTypes::Scarab_Damage);
+			if (wontHave(UnitTypes::Protoss_Observatory))
+				TheBuilder->build(UnitTypes::Protoss_Observatory);
+			if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Shuttle))
+				TheProducer->produceAlways(5, UnitTypes::Protoss_Observer, 5);
+		}
+		else if (ut == UnitTypes::Protoss_Shuttle)
+		{
+			if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Reaver))
+				TheProducer->produceAlways(5, UnitTypes::Protoss_Observer, 5);
+		}
+		else if (ut == UnitTypes::Protoss_Stargate)
+		{
+			if (EUnitsFilter::Instance().getNumbersType(UnitTypes::Zerg_Mutalisk) > 10)
+			{
+				TheProducer->produce(6, UnitTypes::Protoss_Corsair, 80, 2);
+				TheProducer->produceAlways(4, UnitTypes::Protoss_Corsair, 2);
+			}
+			if (wontHave(UnitTypes::Protoss_Fleet_Beacon))
+				TheBuilder->build(UnitTypes::Protoss_Fleet_Beacon);
+			if (wontHave(UnitTypes::Protoss_Arbiter_Tribunal))
+				TheBuilder->build(UnitTypes::Protoss_Arbiter_Tribunal);
+		}
+		else if (ut == UnitTypes::Protoss_Fleet_Beacon)
+		{
+			TheProducer->produce(4, UnitTypes::Protoss_Carrier, 80);
+			TheProducer->produceAlways(4, UnitTypes::Protoss_Carrier, 5);
+		}
+		else if (ut == UnitTypes::Protoss_Arbiter_Tribunal)
+		{
+			TheProducer->produce(2, UnitTypes::Protoss_Arbiter, 80);
+			TheProducer->produceAlways(1, UnitTypes::Protoss_Arbiter, 5);
+		}
+	}
 }
 
 void Macro::onUnitDestroy(BWAPI::Unit* unit)
 {
-  TheArbitrator->onRemoveObject(unit);
-  TheInformationManager->onUnitDestroy(unit);
-  TheMacroBaseManager->onUnitDestroy(unit);
-  TheMacroWorkerManager->onRemoveUnit(unit);
+	TheArbitrator->onRemoveObject(unit);
+	TheInformationManager->onUnitDestroy(unit);
+	TheBasesManager->onUnitDestroy(unit);
+	TheWorkerManager->onUnitDestroy(unit);
+	TheBuilder->onUnitDestroy(unit);
+	TheProducer->onUnitDestroy(unit);
+	//TheUpgrader->onUnitDestroy(unit);
 }
 
 void Macro::onUnitMorph(BWAPI::Unit* unit)
 {
-  TheUnitGroupManager->onUnitMorph(unit);
+	TheUnitGroupManager->onUnitMorph(unit);
 }
 
 void Macro::onUnitRenegade(BWAPI::Unit* unit)
 {
-  TheUnitGroupManager->onUnitRenegade(unit);
+	TheUnitGroupManager->onUnitRenegade(unit);
+	// the following is experimental
+	if (unit->getPlayer() != Broodwar->self())
+	{
+		TheArbitrator->onRemoveObject(unit);
+		TheWorkerManager->onRemoveUnit(unit);
+		TheInformationManager->onUnitDestroy(unit);
+		TheInformationManager->onUnitDiscover(unit);
+	}
+}
+
+void Macro::expand()
+{
+	Macro::Instance().expands += 1;
+	TheBasesManager->expand();
 }

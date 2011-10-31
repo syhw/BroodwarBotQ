@@ -5,8 +5,8 @@
 class SpecialUnit : public BayesianUnit
 {
 public:
-	SpecialUnit(BWAPI::Unit* u, UnitsGroup* ug);
-	~SpecialUnit();
+	SpecialUnit(BWAPI::Unit* u);
+	virtual ~SpecialUnit();
 	virtual void micro() = 0;
 	virtual void check() = 0;
 	virtual int getAttackDuration();

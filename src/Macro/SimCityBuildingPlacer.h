@@ -1,6 +1,4 @@
 #pragma once
-#include "Macro/MacroManager/TaskStreamObserver.h"
-#include "Macro/MacroManager/TaskStream.h"
 #include "Macro/RectangleArray.h"
 #include "Macro/ReservedMap.h"
 #include <list>
@@ -12,6 +10,9 @@ struct BuildingsCluster
 	BWAPI::TilePosition center;
 	int size;
 	bool vertical;
+	BuildingsCluster()
+		: size(0)
+	{}
 };
 
 struct PositionAccountant
@@ -19,8 +20,10 @@ struct PositionAccountant
 	BWAPI::UnitType ut;
 	std::list<BWAPI::TilePosition> pos;
 	std::set<BWAPI::TilePosition> givenPos;
-	BWAPI::TilePosition reservePos(Task& task);
+	void cleanUp(); // because maps suck?
 	BWAPI::TilePosition reservePos();
+	BWAPI::TilePosition reservePos(BWAPI::TilePosition tp);
+	BWAPI::TilePosition findClosest(BWAPI::TilePosition seed);
 	inline void freePos(const BWAPI::TilePosition& tp)
 	{
 		givenPos.erase(tp);
@@ -56,19 +59,22 @@ struct PositionAccountant
 	}
 };
 
-class SimCityBuildingPlacer : public TaskStreamObserver
+class SimCityBuildingPlacer
 {
 public:
-	static SimCityBuildingPlacer* getInstance();
 	SimCityBuildingPlacer();
-	virtual void attached(TaskStream* ts);
-	virtual void detached(TaskStream* ts);
-	virtual void newStatus(TaskStream* ts);
-	virtual void completedTask(TaskStream* ts, const Task &t);
-	virtual void update(TaskStream* ts);
-	void setTilePosition(TaskStream* ts, BWAPI::TilePosition p);
-	void setRelocatable(TaskStream* ts, bool isRelocatable);
-	void setBuildDistance(TaskStream* ts, int distance);
+	BWAPI::TilePosition getTilePosition(const BWAPI::UnitType& ut, BWAPI::TilePosition seed = BWAPI::TilePositions::None);
+	BWAPI::TilePosition getPylonTilePositionCovering(const BWAPI::TilePosition& tp);
+	void releaseTilePosition(const BWAPI::TilePosition& tp, const BWAPI::UnitType& ut);
+	void usedTilePosition(const BWAPI::TilePosition& tp, const BWAPI::UnitType& ut);
+#ifdef __DEBUG__
+	void update();
+#endif
+	void onUnitDestroy(BWAPI::Unit* unit);
+    void makeCannonsMinerals(BWTA::BaseLocation* home, bool quick=false);
+	void makeCannonChoke(BWTA::Region* inter, BWTA::Chokepoint* chok, bool quick=false);
+	static bool blockedBySomething(BWAPI::TilePosition position, BWAPI::UnitType type);
+	static bool inMineralLine(BWTA::BaseLocation* b, BWAPI::TilePosition tp);
 private:
 	std::list<BWAPI::TilePosition> existingPylons;
 	PositionAccountant pylons;
@@ -79,32 +85,28 @@ private:
 	BWTA::Chokepoint* frontChoke;
 	std::set<BWTA::Chokepoint*> backdoorChokes;
 	int nbClusters;
+	bool _noMoreClustersAtHome;
+	bool _canNoLongerGenerateClusters;
+	std::set<BWTA::BaseLocation*> _searchedForClustersAtBase;
+	std::set<BWTA::Region*> _searchedForClustersAtRegion;
+	inline void searchedAtBase(BWTA::BaseLocation* b);
 
-	BWAPI::TilePosition buildFartherFrom(const BWAPI::TilePosition& tp,
-		const BWAPI::TilePosition& fartherFrom,
-		int howMuchFarther,
-		const BWAPI::UnitType& ut);
-	BWAPI::TilePosition getBuildLocationNear(BWAPI::Unit* builder,
-		BWAPI::TilePosition position,
-		BWAPI::UnitType type, int buildDist);
+	inline BuildingsCluster searchForCluster(BWTA::BaseLocation* b);
     inline BuildingsCluster searchForCluster(BWTA::Region* r);
+	inline BuildingsCluster searchForCluster(int minX, int maxX, int minY, int maxY, BWTA::Region* r);
+	inline bool canBuildCluster(BWAPI::TilePosition center, bool vertical, int size);
 	inline int canBuildCluster(const BWAPI::TilePosition& center, bool vertical);
 	inline int makeCluster(const BWAPI::TilePosition& center,
 		int nbTechBuildings, bool vertical, int cSize=0);
-    inline void makeCannonsMinerals(BWTA::BaseLocation* home);
-	inline void generate();
+	BWAPI::TilePosition closestBuildableSameRegion(const BWAPI::TilePosition& tp);
+	BWAPI::TilePosition closestBuildableSameRegionNotTP2(const BWAPI::TilePosition& tp, const BWAPI::TilePosition& tp2);
+	inline void generate(int min_size = 1);
+	inline void generateGatesPos();
+	inline void generateTechPos();
+	inline void generateCannonsPos();
+	inline void generatePylonsPos();
+	inline std::set<BWAPI::Unit*> checkPower(const std::set<BWAPI::Unit*>& buildings);
+	inline bool powerBuildings(const std::set<BWAPI::Unit*>& buildings);
 	bool canBuildHere(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type) const;
-	bool canBuildHereWithSpace(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type, int buildDist) const;
-	bool fullCanBuildHere(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type) const;
-	bool buildable(BWAPI::Unit* builder, int x, int y) const;
-	struct data
-	{
-		bool isRelocatable;
-		int buildDistance;
-		BWAPI::TilePosition reservePosition;
-		int reserveWidth;
-		int reserveHeight;
-	};
-	std::map< TaskStream*, data > taskStreams;
-
+	bool fullCanBuildHere(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type) const; // double checks (map init?)
 };

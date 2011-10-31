@@ -4,10 +4,6 @@
 #include "Macro/BWSAL.h"
 #include <set>
 
-#define __POOL_TIME_RUSH__ 130 // seconds, 3 workers + 1 pool + 11 seconds
-#define __BBS_TIME_RUSH__ 230 // seconds, 4 workers + 2 barracks + 18 seconds
-#define __GATES_TIME_RUSH__ 190 // seconds, 4 workers + 2 gateways + 18 seconds
-
 using namespace BWAPI;
 using namespace std;
 
@@ -37,6 +33,7 @@ void BattleBroodAI::onStart()
    
 	this->intelligence = & Intelligence::Instance();
 	this->macro = & Macro::Instance();
+	this->macro->init();
 	this->micro = & Micro::Instance();
     this->timeManager = & TimeManager::Instance();
 }
@@ -44,8 +41,8 @@ void BattleBroodAI::onStart()
 void BattleBroodAI::onEnd(bool isWinner)
 {
 	Intelligence::Destroy();
-	Macro::Destroy();
 	Micro::Destroy();
+	Macro::Destroy();
     TimeManager::Destroy();
 
     if (isWinner)
@@ -90,23 +87,22 @@ void BattleBroodAI::onFrame()
 #endif
 
     //timeManager->update();
-	TheArbitrator->update();
     clock_t time1 = clock();
 	intelligence->update(); // Intelligence update
     clock_t time2 = clock();
 	double interval = (double)(time2 - time1)/CLOCKS_PER_SEC;
 	if (interval > 0.040)
 		Broodwar->printf("INTELLIGENCE took %2.5f seconds", interval);
-	macro->update(); // Macro update
+	micro->update(); // Micro update
 	time1 = clock();
 	interval = (double)(time1 - time2)/CLOCKS_PER_SEC;
 	if (interval > 0.040)
-		Broodwar->printf("MACRO took %2.5f seconds", interval);
-	micro->update(); // Micro update
+		Broodwar->printf("MICRO took %2.5f seconds", interval);
+	macro->update(); // Macro update
 	time2 = clock();
 	interval = (double)(time2 - time1)/CLOCKS_PER_SEC;
 	if (interval > 0.040)
-		Broodwar->printf("MICRO took %2.5f seconds", interval);
+		Broodwar->printf("MACRO took %2.5f seconds", interval);
 
 #ifdef __DEBUG__
     std::set<Unit*> units=Broodwar->self()->getUnits();
@@ -119,6 +115,8 @@ void BattleBroodAI::onFrame()
                 int x=(*i)->getPosition().x();
                 int y=(*i)->getPosition().y();
                 std::list< std::pair< Arbitrator::Controller<BWAPI::Unit*,double>*, double> > bids=TheArbitrator->getAllBidders(*i);
+				if (bids.empty())
+					continue;
                 int y_off=0;
                 bool first = false;
                 const char activeColor = '\x07', inactiveColor = '\x16';
@@ -145,6 +143,7 @@ void BattleBroodAI::onFrame()
 void BattleBroodAI::onUnitCreate(BWAPI::Unit* unit)
 {
 	intelligence->onUnitCreate(unit);
+	macro->onUnitCreate(unit);
 	micro->onUnitCreate(unit);
 }
 
@@ -153,7 +152,6 @@ void BattleBroodAI::onUnitDestroy(BWAPI::Unit* unit)
 	intelligence->onUnitDestroy(unit);
 	macro->onUnitDestroy(unit);
 	micro->onUnitDestroy(unit);
-	TheArbitrator->onRemoveObject(unit);
 }
 
 void BattleBroodAI::onUnitShow(BWAPI::Unit* unit)
@@ -172,7 +170,8 @@ void BattleBroodAI::onUnitDiscover(BWAPI::Unit* unit)
 	macro->onUnitDiscover(unit);
 }
 
-void BattleBroodAI::onUnitEvade(BWAPI::Unit* unit){
+void BattleBroodAI::onUnitEvade(BWAPI::Unit* unit)
+{
 	macro->onUnitEvade(unit);
 }
 
@@ -186,6 +185,7 @@ void BattleBroodAI::onUnitRenegade(BWAPI::Unit* unit)
 {
 	intelligence->onUnitRenegade(unit);
 	macro->onUnitRenegade(unit);
+	micro->onUnitRenegade(unit);
 }
 
 void BattleBroodAI::onPlayerLeft(BWAPI::Player* player)
@@ -195,10 +195,11 @@ void BattleBroodAI::onPlayerLeft(BWAPI::Player* player)
 
 void BattleBroodAI::onNukeDetect(BWAPI::Position target)
 {
-    //if (target!=Positions::Unknown)
-    //	Broodwar->printf("Nuclear Launch Detected at (%d,%d)",target.x(),target.y());
-    //else
-    //	Broodwar->printf("Nuclear Launch Detected");
+	micro->onNukeDetect(target);
+    if (target!=Positions::Unknown)
+    	Broodwar->printf("Nuclear Launch Detected at (%d,%d)",target.x(),target.y());
+    else
+    	Broodwar->printf("Nuclear Launch Detected");
 }
 
 void BattleBroodAI::onSendText(std::string text)
@@ -233,32 +234,12 @@ void BattleBroodAI::onSendText(std::string text)
         //  Broodwar->printf("Set Speed %i", x);
         Broodwar->setLocalSpeed(x);
     }
-    else if (text=="/target")
-    {
-        set<pBayesianUnit> tmp;
-        // for (std::list<UnitsGroup*>::iterator it = this->warManager->unitsGroups.begin(); it != this->warManager->unitsGroups.end(); it++) // why HEAD does have a different warManager->unitsGroups? @merge
-        for (std::list<UnitsGroup*>::iterator it = micro->warManager->unitsGroups.begin(); it != micro->warManager->unitsGroups.end(); it++)
-        {
-            set<pBayesianUnit> tmp;
-            (*it)->selectedUnits(tmp);
-            if (tmp.size() == 0)
-                //    Broodwar->printf("No selected units");
-                for (std::set<pBayesianUnit>::const_iterator i = tmp.begin(); i != tmp.end(); ++i)
-                {
-                    //  Broodwar->printf("Target de l'unité : (%i, %i)", (*i)->target.x(), (*i)->target.y());
-                    Position pos(Broodwar->getScreenPosition() + Broodwar->getMousePosition());
-                    // Broodwar->printf("Curseur : (%i, %i)", pos.x(), pos.y());
-                }
-        }
-    }
-
-    UnitType type=UnitTypes::getUnitType(text);
     if (text=="debug")
     {
-        this->showManagerAssignments=true;
+        showManagerAssignments = !showManagerAssignments;
         return;
     }
-    if (type!=UnitTypes::Unknown)
+    /*if (type!=UnitTypes::Unknown)
     {
 		macro->buildOrderAdd(type);
     }
@@ -279,7 +260,7 @@ void BattleBroodAI::onSendText(std::string text)
             else
                 Broodwar->printf("You typed '%s'!",text.c_str());
         }
-    }
+    }*/
     return;
 }
 

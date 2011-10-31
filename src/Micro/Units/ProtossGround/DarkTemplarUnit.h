@@ -8,8 +8,8 @@ class DarkTemplarUnit : public GroundUnit
 protected:
     static std::set<BWAPI::UnitType> setPrio;
 public:
-    DarkTemplarUnit(BWAPI::Unit* u, UnitsGroup* ug);
-    ~DarkTemplarUnit();
+    DarkTemplarUnit(BWAPI::Unit* u);
+    virtual ~DarkTemplarUnit();
     virtual void micro();
     virtual void check();
     virtual int getAttackDuration();

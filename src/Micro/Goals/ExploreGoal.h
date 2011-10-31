@@ -7,8 +7,12 @@
 
 class ExploreGoal: public Goal
 {
+	inline void needAScoutingUnit();
+	BWTA::Region* _region;
+	int _firstRealized;
 public:
-	ExploreGoal::ExploreGoal(BWAPI::TilePosition tp);
-	ExploreGoal(BWTA::Region* region);
+	ExploreGoal(BWTA::Region* region, int priority = 50);
+	virtual ~ExploreGoal();
 	void achieve();
+	virtual void onOffer(std::set<BWAPI::Unit*> objects);
 };

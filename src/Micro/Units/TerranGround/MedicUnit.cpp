@@ -10,8 +10,8 @@ ProbTables MedicUnit::_sProbTables = ProbTables(BWAPI::UnitTypes::Terran_Medic.g
 
 std::set<BWAPI::UnitType> MedicUnit::setPrio;
 
-MedicUnit::MedicUnit(BWAPI::Unit* u,UnitsGroup* ug)
-: GroundUnit(u, ug, &_sProbTables)
+MedicUnit::MedicUnit(BWAPI::Unit* u)
+: GroundUnit(u, &_sProbTables)
 {
     _fleeingDmg = 32; // one round of storm = 14
 }
@@ -74,7 +74,7 @@ void MedicUnit::micro()
         _lastAttackFrame = currentFrame;
     if (currentFrame - _lastAttackFrame <= getAttackDuration()) // not interrupting attacks
         return;
-    if (unit->getGroundWeaponCooldown() > Broodwar->getLatency()*2 + 2) // == (Broodwar->getLatency()+1)*2, safety
+    if (unit->getGroundWeaponCooldown() > Broodwar->getLatencyFrames()*2 + 2) // == (Broodwar->getLatencyFrames()+1)*2, safety
     {
         if (_fleeing)
         {

@@ -5,8 +5,8 @@ using namespace BWAPI;
 
 std::set<BWAPI::UnitType> MutaliskUnit::setPrio;
 
-MutaliskUnit::MutaliskUnit(BWAPI::Unit* u,UnitsGroup* ug)
-: FlyingUnit(u, ug)
+MutaliskUnit::MutaliskUnit(BWAPI::Unit* u)
+: FlyingUnit(u)
 {
     if (setPrio.empty())
     {
@@ -22,12 +22,6 @@ MutaliskUnit::~MutaliskUnit()
         clearDamages();
 }
 
-bool MutaliskUnit::decideToFlee()
-{
-    // TODO complete conditions
-    return (_lastTotalHP - unit->getHitPoints() > 20);
-}
-
 void MutaliskUnit::micro()
 {
     updateRangeEnemies();
@@ -37,7 +31,7 @@ void MutaliskUnit::micro()
     {
         if (it->second->isVisible() && it->second->getType() == UnitTypes::Zerg_Scourge && it->second->getTarget() == unit)
         {
-            if (it->first > ((unit->getType().acceleration() + Broodwar->getLatency()) * UnitTypes::Zerg_Scourge.topSpeed() // what the scourge may run during my acceleration time + lag
+            if (it->first > ((unit->getType().acceleration() + Broodwar->getLatencyFrames()) * UnitTypes::Zerg_Scourge.topSpeed() // what the scourge may run during my acceleration time + lag
                 - unit->getType().acceleration() * (unit->getType().topSpeed()/2.1) // what I may run during my acceleration time
                 + _maxDimension/2 - UnitTypes::Zerg_Scourge.dimensionUp() + 0.1))// difference of both sizes
                 whereFlee += Vec(it->second->getVelocityX(), it->second->getVelocityY());
@@ -62,7 +56,7 @@ void MutaliskUnit::micro()
     if (currentFrame - _lastAttackFrame <= getAttackDuration()) // not interrupting attack
         return;
 
-    if (unit->getAirWeaponCooldown() <= Broodwar->getLatency() + 1)
+    if (unit->getAirWeaponCooldown() <= Broodwar->getLatencyFrames() + 1)
     {
         updateTargetEnemy();
         if (!inRange(targetEnemy))
@@ -87,7 +81,7 @@ void MutaliskUnit::check()
 
 int MutaliskUnit::getAttackDuration()
 {
-    return 1;//Broodwar->getLatency();
+    return 1;//Broodwar->getLatencyFrames();
 }
 
 std::set<BWAPI::UnitType> MutaliskUnit::getSetPrio()

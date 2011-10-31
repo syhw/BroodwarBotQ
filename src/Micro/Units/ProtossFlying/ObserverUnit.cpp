@@ -5,7 +5,8 @@
 
 using namespace BWAPI;
 
-ObserverUnit::ObserverUnit(BWAPI::Unit* u,UnitsGroup* ug):FlyingUnit(u, ug)
+ObserverUnit::ObserverUnit(BWAPI::Unit* u)
+: FlyingUnit(u)
 {
     _eUnitsFilter = & EUnitsFilter::Instance();
 }
@@ -16,15 +17,18 @@ ObserverUnit::~ObserverUnit()
 
 void ObserverUnit::micro()
 {
-    if (Broodwar->getFrameCount() - _lastClickFrame < Broodwar->getLatency())
+	if (dodgeStorm())
+		return;
+    if (Broodwar->getFrameCount() - _lastClickFrame <= Broodwar->getLatencyFrames())
         return;
     Position invisPos = Positions::None;
     double minDist = 100000.0;
     for (std::map<Unit*, Position>::const_iterator it = _unitsGroup->enemies.begin();
         it != _unitsGroup->enemies.end(); ++it)
     {
-        double enemyDist = it->second.getDistance(_unitPos);
-        if (_eUnitsFilter->getInvisibleUnits().count(it->first) && enemyDist < minDist)
+        double enemyDist = it->second.getApproxDistance(_unitPos);
+		//if (_eUnitsFilter->getInvisibleUnits().count(it->first) && enemyDist < minDist)
+		if (!it->first->isDetected() && enemyDist < minDist)
         {
             minDist = enemyDist;
             invisPos = it->second;
@@ -37,7 +41,12 @@ void ObserverUnit::micro()
         _lastMoveFrame = Broodwar->getFrameCount();
     } 
     else
-        clickTarget();
+	{
+		_mode = MODE_SCOUT;
+		updateDir();
+		clickDir();
+		_mode = MODE_FIGHT_A;
+	}
 }
 
 void ObserverUnit::check()

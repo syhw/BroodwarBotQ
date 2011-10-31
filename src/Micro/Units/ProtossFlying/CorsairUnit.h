@@ -9,8 +9,8 @@ protected:
     static std::set<BWAPI::UnitType> setPrio;
     inline bool decideToFlee();
 public:
-    CorsairUnit(BWAPI::Unit* u,UnitsGroup* ug);
-    ~CorsairUnit();
+    CorsairUnit(BWAPI::Unit* u);
+    virtual ~CorsairUnit();
     virtual void micro();
     virtual void check();
     virtual int getAttackDuration();

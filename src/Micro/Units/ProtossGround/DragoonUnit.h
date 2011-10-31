@@ -11,13 +11,14 @@ protected:
     static int attackDuration;
     virtual bool decideToFlee();
 public:
-    DragoonUnit(BWAPI::Unit* u, UnitsGroup* ug);
-    ~DragoonUnit();
+    DragoonUnit(BWAPI::Unit* u);
+    virtual ~DragoonUnit();
     virtual int addRangeGround();
     virtual int addRangeAir();
+    static double getMaxRange();
+
     virtual void micro();
     virtual void check();
-    static double getMaxRange();
     virtual int getAttackDuration();
     virtual std::set<BWAPI::UnitType> getSetPrio();
 };

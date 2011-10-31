@@ -8,7 +8,9 @@
 #include "Regions/MapManager.h"
 #include "Regions/Regions.h"
 #include "Micro/UnitsGroup.h"
+#include "Micro/Goals/GoalManager.h"
 #include "Macro/UnitGroupManager.h"
+#include "Macro/Arbitrator.h"
 
 static bool analyzed;
 static bool analysis_just_finished;
@@ -19,11 +21,12 @@ DWORD WINAPI AnalyzeThread();
 class MicroAIModule : public BWAPI::AIModule
 {
 public:	    
-    UnitsGroup* mm;
     EUnitsFilter* eUnitsFilter;
     MapManager* mapManager;
     Regions* regions;
     UnitGroupManager * unitGroupManager;
+    Arbitrator::Arbitrator<BWAPI::Unit*,double> arbitrator;
+    GoalManager* goalManager;
     bool enemiesFound;
     BWAPI::TilePosition eStartLocation;
     MicroAIModule();

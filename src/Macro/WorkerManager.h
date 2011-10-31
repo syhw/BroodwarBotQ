@@ -1,8 +1,8 @@
 #pragma once
 #include "Macro/Arbitrator.h"
 #include <BWAPI.h>
-#include "Macro/BaseManager.h"
-class BuildOrderManager;
+#include "Macro/BasesManager.h"
+
 class WorkerManager : public Arbitrator::Controller<BWAPI::Unit*,double>
 {
   public:
@@ -14,15 +14,15 @@ class WorkerManager : public Arbitrator::Controller<BWAPI::Unit*,double>
         BWAPI::Unit* newResource;
         int lastFrameSpam;
     };
-    WorkerManager(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator);
-    void setBaseManager(BaseManager* baseManager);
-    void setBuildOrderManager(BuildOrderManager* buildOrderManager);
+    static WorkerManager* create();
+    static void destroy();
     virtual void onOffer(std::set<BWAPI::Unit*> units);
     virtual void onRevoke(BWAPI::Unit* unit, double bid);
     virtual void update();
     virtual std::string getName() const;
-    virtual std::string getShortName() const;
+	virtual std::string getShortName() const;
 
+	void onUnitDestroy(BWAPI::Unit* unit);
     void onRemoveUnit(BWAPI::Unit* unit);
     void setWorkersPerGas(int count);
     double getMineralRate() const;
@@ -32,10 +32,8 @@ class WorkerManager : public Arbitrator::Controller<BWAPI::Unit*,double>
     void disableAutoBuild();
     void setAutoBuildPriority(int priority);
   private:
-
-    Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
-    BaseManager* baseManager;
-    BuildOrderManager* buildOrderManager;
+    WorkerManager();
+    ~WorkerManager();
     std::map<BWAPI::Unit*,WorkerData> workers;
     std::map<BWAPI::Unit*, std::set<BWAPI::Unit*> > currentWorkers;
     std::map<BWAPI::Unit*, Base*> resourceBase;
@@ -54,3 +52,4 @@ class WorkerManager : public Arbitrator::Controller<BWAPI::Unit*,double>
     int autoBuildPriority;
     int optimalWorkerCount;
 };
+extern WorkerManager* TheWorkerManager;

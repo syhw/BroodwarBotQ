@@ -5,9 +5,11 @@
 
 class ProbeUnit : public GroundUnit
 {
+	static BWAPI::Unit* backUpMineral;
+	bool decideToFlee();
 public:
-    ProbeUnit(BWAPI::Unit* u,UnitsGroup* ug);
-    ~ProbeUnit();
+    ProbeUnit(BWAPI::Unit* u);
+    virtual ~ProbeUnit();
     virtual void micro();
     virtual void check();
     virtual int getAttackDuration();

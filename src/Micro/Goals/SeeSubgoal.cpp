@@ -1,42 +1,42 @@
 #include <PrecompiledHeader.h>
 #include "SeeSubgoal.h"
 	
-SeeSubgoal::SeeSubgoal(SubgoalLogic l, BWAPI::Position pos)
-: Subgoal(l)
-, achieved(false)
-, pos(pos)
+SeeSubgoal::SeeSubgoal(SubgoalLogic l, UnitsGroup* ug, BWAPI::Position pos)
+: Subgoal(l, ug)
+, _achieved(false)
+, _pos(pos)
 {
 }
 
 SeeSubgoal::SeeSubgoal(const SeeSubgoal &ssg)
-: Subgoal(ssg.logic)
-, achieved(ssg.achieved)
-, pos(ssg.pos)
+: Subgoal(ssg._logic, ssg._unitsGroup)
+, _achieved(ssg._achieved)
+, _pos(ssg._pos)
 {
 }
 
 bool SeeSubgoal::isRealized()
 {
-	return check();
-}
-
-bool SeeSubgoal::check()
-{
-	return BWAPI::Broodwar->isVisible(pos.x()/32, pos.y()/32);
+    _achieved = _achieved || BWAPI::Broodwar->isVisible(_pos.x()/32, _pos.y()/32);
+	return _achieved;
 }
 
 void SeeSubgoal::tryToRealize()
 {
-	unitsGroup->move(pos);
-	unitsGroup->switchMode(MODE_SCOUT);
+	_unitsGroup->move(_pos);
 }
 
 double SeeSubgoal::distanceToRealize()
 {
-	return unitsGroup->getCenter().getDistance(pos); 
+	if (!_unitsGroup)
+		return -1.0;
+	if (_unitsGroup->distToTarget > 0.0) // _unitsGroup not in the same region as its target and distToTarget has been initialized
+		return _unitsGroup->distToTarget;
+	return _unitsGroup->getDistance(_pos); 
 }
 
 double SeeSubgoal::distanceToRealize(BWAPI::Position p)
 {
-	return p.getDistance(pos);
+	/// Does not use pathfinding and so is not very precise
+	return p.getApproxDistance(_pos);
 }

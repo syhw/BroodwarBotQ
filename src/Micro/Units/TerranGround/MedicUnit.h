@@ -11,8 +11,8 @@ protected:
     bool decideToFlee();
     int fightMove();
 public:
-    MedicUnit(BWAPI::Unit* u,UnitsGroup* ug);
-    ~MedicUnit();
+    MedicUnit(BWAPI::Unit* u);
+    virtual ~MedicUnit();
 #ifdef __LEARNING_PROB_TABLES__
 	static void initProbTables();
 #endif

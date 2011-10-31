@@ -1,54 +1,88 @@
 #pragma once
 #include <boost/shared_ptr.hpp>
+#ifndef GOAL_SMART_POINTER
+#define GOAL_SMART_POINTER
 class Goal;
 typedef boost::shared_ptr<Goal> pGoal;
-
+#endif
 #include "Subgoal.h"
+#ifndef SUBGOAL_SMART_POINTER
+#define SUBGOAL_SMART_POINTER
+class Subgoal;
+typedef boost::shared_ptr<Subgoal> pSubgoal;
+#endif
+class UnitsGroup;
+#include "Macro/Arbitrator.h"
+#include "Micro/UnitsGroup.h"
+#include "Micro/Goals/GoalManager.h"
+#include "Defines.h"
 #include <BWAPI.h>
 #include <BWTA.h>
-#include <windows.h>
-#include "Micro/Formations.h"
 #include <list>
+#include <map>
 
-class BasicUnitsGroup;
-class Subgoal;
+
 
 typedef enum
 {
-	GS_ND_STATUS           = 0,
-	GS_ACHIEVED            = 0,
-	GS_IN_PROGRESS         = 1, //When attributed
-	GS_NOT_ATTRIBUTED      = 2,
-	GS_NOT_ENOUGH_UNITS    = 3
+	GS_WAIT_PRECONDITION   = 0,
+	GS_IN_PROGRESS         = 1,
+	GS_IN_CANCEL           = 2,
+	GS_CANCELED            = 3,
+	GS_ACHIEVED            = 4
 } GoalStatus;
 
-class Goal
+/***
+ * Simple Goal class without canceling check in check()
+ * neededUnits/preconditions should perhaps be moved into a special Subgoal
+ */
+class Goal : public Arbitrator::Controller<BWAPI::Unit*, double>
 {
+	//friend class UnitsGroup;
+	friend class GoalManager;
 protected:
-	UnitsGroup * unitsGroup;   //Use setUnitsGroup
-	std::list<pSubgoal> subgoals;   //The subgoals cannot be shared
-	GoalStatus status;              /**< status of the goal */
-    int firstFrame;
-
+	/// Units it can use
+	UnitsGroup _unitsGroup;
+	std::list<BWAPI::Unit*> _incompleteUnits;
+	/// Preconditions
+	std::map<BWAPI::UnitType, int> _neededUnits;
+	std::set<BWAPI::Unit*> _biddedOn;
+    int _priority;
+    int _firstFrame;
+	int _firstActive;
+	/// Subgoals
+	std::list<pSubgoal> _subgoals;
+    /// Status
+	GoalStatus _status;
+	void bidOnUnitType(const BWAPI::UnitType& ut);
+	void bidOnMilitaryUnits();
+	void bidOnUnit(BWAPI::Unit* u);
 public:
-	void setUnitsGroup(UnitsGroup * ug);
-	
-
-	//Constructors
-	Goal();//Don't forget to set the unitsGroup
-	Goal(UnitsGroup * ug);
-    Goal(UnitsGroup * ug, pSubgoal s);
+	Goal(int priority = 50, int firstFrame = 0);
+	Goal(pSubgoal s, int priority = 50, int firstFrame = 0);
+	Goal(const std::map<BWAPI::UnitType, int>& nU, pSubgoal s,
+		int priority = 50, int firstFrame = 0);
+	Goal(const std::map<BWAPI::UnitType, int>& nU,
+		int priority = 50, int firstFrame = 0);
 	virtual ~Goal();
 	
-	virtual void achieve();//Start the goal
+	/// Controller methods
+	virtual void onOffer(std::set<BWAPI::Unit*> objects);
+	virtual void onRevoke(BWAPI::Unit* u, double bid);
+    virtual std::string getName() const;
+	virtual std::string getShortName() const;
+	virtual void update();
 
-	virtual void checkAchievement();//Check if accomplished
-	//(Check if all subgoals are accomplished)
+	virtual void onUnitDestroy(BWAPI::Unit* unit);
 
-	//Mutators
+	virtual void achieve();
+	virtual void check();
+	virtual void cancel(); // Does nothing, to be overwritten in cancelable goals
+
 	void addSubgoal(pSubgoal s);
+	void addNeededUnits(const std::map<BWAPI::UnitType, int>& neededUnits);
+	void setFirstFrame(int firstFrame);
+	void setPriority(int priority);
 	void setStatus(GoalStatus s);
-	virtual int estimateDistance(BWAPI::Position);
-	//Accessors
 	GoalStatus getStatus() const;
 };
