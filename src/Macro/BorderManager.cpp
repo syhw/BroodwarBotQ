@@ -1,11 +1,26 @@
 #include <PrecompiledHeader.h>
-#include <BorderManager.h>
-#include <InformationManager.h>
-void BorderManager::setDependencies()
-{
-	this->informationManager=& InformationManager::Instance();
-}
+#include "Macro/BorderManager.h"
+#include "Macro/InformationManager.h"
+BorderManager* TheBorderManager = NULL;
 
+BorderManager* BorderManager::create()
+{
+  if (TheBorderManager) return TheBorderManager;
+  return new BorderManager();
+}
+void BorderManager::destroy()
+{
+  if (TheBorderManager)
+    delete TheBorderManager;
+}
+BorderManager::BorderManager()
+{
+  TheBorderManager = this;
+}
+BorderManager::~BorderManager()
+{
+  TheBorderManager = NULL;
+}
 void BorderManager::addMyBase(BWTA::BaseLocation* location)
 {
   this->myBases.insert(location);
@@ -26,10 +41,9 @@ const std::set<BWTA::Chokepoint*>& BorderManager::getEnemyBorder() const
 }
 void BorderManager::update()
 {
-
-  if (informationManager->getEnemyBases()!=this->enemyBases)
+  if (TheInformationManager->getEnemyBases()!=this->enemyBases)
   {
-    this->enemyBases=informationManager->getEnemyBases();
+    this->enemyBases=TheInformationManager->getEnemyBases();
     recalculateBorders();
   }
   for(std::set<BWTA::Chokepoint*>::const_iterator c=myBorder.begin();c!=myBorder.end();c++)
@@ -44,12 +58,10 @@ void BorderManager::update()
     BWAPI::Position point2=(*c)->getSides().second;
     BWAPI::Broodwar->drawLineMap(point1.x(),point1.y(),point2.x(),point2.y(),BWAPI::Colors::Orange);
   }
-
 }
 
 void BorderManager::recalculateBorders()
 {
-
   this->myRegions.clear();
   this->myBorder.clear();
   this->enemyRegions.clear();
@@ -125,5 +137,4 @@ void BorderManager::recalculateBorders()
         enemyBorder.erase(*c);
     }
   }
-
 }

@@ -1,12 +1,10 @@
 #include <PrecompiledHeader.h>
-#include <WarManager.h>
-#include <util.h>
-#include <UnitsGroup.h>
-#include "DefendBaseGroundGoal.h"
-#include "BorderManager.h"
-#include "AttackGoal.h"
-#include "ScoutManager.h"
-
+#include <Micro/WarManager.h>
+#include "Macro/UnitGroupManager.h"
+#include "Micro/UnitsGroup.h"
+#include "Micro/Goals/AttackGoal.h"
+#include "Intelligence/ScoutController.h"
+#include "Macro/BWSAL.h"
 
 using std::map;
 using std::set;
@@ -16,12 +14,10 @@ using namespace BWAPI;
 using namespace BWTA;
 
 WarManager::WarManager() 
-: BaseObject("WarManager")
+: informationManager(TheInformationManager)
+, home(BWTA::getStartLocation(Broodwar->self()))
 {
-	arbitrator = NULL;
     unitsGroups.push_front(new UnitsGroup()); // to garbage collect idle units
-    informationManager = & InformationManager::Instance();
-    home = BWTA::getStartLocation(Broodwar->self());
 }
 
 WarManager::~WarManager() 
@@ -29,25 +25,24 @@ WarManager::~WarManager()
 	//Broodwar->printf("INOUT WarManager::~WarManager()");
 }
 
-void WarManager::setDependencies()
-{
-	this->arbitrator = static_cast< Arbitrator::Arbitrator<BWAPI::Unit*,double>* >(& Arbitrator::Arbitrator<BWAPI::Unit*,double>::Instance()) ;
-}
-
-void WarManager::onStart()
-{
-}
-
 void WarManager::update()
 {
-    /*if (!ScoutManager::Instance().enemyFound && Broodwar->getFrameCount() > 4320)
-    {
-        for (std::list<UnitsGroup*>::iterator it = unitsGroups.begin();
-            it != unitsGroups.end(); ++it)
-        {
-            pGoal goal = pGoal(new AttackGoal(*it, Scout
-        }
-        }*/
+	/*
+	int count = 0;
+	for (std::list<UnitsGroup *>::const_iterator it = this->unitsGroups.begin();
+		it != unitsGroups.end(); ++it)
+		count += (*it)->getUnits()->size();
+	Broodwar->printf("I have: %d units groups and %d units total", unitsGroups.size(), count);
+	*/
+
+//    if (!ScoutController::Instance().enemyFound && Broodwar->getFrameCount() > 4320)
+//    {
+//        for (std::list<UnitsGroup*>::iterator it = unitsGroups.begin();
+//            it != unitsGroups.end(); ++it)
+//        {
+//			pGoal goal = pGoal(new AttackGoal(*it, ScoutController::Instance().enemyStartLocation));
+//        }
+//	}
 
     //Suppress the list prompted to suppress 
     if (!promptedRemove.empty())
@@ -66,13 +61,13 @@ void WarManager::update()
 
 
 	//Set bid on appropriate units (not workers and not building)
-	std::set<BWAPI::Unit *> myUnits = BWAPI::Broodwar->self()->getUnits();
-
-	for(std::set<BWAPI::Unit *>::iterator it = myUnits.begin(); it != myUnits.end(); ++it){
-		if (!(*it)->getType().isBuilding() && !(*it)->getType().isWorker())
-        {
-			this->arbitrator->setBid(this, (*it), 20);
-		}
+	std::set<Unit*> usefulUnits = 
+		SelectAll().not(isWorker, isBuilding);
+	for (std::set<Unit*>::const_iterator it = usefulUnits.begin();
+		it != usefulUnits.end(); ++it)
+	{
+		if (!(TheArbitrator->hasBid(*it)))
+			TheArbitrator->setBid(this, *it, 20);
 	}
 
 	//Update unitsgroup;
@@ -81,7 +76,9 @@ void WarManager::update()
 	{
         if ((*it)->size() > 2 && (*it)->emptyGoals())
             sendGroupToAttack(*it);
-	        (*it)->update();
+		else if ((*it)->emptyGoals())
+			sendGroupToDefense(*it);
+		(*it)->update();
 	}
 }
 
@@ -96,20 +93,21 @@ void WarManager::onOffer(std::set<BWAPI::Unit*> units)
 	{
 		if (!(*u)->getType().isWorker() && !(*u)->getType().isBuilding())
 		{
-			arbitrator->accept(this, *u);
+			TheArbitrator->accept(this, *u);
+			TheArbitrator->setBid(this, *u, 100);
             unitsGroups.front()->takeControl(*u);
 			//Broodwar->printf("New %s added to the micro manager", (*u)->getType().getName().c_str());
 		}
 		else
 		{
-			arbitrator->decline(this, *u, 0);
+			TheArbitrator->decline(this, *u, 0);
 		}
 	}
 }
 
 void WarManager::onRevoke(BWAPI::Unit* unit, double bid)
 {
-	// @merge this->onUnitDestroy(unit);
+	this->onUnitDestroy(unit);
 }
 
 std::string WarManager::getName() const
@@ -119,10 +117,8 @@ std::string WarManager::getName() const
 
 void WarManager::onUnitCreate(BWAPI::Unit* unit)
 {
-	/*
 	if (!unit->getType().isWorker() && unit->getPlayer()==Broodwar->self() && !unit->getType().isBuilding() && unit->getType().canAttack())
-		arbitrator->setBid(this, unit, 100);
-	*/
+		TheArbitrator->setBid(this, unit, 20);
 }
 
 void WarManager::onUnitDestroy(BWAPI::Unit* unit)
@@ -137,23 +133,33 @@ void WarManager::onUnitDestroy(BWAPI::Unit* unit)
 	}
 }
 
-void WarManager::display()
+void WarManager::sendGroupToAttack(UnitsGroup* ug)
 {
-	for( std::list<UnitsGroup*>::iterator it = unitsGroups.begin(); it != unitsGroups.end(); it++) // SEGFAULT
-		(*it)->display();
-}
-
-void WarManager::sendGroupToAttack( UnitsGroup* ug)
-{
-	if (ScoutManager::Instance().enemyFound)
+	if (ScoutController::Instance().enemyFound)
     {
-        ug->addGoal(pGoal(new AttackGoal(ug, ScoutManager::Instance().enemyStartLocation)));
+        ug->addGoal(pGoal(new AttackGoal(ug, ScoutController::Instance().enemyStartLocation)));
+	} 
+	else 
+	{
+		for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getStartLocations().begin();
+			it != BWTA::getStartLocations().end(); ++it)
+		{
+			if (*it != BWTA::getStartLocation(Broodwar->self()))
+				ug->addGoal(pGoal(new AttackGoal(ug, (*it)->getPosition())));
+		}
 	}
 }
 
-void WarManager::sendGroupToDefense( UnitsGroup* ug)
+void WarManager::sendGroupToDefense(UnitsGroup* ug)
 {
-
+	if (home->getRegion()->getChokepoints().size() == 1)
+	{
+		ug->addGoal(pGoal(new AttackGoal(ug, (*(home->getRegion()->getChokepoints().begin()))->getCenter())));
+	}
+	else 
+	{
+		// TODO
+	}
 }
 
 
@@ -175,11 +181,4 @@ bool WarManager::remove(UnitsGroup* u)
 void WarManager::promptRemove(UnitsGroup* ug)
 {
 	this->promptedRemove.push_back(ug);
-}
-
-std::set<Unit*> WarManager::getEnemies()
-{
-    std::set<BWAPI::Player*>::iterator iter = Broodwar->getPlayers().begin();
-    for(;iter != Broodwar->getPlayers().end() && !(*iter)->isEnemy(Broodwar->self());iter++);
-    return (*iter)->getUnits();
 }

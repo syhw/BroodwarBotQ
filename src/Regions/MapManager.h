@@ -1,9 +1,10 @@
 #pragma once
 #include <BWAPI.h>
-#include "CSingleton.h"
-#include "EUnitsFilter.h"
+#include <BWTA.h>
+#include "Utils/CSingleton.h"
+#include "Intelligence/EUnitsFilter.h"
 #include <vector>
-#include "Vec.h"
+#include "Utils/Vec.h"
 
 #include <windows.h>
 #include <process.h>
@@ -68,8 +69,10 @@ public:
     int* airDamages;            // build tiles
     Vec* groundDamagesGrad;     // build tiles
     Vec* airDamagesGrad;        // build tiles
+	std::map<BWTA::Region*, BWAPI::Position> regionsPFCenters; // Pathfinding wise region centers
+	std::map<BWTA::Region*, std::map<BWTA::Region*, double> > distRegions; // distRegions[R1][R2] w.r.t regionsPFCenters
+	std::map<BWTA::Region*, BWAPI::TilePosition> regionsInsideCenter; // Centers of the regions that are inside
     std::map<Position, int> stormPos;
-    void setDependencies();
     void onUnitCreate(BWAPI::Unit* u);
     void onUnitDestroy(BWAPI::Unit* u);
     void onUnitShow(BWAPI::Unit* u);
@@ -81,6 +84,8 @@ public:
     const std::map<BWAPI::Bullet*, BWAPI::Position> & getTrackedStorms();
     BWAPI::Position closestWalkabableSameRegionOrConnected(BWAPI::Position p);
     BWAPI::TilePosition closestWalkabableSameRegionOrConnected(BWAPI::TilePosition tp);
+	inline bool isBTWalkable(int x, int y);
+	inline bool isBTWalkable(BWAPI::TilePosition tp);
     void drawBuildings();           // debug
     void drawBuildingsStrict();     // debug
     void drawWalkability();         // debug

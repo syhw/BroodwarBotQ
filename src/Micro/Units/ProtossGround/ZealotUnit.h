@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Defines.h"
-#include <GroundUnit.h>
+#include "Micro/Units/GroundUnit.h"
 #include <BWAPI.h>
 
 class ZealotUnit : public GroundUnit
@@ -15,7 +15,7 @@ protected:
     void clearDamages();
     int fightMove();
 public:
-    ZealotUnit(BWAPI::Unit* u, UnitsGroup* ug);
+    ZealotUnit(BWAPI::Unit* u,UnitsGroup* ug);
     ~ZealotUnit();
 #ifdef __LEARNING_PROB_TABLES__
 	static void initProbTables();

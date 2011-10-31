@@ -1,5 +1,5 @@
 #pragma once
-#include "Goal.h"
+#include "Micro/Goals/Goal.h"
 
 class AttackGoal: public Goal
 {

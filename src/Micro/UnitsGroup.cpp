@@ -1,28 +1,29 @@
 #include <PrecompiledHeader.h>
 #include <Defines.h>
-#include <UnitsGroup.h>
+#include "Micro/UnitsGroup.h"
 #include <Position.h>
-#include <util.h>
-#include <cmath>
-#include <ArbiterUnit.h>
-#include <ArchonUnit.h>
-#include <CarrierUnit.h>
-#include <ObserverUnit.h>
-#include <CorsairUnit.h>
-#include <ZealotUnit.h>
-#include <ShuttleUnit.h>
-#include <ScoutUnit.h>
-#include <ReaverUnit.h>
-#include <ProbeUnit.h>
-#include <HighTemplarUnit.h>
-#include <DragoonUnit.h>
-#include <DarkTemplarUnit.h>
-#include <DarkArchonUnit.h>
-#include <ScourgeUnit.h>
-#include <MutaliskUnit.h>
+#include "Utils/Util.h"
+#include "Micro/Units/ProtossSpecial/ArbiterUnit.h"
+#include "Micro/Units/ProtossSpecial/DarkArchonUnit.h"
+#include "Micro/Units/ProtossSpecial/HighTemplarUnit.h"
+#include "Micro/Units/ProtossFlying/CarrierUnit.h"
+#include "Micro/Units/ProtossFlying/ObserverUnit.h"
+#include "Micro/Units/ProtossFlying/ShuttleUnit.h"
+#include "Micro/Units/ProtossFlying/CorsairUnit.h"
+#include "Micro/Units/ProtossFlying/ScoutUnit.h"
+#include "Micro/Units/ProtossGround/ArchonUnit.h"
+#include "Micro/Units/ProtossGround/ZealotUnit.h"
+#include "Micro/Units/ProtossGround/ReaverUnit.h"
+#include "Micro/Units/ProtossGround/ProbeUnit.h"
+#include "Micro/Units/ProtossGround/DragoonUnit.h"
+#include "Micro/Units/ProtossGround/DarkTemplarUnit.h"
+#include "Micro/Units/TerranGround/MarineUnit.h"
+#include "Micro/Units/TerranGround/MedicUnit.h"
+#include "Micro/Units/ZergFlying/ScourgeUnit.h"
+#include "Micro/Units/ZergFlying/MutaliskUnit.h"
 #include <stack>
 #include <typeinfo>
-#include "Nearby.h"
+#include "Utils/Nearby.h"
 
 int round(double a)
 {
@@ -42,7 +43,6 @@ UnitsGroup::UnitsGroup()
 , totalMinPrice(0)
 , totalGazPrice(0)
 , totalSupply(0)
-, _alignFormation(true)
 , _hasDetection(0)
 , enemiesCenter(Position(0, 0))
 {
@@ -51,7 +51,6 @@ UnitsGroup::UnitsGroup()
 
 UnitsGroup::~UnitsGroup()
 {
-
 }
 
 bool comp_i_dist(const i_dist& l, const i_dist& r) { return (r.dist < l.dist); }
@@ -251,26 +250,26 @@ double UnitsGroup::evaluateForces()
         return ourScore/theirScore;
 }
 
+void BasicUnitsGroup::update()
+{
+    accomplishGoal();
+	for (std::vector<pBayesianUnit>::const_iterator it = units.begin();
+		it != units.end(); ++it)
+	    (*it)->update();
+}
+
 void UnitsGroup::update()
 {
+	if (this == NULL) /// WHAT
+		return;  /// THE FUCK?
 #ifdef __DEBUG__
     clock_t start = clock();
 #endif
-    if (this == NULL)
-        return;
 	if (units.empty())
     {
 		accomplishGoal();
 		return;
     }
-    if (units.size() == 1 && (*units.begin())->getMode() == MODE_SCOUT) // quick/dirty fix for scouting / scout goals :(
-    {
-        defaultTargetEnemy = NULL;
-        accomplishGoal();
-        (*units.begin())->update();
-        return;
-    }
-
 #ifdef __ARRIVING__UNITS__
     if (!arrivingUnits.empty())
     {
@@ -334,7 +333,9 @@ void UnitsGroup::update()
             || (*it)->unit->getType() == UnitTypes::Protoss_Archon)
             contactUnits = true;
         */
-        this->totalHP += (*it)->unit->getHitPoints();
+        totalHP += (*it)->unit->getHitPoints();
+		if (Broodwar->self()->getRace() == Races::Protoss)
+			totalHP += (*it)->unit->getShields();
         double tmp_max = max(max((*it)->unit->getType().groundWeapon().maxRange(), (*it)->unit->getType().airWeapon().maxRange()), 
             (*it)->unit->getType().sightRange()); // TODO: upgrades
         if (tmp_max > maxRange)
@@ -397,9 +398,10 @@ void UnitsGroup::update()
                 {
                     const std::pair<BWTA::Region*, BWTA::Region*> regions = nearestChoke->getRegions();
                     BWTA::Region* higherRegion = 
-                        (Broodwar->getGroundHeight(TilePosition(regions.first->getCenter())) > Broodwar->getGroundHeight(TilePosition(regions.second->getCenter()))) 
+						(Broodwar->getGroundHeight(TilePosition(regions.first->getCenter()))
+> Broodwar->getGroundHeight(TilePosition(regions.second->getCenter())))
                         ? regions.first : regions.second;
-                    (*it)->target = higherRegion->getCenter();
+					(*it)->target = MapManager::Instance().regionsPFCenters[higherRegion];
                 }
                 else
                     (*it)->target = (*it)->unit->getPosition();
@@ -495,8 +497,6 @@ void UnitsGroup::addGoal(pGoal goal)
 {
     this->goals.push_back(goal);
 	goal->setUnitsGroup(this);
-   // if (goals.size() == 1 && !this->units.empty())
-   // this->goals.front()->achieve();
 }
 
 void UnitsGroup::addGoalFront(pGoal goal)
@@ -538,21 +538,13 @@ double UnitsGroup::getDistance(BWAPI::Unit* u) const
     return Vec(center - u->getPosition()).norm();
 }
 
-void UnitsGroup::takeControl(Unit* u)
-{//TOCHECK FOR THE GOAL MANAGEMENT
-    //for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
-    //{
-    //    if ((*it)->unit == u)
-    //        return;
-    //}
+pBayesianUnit UnitsGroup::addUnit(Unit* u)
+{
     pBayesianUnit tmp;
     if (u->getType() == BWAPI::UnitTypes::Protoss_Arbiter)
         tmp = pBayesianUnit(new ArbiterUnit(u, this));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Archon)
-    {
-        _alignFormation = false;
         tmp = pBayesianUnit(new ArchonUnit(u, this));
-    }
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Carrier)
         tmp = pBayesianUnit(new CarrierUnit(u, this));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Corsair)
@@ -576,29 +568,38 @@ void UnitsGroup::takeControl(Unit* u)
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Shuttle)
         tmp = pBayesianUnit(new ShuttleUnit(u, this));
     else if (u->getType() == BWAPI::UnitTypes::Protoss_Zealot)
-    {
-        _alignFormation = false;
         tmp = pBayesianUnit(new ZealotUnit(u, this));
-    }
     else if (u->getType() == BWAPI::UnitTypes::Zerg_Mutalisk)
         tmp = pBayesianUnit(new MutaliskUnit(u, this));
     else if (u->getType() == BWAPI::UnitTypes::Zerg_Scourge)
         tmp = pBayesianUnit(new ScourgeUnit(u, this));
+	else if (u->getType() == BWAPI::UnitTypes::Terran_Marine)
+		tmp = pBayesianUnit(new MarineUnit(u, this));
+	else if (u->getType() == BWAPI::UnitTypes::Terran_Medic)
+		tmp = pBayesianUnit(new MedicUnit(u, this));
     else
-        Broodwar->printf("Cette race n'est pas correctement gérée par l'IA pour le moment !");
+	{
+        Broodwar->printf("This race/unit is not implemented");
+		return tmp;
+	}
+	return tmp;
+}
 
+void UnitsGroup::takeControl(Unit* u)
+{
+	pBayesianUnit tmp = addUnit(u);
 #ifdef __ARRIVING__UNITS__
     if (u->getDistance(center) < __MAX_DISTANCE_TO_GROUP__ || !units.size())
     {
 #endif
-        if (tmp != NULL)
+		if (tmp.get() != NULL)
             this->units.push_back(tmp);
 #ifdef __ARRIVING__UNITS__
     }
     else
     {
         u->attack(center);
-        if (tmp != NULL)
+        if (tmp.get() != NULL)
             this->arrivingUnits.push_back(tmp);
     }
 #endif
@@ -607,21 +608,22 @@ void UnitsGroup::takeControl(Unit* u)
     totalMinPrice += u->getType().mineralPrice();
     totalGazPrice += u->getType().gasPrice();
     totalSupply += u->getType().supplyRequired();
-	/*if(this->goals.size()==1){
-		if(this->goals.front()->getStatus()==GS_ACHIEVED){
-			goals.front()->achieve();
-		}
-	}*/
 }
 
-void UnitsGroup::giveUpControl(Unit* u)
+bool BasicUnitsGroup::removeUnit(Unit* u)
 {
     for (std::vector<pBayesianUnit>::const_iterator it = units.begin(); it != units.end(); ++it)
         if ((*it)->unit == u)
         {
             units.erase(it);
-            break;
+			return true;
         }
+	return false;
+}
+
+void UnitsGroup::giveUpControl(Unit* u)
+{
+	removeUnit(u);
     if (u->getType() == UnitTypes::Protoss_Observer)
     {
         _hasDetection = false;
@@ -637,11 +639,11 @@ void UnitsGroup::giveUpControl(Unit* u)
     totalSupply -= u->getType().supplyRequired();
 }
 
-bool UnitsGroup::emptyUnits()
+bool BasicUnitsGroup::emptyUnits()
 {
     return units.empty();
 }
-bool UnitsGroup::emptyGoals()
+bool BasicUnitsGroup::emptyGoals()
 {
     return goals.empty();
 }
@@ -668,7 +670,7 @@ void UnitsGroup::updateNearbyEnemyUnitsFromFilter(BWAPI::Position p, double radi
     }
 }
 
-const BayesianUnit& UnitsGroup::operator[](int i)
+const BayesianUnit& UnitsGroup::operator[](ptrdiff_t i)
 {
     return *(units[i]);
 }
@@ -708,7 +710,7 @@ void UnitsGroup::display()
 	
 }
 
-int UnitsGroup::size() const
+int BasicUnitsGroup::size() const
 {
     return units.size();
 }
@@ -766,7 +768,7 @@ void UnitsGroup::selectedUnits(std::set<pBayesianUnit>& u)
 #endif
 
 
-void UnitsGroup::accomplishGoal()
+void BasicUnitsGroup::accomplishGoal()
 {	
 	if(goals.size() > 0){
 		if (goals.front()->getStatus() != GS_ACHIEVED) {
@@ -796,11 +798,9 @@ pGoal UnitsGroup::getLastGoal(){
 }
 
 bool UnitsGroup::isWaiting(){
-
 	if(goals.size() <= 0)
 		//Problematic situation
 		return true;
-
 	return goals.size() == 1 && (*goals.front()).getStatus() == GS_ACHIEVED ;
 }
 

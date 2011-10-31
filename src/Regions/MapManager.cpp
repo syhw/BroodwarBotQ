@@ -1,8 +1,7 @@
 #include <PrecompiledHeader.h>
-#include <Defines.h>
-#include "MapManager.h"
-#include "UnitGroupManager.h"
-#include "HighTemplarUnit.h"
+#include "Defines.h"
+#include "Regions/MapManager.h"
+#include "Micro/Units/ProtossSpecial/HighTemplarUnit.h"
 
 #define __MESH_SIZE__ 32 // 16 // 24 // 32 // 48
 #define __STORM_SIZE__ 96
@@ -21,6 +20,7 @@ MapManager::MapManager()
         FALSE,                 // initially not owned
         NULL))                  // unnamed mutex
 , _lastStormUpdateFrame(0)
+, _eUnitsFilter(& EUnitsFilter::Instance())
 {
 #ifdef __DEBUG__
     if (_stormPosMutex == NULL) 
@@ -38,6 +38,110 @@ MapManager::MapManager()
     airDamages = new int[Broodwar->mapWidth() * Broodwar->mapHeight()];
     groundDamagesGrad = new Vec[Broodwar->mapWidth() * Broodwar->mapHeight()];
     airDamagesGrad = new Vec[Broodwar->mapWidth() * Broodwar->mapHeight()];
+
+	/// Fill regionsPFCenters (regions pathfinding aware centers, 
+	/// min of the sum of the distance to chokes on paths between/to chokes)
+	const std::set<BWTA::Region*> allRegions = BWTA::getRegions();
+	for (std::set<BWTA::Region*>::const_iterator it = allRegions.begin();
+		it != allRegions.end(); ++it)
+	{
+		std::list<Position> chokesCenters;
+		for (std::set<BWTA::Chokepoint*>::const_iterator it2 = (*it)->getChokepoints().begin();
+			it2 != (*it)->getChokepoints().end(); ++it2)
+			chokesCenters.push_back((*it2)->getCenter());
+		if (chokesCenters.empty())
+			regionsPFCenters.insert(std::make_pair<BWTA::Region*, Position>(*it, (*it)->getCenter()));
+		else
+		{
+			std::list<TilePosition> validTilePositions;
+			for (std::list<Position>::const_iterator c1 = chokesCenters.begin();
+				c1 != chokesCenters.end(); ++c1)
+			{
+				for (std::list<Position>::const_iterator c2 = chokesCenters.begin();
+					c2 != chokesCenters.end(); ++c2)
+				{
+					if (*c1 != *c2)
+					{
+						std::vector<TilePosition> buffer = BWTA::getShortestPath(TilePosition(*c1), TilePosition(*c2));
+						for (std::vector<TilePosition>::const_iterator vp = buffer.begin();
+							vp != buffer.end(); ++vp)
+							validTilePositions.push_back(*vp);
+					}
+				}
+			}
+			double minDist = 1000000000000.0;
+			TilePosition centerCandidate = TilePosition((*it)->getCenter());
+			for (std::list<TilePosition>::const_iterator vp = validTilePositions.begin();
+				vp != validTilePositions.end(); ++vp)
+			{
+				double tmp = 0.0;
+				for (std::list<Position>::const_iterator c = chokesCenters.begin();
+					c != chokesCenters.end(); ++c)
+				{
+					tmp += BWTA::getGroundDistance(TilePosition(*c), *vp);
+				}
+				if (tmp < minDist)
+				{
+					minDist = tmp;
+					centerCandidate = *vp;
+				}
+			}
+			regionsPFCenters.insert(std::make_pair<BWTA::Region*, Position>(*it, Position(centerCandidate)));
+		}
+	}
+
+	/// Fill distRegions with the mean distance between each Regions
+	for (std::set<BWTA::Region*>::const_iterator it = allRegions.begin();
+		it != allRegions.end(); ++it)
+	{
+		distRegions.insert(std::pair<BWTA::Region*, std::map<BWTA::Region*, double> >(*it,
+			std::map<BWTA::Region*, double>()));
+		for (std::set<BWTA::Region*>::const_iterator it2 = allRegions.begin();
+			it2 != allRegions.end(); ++it2)
+		{
+			distRegions[*it].insert(std::pair<BWTA::Region*, double>(*it2, 
+				BWTA::getGroundDistance(TilePosition(regionsPFCenters[*it]),
+				TilePosition(regionsPFCenters[*it2]))));
+		}
+	}
+
+	/// search the centers of all regions
+	for (std::set<BWTA::Region*>::const_iterator it = allRegions.begin();
+		it != allRegions.end(); ++it)
+	{
+		TilePosition tmpRegionCenter = TilePosition((*it)->getCenter()); // region->getCenter() is bad (can be out of the Region)
+		BWTA::Polygon polygon = (*it)->getPolygon();
+		std::set<TilePosition> out;
+		std::list<TilePosition>in;
+		for (std::vector<Position>::const_iterator it2 = polygon.begin();
+			it2 != polygon.end(); ++it2)
+		{
+			in.push_back(TilePosition(*it2));
+		}
+		while (!out.empty())
+		{
+			if (out.size() == 1)
+			{
+				tmpRegionCenter = *(out.begin());
+				break;
+			}
+			else
+			{
+				std::list<TilePosition> newIn;
+				for (std::list<TilePosition>::const_iterator it2 = in.begin();
+					it2 != in.end(); ++it2)
+				{
+					out.erase(*it2);
+					newIn.push_back(TilePosition(it2->x()+1, it2->y()));
+					newIn.push_back(TilePosition(it2->x(), it2->y()+1));
+					newIn.push_back(TilePosition(it2->x()-1, it2->y()));
+					newIn.push_back(TilePosition(it2->x(), it2->y()-1));
+				}
+				in.swap(newIn);
+			}
+		}
+		regionsInsideCenter.insert(std::make_pair<BWTA::Region*, TilePosition>(*it, tmpRegionCenter));
+	}
 
     // initialization
     for (int x = 0; x < _width; ++x) 
@@ -70,7 +174,6 @@ MapManager::MapManager()
             airDamagesGrad[x + y*_width/4] = Vec(0, 0);
         }
     }
-    _eUnitsFilter = NULL;
 }
 
 MapManager::~MapManager()
@@ -88,11 +191,6 @@ MapManager::~MapManager()
     delete [] groundDamagesGrad;
     delete [] airDamagesGrad;
     CloseHandle(_stormPosMutex);
-}
-
-void MapManager::setDependencies()
-{
-    _eUnitsFilter = & EUnitsFilter::Instance();
 }
 
 void MapManager::modifyBuildings(Unit* u, bool b)
@@ -803,6 +901,18 @@ TilePosition MapManager::closestWalkabableSameRegionOrConnected(TilePosition tp)
     if (saved != TilePositions::None)
         return saved;
     return TilePositions::None;
+}
+
+bool MapManager::isBTWalkable(int x, int y)
+{
+	return lowResWalkability[x + y*Broodwar->mapWidth()] 
+		   && !buildings[x + y*Broodwar->mapWidth()];
+}
+
+bool MapManager::isBTWalkable(TilePosition tp)
+{
+	return lowResWalkability[tp.x() + tp.y()*Broodwar->mapWidth()] 
+		   && !buildings[tp.x() + tp.y()*Broodwar->mapWidth()];
 }
 
 void MapManager::drawBuildings()

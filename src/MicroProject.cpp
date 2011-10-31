@@ -1,10 +1,14 @@
 #include <PrecompiledHeader.h>
-#include "Util.h"
+#include "Utils/Util.h"
 #include "MicroProject.h"
-#include "Goal.h"
-#include "FormationSubgoal.h"
-#include "AttackGoal.h"
+#include "Micro/Goals/Goal.h"
+#include "Micro/Goals/FormationSubgoal.h"
+#include "Micro/Goals/AttackGoal.h"
+
+#ifdef __LEARNING_PROB_TABLES__
 #include "ZealotUnit.h"
+#endif
+
 using namespace BWAPI;
 using namespace std;
 
@@ -26,11 +30,8 @@ void MicroAIModule::onStart()
 	BWTA::readMap();
 	BWTA::analyze();
     this->eUnitsFilter = & EUnitsFilter::Instance();
-    this->eTechEstimator = & ETechEstimator::Instance();
     this->mapManager = & MapManager::Instance();
-	this->objectManager = & ObjectManager::Instance();
-    this->unitGroupManager = & UnitGroupManager::Instance();
-    this->mapManager->setDependencies();
+	this->unitGroupManager = UnitGroupManager::create();
 	// this->rdmGenerators = & RandomGenerators::Instance();
 
 	mm = new UnitsGroup();
@@ -257,7 +258,6 @@ void MicroAIModule::onFrame()
 {
     if (Broodwar->getLastError() != BWAPI::Errors::None)
         Broodwar->printf("LAST ERROR: %s", Broodwar->getLastError().toString().c_str());
-    objectManager->onFrame();
 	if (mm != NULL) 
         mm->update();
     // regions->display();
@@ -346,7 +346,6 @@ MicroAIModule::MicroAIModule()
 void MicroAIModule::onEnd(bool isWinner)
 {
     MapManager::Destroy();
-    ObjectManager::Destroy();
     // regions::Destroy();
     mm->~UnitsGroup();
 #ifndef __LEARNING_PROB_TABLES__

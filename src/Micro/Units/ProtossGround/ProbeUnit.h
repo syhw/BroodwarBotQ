@@ -1,12 +1,12 @@
 #pragma once
 
-#include <GroundUnit.h>
+#include "Micro/Units/GroundUnit.h"
 #include <BWAPI.h>
 
 class ProbeUnit : public GroundUnit
 {
 public:
-    ProbeUnit(BWAPI::Unit* u, UnitsGroup* ug);
+    ProbeUnit(BWAPI::Unit* u,UnitsGroup* ug);
     ~ProbeUnit();
     virtual void micro();
     virtual void check();

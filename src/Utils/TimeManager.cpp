@@ -1,8 +1,7 @@
 #include <PrecompiledHeader.h>
-#include <TimeManager.h>
+#include "Utils/TimeManager.h"
 
 TimeManager::TimeManager()
-: BaseObject("TimeManager")
 {
 
 }

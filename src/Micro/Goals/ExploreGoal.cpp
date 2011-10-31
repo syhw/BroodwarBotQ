@@ -1,11 +1,24 @@
 #include <PrecompiledHeader.h>
-#include "ExploreGoal.h"
+#include "Micro/Goals/ExploreGoal.h"
+
 using namespace BWAPI;
 
-ExploreGoal::ExploreGoal(BWTA::Region* region) 
-:Goal()
+ExploreGoal::ExploreGoal(TilePosition tp) 
+: Goal()
 {
-	if(region != NULL){
+	if (Broodwar->isVisible(tp))
+	{
+		status = GS_ACHIEVED;
+		return;
+	}
+	subgoals.push_back(pSubgoal(new SeeSubgoal(SL_AND, Position(tp))));
+}
+
+ExploreGoal::ExploreGoal(BWTA::Region* region) 
+: Goal()
+{
+	if (region != NULL)
+	{
 		BWTA::Polygon polygon = region->getPolygon();
 		std::list<Position> to_see;
 		bool insert=true;
@@ -54,7 +67,7 @@ void ExploreGoal::achieve(){
 
 	checkAchievement();
 	// !!! Accomplish the subgoals in order
-	if(this->status!=GS_ACHIEVED){
+	if(status!=GS_ACHIEVED){
 	
 		for(std::list<pSubgoal>::iterator it = subgoals.begin(); it != subgoals.end(); ++it){
 			if (!((*it)->isRealized()))

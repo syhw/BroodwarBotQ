@@ -1,10 +1,10 @@
 #pragma once
-#include "Goal.h"
-#include "CSingleton.h"
+#include "Micro/Goals/Goal.h"
+#include "Utils/CSingleton.h"
 #include <stdlib.h>
-#include "UnitsGroup.h"
+#include "Micro/UnitsGroup.h"
 #include <BWAPI.h>
-#include "WarManager.h"
+#include "Micro/WarManager.h"
 #include "../Formations/Formation.h"
 
 //TOCHANGE AT least the class name
@@ -13,7 +13,7 @@ class GoalManager : public CSingleton<GoalManager>
 {
 	friend class CSingleton<GoalManager>;
 private:
-	WarManager * warManager;
+	WarManager * _warManager;
 	std::map<UnitsGroup *, std::list<pGoal> > attributedGoals;
 	GoalManager();
 	~GoalManager();

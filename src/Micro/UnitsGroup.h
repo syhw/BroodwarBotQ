@@ -3,13 +3,13 @@
 #include <BWTA.h>
 #include <windows.h>
 #include <math.h>
-#include "BayesianUnit.h"
-#include "Goal.h"
-#include "Formations.h"
-#include <Vec.h>
+#include "Micro/Units/BayesianUnit.h"
+#include "Micro/Goals/Goal.h"
+#include "Micro/Formations.h"
+#include "Utils/Vec.h"
 #include <set>
 #include <boost/bimap/bimap.hpp>
-#include <EUnitsFilter.h>
+#include "Intelligence/EUnitsFilter.h"
 
 #define _UNITS_DEBUG 1
 
@@ -47,25 +47,40 @@ struct i_dist
 	//bool operator<(i_dist& ext) { return (ext.dist < dist); }
 };
 
-class UnitsGroup
+class BasicUnitsGroup
+{
+protected:
+	std::list<pGoal> goals;
+public:
+	std::vector<pBayesianUnit> units;
+	virtual void update();
+    // Units interface
+    bool removeUnit(BWAPI::Unit* u);
+	// Goals interface
+	void accomplishGoal();
+	bool emptyUnits();
+	bool emptyGoals();
+    int size() const;
+};
+
+class UnitsGroup : public BasicUnitsGroup
 {
 private:
 	int totalHP;
     int totalMinPrice;
     int totalGazPrice;
     int totalSupply;
-	std::list<pGoal> goals;
     EUnitsFilter* _eUnitsFilter;
     std::set<BWAPI::Unit*> _mergersHT;
-    bool _alignFormation;
     bool _hasDetection;
     inline void updateNearbyEnemyUnitsFromFilter(BWAPI::Position p, double radius = 400.0);
     double evaluateForces();
     void displayTargets();  // debug purpose
 public:
+    void takeControl(BWAPI::Unit* u);
+    void giveUpControl(BWAPI::Unit* u);
 	bool isWaiting(); //Return if the 1st goal is accomplished && no other goals
 	pGoal getLastGoal();
-	std::vector<pBayesianUnit> units;
     std::list<pBayesianUnit> arrivingUnits;
     std::vector<BWAPI::Position> ppath;
     std::map<BWAPI::Unit*, BWAPI::Position> enemies;
@@ -88,15 +103,20 @@ public:
 
 	virtual void update();
 	virtual void display();
+
+	// Units interface
+    pBayesianUnit addUnit(BWAPI::Unit* u);
+
 	// Goals interface
+	void setGoals(std::list<pGoal>& goals);
+	void addGoal(pGoal goal);
+    void addGoalFront(pGoal goal);
+
 	virtual void attack(int x, int y);
 	virtual void attack(BWAPI::Position& p);
 	virtual void move(BWAPI::Position& p);
 
 	virtual void formation(pFormation f);
-	virtual void setGoals(std::list<pGoal>& goals);
-	virtual void addGoal(pGoal goal);
-    virtual void addGoalFront(pGoal goal);
 	
 	inline void updateCenter();
     virtual BWAPI::Position getCenter() const;
@@ -107,12 +127,6 @@ public:
     virtual void onUnitShow(BWAPI::Unit* u);
     virtual void onUnitHide(BWAPI::Unit* u);
 
-    // Units interface
-    virtual void takeControl(BWAPI::Unit* u);
-    virtual void giveUpControl(BWAPI::Unit* u);
-	bool emptyUnits();
-	bool emptyGoals();
-    int size() const;
     int getTotalHP() const;
     std::vector<pBayesianUnit>* getUnits();
 
@@ -122,8 +136,7 @@ public:
 #ifdef _UNITS_DEBUG
     void selectedUnits(std::set<pBayesianUnit>& u);
 #endif
-	const BayesianUnit& operator[](int i);
-	void accomplishGoal();
+	const BayesianUnit& operator[](ptrdiff_t i);
 	void switchMode(unit_mode um);
 	void idle();
 };

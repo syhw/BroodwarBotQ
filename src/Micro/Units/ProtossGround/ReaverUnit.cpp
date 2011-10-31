@@ -1,9 +1,9 @@
 #include <PrecompiledHeader.h>
-#include "ReaverUnit.h"
+#include "Micro/Units/ProtossGround/ReaverUnit.h"
 
 std::set<BWAPI::UnitType> ReaverUnit::setPrio;
 
-ReaverUnit::ReaverUnit(BWAPI::Unit* u, UnitsGroup* ug)
+ReaverUnit::ReaverUnit(BWAPI::Unit* u,UnitsGroup* ug)
 : GroundUnit(u, ug)
 {
     if (setPrio.empty())

@@ -1,20 +1,20 @@
 #pragma once
 #include <BWAPI.h>
-#include <UnitGroup.h>
-#include "CSingleton.h"
-class UnitGroupManager: public CSingleton<UnitGroupManager>
+#include "Macro/UnitGroup.h"
+class UnitGroupManager
 {
-	friend class CSingleton<UnitGroupManager>;
-	
   public:
-   
+    static UnitGroupManager* create();
+    static void destroy();
     void onUnitDiscover(BWAPI::Unit* unit);
     void onUnitEvade(BWAPI::Unit* unit);
     void onUnitMorph(BWAPI::Unit* unit);
     void onUnitRenegade(BWAPI::Unit* unit);
-private:
-	UnitGroupManager();
+  private:
+    UnitGroupManager();
+    ~UnitGroupManager();
 };
+extern UnitGroupManager* TheUnitGroupManager;
 UnitGroup AllUnits();
 UnitGroup SelectAll();
 UnitGroup SelectAll(BWAPI::UnitType type);

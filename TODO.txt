@@ -1,3 +1,6 @@
+* Define tech by build tree at some time so that we can rebuild broken buildings
+* Crash on Macro/MacroWorkerManager.cpp:141 for some inputs because of strange assignment values (view Macro/Assignment.cpp:96)
+* BayesianUnit.cpp:442 Use _beginthreadex/_endthreadex functions instead of CreateThread/ExitThread functions.
 * Pass distribution on dirV/actions from BayesianUnit upstream in UnitsGroup
   for a more "global" optimal
 * More thread safety? (BayesianUnit, MapManager)
@@ -11,4 +14,4 @@
 * PROFILE and DEBUG ConstructionManager / BuildManager
 * Add features, like reaver drop, drops, photons defenses, rushes, cheeses counters
 * Remove HACK / TODO / TOCHANGE
-* Clean and optimize only then
+* Clean and optimize only then (SIMD for probabilities calculus)

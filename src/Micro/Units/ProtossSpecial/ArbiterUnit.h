@@ -1,6 +1,6 @@
 #pragma once
 
-#include <FlyingUnit.h>
+#include "Micro/Units/FlyingUnit.h"
 #include <BWAPI.h>
 
 class ArbiterUnit : public FlyingUnit
@@ -8,7 +8,7 @@ class ArbiterUnit : public FlyingUnit
 protected:
     static std::set<BWAPI::UnitType> setPrio;
 public:
-    ArbiterUnit(BWAPI::Unit* u, UnitsGroup* ug);
+    ArbiterUnit(BWAPI::Unit* u,UnitsGroup* ug);
     ~ArbiterUnit();
     virtual void micro();
     virtual void check();

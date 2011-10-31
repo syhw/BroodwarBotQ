@@ -1,11 +1,11 @@
 #include <PrecompiledHeader.h>
-#include "ObserverUnit.h"
-#include "EUnitsFilter.h"
-#include "UnitsGroup.h"
+#include "Micro/Units/ProtossFlying/ObserverUnit.h"
+#include "Intelligence/EUnitsFilter.h"
+#include "Micro/UnitsGroup.h"
 
 using namespace BWAPI;
 
-ObserverUnit::ObserverUnit(BWAPI::Unit* u, UnitsGroup* ug):FlyingUnit(u, ug)
+ObserverUnit::ObserverUnit(BWAPI::Unit* u,UnitsGroup* ug):FlyingUnit(u, ug)
 {
     _eUnitsFilter = & EUnitsFilter::Instance();
 }

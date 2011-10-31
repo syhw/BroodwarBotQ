@@ -1,9 +1,9 @@
 #include <PrecompiledHeader.h>
-#include "ArbiterUnit.h"
+#include "Micro/Units/ProtossSpecial/ArbiterUnit.h"
 
 std::set<BWAPI::UnitType> ArbiterUnit::setPrio;
 
-ArbiterUnit::ArbiterUnit(BWAPI::Unit* u, UnitsGroup* ug)
+ArbiterUnit::ArbiterUnit(BWAPI::Unit* u,UnitsGroup* ug)
 : FlyingUnit(u, ug)
 {
     if (setPrio.empty())

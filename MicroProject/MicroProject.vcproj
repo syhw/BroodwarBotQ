@@ -40,11 +40,12 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Intelligence;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ZergFlying;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Utils/Component;&quot;../../BWAPI_3.6.1/include&quot;;&quot;../../BWAPI_3.6.1/include/BWAPI&quot;;&quot;../../BWAPI_3.6.1/include/BWTA&quot;;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
+				AdditionalIncludeDirectories="../src;../../BWAPI_3.6.1/include;../../BWAPI_3.6.1/include/BWAPI;../../BWAPI_3.6.1/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
+				FloatingPointModel="2"
 				WarningLevel="3"
 				DebugInformationFormat="4"
 			/>
@@ -116,11 +117,12 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Intelligence;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ZergFlying;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Utils/Component;&quot;../../BWAPI_3.6.1/include&quot;;&quot;../../BWAPI_3.6.1/include/BWAPI&quot;;&quot;../../BWAPI_3.6.1/include/BWTA&quot;;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
+				AdditionalIncludeDirectories="../src;../../BWAPI_3.6.1/include;../../BWAPI_3.6.1/include/BWAPI;../../BWAPI_3.6.1/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
+				FloatingPointModel="2"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="PrecompiledHeader.h"
 				WarningLevel="3"
@@ -344,22 +346,18 @@
 						RelativePath="..\src\Utils\Util.cpp"
 						>
 					</File>
-					<Filter
-						Name="Component"
+				</Filter>
+				<Filter
+					Name="TerranGround"
+					>
+					<File
+						RelativePath="..\src\Micro\Units\TerranGround\MarineUnit.cpp"
 						>
-						<File
-							RelativePath="..\src\Utils\Component\BaseData.cpp"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Utils\Component\BaseObject.cpp"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Utils\Component\ObjectManager.cpp"
-							>
-						</File>
-					</Filter>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\TerranGround\MedicUnit.cpp"
+						>
+					</File>
 				</Filter>
 			</Filter>
 			<Filter
@@ -389,10 +387,6 @@
 			<Filter
 				Name="Intelligence"
 				>
-				<File
-					RelativePath="..\src\Intelligence\ETechEstimator.cpp"
-					>
-				</File>
 				<File
 					RelativePath="..\src\Intelligence\EUnitsFilter.cpp"
 					>
@@ -567,6 +561,18 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="TerranGround"
+					>
+					<File
+						RelativePath="..\src\Micro\Units\TerranGround\MarineUnit.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\TerranGround\MedicUnit.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="Goals"
@@ -623,42 +629,10 @@
 					RelativePath="..\src\Utils\Vec.h"
 					>
 				</File>
-				<Filter
-					Name="Component"
-					>
-					<File
-						RelativePath="..\src\Utils\Component\BaseData.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Utils\Component\BaseObject.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Utils\Component\Data.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Utils\Component\Data.inl"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Utils\Component\ObjectManager.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Utils\Component\RefreshWidgetEmiter.h"
-						>
-					</File>
-				</Filter>
 			</Filter>
 			<Filter
 				Name="Intelligence"
 				>
-				<File
-					RelativePath="..\src\Intelligence\ETechEstimator.h"
-					>
-				</File>
 				<File
 					RelativePath="..\src\Intelligence\EUnitsFilter.h"
 					>

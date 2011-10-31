@@ -4,7 +4,7 @@
 
 struct Rainbow {
     std::vector<BWAPI::Color> rainbow;
-    unsigned int ind;
+    size_t ind;
     Rainbow() 
     {
         rainbow.clear();

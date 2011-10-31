@@ -40,12 +40,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Intelligence;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ZergFlying;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Utils/Component;&quot;../../BWAPI_3.6.1/include&quot;;&quot;../../BWAPI_3.6.1/include/BWAPI&quot;;&quot;../../BWAPI_3.6.1/include/BWTA&quot;;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
+				AdditionalIncludeDirectories="../src;../../BWAPI_3.6.1/include;../../BWAPI_3.6.1/include/BWAPI;../../BWAPI_3.6.1/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
+				FloatingPointModel="2"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="PrecompiledHeader.h"
 				WarningLevel="3"
@@ -120,11 +121,12 @@
 				Optimization="3"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Intelligence;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ZergFlying;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Utils/Component;&quot;../../BWAPI_3.6.1/include&quot;;&quot;../../BWAPI_3.6.1/include/BWAPI&quot;;&quot;../../BWAPI_3.6.1/include/BWTA&quot;;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
+				AdditionalIncludeDirectories="../src;../../BWAPI_3.6.1/include;../../BWAPI_3.6.1/include/BWAPI;../../BWAPI_3.6.1/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
+				FloatingPointModel="2"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="PrecompiledHeader.h"
 				WarningLevel="3"
@@ -144,9 +146,12 @@
 				Name="VCLinkerTool"
 				AdditionalOptions="&#x0D;&#x0A;"
 				AdditionalDependencies="../../BWAPI_3.6.1/lib/BWAPI.lib ../../BWAPI_3.6.1/lib/BWTA.lib ../../BWAPI_3.6.1/lib/CGAL-vc90-mt.lib ../../BWAPI_3.6.1/lib/gmp-vc90-mt.lib ../../BWAPI_3.6.1/lib/libboost_thread-vc90-mt-1_40.lib ../../BWAPI_3.6.1/lib/mpfr-vc90-mt.lib ../../BWAPI_3.6.1/lib/tinyxml.lib ../../boost_1_45_0/stage/lib/libboost_serialization-vc90-mt-1_45.lib"
+				LinkIncremental="0"
 				AdditionalLibraryDirectories=""
+				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames="LIBCMT"
 				GenerateDebugInformation="true"
+				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
 				TargetMachine="1"
@@ -201,11 +206,12 @@
 				Optimization="0"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
-				AdditionalIncludeDirectories="../src;&quot;../src/AI-Monitor&quot;;../src/Arbitrator;../src/Intelligence;../src/Macro;../src/Macro/Build;../src/Macro/MacroManager;../src/Macro/Tech;../src/Micro;../src/Micro/Goals;../src/Micro/Units;../src/Micro/Units/ProtossSpecial;../src/Micro/Units/ProtossGround;../src/Micro/Units/ZergFlying;../src/Micro/Units/ProtossFlying;../src/Regions;../src/Utils;../src/Utils/Component;&quot;../../BWAPI_3.6.1/include&quot;;&quot;../../BWAPI_3.6.1/include/BWAPI&quot;;&quot;../../BWAPI_3.6.1/include/BWTA&quot;;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
+				AdditionalIncludeDirectories="../src;../../BWAPI_3.6.1/include;../../BWAPI_3.6.1/include/BWAPI;../../BWAPI_3.6.1/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42"
 				MinimalRebuild="true"
 				ExceptionHandling="2"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
+				FloatingPointModel="2"
 				UsePrecompiledHeader="2"
 				PrecompiledHeaderThrough="PrecompiledHeader.h"
 				WarningLevel="3"
@@ -263,18 +269,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath="..\src\EnhancedUI.cpp"
-				>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="2"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath="..\src\MacroDll.cpp"
 				>
 				<FileConfiguration
@@ -306,15 +300,11 @@
 				RelativePath="..\src\MacroProject.cpp"
 				>
 			</File>
-			<File
-				RelativePath="..\src\Regions\MapManager.cpp"
-				>
-			</File>
 			<Filter
 				Name="Micro"
 				>
 				<File
-					RelativePath="..\src\Micro\DefenseManager.cpp"
+					RelativePath="..\src\Micro\Micro.cpp"
 					>
 				</File>
 				<File
@@ -323,10 +313,6 @@
 				</File>
 				<File
 					RelativePath="..\src\Micro\WarManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Micro\WorkerSelfDefenseManager.cpp"
 					>
 				</File>
 				<Filter
@@ -452,16 +438,24 @@
 							>
 						</File>
 					</Filter>
+					<Filter
+						Name="TerranGround"
+						>
+						<File
+							RelativePath="..\src\Micro\Units\TerranGround\MarineUnit.cpp"
+							>
+						</File>
+						<File
+							RelativePath="..\src\Micro\Units\TerranGround\MedicUnit.cpp"
+							>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="Goals"
 					>
 					<File
 						RelativePath="..\src\Micro\Goals\AttackGoal.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\DefendBaseGroundGoal.cpp"
 						>
 					</File>
 					<File
@@ -502,15 +496,175 @@
 				Name="Macro"
 				>
 				<File
+					RelativePath="..\src\Macro\Assignment.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\Base.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\BaseManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\BasicTaskExecutor.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\BasicWorkerFinder.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\BFSBuildingPlacer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\BorderManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\BuildingPlacer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\BuildManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\BuildOrderManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\BWSAL.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\ConstructionManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\DefenseManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\EnhancedUI.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\InformationManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\LarvaTimeline.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\Macro.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\MacroBase.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\MacroBaseManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\MacroDependencyResolver.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Macro\MacroManager.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\ProtossStrat.cpp"
+					RelativePath="..\src\Macro\MacroSupplyManager.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\TerranStrat.cpp"
+					RelativePath="..\src\Macro\MacroWorkerManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\MetaUnit.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\MorphManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\ProductionManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\PylonBuildingPlacer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\ReservedMap.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\ResourceRates.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\Resources.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\ResourceTimeline.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\ScoutManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\SimCityBuildingPlacer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\SpiralBuildingPlacer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\SupplyManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\Task.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\TaskStream.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\TechManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\TechTimeline.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\TerminateIfEmpty.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\TerminateIfWorkerLost.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\UnitCompositionProducer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\UnitCountTimeline.cpp"
 					>
 				</File>
 				<File
@@ -522,81 +676,33 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Macro\UnitItem.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\UnitPump.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\UnitReadyTimeCalculator.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\UpgradeManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\UpgradeTimeline.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Macro\WorkerManager.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\ZergStrat.cpp"
+					RelativePath="..\src\Macro\WorkerTaskTimeline.cpp"
 					>
 				</File>
-				<Filter
-					Name="Tech"
-					>
-					<File
-						RelativePath="..\src\Macro\Tech\TechManager.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\Tech\UpgradeManager.cpp"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="Build"
-					>
-					<File
-						RelativePath="..\src\Macro\Build\Assignment.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\Build\Base.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\Build\BaseManager.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\BorderManager.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\Build\BuildingPlacer.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\Build\BuildManager.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\Build\BuildOrderManager.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\Build\ConstructionManager.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\Build\MetaUnit.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\Build\MorphManager.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\Build\ProductionManager.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\Build\SupplyManager.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\Build\UnitItem.cpp"
-						>
-					</File>
-				</Filter>
 			</Filter>
 			<Filter
 				Name="Utils"
@@ -609,38 +715,10 @@
 					RelativePath="..\src\Utils\Util.cpp"
 					>
 				</File>
-				<Filter
-					Name="Component"
-					>
-					<File
-						RelativePath="..\src\Utils\Component\BaseData.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Utils\Component\BaseObject.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Utils\Component\Data.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Utils\Component\ObjectManager.cpp"
-						>
-					</File>
-				</Filter>
 			</Filter>
 			<Filter
 				Name="Intelligence"
 				>
-				<File
-					RelativePath="..\src\Intelligence\EEcoEstimator.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Intelligence\EStrat.cpp"
-					>
-				</File>
 				<File
 					RelativePath="..\src\Intelligence\ETechEstimator.cpp"
 					>
@@ -654,11 +732,15 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\InformationManager.cpp"
+					RelativePath="..\src\Intelligence\Intelligence.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\src\Intelligence\ScoutManager.cpp"
+					RelativePath="..\src\Regions\MapManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Intelligence\ScoutController.cpp"
 					>
 				</File>
 			</Filter>
@@ -673,38 +755,22 @@
 				>
 			</File>
 			<File
-				RelativePath="..\src\EnhancedUI.h"
-				>
-			</File>
-			<File
 				RelativePath="..\src\MacroProject.h"
-				>
-			</File>
-			<File
-				RelativePath="..\src\Regions\MapManager.h"
 				>
 			</File>
 			<File
 				RelativePath="..\src\PrecompiledHeader.h"
 				>
 			</File>
-			<File
-				RelativePath="..\src\Regions\WalkTilePosition.h"
-				>
-			</File>
 			<Filter
 				Name="Micro"
 				>
-				<File
-					RelativePath="..\src\Micro\DefenseManager.h"
-					>
-				</File>
 				<File
 					RelativePath="..\src\Micro\Formations.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\Micro\UnitManager.h"
+					RelativePath="..\src\Micro\Micro.h"
 					>
 				</File>
 				<File
@@ -713,10 +779,6 @@
 				</File>
 				<File
 					RelativePath="..\src\Micro\WarManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Micro\WorkerSelfDefenseManager.h"
 					>
 				</File>
 				<Filter
@@ -842,16 +904,24 @@
 							>
 						</File>
 					</Filter>
+					<Filter
+						Name="TerranGround"
+						>
+						<File
+							RelativePath="..\src\Micro\Units\TerranGround\MarineUnit.h"
+							>
+						</File>
+						<File
+							RelativePath="..\src\Micro\Units\TerranGround\MedicUnit.h"
+							>
+						</File>
+					</Filter>
 				</Filter>
 				<Filter
 					Name="Goals"
 					>
 					<File
 						RelativePath="..\src\Micro\Goals\AttackGoal.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\DefendBaseGroundGoal.h"
 						>
 					</File>
 					<File
@@ -892,19 +962,167 @@
 				Name="Macro"
 				>
 				<File
+					RelativePath="..\src\Macro\Arbitrator.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\BaseManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\BasicTaskExecutor.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\BasicWorkerFinder.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\BFSBuildingPlacer.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\BorderManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\BuildingPlacer.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\BuildManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\BuildOrderManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\BWSAL.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\ConstructionManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\DefenseManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\EnhancedUI.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\Heap.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\InformationManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\Macro.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\MacroBaseManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\MacroBuildOrderManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\MacroDependencyResolver.h"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Macro\MacroManager.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\PlannedUnit.h"
+					RelativePath="..\src\Macro\MacroSupplyManager.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\ProtossStrat.h"
+					RelativePath="..\src\Macro\MacroWorkerManager.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\TerranStrat.h"
+					RelativePath="..\src\Macro\MorphManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\ProductionManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\PylonBuildingPlacer.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\RectangleArray.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\ReservedMap.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\ResourceRates.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\Resources.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\ResourceTimeline.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\ScoutManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\SimCityBuildingPlacer.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\SpiralBuildingPlacer.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\SupplyManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\Task.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\TechManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\TechTimeline.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\TerminateIfEmpty.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\TerminateIfWorkerLost.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\UnitCompositionProducer.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\UnitCountTimeline.h"
 					>
 				</File>
 				<File
@@ -916,78 +1134,98 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\WorkerManager.h"
+					RelativePath="..\src\Macro\UnitPump.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\ZergStrat.h"
+					RelativePath="..\src\Macro\UpgradeManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\UpgradeTimeline.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\WorkerManager.h"
 					>
 				</File>
 				<Filter
-					Name="Build"
+					Name="Arbitrator"
 					>
 					<File
-						RelativePath="..\src\Macro\Build\Base.h"
+						RelativePath="..\src\Macro\Arbitrator\Arbitrator.h"
 						>
 					</File>
 					<File
-						RelativePath="..\src\Macro\Build\BaseManager.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\BorderManager.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\Build\BuildingPlacer.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\Build\BuildManager.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\Build\BuildOrderManager.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\Build\ConstructionManager.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\Build\MorphManager.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\Build\ProductionManager.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\Build\RectangleArray.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\Build\SupplyManager.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\Build\TechItem.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Macro\Build\UnitItem.h"
+						RelativePath="..\src\Macro\Arbitrator\Controller.h"
 						>
 					</File>
 				</Filter>
 				<Filter
-					Name="Tech"
+					Name="BaseManager"
 					>
 					<File
-						RelativePath="..\src\Macro\Tech\TechManager.h"
+						RelativePath="..\src\Macro\BaseManager\Base.h"
 						>
 					</File>
 					<File
-						RelativePath="..\src\Macro\Tech\UpgradeManager.h"
+						RelativePath="..\src\Macro\BaseManager\BaseManager.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="BuildOrderManager"
+					>
+					<File
+						RelativePath="..\src\Macro\BuildOrderManager\BuildOrderManager.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Macro\BuildOrderManager\TechItem.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Macro\BuildOrderManager\UnitItem.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="MacroBaseManager"
+					>
+					<File
+						RelativePath="..\src\Macro\MacroBaseManager\MacroBase.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Macro\MacroBaseManager\MacroBaseManager.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="MacroManager"
+					>
+					<File
+						RelativePath="..\src\Macro\MacroManager\LarvaTimeline.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Macro\MacroManager\MacroManager.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Macro\MacroManager\TaskStream.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Macro\MacroManager\TaskStreamObserver.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Macro\MacroManager\UnitReadyTimeCalculator.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Macro\MacroManager\WorkerTaskTimeline.h"
 						>
 					</File>
 				</Filter>
@@ -1020,55 +1258,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Utils\UtilHeap.h"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Utils\Vec.h"
 					>
 				</File>
-				<Filter
-					Name="Component"
-					>
-					<File
-						RelativePath="..\src\Utils\Component\BaseData.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Utils\Component\BaseObject.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Utils\Component\Data.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Utils\Component\Data.inl"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Utils\Component\ObjectManager.h"
-						>
-					</File>
-				</Filter>
-			</Filter>
-			<Filter
-				Name="Arbitrator"
-				>
 				<File
-					RelativePath="..\src\Arbitrator\Arbitrator.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Arbitrator\Arbitrator.inl"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Arbitrator\Controller.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Arbitrator\Heap.h"
+					RelativePath="..\src\Regions\WalkTilePosition.h"
 					>
 				</File>
 			</Filter>
@@ -1076,11 +1270,7 @@
 				Name="Intelligence"
 				>
 				<File
-					RelativePath="..\src\Intelligence\EEcoEstimator.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Intelligence\EStrat.h"
+					RelativePath="..\src\Intelligence\enums_name_tables_tt.h"
 					>
 				</File>
 				<File
@@ -1096,11 +1286,19 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\InformationManager.h"
+					RelativePath="..\src\Intelligence\Intelligence.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\Intelligence\ScoutManager.h"
+					RelativePath="..\src\Regions\MapManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Intelligence\ScoutController.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Intelligence\serialized_tables.h"
 					>
 				</File>
 			</Filter>

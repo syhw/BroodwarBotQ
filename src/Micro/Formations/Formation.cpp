@@ -10,6 +10,7 @@ Formation::Formation(const Formation& f)
 , end_positions(f.end_positions)
 , space(24)
 {
+	log("created a formation\n");
 }
 
 Formation::Formation(const Vec& center, const Vec& direction)
@@ -19,6 +20,7 @@ Formation::Formation(const Vec& center, const Vec& direction)
 , space(24)
 {
     end_positions.clear();
+	log("created a formation\n");
 }
 
 Formation::Formation(const Position& p, const Vec& direction)
@@ -28,10 +30,12 @@ Formation::Formation(const Position& p, const Vec& direction)
 , space(24)
 {
     end_positions.clear();
+	log("created a formation\n");
 }
 
 Formation::~Formation()
 {
+	log("deleted a formation\n");
 }
 
 void Formation::computeMean()

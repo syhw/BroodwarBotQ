@@ -1,6 +1,6 @@
 #include <PrecompiledHeader.h>
-#include "ArchonUnit.h"
-#include "UnitsGroup.h"
+#include "Micro/Units/ProtossGround/ArchonUnit.h"
+#include "Micro/UnitsGroup.h"
 
 std::set<BWAPI::UnitType> ArchonUnit::setPrio;
 

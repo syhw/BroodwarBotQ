@@ -1,7 +1,7 @@
 #include <PrecompiledHeader.h>
-#include "ZealotUnit.h"
-#include "UnitsGroup.h"
-#include "MapManager.h"
+#include "Micro/Units/ProtossGround/ZealotUnit.h"
+#include "Micro/UnitsGroup.h"
+#include "Regions/MapManager.h"
 
 using namespace std;
 using namespace BWAPI;
@@ -11,7 +11,7 @@ ProbTables ZealotUnit::_sProbTables = ProbTables(BWAPI::UnitTypes::Protoss_Zealo
 std::set<BWAPI::UnitType> ZealotUnit::setPrio;
 std::map<BWAPI::Unit*, int> ZealotUnit::_zealotsOn;
 
-ZealotUnit::ZealotUnit(BWAPI::Unit* u, UnitsGroup* ug)
+ZealotUnit::ZealotUnit(BWAPI::Unit* u,UnitsGroup* ug)
 : GroundUnit(u, ug, &_sProbTables)
 {
     if (setPrio.empty())

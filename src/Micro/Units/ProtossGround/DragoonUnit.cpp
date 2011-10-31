@@ -1,6 +1,6 @@
 #include <PrecompiledHeader.h>
-#include "DragoonUnit.h"
-#include "UnitsGroup.h"
+#include "Micro/Units/ProtossGround/DragoonUnit.h"
+#include "Micro/UnitsGroup.h"
 
 //#define __SIMPLE_FLEE__
 
@@ -12,7 +12,7 @@ int DragoonUnit::attackDuration;
 
 std::set<BWAPI::UnitType> DragoonUnit::setPrio;
 
-DragoonUnit::DragoonUnit(BWAPI::Unit* u, UnitsGroup* ug)
+DragoonUnit::DragoonUnit(BWAPI::Unit* u,UnitsGroup* ug)
 : GroundUnit(u, ug)
 {
     if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Singularity_Charge))

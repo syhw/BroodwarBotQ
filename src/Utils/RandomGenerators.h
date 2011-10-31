@@ -1,5 +1,5 @@
 #pragma once
-#include <CSingleton.h>
+#include "Utils/CSingleton.h"
 #include <ctime>
 #include <boost/random/linear_congruential.hpp>
 #include <boost/random/uniform_real.hpp>

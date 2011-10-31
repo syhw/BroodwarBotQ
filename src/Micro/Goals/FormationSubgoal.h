@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Subgoal.h"
-#include "Formations.h"
+#include "Micro/Formations.h"
 #include <BWAPI.h>
-#include "UnitsGroup.h"
+#include "Micro/UnitsGroup.h"
 
 
 class FormationSubgoal : public Subgoal

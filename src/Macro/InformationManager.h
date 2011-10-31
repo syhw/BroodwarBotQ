@@ -2,12 +2,11 @@
 #include <BWAPI.h>
 #include <BWTA.h>
 #include <map>
-#include "CSingleton.h"
-class InformationManager: public CSingleton<InformationManager>
+class InformationManager
 {
-	friend class CSingleton<InformationManager>;
   public:
-    InformationManager();
+    static InformationManager* create();
+    static void destroy();
     void onUnitDiscover(BWAPI::Unit* unit);
     void onUnitEvade(BWAPI::Unit* unit);
     void onUnitDestroy(BWAPI::Unit* unit);
@@ -21,6 +20,8 @@ class InformationManager: public CSingleton<InformationManager>
     const std::set<BWTA::BaseLocation*>& getEnemyBases() const;
     void setBaseEmpty(BWTA::BaseLocation* base);
   private:
+    InformationManager();
+    ~InformationManager();
     class UnitData
     {
       public:
@@ -39,3 +40,4 @@ class InformationManager: public CSingleton<InformationManager>
     std::set<BWTA::BaseLocation*> startLocationCouldContainEnemy;
     bool scoutedAnEnemyBase;
 };
+extern InformationManager* TheInformationManager;

@@ -1,6 +1,6 @@
 #include <PrecompiledHeader.h>
 #include "ArcFormation.h"
-#include "MapManager.h"
+#include "Regions/MapManager.h"
 
 using namespace BWAPI;
 

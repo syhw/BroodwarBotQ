@@ -3,14 +3,12 @@
 #include <BWTA.h>
 #include <windows.h>
 #include "Defines.h"
-#include "Formations.h"
-#include "EUnitsFilter.h"
-#include "ETechEstimator.h"
-#include "MapManager.h"
-#include "ObjectManager.h"
-#include "Regions.h"
-#include "UnitsGroup.h"
-#include <UnitGroupManager.h>
+#include "Micro/Formations.h"
+#include "Intelligence/EUnitsFilter.h"
+#include "Regions/MapManager.h"
+#include "Regions/Regions.h"
+#include "Micro/UnitsGroup.h"
+#include "Macro/UnitGroupManager.h"
 
 static bool analyzed;
 static bool analysis_just_finished;
@@ -23,9 +21,7 @@ class MicroAIModule : public BWAPI::AIModule
 public:	    
     UnitsGroup* mm;
     EUnitsFilter* eUnitsFilter;
-    ETechEstimator* eTechEstimator;
     MapManager* mapManager;
-    ObjectManager* objectManager;
     Regions* regions;
     UnitGroupManager * unitGroupManager;
     bool enemiesFound;

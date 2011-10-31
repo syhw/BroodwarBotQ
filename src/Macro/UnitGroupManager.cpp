@@ -1,5 +1,5 @@
 #include <PrecompiledHeader.h>
-#include <UnitGroupManager.h>
+#include "Macro/UnitGroupManager.h"
 
 std::map<BWAPI::Unit*,BWAPI::Player*> unitOwner;
 std::map<BWAPI::Unit*,BWAPI::UnitType> unitType;
@@ -7,9 +7,21 @@ std::map<BWAPI::Player*, std::map<BWAPI::UnitType,UnitGroup > > data;
 std::map<BWAPI::Player*, UnitGroup> allOwnedUnits;
 UnitGroup allUnits;
 BWAPI::Player* neutral;
+UnitGroupManager* TheUnitGroupManager = NULL;
 
+UnitGroupManager* UnitGroupManager::create()
+{
+  if (TheUnitGroupManager) return TheUnitGroupManager;
+  return new UnitGroupManager();
+}
+void UnitGroupManager::destroy()
+{
+  if (TheUnitGroupManager)
+    delete TheUnitGroupManager;
+}
 UnitGroupManager::UnitGroupManager()
 {
+  TheUnitGroupManager = this;
   for(std::set<BWAPI::Unit*>::iterator i=BWAPI::Broodwar->getAllUnits().begin();i!=BWAPI::Broodwar->getAllUnits().end();i++)
   {
     onUnitDiscover(*i);
@@ -20,6 +32,10 @@ UnitGroupManager::UnitGroupManager()
     if ((*i)->isNeutral())
       neutral=*i;
   }
+}
+UnitGroupManager::~UnitGroupManager()
+{
+  TheUnitGroupManager = NULL;
 }
 void UnitGroupManager::onUnitDiscover(BWAPI::Unit* unit)
 {

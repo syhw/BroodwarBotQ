@@ -19,8 +19,8 @@ performances issues with the BuildManager / ConstructionManager). Also, there's
 a lot of code duplication in the units (micro) code.
 I hope that the same of the bot told you it plays Protoss (only for the moment).
 
-There are different contributions of:
-Guillaume Bousket, 
+Older versions had contributions of:
+Guillaume Bousquet, 
 Louis Schimchowitsch,
 Nicolas Biagianti
 

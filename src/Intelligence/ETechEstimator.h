@@ -1,41 +1,32 @@
 #pragma once
 #include "BWAPI.h"
-#include "CSingleton.h"
-
-class Building {
-public:
-    Building(BWAPI::UnitType t, double p); // Automatically set produces, upgrades and techs
-    BWAPI::UnitType type;
-    std::list<Building> needed;
-    double probToHave;
-};
-
-class Tech {
-public:
-    Tech(BWAPI::TechType type, double probToHave);
-    BWAPI::TechType type;
-    double probToHave;
-};
-
-class Upgrade {
-public:
-    Upgrade(BWAPI::UpgradeType type, double probToHave);
-    BWAPI::UpgradeType type;
-    double probToHave;
-};
-
+#include "Utils/CSingleton.h"
+#include "serialized_tables.h"
+#include <vector>
+#include <set>
+#include <string>
+#include "Defines.h"
 
 class ETechEstimator : public CSingleton<ETechEstimator>
 {
     friend class CSingleton<ETechEstimator>;
     ETechEstimator();
     ~ETechEstimator();
-    std::list<Building> buildings;
-    Building getBuilding(BWAPI::UnitType ut);
+	serialized_tables st;
+	std::vector<long double> openingsProbas;
+	std::set<BWAPI::Unit*> buildingsSeen; 
+	std::set<int> buildingsTypesSeen;
+	bool notFirstOverlord;
+	bool insertBuilding(BWAPI::Unit* u);
+	bool insertBuilding(BWAPI::UnitType ut);
+    void computeDistribOpenings(int time);
+	inline bool testBuildTreePossible(int indBuildTree,
+		const std::set<int>& setObs);
 public:
-    double canProduce(BWAPI::UnitType ut);
-    double hasTech(BWAPI::TechType tt);
-    double hasUpgrade(BWAPI::UpgradeType upt);
-    void updateProbs();
-    void sayProbs();
+	void onUnitDestroy(BWAPI::Unit* u);
+	void onUnitShow(BWAPI::Unit* u);
+	void onUnitHide(BWAPI::Unit* u);
+#ifdef __DEBUG__
+	void onFrame();
+#endif
 };

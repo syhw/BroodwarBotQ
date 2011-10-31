@@ -1,8 +1,8 @@
 #pragma once
 
-#include <SpecialUnit.h>
+#include "Micro/Units/SpecialUnit.h"
 #include <BWAPI.h>
-#include "MapManager.h"
+#include "Regions/MapManager.h"
 
 class HighTemplarUnit : public SpecialUnit
 {
@@ -13,7 +13,7 @@ protected:
     static int lastStormableUnitsUpdateFrame;
     int _mergingFrame;
 public:
-    HighTemplarUnit(BWAPI::Unit* u, UnitsGroup* ug);
+    HighTemplarUnit(BWAPI::Unit* u,UnitsGroup* ug);
     ~HighTemplarUnit();
     std::pair<BWAPI::Position, int> bestStormPos();
     virtual void micro();

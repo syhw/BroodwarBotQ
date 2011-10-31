@@ -1,10 +1,10 @@
 #include <PrecompiledHeader.h>
-#include "HighTemplarUnit.h"
-#include "UnitsGroup.h"
+#include "Micro/Units/ProtossSpecial/HighTemplarUnit.h"
+#include "Micro/UnitsGroup.h"
 
 int HighTemplarUnit::lastStormableUnitsUpdateFrame;
 
-HighTemplarUnit::HighTemplarUnit(BWAPI::Unit* u, UnitsGroup* ug)
+HighTemplarUnit::HighTemplarUnit(BWAPI::Unit* u,UnitsGroup* ug)
 : SpecialUnit(u, ug)
 , _lastStormFrame(0)
 , _mergingFrame(0)

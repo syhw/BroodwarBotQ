@@ -1,11 +1,11 @@
 #include <PrecompiledHeader.h>
-#include "ScourgeUnit.h"
+#include "Micro/Units/ZergFlying/ScourgeUnit.h"
 
 std::set<BWAPI::UnitType> ScourgeUnit::setPrio;
 
 std::set<BWAPI::Unit*> ScourgeUnit::alreadyTargeted;
 
-ScourgeUnit::ScourgeUnit(BWAPI::Unit* u, UnitsGroup* ug)
+ScourgeUnit::ScourgeUnit(BWAPI::Unit* u,UnitsGroup* ug)
 : FlyingUnit(u, ug)
 {
     if (setPrio.empty())

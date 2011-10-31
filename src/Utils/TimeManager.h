@@ -1,10 +1,9 @@
 #pragma once
 #include <windows.h>
-#include <CSingleton.h>
+#include "Utils/CSingleton.h"
 #include <BWAPI.h>
 #include <string>
 #include <exception>
-#include "BaseObject.h"
 
 using namespace BWAPI;
 
@@ -36,7 +35,7 @@ public:
 * All classes running an update/onFrame() in BWAPI's thread should register here
 * To be terminated if they take more than 1/25 sec (40ms) to run (and so slow down the game).
 */
-class TimeManager : public CSingleton<TimeManager>, public BaseObject
+class TimeManager : public CSingleton<TimeManager>
 {
 	friend class CSingleton<TimeManager>;
 
