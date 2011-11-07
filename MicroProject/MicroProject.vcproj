@@ -39,6 +39,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="-D__MICRO_PROJECT__"
 				Optimization="0"
 				AdditionalIncludeDirectories="../src;../../BWAPI_3.6.1/include;../../BWAPI_3.6.1/include/BWAPI;../../BWAPI_3.6.1/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42;&quot;C:\Program Files\Visual Leak Detector\include&quot;"
 				MinimalRebuild="true"
@@ -103,6 +104,7 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				CommandLine=""
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -115,6 +117,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="-D__MICRO_PROJECT__"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				AdditionalIncludeDirectories="../src;../../BWAPI_3.6.1/include;../../BWAPI_3.6.1/include/BWAPI;../../BWAPI_3.6.1/include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42;&quot;C:\Program Files\Visual Leak Detector\include&quot;"
@@ -176,10 +179,266 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Header Files"
+			Name="Source Files"
+			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath="..\src\Macro\BWSAL.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Regions\MapManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\MicroDll.cpp"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="1"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\src\MicroProject.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Micro\UnitsGroup.cpp"
+				>
+			</File>
+			<Filter
+				Name="Formations"
+				>
+				<File
+					RelativePath="..\src\Micro\Formations\ArcFormation.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Formations\Formation.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Formations\LineFormation.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Formations\SquareFormation.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Units"
+				>
+				<File
+					RelativePath="..\src\Micro\Units\BattleUnit.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Units\BayesianUnit.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Units\FlyingUnit.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Units\GroundUnit.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Units\ProtossFlying\ShuttleUnit.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Units\SpecialUnit.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\UnitGroup.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\UnitGroupManager.cpp"
+					>
+				</File>
+				<Filter
+					Name="ProtossFlying"
+					>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossSpecial\ArbiterUnit.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossFlying\CarrierUnit.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossFlying\CorsairUnit.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossFlying\ObserverUnit.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossFlying\ScoutUnit.cpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="ProtossGround"
+					>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossGround\ArchonUnit.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossGround\DarkTemplarUnit.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossGround\DragoonUnit.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossGround\ProbeUnit.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossGround\ReaverUnit.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossGround\ZealotUnit.cpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="ProtossSpecial"
+					>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossSpecial\DarkArchonUnit.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossSpecial\HighTemplarUnit.cpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="ZergFlying"
+					>
+					<File
+						RelativePath="..\src\Micro\Units\ZergFlying\MutaliskUnit.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ZergFlying\ScourgeUnit.cpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="Utils"
+					>
+					<File
+						RelativePath="..\src\Utils\TimeManager.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Utils\Util.cpp"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="TerranGround"
+					>
+					<File
+						RelativePath="..\src\Micro\Units\TerranGround\MarineUnit.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\TerranGround\MedicUnit.cpp"
+						>
+					</File>
+				</Filter>
+			</Filter>
+			<Filter
+				Name="Goals"
+				>
+				<File
+					RelativePath="..\src\Micro\Goals\AttackGoal.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Goals\AvoidNukeGoal.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Goals\FormationSubgoal.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Goals\Goal.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Goals\GoalManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Goals\RegroupGoal.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Goals\SeeSubgoal.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Goals\Subgoal.cpp"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Intelligence"
+				>
+				<File
+					RelativePath="..\src\Intelligence\EUnitsFilter.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Intelligence\EViewedUnit.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Intelligence\Intelligence.cpp"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="Header Files"
+			Filter="h;hpp;hxx;hm;inl;inc;xsd"
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
+			>
+			<File
+				RelativePath="..\src\Macro\Arbitrator.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\Defines.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Micro\Formations.h"
+				>
+			</File>
+			<File
+				RelativePath="..\src\Regions\MapManager.h"
 				>
 			</File>
 			<File
@@ -187,294 +446,58 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\Utils\MinHeap.h"
+				>
+			</File>
+			<File
 				RelativePath="..\src\PrecompiledHeader.h"
 				>
 			</File>
+			<File
+				RelativePath="..\src\Micro\UnitsGroup.h"
+				>
+			</File>
 			<Filter
-				Name="Micro"
+				Name="Formations"
 				>
 				<File
-					RelativePath="..\src\Micro\Formations.h"
+					RelativePath="..\src\Micro\Formations\ArcFormation.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\Micro\Micro.h"
+					RelativePath="..\src\Micro\Formations\Formation.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\Micro\UnitsGroup.h"
+					RelativePath="..\src\Micro\Formations\LineFormation.h"
 					>
 				</File>
-				<Filter
-					Name="Formations"
+				<File
+					RelativePath="..\src\Micro\Formations\SquareFormation.h"
 					>
-					<File
-						RelativePath="..\src\Micro\Formations\ArcFormation.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Formations\Formation.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Formations\LineFormation.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Formations\SquareFormation.h"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="Units"
-					>
-					<File
-						RelativePath="..\src\Micro\Units\BattleUnit.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Units\BayesianUnit.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Units\FlyingUnit.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Units\GroundUnit.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Units\SpecialUnit.h"
-						>
-					</File>
-					<Filter
-						Name="ProtossGround"
-						>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossGround\ArchonUnit.h"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossGround\DarkTemplarUnit.h"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossGround\DragoonUnit.h"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossGround\ProbeUnit.h"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossGround\ReaverUnit.h"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossGround\ZealotUnit.h"
-							>
-						</File>
-					</Filter>
-					<Filter
-						Name="ProtossSpecial"
-						>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossSpecial\DarkArchonUnit.h"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossSpecial\HighTemplarUnit.h"
-							>
-						</File>
-					</Filter>
-					<Filter
-						Name="ProtossFlying"
-						>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossSpecial\ArbiterUnit.h"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossFlying\CarrierUnit.h"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossFlying\CorsairUnit.h"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossFlying\ObserverUnit.h"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossFlying\ScoutUnit.h"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossFlying\ShuttleUnit.h"
-							>
-						</File>
-					</Filter>
-					<Filter
-						Name="ZergFlying"
-						>
-						<File
-							RelativePath="..\src\Micro\Units\ZergFlying\MutaliskUnit.h"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Micro\Units\ZergFlying\ScourgeUnit.h"
-							>
-						</File>
-					</Filter>
-					<Filter
-						Name="TerranGround"
-						>
-						<File
-							RelativePath="..\src\Micro\Units\TerranGround\MarineUnit.h"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Micro\Units\TerranGround\MedicUnit.h"
-							>
-						</File>
-					</Filter>
-				</Filter>
-				<Filter
-					Name="Goals"
-					>
-					<File
-						RelativePath="..\src\Micro\Goals\AttackGoal.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\AvoidNukeGoal.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\DefendGoal.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\DropGoal.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\ExploreGoal.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\FirstScoutGoal.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\FormationSubgoal.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\Goal.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\GoalManager.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\KillSubgoal.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\RegroupGoal.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\SeeSubgoal.h"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\Subgoal.h"
-						>
-					</File>
-				</Filter>
+				</File>
 			</Filter>
 			<Filter
-				Name="Macro"
+				Name="Units"
 				>
 				<File
-					RelativePath="..\src\Macro\Arbitrator.h"
+					RelativePath="..\src\Micro\Units\BattleUnit.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\Base.h"
+					RelativePath="..\src\Micro\Units\BayesianUnit.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\BasesManager.h"
+					RelativePath="..\src\Micro\Units\FlyingUnit.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\BorderManager.h"
+					RelativePath="..\src\Micro\Units\GroundUnit.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\Builder.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\BWSAL.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\DefenseManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\EnhancedUI.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\Heap.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\InformationManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\Macro.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\Producer.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\RectangleArray.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\ReservedMap.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\ResourceRates.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\Resources.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\ScoutManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\SimCityBuildingPlacer.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\SupplyManager.h"
+					RelativePath="..\src\Micro\Units\SpecialUnit.h"
 					>
 				</File>
 				<File
@@ -485,29 +508,137 @@
 					RelativePath="..\src\Macro\UnitGroupManager.h"
 					>
 				</File>
-				<File
-					RelativePath="..\src\Macro\UpgradeManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\WorkerManager.h"
-					>
-				</File>
 				<Filter
-					Name="Arbitrator"
+					Name="ProtossFlying"
 					>
 					<File
-						RelativePath="..\src\Macro\Arbitrator\Arbitrator.h"
+						RelativePath="..\src\Micro\Units\ProtossSpecial\ArbiterUnit.h"
 						>
 					</File>
 					<File
-						RelativePath="..\src\Macro\Arbitrator\Controller.h"
+						RelativePath="..\src\Micro\Units\ProtossFlying\CarrierUnit.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossFlying\CorsairUnit.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossFlying\ObserverUnit.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossFlying\ScoutUnit.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossFlying\ShuttleUnit.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="ProtossSpecial"
+					>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossSpecial\DarkArchonUnit.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossSpecial\HighTemplarUnit.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="ZergFlying"
+					>
+					<File
+						RelativePath="..\src\Micro\Units\ZergFlying\MutaliskUnit.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ZergFlying\ScourgeUnit.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="ProtossGround"
+					>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossGround\ArchonUnit.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossGround\DarkTemplarUnit.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossGround\DragoonUnit.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossGround\ProbeUnit.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossGround\ReaverUnit.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\ProtossGround\ZealotUnit.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="TerranGround"
+					>
+					<File
+						RelativePath="..\src\Micro\Units\TerranGround\MarineUnit.h"
+						>
+					</File>
+					<File
+						RelativePath="..\src\Micro\Units\TerranGround\MedicUnit.h"
 						>
 					</File>
 				</Filter>
 			</Filter>
 			<Filter
-				Name="Util"
+				Name="Goals"
+				>
+				<File
+					RelativePath="..\src\Micro\Goals\AttackGoal.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Goals\AvoidNukeGoal.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Goals\FormationSubgoal.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Goals\Goal.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Goals\GoalManager.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Goals\RegroupGoal.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Goals\SeeSubgoal.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Goals\Subgoal.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Utils"
 				>
 				<File
 					RelativePath="..\src\Utils\CSingleton.h"
@@ -518,7 +649,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Utils\QuadTree.h"
+					RelativePath="..\src\Utils\Rainbow.h"
 					>
 				</File>
 				<File
@@ -534,29 +665,13 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Utils\Util.h"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Utils\Vec.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Regions\WalkTilePosition.h"
 					>
 				</File>
 			</Filter>
 			<Filter
 				Name="Intelligence"
 				>
-				<File
-					RelativePath="..\src\Intelligence\enums_name_tables_tt.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Intelligence\ETechEstimator.h"
-					>
-				</File>
 				<File
 					RelativePath="..\src\Intelligence\EUnitsFilter.h"
 					>
@@ -569,354 +684,24 @@
 					RelativePath="..\src\Intelligence\Intelligence.h"
 					>
 				</File>
-				<File
-					RelativePath="..\src\Regions\MapManager.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Intelligence\serialized_tables.h"
-					>
-				</File>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="Source Files"
-			>
-			<File
-				RelativePath="..\src\MicroDll.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\src\MicroProject.cpp"
-				>
-			</File>
-			<Filter
-				Name="Micro"
-				>
-				<File
-					RelativePath="..\src\Micro\Micro.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Micro\UnitsGroup.cpp"
-					>
-				</File>
-				<Filter
-					Name="Formations"
-					>
-					<File
-						RelativePath="..\src\Micro\Formations\ArcFormation.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Formations\Formation.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Formations\LineFormation.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Formations\SquareFormation.cpp"
-						>
-					</File>
-				</Filter>
-				<Filter
-					Name="Units"
-					>
-					<File
-						RelativePath="..\src\Micro\Units\BattleUnit.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Units\BayesianUnit.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Units\FlyingUnit.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Units\GroundUnit.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Units\SpecialUnit.cpp"
-						>
-					</File>
-					<Filter
-						Name="ProtossGround"
-						>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossGround\ArchonUnit.cpp"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossGround\DarkTemplarUnit.cpp"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossGround\DragoonUnit.cpp"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossGround\ProbeUnit.cpp"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossGround\ReaverUnit.cpp"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossGround\ZealotUnit.cpp"
-							>
-						</File>
-					</Filter>
-					<Filter
-						Name="ProtossSpecial"
-						>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossSpecial\DarkArchonUnit.cpp"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossSpecial\HighTemplarUnit.cpp"
-							>
-						</File>
-					</Filter>
-					<Filter
-						Name="ProtossFlying"
-						>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossSpecial\ArbiterUnit.cpp"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossFlying\CarrierUnit.cpp"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossFlying\CorsairUnit.cpp"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossFlying\ObserverUnit.cpp"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossFlying\ScoutUnit.cpp"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Micro\Units\ProtossFlying\ShuttleUnit.cpp"
-							>
-						</File>
-					</Filter>
-					<Filter
-						Name="ZergFlying"
-						>
-						<File
-							RelativePath="..\src\Micro\Units\ZergFlying\MutaliskUnit.cpp"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Micro\Units\ZergFlying\ScourgeUnit.cpp"
-							>
-						</File>
-					</Filter>
-					<Filter
-						Name="TerranGround"
-						>
-						<File
-							RelativePath="..\src\Micro\Units\TerranGround\MarineUnit.cpp"
-							>
-						</File>
-						<File
-							RelativePath="..\src\Micro\Units\TerranGround\MedicUnit.cpp"
-							>
-						</File>
-					</Filter>
-				</Filter>
-				<Filter
-					Name="Goals"
-					>
-					<File
-						RelativePath="..\src\Micro\Goals\AttackGoal.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\AvoidNukeGoal.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\DefendGoal.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\DropGoal.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\ExploreGoal.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\FirstScoutGoal.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\FormationSubgoal.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\Goal.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\GoalManager.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\KillSubgoal.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\RegroupGoal.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\SeeSubgoal.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\src\Micro\Goals\Subgoal.cpp"
-						>
-					</File>
-				</Filter>
 			</Filter>
 			<Filter
-				Name="Macro"
+				Name="Arbitrator"
 				>
 				<File
-					RelativePath="..\src\Macro\Assignment.cpp"
+					RelativePath="..\src\Macro\Arbitrator\Arbitrator.h"
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\Base.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\BasesManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\BorderManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\Builder.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\BWSAL.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\DefenseManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\EnhancedUI.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\InformationManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\Macro.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\Producer.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\ReservedMap.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\ResourceRates.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\Resources.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\ScoutManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\SimCityBuildingPlacer.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\SupplyManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\UnitGroup.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\UnitGroupManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\WorkerManager.cpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Utils"
-				>
-				<File
-					RelativePath="..\src\Utils\TimeManager.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Utils\Util.cpp"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="Intelligence"
-				>
-				<File
-					RelativePath="..\src\Intelligence\ETechEstimator.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Intelligence\EUnitsFilter.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Intelligence\EViewedUnit.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Intelligence\Intelligence.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Regions\MapManager.cpp"
+					RelativePath="..\src\Macro\Arbitrator\Controller.h"
 					>
 				</File>
 			</Filter>
 		</Filter>
 		<Filter
 			Name="Resource Files"
+			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
+			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 		</Filter>
 	</Files>
