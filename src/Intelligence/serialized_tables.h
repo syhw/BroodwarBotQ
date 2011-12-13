@@ -34,4 +34,12 @@ struct serialized_tables
         , vector_X(vx)
         , distances_X(dx)
     {}
+	void swap(serialized_tables& st)
+	{
+		tabulated_P_Time_X_Op.swap(st.tabulated_P_Time_X_Op);
+		tabulated_P_X_Op.swap(st.tabulated_P_X_Op);
+		openings.swap(st.openings);
+		vector_X.swap(st.vector_X);
+		distances_X.swap(st.distances_X);
+	}
 };

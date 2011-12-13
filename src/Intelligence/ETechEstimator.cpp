@@ -12,16 +12,24 @@
 using namespace BWAPI;
 using namespace std;
 
+void ETechEstimator::loadTable(const char* tname)
+{
+	std::ifstream ifs(tname);
+	boost::archive::text_iarchive ia(ifs);
+	ia >> st;
+	tableLoaded = true;
+}
+
 ETechEstimator::ETechEstimator()
 : notFirstOverlord(false)
 , hasInfered(false)
+, tableLoaded(false)
 {
 	/// Load the learned prob tables (uniforms + bell shapes) for the right match up
 	/// This is not obfuscation, the learning of these tables is described in the CIG 2011 Paper
 	/// A Bayesian Model for Opening Prediction in RTS Games with Application to StarCraft, Gabriel Synnaeve, Pierre Bessière, CIG (IEEE) 2011
 	/// All code for the learning is here: https://github.com/SnippyHolloW/OpeningTech
 	{
-		// TODO Random case (load all, use the good one)
 		// do __NOT__ use Intelligence::Instance().enemyRace other wise infinite constructors loop and stack overflow and carnage ensues
 		Race enemyRace;
 		for (set<Player*>::const_iterator p = Broodwar->getPlayers().begin();
@@ -36,26 +44,55 @@ ETechEstimator::ETechEstimator()
 		string serializedTablesFileName("bwapi-data/AI/tables/");
 		//string serializedTablesFileName("C:\\StarCraft\\AI\\BroodwarBotQ\\data\\tables\\");
 		if (enemyRace == Races::Terran || !enemyRace.getName().compare("Terran"))
+		{
 #ifdef __BENS_LABELS__
 			serializedTablesFileName.append("TvP.table");
 #else
 			serializedTablesFileName.append("TvPx.table");
 #endif
+			loadTable(serializedTablesFileName.c_str());
+		}
 		else if (enemyRace == Races::Protoss || !enemyRace.getName().compare("Protoss"))
+		{
 #ifdef __BENS_LABELS__
 			serializedTablesFileName.append("PvP.table");
 #else
 			serializedTablesFileName.append("PvPx.table");
 #endif
+			loadTable(serializedTablesFileName.c_str());
+		}
 		else if (enemyRace == Races::Zerg || !enemyRace.getName().compare("Zerg"))
+		{
 #ifdef __BENS_LABELS__
 			serializedTablesFileName.append("ZvP.table");
 #else
 			serializedTablesFileName.append("ZvPx.table");
 #endif
-		std::ifstream ifs(serializedTablesFileName.c_str());
-		boost::archive::text_iarchive ia(ifs);
-		ia >> st;
+			loadTable(serializedTablesFileName.c_str());
+		}
+		else // RANDOM
+		{
+			string tmpTvP(serializedTablesFileName);
+			string tmpZvP(serializedTablesFileName);
+#ifdef __BENS_LABELS__
+			serializedTablesFileName.append("PvP.table");
+			tmpTvP.append("TvP.table");
+			tmpZvP.append("ZvP.table");
+#else
+			serializedTablesFileName.append("PvPx.table");
+			tmpTvP.append("TvPx.table");
+			tmpZvP.append("ZvPx.table");
+#endif
+			std::ifstream ifs(serializedTablesFileName.c_str());
+			boost::archive::text_iarchive ia(ifs);
+			ia >> st;
+			std::ifstream ifs2(tmpTvP.c_str());
+			boost::archive::text_iarchive ia2(ifs2);
+			ia2 >> TvP;
+			std::ifstream ifs3(tmpZvP.c_str());
+			boost::archive::text_iarchive ia3(ifs3);
+			ia3 >> ZvP;
+		}
 	}
 
 	/// Initialize openingsProbas with a uniform distribution
@@ -80,6 +117,17 @@ void ETechEstimator::onUnitShow(Unit* u)
 	if (u->getPlayer()->isEnemy(Broodwar->self())
 		&& !alreadySaw(u->getType()))
 	{
+		/// If it's the first enemy unit that we see and he is random,
+		/// update st with the good serialized_table
+		if (!tableLoaded)
+		{
+			if (u->getType().getRace() == Races::Terran)
+				st.swap(TvP);
+			else if (u->getType().getRace() == Races::Zerg)
+				st.swap(ZvP);
+			tableLoaded = true;
+		}
+
 		int recomputeTime = 0;
 		if (u->getType().isBuilding() 
 			|| u->getType() == UnitTypes::Zerg_Overlord)
@@ -125,6 +173,8 @@ void ETechEstimator::onUnitHide(Unit* u)
 #ifdef __DEBUG__
 void ETechEstimator::onFrame()
 {
+	if (!tableLoaded)
+		return;
 	Broodwar->drawTextScreen(510, 150, "Opening Prediction");
 	Broodwar->drawLineScreen(490, 148, 630, 148, BWAPI::Colors::Blue);
 	Broodwar->drawLineScreen(490, 148, 490, 170 + 18*openingsProbas.size(), BWAPI::Colors::Blue);
