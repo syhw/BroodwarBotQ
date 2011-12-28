@@ -78,6 +78,10 @@ class ETechEstimator : public CSingleton<ETechEstimator>
     ETechEstimator();
     ~ETechEstimator();
 	serialized_tables st;
+	serialized_tables TvP; // tmp table to handle random
+	serialized_tables ZvP; // tmp table to handle random
+	bool tableLoaded;
+	void loadTable(const char* tname);
 	std::vector<long double> openingsProbas; // see the big fat comment above
 	std::set<BWAPI::Unit*> buildingsSeen; 
 	std::set<int> buildingsTypesSeen;
