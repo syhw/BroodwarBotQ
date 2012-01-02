@@ -2,9 +2,6 @@
 
 //our defines
 
-#undef _SECURE_SCL
-#define _SECURE_SCL 0 // remove iterator runtime checkses
-
 #define __DEBUG__
 //#define __NON_IMPLEMENTE__
 #define BW_POS_MOUSE
