@@ -20,11 +20,14 @@ Task::Task(BWAPI::Unit* w, BWAPI::TilePosition tp, BWAPI::UnitType ut, int lo)
 , tilePosition(tp)
 , type(ut)
 , lastOrder(lo)
-, finished(false)
 , tries(0)
-, initialized(false)
+, positioned(false)
+, powered(false)
 , reserved(false)
+, finished(false)
 {
+	if (type == UnitTypes::Protoss_Pylon || type == UnitTypes::Protoss_Assimilator || type == UnitTypes::Protoss_Nexus)
+		powered = true;
 }
 
 Task::~Task()
@@ -75,20 +78,34 @@ int Task::framesToCompleteRequirements(UnitType type)
 	return ret;
 }
 
-void Task::init()
+bool Task::requirements()
 {
-	initialized = true;
-	if (tilePosition == TilePositions::None)
-		tilePosition = buildingPlacer->getTilePosition(type);
-	if (!tilePosition.isValid() || TilePositions::None)
-	{
-		finished = true;
-		return;
-	}
-
+	/// side effect function which builds the requirements
 	int delay = Task::framesToCompleteRequirements(type); // launches the requirements
 	if (delay)
+	{
 		lastOrder = max(lastOrder, Broodwar->getFrameCount() + delay);
+		return false;
+	}
+	else
+		return true;
+}
+
+void Task::positionIt()
+{
+	if (tilePosition == TilePositions::None || tilePosition == TilePositions::Invalid || tilePosition == TilePositions::Unknown
+		|| !tilePosition.isValid() || 
+		(type != UnitTypes::Protoss_Assimilator && !Broodwar->isBuildable(tilePosition.x(), tilePosition.y(), true)))
+		tilePosition = buildingPlacer->getTilePosition(type);
+	if (!tilePosition.isValid() || tilePosition == TilePositions::None)
+	{
+		finished = true;
+#ifdef __DEBUG__
+		Broodwar->printf("\x08 !!! CANCELED Building %s at (%d,%d) !!! NO POSITION", type.getName().c_str(), tilePosition.x(), tilePosition.y());
+#endif
+	}
+	else
+		positioned = true;
 }
 
 void Task::onOffer(set<Unit*> units)
@@ -154,36 +171,34 @@ void Task::askWorker()
 	TheArbitrator->setBid(this, usefulUnits, 60); // TODO change 60
 }
 
-void Task::buildIt()
+void Task::powerIt()
 {
-	if (tries > __MAX_TRIES_BUILD_SOMETHING__)
+	if (!Broodwar->hasPower(tilePosition))
 	{
-		finished = true;
-#ifdef __DEBUG__
-		Broodwar->printf("\x08 !!! CANCELED Building %s at (%d,%d) !!!", type.getName().c_str(), tilePosition.x(), tilePosition.y());
-#endif
-		return;
-	}
-	if (!worker || !worker->exists() || worker->getPlayer() != Broodwar->self())
-	{
-		/// Just in case the worker got killed / captured
-		worker = NULL;
-		askWorker();
-		return;
-	}
-	++tries;
-	if (tilePosition == TilePositions::None || tilePosition == TilePositions::Invalid
-		|| tilePosition == TilePositions::Invalid || tilePosition == TilePosition(0,0))
-	{
-		buildingPlacer->getTilePosition(type);
-		return;
-	}
-	if (Broodwar->getFrameCount() > lastOrder + 17 + Broodwar->getLatencyFrames())
-	{
-		/// If it requires psi but there is not, ask for a powering pylon, or cancel if we can't power it
-		if (type != UnitTypes::Protoss_Pylon && type != UnitTypes::Protoss_Assimilator && type != UnitTypes::Protoss_Nexus
-			&& !Broodwar->hasPower(tilePosition)) // type.requiresPsi()
+		powered = false;
+		/// Look for a pylon which will be built and will cover
+		bool foundCovering = false;
+		for each (Unit* pic in TheBuilder->getInConstruction(UnitTypes::Protoss_Pylon))
 		{
+			if (pic->getTilePosition().getDistance(tilePosition) < 4*TILE_SIZE)
+			{
+				foundCovering = true;
+				break;
+			}
+		}
+		for each (TilePosition tp in TheBuilder->getFutureTaskPos(UnitTypes::Protoss_Pylon, this))
+		{
+			if (tp == TilePositions::None || tp == TilePositions::Invalid || tp == TilePositions::Unknown)
+				return;
+			if (tp.getDistance(tilePosition) < 4*TILE_SIZE)
+			{
+				foundCovering = true;
+				break;
+			}
+		}
+		if (!foundCovering)
+		{
+			/// Seek a covering pylon position
 			TilePosition pylonTP = buildingPlacer->getPylonTilePositionCovering(tilePosition);
 			if (pylonTP != TilePositions::None)
 			{
@@ -195,9 +210,47 @@ void Task::buildIt()
 					+ (int)(100.0 /TheResourceRates->getGatherRate().getMinerals()); // delay our construction, assume we have no money
 			}
 			else
-				finished = true;
-			return;
+			{
+				finished = true; // abandon construction
+#ifdef __DEBUG__
+				Broodwar->printf("\x08 !!! CANCELED Building %s at (%d,%d) !!! NO POWER", type.getName().c_str(), tilePosition.x(), tilePosition.y());
+#endif
+			}
 		}
+	}
+	else
+		powered = true;
+}
+
+void Task::buildIt()
+{
+	if (tries > __MAX_TRIES_BUILD_SOMETHING__)
+	{
+		finished = true;
+#ifdef __DEBUG__
+		Broodwar->printf("\x08 !!! CANCELED Building %s at (%d,%d) !!! TOO MUCH TRIES", type.getName().c_str(), tilePosition.x(), tilePosition.y());
+#endif
+		return;
+	}
+	if (!worker || !worker->exists() || worker->getPlayer() != Broodwar->self())
+	{
+		/// Just in case the worker got killed / captured
+		worker = NULL;
+		askWorker();
+		return;
+	}
+	++tries;
+	/*if (tilePosition == TilePositions::None || tilePosition == TilePositions::Invalid
+		|| tilePosition == TilePositions::Invalid || tilePosition == TilePosition(0,0))
+	{
+		buildingPlacer->getTilePosition(type);
+		return;
+	}*/
+	if (Broodwar->getFrameCount() > lastOrder + 17 + Broodwar->getLatencyFrames())
+	{
+		if (finished)
+			return;
+
 		/// Move closer to the construction site
 		if (worker->getDistance(Position(tilePosition)) > 6 * TILE_SIZE) // 6 > sqrt(biggest^2+biggest^2) (biggest buildings as Protoss are nexus/gates)
 		{
@@ -217,11 +270,16 @@ void Task::buildIt()
 		else if (!worker->build(tilePosition, type))
 		{
 #ifdef __DEBUG__
-			Broodwar->printf("Can't build %s at (%d,%d)", type.getName().c_str(), tilePosition.x(), tilePosition.y());
+			Broodwar->printf("ERROR: Can't build %s at (%d,%d)", type.getName().c_str(), tilePosition.x(), tilePosition.y());
 #endif
 		}
 		lastOrder = Broodwar->getFrameCount();
 	}
+}
+
+TilePosition Task::getTilePosition() const
+{
+	return tilePosition;
 }
 
 string Task::getName() const
@@ -288,10 +346,22 @@ void Task::check()
 
 void Task::update()
 {
-	if (!initialized)
-		init();
+	if (finished)
+		return;
 	if (Broodwar->getFrameCount() <= lastOrder) // delay hack
 		return;
+	if (!requirements())
+		return;
+	if (!positioned)
+	{
+		positionIt();
+		return;
+	}
+	if (!powered)
+	{
+		powerIt();
+		return;
+	}
 	if (!reserved)
 	{
 		Macro::Instance().reservedMinerals += type.mineralPrice();
@@ -318,6 +388,11 @@ const UnitType& Task::getType() const
 int Task::getLastOrder() const
 {
 	return lastOrder;
+}
+
+bool Task::hasReserved()
+{
+	return reserved;
 }
 
 bool Task::isFinished()
@@ -359,7 +434,6 @@ Builder::~Builder()
 void Builder::addTask(const UnitType& t, const TilePosition& seedPosition, bool quick, int lastOrder)
 {
 	pTask tmp(new Task(NULL, seedPosition, t, lastOrder));
-	tmp->init();
 	if (quick)
 		tasks.push_front(tmp);
 	else
@@ -448,6 +522,30 @@ const list<Unit*>& Builder::getInConstruction()
 	return inConstruction;
 }
 
+list<Unit*> Builder::getInConstruction(const UnitType& t)
+{
+	list<Unit*> r;
+	for each (Unit* u in inConstruction)
+	{
+		if (u->getType() == t)
+			r.push_back(u);
+	}
+	return r;
+}
+
+list<TilePosition> Builder::getFutureTaskPos(const UnitType& t, Task* before)
+{
+	list<TilePosition> r;
+	for each (pTask task in tasks)
+	{
+		if (task.get() == before)
+			return r;
+		if (task->getType() == t)
+			r.push_back(task->getTilePosition());
+	}
+	return r;
+}
+
 /*** 
  * Computes the number of additional supply that we can hope to have
  * for _frames_ later.
@@ -493,7 +591,6 @@ void Builder::update()
 #ifdef __DEBUG__
 				Broodwar->printf("Building %s pop %d", it->second->getName().c_str(), Broodwar->self()->supplyUsed()/2);
 #endif
-				it->second->init();
 				tasks.push_front(it->second);
 				toRemove.push_back(it->first);
 			}

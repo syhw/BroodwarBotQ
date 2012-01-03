@@ -1288,6 +1288,7 @@ void SimCityBuildingPlacer::onUnitDestroy(Unit* unit)
 
 bool SimCityBuildingPlacer::canBuildHere(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type) const
 {
+	// TODO FIXIT perhaps chance Broodwar->canBuildHere by Broodwar->isBuildable(_, true)
 	if (type.isAddon()) type=type.whatBuilds().first;
 	//returns true if we can build this type of unit here. Takes into account reserved tiles.
 	if (!BWAPI::Broodwar->canBuildHere(builder, position, type))

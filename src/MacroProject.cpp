@@ -104,6 +104,7 @@ void BattleBroodAI::onFrame()
 	if (interval > 0.040)
 		Broodwar->printf("MACRO took %2.5f seconds", interval);
 
+	/*
 #ifdef __DEBUG__
     std::set<Unit*> units=Broodwar->self()->getUnits();
     if (this->showManagerAssignments)
@@ -131,6 +132,7 @@ void BattleBroodAI::onFrame()
         }
     }
 #endif
+	*/
 
 #ifdef __DEBUG__
 	clock_t end = clock();
