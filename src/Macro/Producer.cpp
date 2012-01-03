@@ -279,8 +279,8 @@ int Producer::additionalUnitsSupply(int frames)
 			supply += it->second.supplyRequired();
 			minerals -= it->second.mineralPrice();
 			gas -= it->second.gasPrice();
-			if (it->second.buildTime() < 
-				(frames - max(builder->second->getRemainingBuildTime(), builder->second->getRemainingTrainTime()))) // just a second one of the same unit, then it's too far in the future
+			if (it->second.buildTime() + max(builder->second->getRemainingBuildTime(), builder->second->getRemainingTrainTime()) < 
+				frames) // just a second one of the same unit, then it's too far in the future
 			{
 				supply += it->second.supplyRequired();
 				minerals -= it->second.mineralPrice();
