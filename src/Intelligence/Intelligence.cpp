@@ -115,7 +115,7 @@ void Intelligence::update()
 		{
 			if (b != enemyHome)
 			{
-				double dist = MapManager::Instance().distBaseToBase[enemyHome][b];
+				double dist = MapManager::Instance().distBaseToBase(enemyHome, b);
 				if (dist > 0.0)
 					enemyBasesOrder.insert(std::make_pair<double, BWTA::BaseLocation*>(dist, b));
 				else

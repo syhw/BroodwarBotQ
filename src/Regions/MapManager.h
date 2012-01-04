@@ -9,6 +9,11 @@
 #include <windows.h>
 #include <process.h>
 
+#include "boost/archive/binary_oarchive.hpp"
+#include "boost/archive/binary_iarchive.hpp"
+#include "boost/serialization/map.hpp"
+#include "boost/serialization/utility.hpp"
+
 class BayesianUnit;
 
 struct PathfindWork
@@ -30,6 +35,24 @@ struct PathfindWork
 	{
 	}
 };
+
+struct PathAwareMaps
+{
+    friend class boost::serialization::access;
+	template <class archive>
+    void serialize(archive & ar, const unsigned int version)
+    {
+        ar & regionsPFCenters;
+		ar & distRegions;
+        ar & distBaseToBase;
+    }
+	std::map<int, std::pair<int, int> > regionsPFCenters; // Pathfinding wise region centers
+	std::map<int, std::map<int, double> > distRegions; // distRegions[R1][R2] w.r.t regionsPFCenters
+	std::map<int, std::map<int, double> > distBaseToBase;
+};
+
+BOOST_CLASS_TRACKING(PathAwareMaps, boost::serialization::track_never);
+BOOST_CLASS_VERSION(PathAwareMaps, 1);
 
 /** From BWAPI's doc:
 * Positions are measured in pixels and are the highest resolution
@@ -113,6 +136,10 @@ class MapManager : public CSingleton<MapManager>
     void straightLine(std::vector<BWAPI::TilePosition>& btpath, 
         const BWAPI::TilePosition& start, const BWAPI::TilePosition& end);
 
+	std::map<BWTA::Region*, int> regionToHash;
+	std::map<BWTA::BaseLocation*, int> baseLocationToHash;
+	PathAwareMaps _pfMaps;
+
 public:
     bool* walkability;          // walk tiles
     bool* buildings_wt;         // walk tiles
@@ -124,11 +151,6 @@ public:
     int* airDamages;            // build tiles
     Vec* groundDamagesGrad;     // build tiles
     Vec* airDamagesGrad;        // build tiles
-	std::map<BWTA::Region*, BWAPI::Position> regionsPFCenters; // Pathfinding wise region centers
-	std::map<BWTA::Region*, std::map<BWTA::Region*, double> > distRegions; // distRegions[R1][R2] w.r.t regionsPFCenters
-	std::map<BWTA::Region*, std::map<double, BWTA::Region*> > regionsByDist; // regionsByDust[R] ordered by distance w.r.t. regionsPFCenters too
-	std::map<BWTA::BaseLocation*, std::map<BWTA::BaseLocation*, double> > distBaseToBase;
-	std::map<BWTA::Region*, BWAPI::TilePosition> regionsInsideCenter; // Centers of the regions that are inside
     std::map<Position, int> stormPos;
     void onUnitCreate(BWAPI::Unit* u);
     void onUnitDestroy(BWAPI::Unit* u);
@@ -147,6 +169,11 @@ public:
     BWAPI::TilePosition closestWalkabableSameRegionOrConnected(BWAPI::TilePosition tp);
 	bool isBTWalkable(int x, int y);
 	bool isBTWalkable(const BWAPI::TilePosition& tp);
+
+	BWAPI::Position regionsPFCenters(BWTA::Region* r);
+	double distRegions(BWTA::Region* r1, BWTA::Region* r2);
+	double distBaseToBase(BWTA::BaseLocation* b1, BWTA::BaseLocation* b2);
+	
     void drawBuildings();           // debug
     void drawBuildingsStrict();     // debug
     void drawWalkability();         // debug

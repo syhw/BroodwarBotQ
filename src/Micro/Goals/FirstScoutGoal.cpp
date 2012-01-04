@@ -19,7 +19,7 @@ inline BWTA::BaseLocation* getNearestBL(const TilePosition& tp, const set<BWTA::
 	for (std::set<BWTA::BaseLocation*>::const_iterator it = s.begin(); 
 		it != s.end(); ++it)
 	{
-		double tmp = MapManager::Instance().distRegions[(*it)->getRegion()][BWTA::getRegion(tp)];
+		double tmp = MapManager::Instance().distRegions((*it)->getRegion(), BWTA::getRegion(tp));
 		if (tmp > 0 && tmp < min)
 		{
 			min = tmp;

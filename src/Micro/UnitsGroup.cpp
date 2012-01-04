@@ -395,7 +395,7 @@ void UnitsGroup::updateArrivingUnits()
 							BWTA::Region* r2 = BWTA::getRegion(TilePosition(groupTargetPosition));
 							if (r1 && r2)
 							{
-								double tmpDist = MapManager::Instance().distRegions[r1][r2];
+								double tmpDist = MapManager::Instance().distRegions(r1, r2);
 								if (tmpDist <= distToTarget) // we want to come from behind the group)
 									(*it)->target = center;
 								else
@@ -640,7 +640,7 @@ void UnitsGroup::update()
 							BWTA::Region* higherRegion = 
 								(Broodwar->getGroundHeight(TilePosition(regions.first->getCenter())) > Broodwar->getGroundHeight(TilePosition(regions.second->getCenter())))
 								? regions.first : regions.second;
-							(*it)->target = (MapManager::Instance().regionsPFCenters[higherRegion]);
+							(*it)->target = (MapManager::Instance().regionsPFCenters(higherRegion));
 							(*it)->switchMode(MODE_FIGHT_G);
 #ifdef __DEBUG__
 							Position displayp = (*it)->unit->getPosition();
@@ -958,7 +958,7 @@ void UnitsGroup::updateCenter()
 		BWTA::Region* r1 = BWTA::getRegion(TilePosition(center));
 		BWTA::Region* r2 = BWTA::getRegion(TilePosition(groupTargetPosition));
 		if (r1 && r2 && r1 != r2)
-			distToTarget = MapManager::Instance().distRegions[r1][r2]; // Note: distToTarget = -1 if we can't go by group from r1 to r2
+			distToTarget = MapManager::Instance().distRegions(r1, r2); // Note: distToTarget = -1 if we can't go by group from r1 to r2
 		else
 			distToTarget = center.getApproxDistance(groupTargetPosition); // same regions, or regions fucked up
 	}

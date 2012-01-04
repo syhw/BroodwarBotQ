@@ -11,3 +11,4 @@ std::vector<double> exponentialDistribution(double lambda, unsigned int bins=100
 long double maxVector(const std::vector<long double>& t);
 size_t indMax(const std::vector<long double>& t);
 std::set<size_t> supTo(const std::vector<long double>& t, long double minProb);
+bool fileExists(const char *fileName);

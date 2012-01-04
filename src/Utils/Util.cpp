@@ -131,3 +131,12 @@ std::set<size_t> supTo(const std::vector<long double>& t, long double minProb)
 	}
 	return ret;
 }
+
+bool fileExists(const char *fileName)
+{
+    DWORD fileAttr;
+    fileAttr = GetFileAttributesA(fileName);
+    if (0xFFFFFFFF == fileAttr)
+        return false;
+    return true;
+}

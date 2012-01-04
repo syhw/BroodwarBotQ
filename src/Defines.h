@@ -33,5 +33,6 @@
 #ifdef __RELEASE_OPTIM__
 #undef _SECURE_SCL
 #define _SECURE_SCL 0 // remove iterator runtime checks
+#define _HAS_ITERATOR_DEBUGGING 0
 #endif
 #endif

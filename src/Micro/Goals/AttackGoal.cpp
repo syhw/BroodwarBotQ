@@ -118,7 +118,7 @@ void AttackGoal::createMidSubgoal()
         return;
     Position tmpPos = _unitsGroup.ppath[_unitsGroup.ppath.size() / 2];
     BWTA::Region* r = BWTA::getRegion(TilePosition(tmpPos));
-	tmpPos = MapManager::Instance().regionsPFCenters[r];
+	tmpPos = MapManager::Instance().regionsPFCenters(r);
 	//Create an intermediate subgoal at half the way of the path of the unitsgroup
     if (r != BWTA::getRegion(TilePosition(_unitsGroup.center)))
         addSubgoal(pSubgoal(new FormationSubgoal(SL_AND, &_unitsGroup, pFormation(new SquareFormation(tmpPos)))));

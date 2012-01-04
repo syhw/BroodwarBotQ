@@ -29,7 +29,7 @@ void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnit
 #ifdef __SAFE_SQUARE_FORMATION__
 	BWTA::Region* regionCenter = BWTA::getRegion(TilePosition(center.toPosition()));
 	if (regionCenter != NULL)
-		center = MapManager::Instance().regionsPFCenter[regionCenter];
+		center = MapManager::Instance().regionsPFCenter(regionCenter);
 #endif
 	if (!Broodwar->isWalkable(center.toPosition().x()/8, center.toPosition().y()/8))
 		center = Vec(MapManager::Instance().closestWalkabableSameRegionOrConnected(center.toPosition()));
