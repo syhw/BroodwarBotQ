@@ -565,12 +565,6 @@ void ETechEstimator::useDistribOpenings()
 		+ TheBuilder->willBuild(UnitTypes::Protoss_Photon_Cannon); // ~~
 	if (enemyRace == Races::Terran)
 	{
-		if (fearThese.count(0)) // Bio
-		{
-			if (openingsProbas[0] > openingsProbas[1] && openingsProbas[0] > openingsProbas[2])
-				Macro::Instance().stormFirst = true;
-		}
-
 		if (fearThese.count(2)) // VulturesHarass
 		{
 			TheProducer->produce(2, UnitTypes::Protoss_Observer, (int)(openingsProbas[2]*100));
@@ -578,14 +572,17 @@ void ETechEstimator::useDistribOpenings()
 			Broodwar->printf("Producing observers bc of Vultures");
 #endif
 		}
-
-		if (fearThese.count(3)) // SiegeExpand
+		else if (fearThese.count(3)) // SiegeExpand
 		{
 			if (!Macro::Instance().expands && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 4)
 				Macro::Instance().expand();
 		}
-
-		if (fearThese.count(5)) // FastDropship
+		else if (fearThese.count(0)) // Bio
+		{
+			if (openingsProbas[0] > openingsProbas[1] && openingsProbas[0] > openingsProbas[2])
+				Macro::Instance().stormFirst = true;
+		}
+		else if (fearThese.count(5)) // FastDropship
 		{
 			while (builtCannons < 3 + 1*Macro::Instance().expands) 
 			{
@@ -603,7 +600,7 @@ void ETechEstimator::useDistribOpenings()
 		{
 			TheProducer->produce(2, UnitTypes::Protoss_Zealot, 60, 2);
 		}
-		if (fearThese.count(1) || openingsProbas[1] > 0.15) // FastDT
+		else if (fearThese.count(1) || openingsProbas[1] > 0.15) // FastDT
 		{
 			if (!Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Forge)
 				&& !TheBuilder->willBuild(UnitTypes::Protoss_Forge))
@@ -641,8 +638,7 @@ void ETechEstimator::useDistribOpenings()
 			Broodwar->printf("Producing observers bc of DTs");
 #endif
 		}
-
-		if (fearThese.count(3)) // ReaverDrop
+		else if (fearThese.count(3)) // ReaverDrop
 		{
 			while (builtCannons < 3 + 1*Macro::Instance().expands) 
 			{
@@ -653,8 +649,7 @@ void ETechEstimator::useDistribOpenings()
 			Broodwar->printf("Building cannons bc of ReaverDrop");
 #endif
 		}
-
-		if (fearThese.count(5) // FastExpand
+		else if (fearThese.count(5) // FastExpand
 			&& openingsProbas[5] > 0.35)
 		{
 			if (!Macro::Instance().expands && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 3)
@@ -663,33 +658,6 @@ void ETechEstimator::useDistribOpenings()
 	}
 	else if (enemyRace == Races::Zerg)
 	{
-		if (fearThese.count(0)) // TwoHatchMuta
-		{
-			while (builtCannons < 3 + 1*Macro::Instance().expands) 
-			{
-				TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
-				++builtCannons;
-			}
-#ifdef __DEBUG__
-			Broodwar->printf("Building cannons bc of 2H Mutas");
-#endif
-		}
-		
-		if (fearThese.count(1)) // ThreeHatchMuta
-		{
-			while (builtCannons < 3 + 1*Macro::Instance().expands) 
-			{
-				TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
-				++builtCannons;
-			}
-#ifdef __DEBUG__
-			Broodwar->printf("Building cannons bc of 3H Mutas");
-#endif
-		}
-
-		if (openingsProbas[0] > openingsProbas[5] && openingsProbas[1] > openingsProbas[5]) // storm against mutas, if Mutas > Lurkers
-			Macro::Instance().stormFirst = true;
-
 		if (fearThese.count(5)) // Lurker
 		{
 			Macro::Instance().reaverFirst = false; // we will need obs
@@ -703,6 +671,31 @@ void ETechEstimator::useDistribOpenings()
 			Broodwar->printf("Producing observers bc of Lurkers");
 #endif
 		}
+		else if (fearThese.count(0)) // TwoHatchMuta
+		{
+			while (builtCannons < 3 + 1*Macro::Instance().expands) 
+			{
+				TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
+				++builtCannons;
+			}
+#ifdef __DEBUG__
+			Broodwar->printf("Building cannons bc of 2H Mutas");
+#endif
+		}
+		else if (fearThese.count(1)) // ThreeHatchMuta
+		{
+			while (builtCannons < 3 + 1*Macro::Instance().expands) 
+			{
+				TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
+				++builtCannons;
+			}
+#ifdef __DEBUG__
+			Broodwar->printf("Building cannons bc of 3H Mutas");
+#endif
+		}
+
+		if (openingsProbas[0] > openingsProbas[5] && openingsProbas[1] > openingsProbas[5]) // storm against mutas, if Mutas > Lurkers
+			Macro::Instance().stormFirst = true;
 	}
 #endif
 }
