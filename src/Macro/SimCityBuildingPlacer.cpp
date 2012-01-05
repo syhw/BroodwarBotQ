@@ -183,13 +183,21 @@ PositionAccountant* SimCityBuildingPlacer::getPositionAccountant(const BWAPI::Un
 void SimCityBuildingPlacer::generateGatesPos()
 {
 	for each (Base* b in TheBasesManager->getAllBases())
-		gates.addPos(generateBuildLocationNear(b->getBaseLocation()->getTilePosition(), UnitTypes::Protoss_Gateway));
+	{
+		TilePosition tmp = generateBuildLocationNear(b->getBaseLocation()->getTilePosition(), UnitTypes::Protoss_Gateway);
+		if (tmp != TilePositions::None)
+			gates.addPos(tmp);
+	}
 }
 
 void SimCityBuildingPlacer::generateTechPos()
 {
 	for each (Base* b in TheBasesManager->getAllBases())
-		tech.addPos(generateBuildLocationNear(b->getBaseLocation()->getTilePosition(), UnitTypes::Protoss_Cybernetics_Core));
+	{
+		TilePosition tmp = generateBuildLocationNear(b->getBaseLocation()->getTilePosition(), UnitTypes::Protoss_Cybernetics_Core);
+		if (tmp != TilePositions::None)
+			tech.addPos(tmp);
+	}
 }
 
 void SimCityBuildingPlacer::generateCannonsPos()
@@ -1519,4 +1527,5 @@ TilePosition SimCityBuildingPlacer::generateBuildLocationNear(const TilePosition
 		if (canBuildHereWithSpace(NULL, t, ut, buildDist))
 			return t;
     }
+	return TilePositions::None;
 }
