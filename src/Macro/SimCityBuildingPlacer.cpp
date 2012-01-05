@@ -166,14 +166,30 @@ bool SimCityBuildingPlacer::inMineralLine(BWTA::BaseLocation* b, BWAPI::TilePosi
 	return (tp.x() < maxX && tp.x() > minX && tp.y() < maxY && tp.y() > minY);
 }
 
+PositionAccountant* SimCityBuildingPlacer::getPositionAccountant(const BWAPI::UnitType& ut)
+{
+    if (ut == UnitTypes::Protoss_Pylon)
+		return &pylons;
+    else if (ut == UnitTypes::Protoss_Gateway || ut == UnitTypes::Protoss_Stargate)
+		return &gates;
+	else if (ut == UnitTypes::Protoss_Photon_Cannon)
+		return &cannons;
+	else if (ut == UnitTypes::Protoss_Assimilator)
+		return &tech; // TODO
+	else
+		return &tech;
+}
+
 void SimCityBuildingPlacer::generateGatesPos()
 {
-	// TODO
+	for each (Base* b in TheBasesManager->getAllBases())
+		generateBuildLocationNear(b->getBaseLocation()->getTilePosition(), UnitTypes::Protoss_Gateway);
 }
 
 void SimCityBuildingPlacer::generateTechPos()
 {
-	// TODO
+	for each (Base* b in TheBasesManager->getAllBases())
+		generateBuildLocationNear(b->getBaseLocation()->getTilePosition(), UnitTypes::Protoss_Cybernetics_Core);
 }
 
 void SimCityBuildingPlacer::generateCannonsPos()
@@ -185,6 +201,7 @@ void SimCityBuildingPlacer::generateCannonsPos()
 		else
 			makeCannonChoke(cp->getRegions().second, cp, true);
 	}
+	// TODO
 }
 
 void SimCityBuildingPlacer::generatePylonsPos()
@@ -456,6 +473,27 @@ BuildingsCluster SimCityBuildingPlacer::searchForCluster(BWTA::Region* r)
 		    maxY = tmpY;
 	}
 	return searchForCluster(minX, maxX, minY, maxY, r);
+}
+
+pair<TilePosition, TilePosition> getOuterBoundsRegion(BWTA::Region* r)
+{
+	TilePosition center(r->getCenter());
+	int minX = center.x();
+	int maxX = center.x();
+	int minY = center.y();
+	int maxY = center.y();
+	for each (Position p in r->getPolygon())
+	{
+		if (p.x()/TILE_SIZE < minX)
+			minX = p.x()/TILE_SIZE;
+		if (p.y()/TILE_SIZE < minY)
+			minY = p.y()/TILE_SIZE;
+		if (p.x()/TILE_SIZE > maxX)
+			maxX = p.x()/TILE_SIZE;
+		if (p.y()/TILE_SIZE > maxY)
+			maxY = p.y()/TILE_SIZE;
+	}
+	return make_pair(TilePosition(minX, minY), TilePosition(maxX, maxY));
 }
 
 BuildingsCluster SimCityBuildingPlacer::searchForCluster(int minX, int maxX, int minY, int maxY, BWTA::Region* r)
@@ -1226,12 +1264,8 @@ void SimCityBuildingPlacer::onUnitDestroy(Unit* unit)
 			else
 				pylons.addAsSecondPos(tp); // not to wait too much
 		}
-		else if (ut == UnitTypes::Protoss_Gateway || ut == UnitTypes::Protoss_Stargate)
-			gates.addPos(tp);
-		else if (ut == UnitTypes::Protoss_Photon_Cannon)
-			cannons.addPos(tp);
-		else
-			tech.addPos(tp);
+		else 
+			getPositionAccountant(ut)->addPos(tp);
 
 		/// set rally points in order not to block units (in case it's an inner building)
 		set<Unit*> unpoweredBuildings = checkPower(closeBuildings);
@@ -1278,6 +1312,26 @@ bool SimCityBuildingPlacer::canBuildHere(BWAPI::Unit* builder, BWAPI::TilePositi
 	for(int x = position.x(); x < position.x() + type.tileWidth(); x++)
 		for(int y = position.y(); y < position.y() + type.tileHeight(); y++)
 			if (TheReservedMap->isReserved(x,y))
+				return false;
+	return true;
+}
+
+bool SimCityBuildingPlacer::canBuildHereWithSpace(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type, int buildDist) const
+{
+	if (type.isAddon()) type=type.whatBuilds().first;
+	if (!canBuildHere(builder, position, type))
+		return false;
+	if (type.isRefinery())
+		return true;
+	int startx = position.x() - buildDist;
+	int endx = position.x() + type.tileWidth() + buildDist;
+	int starty = position.y() - buildDist;
+	int endy = position.y() + type.tileHeight() + buildDist;
+	if (startx < 0 || starty < 0 || endx > BWAPI::Broodwar->mapWidth() || endy > BWAPI::Broodwar->mapHeight())
+		return false;
+	for(int x = startx; x < endx; x++)
+		for(int y = starty; y < endy; y++)
+			if (!BWAPI::Broodwar->isBuildable(x, y, true) || TheReservedMap->isReserved(x,y))
 				return false;
 	return true;
 }
@@ -1442,4 +1496,34 @@ TilePosition SimCityBuildingPlacer::getPylonTilePositionCovering(const TilePosit
 		ret = pylons.reservePos(t);
 	}
 	return ret;
+}
+
+void SimCityBuildingPlacer::generateBuildLocationNear(const TilePosition& tp, const BWAPI::UnitType& ut, int buildDist)
+{
+	/// returns a valid build location (with buildDist space around) near/around the TilePosition tp
+	multimap<double, TilePosition> openTiles;
+	openTiles.insert(make_pair(0, tp));
+    set<TilePosition> closedTiles;
+	pair<TilePosition, TilePosition> outerBounds = getOuterBoundsRegion(BWTA::getRegion(tp));
+	for (int x = outerBounds.first.x(); x < outerBounds.second.x(); ++x)
+		for (int y = outerBounds.first.y(); y < outerBounds.second.y(); ++y)
+		{
+			TilePosition tmp(x, y);
+			if (Broodwar->isBuildable(tmp, true) && closedTiles.find(tmp) == closedTiles.end())
+			{
+				openTiles.insert(make_pair(tp.getDistance(tmp), tmp));
+			}
+		}
+
+    // Do a breadth first search to find a nearby valid build location with space
+	for each (pair<double, TilePosition> pp in openTiles)
+    {
+		TilePosition t = pp.second;
+		if (closedTiles.find(t) != closedTiles.end() && canBuildHereWithSpace(NULL, t, ut, buildDist))
+			getPositionAccountant(ut)->addPos(t);
+		//for (int x = t.x() - buildDist; x < t.x() + ut.tileWidth() + buildDist; ++x)
+		for (int x = t.x(); x < t.x() + ut.tileWidth(); ++x)
+			for (int y = t.y(); y < t.y() + ut.tileHeight(); ++y)
+				closedTiles.insert(TilePosition(x, y));
+    }
 }
