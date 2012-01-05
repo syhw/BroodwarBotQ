@@ -183,13 +183,13 @@ PositionAccountant* SimCityBuildingPlacer::getPositionAccountant(const BWAPI::Un
 void SimCityBuildingPlacer::generateGatesPos()
 {
 	for each (Base* b in TheBasesManager->getAllBases())
-		generateBuildLocationNear(b->getBaseLocation()->getTilePosition(), UnitTypes::Protoss_Gateway);
+		gates.addPos(generateBuildLocationNear(b->getBaseLocation()->getTilePosition(), UnitTypes::Protoss_Gateway));
 }
 
 void SimCityBuildingPlacer::generateTechPos()
 {
 	for each (Base* b in TheBasesManager->getAllBases())
-		generateBuildLocationNear(b->getBaseLocation()->getTilePosition(), UnitTypes::Protoss_Cybernetics_Core);
+		tech.addPos(generateBuildLocationNear(b->getBaseLocation()->getTilePosition(), UnitTypes::Protoss_Cybernetics_Core));
 }
 
 void SimCityBuildingPlacer::generateCannonsPos()
@@ -1498,32 +1498,25 @@ TilePosition SimCityBuildingPlacer::getPylonTilePositionCovering(const TilePosit
 	return ret;
 }
 
-void SimCityBuildingPlacer::generateBuildLocationNear(const TilePosition& tp, const BWAPI::UnitType& ut, int buildDist)
+TilePosition SimCityBuildingPlacer::generateBuildLocationNear(const TilePosition& tp, const BWAPI::UnitType& ut, int buildDist)
 {
 	/// returns a valid build location (with buildDist space around) near/around the TilePosition tp
 	multimap<double, TilePosition> openTiles;
 	openTiles.insert(make_pair(0, tp));
-    set<TilePosition> closedTiles;
 	pair<TilePosition, TilePosition> outerBounds = getOuterBoundsRegion(BWTA::getRegion(tp));
 	for (int x = outerBounds.first.x(); x < outerBounds.second.x(); ++x)
 		for (int y = outerBounds.first.y(); y < outerBounds.second.y(); ++y)
 		{
 			TilePosition tmp(x, y);
-			if (Broodwar->isBuildable(tmp, true) && closedTiles.find(tmp) == closedTiles.end())
+			if (Broodwar->isBuildable(tmp, true))
 			{
 				openTiles.insert(make_pair(tp.getDistance(tmp), tmp));
 			}
 		}
-
-    // Do a breadth first search to find a nearby valid build location with space
 	for each (pair<double, TilePosition> pp in openTiles)
     {
 		TilePosition t = pp.second;
-		if (closedTiles.find(t) != closedTiles.end() && canBuildHereWithSpace(NULL, t, ut, buildDist))
-			getPositionAccountant(ut)->addPos(t);
-		//for (int x = t.x() - buildDist; x < t.x() + ut.tileWidth() + buildDist; ++x)
-		for (int x = t.x(); x < t.x() + ut.tileWidth(); ++x)
-			for (int y = t.y(); y < t.y() + ut.tileHeight(); ++y)
-				closedTiles.insert(TilePosition(x, y));
+		if (canBuildHereWithSpace(NULL, t, ut, buildDist))
+			return t;
     }
 }

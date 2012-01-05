@@ -65,7 +65,7 @@ public:
 	SimCityBuildingPlacer();
 	BWAPI::TilePosition getTilePosition(const BWAPI::UnitType& ut, BWAPI::TilePosition seed = BWAPI::TilePositions::None);
 	BWAPI::TilePosition getPylonTilePositionCovering(const BWAPI::TilePosition& tp);
-	void generateBuildLocationNear(const BWAPI::TilePosition& tp, const BWAPI::UnitType& ut, int buildDist=1);
+	BWAPI::TilePosition generateBuildLocationNear(const BWAPI::TilePosition& tp, const BWAPI::UnitType& ut, int buildDist=1);
 	void releaseTilePosition(const BWAPI::TilePosition& tp, const BWAPI::UnitType& ut);
 	void usedTilePosition(const BWAPI::TilePosition& tp, const BWAPI::UnitType& ut);
 #ifdef __DEBUG__
