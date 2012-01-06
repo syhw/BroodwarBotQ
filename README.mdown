@@ -3,9 +3,7 @@ BroodwarBotQ, a good zergling is better BBQ'd
 
 ## Foreword / Bullshit ##
 
-This bot is using BWAPI 3.5.1, and BWTA. It is heavily based on BWSAL, 
-so thanks and kudos to lowerlogic and other contributors. I hope to be
-able to contribute (for instance MapManager) too.
+This bot is using BWAPI 3.7+, and BWTA: kudos to all these contributors.
 
 There are still A LOT of improvements to do. // TODO or // HACK or // TOCHANGE
 are everywhere. A lot of improvements are in my head and some others in texts/
@@ -26,7 +24,7 @@ Nicolas Biagianti
 
 ## Install / Serious Stuff ##
 
-1. You need BWAPI 3.6.1, go on the [BWAPI](http://code.google.com/p/bwapi/)
+1. You need BWAPI 3.7, go on the [BWAPI](http://code.google.com/p/bwapi/)
      website to install it.
 
 2. Open BattleBroodAI.sln and compile the project as Release.
