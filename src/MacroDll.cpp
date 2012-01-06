@@ -1,3 +1,5 @@
+#define WIN32_LAEN_AND_MEAN
+
 #include <PrecompiledHeader.h>
 #include <tchar.h>
 #include "MacroProject.h"
