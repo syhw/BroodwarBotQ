@@ -14,7 +14,7 @@ using namespace BWAPI;
 
 //#define __LEADING_UNIT_BY_SIZE_HP__
 //#define __WITH_RETREAT__
-#define __MAX_DISTANCE_TO_GROUP__ 512
+#define __MAX_DISTANCE_TO_GROUP__ 13*TILE_SIZE
 
 UnitsGroup::UnitsGroup()
 : defaultTargetEnemy(NULL)

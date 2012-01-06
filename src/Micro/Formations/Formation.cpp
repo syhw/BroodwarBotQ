@@ -3,6 +3,25 @@
 
 using namespace BWAPI;
 
+Vec closestRegionCenterConnectedToStart(const Vec& c)
+{
+	double min = DBL_MAX;
+	Position tmp(c.toPosition());
+	BWTA::Region* s = NULL;
+	for each (BWTA::Region* r in BWTA::getRegions())
+	{
+		double dist = r->getPolygon().getCenter().getApproxDistance(tmp);
+		if (dist < min)
+		{
+			min = dist;
+			s = r;
+		}
+	}
+	if (s != NULL)
+		return Vec(s->getPolygon().getCenter());
+	return c;
+}
+
 Formation::Formation(const Formation& f)
 : center(f.center)
 , direction(f.direction)
@@ -15,24 +34,28 @@ Formation::Formation(const Formation& f)
 #endif
 }
 
-Formation::Formation(const Vec& center, const Vec& direction)
+Formation::Formation(const Vec& center, int nonFlyers, const Vec& direction)
 : center(center)
 , direction(direction)
 , mean(center)
 , space(24)
+, non_flyers(nonFlyers)
 {
+	checkCenterReachability();
     end_positions.clear();
 #ifdef __MICRO_DEBUG__
 	log("created a formation\n");
 #endif
 }
 
-Formation::Formation(const Position& p, const Vec& direction)
+Formation::Formation(const Position& p, int nonFlyers, const Vec& direction)
 : center(p.x(), p.y())
 , direction( direction)
 , mean(p.x(), p.y())
 , space(24)
+, non_flyers(nonFlyers)
 {
+	checkCenterReachability();
     end_positions.clear();
 #ifdef __MICRO_DEBUG__
 	log("created a formation\n");
@@ -58,6 +81,22 @@ void Formation::computeMean()
         mean.y += it->y();
     }
     mean /= end_positions.size();
+}
+
+void Formation::checkCenterReachability()
+{
+#ifdef __MICRO_DEBUG__
+	Position cp(center.toPosition());
+	if (cp == Position(0,0) || cp == Positions::None || cp == Positions::Unknown || !cp.isValid())
+		Broodwar->printf("ERROR: given a bad center position for the formation");
+#endif
+	if (non_flyers && !BWTA::isConnected(TilePosition(center.toPosition()), Broodwar->self()->getStartLocation())) // DropGoal _will_ have 0 nonFlyers
+	{
+#ifdef __MICRO_DEBUG__
+		Broodwar->printf("WARNING: given an unreachable center for the formation");
+#endif
+		center = closestRegionCenterConnectedToStart(center);
+	}
 }
 
 // No formations => on one point

@@ -38,7 +38,7 @@ AttackGoal::AttackGoal(const map<UnitType, int>& miniUnits, BWAPI::Position p,
 	   firstFrame)
 {
 	addSubgoal(pSubgoal(new FormationSubgoal(SL_OR, &_unitsGroup,
-	                                 pFormation(new SquareFormation(p)))));
+		pFormation(new SquareFormation(p, _unitsGroup.nonFlyers)))));
 	bidOnMilitaryUnits();
 	GoalManager::Instance().attackGoals += 1;
 }
@@ -48,7 +48,7 @@ AttackGoal::AttackGoal(BWAPI::Position p, int priority, int firstFrame)
 	   firstFrame)
 {
     addSubgoal(pSubgoal(new FormationSubgoal(SL_OR, &_unitsGroup,
-	                                 pFormation(new SquareFormation(p)))));
+		pFormation(new SquareFormation(p, _unitsGroup.nonFlyers)))));
 	bidOnMilitaryUnits();
 	GoalManager::Instance().attackGoals += 1;
 }
@@ -121,7 +121,8 @@ void AttackGoal::createMidSubgoal()
 	tmpPos = MapManager::Instance().regionsPFCenters(r);
 	//Create an intermediate subgoal at half the way of the path of the unitsgroup
     if (r != BWTA::getRegion(TilePosition(_unitsGroup.center)))
-        addSubgoal(pSubgoal(new FormationSubgoal(SL_AND, &_unitsGroup, pFormation(new SquareFormation(tmpPos)))));
+        addSubgoal(pSubgoal(new FormationSubgoal(SL_AND, &_unitsGroup, pFormation(
+		new SquareFormation(tmpPos, _unitsGroup.nonFlyers())))));
 }
 #endif
 

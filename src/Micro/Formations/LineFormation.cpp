@@ -9,13 +9,13 @@ LineFormation::LineFormation(const LineFormation& f)
 , _lines(1)
 { }
 
-LineFormation::LineFormation(const Vec& center, const Vec& direction)
-: Formation(center, direction)
+LineFormation::LineFormation(const Vec& center, const Vec& direction, int nonFlyers)
+: Formation(center, nonFlyers, direction)
 , _lines(1)
 { }
 
-LineFormation::LineFormation(const Position& p, const Vec& direction)
-: Formation(p, direction)
+LineFormation::LineFormation(const Position& p, const Vec& direction, int nonFlyers)
+: Formation(p, nonFlyers, direction)
 , _lines(1)
 { }
 

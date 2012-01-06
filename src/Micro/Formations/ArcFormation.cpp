@@ -8,11 +8,11 @@ ArcFormation::ArcFormation(const ArcFormation& f)
 : Formation(f) 
 {}
 
-ArcFormation::ArcFormation(const Vec& onCircle, const Vec& circleCenter)
-: Formation(center, direction) {}
+ArcFormation::ArcFormation(const Vec& onCircle, const Vec& circleCenter, int nonFlyers)
+: Formation(center, nonFlyers, direction) {}
 
-ArcFormation::ArcFormation(const Position& onCircle, const Position& circleCenter)
-: Formation(onCircle, Vec(circleCenter.x(), circleCenter.y())) {}
+ArcFormation::ArcFormation(const Position& onCircle, const Position& circleCenter, int nonFlyers)
+: Formation(onCircle, nonFlyers, Vec(circleCenter.x(), circleCenter.y())) {}
 
 void ArcFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
 {

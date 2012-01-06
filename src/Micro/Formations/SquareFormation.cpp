@@ -9,11 +9,11 @@ using namespace BWAPI;
 SquareFormation::SquareFormation(const SquareFormation& f)
 : Formation(f) {}
 
-SquareFormation::SquareFormation(const Vec& center, const Vec& direction)
-: Formation(center, direction) {}
+SquareFormation::SquareFormation(const Vec& center, int nonFlyers, const Vec& direction)
+: Formation(center, nonFlyers, direction) {}
 
-SquareFormation::SquareFormation(const Position& p, const Vec& direction)
-: Formation(p, direction) {}
+SquareFormation::SquareFormation(const Position& p, int nonFlyers, const Vec& direction)
+: Formation(p, nonFlyers, direction) {}
 
 void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
 {
@@ -31,7 +31,8 @@ void SquareFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnit
 	if (regionCenter != NULL)
 		center = MapManager::Instance().regionsPFCenter(regionCenter);
 #endif
-	if (!Broodwar->isWalkable(center.toPosition().x()/8, center.toPosition().y()/8))
+	if (non_flyers 
+		&& !Broodwar->isWalkable(center.toPosition().x()/8, center.toPosition().y()/8))
 		center = Vec(MapManager::Instance().closestWalkabableSameRegionOrConnected(center.toPosition()));
 
 	if (unwantedSlots >= vUnits.size())

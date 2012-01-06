@@ -11,7 +11,7 @@ RegroupGoal::RegroupGoal(Position p, int priority, int firstFrame)
 : Goal(priority, firstFrame)
 {
 	addSubgoal(pSubgoal(new FormationSubgoal(SL_OR, &_unitsGroup, 
-		pFormation(new SquareFormation(p)))));
+		pFormation(new SquareFormation(p, _unitsGroup.nonFlyers)))));
 	_status = GS_IN_PROGRESS;
 	bidOnMilitaryUnits();
 	GoalManager::Instance().attackGoals += 1;
