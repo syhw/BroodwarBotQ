@@ -122,7 +122,7 @@ void EUnitsFilter::update(Unit* u)
     if ((!(u->isDetected()) || u->isCloaked() || u->isBurrowed()) && Broodwar->isVisible(TilePosition(_eViewedUnits[u].position)))
     {
         _invisibleUnits[u] = std::make_pair<UnitType, Position>(u->getType(), u->getPosition());
-#ifdef __DEBUG__
+#ifdef __INTELLIGENCE_DEBUG__
         Broodwar->printf("Type %s", _eViewedUnits[u].type.getName().c_str());
 #endif
     }
@@ -240,7 +240,7 @@ BWAPI::Unit* EUnitsFilter::getClosestCenter(BWTA::BaseLocation* b)
 	return NULL;
 }
 
-#ifdef __DEBUG__
+#ifdef __INTELLIGENCE_DEBUG__
 void EUnitsFilter::bwOutput()
 {
     for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = _eViewedUnits.begin(); 

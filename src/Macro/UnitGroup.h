@@ -361,7 +361,7 @@ enum FilterAttributeOrder
 class UnitGroup : public std::set<BWAPI::Unit*>
 {
   public:
-    static UnitGroup getUnitGroup(const std::set<BWAPI::Unit*> units)
+    static UnitGroup getUnitGroup(const std::set<BWAPI::Unit*>& units)
     {
       UnitGroup u;
       u.insert(units.begin(), units.end());

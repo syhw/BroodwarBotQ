@@ -114,7 +114,7 @@ void BasesManager::expand(BWTA::BaseLocation* location)
 			}
 		}
 	}
-#ifdef __DEBUG__
+#ifdef __MACRO_DEBUG__
 	if (location == NULL)
 		Broodwar->printf("CANNOT EXPAND");
 #endif

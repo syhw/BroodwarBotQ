@@ -72,7 +72,7 @@ MapManager::MapManager()
 , _currentPathfindWork(NULL, NULL, TilePositions::None, TilePositions::None, -1)
 , _currentPathfindWorkAborded(false)
 {
-#ifdef __DEBUG__
+#ifdef __INTELLIGENCE_DEBUG__
     if (_stormPosMutex == NULL) 
     {
         Broodwar->printf("CreateMutex error: %d\n", GetLastError());
@@ -248,7 +248,7 @@ MapManager::MapManager()
 
 MapManager::~MapManager()
 {
-#ifdef __DEBUG__
+#ifdef __INTELLIGENCE_DEBUG__
     Broodwar->printf("MapManager destructor started");
 #endif
     delete [] walkability;
@@ -272,7 +272,7 @@ MapManager::~MapManager()
 	delete [] _buildingsBuf;
     delete [] _groundDamagesBuf;
 	delete [] _airDamagesBuf;
-#ifdef __DEBUG__
+#ifdef __INTELLIGENCE_DEBUG__
     Broodwar->printf("MapManager destructor finished");
 #endif
 }
@@ -693,7 +693,7 @@ void MapManager::justStormed(Position p)
 
 void MapManager::update()
 {
-#ifdef __DEBUG__
+#ifdef __INTELLIGENCE_DEBUG__
     clock_t start = clock();
 #endif
     // update our units' positions
@@ -826,7 +826,7 @@ void MapManager::update()
             {
                 _alliedUnitsPosBuf = _ourUnits;
                 _invisibleUnitsBuf = _eUnitsFilter->getInvisibleUnits();
-#ifdef __DEBUG__
+#ifdef __INTELLIGENCE_DEBUG__
                 for (std::map<Unit*, std::pair<UnitType, Position> >::const_iterator ii = _invisibleUnitsBuf.begin();
                     ii != _invisibleUnitsBuf.end(); ++ii)
                     Broodwar->drawCircleMap(ii->second.second.x(), ii->second.second.y(), 8, Colors::Red, true);
@@ -946,7 +946,7 @@ void MapManager::update()
 		ReleaseMutex(_pathfindingMutex);
 	}
 
-#ifdef __DEBUG__
+#ifdef __INTELLIGENCE_DEBUG__
     clock_t end = clock();
     double duration = (double)(end - start) / CLOCKS_PER_SEC;
     if (duration > 0.040) 
@@ -1043,7 +1043,7 @@ TilePosition MapManager::closestWalkabableSameRegionOrConnected(TilePosition tp)
     {
         for (int y = lowerY; y <= higherY; ++y)
         {
-#ifdef __DEBUG__
+#ifdef __INTELLIGENCE_DEBUG__
             //Broodwar->drawBoxMap(x*32 + 2, y*32 + 2, x*32+29, y*32+29, Colors::Red);
 #endif
             if (_lowResWalkability[x + y*Broodwar->mapWidth()])
@@ -1066,7 +1066,7 @@ TilePosition MapManager::closestWalkabableSameRegionOrConnected(TilePosition tp)
     {
         for (int y = lowerY; y <= higherY; ++y)
         {
-#ifdef __DEBUG__
+#ifdef __INTELLIGENCE_DEBUG__
             //Broodwar->drawBoxMap(x*32 + 2, y*32 + 2, x*32+29, y*32+29, Colors::Red);
 #endif
             if (_lowResWalkability[x + y*Broodwar->mapWidth()])
@@ -1323,7 +1323,7 @@ void MapManager::registerPathfindWork(BayesianUnit* ptr, BWAPI::Unit* u, BWAPI::
 	if (_pathfindWorks.size() > __MAX_PATHFINDING_WORKS__)
 	{
 		_pathfindWorks.pop_front();
-#ifdef __DEBUG__
+#ifdef __INTELLIGENCE_DEBUG__
 		Broodwar->printf("!!! poping front of pathfinding works");
 #endif
 	}

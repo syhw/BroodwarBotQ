@@ -95,7 +95,7 @@ bool DragoonUnit::decideToFlee()
 
 void DragoonUnit::micro()
 {
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
     if (unit->isStartingAttack())
     {
         if (Broodwar->getSelectedUnits().count(unit))

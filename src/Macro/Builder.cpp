@@ -101,7 +101,7 @@ void Task::positionIt()
 		|| !tilePosition.isValid())
 	{
 		finished = true;
-#ifdef __DEBUG__
+#ifdef __MACRO_DEBUG__
 		Broodwar->printf("\x08 !!! CANCELED Building %s at (%d,%d) !!! NO POSITION", type.getName().c_str(), tilePosition.x(), tilePosition.y());
 #endif
 	}
@@ -214,7 +214,7 @@ void Task::powerIt()
 			else
 			{
 				finished = true; // abandon construction
-#ifdef __DEBUG__
+#ifdef __MACRO_DEBUG__
 				Broodwar->printf("\x08 !!! CANCELED Building %s at (%d,%d) !!! NO POWER", type.getName().c_str(), tilePosition.x(), tilePosition.y());
 #endif
 			}
@@ -229,7 +229,7 @@ void Task::buildIt()
 	if (tries > __MAX_TRIES_BUILD_SOMETHING__)
 	{
 		finished = true;
-#ifdef __DEBUG__
+#ifdef __MACRO_DEBUG__
 		Broodwar->printf("\x08 !!! CANCELED Building %s at (%d,%d) !!! TOO MUCH TRIES", type.getName().c_str(), tilePosition.x(), tilePosition.y());
 #endif
 		return;
@@ -271,7 +271,7 @@ void Task::buildIt()
 		/// Try and build it if we can
 		else if (!worker->build(tilePosition, type))
 		{
-#ifdef __DEBUG__
+#ifdef __MACRO_DEBUG__
 			Broodwar->printf("ERROR: Can't build %s at (%d,%d)", type.getName().c_str(), tilePosition.x(), tilePosition.y());
 #endif
 		}
@@ -570,7 +570,7 @@ int Builder::additionalSupplyNextFrames(int frames)
 			continue;
 		supply += u->getType().supplyProvided();
 	}
-#ifdef __DEBUG__
+#ifdef __MACRO_DEBUG__
 	Broodwar->drawTextScreen(190, 56, "\x11 incS: %d", supply);
 #endif
 	return supply;
@@ -590,7 +590,7 @@ void Builder::update()
 		{
 			if (it->first <= Broodwar->self()->supplyUsed()/2)
 			{
-#ifdef __DEBUG__
+#ifdef __MACRO_DEBUG__
 				Broodwar->printf("Building %s pop %d", it->second->getName().c_str(), Broodwar->self()->supplyUsed()/2);
 #endif
 				tasks.push_front(it->second);
@@ -645,7 +645,7 @@ void Builder::update()
 		}
 	}
 
-#ifdef __DEBUG__
+#ifdef __MACRO_DEBUG__
 	Task::buildingPlacer->update();
 	int dy = 0;
 	for each (pTask t in tasks)

@@ -178,7 +178,7 @@ void align(std::vector<Position>& from, std::vector<Position>& to, std::vector<u
 	}
 }
 
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
 void UnitsGroup::displayTargets()
 {
 	for each(pBayesianUnit u in units)
@@ -338,7 +338,7 @@ std::vector<Position> UnitsGroup::findRangePositions()
 		if (seed.getApproxDistance(center) <= sqrt((double)units.size()*units.size()*16))
 			readyToAttack = true;
 	}
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
 	for each (Position p in ret)
 		Broodwar->drawBoxMap(p.x()-8,p.y()-8,p.x()+8,p.y()+8,Colors::Green,false);
 #endif
@@ -496,7 +496,7 @@ void UnitsGroup::updateOurStats()
 
 void UnitsGroup::update()
 {
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
 	clock_t start = clock();
 #endif
 	if (units.empty())
@@ -565,7 +565,7 @@ void UnitsGroup::update()
 						(*it)->switchMode(MODE_FIGHT_A);
 					else
 						(*it)->switchMode(MODE_FIGHT_G);
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
 					Position displayp = (*it)->unit->getPosition();
 					Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Back");
 #endif
@@ -582,7 +582,7 @@ void UnitsGroup::update()
 				// we can be offensive, use our goal target and do what we want
 				for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
 				{
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
 					Position displayp = (*it)->unit->getPosition();
 					Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Offensive");
 #endif
@@ -605,7 +605,7 @@ void UnitsGroup::update()
 						{
 							units[i]->target = bestPositions[i % bestPositions.size()];
 							units[i]->switchMode(MODE_MOVE);
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
 							Position displayp = units[i]->unit->getPosition();
 							Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Place");
 #endif
@@ -620,7 +620,7 @@ void UnitsGroup::update()
 								(*it)->switchMode(MODE_FIGHT_A);
 							else
 								(*it)->switchMode(MODE_FIGHT_G);
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
 							Position displayp = (*it)->unit->getPosition();
 							Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Attack");
 #endif
@@ -642,7 +642,7 @@ void UnitsGroup::update()
 								? regions.first : regions.second;
 							(*it)->target = (MapManager::Instance().regionsPFCenters(higherRegion));
 							(*it)->switchMode(MODE_FIGHT_G);
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
 							Position displayp = (*it)->unit->getPosition();
 							Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Ramp");
 #endif
@@ -654,7 +654,7 @@ void UnitsGroup::update()
 								(*it)->switchMode(MODE_FIGHT_A);
 							else
 								(*it)->switchMode(MODE_FIGHT_G);
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
 							Position displayp = (*it)->unit->getPosition();
 							Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Attack");
 #endif
@@ -665,7 +665,7 @@ void UnitsGroup::update()
 		}
 	}
 
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
 	displayTargets();
 	clock_t finish = clock();
 	double duration = (double)(finish - start) / CLOCKS_PER_SEC;
@@ -896,7 +896,7 @@ int BasicUnitsGroup::size() const
 
 void UnitsGroup::updateCenter()
 {
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
 	assert(this != NULL);
 #endif
 	if (units.empty())
@@ -924,7 +924,7 @@ void UnitsGroup::updateCenter()
 	}
 	center.x() /= units.size();
 	center.y() /= units.size();
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
 	assert(center.isValid());
 #endif
 	if (!center.isValid())  // TODO remove

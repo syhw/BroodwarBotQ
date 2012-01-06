@@ -67,7 +67,7 @@ void DefendGoal::check()
 
 		_status = GS_IN_PROGRESS;
 
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
 		Broodwar->drawCircleMap(_defPos.x(), _defPos.y(), __TILES_RADIUS_DEFEND_BASE__ * TILE_SIZE, Colors::Red); // def aggro zone
 #endif
 		// Perhaps use SelectAll()?
@@ -133,7 +133,7 @@ void DefendGoal::check()
 		else
 			goTo = _defPos;
 		_unitsGroup.move(goTo);
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
 		Broodwar->drawCircleMap(_threatMiddle.x(), _threatMiddle.y(), 16, Colors::Red);
 		Broodwar->drawCircleMap(goTo.x(), goTo.y(), 10, Colors::Red, true);
 		//Broodwar->printf("Defending in (%d, %d)", goTo.x(), goTo.y());

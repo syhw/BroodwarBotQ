@@ -52,7 +52,7 @@ void Intelligence::update()
 	eUnitsFilter->update();
 	mapManager->update();
 #ifdef __ETECH_ESTIMATOR__
-#ifdef __DEBUG__
+#ifdef __INTELLIGENCE_DEBUG__
 	eTechEstimator->onFrame();
 #endif
 #endif
@@ -91,7 +91,7 @@ void Intelligence::update()
 
 	if (Broodwar->getFrameCount() > 6*60*24)
 		enemyRush = false;
-#ifdef __DEBUG__
+#ifdef __INTELLIGENCE_DEBUG__
 	if (enemyRush)
 		Broodwar->drawTextScreen(585, 18, "\x08RUSH");
 	else
@@ -155,7 +155,7 @@ void Intelligence::update()
 			// push_back(front) + pop_front done one frame later by above code
 		}
 	}
-#ifdef __DEBUG__
+#ifdef __INTELLIGENCE_DEBUG__
 	int cc = 0;
 	for each (BWTA::BaseLocation* b in _enemyBasesOrder)
 	{

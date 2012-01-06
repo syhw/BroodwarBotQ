@@ -101,7 +101,7 @@ void Macro::init()
 
 void Macro::update()
 {
-#ifdef __DEBUG__
+#ifdef __MACRO_DEBUG__
 	Broodwar->drawTextScreen(130, 38, "\x11 rM: %d, rG: %d", reservedMinerals, reservedGas);
 #endif
 	if (reservedMinerals < 0) // safety
@@ -199,7 +199,7 @@ void Macro::update()
 		if (Broodwar->self()->gas() > 150 && !Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Reaver))
 			TheProducer->produce(1, UnitTypes::Protoss_Reaver, 95);
 	}
-#ifdef __DEBUG__
+#ifdef __MACRO_DEBUG__
 	reaverFirst = true;// TODO REMOVE DEBUG
 #endif
 }

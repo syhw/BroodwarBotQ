@@ -52,14 +52,14 @@ void GoalManager::update()
 		_firstPoke = true;
 	}*/ 
 
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
 	int y = 3;
 #endif
 	/// Update all goals
 	for each (pGoal g in _goals)
 	{
 		g->update();
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
 		if (g->getStatus() == GS_WAIT_PRECONDITION)
 			Broodwar->drawTextScreen(5, y, "\x17%s", g->getName().c_str());
 		else if (g->getStatus() == GS_IN_PROGRESS)
@@ -75,7 +75,7 @@ void GoalManager::update()
 	{
 		if ((*it)->getStatus() == GS_ACHIEVED || (*it)->getStatus() == GS_CANCELED)
 		{
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
 			Broodwar->printf("\x08 !!! DELETED A %s GOAL !!!", (*it)->getName().c_str());
 #endif
 			_goals.erase(it++);

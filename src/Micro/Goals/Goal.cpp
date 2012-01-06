@@ -10,11 +10,11 @@ using namespace BWAPI;
 
 Goal::~Goal()
 {
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
 	clock_t start = clock();
 #endif
 	TheArbitrator->removeController(this);
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
 	clock_t end = clock();
 	double time = (double)(end - start)/CLOCKS_PER_SEC;
 	if (time > 0.01)
@@ -299,7 +299,7 @@ void Goal::check()
 	if (res_or || (and_goals && res_and))
 	{
 		_status= GS_ACHIEVED;
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
 		BWAPI::Broodwar->printf("\x13 \x04 goal finished in ~ %d seconds", (BWAPI::Broodwar->getFrameCount() - _firstFrame)/24);
 #endif
 	}

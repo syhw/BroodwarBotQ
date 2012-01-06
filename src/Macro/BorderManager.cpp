@@ -56,7 +56,7 @@ void BorderManager::update()
 	{
 		BWAPI::Position point1=(*c)->getSides().first;
 		BWAPI::Position point2=(*c)->getSides().second;
-#ifdef __DEBUG__
+#ifdef __MACRO_DEBUG__
 		BWAPI::Broodwar->drawLineMap(point1.x(),point1.y(),point2.x(),point2.y(),BWAPI::Colors::Red);
 #endif
 	}
@@ -64,7 +64,7 @@ void BorderManager::update()
 	{
 		BWAPI::Position point1=(*c)->getSides().first;
 		BWAPI::Position point2=(*c)->getSides().second;
-#ifdef __DEBUG__
+#ifdef __MACRO_DEBUG__
 		BWAPI::Broodwar->drawLineMap(point1.x(),point1.y(),point2.x(),point2.y(),BWAPI::Colors::Orange);
 #endif
 	}

@@ -22,12 +22,12 @@ void UnitGroupManager::destroy()
 UnitGroupManager::UnitGroupManager()
 {
   TheUnitGroupManager = this;
-  for(std::set<BWAPI::Unit*>::iterator i=BWAPI::Broodwar->getAllUnits().begin();i!=BWAPI::Broodwar->getAllUnits().end();i++)
+  for(std::set<BWAPI::Unit*>::iterator i=BWAPI::Broodwar->getAllUnits().begin();i!=BWAPI::Broodwar->getAllUnits().end();++i)
   {
     onUnitDiscover(*i);
   }
   neutral=NULL;
-  for(std::set<BWAPI::Player*>::iterator i=BWAPI::Broodwar->getPlayers().begin();i!=BWAPI::Broodwar->getPlayers().end();i++)
+  for(std::set<BWAPI::Player*>::iterator i=BWAPI::Broodwar->getPlayers().begin();i!=BWAPI::Broodwar->getPlayers().end();++i)
   {
     if ((*i)->isNeutral())
       neutral=*i;

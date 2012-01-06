@@ -96,7 +96,7 @@ void AttackGoal::achieve()
 	{
 		for (std::vector<pBayesianUnit>::iterator it = _unitsGroup.units.begin(); it != _unitsGroup.units.end(); ++it)
 		{
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
 			Position displayp = (*it)->unit->getPosition();
 			Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Regroup");
 #endif

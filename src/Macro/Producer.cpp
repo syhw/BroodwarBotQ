@@ -311,7 +311,7 @@ int Producer::additionalUnitsSupply(int frames)
 		}
 	}
 	
-#ifdef __DEBUG__
+#ifdef __MACRO_DEBUG__
 	Broodwar->drawTextScreen(130, 56, "\x11 addS: %d,", supply);
 #endif
 	return supply;

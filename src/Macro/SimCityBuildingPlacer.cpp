@@ -358,7 +358,7 @@ generate_end:
 		else
 			makeCluster(bc.center, 2, bc.vertical, bc.size);
 	}
-#ifdef __DEBUG__
+#ifdef __MACRO_DEBUG__
 	else
 		Broodwar->printf("Could not generate a cluster of size %d", min_size);
 #endif
@@ -965,7 +965,7 @@ void SimCityBuildingPlacer::makeCannonChoke(BWTA::Region* inter, BWTA::Chokepoin
 	if (interP == Positions::None || exterP == Positions::None)
 	{
 		// we failed to determine internal and external Positions
-#ifdef __DEBUG__
+#ifdef __MACRO_DEBUG__
 		Broodwar->printf("makeCannonChoke failed to determine internal and external positions of the choke");
 #endif
 		return;
@@ -978,7 +978,7 @@ void SimCityBuildingPlacer::makeCannonChoke(BWTA::Region* inter, BWTA::Chokepoin
 	if (interTP == TilePositions::None)
 	{
 		// failed again! :P
-#ifdef __DEBUG__
+#ifdef __MACRO_DEBUG__
 		Broodwar->printf("makeCannonChoke failed to determine a buildable interTP tile");
 #endif
 		return;
@@ -1151,7 +1151,7 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 	double minDist = DBL_MAX;
 	set<BWTA::BaseLocation*> startLocs = BWTA::getStartLocations();
 	startLocs.erase(BWTA::getStartLocation(Broodwar->self()));
-#ifdef __DEBUG__
+#ifdef __MACRO_DEBUG__
 	assert(!startLocs.empty()); // 1 player map ? :D
 #endif
 	TilePosition otherStartLocation((*startLocs.begin())->getTilePosition());
@@ -1219,7 +1219,7 @@ SimCityBuildingPlacer::SimCityBuildingPlacer()
 	makeCannonsMinerals(home);
 }
 
-#ifdef __DEBUG__
+#ifdef __MACRO_DEBUG__
 void SimCityBuildingPlacer::update()
 {
 	int i = 0;

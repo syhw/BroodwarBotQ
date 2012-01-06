@@ -798,7 +798,7 @@ void BayesianUnit::updatePPath()
 
 #endif
 
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
     //drawBTPath();
     //drawPath();
     //drawPPath();
@@ -985,7 +985,7 @@ void BayesianUnit::resumeFromBlocked()
 {
     if ((Broodwar->getFrameCount() - _lastClickFrame) > 24)
     {
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
         //Broodwar->printf("resuming from blocked");
 #endif
         if (_lastRightClick != target)
@@ -1723,13 +1723,13 @@ void BayesianUnit::updateDir()
    
     // compute the probability to go in each dirv(ector)
     computeProbs();
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
     drawProbs(_dirvProb, _unitsGroup->size()); // DRAWPROBS
 #endif
 
     // select the most probable, most in the direction of obj if equally probables
     selectDir(obj);
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
     drawDir();
 #endif
 }
@@ -2120,7 +2120,7 @@ void BayesianUnit::update()
 	}
 #endif
 
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
 	assert(_unitsGroup != NULL);
 	assert(unit != NULL);
 	assert(_unitsGroup != NULL);
@@ -2246,7 +2246,7 @@ void BayesianUnit::update()
             this->switchMode(MODE_INPOS);
             return;
         }
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
         Broodwar->drawLineMap(_unitPos.x(), _unitPos.y(), target.x(), target.y(), Colors::Purple);
 #endif
         if (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatencyFrames() + getAttackDuration())
@@ -2258,7 +2258,7 @@ void BayesianUnit::update()
         break;
     }
 
-#ifdef __DEBUG__
+#ifdef __MICRO_DEBUG__
     drawTarget();
 #endif
     _lastTotalHP = unit->getShields() + unit->getHitPoints();

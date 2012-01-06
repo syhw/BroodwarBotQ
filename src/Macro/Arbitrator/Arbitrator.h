@@ -457,7 +457,7 @@ namespace Arbitrator
       this->objectsCanIncreaseBid.clear();
 
       //go through all the updated objects
-      for(std::set<_Tp>::iterator i = updatedObjects.begin(); i != updatedObjects.end(); i++)
+      for(std::set<_Tp>::iterator i = updatedObjects.begin(); i != updatedObjects.end(); ++i)
       {
         std::map<_Tp,Heap<Controller<_Tp,_Val>*, _Val> >::iterator bidsIter = bids.find(*i);
         std::map<_Tp,Controller<_Tp,_Val>* >::iterator ownerIter = owner.find(*i);
@@ -479,7 +479,7 @@ namespace Arbitrator
       updatedObjects.clear();
 
       //offer the objects to the top bidders
-      for(std::map< Controller<_Tp,_Val>*, std::set<_Tp> >::iterator i = objectsToOffer.begin(); i != objectsToOffer.end(); i++)
+      for(std::map< Controller<_Tp,_Val>*, std::set<_Tp> >::iterator i = objectsToOffer.begin(); i != objectsToOffer.end(); ++i)
       {
         objectsCanIncreaseBid=i->second;
         unansweredObjects=i->second;
@@ -489,7 +489,7 @@ namespace Arbitrator
         inOnOffer=false;
 
         //decline all unanswered objects
-        for(std::set<_Tp>::iterator j=unansweredObjects.begin();j!=unansweredObjects.end();j++)
+        for(std::set<_Tp>::iterator j=unansweredObjects.begin();j!=unansweredObjects.end();++j)
         {
           decline(i->first,*j,0);
         }
