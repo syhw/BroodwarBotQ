@@ -136,7 +136,7 @@ void DefendGoal::check()
 #ifdef __DEBUG__
 		Broodwar->drawCircleMap(_threatMiddle.x(), _threatMiddle.y(), 16, Colors::Red);
 		Broodwar->drawCircleMap(goTo.x(), goTo.y(), 10, Colors::Red, true);
-		Broodwar->printf("Defending in (%d, %d)", goTo.x(), goTo.y());
+		//Broodwar->printf("Defending in (%d, %d)", goTo.x(), goTo.y());
 #endif
 		_unitsGroup.readyToAttack = true;
 		_unitsGroup.suicide = true;

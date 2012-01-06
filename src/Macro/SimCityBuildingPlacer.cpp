@@ -1464,7 +1464,8 @@ TilePosition SimCityBuildingPlacer::getPylonTilePositionCovering(const TilePosit
 	TilePosition ret(TilePositions::None);
 	for each (TilePosition t in pylons.pos)
 	{
-		if (t.getDistance(tp) <= 4*TILE_SIZE
+		TilePosition tt(t.x()+1, t.y()+1);
+		if (tt.getDistance(TilePosition(tp.x()+1, tp.y()+1)) <= __PYLON_COVERAGE_TILES__*TILE_SIZE // TODO wrong, should be tp.x()+TYPE.tileWidth()/2, same for y...
 			&& pylons.reservePos(t) != TilePositions::None)
 			return t;
 	}

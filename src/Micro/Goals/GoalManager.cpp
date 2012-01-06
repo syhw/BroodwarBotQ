@@ -74,7 +74,12 @@ void GoalManager::update()
 		it != _goals.end();)
 	{
 		if ((*it)->getStatus() == GS_ACHIEVED || (*it)->getStatus() == GS_CANCELED)
+		{
+#ifdef __DEBUG__
+			Broodwar->printf("\x08 !!! DELETED A %s GOAL !!!", (*it)->getName().c_str());
+#endif
 			_goals.erase(it++);
+		}
 		else
 			++it;
 	}

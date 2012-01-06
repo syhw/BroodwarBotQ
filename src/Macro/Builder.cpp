@@ -97,7 +97,8 @@ void Task::positionIt()
 		|| !tilePosition.isValid() || 
 		(type != UnitTypes::Protoss_Assimilator && !Broodwar->isBuildable(tilePosition.x(), tilePosition.y(), true)))
 		tilePosition = buildingPlacer->getTilePosition(type);
-	if (!tilePosition.isValid() || tilePosition == TilePositions::None)
+	if (tilePosition == TilePositions::None || tilePosition == TilePositions::Invalid || tilePosition == TilePositions::Unknown
+		|| !tilePosition.isValid())
 	{
 		finished = true;
 #ifdef __DEBUG__
@@ -175,12 +176,13 @@ void Task::powerIt()
 {
 	if (!Broodwar->hasPower(tilePosition))
 	{
+		TilePosition tmpTilePosition(tilePosition.x()+type.tileWidth()/2, tilePosition.y()+type.tileHeight()/2);
 		powered = false;
 		/// Look for a pylon which will be built and will cover
 		bool foundCovering = false;
 		for each (Unit* pic in TheBuilder->getInConstruction(UnitTypes::Protoss_Pylon))
 		{
-			if (pic->getTilePosition().getDistance(tilePosition) < 4*TILE_SIZE)
+			if (tmpTilePosition.getDistance(TilePosition(pic->getTilePosition().x()+1, pic->getTilePosition().y()+1)) < __PYLON_COVERAGE_TILES__*TILE_SIZE)
 			{
 				foundCovering = true;
 				break;
@@ -190,7 +192,7 @@ void Task::powerIt()
 		{
 			if (tp == TilePositions::None || tp == TilePositions::Invalid || tp == TilePositions::Unknown)
 				return;
-			if (tp.getDistance(tilePosition) < 4*TILE_SIZE)
+			if (tmpTilePosition.getDistance(TilePosition(tp.x()+1, tp.y()+1)) < __PYLON_COVERAGE_TILES__*TILE_SIZE)
 			{
 				foundCovering = true;
 				break;

@@ -17,6 +17,7 @@
 #define __MAX_WORKERS__ 75
 #define __TILES_RADIUS_DEFEND_BASE__ 26
 #define __MAX_TRIES_BUILD_SOMETHING__ 1440 // IN FRAMES, 1 minute here
+#define __PYLON_COVERAGE_TILES__ 4
 
 #ifdef __DEBUG__
 //#include <vld.h>
