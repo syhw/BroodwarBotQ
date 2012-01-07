@@ -22,7 +22,7 @@ void BattleBroodAI::onStart()
     //Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
 #ifdef __DEBUG__
     Broodwar->enableFlag(Flag::UserInput);
-    Broodwar->setLocalSpeed(0);
+    //Broodwar->setLocalSpeed(0);
 #endif
 	Broodwar->setLatCom(false);
 	Broodwar->setCommandOptimizationLevel(1);
@@ -35,7 +35,7 @@ void BattleBroodAI::onStart()
 	this->macro = & Macro::Instance();
 	this->macro->init();
 	this->micro = & Micro::Instance();
-    this->timeManager = & TimeManager::Instance();
+    //this->timeManager = & TimeManager::Instance();
 }
 
 void BattleBroodAI::onEnd(bool isWinner)

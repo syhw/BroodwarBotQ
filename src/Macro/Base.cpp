@@ -96,6 +96,10 @@ bool Base::isActive() const
 
 void Base::update()
 {
+#ifdef __MACRO_DEBUG__
+	BWAPI::Broodwar->drawBoxMap(this->baseLocation->getPosition().x()-2*TILE_SIZE, this->baseLocation->getPosition().y()-2*TILE_SIZE,
+		this->baseLocation->getPosition().x()+2*TILE_SIZE, this->baseLocation->getPosition().y()+2*TILE_SIZE, BWAPI::Colors::Cyan);
+#endif
 	if (resourceDepot == NULL)
 	{
 		std::set<Unit*> tmp = Broodwar->getUnitsOnTile(baseLocation->getTilePosition().x(), baseLocation->getTilePosition().y());

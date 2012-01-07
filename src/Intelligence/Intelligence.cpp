@@ -29,7 +29,7 @@ Intelligence::Intelligence()
 #endif
 	mapManager = & MapManager::Instance();
 
-	/// This is not so dumb: for when Random will work
+	/// This is not so dumb: for when BWAPI getRace() will work with Random
 	if (Broodwar->enemy()->getRace() == Races::Protoss)
 		enemyRace = Races::Protoss;
 	else if (Broodwar->enemy()->getRace() == Races::Terran)
@@ -52,7 +52,7 @@ void Intelligence::update()
 	eUnitsFilter->update();
 	mapManager->update();
 #ifdef __ETECH_ESTIMATOR__
-#ifdef __INTELLIGENCE_DEBUG__
+#ifdef __ETECHESTIMATOR_DEBUG__
 	eTechEstimator->onFrame();
 #endif
 #endif

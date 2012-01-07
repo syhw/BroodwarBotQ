@@ -42,16 +42,6 @@ void GoalManager::update()
 		_goal.push_back(garbageCollector);
 	}*/
 
-	/// Do a first poke with at least 2 zealots against Z and at least 2 goons against others
-	/// Hackety hack! TODO remove
-	if (!_firstPoke && ScoutController::Instance().enemyFound &&
-		(Broodwar->enemy()->getRace() == Races::Zerg && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Zealot) >= 2)
-		|| (Broodwar->enemy()->getRace() != Races::Zerg && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) >= 2)
-    {
-        ug->addGoal(pGoal(new AttackGoal(ug, ScoutController::Instance().enemyStartLocation)));
-		_firstPoke = true;
-	}
-
 #ifdef __MICRO_DEBUG__
 	int y = 3;
 #endif

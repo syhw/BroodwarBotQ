@@ -19,7 +19,7 @@ void MicroAIModule::onStart()
 {
 #ifdef __LEARNING_PROB_TABLES__
 	ZealotUnit::initProbTables();
-	#endif
+#endif
 	///Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
 	// Enable some cheat flags
     //Broodwar->printf("ON START !!\n");

@@ -100,7 +100,7 @@ public:
 	void onUnitDestroy(BWAPI::Unit* u);
 	void onUnitShow(BWAPI::Unit* u);
 	void onUnitHide(BWAPI::Unit* u);
-#ifdef __DEBUG__
+#ifdef __ETECHESTIMATOR_DEBUG__
 	void onFrame();
 #endif
 };

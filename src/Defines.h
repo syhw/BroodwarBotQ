@@ -4,6 +4,7 @@
 
 ///#define __DEBUG__
 ///#define __INTELLIGENCE_DEBUG__
+#define __ETECHESTIMATOR_DEBUG__
 ///#define __MACRO_DEBUG__
 ///#define __MICRO_DEBUG__
 
@@ -22,6 +23,7 @@
 #define __TILES_RADIUS_DEFEND_BASE__ 26
 #define __MAX_TRIES_BUILD_SOMETHING__ 1440 // IN FRAMES, 1 minute here
 #define __PYLON_COVERAGE_TILES__ 4
+#define __2_PROBES_PER_ENEMY_WORKER_DEFENSE__
 
 #ifdef __DEBUG__
 //#include <vld.h>

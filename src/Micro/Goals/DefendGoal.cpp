@@ -1,4 +1,5 @@
 #include <PrecompiledHeader.h>
+#include "Defines.h"
 #include "Micro/Goals/DefendGoal.h"
 #include "Subgoal.h"
 #include "FormationSubgoal.h"
@@ -103,9 +104,11 @@ void DefendGoal::check()
 				|| ut == UnitTypes::Protoss_Dark_Templar || ut == UnitTypes::Zerg_Lurker)
 				; // TODO
 			//_eUnits += 16; // (supply is *2, 2 for a marine for instance)
+#ifdef __2_PROBES_PER_ENEMY_WORKER_DEFENSE__
 			else if ((ut == UnitTypes::Protoss_Probe || ut == UnitTypes::Terran_SCV || ut == UnitTypes::Zerg_Drone)
 				&& (u->isAttacking() || u->isConstructing())) //|| u->getTarget()->getPlayer() == Broodwar->self()))
 				_eUnits += ut.supplyRequired(); // 2 probes on one attacking worker
+#endif
 			else if (ut == UnitTypes::Zerg_Zergling)
 				_eUnits += 3*(ut.supplyRequired()); // 3 probes per zergling (zerglings are 1 supply each)
 			else 

@@ -38,14 +38,13 @@ void Micro::update()
 		if ((Broodwar->enemy()->getRace() == Races::Protoss && (
 			(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 1 && ETechEstimator::Instance().getOpeningsProbas()[1] > 0.15 // fast DT
 			|| TheInformationManager->getEnemyBases().size() > 1 )
-			|| (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 4))
+			|| (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 3))
 			) || Broodwar->enemy()->getRace() == Races::Terran && (
 			(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 1 && ETechEstimator::Instance().getOpeningsProbas()[3] > 0.2 // siege expand
 			|| TheInformationManager->getEnemyBases().size() > 1)
 			|| (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 4)
 			) || Broodwar->enemy()->getRace() == Races::Zerg && (
-			(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Zealot) > 3
-			&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 1 && 
+			(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Zealot) > 3 &&
 			(ETechEstimator::Instance().getOpeningsProbas()[0] > 0.2 || ETechEstimator::Instance().getOpeningsProbas()[1] > 0.2 // mutas
 			|| TheInformationManager->getEnemyBases().size() > 1))
 			|| Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 3

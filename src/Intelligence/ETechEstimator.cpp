@@ -170,7 +170,7 @@ void ETechEstimator::onUnitHide(Unit* u)
 {
 }
 
-#ifdef __INTELLIGENCE_DEBUG__
+#ifdef __ETECHESTIMATOR_DEBUG__
 void ETechEstimator::onFrame()
 {
 	if (!tableLoaded)
@@ -181,7 +181,7 @@ void ETechEstimator::onFrame()
 	Broodwar->drawLineScreen(630, 148, 630, 170 + 18*openingsProbas.size(), BWAPI::Colors::Blue);
 	Broodwar->drawLineScreen(490, 170 + 18*openingsProbas.size(), 630, 170 + 18*openingsProbas.size(), BWAPI::Colors::Blue);
 	for (size_t i = 0; i < openingsProbas.size(); ++i)
-		Broodwar->drawTextScreen(500, 170+18*i, "%s ==> %Lg", st.openings[i].c_str(), openingsProbas[i]);
+		Broodwar->drawTextScreen(500, 170+18*i, "%s ==> %Lg", st.openings[i].c_str(), openingsProbas[i]*100);
 }
 #endif
 
