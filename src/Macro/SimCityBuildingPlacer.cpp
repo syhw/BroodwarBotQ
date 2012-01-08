@@ -81,19 +81,57 @@ inline bool existsInnerPath(const TilePosition& tp1,
 	return false;
 }
 
-inline bool floodFillWalkable(const TilePosition& pos, const UnitType& ut, const TilePosition& toReach)
+list<TilePosition> manhattanWalkableNotReserved(const TilePosition& pos)
 {
-	/// TODO
+	list<TilePosition> ret;
+	TilePosition tmp(pos.x()-1, pos.y());
+	if (tmp.isValid() && MapManager::Instance().isBTWalkable(tmp) && !TheReservedMap->isReserved(tmp))
+		ret.push_back(tmp);
+	tmp = TilePosition(pos.x()+1, pos.y());
+	if (tmp.isValid() && MapManager::Instance().isBTWalkable(tmp) && !TheReservedMap->isReserved(tmp))
+		ret.push_back(tmp);
+	tmp = TilePosition(pos.x(), pos.y()-1);
+	if (tmp.isValid() && MapManager::Instance().isBTWalkable(tmp) && !TheReservedMap->isReserved(tmp))
+		ret.push_back(tmp);
+	tmp = TilePosition(pos.x(), pos.y()+1);
+	if (tmp.isValid() && MapManager::Instance().isBTWalkable(tmp) && !TheReservedMap->isReserved(tmp))
+		ret.push_back(tmp);
+	return ret;
+}
+
+inline bool floodFillWalkable(const TilePosition& pos, const UnitType& ut, const TilePosition& start)
+{
+	/// TODO make a flow map of all the statics (terrain+buildings) in MapManager and use it everywhere (here included)
+	set<TilePosition> endTiles;
+	for (int x = max(0, pos.x()-1); x < min(Broodwar->mapWidth()/TILE_SIZE, pos.x()+ut.tileWidth()+1); ++x)
+		for (int y = max(0, pos.y()-1); y < min(Broodwar->mapHeight()/TILE_SIZE, pos.y()+ut.tileHeight()+1); ++y)
+			if (MapManager::Instance().isBTWalkable(x, y) && !TheReservedMap->isReserved(x, y))
+				endTiles.insert(TilePosition(x, y));
+	BWTA::Region*r = BWTA::getRegion(pos);
 	int i = 0;
-	int maxIter = static_cast<int>(BWTA::getRegion(start)->getPolygon().getPerimeter() / TILE_SIZE); // or max dimension or region * sinuosity
-	bool grown = true;
-	std::set<TilePosition> walkable;
-	walkable.insert(toReach)
-	while (grown && i < maxIter)
+	int maxIter = static_cast<int>(r->getPolygon().getPerimeter() / TILE_SIZE); // or max dimension or region * sinuosity
+	set<TilePosition> walkable;
+	walkable.insert(start);
+	list<TilePosition> walkableAround = manhattanWalkableNotReserved(start);
+	while (!walkableAround.empty() && i++ < maxIter)
 	{
-		/// TODO TODO
-		if (walkable.count(end))
-			return true;
+		list<TilePosition> newWalkableAround;
+		for each (TilePosition tp in walkableAround)
+		{
+			if (!walkable.count(tp))
+			{
+				walkable.insert(tp);
+				if (BWTA::getRegion(tp) == r)
+					newWalkableAround.splice(newWalkableAround.end(), manhattanWalkableNotReserved(tp));
+			}
+		}
+		walkableAround.swap(newWalkableAround);
+		bool allWalkables = true;
+		for each (TilePosition tp in endTiles)
+			allWalkables &= static_cast<bool>(walkable.count(tp));
+		if (!allWalkables)
+			continue;
+		return true;
 	}
 	return false;
 }
@@ -345,8 +383,11 @@ void SimCityBuildingPlacer::generate(int min_size)
 	/// Search at home again
 	if (!_noMoreClustersAtHome && bc.size < min_size)
 		bc = searchForCluster(home->getRegion()); // perhaps a 4th/5th/... cluster at home?
+
+	if (Broodwar->getFrameCount() > 100)
+		_canNoLongerGenerateClusters = true;
 	/// Search at other start locations
-	if (bc.size < min_size && Broodwar->getFrameCount() > 10*24*60)
+	/*if (bc.size < min_size && Broodwar->getFrameCount() > 10*24*60)
 	{
 		if (TheInformationManager == NULL)
 			TheInformationManager = InformationManager::create();
@@ -363,9 +404,7 @@ void SimCityBuildingPlacer::generate(int min_size)
 			if ((double)(clock() - start)/CLOCKS_PER_SEC > 0.01) // 1 milli second
 				goto generate_end; // TODO: remove
 		}
-	}
-	/// Search in other places if the map has only 2 start locations
-	/// TODO
+	}*/
 
 generate_end:
 	if (bc.size >= min_size)
