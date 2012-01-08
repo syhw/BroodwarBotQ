@@ -2126,13 +2126,13 @@ void BayesianUnit::update()
 	assert(_unitsGroup != NULL);
 	drawPPath();
 	if (_mode == MODE_FIGHT_G || _mode == MODE_FIGHT_A)
-		Broodwar->drawTextMap(unit->getPosition().x() - 8, unit->getPosition().y() - 10, "\x08FI");
+		Broodwar->drawTextMap(unit->getPosition().x() - 8, unit->getPosition().y() - 10, "\x08 FI");
 	else if (_mode == MODE_SCOUT)
-		Broodwar->drawTextMap(unit->getPosition().x() - 8, unit->getPosition().y() - 10, "\x1FSC");
+		Broodwar->drawTextMap(unit->getPosition().x() - 8, unit->getPosition().y() - 10, "\x1F SC");
 	else if (_mode == MODE_INPOS)
-		Broodwar->drawTextMap(unit->getPosition().x() - 8, unit->getPosition().y() - 10, "\x07IP");
+		Broodwar->drawTextMap(unit->getPosition().x() - 8, unit->getPosition().y() - 10, "\x07 IP");
 	else
-		Broodwar->drawTextMap(unit->getPosition().x() - 8, unit->getPosition().y() - 10, "\x1FMO");
+		Broodwar->drawTextMap(unit->getPosition().x() - 8, unit->getPosition().y() - 10, "\x1F MO");
 #endif
 
     _unitPos = unit->getPosition();

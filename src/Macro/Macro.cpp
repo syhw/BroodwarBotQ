@@ -123,7 +123,8 @@ void Macro::update()
 
 	TheArbitrator->update();
 	
-	if (!expands && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 12)
+	/// TODO REMOVE THAT
+	if (!expands && (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 12 || Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway) > 2))
 	{
 		expand();
 	}
