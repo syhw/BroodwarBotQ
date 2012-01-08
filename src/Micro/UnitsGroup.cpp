@@ -14,6 +14,7 @@ using namespace BWAPI;
 
 //#define __LEADING_UNIT_BY_SIZE_HP__
 //#define __WITH_RETREAT__
+//#define __WITH_SUICIDE__
 #define __MAX_DISTANCE_TO_GROUP__ 13*TILE_SIZE
 
 UnitsGroup::UnitsGroup()
@@ -491,8 +492,10 @@ void UnitsGroup::updateOurStats()
 	/// Hack/Experimental++
 	if (oldTotalHP - _totalHP > 150)
 		readyToAttack = true;
+#ifdef __WITH_SUICIDE__
 	if (suicide || oldTotalHP - _totalHP > 300)
 		suicide = true;
+#endif
 }
 
 void UnitsGroup::update()
@@ -566,7 +569,7 @@ void UnitsGroup::update()
 	{
 		force = evaluateForces();
 		//if ((Broodwar->getFrameCount() - _backFrame < 240 && Broodwar->getFrameCount() - _offensiveFrame >= 240) || force < 0.8 && !suicide) // take decisions for 10 seconds, renewable
-		if (Broodwar->getFrameCount() - _backFrame < 240 || force < 0.8 && !suicide) // take decisions for 10 seconds, renewable
+		if (Broodwar->getFrameCount() - _backFrame < 240 || force < 0.9 && !suicide) // take decisions for 10 seconds, renewable
 		{
 			if (Broodwar->getFrameCount() - _backFrame >= 240)
 				_backFrame = Broodwar->getFrameCount();

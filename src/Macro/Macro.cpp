@@ -159,9 +159,11 @@ void Macro::update()
 			TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
 
 		if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Observer)
-			&& (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Reaver > 1) || Broodwar->self()->completedUnitCount(UnitTypes::Protoss_High_Templar) > 2))
+			///&& (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Reaver > 1) || Broodwar->self()->completedUnitCount(UnitTypes::Protoss_High_Templar) > 2)
+			)
 		{
 			expand();
+			TheProducer->produceAlways(8, UnitTypes::Protoss_Zealot, 3);
 		}
 	}
 	else if (expands > 1)

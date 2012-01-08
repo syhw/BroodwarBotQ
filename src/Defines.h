@@ -11,7 +11,7 @@
 ///#define __MICRO_DEBUG__
 
 //#define __NON_IMPLEMENTE__
-///#define BW_POS_MOUSE
+#define BW_POS_MOUSE
 //#define __LEARNING_PROB_TABLES__
 
 #define WALK_TILES_SIZE 8
@@ -25,8 +25,8 @@
 #define __MAX_WORKERS__ 75
 #define __TILES_RADIUS_DEFEND_BASE__ 26
 #define __MAX_TRIES_BUILD_SOMETHING__ 1440 // IN FRAMES, 1 minute here
-#define __PYLON_COVERAGE_TILES__ 4
-#define __2_PROBES_PER_ENEMY_WORKER_DEFENSE__
+#define __PYLON_COVERAGE_TILES__ 4 // length/size of the pylon coverage radius in build tiles
+#define __2_PROBES_PER_ENEMY_WORKER_DEFENSE__ // put 2 probes on one attacking worker in DefendGoal
 
 #ifdef __DEBUG__
 //#include <vld.h>
@@ -39,10 +39,7 @@
 
 #ifndef __DEBUG__ // Perf
 #undef __DO_NOT_HARASS_SCOUT__
-#define __RELEASE_OPTIM__
-#ifdef __RELEASE_OPTIM__
 #undef _SECURE_SCL
 #define _SECURE_SCL 0 // remove iterator runtime checks
 #define _HAS_ITERATOR_DEBUGGING 0
-#endif
 #endif

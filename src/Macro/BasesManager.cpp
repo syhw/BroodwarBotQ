@@ -37,10 +37,10 @@ BasesManager::~BasesManager()
 
 void BasesManager::update()
 {
-//#ifdef __MACRO_DEBUG__
+#ifdef __MACRO_DEBUG__
 	if (expanding)
-		Broodwar->drawTextScreen(120, 4, "EXPANDING");
-//#endif
+		Broodwar->drawTextScreen(120, 8, "EXPANDING");
+#endif
 	//check to see if any new base locations need to be added
 	for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getBaseLocations().begin();
 		it != BWTA::getBaseLocations().end(); ++it)

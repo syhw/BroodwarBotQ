@@ -339,7 +339,7 @@ void Task::check()
 		else if (tmp.canMove())
 		{
 #ifdef __MACRO_DEBUG__
-			Broodwar->printf("A unit is blocking the construction in %d, %d", position.x(), position.y());
+			Broodwar->printf("A unit is blocking the construction in %d, %d", tilePosition.x(), tilePosition.y());
 #endif
 			(*it)->move(Position(Broodwar->self()->getStartLocation())); // try and move the unit, TODO will block if the unit doesn't move
 		}
