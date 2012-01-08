@@ -72,7 +72,7 @@ private:
 	inline void activeUnit(pBayesianUnit bu);
     bool removeUnit(BWAPI::Unit* u);
     bool removeArrivingUnit(BWAPI::Unit* u);
-#ifndef __RELEASE_OPTIM__
+#ifdef __MICRO_DEBUG__
     void displayTargets();  // debug purpose
 #endif
 public:
@@ -109,7 +109,7 @@ public:
 	UnitsGroup();
 	virtual ~UnitsGroup();
 	void update();
-#ifndef __RELEASE_OPTIM__
+#ifdef __MICRO_DEBUG__
 	void display();
 #endif
 	/// Group interaction/orders
@@ -140,7 +140,7 @@ public:
 	/// Templas merging
     inline void templarMergingStuff();
     void signalMerge(BWAPI::Unit* u);
-#ifndef __RELEASE_OPTIM__
+#ifdef __MICRO_DEBUG__
     void selectedUnits(std::set<pBayesianUnit>& u);
 #endif
 };

@@ -53,6 +53,14 @@ void BattleBroodAI::onEnd(bool isWinner)
 
 void BattleBroodAI::onFrame()
 {
+#ifdef __MANNER__
+	if (Broodwar->getFrameCount() == 360)
+	{
+		Broodwar->sendText("gl hf :)");
+		Broodwar->sendText("<('-'<)  ^('-'^)  (^'-')^  (>'-')>  (v'-')v  v('-'v)  ^('-')^");
+	}
+#endif
+
 #ifdef __DEBUG__
 	for(std::set<BWTA::Region*>::const_iterator r=BWTA::getRegions().begin();r!=BWTA::getRegions().end();r++)
 	{

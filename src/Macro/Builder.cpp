@@ -337,7 +337,12 @@ void Task::check()
 			return;
 		}
 		else if (tmp.canMove())
+		{
+#ifdef __MACRO_DEBUG__
+			Broodwar->printf("A unit is blocking the construction in %d, %d", position.x(), position.y());
+#endif
 			(*it)->move(Position(Broodwar->self()->getStartLocation())); // try and move the unit, TODO will block if the unit doesn't move
+		}
 		else if (!(tmp == UnitTypes::Resource_Vespene_Geyser && type == Broodwar->self()->getRace().getRefinery()))
 		{
 			tilePosition = buildingPlacer->getTilePosition(type); // really blocked (can't move)

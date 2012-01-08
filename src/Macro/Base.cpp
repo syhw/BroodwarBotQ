@@ -1,4 +1,5 @@
 #include <PrecompiledHeader.h>
+#include <Macro/Macro.h>
 #include <Macro/Base.h>
 #include <Macro/Builder.h>
 #include "Defines.h"
@@ -110,8 +111,11 @@ void Base::update()
 				resourceDepot = *it;
 		}
 	}
-	if (resourceDepot == NULL && (Broodwar->getFrameCount() - centerInConstruction) > __MAX_TRIES_BUILD_SOMETHING__+250) // it has been canced
+	if (resourceDepot == NULL && (Broodwar->getFrameCount() - centerInConstruction) > __MAX_TRIES_BUILD_SOMETHING__+250) // it has been canceled
+	{
+		/// TODO can be that there is a burrowed unit or a mine here
 		buildCenter();
+	}
 	if (refinery == NULL)
 	{	
 		for (std::set<Unit*>::const_iterator it = baseLocation->getGeysers().begin();
@@ -145,11 +149,29 @@ void Base::update()
 		&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Can
 		TheBuilder->buildCannonsMinerals(baseLocation);
 		cannoned = true;*/
+
+	/// TODO PURE HACK TO EXPAND WHEN AT SATURATION !!! !!! !!!
+	if (resourceDepot != NULL && !(Broodwar->getFrameCount() % ((resourceDepot->getPosition().x() % 100) + 15)))
+	{
+		std::set<Unit*> tmp = Broodwar->getUnitsInRadius(resourceDepot->getPosition(), 8*TILE_SIZE);
+		int nbWorkers = 0;
+		int nbResources = 0;
+		for each (Unit* u in tmp)
+		{
+			if (u->getPlayer() == Broodwar->self() && u->getType().isWorker())
+				++nbWorkers;
+			else if (u->getType().isMineralField() || u->getType() == UnitTypes::Resource_Vespene_Geyser)
+				++nbResources;
+		}
+		if ((static_cast<double>(nbWorkers) / nbResources) > 3.0)
+			Macro::Instance().expand();
+	}
 }
 
 void Base::buildCenter()
 {
-	TheBuilder->addTask(Broodwar->self()->getRace().getCenter(), baseLocation->getTilePosition(), false);
+	//TheBuilder->addTask(Broodwar->self()->getRace().getCenter(), baseLocation->getTilePosition(), false);
+	TheBuilder->addTask(Broodwar->self()->getRace().getCenter(), baseLocation->getTilePosition(), true);
 	centerInConstruction = Broodwar->getFrameCount();
 }
 

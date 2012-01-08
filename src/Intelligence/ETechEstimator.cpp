@@ -111,7 +111,8 @@ void ETechEstimator::onUnitDestroy(Unit* u)
 
 void ETechEstimator::onUnitShow(Unit* u)
 {
-	if (Broodwar->getFrameCount()/24 >= LEARNED_TIME_LIMIT)
+	if (Broodwar->getFrameCount()/24 >= LEARNED_TIME_LIMIT
+		|| u->getPlayer()->isNeutral())
 		return;
 
 	if (u->getPlayer()->isEnemy(Broodwar->self())
@@ -175,7 +176,7 @@ void ETechEstimator::onFrame()
 {
 	if (!tableLoaded)
 		return;
-	Broodwar->drawTextScreen(510, 150, "Opening Prediction");
+	Broodwar->drawTextScreen(510, 150, "Strategy Prediction (percent)");
 	Broodwar->drawLineScreen(490, 148, 630, 148, BWAPI::Colors::Blue);
 	Broodwar->drawLineScreen(490, 148, 490, 170 + 18*openingsProbas.size(), BWAPI::Colors::Blue);
 	Broodwar->drawLineScreen(630, 148, 630, 170 + 18*openingsProbas.size(), BWAPI::Colors::Blue);

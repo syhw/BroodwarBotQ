@@ -17,7 +17,7 @@ public:
 	void update();
 
 	Base* getBase(BWTA::BaseLocation* location);
-	void expand(BWTA::BaseLocation* location = NULL);
+	bool expand(BWTA::BaseLocation* location = NULL);
 	void setFirstGasPop(int pop);
 
 	const std::list<Base*>& getAllBases() const;

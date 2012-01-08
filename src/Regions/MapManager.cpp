@@ -519,7 +519,7 @@ void MapManager::onUnitShow(Unit* u)
 {
 	if (u->getType().isBuilding())
 	    addBuilding(u);
-    if (u->getPlayer() == Broodwar->self())
+	if (u->getPlayer()->isAlly(Broodwar->self()) || u->getPlayer() == Broodwar->self())
         addAlliedUnit(u);
 }
 
@@ -977,7 +977,7 @@ const std::map<BWAPI::Bullet*, BWAPI::Position>& MapManager::getTrackedStorms()
     return _trackedStorms;
 }
 
-Position MapManager::closestWalkabableSameRegionOrConnected(Position p)
+Position MapManager::closestWalkableSameRegionOrConnected(Position p)
 {
     if (!p.isValid())
         p.makeValid();
@@ -1027,11 +1027,14 @@ Position MapManager::closestWalkabableSameRegionOrConnected(Position p)
     return Positions::None;
 }
 
-TilePosition MapManager::closestWalkabableSameRegionOrConnected(TilePosition tp)
+TilePosition MapManager::closestWalkable(TilePosition tp, BWTA::Region* r)
 {
+#ifdef __INTELLIGENCE_DEBUG__
+	assert(tp.isValid());
+	assert(r != NULL);
+#endif
     if (!tp.isValid())
         tp.makeValid();
-    BWTA::Region* r = BWTA::getRegion(tp);
 	if (r == NULL) // defensive
 		return tp;
     int lowerX = (tp.x() - 1) > 0 ? tp.x() - 1 : 0;
@@ -1081,6 +1084,17 @@ TilePosition MapManager::closestWalkabableSameRegionOrConnected(TilePosition tp)
     if (saved != TilePositions::None)
         return saved;
     return TilePositions::None;
+}
+
+TilePosition MapManager::closestWalkableSameRegionOrConnected(TilePosition tp)
+{
+#ifdef __INTELLIGENCE_DEBUG__
+	assert(tp.isValid());
+#endif
+    if (!tp.isValid())
+        tp.makeValid();
+    BWTA::Region* r = BWTA::getRegion(tp);
+	return closestWalkable(tp, r);
 }
 
 bool MapManager::isBTWalkable(int x, int y)
@@ -1306,7 +1320,7 @@ void MapManager::registerPathfindWork(BayesianUnit* ptr, BWAPI::Unit* u, BWAPI::
 	if (!u->getType().isFlyer())
 	{
 		if (!_lowResWalkability[end.x() + end.y()*Broodwar->mapWidth()])
-			target = closestWalkabableSameRegionOrConnected(target);
+			target = closestWalkableSameRegionOrConnected(target);
 	}
 	if (!target.isValid())
 		target.makeValid();

@@ -89,10 +89,10 @@ Base* BasesManager::getBase(BWTA::BaseLocation* location)
 	return i->second;
 }
 
-void BasesManager::expand(BWTA::BaseLocation* location)
+bool BasesManager::expand(BWTA::BaseLocation* location)
 {
 	if (expanding)
-		return;
+		return false;
 	else
 		expanding = true;
 	if (location == NULL)
@@ -124,7 +124,10 @@ void BasesManager::expand(BWTA::BaseLocation* location)
 		allBases.push_back(new Base(location));
 		location2base[location] = allBases.back();
 		TheBorderManager->addMyBase(location);
+		return true;
 	}
+	else
+		return false;
 }
 
 void BasesManager::setFirstGasPop(int pop)

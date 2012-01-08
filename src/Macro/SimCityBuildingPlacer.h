@@ -110,6 +110,7 @@ private:
 	inline std::set<BWAPI::Unit*> checkPower(const std::set<BWAPI::Unit*>& buildings);
 	inline bool powerBuildings(const std::set<BWAPI::Unit*>& buildings);
 	bool canBuildHere(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type) const;
+	bool canBuildHereWithPath(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type) const;
 	bool canBuildHereWithSpace(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type, int buildDist=1) const;
 	bool fullCanBuildHere(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type) const; // double checks (map init?)
 };

@@ -81,6 +81,23 @@ inline bool existsInnerPath(const TilePosition& tp1,
 	return false;
 }
 
+inline bool floodFillWalkable(const TilePosition& pos, const UnitType& ut, const TilePosition& toReach)
+{
+	/// TODO
+	int i = 0;
+	int maxIter = static_cast<int>(BWTA::getRegion(start)->getPolygon().getPerimeter() / TILE_SIZE); // or max dimension or region * sinuosity
+	bool grown = true;
+	std::set<TilePosition> walkable;
+	walkable.insert(toReach)
+	while (grown && i < maxIter)
+	{
+		/// TODO TODO
+		if (walkable.count(end))
+			return true;
+	}
+	return false;
+}
+
 void PositionAccountant::cleanUp()
 {
 	for (list<TilePosition>::const_iterator it = pos.begin();
@@ -1098,25 +1115,25 @@ void SimCityBuildingPlacer::makeCannonsMinerals(BWTA::BaseLocation* hom, bool qu
 			if (tmp.getDistance(hom->getTilePosition()) < 6)
 				continue;
 			double tmpd1 = tmp.getDistance(furtherMineral);
-			if (tmpd1 < dist && canBuildHere(NULL, tmp, UnitTypes::Protoss_Pylon))
+			if (tmpd1 < dist && canBuildHereWithPath(NULL, tmp, UnitTypes::Protoss_Pylon))
 			{
 				pylon1 = cannon1;
 				cannon1 = tmp;
 				dist = tmpd1;
 			}
-			else if (tmpd1 < distb && canBuildHere(NULL, tmp, UnitTypes::Protoss_Pylon))
+			else if (tmpd1 < distb && canBuildHereWithPath(NULL, tmp, UnitTypes::Protoss_Pylon))
 			{
 				pylon1 = tmp;
 				distb = tmpd1;
 			}
 			double tmpd2 = tmp.getDistance(gasTilePos);
-			if (tmpd2 < dist2 && canBuildHere(NULL, tmp, UnitTypes::Protoss_Pylon))
+			if (tmpd2 < dist2 && canBuildHereWithPath(NULL, tmp, UnitTypes::Protoss_Pylon))
 			{
 				pylon2 = cannon2;
 				cannon2 = tmp;
 				dist2 = tmpd2;
 			}
-			else if (tmpd2 < dist2b && canBuildHere(NULL, tmp, UnitTypes::Protoss_Pylon))
+			else if (tmpd2 < dist2b && canBuildHereWithPath(NULL, tmp, UnitTypes::Protoss_Pylon))
 			{
 				pylon2 = tmp;
 				dist2b = tmpd2;
@@ -1322,6 +1339,16 @@ bool SimCityBuildingPlacer::canBuildHere(BWAPI::Unit* builder, BWAPI::TilePositi
 			if (TheReservedMap->isReserved(x,y))
 				return false;
 	return true;
+}
+
+bool SimCityBuildingPlacer::canBuildHereWithPath(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type) const
+{
+	if (!canBuildHere(builder, position, type))
+		return false;
+	TilePosition tpChokeMid(frontChoke->getCenter());
+	if (!MapManager::Instance().isBTWalkable(tpChokeMid))
+		tpChokeMid = MapManager::Instance().closestWalkable(tpChokeMid, home->getRegion());
+	return floodFillWalkable(position, type, tpChokeMid);
 }
 
 bool SimCityBuildingPlacer::canBuildHereWithSpace(BWAPI::Unit* builder, BWAPI::TilePosition position, BWAPI::UnitType type, int buildDist) const

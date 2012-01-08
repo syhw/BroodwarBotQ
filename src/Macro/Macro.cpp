@@ -199,7 +199,7 @@ void Macro::update()
 		if (Broodwar->self()->gas() > 150 && !Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Reaver))
 			TheProducer->produce(1, UnitTypes::Protoss_Reaver, 95);
 	}
-#ifdef __MACRO_DEBUG__
+#ifdef __REAVER_FIRST__
 	reaverFirst = true;// TODO REMOVE DEBUG
 #endif
 }
@@ -372,8 +372,10 @@ Zerg openings, in order (in the vector):
 			{
 				if (wontHave(UnitTypes::Protoss_Robotics_Support_Bay))
 					TheBuilder->build(UnitTypes::Protoss_Robotics_Support_Bay);
+#ifdef __REAVER_FIRST__
 				TheProducer->produce(1, UnitTypes::Protoss_Shuttle, 95);
 				TheProducer->produceAlways(1, UnitTypes::Protoss_Shuttle, 3);
+#endif
 			}
 			else
 			{
@@ -401,8 +403,10 @@ Zerg openings, in order (in the vector):
 		else if (ut == UnitTypes::Protoss_Robotics_Support_Bay)
 		{
 			TheProducer->produce(1, UnitTypes::Protoss_Reaver, 95);
+#ifdef __REAVER_FIRST__
 			if (!Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Shuttle))
 				TheProducer->produce(1, UnitTypes::Protoss_Shuttle, 95);
+#endif
 			TheProducer->produceAlways(3, UnitTypes::Protoss_Reaver, 5);
 		}
 		else if (ut == UnitTypes::Protoss_Observer)
@@ -417,7 +421,9 @@ Zerg openings, in order (in the vector):
 				TheProducer->researchUpgrade(UpgradeTypes::Scarab_Damage);
 			if (wontHave(UnitTypes::Protoss_Observatory))
 				TheBuilder->build(UnitTypes::Protoss_Observatory);
+#ifdef __REAVER_FIRST__
 			if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Shuttle))
+#endif
 				TheProducer->produceAlways(5, UnitTypes::Protoss_Observer, 5);
 		}
 		else if (ut == UnitTypes::Protoss_Shuttle)
@@ -481,6 +487,6 @@ void Macro::onUnitRenegade(BWAPI::Unit* unit)
 
 void Macro::expand()
 {
-	Macro::Instance().expands += 1;
-	TheBasesManager->expand();
+	if (TheBasesManager->expand())
+		Macro::Instance().expands += 1;
 }

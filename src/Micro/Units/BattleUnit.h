@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <algorithm>
 #include "Regions/WalkTilePosition.h"
+#include "Defines.h"
 
 
 class BattleUnit
@@ -14,7 +15,7 @@ protected:
     int _accel;
     double _topSpeed;
     BWAPI::TilePosition _tptarget;
-#ifndef __RELEASE_OPTIM__
+#ifdef __MICRO_DEBUG__
     void drawVelocityArrow() const;
     void drawPath() const;
     void drawBTPath() const;
@@ -35,7 +36,7 @@ public:
 	BWAPI::Unit* unit;
     BWAPI::Unit* targetEnemy; // public for debug purpose, __USE__ setTargetEnemy(Unit*)
     BWAPI::Unit* oorTargetEnemy;
-	BWAPI::Position target; // display debug purpose
+	BWAPI::Position target; // public for display debug purpose
     const std::vector<BWAPI::Position> & getPPath();
     BWAPI::Position BattleUnit::getPPath(unsigned int n);
 

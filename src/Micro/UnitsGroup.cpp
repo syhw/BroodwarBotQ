@@ -305,11 +305,11 @@ std::vector<Position> UnitsGroup::findRangePositions()
 		TilePosition tp2(p2);
 		TilePosition tp3(p3);
 		if (!MapManager::Instance().isBTWalkable(tp1))
-			tp1 = MapManager::Instance().closestWalkabableSameRegionOrConnected(tp1);
+			tp1 = MapManager::Instance().closestWalkableSameRegionOrConnected(tp1);
 		if (!MapManager::Instance().isBTWalkable(tp2))
-			tp2 = MapManager::Instance().closestWalkabableSameRegionOrConnected(tp2);
+			tp2 = MapManager::Instance().closestWalkableSameRegionOrConnected(tp2);
 		if (!MapManager::Instance().isBTWalkable(tp3))
-			tp3 = MapManager::Instance().closestWalkabableSameRegionOrConnected(tp3);
+			tp3 = MapManager::Instance().closestWalkableSameRegionOrConnected(tp3);
 		if (tp1 != TilePositions::None)
 			ret.push_back(Position(tp1));
 		if (tp2 != TilePositions::None)
@@ -333,7 +333,7 @@ std::vector<Position> UnitsGroup::findRangePositions()
 			tmp *= (10+4)*32;
 		Position seed = tmp.translate(enemiesCenter);
 		if (Broodwar->isWalkable(seed.x()/8, seed.y()/8))
-			seed = Position(MapManager::Instance().closestWalkabableSameRegionOrConnected(TilePosition(seed)));
+			seed = Position(MapManager::Instance().closestWalkableSameRegionOrConnected(TilePosition(seed)));
 		ret.push_back(seed);
 		if (seed.getApproxDistance(center) <= sqrt((double)units.size()*units.size()*16))
 			readyToAttack = true;
@@ -507,6 +507,10 @@ void UnitsGroup::update()
 
 	/// Update the center of the group
 	updateCenter(); // the center will drift towards the arriving units TOFIX TODO
+#ifdef __MICRO_DEBUG__
+	Broodwar->drawLineMap(center.x(), center.y(), groupTargetPosition.x(), groupTargetPosition.y(), Colors::Orange);
+	Broodwar->drawLineMap(center.x()+1, center.y()+1, groupTargetPosition.x()+1, groupTargetPosition.y()+1, Colors::Orange);
+#endif
 
 	/// Choose a non flying leadingUnit
 	chooseLeadingUnit();
@@ -551,7 +555,7 @@ void UnitsGroup::update()
 		{
 			if (Broodwar->getFrameCount() - _backFrame >= 240)
 				_backFrame = Broodwar->getFrameCount();
-			// strategic withdrawal
+			/// strategic withdrawal
 			for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
 			{
 				(*it)->target = Position(Broodwar->self()->getStartLocation());
@@ -579,21 +583,21 @@ void UnitsGroup::update()
 			{
 				if (Broodwar->getFrameCount() - _offensiveFrame >= 240)
 					_offensiveFrame = Broodwar->getFrameCount();
-				// we can be offensive, use our goal target and do what we want
+				/// we can be offensive, use our goal target and do what we want
 				for(std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
 				{
 #ifdef __MICRO_DEBUG__
 					Position displayp = (*it)->unit->getPosition();
 					Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Offensive");
 #endif
-					// target fixed by the subgoal
+					/// target fixed by the subgoal
 					if ((*it)->getType().isFlyer())
 						(*it)->switchMode(MODE_FIGHT_A);
 					else
 						(*it)->switchMode(MODE_FIGHT_G);
 				}
 			}
-			else // position and go
+			else /// position and go
 			{
 				if (enemyStatic && !readyToAttack)
 				{
@@ -611,7 +615,7 @@ void UnitsGroup::update()
 #endif
 						}
 					}
-					else // we didn't found where to place ourselves, stand our ground
+					else /// we didn't found where to place ourselves, stand our ground
 					{
 						for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
 						{
@@ -714,6 +718,12 @@ void UnitsGroup::formation(pFormation f)
 	mid_based_align(from, to, alignment);
 	for (unsigned int i = 0; i < units.size(); i++)
 	{
+#ifdef __MICRO_DEBUG__
+		assert (to[alignment[i]] != Positions::None);
+		assert (to[alignment[i]] != Positions::Invalid);
+		assert (to[alignment[i]] != Positions::Unknown);
+		assert (to[alignment[i]] != Position(0, 0));
+#endif
 		units[i]->target = to[alignment[i]];
 	}
 	/*** TODO BUG IN SquareFormation TODO TODO TODO}
@@ -859,7 +869,7 @@ const BayesianUnit& UnitsGroup::operator[](ptrdiff_t i)
 	return *(units[i]);
 }
 
-#ifndef __RELEASE_OPTIM__
+#ifdef __MICRO_DEBUG__
 void UnitsGroup::display()
 {
 	Broodwar->drawCircle(CoordinateType::Map, center.x(), center.y(), 8, Colors::Green);
@@ -925,10 +935,13 @@ void UnitsGroup::updateCenter()
 	center.x() /= units.size();
 	center.y() /= units.size();
 #ifdef __MICRO_DEBUG__
-	assert(center.isValid());
+	///assert(center.isValid()); /// TODO that shit actually happens! BUG WHY?
 #endif
-	if (!center.isValid())  // TODO remove
-		center.makeValid(); // TODO remove
+	if (!center.isValid())
+	{
+		center = leadingUnit->unit->getPosition();
+		center.makeValid();
+	}
 
 	groupAltitude = round((double)groupAltitude / units.size());
 	if (nearestChoke != NULL)
@@ -1010,7 +1023,7 @@ Position UnitsGroup::getCenter() const
 	return center;
 }
 
-#ifndef __RELEASE_OPTIM__
+#ifdef __MICRO_DEBUG__
 void UnitsGroup::selectedUnits(std::set<pBayesianUnit>& u)
 {
 	for (std::vector<pBayesianUnit>::iterator i=this->units.begin(); i!=this->units.end(); ++i)

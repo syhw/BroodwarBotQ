@@ -52,13 +52,13 @@ void ArcFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
         p2 = tmpv2.translate(center);
         if (!vUnits[0]->unit->getType().isFlyer() && !Broodwar->isWalkable(p1.x()/8, p1.y()/8))
         {
-            Position tmp = MapManager::Instance().closestWalkabableSameRegionOrConnected(p1);
+            Position tmp = MapManager::Instance().closestWalkableSameRegionOrConnected(p1);
             if (tmp != Positions::None)
                 p1 = tmp;
         }
         if (!vUnits[1]->unit->getType().isFlyer() && !Broodwar->isWalkable(p2.x()/8, p2.y()/8))
         {
-            Position tmp = MapManager::Instance().closestWalkabableSameRegionOrConnected(p2);
+            Position tmp = MapManager::Instance().closestWalkableSameRegionOrConnected(p2);
             if (tmp != Positions::None)
                 p2 = tmp;
         }
@@ -74,7 +74,7 @@ void ArcFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
         p2 = Position((int)center.x, (int)center.y);
         if (!vUnits[0]->unit->getType().isFlyer() && !Broodwar->isWalkable(p1.x()/8, p1.y()/8))
         {
-            Position tmp = MapManager::Instance().closestWalkabableSameRegionOrConnected(p1);
+            Position tmp = MapManager::Instance().closestWalkableSameRegionOrConnected(p1);
             if (tmp != Positions::None)
                 p1 = tmp;
         }
@@ -93,7 +93,7 @@ void ArcFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
         p1 = tmpv.translate(p1);
         if (!vUnits[i+add]->unit->getType().isFlyer() && !Broodwar->isWalkable(p1.x()/8, p1.y()/8))
         {
-            Position tmp = MapManager::Instance().closestWalkabableSameRegionOrConnected(p1);
+            Position tmp = MapManager::Instance().closestWalkableSameRegionOrConnected(p1);
             if (tmp != Positions::None)
                 p1 = tmp;
         }
@@ -114,7 +114,7 @@ void ArcFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
         p2 = tmpv.translate(p2);
         if (!vUnits[i+add]->unit->getType().isFlyer() && !Broodwar->isWalkable(p2.x()/8, p2.y()/8))
         {
-            Position tmp = MapManager::Instance().closestWalkabableSameRegionOrConnected(p2);
+            Position tmp = MapManager::Instance().closestWalkableSameRegionOrConnected(p2);
             if (tmp != Positions::None)
                 p2 = tmp;
         }

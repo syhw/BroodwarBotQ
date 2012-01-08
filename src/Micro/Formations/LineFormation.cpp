@@ -60,7 +60,7 @@ void LineFormation::computeToPositions(const std::vector<pBayesianUnit>& vUnits)
         Position topos = (begin + (dir * i * 1.2 * maxLength)).toPosition();
         if (!vUnits[i]->unit->getType().isFlyer() && !Broodwar->isWalkable(topos.x()/8, topos.y()/8))
         {
-            Position tmp = MapManager::Instance().closestWalkabableSameRegionOrConnected(topos);
+            Position tmp = MapManager::Instance().closestWalkableSameRegionOrConnected(topos);
             if (tmp != Positions::None)
                 topos = tmp;
         }

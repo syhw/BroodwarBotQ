@@ -165,8 +165,9 @@ public:
     const std::map<BWAPI::Unit*, BWAPI::Position> & getOurUnits();
     const std::map<BWAPI::Unit*, BWAPI::Position> & getTrackedUnits();
     const std::map<BWAPI::Bullet*, BWAPI::Position> & getTrackedStorms();
-    BWAPI::Position closestWalkabableSameRegionOrConnected(BWAPI::Position p);
-    BWAPI::TilePosition closestWalkabableSameRegionOrConnected(BWAPI::TilePosition tp);
+    BWAPI::Position closestWalkableSameRegionOrConnected(BWAPI::Position p);
+	BWAPI::TilePosition closestWalkable(BWAPI::TilePosition tp, BWTA::Region* r);
+    BWAPI::TilePosition closestWalkableSameRegionOrConnected(BWAPI::TilePosition tp);
 	bool isBTWalkable(int x, int y);
 	bool isBTWalkable(const BWAPI::TilePosition& tp);
 

@@ -56,7 +56,7 @@ Position BattleUnit::getPPath(unsigned int n)
     return _ppath[n];
 }
 
-#ifndef __RELEASE_OPTIM__
+#ifdef __MICRO_DEBUG__
 void BattleUnit::drawVelocityArrow() const
 {
     int xfrom = unit->getPosition().x();
@@ -122,6 +122,7 @@ void BattleUnit::drawEnclosingBox() const
 
 void BattleUnit::drawTarget() const
 {
-    Broodwar->drawCircle(CoordinateType::Map, target.x(), target.y(), 4, Colors::Purple, true);
+    Broodwar->drawCircleMap(target.x(), target.y(), 4, Colors::Purple, true);
+    Broodwar->drawLineMap(target.x(), target.y(), unit->getPosition().x(), unit->getPosition().y(), Colors::Purple);
 }
 #endif
