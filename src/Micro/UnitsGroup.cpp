@@ -14,7 +14,6 @@ using namespace BWAPI;
 
 //#define __LEADING_UNIT_BY_SIZE_HP__
 //#define __WITH_RETREAT__
-///#define __SWITCH_MOVE_WHEN_FAR__
 #define __MAX_DISTANCE_TO_GROUP__ 13*TILE_SIZE
 
 UnitsGroup::UnitsGroup()
@@ -581,19 +580,10 @@ void UnitsGroup::update()
 				else
 #endif
 				{
-#ifdef __SWITCH_MOVE_WHEN_FAR__
-					if ((*it)->targetEnemy && (!(*it)->targetEnemy->isVisible()
-						|| (*it)->targetEnemy->getDistance((*it)->unit) > ((*it)->getType().groundWeapon().maxRange() + 4*TILE_SIZE)))
-						(*it)->switchMode(MODE_MOVE);
-					else
-#endif
-					{
 					if ((*it)->getType().isFlyer())
 						(*it)->switchMode(MODE_FIGHT_A);
 					else
 						(*it)->switchMode(MODE_FIGHT_G);
-					}
-
 #ifdef __MICRO_DEBUG__
 					Position displayp = (*it)->unit->getPosition();
 					Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Back");
@@ -616,18 +606,10 @@ void UnitsGroup::update()
 					Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Offensive");
 #endif
 					/// target fixed by the subgoal
-#ifdef __SWITCH_MOVE_WHEN_FAR__
-					if ((*it)->targetEnemy && (!(*it)->targetEnemy->isVisible()
-						|| (*it)->targetEnemy->getDistance((*it)->unit) > ((*it)->getType().groundWeapon().maxRange() + 4*TILE_SIZE)))
-						(*it)->switchMode(MODE_MOVE);
-					else
-#endif
-					{
 					if ((*it)->getType().isFlyer())
 						(*it)->switchMode(MODE_FIGHT_A);
 					else
 						(*it)->switchMode(MODE_FIGHT_G);
-					}
 				}
 			}
 			else /// position and go
@@ -653,18 +635,10 @@ void UnitsGroup::update()
 						for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
 						{
 							(*it)->target = (*it)->unit->getPosition();
-#ifdef __SWITCH_MOVE_WHEN_FAR__
-							if ((*it)->targetEnemy && (!(*it)->targetEnemy->isVisible()
-								|| (*it)->targetEnemy->getDistance((*it)->unit) > ((*it)->getType().groundWeapon().maxRange() + 4*TILE_SIZE)))
-								(*it)->switchMode(MODE_MOVE);
-							else
-#endif
-							{
 							if ((*it)->getType().isFlyer())
 								(*it)->switchMode(MODE_FIGHT_A);
 							else
 								(*it)->switchMode(MODE_FIGHT_G);
-							}
 #ifdef __MICRO_DEBUG__
 							Position displayp = (*it)->unit->getPosition();
 							Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Attack");
@@ -695,18 +669,10 @@ void UnitsGroup::update()
 						else
 						{	
 							(*it)->target = (*it)->unit->getPosition();
-#ifdef __SWITCH_MOVE_WHEN_FAR__
-							if ((*it)->targetEnemy && (!(*it)->targetEnemy->isVisible()
-								|| (*it)->targetEnemy->getDistance((*it)->unit) > ((*it)->getType().groundWeapon().maxRange() + 4*TILE_SIZE)))
-								(*it)->switchMode(MODE_MOVE);
-							else
-#endif
-							{
 							if ((*it)->getType().isFlyer())
 								(*it)->switchMode(MODE_FIGHT_A);
 							else
 								(*it)->switchMode(MODE_FIGHT_G);
-							}
 #ifdef __MICRO_DEBUG__
 							Position displayp = (*it)->unit->getPosition();
 							Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Attack");
