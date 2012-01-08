@@ -163,7 +163,8 @@ void Base::update()
 			else if (u->getType().isMineralField() || u->getType() == UnitTypes::Resource_Vespene_Geyser)
 				++nbResources;
 		}
-		if ((static_cast<double>(nbWorkers) / nbResources) > 3.0)
+		double ratio = (static_cast<double>(nbWorkers) / nbResources);
+		if (ratio > 3.0 || Broodwar->getFrameCount() > 12*60*24 && ratio > 2.0)
 			Macro::Instance().expand();
 	}
 }

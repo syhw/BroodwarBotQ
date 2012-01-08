@@ -1,6 +1,7 @@
 #include <PrecompiledHeader.h>
 #include "Macro/BasesManager.h"
 #include "Macro/BorderManager.h"
+#include "Defines.h"
 
 using namespace BWAPI;
 
@@ -36,6 +37,10 @@ BasesManager::~BasesManager()
 
 void BasesManager::update()
 {
+#ifdef __MACRO_DEBUG__
+	if (expanding)
+		Broodwar->drawTextScreen(200, 10, "\x08 EXPANDING");
+#endif
 	//check to see if any new base locations need to be added
 	for (std::set<BWTA::BaseLocation*>::const_iterator it = BWTA::getBaseLocations().begin();
 		it != BWTA::getBaseLocations().end(); ++it)

@@ -695,7 +695,10 @@ void MapManager::update()
 {
 #ifdef __INTELLIGENCE_DEBUG__
     clock_t start = clock();
+	drawLowResWalkability(); /// TODO REMOVE
 #endif
+
+
     // update our units' positions
     for (std::map<BWAPI::Unit*, BWAPI::Position>::iterator it = _ourUnits.begin();
         it != _ourUnits.end(); ++it)
