@@ -171,7 +171,7 @@ void Base::update()
 
 void Base::buildCenter()
 {
-	//TheBuilder->addTask(Broodwar->self()->getRace().getCenter(), baseLocation->getTilePosition(), false);
+	///TheBuilder->addTask(Broodwar->self()->getRace().getCenter(), baseLocation->getTilePosition(), false);
 	TheBuilder->addTask(Broodwar->self()->getRace().getCenter(), baseLocation->getTilePosition(), true);
 	centerInConstruction = Broodwar->getFrameCount();
 }

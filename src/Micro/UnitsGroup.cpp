@@ -14,6 +14,7 @@ using namespace BWAPI;
 
 //#define __LEADING_UNIT_BY_SIZE_HP__
 //#define __WITH_RETREAT__
+///#define __SWITCH_MOVE_WHEN_FAR__
 #define __MAX_DISTANCE_TO_GROUP__ 13*TILE_SIZE
 
 UnitsGroup::UnitsGroup()
@@ -29,6 +30,7 @@ UnitsGroup::UnitsGroup()
 , nonFlyers(0)
 , groupMode(MODE_MOVE)
 , _hasDetection(0)
+, _enemiesVisible(false)
 , centerSpeed(0,0)
 , center(0,0)
 , groupAltitude(0)
@@ -526,26 +528,40 @@ void UnitsGroup::update()
 
 	if (!enemiesDefinedByGoal)
 	{
-		/// Update nearby enemy units from eUnitsFilter (SLOW)
-		updateNearbyEnemyUnitsFromFilter(center, maxRadius + _maxRange + 92); // possibly hidden units, could be taken from onUnitsShow/View asynchronously for more efficiency
+		/// Update nearby enemy units from eUnitsFilter (SLOW) TODO CHANGE
+		updateNearbyEnemyUnitsFromFilter(center, 13*TILE_SIZE);/// maxRadius + _maxRange + 92); // possibly hidden units, could be taken from onUnitsShow/View asynchronously for more efficiency
 	}
 
 	/// Update enemiesCenter / enemiesAltitude
 	updateEnemiesCenter();
 	if (enemies.empty())
 	{
+#ifdef __MICRO_DEBUG__
+		Broodwar->drawTextScreen(340, 200, "enemies is empty");
+#endif
 		readyToAttack = false;
 		suicide = false;
 	}
+#ifdef __MICRO_DEBUG__
+	else
+		Broodwar->drawTextScreen(340, 200, "there are enemies!!");
+#endif
 
 	if (groupMode == MODE_SCOUT)
 	{
 		for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
 			(*it)->target = groupTargetPosition;
 	}
+	else /// TODO test
+	{
+		if (!_enemiesVisible) /// TODO test
+			switchMode(MODE_MOVE); /// TODO test 
+	}
 
 	/// All the things to do when we have to fight
-	if ((!enemies.empty() && groupMode != MODE_SCOUT)
+	if ((!enemies.empty() 
+		&& _enemiesVisible /// TODO test
+		&& groupMode != MODE_SCOUT)
 		|| Broodwar->getFrameCount() - _backFrame < 240
 		|| Broodwar->getFrameCount() - _offensiveFrame < 240)
 	{
@@ -565,10 +581,19 @@ void UnitsGroup::update()
 				else
 #endif
 				{
+#ifdef __SWITCH_MOVE_WHEN_FAR__
+					if ((*it)->targetEnemy && (!(*it)->targetEnemy->isVisible()
+						|| (*it)->targetEnemy->getDistance((*it)->unit) > ((*it)->getType().groundWeapon().maxRange() + 4*TILE_SIZE)))
+						(*it)->switchMode(MODE_MOVE);
+					else
+#endif
+					{
 					if ((*it)->getType().isFlyer())
 						(*it)->switchMode(MODE_FIGHT_A);
 					else
 						(*it)->switchMode(MODE_FIGHT_G);
+					}
+
 #ifdef __MICRO_DEBUG__
 					Position displayp = (*it)->unit->getPosition();
 					Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Back");
@@ -591,10 +616,18 @@ void UnitsGroup::update()
 					Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Offensive");
 #endif
 					/// target fixed by the subgoal
+#ifdef __SWITCH_MOVE_WHEN_FAR__
+					if ((*it)->targetEnemy && (!(*it)->targetEnemy->isVisible()
+						|| (*it)->targetEnemy->getDistance((*it)->unit) > ((*it)->getType().groundWeapon().maxRange() + 4*TILE_SIZE)))
+						(*it)->switchMode(MODE_MOVE);
+					else
+#endif
+					{
 					if ((*it)->getType().isFlyer())
 						(*it)->switchMode(MODE_FIGHT_A);
 					else
 						(*it)->switchMode(MODE_FIGHT_G);
+					}
 				}
 			}
 			else /// position and go
@@ -620,10 +653,18 @@ void UnitsGroup::update()
 						for (std::vector<pBayesianUnit>::iterator it = this->units.begin(); it != this->units.end(); ++it)
 						{
 							(*it)->target = (*it)->unit->getPosition();
+#ifdef __SWITCH_MOVE_WHEN_FAR__
+							if ((*it)->targetEnemy && (!(*it)->targetEnemy->isVisible()
+								|| (*it)->targetEnemy->getDistance((*it)->unit) > ((*it)->getType().groundWeapon().maxRange() + 4*TILE_SIZE)))
+								(*it)->switchMode(MODE_MOVE);
+							else
+#endif
+							{
 							if ((*it)->getType().isFlyer())
 								(*it)->switchMode(MODE_FIGHT_A);
 							else
 								(*it)->switchMode(MODE_FIGHT_G);
+							}
 #ifdef __MICRO_DEBUG__
 							Position displayp = (*it)->unit->getPosition();
 							Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Attack");
@@ -654,10 +695,18 @@ void UnitsGroup::update()
 						else
 						{	
 							(*it)->target = (*it)->unit->getPosition();
+#ifdef __SWITCH_MOVE_WHEN_FAR__
+							if ((*it)->targetEnemy && (!(*it)->targetEnemy->isVisible()
+								|| (*it)->targetEnemy->getDistance((*it)->unit) > ((*it)->getType().groundWeapon().maxRange() + 4*TILE_SIZE)))
+								(*it)->switchMode(MODE_MOVE);
+							else
+#endif
+							{
 							if ((*it)->getType().isFlyer())
 								(*it)->switchMode(MODE_FIGHT_A);
 							else
 								(*it)->switchMode(MODE_FIGHT_G);
+							}
 #ifdef __MICRO_DEBUG__
 							Position displayp = (*it)->unit->getPosition();
 							Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Attack");
@@ -855,13 +904,17 @@ void UnitsGroup::updateNearbyEnemyUnitsFromFilter(BWAPI::Position p, double radi
 {
 	// TODO Use a Quadtree (or use BWAPI's getUnitsInRadius, which uses a Quadtree)
 	enemies.clear();
+	_enemiesVisible = false;
 	// have units that have been seek like units on cliffs or lurkers before burrowing (for instance)
 	for (std::map<BWAPI::Unit*, EViewedUnit>::const_iterator it = _eUnitsFilter->getViewedUnits().begin();
 		it != _eUnitsFilter->getViewedUnits().end(); ++it)
-	{
-		if (it->second.position.getApproxDistance(p) <= radius)
-			enemies.insert(std::make_pair<Unit*, Position>(it->first, it->second.position));
-	}
+		for each (pBayesianUnit pBu in units) /// EXPERIMENTAL (second loop) TODO
+		{
+			if (it->second.position.getApproxDistance(pBu->unit->getPosition()) <= radius)
+				enemies.insert(std::make_pair<Unit*, Position>(it->first, it->second.position));
+			if (it->first && it->first->isVisible())
+				_enemiesVisible = true;
+		}
 }
 
 const BayesianUnit& UnitsGroup::operator[](ptrdiff_t i)
@@ -988,6 +1041,9 @@ void UnitsGroup::updateEnemiesCenter()
 		for (std::map<Unit*, Position>::const_iterator it = enemies.begin();
 			it != enemies.end(); ++it)
 		{
+#ifdef __MICRO_DEBUG__
+			Broodwar->drawBoxMap(it->second.x() - 12, it->second.y() - 12, it->second.x() + 8, it->second.y() + 8, Colors::Red);
+#endif
 			enemiesCenter += it->second;
 			if (!(it->first->getType().isFlyer()))
 				enemiesAltitude += BWAPI::Broodwar->getGroundHeight(TilePosition(it->second));

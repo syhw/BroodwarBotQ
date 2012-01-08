@@ -36,7 +36,7 @@
 #define __TILES_AROUND__ 2 // atomic = 2
 //#define __OUR_PATHFINDER__
 //#define __EXACT_OBJ__
-#define __SAMPLE_DIR__
+///#define __SAMPLE_DIR__
 #ifdef __SAMPLE_DIR__
 #include "Utils/RandomGenerators.h"
 #endif
@@ -687,6 +687,10 @@ void BayesianUnit::updateObj()
 			}
         }
     }
+#ifdef __MICRO_DEBUG__
+	if (_mode == MODE_FIGHT_G && obj == Vec(0, 0))
+		Broodwar->printf("mode_fight_g and obj=(0,0)");
+#endif
 }
 
 void BayesianUnit::newPath()

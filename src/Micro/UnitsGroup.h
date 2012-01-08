@@ -66,6 +66,7 @@ private:
     EUnitsFilter* _eUnitsFilter;
     std::set<BWAPI::Unit*> _mergersHT;
     bool _hasDetection;
+	bool _enemiesVisible;
     inline void updateNearbyEnemyUnitsFromFilter(BWAPI::Position p, double radius = 400.0);
     double evaluateForces();
 	inline std::vector<BWAPI::Position> findRangePositions();

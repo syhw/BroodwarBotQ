@@ -116,6 +116,9 @@ void DragoonUnit::micro()
     updateTargetEnemy();
     if (unit->getGroundWeaponCooldown() <= Broodwar->getLatencyFrames() + 1)
     {
+#ifdef __MICRO_DEBUG__
+		Broodwar->drawBoxMap(_unitPos.x()-10, _unitPos.y()-10, _unitPos.x()+8, _unitPos.y()+8, Colors::Red, true);
+#endif
         if (!inRange(targetEnemy))
         {
             clearDamages();
@@ -136,10 +139,16 @@ void DragoonUnit::micro()
 			//	simpleFlee();
 			//else
 				flee();
+#ifdef __MICRO_DEBUG__
+				Broodwar->drawBoxMap(_unitPos.x()-10, _unitPos.y()-10, _unitPos.x()+8, _unitPos.y()+8, Colors::Green, true);
+#endif
 #endif
         }
         else
         {
+#ifdef __MICRO_DEBUG__
+		Broodwar->drawBoxMap(_unitPos.x()-10, _unitPos.y()-10, _unitPos.x()+8, _unitPos.y()+8, Colors::Purple, true);
+#endif
 			fightMove();
         }
     }

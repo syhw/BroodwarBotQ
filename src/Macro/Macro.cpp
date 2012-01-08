@@ -195,8 +195,10 @@ void Macro::update()
 	if (Broodwar->self()->minerals() > 250 
 		&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Robotics_Support_Bay))
 	{
+#ifdef __REAVER_FIRST__
 		if (!Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Shuttle))
 			TheProducer->produce(1, UnitTypes::Protoss_Shuttle, 90);
+#endif
 		if (Broodwar->self()->gas() > 150 && !Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Reaver))
 			TheProducer->produce(1, UnitTypes::Protoss_Reaver, 95);
 	}

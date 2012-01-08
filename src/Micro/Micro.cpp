@@ -31,7 +31,7 @@ Micro::~Micro()
 
 void Micro::update()
 {
-	/// Launch the first push as soon as we have 2 dragoons and we know where the enemy is
+	/// Launch the first push as soon as we have a few dragoons and we know where the enemy is
 	if (!_launchedFirstPush && needDefense.empty()
 		&& !TheInformationManager->getEnemyBases().empty())
 	{
