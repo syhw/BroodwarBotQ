@@ -68,7 +68,7 @@ public:
 	BWAPI::TilePosition generateBuildLocationNear(const BWAPI::TilePosition& tp, const BWAPI::UnitType& ut, int buildDist=1);
 	void releaseTilePosition(const BWAPI::TilePosition& tp, const BWAPI::UnitType& ut);
 	void usedTilePosition(const BWAPI::TilePosition& tp, const BWAPI::UnitType& ut);
-#ifdef __DEBUG__
+#ifdef __MACRO_DEBUG__
 	void update();
 #endif
 	void onUnitDestroy(BWAPI::Unit* unit);
