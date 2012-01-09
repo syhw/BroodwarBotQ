@@ -1053,7 +1053,7 @@ void SimCityBuildingPlacer::makeCannonChoke(BWTA::Region* inter, BWTA::Chokepoin
 
 	TilePosition pylon(interTP);
 	TilePosition cannon((simpleDirPara+Vec(interTP.x(), interTP.y())).toTilePosition());
-	if (!canBuildHere(NULL, cannon, UnitTypes::Protoss_Pylon))
+	if (!canBuildHereWithPath(NULL, cannon, UnitTypes::Protoss_Pylon))
 		cannon = closestBuildableSameRegionNotTP2(cannon, pylon);
 
 	set<TilePosition> tmpSet;
@@ -1143,10 +1143,10 @@ void SimCityBuildingPlacer::makeCannonsMinerals(BWTA::BaseLocation* hom, bool qu
 	TilePosition pylon2;
 	for (x = min(max(gasTilePos.x() - UnitTypes::Protoss_Pylon.tileWidth(), 0), max(furtherMineral.x() - UnitTypes::Protoss_Pylon.tileWidth(), 0));
 		x < max(min(gasTilePos.x() + UnitTypes::Resource_Vespene_Geyser.tileWidth() + UnitTypes::Protoss_Pylon.tileWidth() + 1, Broodwar->mapWidth()),
-		min(furtherMineral.x() + UnitTypes::Resource_Mineral_Field.tileWidth() + UnitTypes::Protoss_Pylon.tileWidth() + 1, Broodwar->mapWidth())); x += 2)
+		min(furtherMineral.x() + UnitTypes::Resource_Mineral_Field.tileWidth() + UnitTypes::Protoss_Pylon.tileWidth() + 1, Broodwar->mapWidth())); ++x)
 		for (y = min(max(gasTilePos.y() - UnitTypes::Protoss_Pylon.tileHeight(), 0), max(furtherMineral.y() - UnitTypes::Protoss_Pylon.tileHeight(), 0));
 			y < max(min(gasTilePos.y() + UnitTypes::Resource_Vespene_Geyser.tileHeight() + UnitTypes::Protoss_Pylon.tileHeight() + 1, Broodwar->mapHeight()),
-			min(furtherMineral.y() + UnitTypes::Resource_Mineral_Field.tileHeight() + UnitTypes::Protoss_Pylon.tileHeight() + 1, Broodwar->mapHeight())); y += 2)
+			min(furtherMineral.y() + UnitTypes::Resource_Mineral_Field.tileHeight() + UnitTypes::Protoss_Pylon.tileHeight() + 1, Broodwar->mapHeight())); ++y)
 		{
 			TilePosition tmp(x, y);
 			if (inMineralLine(hom, tmp))

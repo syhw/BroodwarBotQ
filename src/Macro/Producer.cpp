@@ -399,10 +399,12 @@ void Producer::update()
 		if (!TheBuilder->numberInFutureTasks(Broodwar->self()->getRace().getSupplyProvider()) &&
 			Broodwar->self()->supplyTotal() < 400 &&
 			addSupply + Broodwar->self()->supplyUsed() > TheBuilder->additionalSupplyNextFrames(frames) + Broodwar->self()->supplyTotal())
+		{
 #ifdef __MACRO_DEBUG__
-		//	Broodwar->printf("we need another pylon: prevision supply %d in %d sec", addSupply + Broodwar->self()->supplyUsed(), frames/24);
+			Broodwar->printf("we need another pylon: prevision supply %d in %d sec", addSupply + Broodwar->self()->supplyUsed(), frames/24);
 #endif
 			TheBuilder->build(Broodwar->self()->getRace().getSupplyProvider());
+		}
 		}
 
 		/// Research Techs/Upgrades
