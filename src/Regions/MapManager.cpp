@@ -12,7 +12,7 @@ using namespace BWAPI;
 
 std::map<BWAPI::Unit*, BWAPI::Position> HighTemplarUnit::stormableUnits;
 
-int hash(BWAPI::Position p)
+int hash(BWAPI::TilePosition p)
 {
 	/// Max size for a map is 512x512 build tiles => 512*32 = 16384 = 2^14 pixels
 	/// Unwalkable regions will map to 0
@@ -23,12 +23,12 @@ int hash(BWAPI::Position p)
 
 int hash(BWTA::Region* r)
 {
-	return hash(r->getPolygon().getCenter());
+	return hash(TilePosition(r->getPolygon().getCenter()));
 }
 
 int hash(BWTA::BaseLocation* bl)
 {
-	return hash(bl->getPosition());
+	return hash(bl->getTilePosition());
 }
 void drawBTPath(const std::vector<TilePosition>& btpath)
 {
@@ -1836,10 +1836,10 @@ void MapManager::quickPathFind(std::vector<TilePosition>& btpath,
 }
 */
 
-BWAPI::Position MapManager::regionsPFCenters(BWTA::Region* r)
+BWAPI::TilePosition MapManager::regionsPFCenters(BWTA::Region* r)
 {
 	int tmp = hash(r);
-	return Position(_pfMaps.regionsPFCenters[tmp].first, _pfMaps.regionsPFCenters[tmp].second);
+	return TilePosition(Position(_pfMaps.regionsPFCenters[tmp].first, _pfMaps.regionsPFCenters[tmp].second));
 }
 
 double MapManager::distRegions(BWTA::Region *r1, BWTA::Region *r2)
