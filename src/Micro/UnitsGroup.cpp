@@ -662,7 +662,7 @@ void UnitsGroup::update()
 							BWTA::Region* higherRegion = 
 								(Broodwar->getGroundHeight(TilePosition(regions.first->getCenter())) > Broodwar->getGroundHeight(TilePosition(regions.second->getCenter())))
 								? regions.first : regions.second;
-							(*it)->target = (MapManager::Instance().regionsPFCenters(higherRegion));
+							(*it)->target = Position((MapManager::Instance().regionsPFCenters(higherRegion)));
 							(*it)->switchMode(MODE_FIGHT_G);
 #ifdef __MICRO_DEBUG__
 							Position displayp = (*it)->unit->getPosition();

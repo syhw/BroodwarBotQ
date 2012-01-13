@@ -91,7 +91,6 @@ class MapManager : public CSingleton<MapManager>
     std::map<BWAPI::Unit*, BWAPI::Position> _alliedUnitsPosBuf;
     std::map<BWAPI::Unit*, BWAPI::Position> _enemyUnitsPosBuf;
     std::map<BWAPI::Unit*, std::pair<BWAPI::UnitType, BWAPI::Position> > _invisibleUnitsBuf;
-	BWAPI::TilePosition regionsPFCenters(BWTA::Region* r);
     inline void updateStormPos();
     int _width;
     int _height;
@@ -172,6 +171,7 @@ public:
     BWAPI::TilePosition closestWalkableSameRegionOrConnected(BWAPI::TilePosition tp);
 	bool isBTWalkable(int x, int y);
 	bool isBTWalkable(const BWAPI::TilePosition& tp);
+	BWAPI::TilePosition regionsPFCenters(BWTA::Region* r);
 
 	double distRegions(BWTA::Region* r1, BWTA::Region* r2);
 	double distBaseToBase(BWTA::BaseLocation* b1, BWTA::BaseLocation* b2);

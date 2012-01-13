@@ -175,9 +175,13 @@ MapManager::MapManager()
 				std::map<int, double>()));
 			for (std::set<BWTA::Region*>::const_iterator it2 = allRegions.begin();
 				it2 != allRegions.end(); ++it2)
-				_pfMaps.distRegions[hash(*it)].insert(std::make_pair(hash(*it2), 
-					BWTA::getGroundDistance(TilePosition(regionsPFCenters(*it)),
-					TilePosition(regionsPFCenters(*it2)))));
+				if (_pfMaps.distRegions.count(hash(*it2)))
+					_pfMaps.distRegions[hash(*it)].insert(std::make_pair(hash(*it2),
+						_pfMaps.distRegions[hash(*it2)][hash(*it)]));
+				else
+					_pfMaps.distRegions[hash(*it)].insert(std::make_pair(hash(*it2), 
+						BWTA::getGroundDistance(TilePosition(regionsPFCenters(*it)),
+						TilePosition(regionsPFCenters(*it2)))));
 		}
 
 		/// Fill distBaseToBase
@@ -187,8 +191,12 @@ MapManager::MapManager()
 				std::map<int, double>()));
 			for each (BWTA::BaseLocation* b2 in BWTA::getBaseLocations())
 			{
-				_pfMaps.distBaseToBase[hash(b1)].insert(std::make_pair(hash(b2),
-					BWTA::getGroundDistance(b1->getTilePosition(), b2->getTilePosition())));
+				if (_pfMaps.distBaseToBase.count(hash(b2)))
+					_pfMaps.distBaseToBase[hash(b1)].insert(std::make_pair(hash(b2),
+						_pfMaps.distBaseToBase[hash(b2)][hash(b1)]));
+				else
+					_pfMaps.distBaseToBase[hash(b1)].insert(std::make_pair(hash(b2),
+						BWTA::getGroundDistance(b1->getTilePosition(), b2->getTilePosition())));
 			}
 		}
 
