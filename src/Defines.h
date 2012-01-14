@@ -4,14 +4,14 @@
 
 /// #define __REAVER_FIRST__
 
-#define __DEBUG__
+///#define __DEBUG__
 ///#define __INTELLIGENCE_DEBUG__
 ///#define __ETECHESTIMATOR_DEBUG__
-#define __MACRO_DEBUG__
+///#define __MACRO_DEBUG__
 ///#define __MICRO_DEBUG__
 
 //#define __NON_IMPLEMENTE__
-#define BW_POS_MOUSE
+///#define BW_POS_MOUSE
 //#define __LEARNING_PROB_TABLES__
 
 #define WALK_TILES_SIZE 8
@@ -32,14 +32,13 @@
 //#include <vld.h>
 #endif
 
-//#define __MICRO_PROJECT__
 #ifdef __MICRO_PROJECT__
 #undef __ETECH_ESTIMATOR__
 #endif
 
 #ifndef __DEBUG__ // Perf
 #undef __DO_NOT_HARASS_SCOUT__
-#undef _SECURE_SCL
-#define _SECURE_SCL 0 // remove iterator runtime checks
-#define _HAS_ITERATOR_DEBUGGING 0
+///#undef _SECURE_SCL
+///#define _SECURE_SCL 0 // remove iterator runtime checks
+///#define _HAS_ITERATOR_DEBUGGING 0
 #endif

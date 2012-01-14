@@ -2357,7 +2357,7 @@ ProbTablesData::ProbTablesData(int utID, std::vector<double>damageP,
 
 ProbTables::~ProbTables()
 {
-	string filename("bwapi-data/prob_tables/");
+	string filename("bwapi-data/AI/micro_tables/");
 	if (unitTypeID >= 0)
 	{
 		BWAPI::UnitType tmp(unitTypeID);
