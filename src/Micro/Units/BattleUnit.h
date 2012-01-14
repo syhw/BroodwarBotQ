@@ -6,7 +6,6 @@
 #include "Regions/WalkTilePosition.h"
 #include "Defines.h"
 
-
 class BattleUnit
 {
     friend void baseMicro();
