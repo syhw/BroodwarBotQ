@@ -66,7 +66,7 @@ void MicroAIModule::onStart()
 
 	list<pGoal> goals;
 		 
-    if (mapName == std::string("muta.scm") || mapName == std::string("mutaCOMPUTER.scm"))
+    /*if (mapName == std::string("muta.scm") || mapName == std::string("mutaCOMPUTER.scm"))
     {
         tmp_form = pFormation(new ArcFormation(
             Position(Broodwar->mapWidth()/2*32 + sign*350,(Broodwar->mapHeight()/2 + 4)*32), 
@@ -144,7 +144,7 @@ void MicroAIModule::onStart()
 		tmp_goal = pGoal(new AttackGoal(tmp_subgoal));
 		goals.push_back(tmp_goal);
 	}
-    else
+    else*/
     {
         tmp_form = pFormation(new ArcFormation(
             Position(Broodwar->mapWidth()/2*32 + sign*350,(Broodwar->mapHeight()/2 + 4)*32), 
