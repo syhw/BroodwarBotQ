@@ -14,7 +14,7 @@ using namespace std;
 
 inline BWTA::BaseLocation* getNearestBL(const TilePosition& tp, const set<BWTA::BaseLocation*>& s)
 {
-	BWTA::BaseLocation* ret;
+	BWTA::BaseLocation* ret = *(s.begin());
 	double min = DBL_MAX;
 	for (std::set<BWTA::BaseLocation*>::const_iterator it = s.begin(); 
 		it != s.end(); ++it)

@@ -544,10 +544,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\EnhancedUI.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Macro\InformationManager.cpp"
 					>
 				</File>
@@ -572,15 +568,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\ScoutManager.cpp"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Macro\SimCityBuildingPlacer.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\SupplyManager.cpp"
 					>
 				</File>
 				<File
@@ -890,10 +878,6 @@
 					>
 				</File>
 				<File
-					RelativePath="..\src\Macro\EnhancedUI.h"
-					>
-				</File>
-				<File
 					RelativePath="..\src\Macro\Heap.h"
 					>
 				</File>
@@ -923,10 +907,6 @@
 				</File>
 				<File
 					RelativePath="..\src\Macro\Resources.h"
-					>
-				</File>
-				<File
-					RelativePath="..\src\Macro\ScoutManager.h"
 					>
 				</File>
 				<File

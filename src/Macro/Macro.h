@@ -1,7 +1,6 @@
 #pragma once
 #include <Utils/CSingleton.h>
 #include "Macro/ResourceRates.h"
-//#include "Macro/SupplyManager.h"
 #include "Macro/InformationManager.h"
 #include "Macro/BorderManager.h"
 #include "Macro/BasesManager.h"
