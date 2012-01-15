@@ -1,6 +1,9 @@
+#define WIN32_LEAN_AND_MEAN
+
 #include <PrecompiledHeader.h>
 #include <tchar.h>
 #include "MicroProject.h"
+#include "Defines.h"
 
 MicroAIModule* broodAI = NULL;
 

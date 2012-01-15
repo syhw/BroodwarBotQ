@@ -1,4 +1,4 @@
-#define WIN32_LAEN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
 
 #include <PrecompiledHeader.h>
 #include <tchar.h>
