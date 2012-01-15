@@ -7,7 +7,6 @@
 #endif
 #include "Macro/InformationManager.h"
 #include "Regions/MapManager.h"
-#include "Intelligence/FirstScoutController.h"
 
 class Intelligence : public CSingleton<Intelligence>
 {
