@@ -969,7 +969,7 @@ void UnitsGroup::updateCenter()
 	if (nearestChoke != NULL)
 		distToNearestChoke = nearestChoke->getCenter().getApproxDistance(center);
 	if ((!nearestChoke || distToNearestChoke > 8*TILE_SIZE))
-		nearestChoke = BWTA::getNearestChokepoint(center);
+		nearestChoke = BWTA::getNearestChokepoint(TilePosition(center));
 
 	// update stdDevRadius and maxRadius
 	maxRadius = -1.0;

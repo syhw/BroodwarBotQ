@@ -121,7 +121,7 @@
 				AdditionalOptions="-D__MICRO_PROJECT__, -D_SCL_SECURE_NO_WARNINGS"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="../src;../../include;../../include/BWAPI;../../include/BWTA;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42;&quot;C:\Program Files\Visual Leak Detector\include&quot;"
+				AdditionalIncludeDirectories="../src;../../include;../../boost_1_45_0;../../boost_1_43_0;../../boost_1_42;&quot;C:\Program Files\Visual Leak Detector\include&quot;"
 				PreprocessorDefinitions="__MICRO_PROJECT__=1;_SECURE_SCL=0;_HAS_ITERATOR_DEBUGGING=0;WIN32;NDEBUG;_WINDOWS;_USRDLL"
 				MinimalRebuild="false"
 				ExceptionHandling="2"
