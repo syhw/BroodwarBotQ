@@ -14,6 +14,8 @@
 #include "boost/serialization/map.hpp"
 #include "boost/serialization/utility.hpp"
 
+// #define __BUILDINGS_WT_STRICT__
+
 class BayesianUnit;
 
 struct PathfindWork
@@ -44,23 +46,45 @@ struct PathAwareMaps
     {
         ar & regionsPFCenters;
 		ar & distRegions;
+		ar & distCDR;
         ar & distBaseToBase;
     }
 	std::map<int, std::pair<int, int> > regionsPFCenters; // Pathfinding wise region centers
 	std::map<int, std::map<int, double> > distRegions; // distRegions[R1][R2] w.r.t regionsPFCenters
-	/// TODO add ChokeDepReg
+	std::map<int, std::map<int, double> > distCDR;
 	std::map<int, std::map<int, double> > distBaseToBase;
 };
 
 BOOST_CLASS_TRACKING(PathAwareMaps, boost::serialization::track_never);
-BOOST_CLASS_VERSION(PathAwareMaps, 1);
+BOOST_CLASS_VERSION(PathAwareMaps, 2);
+
+typedef int ChokeDepReg;
+struct ChokeDepReg_data
+{
+    friend class boost::serialization::access;
+	template <class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+        ar & chokeDependantRegion;
+    }
+	// -1 -> unwalkable regions
+	std::vector<std::vector<ChokeDepReg> > chokeDependantRegion;
+	ChokeDepReg_data() 
+		: chokeDependantRegion(std::vector<std::vector<ChokeDepReg> >(BWAPI::Broodwar->mapWidth(), std::vector<ChokeDepReg>(BWAPI::Broodwar->mapHeight(), -1)))
+	{}
+	ChokeDepReg_data(const std::vector<std::vector<ChokeDepReg> >& cdr)
+		: chokeDependantRegion(cdr)
+	{}
+};
+
+BOOST_CLASS_TRACKING(ChokeDepReg_data, boost::serialization::track_never);
+BOOST_CLASS_VERSION(ChokeDepReg_data, 2);
 
 /** From BWAPI's doc:
 * Positions are measured in pixels and are the highest resolution
 * Walk Tiles - each walk tile is an 8x8 square of pixels. These are called walk tiles because walkability data is available at this resolution.
 * Build Tiles - each build tile is a 4x4 square of walk tiles, or a 32x32 square of pixels. These are called build tiles because buildability data is available at this resolution. 
 */
-// #define __BUILDINGS_WT_STRICT__
 
 // TODO improve storms with units movements (interpolate)
 // TODO improve storms by scoring on UnitTypes
@@ -137,8 +161,12 @@ class MapManager : public CSingleton<MapManager>
     void straightLine(std::vector<BWAPI::TilePosition>& btpath, 
         const BWAPI::TilePosition& start, const BWAPI::TilePosition& end);
 
-	std::map<BWTA::Region*, int> regionToHash;
-	std::map<BWTA::BaseLocation*, int> baseLocationToHash;
+	// Neither Region* (of course) nor the ordering in the Regions set is
+	// deterministic, so we have a map which maps Region* to a unique int
+	// which is region's center (0)<x Position + 1><y Position>
+	// on                               16 bits      16 bits
+	std::set<ChokeDepReg> allChokeDepRegs;
+	ChokeDepReg_data _rd;
 	PathAwareMaps _pfMaps;
 
 public:

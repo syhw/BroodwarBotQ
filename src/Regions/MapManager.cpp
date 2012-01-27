@@ -7,6 +7,7 @@
 #define __MESH_SIZE__ 16 // 16 // 24 // 32 // 48
 #define __STORM_SIZE__ 96
 #define __MAX_PATHFINDING_WORKS__ 10
+#define __MIN_CDREGION_RADIUS__ 9
 
 using namespace BWAPI;
 
@@ -15,10 +16,7 @@ std::map<BWAPI::Unit*, BWAPI::Position> HighTemplarUnit::stormableUnits;
 int hash(BWAPI::TilePosition p)
 {
 	/// Max size for a map is 512x512 build tiles => 512*32 = 16384 = 2^14 pixels
-	/// Unwalkable regions will map to 0
-	int tmp = p.x() + 1; // + 1 to give room for choke dependant regions (after shifting)
-	tmp = (tmp << 16) | p.y();
-	return tmp;
+	return (((p.x() + 1) << 16) | p.y());
 }
 
 int hash(BWTA::Region* r)
@@ -30,6 +28,13 @@ int hash(BWTA::BaseLocation* bl)
 {
 	return hash(bl->getTilePosition());
 }
+
+BWAPI::TilePosition cdrCenter(ChokeDepReg c)
+{
+	/// /!\ This is will give centers out of the ChokeDepRegions for some coming from BWTA::Region
+	return TilePosition(((0xFFFF0000 & c) >> 16) - 1, 0x0000FFFF & c);
+}
+
 void drawBTPath(const std::vector<TilePosition>& btpath)
 {
     if (btpath.empty())
@@ -99,12 +104,71 @@ MapManager::MapManager()
     groundDamagesGrad = new Vec[Broodwar->mapWidth() * Broodwar->mapHeight()];
     airDamagesGrad = new Vec[Broodwar->mapWidth() * Broodwar->mapHeight()];
 
-	for each (BWTA::Region* r in BWTA::getRegions())
-		regionToHash.insert(std::make_pair(r, hash(r)));
-	for each (BWTA::BaseLocation* bl in BWTA::getBaseLocations())
-		baseLocationToHash.insert(std::make_pair(bl, hash(bl)));
+	char buf[512];
+	sprintf_s(buf, "bwapi-data/AI/terrain/%s.cdr", BWAPI::Broodwar->mapHash().c_str());
+	if (fileExists(buf))
+	{	
+		// fill our own regions data (rd) with the archived file
+		std::ifstream ifs(buf, std::ios::binary);
+		boost::archive::binary_iarchive ia(ifs);
+		ia >> _rd;
+	}
+	else
+	{
+		std::map<BWTA::Chokepoint*, int> maxTiles; // max tiles for each CDRegion
+		int k = 1; // 0 is reserved for unwalkable regions
+		/// 1. for each region, max radius = max(__MIN_CDREGION_RADIUS__, choke size)
+		for each (BWTA::Chokepoint* c in BWTA::getChokepoints())
+		{
+			maxTiles.insert(std::make_pair(c, max(__MIN_CDREGION_RADIUS__, static_cast<int>(c->getWidth())/TILE_SIZE)));
+		}
+		/// 2. Voronoi on both choke's regions
+		for (int x = 0; x < Broodwar->mapWidth(); ++x)
+			for (int y = 0; y < Broodwar->mapHeight(); ++y)
+			{
+				TilePosition tmp(x, y);
+				BWTA::Region* r = BWTA::getRegion(tmp);
+				double minDist = DBL_MAX - 100.0;
+				for each (BWTA::Chokepoint* c in BWTA::getChokepoints())
+				{
+					TilePosition chokeCenter(c->getCenter().x() / TILE_SIZE, c->getCenter().y() / TILE_SIZE);
+					double tmpDist = tmp.getDistance(chokeCenter);
+					double pathFindDist = DBL_MAX;
+					if (tmpDist < minDist && tmpDist <= 1.0 * maxTiles[c]
+						&& (pathFindDist=BWTA::getGroundDistance(tmp, chokeCenter)) < minDist
+						&& pathFindDist >= 0.0 // -1 means no way to go there
+					    && (c->getRegions().first == r || c->getRegions().second == r)
+					)
+					{
+						minDist = pathFindDist;
+						_rd.chokeDependantRegion[x][y] = hash(chokeCenter);
+					}
+				}
+			}
+		/// 3. Complete with (amputated) BWTA regions
+		for (int x = 0; x < Broodwar->mapWidth(); ++x)
+			for (int y = 0; y < Broodwar->mapHeight(); ++y)
+			{
+				TilePosition tmp(x, y);
+				if (_rd.chokeDependantRegion[x][y] == -1 && BWTA::getRegion(tmp) != NULL)
+					_rd.chokeDependantRegion[x][y] = hash(BWTA::getRegion(tmp));
+			}
+		std::ofstream ofs(buf, std::ios::binary);
+		{
+			boost::archive::binary_oarchive oa(ofs);
+			oa << _rd;
+		}
+	}
+	// initialize allChokeDepRegs
+	for (int i = 0; i < Broodwar->mapWidth(); ++i)
+	{
+		for (int j = 0; j < Broodwar->mapHeight(); ++j)
+		{
+			if (_rd.chokeDependantRegion[i][j] != -1)
+				allChokeDepRegs.insert(_rd.chokeDependantRegion[i][j]);
+		}
+	}
 
-	char buf[500];
 	sprintf_s(buf, "bwapi-data/AI/terrain/%s.pfd", BWAPI::Broodwar->mapHash().c_str());
 	if (fileExists(buf))
 	{	
@@ -180,8 +244,7 @@ MapManager::MapManager()
 						_pfMaps.distRegions[hash(*it2)][hash(*it)]));
 				else
 					_pfMaps.distRegions[hash(*it)].insert(std::make_pair(hash(*it2), 
-						BWTA::getGroundDistance(TilePosition(regionsPFCenters(*it)),
-						TilePosition(regionsPFCenters(*it2)))));
+						BWTA::getGroundDistance(regionsPFCenters(*it), regionsPFCenters(*it2))));
 		}
 
 		/// Fill distBaseToBase
