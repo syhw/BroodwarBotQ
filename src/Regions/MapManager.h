@@ -197,8 +197,13 @@ public:
     BWAPI::Position closestWalkableSameRegionOrConnected(BWAPI::Position p);
 	BWAPI::TilePosition closestWalkable(BWAPI::TilePosition tp, BWTA::Region* r);
     BWAPI::TilePosition closestWalkableSameRegionOrConnected(BWAPI::TilePosition tp);
-	bool isBTWalkable(int x, int y);
-	bool isBTWalkable(const BWAPI::TilePosition& tp);
+	BWAPI::TilePosition closestWalkableSameCDR(const BWAPI::TilePosition& tp, ChokeDepReg c);
+	BWAPI::TilePosition closestWalkable(const BWAPI::TilePosition& tp);
+	static BWTA::Region* closestRegion(const BWAPI::TilePosition& tp);
+	ChokeDepReg closestCDR(const BWAPI::TilePosition& tp);
+	inline bool isBTRawWalkable(const TilePosition& tp);
+	inline bool isBTWalkable(int x, int y);
+	inline bool isBTWalkable(const BWAPI::TilePosition& tp);
 	BWAPI::TilePosition regionsPFCenters(BWTA::Region* r);
 
 	double distRegions(BWTA::Region* r1, BWTA::Region* r2);

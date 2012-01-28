@@ -13,6 +13,7 @@ using namespace BWAPI;
 
 std::map<BWAPI::Unit*, BWAPI::Position> HighTemplarUnit::stormableUnits;
 
+
 int hash(BWAPI::TilePosition p)
 {
 	/// Max size for a map is 512x512 build tiles => 512*32 = 16384 = 2^14 pixels
@@ -246,6 +247,30 @@ MapManager::MapManager()
 					_pfMaps.distRegions[hash(*it)].insert(std::make_pair(hash(*it2), 
 						BWTA::getGroundDistance(regionsPFCenters(*it), regionsPFCenters(*it2))));
 		}
+
+		/// Fill distCDR
+		/// -1 if the 2 Regions are not mutualy/inter accessible by ground
+		for each (ChokeDepReg cdr in allChokeDepRegs)
+		{
+			_pfMaps.distCDR.insert(std::make_pair(cdr,
+				std::map<int, double>()));
+			for each (ChokeDepReg cdr2 in allChokeDepRegs)
+			{
+				if (_pfMaps.distCDR.count(cdr2))
+					_pfMaps.distCDR[cdr].insert(std::make_pair(cdr2, _pfMaps.distCDR[cdr2][cdr]));
+				else
+				{
+					BWAPI::TilePosition tmp = cdrCenter(cdr);
+					BWAPI::TilePosition tmp2 = cdrCenter(cdr2);
+					if (!isBTRawWalkable(tmp) || _rd.chokeDependantRegion[tmp.x()][tmp.y()] != cdr)
+						tmp = closestWalkableSameCDR(tmp, cdr);
+					if (!isBTRawWalkable(tmp2) || _rd.chokeDependantRegion[tmp2.x()][tmp2.y()] != cdr2)
+						tmp2 = closestWalkableSameCDR(tmp2, cdr2);
+					_pfMaps.distCDR[cdr].insert(std::make_pair(cdr2,
+						BWTA::getGroundDistance(TilePosition(tmp), TilePosition(tmp2))));
+				}
+			}
+		}	
 
 		/// Fill distBaseToBase
 		for each (BWTA::BaseLocation* b1 in BWTA::getBaseLocations())
@@ -1169,6 +1194,42 @@ TilePosition MapManager::closestWalkableSameRegionOrConnected(TilePosition tp)
         tp.makeValid();
     BWTA::Region* r = BWTA::getRegion(tp);
 	return closestWalkable(tp, r);
+}
+
+BWTA::Region* MapManager::closestRegion(const TilePosition& tp)
+{
+	double m = DBL_MAX;
+	Position tmp(tp);
+	BWTA::Region* ret = BWTA::getRegion(tp);
+	for each (BWTA::Region* r in BWTA::getRegions())
+	{
+		if (r->getCenter().getDistance(tmp) < m)
+		{
+			m = r->getCenter().getDistance(tmp);
+			ret = r;
+		}
+	}
+	return ret;
+}
+
+ChokeDepReg MapManager::closestCDR(const BWAPI::TilePosition& tp)
+{
+	ChokeDepReg ret = _rd.chokeDependantRegion[tp.x()][tp.y()];
+	double m = DBL_MAX;
+	for each (ChokeDepReg cdr in allChokeDepRegs)
+	{
+		if (cdrCenter(cdr).getDistance(tp) < m)
+		{
+			m = cdrCenter(cdr).getDistance(tp);
+			ret = cdr;
+		}
+	}
+	return ret;
+}
+
+bool MapManager::isBTRawWalkable(const TilePosition& tp)
+{
+	return _lowResWalkability[tp.x() + tp.y()*Broodwar->mapWidth()];
 }
 
 bool MapManager::isBTWalkable(int x, int y)
