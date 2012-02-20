@@ -181,6 +181,7 @@ public:
     Vec* groundDamagesGrad;     // build tiles
     Vec* airDamagesGrad;        // build tiles
     std::map<Position, int> stormPos;
+	bool isWalkable(const BWAPI::TilePosition& tp);
     void onUnitCreate(BWAPI::Unit* u);
     void onUnitDestroy(BWAPI::Unit* u);
     void onUnitShow(BWAPI::Unit* u);
@@ -202,8 +203,8 @@ public:
 	static BWTA::Region* closestRegion(const BWAPI::TilePosition& tp);
 	ChokeDepReg closestCDR(const BWAPI::TilePosition& tp);
 	inline bool isBTRawWalkable(const TilePosition& tp);
-	inline bool isBTWalkable(int x, int y);
-	inline bool isBTWalkable(const BWAPI::TilePosition& tp);
+	bool isBTWalkable(int x, int y);
+	bool isBTWalkable(const BWAPI::TilePosition& tp);
 	BWAPI::TilePosition regionsPFCenters(BWTA::Region* r);
 
 	double distRegions(BWTA::Region* r1, BWTA::Region* r2);

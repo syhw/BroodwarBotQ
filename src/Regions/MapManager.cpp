@@ -13,6 +13,10 @@ using namespace BWAPI;
 
 std::map<BWAPI::Unit*, BWAPI::Position> HighTemplarUnit::stormableUnits;
 
+bool MapManager::isWalkable(const TilePosition& tp)
+{
+	return _lowResWalkability[tp.x() + tp.y()*Broodwar->mapWidth()];
+}
 
 int hash(BWAPI::TilePosition p)
 {
@@ -1194,6 +1198,45 @@ TilePosition MapManager::closestWalkableSameRegionOrConnected(TilePosition tp)
         tp.makeValid();
     BWTA::Region* r = BWTA::getRegion(tp);
 	return closestWalkable(tp, r);
+}
+
+BWAPI::TilePosition MapManager::closestWalkableSameCDR(const BWAPI::TilePosition& tp, ChokeDepReg c)
+{
+	/// Finds the closest-to-"p" walkable position in the given "c"
+	double m = DBL_MAX;
+	BWAPI::TilePosition ret(tp);
+	for (int x = max(0, tp.x() - 4); x < min(Broodwar->mapWidth(), tp.x() + 4); ++x)
+	{
+		for (int y = max(0, tp.y() - 4); y < min(Broodwar->mapHeight(), tp.y() + 4); ++y)
+		{
+			TilePosition tmp(x, y);
+			if (_rd.chokeDependantRegion[x][y] == c 
+				&& isWalkable(tmp) 
+				&& tp.getDistance(tmp) < m)
+			{
+				m = tp.getDistance(tmp);
+				ret = tmp;
+			}
+		}
+	}
+	if (_rd.chokeDependantRegion[ret.x()][ret.y()] != c)
+	{
+		for (int x = max(0, tp.x() - 10); x < min(Broodwar->mapWidth(), tp.x() + 10); ++x)
+			for (int y = max(0, tp.y() - 10); y < min(Broodwar->mapHeight(), tp.y() + 10); ++y)
+			{
+				TilePosition tmp(x, y);
+				if (_rd.chokeDependantRegion[x][y] == c 
+					&& isWalkable(tmp) 
+					&& tp.getDistance(tmp) < m)
+				{
+					m = tp.getDistance(tmp);
+					ret = tmp;
+				}
+			}
+	}
+	if (ret == tp) // sometimes centers are in convex subregions
+		return closestWalkableSameRegionOrConnected(tp); // TODO FIX
+	return ret;
 }
 
 BWTA::Region* MapManager::closestRegion(const TilePosition& tp)
