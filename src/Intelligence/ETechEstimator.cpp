@@ -1,5 +1,3 @@
-#include <PrecompiledHeader.h>
-#include "Intelligence/ETechEstimator.h"	
 #include "enums_name_tables_tt.h"
 #include "Macro/Producer.h"
 #include "Macro/Builder.h"
@@ -8,6 +6,7 @@
 #include "Utils/Util.h"
 
 #define LEARNED_TIME_LIMIT 1080 // 18 minutes
+#define MIN_PROB 0.00000000000000000001
 
 using namespace BWAPI;
 using namespace std;
@@ -502,7 +501,7 @@ void ETechEstimator::computeDistribOpenings(int time)
 	long double runningSum = 0.0;
 	for (size_t i = 0; i < openingsProbas.size(); ++i)
 	{
-		long double sumX = 0.00000000000000000001;
+		long double sumX = MIN_PROB;
 		for (list<unsigned int>::const_iterator it = compatibleXes.begin();
 			it != compatibleXes.end(); ++it)
 		{
@@ -518,9 +517,9 @@ void ETechEstimator::computeDistribOpenings(int time)
 	{
 		openingsProbas[i] /= runningSum;
 		if (openingsProbas[i] != openingsProbas[i] // test for NaN / 1#IND
-		//|| openingsProbas[i] < 0.00000000000000000001         // min proba
+		//|| openingsProbas[i] < MIN_PROB        // min proba
 		)
-			openingsProbas[i] = 0.00000000000000000001;
+			openingsProbas[i] = MIN_PROB;
 		verifSum += openingsProbas[i];
 	}
 	if (verifSum < 0.99 || verifSum > 1.01)
