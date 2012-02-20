@@ -1,3 +1,5 @@
+#include <PrecompiledHeader.h>
+#include "Intelligence/ETechEstimator.h"	
 #include "enums_name_tables_tt.h"
 #include "Macro/Producer.h"
 #include "Macro/Builder.h"
@@ -504,7 +506,7 @@ void ETechEstimator::computeDistribOpenings(int time)
 		long double sumX = MIN_PROB;
 		for (list<unsigned int>::const_iterator it = compatibleXes.begin();
 			it != compatibleXes.end(); ++it)
-		{
+		{ /// perhaps underflow? log-prob?
 			sumX += st.tabulated_P_X_Op[(*it) * openingsProbas.size() + i]
 			* st.tabulated_P_Time_X_Op[(*it) * openingsProbas.size() * LEARNED_TIME_LIMIT
 				+ i * LEARNED_TIME_LIMIT + time];
