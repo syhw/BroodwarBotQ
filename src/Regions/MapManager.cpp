@@ -1134,7 +1134,7 @@ TilePosition MapManager::closestWalkable(TilePosition tp, BWTA::Region* r)
 {
 #ifdef __INTELLIGENCE_DEBUG__
 	assert(tp.isValid());
-	assert(r != NULL);
+	//assert(r != NULL); ////////////////////////////////////////////////////////// TODO
 #endif
     if (!tp.isValid())
         tp.makeValid();
