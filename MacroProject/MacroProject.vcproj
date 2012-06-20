@@ -316,6 +316,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Micro\Tactician.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Micro\UnitsGroup.cpp"
 					>
 				</File>
@@ -647,6 +651,10 @@
 				</File>
 				<File
 					RelativePath="..\src\Micro\Micro.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Micro\Tactician.h"
 					>
 				</File>
 				<File
