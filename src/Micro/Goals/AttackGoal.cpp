@@ -143,7 +143,11 @@ void AttackGoal::abort()
 	TilePosition tp;
 	BWTA::BaseLocation* eHome = Intelligence::Instance().enemyHome;
 	if (eHome == NULL)
+#ifndef __MICRO_PROJECT__
 		tp = BWTA::getStartLocation(Broodwar->self())->getTilePosition();
+#else
+		tp = BWAPI::TilePosition(Broodwar->mapWidth()/2, Broodwar->mapHeight()/2); // middle of the map
+#endif
 	else
 	{
 		int cOP = closestOnPath(_unitsGroup.center, MapManager::Instance().getPathFromHomeToSL(eHome));

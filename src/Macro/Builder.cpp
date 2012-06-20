@@ -270,7 +270,7 @@ void Task::buildIt()
 		}
 		/// Try and build it if we can
 		else if (!worker->build(tilePosition, type))
-		{
+		{ /// TODO time_to_rebuild *= 2
 #ifdef __MACRO_DEBUG__
 			Broodwar->printf("ERROR: Can't build %s at (%d,%d)", type.getName().c_str(), tilePosition.x(), tilePosition.y());
 #endif
