@@ -51,11 +51,11 @@ void GoalManager::update()
 		g->update();
 #ifdef __MICRO_DEBUG__
 		if (g->getStatus() == GS_WAIT_PRECONDITION)
-			Broodwar->drawTextScreen(5, y, "\x17%s", g->getName().c_str());
+			Broodwar->drawTextScreen(5, y, "\x17%s: %d", g->getName().c_str(), g);
 		else if (g->getStatus() == GS_IN_PROGRESS)
-			Broodwar->drawTextScreen(5, y, "\x07%s", g->getName().c_str());
+			Broodwar->drawTextScreen(5, y, "\x07%s: %d", g->getName().c_str(), g);
 		else
-			Broodwar->drawTextScreen(5, y, "%s", g->getName().c_str());
+			Broodwar->drawTextScreen(5, y, "%s: %d", g->getName().c_str(), g);
 		y += 8;
 #endif
 	}

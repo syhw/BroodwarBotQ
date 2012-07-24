@@ -4,7 +4,7 @@
 #include "Micro/Goals/Goal.h"
 #include "Micro/Goals/FormationSubgoal.h"
 #include "Micro/Goals/AttackGoal.h"
-#include "Micro/Tactician.h"
+//#include "Micro/Tactician.h"
 #include "Macro/BWSAL.h"
 
 #ifdef __LEARNING_PROB_TABLES__

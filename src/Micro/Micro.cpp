@@ -211,7 +211,7 @@ void Micro::onUnitDestroy(BWAPI::Unit *unit)
 
 void Micro::onUnitRenegade(BWAPI::Unit *unit)
 {
-	goalManager->onUnitDestroy(unit); // to test
+	goalManager->onUnitDestroy(unit); // to test TODO
 }
 
 void Micro::onNukeDetect(BWAPI::Position target)

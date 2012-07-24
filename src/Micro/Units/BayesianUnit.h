@@ -103,6 +103,7 @@ protected:
     std::vector<Vec> _dirv;
     int _maxDimension, _minDimension;
     int _lastAttackFrame;
+    int _lastFiredFrame;
     int _lastMoveFrame;
     int _lastClickFrame;
     int _lastRefreshPathRequest;
