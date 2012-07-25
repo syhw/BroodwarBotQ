@@ -589,7 +589,7 @@ void UnitsGroup::update()
 						(*it)->switchMode(MODE_FIGHT_G);
 #ifdef __MICRO_DEBUG__
 					Position displayp = (*it)->unit->getPosition();
-					Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Back");
+					Broodwar->drawTextMap(min(Broodwar->mapWidth()*TILE_SIZE - 8, displayp.x() + 8), min(Broodwar->mapHeight()*TILE_SIZE - 8, displayp.y() + 8), "\x07 Back");
 #endif
 				}
 			}
@@ -606,7 +606,7 @@ void UnitsGroup::update()
 				{
 #ifdef __MICRO_DEBUG__
 					Position displayp = (*it)->unit->getPosition();
-					Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Offensive");
+					Broodwar->drawTextMap(min(Broodwar->mapWidth()*TILE_SIZE - 8, displayp.x() + 8), min(Broodwar->mapHeight()*TILE_SIZE - 8, displayp.y() + 8), "\x07 Offensive");
 #endif
 					/// target fixed by the subgoal
 					if ((*it)->getType().isFlyer())
@@ -629,7 +629,7 @@ void UnitsGroup::update()
 							units[i]->switchMode(MODE_MOVE);
 #ifdef __MICRO_DEBUG__
 							Position displayp = units[i]->unit->getPosition();
-							Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Place");
+							Broodwar->drawTextMap(min(Broodwar->mapWidth()*TILE_SIZE - 8, displayp.x() + 8), min(Broodwar->mapHeight()*TILE_SIZE - 8, displayp.y() + 8), "\x07 Place");
 #endif
 						}
 					}
@@ -644,7 +644,7 @@ void UnitsGroup::update()
 								(*it)->switchMode(MODE_FIGHT_G);
 #ifdef __MICRO_DEBUG__
 							Position displayp = (*it)->unit->getPosition();
-							Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Attack");
+							Broodwar->drawTextMap(min(Broodwar->mapWidth()*TILE_SIZE - 8, displayp.x() + 8), min(Broodwar->mapHeight()*TILE_SIZE - 8, displayp.y() + 8), "\x07 Attack");
 #endif
 						}
 					}
@@ -666,7 +666,7 @@ void UnitsGroup::update()
 							(*it)->switchMode(MODE_FIGHT_G);
 #ifdef __MICRO_DEBUG__
 							Position displayp = (*it)->unit->getPosition();
-							Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Ramp");
+							Broodwar->drawTextMap(min(Broodwar->mapWidth()*TILE_SIZE - 8, displayp.x() + 8), min(Broodwar->mapHeight()*TILE_SIZE - 8, displayp.y() + 8), "\x07 Ramp");
 #endif
 						}
 						else
@@ -678,7 +678,7 @@ void UnitsGroup::update()
 								(*it)->switchMode(MODE_FIGHT_G);
 #ifdef __MICRO_DEBUG__
 							Position displayp = (*it)->unit->getPosition();
-							Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Attack");
+							Broodwar->drawTextMap(min(Broodwar->mapWidth()*TILE_SIZE - 8, displayp.x() + 8), min(Broodwar->mapHeight()*TILE_SIZE - 8, displayp.y() + 8), "\x07 Attack");
 #endif
 						}
 					}

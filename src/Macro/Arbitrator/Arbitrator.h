@@ -444,10 +444,6 @@ namespace Arbitrator
   template <class _Tp,class _Val>
   void Arbitrator<_Tp,_Val>::update()
   {
-#ifdef __ARBITRATOR_DEBUG__
-	  // TODO afficher le pointeur de l'objet qui possede l'unit sur l'unit
-	  // Broodwar->drawTextMap(displayp.x() - 8, displayp.y() + 8, "\x07 POINTEUR")
-#endif
     this->inUpdate=true;
     bool first=true;
     //first we construct a map for the objects to offer

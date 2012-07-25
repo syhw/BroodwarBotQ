@@ -165,6 +165,15 @@ string Goal::getShortName() const
  */
 void Goal::update()
 {
+#ifdef __ARBITRATOR_DEBUG__
+	  // TODO afficher le pointeur de l'objet qui possede l'unit sur l'unit
+	for each (pBayesianUnit bu in _unitsGroup.units)
+	{
+		Position displayp = bu->unit->getPosition();
+		Broodwar->drawTextMap(max(0, displayp.x() - 16), min(Broodwar->mapHeight()*TILE_SIZE - 8, displayp.y() + 16), "\x07 %d", this);
+	}
+#endif
+
 	/// Update incomplete units
 	for (list<Unit*>::const_iterator it = _incompleteUnits.begin();
 		it != _incompleteUnits.end(); )

@@ -98,7 +98,7 @@ void AttackGoal::achieve()
 		{
 #ifdef __MICRO_DEBUG__
 			Position displayp = (*it)->unit->getPosition();
-			Broodwar->drawTextMap(displayp.x() + 8, displayp.y() + 8, "\x07 Regroup");
+			Broodwar->drawTextMap(min(Broodwar->mapWidth()*TILE_SIZE - 8, displayp.x() + 8), min(Broodwar->mapHeight()*TILE_SIZE - 8, displayp.y() + 8), "\x07 Regroup");
 #endif
 			(*it)->target = _unitsGroup.center;
 			if ((*it)->getType().isFlyer())
