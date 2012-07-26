@@ -80,6 +80,7 @@ void DefendGoal::check()
 		bool threatIsFlyer = false;
 		set<Unit*> unitsAround = Broodwar->getUnitsInRadius(_defPos, __TILES_RADIUS_DEFEND_BASE__ * TILE_SIZE); // could be another radius 
 		_unitsGroup.enemies.clear();
+		bool onlyScouts = true;
 		for each (Unit* u in unitsAround)
 		{
 			if (u->getPlayer() != Broodwar->enemy())
@@ -100,21 +101,35 @@ void DefendGoal::check()
 				)
 				threatIsFlyer = true;
 
-			if (ut == UnitTypes::Terran_Dropship || ut == UnitTypes::Protoss_Shuttle || ut == UnitTypes::Zerg_Overlord
-				|| ut == UnitTypes::Protoss_Dark_Templar || ut == UnitTypes::Zerg_Lurker)
-				; // TODO
-			//_eUnits += 16; // (supply is *2, 2 for a marine for instance)
+			if (ut.isWorker())
+			{
+				if (u->isAttacking() || u->isConstructing()) //|| u->getTarget()->getPlayer() == Broodwar->self()))
+				{
+					onlyScouts = false;
 #ifdef __2_PROBES_PER_ENEMY_WORKER_DEFENSE__
-			else if ((ut == UnitTypes::Protoss_Probe || ut == UnitTypes::Terran_SCV || ut == UnitTypes::Zerg_Drone)
-				&& (u->isAttacking() || u->isConstructing())) //|| u->getTarget()->getPlayer() == Broodwar->self()))
-				_eUnits += ut.supplyRequired(); // 2 probes on one attacking worker
+					_eUnits += 2; // 2 probes on one attacking worker
+#else
+					_eUnits += 1;
 #endif
-			else if (ut == UnitTypes::Zerg_Zergling)
-				_eUnits += 3*(ut.supplyRequired()); // 3 probes per zergling (zerglings are 1 supply each)
-			else 
-				_eUnits += ut.supplyRequired();
+				}
+			}
+			else
+			{
+				onlyScouts = false; // TODO precise that
+				if (ut == UnitTypes::Terran_Dropship 
+					|| ut == UnitTypes::Protoss_Shuttle 
+					|| ut == UnitTypes::Zerg_Overlord 
+					|| ut == UnitTypes::Protoss_Dark_Templar 
+					|| ut == UnitTypes::Zerg_Lurker)
+					; // TODO 
+					//_eUnits += 16; // (supply is *2, 2 for a marine for instance)
+				else if (ut == UnitTypes::Zerg_Zergling)
+					_eUnits += 3*(ut.supplyRequired()); // 3 probes per zergling (zerglings are 1 supply each)
+				else 
+					_eUnits += ut.supplyRequired();
+			}
 		}
-		if (_unitsGroup.enemies.empty() && Broodwar->getFrameCount() - _firstActive > 10*24) // 10 sec (defensive/robustness)
+		if ((onlyScouts || _unitsGroup.enemies.empty()) && Broodwar->getFrameCount() - _firstActive > 10*24) // 10 sec (defensive/robustness)
 		{
 			_status = GS_ACHIEVED;
 			Micro::Instance().needDefense.erase(_base);
@@ -227,9 +242,7 @@ void DefendGoal::onOffer(set<Unit*> objects) // TODO refactor (only a 3 lines di
 				{
 					if (_neededUnits.find(u->getType()) != _neededUnits.end())
 						_neededUnits[u->getType()] -= 1;
-					pBayesianUnit tmpbu = gm->getCompletedUnit(u);
-					tmpbu->setLastFiredFrame(Broodwar->getFrameCount() + 25);
-					_unitsGroup.dispatchCompleteUnit(tmpbu);
+					_unitsGroup.dispatchCompleteUnit(gm->getCompletedUnit(u));
 				}
 				else
 					_incompleteUnits.push_back(u);

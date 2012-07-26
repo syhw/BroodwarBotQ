@@ -9,6 +9,8 @@
 using namespace BWAPI;
 using namespace std;
 
+#define ARMY_RADIUS_CLUSTER = 10; // in build tiles
+
 EUnitsFilter::EUnitsFilter()
 {
     timeManager = & TimeManager::Instance();
@@ -157,28 +159,6 @@ void EUnitsFilter::onUnitMorph(Unit* u)
 void EUnitsFilter::onUnitShow(Unit* u)
 {
     update(u);
-
-#ifndef __MICRO_PROJECT__
-	/// Spawn defend goals
-	if (u->getPlayer() == Broodwar->enemy())
-	{
-		for each (Base* bb in TheBasesManager->getAllBases())
-		{
-			BWTA::BaseLocation* b = bb->getBaseLocation();
-			if (Micro::Instance().needDefense.count(b))
-				continue;
-			BWAPI::Position bp = b->getPosition();
-			if (u->getDistance(bp) < __TILES_RADIUS_DEFEND_BASE__*TILE_SIZE
-				|| (u->getTargetPosition() != Positions::None && u->getTargetPosition() != Positions::Invalid
-				&& u->getTargetPosition() != Positions::Unknown && u->getTargetPosition().getApproxDistance(bp) < __TILES_RADIUS_DEFEND_BASE__*TILE_SIZE*0.75) // !!
-				|| (u->getTarget() != NULL && u->getTarget()->exists() && u->getTarget()->getType().isBuilding() && u->getTarget()->getPlayer() == Broodwar->self()))
-			{
-				GoalManager::Instance().addGoal(pGoal(new DefendGoal(b))); // TODO priority w.r.t. importance of the base
-				Micro::Instance().needDefense.insert(b);
-			}
-		}
-	}
-#endif
 }
 
 void EUnitsFilter::onUnitHide(Unit* u)
@@ -191,8 +171,30 @@ void EUnitsFilter::onUnitRenegade(Unit* u)
     update(u);
 }
 
+void EUnitsFilter::updateEArmies()
+{
+    std::map<BWAPI::Unit*, EViewedUnit> unassigned;
+	copy(_eviewedUnits.begin(), _eviewedUnits.end(), unassigned.begin());
+	int i = 0;
+	map<Unit*, int> tmpPairings;
+	for each (pair<Unit*, EViewedUnit> eUnit1 in unassigned)
+	{
+		pair<int, list<Unit*> > tmpArmy;
+		tmpArmy.first = i++;
+		for each (pair<Unit*, EViewedUnit> eUnit2 in unassigned)
+		{
+			if eUnit1.second.position.getApproxDistance(eUnit2.second.position)
+				< TILE_SIZE * ARMY_RADIUS_CLUSTER)
+			{
+				tmpArmy.second.push_back(eUnit2.first);
+			}
+		}
+	}
+}
+
 void EUnitsFilter::update()
 {
+	updateEArmies();
 }
 
 const std::map<BWAPI::Unit*, EViewedUnit>& EUnitsFilter::getViewedUnits()

@@ -17,7 +17,7 @@
 
 #define WALK_TILES_SIZE 8
 
-#define __DO_NOT_HARASS_SCOUT__ // will not compile the harassing part in the FirstScoutGoal (to play against the built-in AI)
+//#define __DO_NOT_HARASS_SCOUT__ // will not compile the harassing part in the FirstScoutGoal (to play against the built-in AI)
 #define __MANNER__ // will say gl hf (and in the future TODO leave game)
 #define __CONTROL_BO_UNTIL_SECOND_PYLON__ // no supply management before the second pylon, if you don't place it in the BO, you're locked
 #define __ETECH_ESTIMATOR__ // use the ETechEstimator (or not if undef)
@@ -27,7 +27,7 @@
 #define __TILES_RADIUS_DEFEND_BASE__ 26
 #define __MAX_TRIES_BUILD_SOMETHING__ 1440 // IN FRAMES, 1 minute here
 #define __PYLON_COVERAGE_TILES__ 4 // length/size of the pylon coverage radius in build tiles
-#define __2_PROBES_PER_ENEMY_WORKER_DEFENSE__ // put 2 probes on one attacking worker in DefendGoal
+//#define __2_PROBES_PER_ENEMY_WORKER_DEFENSE__ // put 2 probes on one attacking worker in DefendGoal
 
 #ifdef __DEBUG__
 //#include <vld.h>

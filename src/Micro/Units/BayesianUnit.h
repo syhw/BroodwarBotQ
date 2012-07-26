@@ -103,7 +103,6 @@ protected:
     std::vector<Vec> _dirv;
     int _maxDimension, _minDimension;
     int _lastAttackFrame;
-    int _lastFiredFrame;
     int _lastMoveFrame;
     int _lastClickFrame;
     int _lastRefreshPathRequest;
@@ -209,7 +208,6 @@ public:
     int _fleeingDmg; // number of DPS we have to take in to decide to flee, default 20
 	static pBayesianUnit newBayesianUnit(BWAPI::Unit* u);
 
-	void setLastFiredFrame(int frame);
 	bool isFighting();
     void move(BWAPI::Position p); // debug purposes
 	void switchMode(unit_mode um);

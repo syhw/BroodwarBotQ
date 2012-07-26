@@ -202,6 +202,31 @@ void Micro::onUnitCreate(BWAPI::Unit *unit)
 
 void Micro::onUnitShow(BWAPI::Unit *unit)
 {
+	/// Spawn defend goals
+	if (unit->getPlayer() == Broodwar->enemy())
+	{
+		for each (Base* bb in TheBasesManager->getAllBases())
+		{
+			BWTA::BaseLocation* b = bb->getBaseLocation();
+			if (Micro::Instance().needDefense.count(b))
+				continue;
+			BWAPI::Position bp = b->getPosition();
+			if (unit->getDistance(bp) < __TILES_RADIUS_DEFEND_BASE__*TILE_SIZE
+				|| (unit->getTargetPosition() != Positions::None 
+					&& unit->getTargetPosition() != Positions::Invalid
+				    && unit->getTargetPosition() != Positions::Unknown 
+					&& unit->getTargetPosition().getApproxDistance(bp) 
+						< __TILES_RADIUS_DEFEND_BASE__*TILE_SIZE*0.75) // !!
+				|| (unit->getTarget() != NULL 
+					&& unit->getTarget()->exists() 
+					&& unit->getTarget()->getType().isBuilding() 
+					&& unit->getTarget()->getPlayer() == Broodwar->self()))
+			{
+				GoalManager::Instance().addGoal(pGoal(new DefendGoal(b))); // TODO priority w.r.t. importance of the base
+				Micro::Instance().needDefense.insert(b);
+			}
+		}
+	}
 }
 
 void Micro::onUnitDestroy(BWAPI::Unit *unit)

@@ -67,7 +67,6 @@ BayesianUnit::BayesianUnit(Unit* u, const ProbTables* probTables)
 				   unit->getType().airWeapon().maxRange()))
 , _lastRightClick(unit->getPosition())
 , _lastAttackFrame(-100)
-, _lastFiredFrame(-100)
 , _lastClickFrame(-100)
 , _lastMoveFrame(-100)
 , _lastRefreshPathRequest(-100)
@@ -1847,14 +1846,9 @@ pBayesianUnit BayesianUnit::newBayesianUnit(Unit* u)
 	return tmp;
 }
 
-void BayesianUnit::setLastFiredFrame(int frame)
-{
-	_lastFiredFrame = frame;
-}
-
 bool BayesianUnit::isFighting()
 {
-	if (Broodwar->getFrameCount() - _lastFiredFrame < 101) // 4 sec
+	if (Broodwar->getFrameCount() - _lastAttackFrame < 101) // 4 sec
 		return true; // high templars and dark archons will never be fighting
 	return false;
 }
@@ -2148,9 +2142,6 @@ void BayesianUnit::update()
     _unitPos = unit->getPosition();
     /// check() for all inherited classes
     check();
-	if (unit->getGroundWeaponCooldown() == unit->getType().groundWeapon().damageCooldown()
-		|| unit->getAirWeaponCooldown() == unit->getType().airWeapon().damageCooldown())
-		_lastFiredFrame = Broodwar->getFrameCount();
 
     //if (targetEnemy && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->getDistance(_unitPos) > 512) // 16buildtiles*32
         //switchMode(MODE_MOVE);

@@ -1,7 +1,6 @@
 #pragma once
 #include "Defines.h"
 #include "Utils/CSingleton.h"
-#include "Utils/TimeManager.h"
 #include "EViewedUnit.h"
 #include <BWTA.h>
 #include <BWAPI.h>
@@ -14,13 +13,14 @@ class EUnitsFilter : public CSingleton<EUnitsFilter>
     friend class CSingleton<EUnitsFilter>;
     EUnitsFilter();
     ~EUnitsFilter() { }
-    TimeManager* timeManager;
+	std::map<int, std::list<BWAPI::Unit*> > _eArmies;
     std::set<BWAPI::UnitType> _interestingTypes;
     std::map<BWAPI::Unit*, EViewedUnit> _eViewedUnits;
     std::map<BWAPI::Unit*, std::pair<BWAPI::UnitType, BWAPI::Position> > _invisibleUnits;
 public:
     //std::map<BWAPI::Unit*, EViewedUnit> _eViewedUnits;
 
+	inline void updateEArmies();
     void update(BWAPI::Unit* u);
     void filter(BWAPI::Unit* u);
     void onUnitDestroy(BWAPI::Unit* u);
