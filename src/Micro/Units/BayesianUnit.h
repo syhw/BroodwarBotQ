@@ -209,6 +209,7 @@ public:
     int _fleeingDmg; // number of DPS we have to take in to decide to flee, default 20
 	static pBayesianUnit newBayesianUnit(BWAPI::Unit* u);
 
+	void setLastFiredFrame(int frame);
 	bool isFighting();
     void move(BWAPI::Position p); // debug purposes
 	void switchMode(unit_mode um);

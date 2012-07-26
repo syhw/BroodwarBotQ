@@ -1847,6 +1847,11 @@ pBayesianUnit BayesianUnit::newBayesianUnit(Unit* u)
 	return tmp;
 }
 
+void BayesianUnit::setLastFiredFrame(int frame)
+{
+	_lastFiredFrame = frame;
+}
+
 bool BayesianUnit::isFighting()
 {
 	if (Broodwar->getFrameCount() - _lastFiredFrame < 101) // 4 sec

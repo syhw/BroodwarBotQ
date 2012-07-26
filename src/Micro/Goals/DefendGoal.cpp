@@ -197,7 +197,11 @@ void DefendGoal::bidDefUnits()
 	set<Unit*> interestingUnits = SelectAll().not(isBuilding);
 	for each (Unit* u in interestingUnits)
 	{
-		if (!_biddedOn.count(u) && (!u->getType().isWorker() || (_threatMiddle.isValid() && u->getDistance(_threatMiddle) < __BAIT_WORKERS_TILES_DISTANCE__*TILE_SIZE && _nbWorkers < _eUnits)))
+		if (!_biddedOn.count(u) && (!u->getType().isWorker() 
+			|| (_threatMiddle.isValid() 
+			   && u->getDistance(_threatMiddle) 
+			      < __BAIT_WORKERS_TILES_DISTANCE__*TILE_SIZE 
+			   && _nbWorkers < _eUnits)))
 		{
 			// units at 20 build tiles will be bidded on at 70, really important goals will have a priority > 90
 			int prio = max(_priority, 90 - (int)(u->getDistance(_defPos)/TILE_SIZE)); 
@@ -223,7 +227,9 @@ void DefendGoal::onOffer(set<Unit*> objects) // TODO refactor (only a 3 lines di
 				{
 					if (_neededUnits.find(u->getType()) != _neededUnits.end())
 						_neededUnits[u->getType()] -= 1;
-					_unitsGroup.dispatchCompleteUnit(gm->getCompletedUnit(u));
+					pBayesianUnit tmpbu = gm->getCompletedUnit(u);
+					tmpbu->setLastFiredFrame(Broodwar->getFrameCount() + 25);
+					_unitsGroup.dispatchCompleteUnit(tmpbu);
 				}
 				else
 					_incompleteUnits.push_back(u);
