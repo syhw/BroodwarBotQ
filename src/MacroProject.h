@@ -28,7 +28,7 @@ public:
 	Intelligence* intelligence;
 	Macro* macro;
 	Micro* micro;
-	TimeManager* timeManager;
+	//TimeManager* timeManager;
 
 	bool showManagerAssignments;
 	

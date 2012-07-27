@@ -7,6 +7,8 @@
 #include <map>
 #include <utility>
 
+#define ARMY_RADIUS_CLUSTER 10 // in build tiles
+
 // This class works closely tied to MapManager (see MapManager::update())
 class EUnitsFilter : public CSingleton<EUnitsFilter>
 {

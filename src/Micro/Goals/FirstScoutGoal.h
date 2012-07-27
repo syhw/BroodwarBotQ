@@ -18,7 +18,7 @@ private:
 	bool _mannerPylon;
 	bool _canHarassWorkers;
 	BWAPI::Position _arrivePosition;
-	std::set<Unit*> _unitsAround;
+	std::set<BWAPI::Unit*> _unitsAround;
 	BWAPI::Unit* _mineral;
 	inline void goHome(BWAPI::Unit* scoutUnit);
 	inline void micro(BWAPI::Unit* scoutUnit);

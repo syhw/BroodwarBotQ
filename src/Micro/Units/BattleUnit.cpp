@@ -2,13 +2,14 @@
 #include "BattleUnit.h"
 #include "Utils/Vec.h"
 #include "Defines.h"
+
 using namespace BWAPI;
 
 //////////////////////////////////////////////////
 ////////            BattleUnit             ///////
 //////////////////////////////////////////////////
 
-BattleUnit::BattleUnit(BWAPI::Unit* unit)
+BattleUnit::BattleUnit(Unit* unit)
 : unit(unit)
 , _tick(0)
 , targetEnemy(NULL)
@@ -46,7 +47,7 @@ bool BattleUnit::operator == (const BattleUnit& bu) const
 }
 
 
-const std::vector<BWAPI::Position> & BattleUnit::getPPath()
+const std::vector<Position> & BattleUnit::getPPath()
 {
     return _ppath;
 }

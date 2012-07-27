@@ -6,22 +6,22 @@
 using namespace std;
 using namespace BWAPI;
 
-ProbTables ZealotUnit::_sProbTables = ProbTables(BWAPI::UnitTypes::Protoss_Zealot.getID());
+ProbTables ZealotUnit::_sProbTables = ProbTables(UnitTypes::Protoss_Zealot.getID());
 
-std::set<BWAPI::UnitType> ZealotUnit::setPrio;
+std::set<UnitType> ZealotUnit::setPrio;
 
-ZealotUnit::ZealotUnit(BWAPI::Unit* u)
+ZealotUnit::ZealotUnit(Unit* u)
 : GroundUnit(u, &_sProbTables)
 {
     if (setPrio.empty())
     {
-        setPrio.insert(BWAPI::UnitTypes::Protoss_Reaver);
-        setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode);
-        setPrio.insert(BWAPI::UnitTypes::Zerg_Hydralisk);
-		setPrio.insert(BWAPI::UnitTypes::Zerg_Lurker);
-		setPrio.insert(BWAPI::UnitTypes::Zerg_Defiler);
+        setPrio.insert(UnitTypes::Protoss_Reaver);
+        setPrio.insert(UnitTypes::Protoss_High_Templar);
+        setPrio.insert(UnitTypes::Terran_Siege_Tank_Siege_Mode);
+        setPrio.insert(UnitTypes::Terran_Siege_Tank_Tank_Mode);
+        setPrio.insert(UnitTypes::Zerg_Hydralisk);
+		setPrio.insert(UnitTypes::Zerg_Lurker);
+		setPrio.insert(UnitTypes::Zerg_Defiler);
     }
     _fleeingDmg = 36; // one round of storm = 14
 }
@@ -33,7 +33,7 @@ ZealotUnit::~ZealotUnit()
 #ifdef __LEARNING_PROB_TABLES__
 void ZealotUnit::initProbTables()
 {
-	_sProbTables = ProbTables(BWAPI::UnitTypes::Protoss_Zealot.getID());
+	_sProbTables = ProbTables(UnitTypes::Protoss_Zealot.getID());
 }
 #endif
 
@@ -115,11 +115,11 @@ void ZealotUnit::updateTargetEnemy()
 			continue;
         UnitType testType = it->first->getType();
         if (testType.isBuilding() 
-            && testType != BWAPI::UnitTypes::Protoss_Photon_Cannon
-			&& (testType != BWAPI::UnitTypes::Terran_Bunker || !it->first->isAttacking())
-            && testType != BWAPI::UnitTypes::Terran_Missile_Turret
-            && testType != BWAPI::UnitTypes::Zerg_Sunken_Colony
-            && testType != BWAPI::UnitTypes::Zerg_Spore_Colony)
+            && testType != UnitTypes::Protoss_Photon_Cannon
+			&& (testType != UnitTypes::Terran_Bunker || !it->first->isAttacking())
+            && testType != UnitTypes::Terran_Missile_Turret
+            && testType != UnitTypes::Zerg_Sunken_Colony
+            && testType != UnitTypes::Zerg_Spore_Colony)
             continue;
 		/// Take one in the setPrio and in range or one in range or the closest
 		if (inRange(it->first))
@@ -213,7 +213,7 @@ void ZealotUnit::check()
 {
     if (unit->getUpgradeLevel(UpgradeTypes::Leg_Enhancements) && !setPrio.count(UnitTypes::Terran_Siege_Tank_Siege_Mode))
     {
-        setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
+        setPrio.insert(UnitTypes::Protoss_High_Templar);
     }
 }
 
@@ -222,7 +222,7 @@ int ZealotUnit::getAttackDuration()
     return 1;
 }
 
-std::set<BWAPI::UnitType> ZealotUnit::getSetPrio()
+std::set<UnitType> ZealotUnit::getSetPrio()
 {
     return ZealotUnit::setPrio;
 }

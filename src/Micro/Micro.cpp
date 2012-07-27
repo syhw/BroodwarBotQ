@@ -31,23 +31,84 @@ Micro::~Micro()
 
 void Micro::update()
 {
+	/// Seek for bases needing defense
+	map<BWTA::Region*, BWTA::BaseLocation*> myBasesRegions;
+#ifdef __DEFEND_BASES_ONLY__
+	for each (Base* b in TheBasesManager->getAllBases())
+	{
+		if (needDefense.find(b->getBaseLocation()) == needDefense.end())
+			myBasesRegions.insert(pair<BWTA::Region*, BWTA::BaseLocation*>(
+				b->getBaseLocation()->getRegion(), b->getBaseLocation()));
+	}
+#else
+	// TODO
+	//myBasesRegions.insert(TheBorderManager->myRegions.begin(),
+	//	TheBorderManager->myRegions.end());
+#endif
+	map<BWTA::BaseLocation*, Vec> tmpMeanDefPositions;
+	map<BWTA::BaseLocation*, int> tmpNumUnits;
+	for (map<Unit*, EViewedUnit>::const_iterator it 
+		= EUnitsFilter::Instance().getViewedUnits().begin();
+		it != EUnitsFilter::Instance().getViewedUnits().end(); ++it)
+	{
+		Position tmpUnitPos = it->second.position;
+		if (it->first->isVisible())
+			tmpUnitPos = it->first->getPosition();
+
+		map<BWTA::Region*, BWTA::BaseLocation*>::const_iterator regit 
+			= myBasesRegions.find(BWTA::getRegion(tmpUnitPos));
+		if (regit != myBasesRegions.end())
+		{
+			if ((!(it->first->getType().isWorker()) 
+					&& it->first->getType() != UnitTypes::Protoss_Observer)
+				|| (it->first->isAttacking() || it->first->isConstructing()))
+			{
+				needDefense.insert(regit->second);
+				if (tmpMeanDefPositions.find(regit->second)
+					!= tmpMeanDefPositions.end())
+				{
+					tmpMeanDefPositions[regit->second] += Vec(it->first->getPosition());
+					tmpNumUnits[regit->second] += 1;
+				}
+				else
+				{
+					tmpMeanDefPositions.insert(pair<BWTA::BaseLocation*,
+						Vec>(regit->second, Vec(it->first->getPosition())));
+					tmpNumUnits.insert(pair<BWTA::BaseLocation*,
+						int>(regit->second, 1));
+				}
+			}
+		}
+	}
+	for (map<BWTA::BaseLocation*, Vec>::const_iterator it
+		= tmpMeanDefPositions.begin(); it != tmpMeanDefPositions.end(); ++it)
+	{
+		Vec tmpVecPos = Vec(it->second / tmpNumUnits[it->first]);
+		pGoal tmp = pGoal(new DefendGoal(tmpVecPos.toPosition()));
+		// OR pGoal tmp = new DefendGoal(it->first);
+		goalManager->addGoal(tmp);
+	}
+
 	/// Launch the first push as soon as we have a few dragoons and we know where the enemy is
 	if (!_launchedFirstPush && needDefense.empty()
 		&& !TheInformationManager->getEnemyBases().empty())
 	{
 		if ((Broodwar->enemy()->getRace() == Races::Protoss && (
-				(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 1 && ETechEstimator::Instance().getOpeningsProbas()[1] > 0.15 // fast DT
+				(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 1 
+					&& ETechEstimator::Instance().getOpeningsProbas()[1] > 0.15 // fast DT
 				|| TheInformationManager->getEnemyBases().size() > 1 ) // fast expand
 				|| (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 3))
 			) 
 			|| Broodwar->enemy()->getRace() == Races::Terran && (
-				(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 1 && ETechEstimator::Instance().getOpeningsProbas()[3] > 0.2 // siege expand
+				(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 1 
+					&& ETechEstimator::Instance().getOpeningsProbas()[3] > 0.2 // siege expand
 				|| TheInformationManager->getEnemyBases().size() > 1) // fast expand
 				|| (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 2) 
 			) 
 			|| Broodwar->enemy()->getRace() == Races::Zerg && (
 				(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Zealot) > 3 &&
-				(ETechEstimator::Instance().getOpeningsProbas()[0] > 0.2 || ETechEstimator::Instance().getOpeningsProbas()[1] > 0.2 // mutas
+				(ETechEstimator::Instance().getOpeningsProbas()[0] > 0.2 
+					|| ETechEstimator::Instance().getOpeningsProbas()[1] > 0.2 // mutas
 				|| TheInformationManager->getEnemyBases().size() > 1)) // fast expand
 				|| Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 2)
 			)
@@ -59,7 +120,8 @@ void Micro::update()
 				pGoal tmp;
 				if (Intelligence::Instance().enemyBasesOrder.size() > 1)
 				{
-					map<double, BWTA::BaseLocation*>::const_iterator it = Intelligence::Instance().enemyBasesOrder.begin();
+					map<double, BWTA::BaseLocation*>::const_iterator it 
+						= Intelligence::Instance().enemyBasesOrder.begin();
 					++it;
 					tmp = pGoal(new AttackGoal(it->second->getPosition(), 30));
 				}
@@ -79,7 +141,8 @@ void Micro::update()
 		&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Shuttle)
 		&& !TheInformationManager->getEnemyBases().empty())
 	{
-		BWTA::BaseLocation* eBase = *(TheInformationManager->getEnemyBases().begin());
+		BWTA::BaseLocation* eBase 
+			= *(TheInformationManager->getEnemyBases().begin());
 		if (eBase != NULL)
 		{
 			map<UnitType, int> tmpNeeded;
@@ -89,7 +152,8 @@ void Micro::update()
 				tmpV += mineral->getPosition();
 			BWAPI::Position mineralsMiddle = Position((int)tmpV.x / eBase->getMinerals().size(), (int)tmpV.y / eBase->getMinerals().size());
 			goalManager->addGoal(pGoal(new DropGoal(mineralsMiddle, tmpNeeded)));*/
-			goalManager->addGoal(pGoal(new DropGoal(eBase->getPosition(), tmpNeeded)));
+			goalManager->addGoal(pGoal(
+				new DropGoal(eBase->getPosition(), tmpNeeded)));
 		}
 	}
 

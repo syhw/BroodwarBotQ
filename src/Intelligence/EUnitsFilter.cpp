@@ -9,11 +9,10 @@
 using namespace BWAPI;
 using namespace std;
 
-#define ARMY_RADIUS_CLUSTER = 10; // in build tiles
 
 EUnitsFilter::EUnitsFilter()
 {
-    timeManager = & TimeManager::Instance();
+    //timeManager = & TimeManager::Instance();
 
     _interestingTypes.insert(UnitTypes::Protoss_Arbiter);
     _interestingTypes.insert(UnitTypes::Protoss_Arbiter_Tribunal);
@@ -173,22 +172,33 @@ void EUnitsFilter::onUnitRenegade(Unit* u)
 
 void EUnitsFilter::updateEArmies()
 {
-    std::map<BWAPI::Unit*, EViewedUnit> unassigned;
-	copy(_eviewedUnits.begin(), _eviewedUnits.end(), unassigned.begin());
+    map<Unit*, EViewedUnit> unassigned;
+	unassigned.insert(_eViewedUnits.begin(), _eViewedUnits.end());
 	int i = 0;
 	map<Unit*, int> tmpPairings;
-	for each (pair<Unit*, EViewedUnit> eUnit1 in unassigned)
+	for (map<Unit*, EViewedUnit>::iterator it = unassigned.begin();
+		it != unassigned.end(); ++it)
 	{
-		pair<int, list<Unit*> > tmpArmy;
-		tmpArmy.first = i++;
+		int current_ind = -1;
+		if (tmpPairings.find(it->first) != tmpPairings.end())
+			current_ind = tmpPairings[it->first];
+		else
+		{
+			current_ind = i++;
+			_eArmies.insert(pair<int, list<Unit*> >(current_ind, list<Unit*>()));
+		}
+
 		for each (pair<Unit*, EViewedUnit> eUnit2 in unassigned)
 		{
-			if eUnit1.second.position.getApproxDistance(eUnit2.second.position)
-				< TILE_SIZE * ARMY_RADIUS_CLUSTER)
+			if (it->second.position.getApproxDistance(eUnit2.second.position) < TILE_SIZE * ARMY_RADIUS_CLUSTER)
 			{
-				tmpArmy.second.push_back(eUnit2.first);
+				tmpPairings.insert(pair<Unit*, int>(eUnit2.first, current_ind));
+				_eArmies[current_ind].push_back(eUnit2.first);
 			}
 		}
+
+		map<Unit*, EViewedUnit>::iterator tmpit = it;
+		unassigned.erase(tmpit);
 	}
 }
 

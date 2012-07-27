@@ -1,18 +1,20 @@
 #include <PrecompiledHeader.h>
 #include "Micro/Units/ZergFlying/ScourgeUnit.h"
 
-std::set<BWAPI::UnitType> ScourgeUnit::setPrio;
+using namespace BWAPI;
 
-std::set<BWAPI::Unit*> ScourgeUnit::alreadyTargeted;
+std::set<UnitType> ScourgeUnit::setPrio;
 
-ScourgeUnit::ScourgeUnit(BWAPI::Unit* u)
+std::set<Unit*> ScourgeUnit::alreadyTargeted;
+
+ScourgeUnit::ScourgeUnit(Unit* u)
 : FlyingUnit(u)
 {
     if (setPrio.empty())
     {
-        setPrio.insert(BWAPI::UnitTypes::Protoss_Corsair);
-        setPrio.insert(BWAPI::UnitTypes::Zerg_Mutalisk);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Valkyrie);
+        setPrio.insert(UnitTypes::Protoss_Corsair);
+        setPrio.insert(UnitTypes::Zerg_Mutalisk);
+        setPrio.insert(UnitTypes::Terran_Valkyrie);
     }
 }
 
@@ -26,7 +28,7 @@ void ScourgeUnit::micro()
     if (targetEnemy != NULL && !(targetEnemy->exists()))
     {
         updateRangeEnemies();
-        for (std::multimap<double, BWAPI::Unit*>::const_iterator it = _rangeEnemies.begin();
+        for (std::multimap<double, Unit*>::const_iterator it = _rangeEnemies.begin();
             it != _rangeEnemies.end(); ++it)
         {
             if (alreadyTargeted.count(it->second))
@@ -46,7 +48,7 @@ void ScourgeUnit::micro()
             if (unit->getGroundWeaponCooldown() == 0)
             {
                 updateRangeEnemies();
-                for (std::multimap<double, BWAPI::Unit*>::const_iterator it = _rangeEnemies.begin();
+                for (std::multimap<double, Unit*>::const_iterator it = _rangeEnemies.begin();
                     it != _rangeEnemies.end(); ++it)
                 {
                     if (alreadyTargeted.count(it->second))
@@ -85,7 +87,7 @@ int ScourgeUnit::getAttackDuration()
         return Broodwar->getLatencyFrames();
 }
 
-std::set<BWAPI::UnitType> ScourgeUnit::getSetPrio()
+std::set<UnitType> ScourgeUnit::getSetPrio()
 {
     return ScourgeUnit::setPrio;
 }

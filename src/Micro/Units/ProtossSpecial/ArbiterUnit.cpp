@@ -3,21 +3,23 @@
 #include "Macro/Producer.h"
 #include "Micro/UnitsGroup.h"
 
-std::set<BWAPI::UnitType> ArbiterUnit::setPrio;
+using namespace BWAPI;
 
-ArbiterUnit::ArbiterUnit(BWAPI::Unit* u)
+std::set<UnitType> ArbiterUnit::setPrio;
+
+ArbiterUnit::ArbiterUnit(Unit* u)
 : FlyingUnit(u)
 {
     if (setPrio.empty())
     {
-        setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
-        setPrio.insert(BWAPI::UnitTypes::Protoss_Dragoon);
-        setPrio.insert(BWAPI::UnitTypes::Protoss_Scout);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Wraith);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Vulture_Spider_Mine);
-        setPrio.insert(BWAPI::UnitTypes::Zerg_Hydralisk);
-        setPrio.insert(BWAPI::UnitTypes::Zerg_Defiler);
-        setPrio.insert(BWAPI::UnitTypes::Zerg_Mutalisk);
+        setPrio.insert(UnitTypes::Protoss_High_Templar);
+        setPrio.insert(UnitTypes::Protoss_Dragoon);
+        setPrio.insert(UnitTypes::Protoss_Scout);
+        setPrio.insert(UnitTypes::Terran_Wraith);
+        setPrio.insert(UnitTypes::Terran_Vulture_Spider_Mine);
+        setPrio.insert(UnitTypes::Zerg_Hydralisk);
+        setPrio.insert(UnitTypes::Zerg_Defiler);
+        setPrio.insert(UnitTypes::Zerg_Mutalisk);
     }
 	_fleeingDmg = 28;
 }
@@ -30,7 +32,7 @@ void ArbiterUnit::micro()
 { 
 	updateRangeEnemies();
     Vec whereFlee = Vec(0, 0);
-	for (std::multimap<double, BWAPI::Unit*>::const_iterator it = _rangeEnemies.begin();
+	for (std::multimap<double, Unit*>::const_iterator it = _rangeEnemies.begin();
         it != _rangeEnemies.end(); ++it)
     {
         if (it->second->isVisible() && it->second->getType() == UnitTypes::Zerg_Scourge && it->second->getTarget() == unit)
@@ -66,7 +68,7 @@ void ArbiterUnit::micro()
 		return;    
 	if (unit->getEnergy() >= 100 && _rangeEnemies.size() > 5)
 	{
-		for (std::multimap<double, BWAPI::Unit*>::const_reverse_iterator it = _rangeEnemies.rbegin(); // lol
+		for (std::multimap<double, Unit*>::const_reverse_iterator it = _rangeEnemies.rbegin(); // lol
 			it != _rangeEnemies.rend(); ++it)
 		{
 			if (it->first < 9*TILE_SIZE)
@@ -107,7 +109,7 @@ int ArbiterUnit::getAttackDuration()
     return 7;
 }
 
-std::set<BWAPI::UnitType> ArbiterUnit::getSetPrio()
+std::set<UnitType> ArbiterUnit::getSetPrio()
 {
     return ArbiterUnit::setPrio;
 }

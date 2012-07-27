@@ -1,19 +1,21 @@
 #include <PrecompiledHeader.h>
 #include "Micro/Units/ProtossGround/DarkTemplarUnit.h"
 
-std::set<BWAPI::UnitType> DarkTemplarUnit::setPrio;
+using namespace BWAPI;
 
-DarkTemplarUnit::DarkTemplarUnit(BWAPI::Unit* u)
+std::set<UnitType> DarkTemplarUnit::setPrio;
+
+DarkTemplarUnit::DarkTemplarUnit(Unit* u)
 : GroundUnit(u)
 {
     if (setPrio.empty())
     {
-        setPrio.insert(BWAPI::UnitTypes::Terran_Missile_Turret);
-        setPrio.insert(BWAPI::UnitTypes::Zerg_Spore_Colony);
-        setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode);
-        setPrio.insert(BWAPI::UnitTypes::Zerg_Defiler);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode);
+        setPrio.insert(UnitTypes::Terran_Missile_Turret);
+        setPrio.insert(UnitTypes::Zerg_Spore_Colony);
+        setPrio.insert(UnitTypes::Protoss_High_Templar);
+        setPrio.insert(UnitTypes::Terran_Siege_Tank_Siege_Mode);
+        setPrio.insert(UnitTypes::Zerg_Defiler);
+        setPrio.insert(UnitTypes::Terran_Siege_Tank_Tank_Mode);
     }
 }
 
@@ -24,7 +26,7 @@ DarkTemplarUnit::~DarkTemplarUnit()
 void DarkTemplarUnit::micro()
 {
 #ifdef __NON_IMPLEMENTE__
-    BWAPI::Broodwar->printf("DarkTemplarUnit::micro non implémenté !");
+    Broodwar->printf("DarkTemplarUnit::micro non implémenté !");
 #endif
 }
 
@@ -37,7 +39,7 @@ int DarkTemplarUnit::getAttackDuration()
     return 0;
 }
 
-std::set<BWAPI::UnitType> DarkTemplarUnit::getSetPrio()
+std::set<UnitType> DarkTemplarUnit::getSetPrio()
 {
     return DarkTemplarUnit::setPrio;
 }

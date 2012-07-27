@@ -2,9 +2,11 @@
 #include "Micro/Units/ProtossGround/ProbeUnit.h"
 #include "Micro/UnitsGroup.h"
 
-BWAPI::Unit* ProbeUnit::backUpMineral = NULL;
+using namespace BWAPI;
 
-ProbeUnit::ProbeUnit(BWAPI::Unit* u)
+Unit* ProbeUnit::backUpMineral = NULL;
+
+ProbeUnit::ProbeUnit(Unit* u)
 : GroundUnit(u)
 {
 }
@@ -91,7 +93,7 @@ int ProbeUnit::getAttackDuration()
     return 0;
 }
 
-std::set<BWAPI::UnitType> ProbeUnit::getSetPrio()
+std::set<UnitType> ProbeUnit::getSetPrio()
 {
-    return std::set<BWAPI::UnitType>();
+    return std::set<UnitType>();
 }

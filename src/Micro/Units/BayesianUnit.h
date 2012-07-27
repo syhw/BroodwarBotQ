@@ -116,7 +116,7 @@ protected:
     const int _refreshPathFramerate; // should be static TODO
     int _maxDistWhileRefreshingPath; // not static because dependent on the speed
     int _maxDistInOneClick; // not static because dependent on the speed
-    Position _inPos;
+    BWAPI::Position _inPos;
     bool _fleeing;
     bool _fightMoving;
     //std::multimap<BWAPI::Position, attractor_type> _prox;
@@ -164,7 +164,7 @@ protected:
     int computeDmg(BWAPI::Unit* u);
     bool inRange(BWAPI::Unit* u);
     bool outRanges(BWAPI::Unit* u);
-	bool outRanges(const std::set<Unit*>& units);
+	bool outRanges(const std::set<BWAPI::Unit*>& units);
 	bool isOutrangingMe(BWAPI::Unit* u);
     void drawDirV();
     void updateObj();
@@ -202,7 +202,7 @@ protected:
     bool dragMine();
     void drawProbs(std::multimap<double, Vec>& probs, int number=0);
     unit_mode _mode;
-    std::set<Unit*> _targetingMe;
+    std::set<BWAPI::Unit*> _targetingMe;
     void updateTargetingMe();
 public:
     int _fleeingDmg; // number of DPS we have to take in to decide to flee, default 20

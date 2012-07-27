@@ -6,11 +6,11 @@
 using namespace std;
 using namespace BWAPI;
 
-ProbTables MedicUnit::_sProbTables = ProbTables(BWAPI::UnitTypes::Terran_Medic.getID());
+ProbTables MedicUnit::_sProbTables = ProbTables(UnitTypes::Terran_Medic.getID());
 
-std::set<BWAPI::UnitType> MedicUnit::setPrio;
+std::set<UnitType> MedicUnit::setPrio;
 
-MedicUnit::MedicUnit(BWAPI::Unit* u)
+MedicUnit::MedicUnit(Unit* u)
 : GroundUnit(u, &_sProbTables)
 {
     _fleeingDmg = 32; // one round of storm = 14
@@ -23,7 +23,7 @@ MedicUnit::~MedicUnit()
 #ifdef __LEARNING_PROB_TABLES__
 void MedicUnit::initProbTables()
 {
-	_sProbTables = ProbTables(BWAPI::UnitTypes::Terran_Medic.getID());
+	_sProbTables = ProbTables(UnitTypes::Terran_Medic.getID());
 }
 #endif
 
@@ -98,7 +98,7 @@ int MedicUnit::getAttackDuration()
     return 1;
 }
 
-std::set<BWAPI::UnitType> MedicUnit::getSetPrio()
+std::set<UnitType> MedicUnit::getSetPrio()
 {
     return MedicUnit::setPrio;
 }

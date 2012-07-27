@@ -108,9 +108,9 @@ class MapManager : public CSingleton<MapManager>
     static unsigned __stdcall StaticLaunchPathfinding(void* obj);
     DWORD LaunchPathfinding();
     int _lastStormUpdateFrame;
-    std::map<Position, int> _stormPosBuf;
-    std::map<Position, int> _dontReStorm;
-    std::map<Position, int> _dontReStormBuf;
+	std::map<BWAPI::Position, int> _stormPosBuf;
+    std::map<BWAPI::Position, int> _dontReStorm;
+    std::map<BWAPI::Position, int> _dontReStormBuf;
     std::multimap<double, BWAPI::Unit*> _rangeEnemiesBuf;
     std::map<BWAPI::Unit*, BWAPI::Position> _alliedUnitsPosBuf;
     std::map<BWAPI::Unit*, BWAPI::Position> _enemyUnitsPosBuf;
@@ -127,8 +127,8 @@ class MapManager : public CSingleton<MapManager>
     inline void addAlliedUnit(BWAPI::Unit* u);
     inline void removeBuilding(BWAPI::Unit* u);
     inline void removeAlliedUnit(BWAPI::Unit* u);
-    inline void modifyDamages(int* tab, Position p, int minRadius, int maxRadius, int damages);
-    inline void updateDamagesGrad(Vec* grad, int* tab, Position p, int minRadius, int maxRadius);
+    inline void modifyDamages(int* tab, BWAPI::Position p, int minRadius, int maxRadius, int damages);
+    inline void updateDamagesGrad(Vec* grad, int* tab, BWAPI::Position p, int minRadius, int maxRadius);
     inline void removeDmg(BWAPI::UnitType ut, BWAPI::Position p);
     inline void removeDmgStorm(BWAPI::Position p);
     inline void addDmg(BWAPI::UnitType ut, BWAPI::Position p);
@@ -180,7 +180,7 @@ public:
     int* airDamages;            // build tiles
     Vec* groundDamagesGrad;     // build tiles
     Vec* airDamagesGrad;        // build tiles
-    std::map<Position, int> stormPos;
+    std::map<BWAPI::Position, int> stormPos;
 	bool isWalkable(const BWAPI::TilePosition& tp);
     void onUnitCreate(BWAPI::Unit* u);
     void onUnitDestroy(BWAPI::Unit* u);
@@ -202,7 +202,7 @@ public:
 	BWAPI::TilePosition closestWalkable(const BWAPI::TilePosition& tp);
 	static BWTA::Region* closestRegion(const BWAPI::TilePosition& tp);
 	ChokeDepReg closestCDR(const BWAPI::TilePosition& tp);
-	inline bool isBTRawWalkable(const TilePosition& tp);
+	inline bool isBTRawWalkable(const BWAPI::TilePosition& tp);
 	bool isBTWalkable(int x, int y);
 	bool isBTWalkable(const BWAPI::TilePosition& tp);
 	BWAPI::TilePosition regionsPFCenters(BWTA::Region* r);

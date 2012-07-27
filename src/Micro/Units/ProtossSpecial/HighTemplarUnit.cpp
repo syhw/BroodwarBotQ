@@ -3,9 +3,11 @@
 #include "Micro/UnitsGroup.h"
 #include "Regions/MapManager.h"
 
+using namespace BWAPI;
+
 int HighTemplarUnit::lastStormableUnitsUpdateFrame;
 
-HighTemplarUnit::HighTemplarUnit(BWAPI::Unit* u)
+HighTemplarUnit::HighTemplarUnit(Unit* u)
 : SpecialUnit(u)
 , _lastStormFrame(0)
 , _mergingFrame(0)
@@ -36,7 +38,7 @@ void HighTemplarUnit::micro()
         return;
 
 	/// Merge if that's the most interesting thing to do
-    if (((!Broodwar->self()->hasResearched(BWAPI::TechTypes::Psionic_Storm) && unit->getEnergy() < 75) || unit->getEnergy() < 20 /* TODO */ || (unit->getEnergy() < 74 && unit->getHitPoints() < 20) 
+    if (((!Broodwar->self()->hasResearched(TechTypes::Psionic_Storm) && unit->getEnergy() < 75) || unit->getEnergy() < 20 /* TODO */ || (unit->getEnergy() < 74 && unit->getHitPoints() < 20) 
         || (unit->getEnergy() < 55 && unit->getShields() < 2)) && elapsed > Broodwar->getLatencyFrames() + getAttackDuration())
     {
         _unitsGroup->signalMerge(unit);
@@ -132,7 +134,7 @@ void HighTemplarUnit::micro()
 			|| bestScore > 4
 			|| (_unitsGroup->enemies.size() == 1 && bestScore >= 3))
         {       
-            unit->useTech(BWAPI::TechTypes::Psionic_Storm, _bestStormPos);
+            unit->useTech(TechTypes::Psionic_Storm, _bestStormPos);
             //Broodwar->printf("Frame %d, pos (%d, %d), stormPos size %d", Broodwar->getFrameCount(), bestStormPos.x(), bestStormPos.y(), _mapManager->stormPos.size());
             // tell the MapManager that we just stormed here
             _mapManager->justStormed(_bestStormPos);
@@ -148,7 +150,7 @@ void HighTemplarUnit::check()
 {
 }
 
-std::set<BWAPI::UnitType> HighTemplarUnit::getSetPrio()
+std::set<UnitType> HighTemplarUnit::getSetPrio()
 {
-    return std::set<BWAPI::UnitType>();
+    return std::set<UnitType>();
 }

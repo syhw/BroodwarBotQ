@@ -1,7 +1,9 @@
 #include <PrecompiledHeader.h>
 #include "Micro/Units/ProtossFlying/ShuttleUnit.h"
 
-ShuttleUnit::ShuttleUnit(BWAPI::Unit* u)
+using namespace BWAPI;
+
+ShuttleUnit::ShuttleUnit(Unit* u)
 : FlyingUnit(u)
 {
 }
@@ -53,7 +55,7 @@ int ShuttleUnit::getAttackDuration()
     return 0;
 }
 
-std::set<BWAPI::UnitType> ShuttleUnit::getSetPrio()
+std::set<UnitType> ShuttleUnit::getSetPrio()
 {
-    return std::set<BWAPI::UnitType>();
+    return std::set<UnitType>();
 }

@@ -2,6 +2,8 @@
 #include "Micro/Goals/KillSubgoal.h"
 #include "Macro/InformationManager.h"
 
+using namespace BWAPI;
+
 KillSubgoal::KillSubgoal(SubgoalLogic l, UnitsGroup* ug, Unit* u) 
 : Subgoal(l, ug)
 , _target(u)

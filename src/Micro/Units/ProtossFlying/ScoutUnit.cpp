@@ -1,23 +1,25 @@
 #include <PrecompiledHeader.h>
 #include "Micro/Units/ProtossFlying/ScoutUnit.h"
 
-std::set<BWAPI::UnitType> ScoutUnit::setPrio;
+using namespace BWAPI;
 
-ScoutUnit::ScoutUnit(BWAPI::Unit* u)
+std::set<UnitType> ScoutUnit::setPrio;
+
+ScoutUnit::ScoutUnit(Unit* u)
 : FlyingUnit(u)
 {
     if (setPrio.empty())
     {
-        setPrio.insert(BWAPI::UnitTypes::Protoss_Corsair);
-        setPrio.insert(BWAPI::UnitTypes::Protoss_Scout);
-        setPrio.insert(BWAPI::UnitTypes::Protoss_Carrier);
-		setPrio.insert(BWAPI::UnitTypes::Terran_Wraith);
-		setPrio.insert(BWAPI::UnitTypes::Terran_Valkyrie);
-		setPrio.insert(BWAPI::UnitTypes::Terran_Science_Vessel);
-		setPrio.insert(BWAPI::UnitTypes::Terran_Battlecruiser);
-		setPrio.insert(BWAPI::UnitTypes::Zerg_Scourge);
-		setPrio.insert(BWAPI::UnitTypes::Zerg_Mutalisk);
-		setPrio.insert(BWAPI::UnitTypes::Zerg_Devourer);
+        setPrio.insert(UnitTypes::Protoss_Corsair);
+        setPrio.insert(UnitTypes::Protoss_Scout);
+        setPrio.insert(UnitTypes::Protoss_Carrier);
+		setPrio.insert(UnitTypes::Terran_Wraith);
+		setPrio.insert(UnitTypes::Terran_Valkyrie);
+		setPrio.insert(UnitTypes::Terran_Science_Vessel);
+		setPrio.insert(UnitTypes::Terran_Battlecruiser);
+		setPrio.insert(UnitTypes::Zerg_Scourge);
+		setPrio.insert(UnitTypes::Zerg_Mutalisk);
+		setPrio.insert(UnitTypes::Zerg_Devourer);
 	}
 }
 
@@ -91,7 +93,7 @@ int ScoutUnit::getAttackDuration()
     return Broodwar->getLatencyFrames();
 }
 
-std::set<BWAPI::UnitType> ScoutUnit::getSetPrio()
+std::set<UnitType> ScoutUnit::getSetPrio()
 {
     return ScoutUnit::setPrio;
 }

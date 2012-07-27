@@ -2,22 +2,24 @@
 #include "Micro/Units/ProtossGround/ArchonUnit.h"
 #include "Micro/UnitsGroup.h"
 
-std::set<BWAPI::UnitType> ArchonUnit::setPrio;
+using namespace BWAPI;
 
-ArchonUnit::ArchonUnit(BWAPI::Unit* u)
+std::set<UnitType> ArchonUnit::setPrio;
+
+ArchonUnit::ArchonUnit(Unit* u)
 : GroundUnit(u)
 {
     if (setPrio.empty())
     {
-        setPrio.insert(BWAPI::UnitTypes::Zerg_Mutalisk);
-        setPrio.insert(BWAPI::UnitTypes::Zerg_Zergling);
-        setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
-        setPrio.insert(BWAPI::UnitTypes::Protoss_Zealot);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Firebat);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Marine);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Medic);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Ghost);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Wraith);
+        setPrio.insert(UnitTypes::Zerg_Mutalisk);
+        setPrio.insert(UnitTypes::Zerg_Zergling);
+        setPrio.insert(UnitTypes::Protoss_High_Templar);
+        setPrio.insert(UnitTypes::Protoss_Zealot);
+        setPrio.insert(UnitTypes::Terran_Firebat);
+        setPrio.insert(UnitTypes::Terran_Marine);
+        setPrio.insert(UnitTypes::Terran_Medic);
+        setPrio.insert(UnitTypes::Terran_Ghost);
+        setPrio.insert(UnitTypes::Terran_Wraith);
     }
 }
 
@@ -118,7 +120,7 @@ int ArchonUnit::getAttackDuration()
     return 3;
 }
 
-std::set<BWAPI::UnitType> ArchonUnit::getSetPrio()
+std::set<UnitType> ArchonUnit::getSetPrio()
 {
     return ArchonUnit::setPrio;
 }

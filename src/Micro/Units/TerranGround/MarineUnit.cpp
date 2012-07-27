@@ -6,19 +6,19 @@
 using namespace std;
 using namespace BWAPI;
 
-ProbTables MarineUnit::_sProbTables = ProbTables(BWAPI::UnitTypes::Terran_Marine.getID());
+ProbTables MarineUnit::_sProbTables = ProbTables(UnitTypes::Terran_Marine.getID());
 
-std::set<BWAPI::UnitType> MarineUnit::setPrio;
+std::set<UnitType> MarineUnit::setPrio;
 
-MarineUnit::MarineUnit(BWAPI::Unit* u)
+MarineUnit::MarineUnit(Unit* u)
 : GroundUnit(u, &_sProbTables)
 {
     if (setPrio.empty())
     {
-        setPrio.insert(BWAPI::UnitTypes::Protoss_Reaver);
-        setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode);
+        setPrio.insert(UnitTypes::Protoss_Reaver);
+        setPrio.insert(UnitTypes::Protoss_High_Templar);
+        setPrio.insert(UnitTypes::Terran_Siege_Tank_Siege_Mode);
+        setPrio.insert(UnitTypes::Terran_Siege_Tank_Tank_Mode);
     }
     _fleeingDmg = 24;
 }
@@ -32,7 +32,7 @@ MarineUnit::~MarineUnit()
 #ifdef __LEARNING_PROB_TABLES__
 void MarineUnit::initProbTables()
 {
-	_sProbTables = ProbTables(BWAPI::UnitTypes::Terran_Marine.getID());
+	_sProbTables = ProbTables(UnitTypes::Terran_Marine.getID());
 }
 #endif
 
@@ -140,7 +140,7 @@ int MarineUnit::getAttackDuration()
     return 1;
 }
 
-std::set<BWAPI::UnitType> MarineUnit::getSetPrio()
+std::set<UnitType> MarineUnit::getSetPrio()
 {
     return MarineUnit::setPrio;
 }

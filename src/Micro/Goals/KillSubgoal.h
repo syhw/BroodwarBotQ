@@ -5,7 +5,7 @@ class KillSubgoal : public Subgoal
 {
 public:
 	KillSubgoal(SubgoalLogic l, UnitsGroup* ug, BWAPI::Unit* u);
-	Unit* _target;
+	BWAPI::Unit* _target;
 	bool isRealized();
 	void tryToRealize();
 	double distanceToRealize();

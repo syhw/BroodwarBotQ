@@ -3,15 +3,15 @@
 
 using namespace BWAPI;
 
-std::set<BWAPI::UnitType> MutaliskUnit::setPrio;
+std::set<UnitType> MutaliskUnit::setPrio;
 
-MutaliskUnit::MutaliskUnit(BWAPI::Unit* u)
+MutaliskUnit::MutaliskUnit(Unit* u)
 : FlyingUnit(u)
 {
     if (setPrio.empty())
     {
-        setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
-        setPrio.insert(BWAPI::UnitTypes::Zerg_Scourge);
+        setPrio.insert(UnitTypes::Protoss_High_Templar);
+        setPrio.insert(UnitTypes::Zerg_Scourge);
     }
     _maxDiag = 46; // to space them more (and avoid splash)
 }
@@ -84,7 +84,7 @@ int MutaliskUnit::getAttackDuration()
     return 1;//Broodwar->getLatencyFrames();
 }
 
-std::set<BWAPI::UnitType> MutaliskUnit::getSetPrio()
+std::set<UnitType> MutaliskUnit::getSetPrio()
 {
     return MutaliskUnit::setPrio;
 }

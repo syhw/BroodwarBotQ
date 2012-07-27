@@ -10,9 +10,9 @@ using namespace BWAPI;
 int DragoonUnit::addRange;
 int DragoonUnit::attackDuration;
 
-std::set<BWAPI::UnitType> DragoonUnit::setPrio;
+std::set<UnitType> DragoonUnit::setPrio;
 
-DragoonUnit::DragoonUnit(BWAPI::Unit* u)
+DragoonUnit::DragoonUnit(Unit* u)
 : GroundUnit(u)
 {
     if (Broodwar->self()->getUpgradeLevel(UpgradeTypes::Singularity_Charge))
@@ -23,15 +23,15 @@ DragoonUnit::DragoonUnit(BWAPI::Unit* u)
 
     if (setPrio.empty())
     {
-        setPrio.insert(BWAPI::UnitTypes::Terran_Vulture_Spider_Mine);
-        setPrio.insert(BWAPI::UnitTypes::Zerg_Lurker);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode);
-        setPrio.insert(BWAPI::UnitTypes::Protoss_Observer);
-        setPrio.insert(BWAPI::UnitTypes::Protoss_Carrier);
-        setPrio.insert(BWAPI::UnitTypes::Protoss_Archon);
-        setPrio.insert(BWAPI::UnitTypes::Protoss_Reaver);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode);
-        setPrio.insert(BWAPI::UnitTypes::Zerg_Defiler);
+        setPrio.insert(UnitTypes::Terran_Vulture_Spider_Mine);
+        setPrio.insert(UnitTypes::Zerg_Lurker);
+        setPrio.insert(UnitTypes::Terran_Siege_Tank_Siege_Mode);
+        setPrio.insert(UnitTypes::Protoss_Observer);
+        setPrio.insert(UnitTypes::Protoss_Carrier);
+        setPrio.insert(UnitTypes::Protoss_Archon);
+        setPrio.insert(UnitTypes::Protoss_Reaver);
+        setPrio.insert(UnitTypes::Terran_Siege_Tank_Tank_Mode);
+        setPrio.insert(UnitTypes::Zerg_Defiler);
     }
     _fleeingDmg = 22; // 
 }
@@ -162,7 +162,7 @@ void DragoonUnit::check()
 
 double DragoonUnit::getMaxRange()
 {
-    return BWAPI::Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Singularity_Charge) == 1 ? 192.0 : 128.0;
+    return Broodwar->self()->getUpgradeLevel(BWAPI::UpgradeTypes::Singularity_Charge) == 1 ? 192.0 : 128.0;
 }
 
 int DragoonUnit::getAttackDuration()
@@ -170,7 +170,7 @@ int DragoonUnit::getAttackDuration()
     return attackDuration;
 }
 
-std::set<BWAPI::UnitType> DragoonUnit::getSetPrio()
+std::set<UnitType> DragoonUnit::getSetPrio()
 {
     return DragoonUnit::setPrio;
 }

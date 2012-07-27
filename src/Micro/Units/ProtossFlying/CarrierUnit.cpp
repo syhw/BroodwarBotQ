@@ -2,31 +2,33 @@
 #include "Micro/Units/ProtossFlying/CarrierUnit.h"
 #include "Macro/Producer.h"
 
-std::set<BWAPI::UnitType> CarrierUnit::setPrio;
+using namespace BWAPI;
 
-CarrierUnit::CarrierUnit(BWAPI::Unit* u)
+std::set<UnitType> CarrierUnit::setPrio;
+
+CarrierUnit::CarrierUnit(Unit* u)
 : FlyingUnit(u)
 {
     if (setPrio.empty())
     {
-        setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
-        setPrio.insert(BWAPI::UnitTypes::Protoss_Corsair);
-        setPrio.insert(BWAPI::UnitTypes::Protoss_Scout);
-        setPrio.insert(BWAPI::UnitTypes::Protoss_Dragoon);
-        setPrio.insert(BWAPI::UnitTypes::Protoss_Archon);
-        setPrio.insert(BWAPI::UnitTypes::Protoss_Carrier);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Marine);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Ghost);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Wraith);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Valkyrie);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Science_Vessel);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Battlecruiser);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Goliath);
-        setPrio.insert(BWAPI::UnitTypes::Zerg_Hydralisk);
-        setPrio.insert(BWAPI::UnitTypes::Zerg_Mutalisk);
-        setPrio.insert(BWAPI::UnitTypes::Zerg_Devourer);
-        setPrio.insert(BWAPI::UnitTypes::Zerg_Scourge);
-        setPrio.insert(BWAPI::UnitTypes::Zerg_Defiler);
+        setPrio.insert(UnitTypes::Protoss_High_Templar);
+        setPrio.insert(UnitTypes::Protoss_Corsair);
+        setPrio.insert(UnitTypes::Protoss_Scout);
+        setPrio.insert(UnitTypes::Protoss_Dragoon);
+        setPrio.insert(UnitTypes::Protoss_Archon);
+        setPrio.insert(UnitTypes::Protoss_Carrier);
+        setPrio.insert(UnitTypes::Terran_Marine);
+        setPrio.insert(UnitTypes::Terran_Ghost);
+        setPrio.insert(UnitTypes::Terran_Wraith);
+        setPrio.insert(UnitTypes::Terran_Valkyrie);
+        setPrio.insert(UnitTypes::Terran_Science_Vessel);
+        setPrio.insert(UnitTypes::Terran_Battlecruiser);
+        setPrio.insert(UnitTypes::Terran_Goliath);
+        setPrio.insert(UnitTypes::Zerg_Hydralisk);
+        setPrio.insert(UnitTypes::Zerg_Mutalisk);
+        setPrio.insert(UnitTypes::Zerg_Devourer);
+        setPrio.insert(UnitTypes::Zerg_Scourge);
+        setPrio.insert(UnitTypes::Zerg_Defiler);
     }
 	_fleeingDmg = 40;
 }
@@ -105,7 +107,7 @@ int CarrierUnit::getAttackDuration()
     return 9;
 }
 
-std::set<BWAPI::UnitType> CarrierUnit::getSetPrio()
+std::set<UnitType> CarrierUnit::getSetPrio()
 {
     return CarrierUnit::setPrio;
 }

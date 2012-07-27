@@ -19,5 +19,5 @@ public:
 	DropGoal(BWAPI::Position p, const std::map<BWAPI::UnitType, int>& nU, int priority=96);
 	virtual ~DropGoal();
 	void achieve();
-	virtual void DropGoal::onOffer(std::set<Unit*> objects);
+	virtual void DropGoal::onOffer(std::set<BWAPI::Unit*> objects);
 };

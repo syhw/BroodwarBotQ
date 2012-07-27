@@ -1,24 +1,26 @@
 #include <PrecompiledHeader.h>
 #include "Micro/Units/ProtossGround/ReaverUnit.h"
 
-std::set<BWAPI::UnitType> ReaverUnit::setPrio;
+using namespace BWAPI;
 
-ReaverUnit::ReaverUnit(BWAPI::Unit* u)
+std::set<UnitType> ReaverUnit::setPrio;
+
+ReaverUnit::ReaverUnit(Unit* u)
 : GroundUnit(u)
 {
     if (setPrio.empty())
     {
-        setPrio.insert(BWAPI::UnitTypes::Protoss_High_Templar);
-        setPrio.insert(BWAPI::UnitTypes::Zerg_Defiler);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode);
-        setPrio.insert(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode);
-        setPrio.insert(BWAPI::UnitTypes::Protoss_Dragoon);
-        setPrio.insert(BWAPI::UnitTypes::Protoss_Reaver);
-        setPrio.insert(BWAPI::UnitTypes::Terran_SCV);
-        setPrio.insert(BWAPI::UnitTypes::Zerg_Drone);
-        setPrio.insert(BWAPI::UnitTypes::Protoss_Probe);
-        setPrio.insert(BWAPI::UnitTypes::Zerg_Hydralisk);
-        setPrio.insert(BWAPI::UnitTypes::Zerg_Lurker);
+        setPrio.insert(UnitTypes::Protoss_High_Templar);
+        setPrio.insert(UnitTypes::Zerg_Defiler);
+        setPrio.insert(UnitTypes::Terran_Siege_Tank_Siege_Mode);
+        setPrio.insert(UnitTypes::Terran_Siege_Tank_Tank_Mode);
+        setPrio.insert(UnitTypes::Protoss_Dragoon);
+        setPrio.insert(UnitTypes::Protoss_Reaver);
+        setPrio.insert(UnitTypes::Terran_SCV);
+        setPrio.insert(UnitTypes::Zerg_Drone);
+        setPrio.insert(UnitTypes::Protoss_Probe);
+        setPrio.insert(UnitTypes::Zerg_Hydralisk);
+        setPrio.insert(UnitTypes::Zerg_Lurker);
     }
 }
 
@@ -55,7 +57,7 @@ void ReaverUnit::check()
 	}
 }
 
-bool ReaverUnit::inRange(BWAPI::Unit* u)
+bool ReaverUnit::inRange(Unit* u)
 {
     return (!u->getType().isFlyer() && _unitPos.getDistance(u->getPosition()) <= (double)8*32);
 }
@@ -65,7 +67,7 @@ int ReaverUnit::getAttackDuration()
     return 42; // real cooldown is 60 :)
 }
 
-std::set<BWAPI::UnitType> ReaverUnit::getSetPrio()
+std::set<UnitType> ReaverUnit::getSetPrio()
 {
     return ReaverUnit::setPrio;
 }
