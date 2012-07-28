@@ -65,7 +65,6 @@ void DefendGoal::check()
 	else
 	{
 		bidDefUnits();
-
 		_status = GS_IN_PROGRESS;
 
 #ifdef __MICRO_DEBUG__
@@ -173,6 +172,7 @@ void DefendGoal::check()
 			TheArbitrator->removeBid(this, _workersOwnded.front());
 			_workersOwned.pop_front();
 		}*/
+
 	}
 }
 
@@ -209,7 +209,7 @@ std::string DefendGoal::getShortName() const
 
 void DefendGoal::bidDefUnits()
 {
-	set<Unit*> interestingUnits = SelectAll().not(isBuilding);
+	set<Unit*> interestingUnits = SelectAll()(isCompleted).not(isBuilding);
 	for each (Unit* u in interestingUnits)
 	{
 		if (!_biddedOn.count(u) && (!u->getType().isWorker() 
@@ -246,6 +246,12 @@ void DefendGoal::onOffer(set<Unit*> objects) // TODO refactor (only a 3 lines di
 				}
 				else
 					_incompleteUnits.push_back(u);
+			}
+			else
+			{
+				TheArbitrator->decline(this, u, 0);
+				TheArbitrator->removeBid(this, u);
+				_biddedOn.erase(u);
 			}
 		}
 	}

@@ -237,6 +237,14 @@ void WorkerManager::rebalanceWorkers()
 
 void WorkerManager::update()
 {
+#ifdef __ARBITRATOR_DEBUG__
+	for each (pair<Unit*, WorkerData> u in workers)
+	{
+		Position displayp = u.first->getPosition();
+		Broodwar->drawTextMap(max(0, displayp.x() - 16), min(Broodwar->mapHeight()*TILE_SIZE - 8, displayp.y() + 16), "\x07 %d", this);
+	}
+#endif
+
 	//bid a constant value of 10 on all completed workers
 	set<Unit*> w = SelectAll()(isCompleted)(isWorker);
 	for each(Unit* u in w)
@@ -275,9 +283,14 @@ void WorkerManager::update()
 			i->getOrder() == Orders::WaitForMinerals || 
 			i->getOrder() == Orders::MoveToGas || 
 			i->getOrder() == Orders::WaitForGas || 
-			i->getOrder() == Orders::PlayerGuard)
+			i->getOrder() == Orders::PlayerGuard) 
+		{
 			if ((i->getTarget()==NULL || !i->getTarget()->exists() || !i->getTarget()->getType().isResourceDepot()) && i->getTarget() != resource)
 				i->rightClick(resource);
+		}
+		else if (!(i->isGatheringGas()) && !(i->isGatheringMinerals()) && !(i->isConstructing()))
+			i->rightClick(resource); /// RECENT ADDITION 28-07-2012
+
 		if (i->isCarryingGas() || i->isCarryingMinerals())
 		{
 			if (i->getOrder() == Orders::ReturnGas || i->getOrder() == Orders::ReturnMinerals ||  (i->getOrder() == Orders::PlayerGuard && BWAPI::Broodwar->getFrameCount()>u->second.lastFrameSpam+BWAPI::Broodwar->getLatencyFrames()*2))

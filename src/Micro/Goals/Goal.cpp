@@ -126,6 +126,12 @@ void Goal::onOffer(set<Unit*> objects)
 				else
 					_incompleteUnits.push_back(u);
 			}
+			else
+			{
+				TheArbitrator->decline(this, u, 0);
+				TheArbitrator->removeBid(this, u);
+				_biddedOn.erase(u);
+			}
 		}
 	}
 	else
@@ -166,7 +172,6 @@ string Goal::getShortName() const
 void Goal::update()
 {
 #ifdef __ARBITRATOR_DEBUG__
-	  // TODO afficher le pointeur de l'objet qui possede l'unit sur l'unit
 	for each (pBayesianUnit bu in _unitsGroup.units)
 	{
 		Position displayp = bu->unit->getPosition();
