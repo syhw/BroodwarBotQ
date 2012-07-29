@@ -12,6 +12,9 @@ class Micro : public CSingleton<Micro>
 	~Micro();
 	bool _launchedFirstPush;
 	bool _launchedFirstDrop;
+	inline void checkDefense();
+	inline void launchFirstPush();
+	inline void launchFirstDrop();
 public:
 	GoalManager* goalManager;
 	std::set<BWTA::Chokepoint*> ourChokes;

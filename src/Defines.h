@@ -27,7 +27,6 @@
 #define __TILES_RADIUS_DEFEND_BASE__ 26
 #define __MAX_TRIES_BUILD_SOMETHING__ 1440 // IN FRAMES, 1 minute here
 #define __PYLON_COVERAGE_TILES__ 4 // length/size of the pylon coverage radius in build tiles
-#define __DEFEND_BASES_ONLY__ // uses only our bases to spawn defend goals
 //#define __2_PROBES_PER_ENEMY_WORKER_DEFENSE__ // put 2 probes on one attacking worker in DefendGoal
 
 #ifdef __DEBUG__
