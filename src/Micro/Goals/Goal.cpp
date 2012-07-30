@@ -193,8 +193,12 @@ void Goal::update()
 			{	
 				if (_neededUnits.find((*it)->getType()) != _neededUnits.end())
 					_neededUnits[(*it)->getType()] -= 1;
-				_unitsGroup.dispatchCompleteUnit(GoalManager::Instance().getCompletedUnit(*it));
-				_incompleteUnits.erase(it++);
+				GoalManager* gm = & GoalManager::Instance();
+				if (gm->getCompletedUnits().find(*it) != gm->getCompletedUnits().end())
+				{
+					_unitsGroup.dispatchCompleteUnit(gm->getCompletedUnit(*it));
+					_incompleteUnits.erase(it++);
+				}
 			}
 			else
 				++it;
