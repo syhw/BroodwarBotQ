@@ -112,15 +112,9 @@ void GoalManager::onUnitDestroy(Unit* u)
 {
 	if (u->getPlayer() == Broodwar->self())
 	{
-		for (map<Unit*, pBayesianUnit>::const_iterator it = _completedUnits.begin();
-			it != _completedUnits.end(); ++it)
-		{
-			if (it->first == u)
-			{
-				_completedUnits.erase(it);
-				break;
-			}
-		}
+		map<Unit*, pBayesianUnit>::iterator itUnit = _completedUnits.find(u);
+		if (itUnit != _completedUnits.end())
+			_completedUnits.erase(itUnit);
 		_inTrainingUnits.remove(u);
 	}
 	for each (pGoal g in _goals)
@@ -134,5 +128,8 @@ const map<Unit*, pBayesianUnit>& GoalManager::getCompletedUnits() const
 
 pBayesianUnit GoalManager::getCompletedUnit(Unit* u)
 {
+#ifdef __DEBUG__
+	assert(_completedUnits.find(u) != _completedUnits.end());
+#endif
 	return _completedUnits[u];
 }

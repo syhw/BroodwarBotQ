@@ -49,6 +49,13 @@ void DropGoal::achieve()
 		if (bu->getType() == UnitTypes::Protoss_Reaver)
 			_reaverBu = bu;
 	}
+	for each (pBayesianUnit bu in _unitsGroup.arrivingUnits)
+	{
+		if (_dropShipBu == NULL && bu->getType() == UnitTypes::Protoss_Shuttle)
+			_dropShipBu = bu;
+		if (_reaverBu == NULL && bu->getType() == UnitTypes::Protoss_Reaver)
+			_reaverBu = bu;
+	}
 	if (_dropShipBu == NULL || _dropShipBu.get() == NULL || _dropShipBu->unit == NULL || !_dropShipBu->unit->exists() || _dropShipBu->getType() != UnitTypes::Protoss_Shuttle
 		|| _reaverBu == NULL || _reaverBu.get() == NULL || _reaverBu->unit == NULL || !_reaverBu->unit->exists() || _reaverBu->getType() != UnitTypes::Protoss_Reaver)
 	{
@@ -67,10 +74,11 @@ void DropGoal::achieve()
 		{
 			/// gogogo
 			_unitsGroup.nonFlyers = 0;
+			_unitsGroup.groupTargetPosition = _dropPos;
 			if (_unitsGroup.groupMode != MODE_SCOUT)
 				_unitsGroup.switchMode(MODE_SCOUT);
 			_unitsGroup.update();
-			if (!(Broodwar->getFrameCount() % 23))
+			if (!(Broodwar->getFrameCount() % 25))
 			{
 				if (_dropShipBu->getPPath().empty())
 				{
@@ -127,30 +135,20 @@ void DropGoal::achieve()
 void DropGoal::onOffer(set<Unit*> objects)
 {
 	GoalManager* gm = & GoalManager::Instance();
-	if ((_status == GS_WAIT_PRECONDITION || _status == GS_IN_PROGRESS)
-		&& _unitsGroup.emptyUnits())
+	//if ((_status == GS_WAIT_PRECONDITION || _status == GS_IN_PROGRESS)
+	//	&& _unitsGroup.emptyUnits())
+	if (_status == GS_WAIT_PRECONDITION)
 	{
-		Position choke = (*BWTA::getStartLocation(Broodwar->self())->getRegion()->getChokepoints().begin())->getCenter();
-		double minDist = DBL_MAX;
-		Unit* acceptedUnit = NULL;
         for each (Unit* u in objects)
 		{
 			if (gm->getCompletedUnits().find(u) != gm->getCompletedUnits().end()
 				&& _neededUnits.find(u->getType()) != _neededUnits.end() // take uniquely needed units
 				&& _neededUnits[u->getType()] > 0)
 			{
-				if (u->getDistance(choke) < minDist)
-				{
-					acceptedUnit = u;
-					minDist = u->getDistance(choke);
-				}
+				TheArbitrator->accept(this, u, _priority);
+				_neededUnits[u->getType()] -= 1;
+				_unitsGroup.dispatchCompleteUnit(gm->getCompletedUnit(u));
 			}
-		}
-		if (acceptedUnit != NULL)
-		{
-			TheArbitrator->accept(this, acceptedUnit, _priority);
-			_neededUnits[acceptedUnit->getType()] -= 1;
-			_unitsGroup.dispatchCompleteUnit(gm->getCompletedUnit(acceptedUnit));
 		}
 	}
 	else
@@ -160,4 +158,9 @@ void DropGoal::onOffer(set<Unit*> objects)
         for each (Unit* u in objects)
 			_biddedOn.erase(u);
 	}
+}
+
+void DropGoal::update()
+{
+	Goal::update();
 }
