@@ -1,7 +1,9 @@
 #pragma once
 #include "Micro/Goals/Goal.h"
+#include "Micro/UnitsGroup.h"
 #include "BWTA.h"
 #include "Micro/Units/BayesianUnit.h"
+
 
 /*** 
  * A helper/wrapper on top of Goal to facilitate simple attacks (pushs)

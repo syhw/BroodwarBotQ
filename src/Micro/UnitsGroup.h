@@ -48,9 +48,14 @@ struct i_dist
 struct BasicUnitsGroup // should derive from vector<pBayesianUnit>
 {
 	std::vector<pBayesianUnit> units;
+	unit_mode groupMode;
 	virtual void update();
 	bool emptyUnits();
     int size() const;
+	void switchMode(unit_mode um);
+	void idle();
+	inline void activateUnit(pBayesianUnit bu);
+	BasicUnitsGroup();
 };
 
 class UnitsGroup : public BasicUnitsGroup
@@ -70,7 +75,6 @@ private:
     inline void updateNearbyEnemyUnitsFromFilter(BWAPI::Position p, double radius = 400.0);
     double evaluateForces();
 	inline std::vector<BWAPI::Position> findRangePositions();
-	inline void activeUnit(pBayesianUnit bu);
     bool removeUnit(BWAPI::Unit* u);
     bool removeArrivingUnit(BWAPI::Unit* u);
 #ifdef __MICRO_DEBUG__
@@ -96,7 +100,6 @@ public:
 	bool readyToAttack;
 	/// Group recap variables
 	int nonFlyers;
-	unit_mode groupMode;
     BWAPI::Position center;
     int groupAltitude;
     double stdDevRadius, maxRadius;
@@ -116,8 +119,6 @@ public:
 	/// Group interaction/orders
 	void move(BWAPI::Position& p);
 	virtual void formation(pFormation f);
-	void switchMode(unit_mode um);
-	void idle();
 	/// Units pool management
 	void dispatchCompleteUnit(pBayesianUnit bu);
     void giveUpControl(BWAPI::Unit* u);
@@ -136,7 +137,6 @@ public:
     inline double getDistance(BWAPI::Unit* u) const;
 	double getDistance(BWAPI::Position p) const;
     int getTotalHP() const;
-    std::vector<pBayesianUnit>* getUnits(); // a baaad getter, keep an eye
 	const BayesianUnit& operator[](ptrdiff_t i);
 	/// Templas merging
     inline void templarMergingStuff();

@@ -17,8 +17,14 @@ using namespace BWAPI;
 //#define __WITH_SUICIDE__
 #define __MAX_DISTANCE_TO_GROUP__ 13*TILE_SIZE
 
+BasicUnitsGroup::BasicUnitsGroup()
+: groupMode(MODE_MOVE)
+{
+}
+
 UnitsGroup::UnitsGroup()
-: defaultTargetEnemy(NULL)
+: BasicUnitsGroup()
+, defaultTargetEnemy(NULL)
 , groupTargetPosition(Positions::None)
 , distToTarget(-1.0)
 , _totalHP(0)
@@ -28,7 +34,6 @@ UnitsGroup::UnitsGroup()
 , _backFrame(-200)
 , _offensiveFrame(-200)
 , nonFlyers(0)
-, groupMode(MODE_MOVE)
 , _hasDetection(0)
 , _enemiesVisible(false)
 , centerSpeed(0,0)
@@ -224,7 +229,7 @@ double UnitsGroup::evaluateForces()
 			// consider ground defenses only because we have only ground atm
 			if (ut == UnitTypes::Protoss_Photon_Cannon || ut == UnitTypes::Terran_Bunker)
 			{
-				theirMinPrice += 4*ut.mineralPrice();
+				theirMinPrice += 8*ut.mineralPrice();
 			} else if (ut == UnitTypes::Zerg_Sunken_Colony)
 			{
 				theirMinPrice += 4*(ut.mineralPrice() + 50);
@@ -374,7 +379,7 @@ void UnitsGroup::updateArrivingUnits()
 			{
 				if ((*it)->unit->getPosition().getApproxDistance(center) < __MAX_DISTANCE_TO_GROUP__)
 				{
-					activeUnit(*it);
+					activateUnit(*it);
 					arrivingUnits.erase(it++);
 				}
 				else
@@ -785,12 +790,6 @@ double UnitsGroup::getDistance(BWAPI::Position p) const
 	return center.getApproxDistance(p);
 }
 
-void UnitsGroup::activeUnit(pBayesianUnit bu)
-{
-	bu->switchMode(groupMode);
-	units.push_back(bu);
-}
-
 void UnitsGroup::dispatchCompleteUnit(pBayesianUnit bu)
 {
 	if (bu == NULL || bu->unit == NULL || !bu->unit->exists())
@@ -799,7 +798,7 @@ void UnitsGroup::dispatchCompleteUnit(pBayesianUnit bu)
 	if (!bu->getType().isFlyer()) // ugly
 		++nonFlyers;
 	if (bu->unit->getPosition().getApproxDistance(center) < __MAX_DISTANCE_TO_GROUP__ || units.empty())
-		activeUnit(bu);
+		activateUnit(bu);
 	else
 	{
 		if (bu->getType().canAttack())
@@ -864,11 +863,6 @@ int UnitsGroup::getTotalHP() const
 	return _totalHP;
 }
 
-std::vector<pBayesianUnit>* UnitsGroup::getUnits()
-{
-	return &units;
-}
-
 void UnitsGroup::updateNearbyEnemyUnitsFromFilter(BWAPI::Position p, double radius)
 {
 	// TODO Use a Quadtree (or use BWAPI's getUnitsInRadius, which uses a Quadtree)
@@ -925,6 +919,26 @@ int BasicUnitsGroup::size() const
 {
 	return units.size();
 }
+
+void BasicUnitsGroup::switchMode(unit_mode um)
+{
+	groupMode = um;
+	for(std::vector<pBayesianUnit>::iterator it = units.begin(); it != units.end(); ++it)
+		(*it)->switchMode(um);
+}
+
+void BasicUnitsGroup::idle()
+{
+	for(std::vector<pBayesianUnit>::iterator it = units.begin(); it != units.end(); ++it)
+		(*it)->target = (*it)->unit->getPosition();
+}
+
+void BasicUnitsGroup::activateUnit(pBayesianUnit bu)
+{
+	bu->switchMode(groupMode);
+	units.push_back(bu);
+}
+
 
 void UnitsGroup::updateCenter()
 {
@@ -1058,19 +1072,6 @@ void UnitsGroup::selectedUnits(std::set<pBayesianUnit>& u)
 	}
 }
 #endif
-
-void UnitsGroup::switchMode(unit_mode um)
-{
-	groupMode = um;
-	for(std::vector<pBayesianUnit>::iterator it = getUnits()->begin(); it != getUnits()->end(); ++it)
-		(*it)->switchMode(um);
-}
-
-void UnitsGroup::idle()
-{
-	for(std::vector<pBayesianUnit>::iterator it = getUnits()->begin(); it != getUnits()->end(); ++it)
-		(*it)->target = (*it)->unit->getPosition();
-}
 
 void UnitsGroup::signalMerge(Unit* u)
 {
