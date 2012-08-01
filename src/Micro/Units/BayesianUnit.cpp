@@ -727,6 +727,8 @@ void BayesianUnit::updatePPath()
 		{
 			if (_mode == MODE_SCOUT)
 				mapManager->threatAwarePathfind(this, unit, unit->getTilePosition(), tptarget, _fleeingDmg);
+			//else if (_mode == MODE_DROP)
+			//	mapManager->visionAwarePathfind(this, unit, unit->getTilePosition(), tptarget, _fleeingDmg);
 			else
 				mapManager->pathfind(this, unit, unit->getTilePosition(), tptarget);
 			_lastRefreshPathRequest = Broodwar->getFrameCount();
@@ -1747,10 +1749,6 @@ void BayesianUnit::drawDir()
 
 void BayesianUnit::clickDir()
 {
-	//////// TODO EXPERIMENTAL
-	//if (unit->isStuck())
-	//	return;
-	//////// /TODO EXPERIMENTAL
     double dist = _unitPos.getDistance(target);
     if ((_mode == MODE_SCOUT || _mode == MODE_MOVE) && (dir == Vec(0,0) || dist < 1.1))
     {
@@ -2169,7 +2167,7 @@ void BayesianUnit::update()
     case MODE_SCOUT:
 		if (_unitsGroup && _unitsGroup->enemies.empty())
 		{
-			if (Broodwar->getFrameCount() - _lastClickFrame > Broodwar->getLatencyFrames())
+			if (Broodwar->getFrameCount() - _lastClickFrame + 2 > Broodwar->getLatencyFrames())
 			{
 				Position p = target;
 				if (unit->getVelocityX() < 0.0001 && unit->getVelocityY() < 0.0001) // stuck

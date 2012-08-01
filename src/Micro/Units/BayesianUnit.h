@@ -45,7 +45,8 @@ enum unit_mode {
 #ifdef __WITH_FLOCKING__
     MODE_FLOCK,
 #endif
-    MODE_MOVE
+    MODE_MOVE,
+	//MODE_DROP
 }; 
 
 enum repulse_value {

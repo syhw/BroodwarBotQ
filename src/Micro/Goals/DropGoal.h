@@ -5,9 +5,6 @@
 #include "Micro/Units/BayesianUnit.h"
 
 
-/*** 
- * A helper/wrapper on top of Goal to facilitate simple attacks (pushs)
- */
 class DropGoal: public Goal
 {
 private:
@@ -15,7 +12,7 @@ private:
 	BWAPI::Position _dropPos;
 	BWTA::BaseLocation* _base;
 	pBayesianUnit _dropShipBu;
-	pBayesianUnit _reaverBu; // hack
+	std::list<pBayesianUnit> _dropeeBu;
 public:
 	DropGoal(BWTA::BaseLocation* b, const std::map<BWAPI::UnitType, int>& nU, int priority=96);
 	DropGoal(BWAPI::Position p, const std::map<BWAPI::UnitType, int>& nU, int priority=96);

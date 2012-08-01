@@ -42,35 +42,33 @@ DropGoal::~DropGoal()
 
 void DropGoal::achieve()
 {
+	Unit* reaver = NULL;
 	for each (pBayesianUnit bu in _unitsGroup.units)
 	{
 		if (bu->getType() == UnitTypes::Protoss_Shuttle)
 			_dropShipBu = bu;
+		else
+			_dropeeBu.push_back(bu);
 		if (bu->getType() == UnitTypes::Protoss_Reaver)
-			_reaverBu = bu;
+			reaver = bu->unit;
 	}
-	for each (pBayesianUnit bu in _unitsGroup.arrivingUnits)
-	{
-		if (_dropShipBu == NULL && bu->getType() == UnitTypes::Protoss_Shuttle)
-			_dropShipBu = bu;
-		if (_reaverBu == NULL && bu->getType() == UnitTypes::Protoss_Reaver)
-			_reaverBu = bu;
-	}
-	if (_dropShipBu == NULL || _dropShipBu.get() == NULL || _dropShipBu->unit == NULL || !_dropShipBu->unit->exists() || _dropShipBu->getType() != UnitTypes::Protoss_Shuttle
-		|| _reaverBu == NULL || _reaverBu.get() == NULL || _reaverBu->unit == NULL || !_reaverBu->unit->exists() || _reaverBu->getType() != UnitTypes::Protoss_Reaver)
+	if (_dropShipBu == NULL || _dropShipBu.get() == NULL 
+		|| _dropShipBu->unit == NULL || !_dropShipBu->unit->exists() 
+		|| _dropShipBu->getType() != UnitTypes::Protoss_Shuttle
+		|| _dropeeBu.empty())
 	{
 		_status = GS_WAIT_PRECONDITION;
 		return;
 	}
 	if (_dropShipBu->unit->getHitPoints() < 27)
 	{
-		_dropShipBu->unit->unload(_reaverBu->unit);
+		_dropShipBu->unit->unloadAll();
 		return;
 	}
 	if (_unitsGroup.getDistance(_dropPos) > 8*TILE_SIZE)
 	{
 		/// we go there
-		if (_dropShipBu->unit->getLoadedUnits().count(_reaverBu->unit))
+		if (_dropShipBu->unit->getLoadedUnits().size() == _unitsGroup.units.size() - 1) // only one dropship
 		{
 			/// gogogo
 			_unitsGroup.nonFlyers = 0;
@@ -104,28 +102,39 @@ void DropGoal::achieve()
 		}
 		else
 		{
-			if (!(Broodwar->getFrameCount() % 13))
+			/*if (reaver != NULL && !(Broodwar->getFrameCount() % 13))
 			{
-				_reaverBu->unit->train(UnitTypes::Protoss_Scarab);
-				_dropShipBu->unit->load(_reaverBu->unit);
+				reaver->train(UnitTypes::Protoss_Scarab);
+				_dropShipBu->unit->load(reaver);
+			}*/
+			for each (pBayesianUnit pbu in _dropeeBu)
+			{
+				if (pbu->getMode() != MODE_FIGHT_G)
+				{
+					pbu->switchMode(MODE_FIGHT_G);
+					pbu->update();
+				}
 			}
-			_reaverBu->switchMode(MODE_FIGHT_G);
-			_reaverBu->update();
 		}
 	}
 	else
 	{
 		/// dropship
-		if (_dropShipBu->unit->getLoadedUnits().count(_reaverBu->unit))
-			_dropShipBu->unit->unload(_reaverBu->unit);
-		else if (_reaverBu->unit->getGroundWeaponCooldown() > 0 && !_reaverBu->unit->isStartingAttack())
-			_dropShipBu->unit->load(_reaverBu->unit);
+		if (_dropShipBu->unit->getLoadedUnits().size())
+			_dropShipBu->unit->unloadAll();
+		else if (reaver != NULL 
+			&& reaver->getGroundWeaponCooldown() > 0 
+			&& !reaver->isStartingAttack())
+			_dropShipBu->unit->load(reaver);
 
-		/// reaver
-		if (_reaverBu->getMode() != MODE_FIGHT_G)
+		/// others
+		for each (pBayesianUnit pbu in _dropeeBu)
 		{
-			_reaverBu->switchMode(MODE_FIGHT_G);
-			_reaverBu->update();
+			if (pbu->getMode() != MODE_FIGHT_G)
+			{
+				pbu->switchMode(MODE_FIGHT_G);
+				pbu->update();
+			}
 		}
 	}
 
@@ -147,7 +156,7 @@ void DropGoal::onOffer(set<Unit*> objects)
 			{
 				TheArbitrator->accept(this, u, _priority);
 				_neededUnits[u->getType()] -= 1;
-				_unitsGroup.dispatchCompleteUnit(gm->getCompletedUnit(u));
+				_unitsGroup.units.push_back(gm->getCompletedUnit(u));
 			}
 		}
 	}

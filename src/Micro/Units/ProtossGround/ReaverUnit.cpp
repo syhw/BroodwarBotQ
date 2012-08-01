@@ -43,13 +43,6 @@ void ReaverUnit::check()
 {
 	if (unit->getTrainingQueue().size() > 1 || Broodwar->getFrameCount() <= Broodwar->getLatencyFrames() + _lastClickFrame)
 		return;
-    if (unit->getScarabCount() == 0)
-    {
-        unit->train(UnitTypes::Protoss_Scarab);
-        unit->train(UnitTypes::Protoss_Scarab);
-        unit->train(UnitTypes::Protoss_Scarab);
-		_lastClickFrame = Broodwar->getFrameCount();
-    }
     if (unit->getScarabCount() < 4 && !(unit->isTraining()))
 	{
         unit->train(UnitTypes::Protoss_Scarab);
