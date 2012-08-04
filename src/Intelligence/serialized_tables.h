@@ -43,3 +43,28 @@ struct serialized_tables
 		distances_X.swap(st.distances_X);
 	}
 };
+
+
+struct openings_knowing_player
+{
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive & ar, const unsigned int version)
+    {
+		ar & numberGames; // against this player
+        ar & tabulated_P_Op_knowing_Time; // against this player
+    }
+	std::vector<int> numberGames; // number of games/time against player
+	std::vector<std::vector<long double> > tabulated_P_Op_knowing_Time; 
+	// in minutes, time (first parameter) and player (the serialized file)
+	// specific: tabulated_P_Op_knowing[time in minute] 
+	// is a player specific prior
+    openings_knowing_player() {}
+    openings_knowing_player(int nb,
+			const std::vector<std::vector<long double> >& p_Op)
+        : numberGames(nb)
+        , tabulated_P_Op_knowing_Time(p_Op)
+    {}
+};
+
+BOOST_CLASS_TRACKING(openings_knowing_player, boost::serialization::track_never)

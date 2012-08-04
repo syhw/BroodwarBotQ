@@ -78,6 +78,7 @@ class ETechEstimator : public CSingleton<ETechEstimator>
     ETechEstimator();
     ~ETechEstimator();
 	serialized_tables st;
+	openings_knowing_player op_prior;
 	serialized_tables TvP; // tmp table to handle random
 	serialized_tables ZvP; // tmp table to handle random
 	bool tableLoaded;
@@ -90,12 +91,14 @@ class ETechEstimator : public CSingleton<ETechEstimator>
 	inline bool alreadySaw(BWAPI::UnitType ut);
 	bool insertBuilding(BWAPI::Unit* u);
 	bool insertBuilding(BWAPI::UnitType ut);
+	std::vector<long double> computeVecDistribOpenings(int time);
     void computeDistribOpenings(int time);
 	inline void useDistribOpenings();
 	inline bool testBuildTreePossible(int indBuildTree,
 		const std::set<int>& setObs);
 public:
 	const std::vector<long double>& getOpeningsProbas() const;
+	std::vector<long double> getOpeningsProbasIn(int time);
 	bool hasInfered;
 	void onUnitDestroy(BWAPI::Unit* u);
 	void onUnitShow(BWAPI::Unit* u);

@@ -13,9 +13,14 @@
 using namespace BWAPI;
 using namespace std;
 
+int format_max_time(int t)
+{
+	return min((LEARNED_TIME_LIMIT-1) / 60, t / 60);
+}
+
 void ETechEstimator::loadTable(const char* tname)
 {
-	std::ifstream ifs(tname);
+	ifstream ifs(tname);
 	boost::archive::text_iarchive ia(ifs);
 	ia >> st;
 	tableLoaded = true;
@@ -84,13 +89,13 @@ ETechEstimator::ETechEstimator()
 			tmpTvP.append("TvPx.table");
 			tmpZvP.append("ZvPx.table");
 #endif
-			std::ifstream ifs(serializedTablesFileName.c_str());
+			ifstream ifs(serializedTablesFileName.c_str());
 			boost::archive::text_iarchive ia(ifs);
 			ia >> st;
-			std::ifstream ifs2(tmpTvP.c_str());
+			ifstream ifs2(tmpTvP.c_str());
 			boost::archive::text_iarchive ia2(ifs2);
 			ia2 >> TvP;
-			std::ifstream ifs3(tmpZvP.c_str());
+			ifstream ifs3(tmpZvP.c_str());
 			boost::archive::text_iarchive ia3(ifs3);
 			ia3 >> ZvP;
 		}
@@ -98,12 +103,40 @@ ETechEstimator::ETechEstimator()
 
 	/// Initialize openingsProbas with a uniform distribution
 	size_t nbOpenings = st.openings.size();
-	for (size_t i = 0; i < nbOpenings; ++i)
-		openingsProbas.push_back(1.0 / nbOpenings); 
+	openingsProbas = vector<long double>(nbOpenings, 1.0 / nbOpenings);
+
+	/// Initialize op_priors from what we saw of the opponent
+	string filename("bwapi-data/read/op_prior_");
+	filename.append(Broodwar->enemy()->getName());
+	ifstream op_priors(filename.c_str());
+	if (op_priors.good())
+	{
+		boost::archive::text_iarchive op_priors_archive(op_priors);
+		op_priors_archive >> op_prior;
+	}
+	else
+	{
+		// we never played against this opponent => uniform prior
+		op_prior.numberGames = vector<int>(LEARNED_TIME_LIMIT / 60, 1);
+		for (size_t t = 0; t < LEARNED_TIME_LIMIT / 60; ++t)
+			op_prior.tabulated_P_Op_knowing_Time
+				.push_back(vector<long double>(nbOpenings, 1.0 / nbOpenings));
+	}
 }
 
 ETechEstimator::~ETechEstimator()
 {
+	/// Write op_priors from what we saw of the opponent
+	{
+		string filename("bwapi-data/read/op_prior_"); // TODO CHANGE IN WRITE FOLDER
+		filename.append(Broodwar->enemy()->getName());
+		ofstream op_priors(filename.c_str());
+		if (op_priors.good())
+		{
+			boost::archive::text_oarchive op_priors_archive(op_priors);
+			op_priors_archive << op_prior;
+		}
+	}
 }
 
 void ETechEstimator::onUnitDestroy(Unit* u)
@@ -198,7 +231,7 @@ bool ETechEstimator::alreadySaw(UnitType ut)
 bool ETechEstimator::insertBuilding(UnitType ut)
 {
 	size_t previous_size = buildingsTypesSeen.size();
-	if (ut.getRace() == BWAPI::Races::Protoss)
+	if (ut.getRace() == Races::Protoss)
 	{
 		if (ut == UnitTypes::Protoss_Robotics_Facility)
 			buildingsTypesSeen.insert(Protoss_Robotics_Facility);
@@ -223,7 +256,7 @@ bool ETechEstimator::insertBuilding(UnitType ut)
 		else if (ut == UnitTypes::Protoss_Robotics_Support_Bay)
 			buildingsTypesSeen.insert(Protoss_Robotics_Support_Bay);
 	}
-	else if (ut.getRace() == BWAPI::Races::Terran)
+	else if (ut.getRace() == Races::Terran)
 	{
 		if (ut == UnitTypes::Terran_Comsat_Station)
 			buildingsTypesSeen.insert(Terran_ComSat);
@@ -254,7 +287,7 @@ bool ETechEstimator::insertBuilding(UnitType ut)
 		else if (ut == UnitTypes::Terran_Missile_Turret)
 			buildingsTypesSeen.insert(Terran_Missile_Turret);
 	}
-	else if (ut.getRace() == BWAPI::Races::Zerg)
+	else if (ut.getRace() == Races::Zerg)
 	{
 		if (ut == UnitTypes::Zerg_Lair)
 			buildingsTypesSeen.insert(Zerg_Lair);
@@ -283,7 +316,7 @@ bool ETechEstimator::insertBuilding(UnitType ut)
 	}
 	else
 	{
-		BWAPI::Broodwar->printf("ERROR: ETechEstimator failed to determine the race of %s", ut.getName().c_str());
+		Broodwar->printf("ERROR: ETechEstimator failed to determine the race of %s", ut.getName().c_str());
 	}
 	if (buildingsTypesSeen.size() > previous_size)
 		return true;
@@ -295,7 +328,7 @@ bool ETechEstimator::insertBuilding(Unit* u)
 {
 	UnitType ut = u->getType();
 	size_t previous_size = buildingsTypesSeen.size();
-	if (ut.getRace() == BWAPI::Races::Protoss)
+	if (ut.getRace() == Races::Protoss)
 	{
 		if (ut == UnitTypes::Protoss_Nexus)
 		{
@@ -354,7 +387,7 @@ bool ETechEstimator::insertBuilding(Unit* u)
 		else if (ut == UnitTypes::Protoss_Shield_Battery)
 			buildingsTypesSeen.insert(Protoss_Shield_Battery);
 	}
-	else if (ut.getRace() == BWAPI::Races::Terran)
+	else if (ut.getRace() == Races::Terran)
 	{
 		if (ut == UnitTypes::Terran_Command_Center)
 		{
@@ -417,7 +450,7 @@ bool ETechEstimator::insertBuilding(Unit* u)
 		else if (ut == UnitTypes::Terran_Bunker)
 			buildingsTypesSeen.insert(Terran_Bunker);
 	}
-	else if (ut.getRace() == BWAPI::Races::Zerg)
+	else if (ut.getRace() == Races::Zerg)
 	{
 		if (ut == UnitTypes::Zerg_Hatchery)
 		{
@@ -479,7 +512,7 @@ bool ETechEstimator::insertBuilding(Unit* u)
 	}
 	else
 	{
-		BWAPI::Broodwar->printf("ERROR: ETechEstimator failed to determine the race of %s", ut.getName().c_str());
+		Broodwar->printf("ERROR: ETechEstimator failed to determine the race of %s", ut.getName().c_str());
 	}
 	buildingsSeen.insert(u);
 	if (buildingsTypesSeen.size() > previous_size)
@@ -488,10 +521,12 @@ bool ETechEstimator::insertBuilding(Unit* u)
 		return false;
 }
 
-void ETechEstimator::computeDistribOpenings(int time)
+vector<long double> ETechEstimator::computeVecDistribOpenings(int time)
 {
+	vector<long double> ret(openingsProbas.size(), 1.0/openingsProbas.size());
+	/// time in seconds
 	if (time >= LEARNED_TIME_LIMIT || time <= 0)
-		return;
+		return ret; // we don't know and thus give back the uniform distrib
 
 	size_t nbXes = st.vector_X.size();
 	list<unsigned int> compatibleXes;
@@ -507,27 +542,48 @@ void ETechEstimator::computeDistribOpenings(int time)
 		for (list<unsigned int>::const_iterator it = compatibleXes.begin();
 			it != compatibleXes.end(); ++it)
 		{ /// perhaps underflow? log-prob?
-			sumX += st.tabulated_P_X_Op[(*it) * openingsProbas.size() + i]
+			sumX += op_prior.tabulated_P_Op_knowing_Time
+				[format_max_time(time)][i]
+			* st.tabulated_P_X_Op[(*it) * openingsProbas.size() + i]
 			* st.tabulated_P_Time_X_Op[(*it) * openingsProbas.size() * LEARNED_TIME_LIMIT
 				+ i * LEARNED_TIME_LIMIT + time];
 		}
-		openingsProbas[i] *= sumX;
-		runningSum += openingsProbas[i];
+		ret[i] *= sumX;
+		runningSum += ret[i];
 	}
 	long double verifSum = 0.0;
 	for (size_t i = 0; i < openingsProbas.size(); ++i)
 	{
-		openingsProbas[i] /= runningSum;
-		if (openingsProbas[i] != openingsProbas[i] // test for NaN / 1#IND
+		ret[i] /= runningSum;
+		if (ret[i] != ret[i] // test for NaN / 1#IND
 		//|| openingsProbas[i] < MIN_PROB        // min proba
 		)
-			openingsProbas[i] = MIN_PROB;
-		verifSum += openingsProbas[i];
+			ret[i] = MIN_PROB;
+		verifSum += ret[i];
 	}
 	if (verifSum < 0.99 || verifSum > 1.01)
 	{
 		for (size_t i = 0; i < openingsProbas.size(); ++i)
-			openingsProbas[i] /= verifSum;
+			ret[i] /= verifSum;
+	}
+	return ret;
+}
+
+void ETechEstimator::computeDistribOpenings(int time)
+{
+	/// time in seconds
+	if (time >= LEARNED_TIME_LIMIT || time <= 0)
+		return;
+	openingsProbas.swap(computeVecDistribOpenings(time));
+	for (size_t i = 0; i < openingsProbas.size(); ++i)
+	{
+		int t = format_max_time(time);
+		// cumulative moving average: ca_{n+1} = (x_{n+1}+n*ca_{n})/(n+1)
+		op_prior.tabulated_P_Op_knowing_Time[t][i]
+		= (openingsProbas[i] + op_prior.numberGames[t] 
+		  *op_prior.tabulated_P_Op_knowing_Time[t][i])
+			  / (op_prior.numberGames[t] + 1);
+		op_prior.numberGames[t] += 1;
 	}
 	hasInfered = true;
 }
@@ -702,7 +758,12 @@ void ETechEstimator::useDistribOpenings()
 #endif
 }
 
-const std::vector<long double>& ETechEstimator::getOpeningsProbas() const
+const vector<long double>& ETechEstimator::getOpeningsProbas() const
 {
 	return openingsProbas;
+}
+
+vector<long double> ETechEstimator::getOpeningsProbasIn(int time)
+{
+	return computeVecDistribOpenings(time);
 }
