@@ -150,13 +150,14 @@ void DropGoal::onOffer(set<Unit*> objects)
 	{
         for each (Unit* u in objects)
 		{
-			if (gm->getCompletedUnits().find(u) != gm->getCompletedUnits().end()
+			pBayesianUnit tmp = gm->getCompletedUnit(u);
+			if (tmp
 				&& _neededUnits.find(u->getType()) != _neededUnits.end() // take uniquely needed units
 				&& _neededUnits[u->getType()] > 0)
 			{
 				TheArbitrator->accept(this, u, _priority);
 				_neededUnits[u->getType()] -= 1;
-				_unitsGroup.units.push_back(gm->getCompletedUnit(u));
+				_unitsGroup.units.push_back(tmp);
 			}
 		}
 	}

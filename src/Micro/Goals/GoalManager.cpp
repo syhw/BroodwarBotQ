@@ -128,8 +128,7 @@ const map<Unit*, pBayesianUnit>& GoalManager::getCompletedUnits() const
 
 pBayesianUnit GoalManager::getCompletedUnit(Unit* u)
 {
-#ifdef __DEBUG__
-	assert(_completedUnits.find(u) != _completedUnits.end());
-#endif
+	if (_completedUnits.find(u) == _completedUnits.end())
+		return pBayesianUnit();
 	return _completedUnits[u];
 }

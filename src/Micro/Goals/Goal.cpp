@@ -117,7 +117,8 @@ void Goal::onOffer(set<Unit*> objects)
 			if (!u->getType().isBuilding() && !u->getType().isWorker())
 			{
 				TheArbitrator->accept(this, u, _priority);
-				if (gm->getCompletedUnits().find(u) != gm->getCompletedUnits().end())
+				pBayesianUnit tmp = gm->getCompletedUnit(u);
+				if (tmp)
 				{
 					if (_neededUnits.find(u->getType()) != _neededUnits.end())
 						_neededUnits[u->getType()] -= 1;
@@ -194,11 +195,10 @@ void Goal::update()
 				if (_neededUnits.find((*it)->getType()) != _neededUnits.end())
 					_neededUnits[(*it)->getType()] -= 1;
 				GoalManager* gm = & GoalManager::Instance();
-				//if (gm->getCompletedUnits().find(*it) != gm->getCompletedUnits().end())
-				//{
-					_unitsGroup.dispatchCompleteUnit(gm->getCompletedUnit(*it));
-					_incompleteUnits.erase(it++);
-				//}
+				pBayesianUnit tmp = gm->getCompletedUnit(*it);
+				if (tmp)
+					_unitsGroup.dispatchCompleteUnit(tmp);
+				_incompleteUnits.erase(it++);
 			}
 			else
 				++it;

@@ -238,11 +238,12 @@ void DefendGoal::onOffer(set<Unit*> objects) // TODO refactor (only a 3 lines di
 				if (u->getType().isWorker())
 					++_nbWorkers;
 				TheArbitrator->accept(this, u, _priority);
-				if (gm->getCompletedUnits().find(u) != gm->getCompletedUnits().end())
+				pBayesianUnit tmp = gm->getCompletedUnit(u);
+				if (tmp)
 				{
 					if (_neededUnits.find(u->getType()) != _neededUnits.end())
 						_neededUnits[u->getType()] -= 1;
-					_unitsGroup.dispatchCompleteUnit(gm->getCompletedUnit(u));
+					_unitsGroup.dispatchCompleteUnit(tmp);
 				}
 				else
 					_incompleteUnits.push_back(u);

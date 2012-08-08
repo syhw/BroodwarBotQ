@@ -108,6 +108,8 @@ ETechEstimator::ETechEstimator()
 	/// Initialize op_priors from what we saw of the opponent
 	string filename("bwapi-data/read/op_prior_");
 	filename.append(Broodwar->enemy()->getName());
+	filename.append("_");
+	filename.append(Broodwar->enemy()->getRace().c_str());
 	ifstream op_priors(filename.c_str());
 	if (op_priors.good())
 	{
@@ -130,6 +132,8 @@ ETechEstimator::~ETechEstimator()
 	{
 		string filename("bwapi-data/read/op_prior_"); // TODO CHANGE IN WRITE FOLDER
 		filename.append(Broodwar->enemy()->getName());
+		filename.append("_");
+		filename.append(Broodwar->enemy()->getRace().c_str());
 		ofstream op_priors(filename.c_str());
 		if (op_priors.good())
 		{

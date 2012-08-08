@@ -334,7 +334,9 @@ void FirstScoutGoal::onOffer(set<Unit*> objects)
 		{
 			TheArbitrator->accept(this, acceptedUnit, _priority);
 			_neededUnits[acceptedUnit->getType()] -= 1;
-			_unitsGroup.dispatchCompleteUnit(gm->getCompletedUnit(acceptedUnit));
+			pBayesianUnit tmp = gm->getCompletedUnit(acceptedUnit);
+			if (tmp) // we only accept complete units but defensive
+				_unitsGroup.dispatchCompleteUnit(tmp);
 		}
 	}
 	else

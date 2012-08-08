@@ -116,14 +116,14 @@ void Micro::launchFirstPush()
 		if (p != Positions::None)
 		{
 			pGoal tmp;
-			if (Intelligence::Instance().enemyBasesOrder.size() > 1)
+			/*if (Intelligence::Instance().enemyBasesOrder.size() > 1)
 			{
 				map<double, BWTA::BaseLocation*>::const_iterator it 
 					= Intelligence::Instance().enemyBasesOrder.begin();
 				++it;
 				tmp = pGoal(new AttackGoal(it->second->getPosition(), 30));
 			}
-			else
+			else*/
 			{
 				tmp = pGoal(new AttackGoal(p, 30));
 			}
