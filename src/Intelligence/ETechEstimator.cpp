@@ -190,7 +190,8 @@ void ETechEstimator::onUnitShow(Unit* u)
 					int tmpTime = (Broodwar->getFrameCount()
 						- (it->first.buildTime()
 						+ u->getType().buildTime() // minimum build time
-						//+ u->getDistance(enemyStart, u->getPosition()) / u->getType().topSpeed() // TODO minimum walktime 
+						//+ u->getDistance(enemyStart, u->getPosition()) / u->getType().topSpeed() // minimum walking distance done next line (approx.)
+						+ ((Broodwar->mapWidth() + Broodwar->mapHeight())/2 * TILE_SIZE) / u->getType().topSpeed()
 						)) / 24;
 					if (!recomputeTime || tmpTime > recomputeTime) // we do only one recompute (the final) instead of many, for each buildings
 						recomputeTime = tmpTime;
