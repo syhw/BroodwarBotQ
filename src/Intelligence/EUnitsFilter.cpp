@@ -185,17 +185,20 @@ void EUnitsFilter::updateEArmies()
 		else
 		{
 			current_ind = i++;
-			_eArmies.insert(pair<int, list<Unit*> >(current_ind, list<Unit*>()));
+			_eArmies.insert(pair<int, EArmy>(current_ind, EArmy()));
 		}
 
+		Vec tmpArmyCenter(0, 0);
 		for each (pair<Unit*, EViewedUnit> eUnit2 in unassigned)
 		{
 			if (it->second.position.getApproxDistance(eUnit2.second.position) < TILE_SIZE * ARMY_RADIUS_CLUSTER)
 			{
 				tmpPairings.insert(pair<Unit*, int>(eUnit2.first, current_ind));
-				_eArmies[current_ind].push_back(eUnit2.first);
+				_eArmies[current_ind].eUnits.push_back(eUnit2.first);
+				tmpArmyCenter += eUnit2.second.position;
 			}
 		}
+		_eArmies[current_ind].position = tmpArmyCenter.toPosition();
 
 		map<Unit*, EViewedUnit>::iterator tmpit = it;
 		unassigned.erase(tmpit);

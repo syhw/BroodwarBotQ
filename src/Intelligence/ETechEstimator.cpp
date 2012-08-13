@@ -36,7 +36,7 @@ ETechEstimator::ETechEstimator()
 	/// A Bayesian Model for Opening Prediction in RTS Games with Application to StarCraft, Gabriel Synnaeve, Pierre Bessière, CIG (IEEE) 2011
 	/// All code for the learning is here: https://github.com/SnippyHolloW/OpeningTech
 	{
-		// do __NOT__ use Intelligence::Instance().enemyRace other wise infinite constructors loop and stack overflow and carnage ensues
+		// do __NOT__ use Intelligence::Instance().enemyRace otherwise infinite constructors loop and stack overflow and carnage ensues
 		Race enemyRace;
 		for (set<Player*>::const_iterator p = Broodwar->getPlayers().begin();
 			p != Broodwar->getPlayers().end(); ++p)
@@ -191,7 +191,7 @@ void ETechEstimator::onUnitShow(Unit* u)
 						- (it->first.buildTime()
 						+ u->getType().buildTime() // minimum build time
 						//+ u->getDistance(enemyStart, u->getPosition()) / u->getType().topSpeed() // minimum walking distance done next line (approx.)
-						+ ((Broodwar->mapWidth() + Broodwar->mapHeight())/2 * TILE_SIZE) / u->getType().topSpeed()
+						+ static_cast<int>(((Broodwar->mapWidth() + Broodwar->mapHeight())/2.0 * TILE_SIZE) / u->getType().topSpeed())
 						)) / 24;
 					if (!recomputeTime || tmpTime > recomputeTime) // we do only one recompute (the final) instead of many, for each buildings
 						recomputeTime = tmpTime;
