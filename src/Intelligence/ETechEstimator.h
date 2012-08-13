@@ -93,7 +93,7 @@ class ETechEstimator : public CSingleton<ETechEstimator>
 	bool insertBuilding(BWAPI::UnitType ut);
 	std::vector<long double> computeVecDistribOpenings(int time);
     void computeDistribOpenings(int time);
-	inline void useDistribOpenings();
+	inline void useDistribOpenings(int time);
 	inline bool testBuildTreePossible(int indBuildTree,
 		const std::set<int>& setObs);
 public:

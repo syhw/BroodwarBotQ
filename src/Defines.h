@@ -6,7 +6,7 @@
 
 #define __DEBUG__
 #define __INTELLIGENCE_DEBUG__
-#define __ETECHESTIMATOR_DEBUG__
+#define __ETECHESTIMATOR_DEBUG__ 
 #define __MACRO_DEBUG__
 #define __MICRO_DEBUG__
 #define __ARBITRATOR_DEBUG__
@@ -28,6 +28,9 @@
 #define __MAX_TRIES_BUILD_SOMETHING__ 1440 // IN FRAMES, 1 minute here
 #define __PYLON_COVERAGE_TILES__ 4 // length/size of the pylon coverage radius in build tiles
 //#define __2_PROBES_PER_ENEMY_WORKER_DEFENSE__ // put 2 probes on one attacking worker in DefendGoal
+
+#define __ETECHESTIMATOR_MINUTES__ 2 // 2 minutes further/later
+// set to 0 for old behavior (estimating state instantaneously instead of predicting)
 
 #ifdef __DEBUG__
 //#include <vld.h>

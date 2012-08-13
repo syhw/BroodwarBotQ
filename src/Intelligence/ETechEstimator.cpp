@@ -201,7 +201,7 @@ void ETechEstimator::onUnitShow(Unit* u)
 		if (recomputeTime)
 		{
 			computeDistribOpenings(recomputeTime);
-			useDistribOpenings();
+			useDistribOpenings(__ETECHESTIMATOR_MINUTES__*60);
 		}
 	}
 }
@@ -213,15 +213,21 @@ void ETechEstimator::onUnitHide(Unit* u)
 #ifdef __ETECHESTIMATOR_DEBUG__
 void ETechEstimator::onFrame()
 {
+	vector<long double> tmpOpProb(openingsProbas);
+#if __ETECHESTIMATOR_MINUTES__ > 0
+	tmpOpProb = getOpeningsProbasIn(__ETECHESTIMATOR_MINUTES__);
+	Broodwar->drawTextScreen(480, 150, "Strategy Prediction t+%d (percent)", __ETECHESTIMATOR_MINUTES__);
+#else
+	Broodwar->drawTextScreen(510, 150, "Strategy Estimation (percent)");
+#endif
 	if (!tableLoaded)
 		return;
-	Broodwar->drawTextScreen(510, 150, "Strategy Prediction (percent)");
 	Broodwar->drawLineScreen(490, 148, 630, 148, BWAPI::Colors::Blue);
-	Broodwar->drawLineScreen(490, 148, 490, 170 + 18*openingsProbas.size(), BWAPI::Colors::Blue);
-	Broodwar->drawLineScreen(630, 148, 630, 170 + 18*openingsProbas.size(), BWAPI::Colors::Blue);
-	Broodwar->drawLineScreen(490, 170 + 18*openingsProbas.size(), 630, 170 + 18*openingsProbas.size(), BWAPI::Colors::Blue);
-	for (size_t i = 0; i < openingsProbas.size(); ++i)
-		Broodwar->drawTextScreen(500, 170+18*i, "%s ==> %Lg", st.openings[i].c_str(), openingsProbas[i]*100);
+	Broodwar->drawLineScreen(490, 148, 490, 170 + 18*tmpOpProb.size(), BWAPI::Colors::Blue);
+	Broodwar->drawLineScreen(630, 148, 630, 170 + 18*tmpOpProb.size(), BWAPI::Colors::Blue);
+	Broodwar->drawLineScreen(490, 170 + 18*tmpOpProb.size(), 630, 170 + 18*tmpOpProb.size(), BWAPI::Colors::Blue);
+	for (size_t i = 0; i < tmpOpProb.size(); ++i)
+		Broodwar->drawTextScreen(500, 170+18*i, "%s ==> %Lg", st.openings[i].c_str(), tmpOpProb[i]*100);
 }
 #endif
 
@@ -614,15 +620,19 @@ bool ETechEstimator::testBuildTreePossible(int indBuildTree, const set<int>& set
 /// TODO: move all that in appropriate methods for specific
 /// "reactions to some opening/strat/tactic" in the relevant managers
 /// (Bullshit talk (c))
-void ETechEstimator::useDistribOpenings()
+void ETechEstimator::useDistribOpenings(int time)
 {
-	if (Broodwar->getFrameCount()/24 >= LEARNED_TIME_LIMIT)
+	if (time + Broodwar->getFrameCount()/24 >= LEARNED_TIME_LIMIT)
 		return;
 	/// here we should now for sure the enemy's race as we have seen at least a building;
 	Race enemyRace = Intelligence::Instance().enemyRace;
 
-	size_t mostProbable = indMax(openingsProbas);
-	set<size_t> fearThese = supTo(openingsProbas, 0.20);
+	vector<long double> tmpOpProb(openingsProbas); 
+	if (time > 0)
+		tmpOpProb = getOpeningsProbasIn(time);
+	
+	size_t mostProbable = indMax(tmpOpProb);
+	set<size_t> fearThese = supTo(tmpOpProb, 0.20);
 #ifdef __BENS_LABELS__
 	int builtCannons = Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Photon_Cannon)
 		+ TheBuilder->willBuild(UnitTypes::Protoss_Photon_Cannon); // ~~
@@ -630,7 +640,7 @@ void ETechEstimator::useDistribOpenings()
 	{
 		if (fearThese.count(2)) // VulturesHarass
 		{
-			TheProducer->produce(2, UnitTypes::Protoss_Observer, (int)(openingsProbas[2]*100));
+			TheProducer->produce(2, UnitTypes::Protoss_Observer, (int)(tmpOpProb[2]*100));
 #ifdef __INTELLIGENCE_DEBUG__
 			Broodwar->printf("Producing observers bc of Vultures");
 #endif
@@ -642,7 +652,7 @@ void ETechEstimator::useDistribOpenings()
 		}
 		else if (fearThese.count(0)) // Bio
 		{
-			if (openingsProbas[0] > openingsProbas[1] && openingsProbas[0] > openingsProbas[2])
+			if (tmpOpProb[0] > tmpOpProb[1] && tmpOpProb[0] > tmpOpProb[2])
 				Macro::Instance().stormFirst = true;
 		}
 		else if (fearThese.count(5)) // FastDropship
@@ -663,7 +673,7 @@ void ETechEstimator::useDistribOpenings()
 		{
 			TheProducer->produce(2, UnitTypes::Protoss_Zealot, 60, 2);
 		}
-		else if (fearThese.count(1) || openingsProbas[1] > 0.15) // FastDT
+		else if (fearThese.count(1) || tmpOpProb[1] > 0.15) // FastDT
 		{
 			if (!Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Forge)
 				&& !TheBuilder->willBuild(UnitTypes::Protoss_Forge))
@@ -713,7 +723,7 @@ void ETechEstimator::useDistribOpenings()
 #endif
 		}
 		else if (fearThese.count(5) // FastExpand
-			&& openingsProbas[5] > 0.35)
+			&& tmpOpProb[5] > 0.35)
 		{
 			if (!Macro::Instance().expands && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 3)
 				Macro::Instance().expand();
@@ -729,7 +739,7 @@ void ETechEstimator::useDistribOpenings()
 			{
 				TheBuilder->build(UnitTypes::Protoss_Robotics_Facility, TilePositions::None, true);
 			}
-			TheProducer->produce(3, UnitTypes::Protoss_Observer, max((int)(openingsProbas[1]*100*2), 95));
+			TheProducer->produce(3, UnitTypes::Protoss_Observer, max((int)(tmpOpProb[1]*100*2), 95));
 #ifdef __INTELLIGENCE_DEBUG__
 			Broodwar->printf("Producing observers bc of Lurkers");
 #endif
@@ -757,7 +767,7 @@ void ETechEstimator::useDistribOpenings()
 #endif
 		}
 
-		if (openingsProbas[0] > openingsProbas[5] && openingsProbas[1] > openingsProbas[5]) // storm against mutas, if Mutas > Lurkers
+		if (tmpOpProb[0] > tmpOpProb[5] && tmpOpProb[1] > tmpOpProb[5]) // storm against mutas, if Mutas > Lurkers
 			Macro::Instance().stormFirst = true;
 	}
 #endif
