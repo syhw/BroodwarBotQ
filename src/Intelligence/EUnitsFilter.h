@@ -35,6 +35,7 @@ public:
     void onUnitHide(BWAPI::Unit* u);
     void onUnitRenegade(BWAPI::Unit* u);
 
+	const std::map<int, EArmy>& getEArmies();
     const std::map<BWAPI::Unit*, EViewedUnit>& getViewedUnits();
     EViewedUnit getViewedUnit(BWAPI::Unit* u);
     int getNumbersType(BWAPI::UnitType ut);

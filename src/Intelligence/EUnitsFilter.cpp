@@ -205,6 +205,11 @@ void EUnitsFilter::updateEArmies()
 	}
 }
 
+const std::map<int, EArmy>& EUnitsFilter::getEArmies()
+{
+	return _eArmies;
+}
+
 void EUnitsFilter::update()
 {
 	updateEArmies();
