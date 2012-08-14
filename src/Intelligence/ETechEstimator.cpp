@@ -640,7 +640,7 @@ void ETechEstimator::useDistribOpenings(int time)
 	{
 		if (fearThese.count(2)) // VulturesHarass
 		{
-			TheProducer->produce(2, UnitTypes::Protoss_Observer, (int)(tmpOpProb[2]*100));
+			ThePlanner->add(UnitTypes::Protoss_Observer, 2, (int)(tmpOpProb[2]*100));
 #ifdef __INTELLIGENCE_DEBUG__
 			Broodwar->printf("Producing observers bc of Vultures");
 #endif
@@ -659,7 +659,7 @@ void ETechEstimator::useDistribOpenings(int time)
 		{
 			while (builtCannons < 3 + 1*Macro::Instance().expands) 
 			{
-				TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
+				ThePlanner->add(UnitTypes::Protoss_Photon_Cannon);
 				++builtCannons;
 			}
 #ifdef __INTELLIGENCE_DEBUG__
@@ -671,37 +671,23 @@ void ETechEstimator::useDistribOpenings(int time)
 	{
 		if (fearThese.empty() && Broodwar->getFrameCount() > 1440)
 		{
-			TheProducer->produce(2, UnitTypes::Protoss_Zealot, 60, 2);
+			ThePlanner->add(UnitTypes::Protoss_Zealot, 2, 60);
 		}
-		else if (fearThese.count(1) || tmpOpProb[1] > 0.15) // FastDT
+		else if (fearThese.count(1) || tmpOpProb[1] > 0.16) // FastDT
 		{
 			if (!Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Forge)
 				&& !TheBuilder->willBuild(UnitTypes::Protoss_Forge))
-			{
-				if (Broodwar->self()->supplyUsed() < 42)
-					TheBuilder->buildOrder(UnitTypes::Protoss_Forge, 16);
-				else
-					TheBuilder->build(UnitTypes::Protoss_Forge, TilePositions::None, true); // quickly build a forge
-			}
+				ThePlanner->add(UnitTypes::Protoss_Forge, 1, 99); // quickly build a forge
 			if ((Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Forge)
 				|| Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Forge))
 				&& builtCannons < 3)
 			{
-				if (Broodwar->self()->supplyUsed() < 42)
-				{
-					TheBuilder->build(UnitTypes::Protoss_Photon_Cannon, TilePositions::None, true);
-					TheBuilder->build(UnitTypes::Protoss_Photon_Cannon, TilePositions::None, true);
-				}
-				else
-				{
-					TheBuilder->buildOrder(UnitTypes::Protoss_Photon_Cannon, 19);
-					TheBuilder->buildOrder(UnitTypes::Protoss_Photon_Cannon, 19);
-				}
+				ThePlanner->add(UnitTypes::Protoss_Photon_Cannon, 2, 99);
 				builtCannons += 2;
 			}
 			while (builtCannons < 3 + 2*Macro::Instance().expands) 
 			{
-				TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
+				ThePlanner->add(UnitTypes::Protoss_Photon_Cannon);
 				++builtCannons;
 			}
 			Macro::Instance().stormFirst = false;
@@ -715,7 +701,7 @@ void ETechEstimator::useDistribOpenings(int time)
 		{
 			while (builtCannons < 3 + 1*Macro::Instance().expands) 
 			{
-				TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
+				ThePlanner->add(UnitTypes::Protoss_Photon_Cannon);
 				++builtCannons;
 			}
 #ifdef __INTELLIGENCE_DEBUG__
@@ -737,9 +723,9 @@ void ETechEstimator::useDistribOpenings(int time)
 			if (!Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Robotics_Facility)
 				&& !TheBuilder->willBuild(UnitTypes::Protoss_Robotics_Facility))
 			{
-				TheBuilder->build(UnitTypes::Protoss_Robotics_Facility, TilePositions::None, true);
+				ThePlanner->add(UnitTypes::Protoss_Robotics_Facility, 1, 99);
 			}
-			TheProducer->produce(3, UnitTypes::Protoss_Observer, max((int)(tmpOpProb[1]*100*2), 95));
+			ThePlanner->add(UnitTypes::Protoss_Observer, 3, 95);
 #ifdef __INTELLIGENCE_DEBUG__
 			Broodwar->printf("Producing observers bc of Lurkers");
 #endif
@@ -748,7 +734,7 @@ void ETechEstimator::useDistribOpenings(int time)
 		{
 			while (builtCannons < 3 + 1*Macro::Instance().expands) 
 			{
-				TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
+				ThePlanner->add(UnitTypes::Protoss_Photon_Cannon);
 				++builtCannons;
 			}
 #ifdef __INTELLIGENCE_DEBUG__
@@ -759,7 +745,7 @@ void ETechEstimator::useDistribOpenings(int time)
 		{
 			while (builtCannons < 3 + 1*Macro::Instance().expands) 
 			{
-				TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
+				ThePlanner->add(UnitTypes::Protoss_Photon_Cannon);
 				++builtCannons;
 			}
 #ifdef __INTELLIGENCE_DEBUG__

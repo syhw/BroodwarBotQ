@@ -69,11 +69,11 @@ void Macro::init()
 			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 16);
 			TheBuilder->buildOrder(UnitTypes::Protoss_Photon_Cannon, 18);
 			TheBuilder->buildOrder(UnitTypes::Protoss_Photon_Cannon, 18);*/
-			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 8);
-			TheBuilder->buildOrder(UnitTypes::Protoss_Gateway, 11);
+			ThePlanner->buildOrder(UnitTypes::Protoss_Pylon, 8);
+			ThePlanner->buildOrder(UnitTypes::Protoss_Gateway, 11);
 			TheBasesManager->setFirstGasPop(12);
-			TheBuilder->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 15);
-			TheBuilder->buildOrder(UnitTypes::Protoss_Pylon, 16);
+			ThePlanner->buildOrder(UnitTypes::Protoss_Cybernetics_Core, 15);
+			ThePlanner->buildOrder(UnitTypes::Protoss_Pylon, 16);
 		}
 		else if (Broodwar->enemy()->getRace() == Races::Terran)
 		{
@@ -171,7 +171,7 @@ void Macro::update()
 		if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_High_Templar) > 7)
 		{
 			TheProducer->researchTech(TechTypes::Maelstrom);
-			TheProducer->produce(2, UnitTypes::Protoss_Dark_Archon, 60, 2);
+			ThePlanner->add(UnitTypes::Protoss_Dark_Archon, 2, 60);
 			TheProducer->produceAlways(2, UnitTypes::Protoss_Dark_Archon, 6);
 		}
 		if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Zealot) > 7)
@@ -199,10 +199,10 @@ void Macro::update()
 	{
 #ifdef __REAVER_FIRST__
 		if (!Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Shuttle))
-			TheProducer->produce(1, UnitTypes::Protoss_Shuttle, 90);
+			ThePlanner->add(UnitTypes::Protoss_Shuttle, 1, 90);
 #endif
 		if (Broodwar->self()->gas() > 150 && !Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Reaver))
-			TheProducer->produce(1, UnitTypes::Protoss_Reaver, 95);
+			ThePlanner->add(UnitTypes::Protoss_Reaver, 1, 95);
 	}
 #ifdef __REAVER_FIRST__
 	reaverFirst = true;// TODO REMOVE DEBUG
@@ -268,20 +268,16 @@ Zerg openings, in order (in the vector):
 			TheProducer->researchUpgrade(UpgradeTypes::Singularity_Charge);
 			if (er == Races::Zerg)
 			{
-				TheProducer->produce(6, UnitTypes::Protoss_Zealot, 49, 2);
-				TheProducer->produce(16, UnitTypes::Protoss_Dragoon, 50);
-				TheProducer->produceAlways(30, UnitTypes::Protoss_Dragoon);
-				TheProducer->produceAlways(6, UnitTypes::Protoss_Zealot, 2);
+				ThePlanner->add(UnitTypes::Protoss_Zealot, 6);
+				ThePlanner->add(UnitTypes::Protoss_Dragoon, 16);
 			}
 			else if (er == Races::Terran)
 			{
-				TheProducer->produce(16, UnitTypes::Protoss_Dragoon, 50);
-				TheProducer->produceAlways(32, UnitTypes::Protoss_Dragoon);
+				ThePlanner->add(UnitTypes::Protoss_Dragoon, 16);
 			}
 			else
 			{
-				TheProducer->produce(16, UnitTypes::Protoss_Dragoon, 50);
-				TheProducer->produceAlways(32, UnitTypes::Protoss_Dragoon);
+				ThePlanner->add(UnitTypes::Protoss_Dragoon, 16);
 			}
 		}
 		else if (ut == UnitTypes::Protoss_Gateway)
@@ -290,7 +286,7 @@ Zerg openings, in order (in the vector):
 			if (Broodwar->self()->supplyUsed() < 40)
 			{
 				if (er == Races::Zerg)
-					TheProducer->produce(2, UnitTypes::Protoss_Zealot, 50);
+					ThePlanner->add(UnitTypes::Protoss_Zealot, 2);
 			}
 			/// 3rd Gateway and oponent not Terran -> forge (for cannons against mutas and DTs, and for +1 attack against Z)
 			if (er != Races::Terran
@@ -378,8 +374,7 @@ Zerg openings, in order (in the vector):
 				if (wontHave(UnitTypes::Protoss_Robotics_Support_Bay))
 					TheBuilder->build(UnitTypes::Protoss_Robotics_Support_Bay);
 #ifdef __REAVER_FIRST__
-				TheProducer->produce(1, UnitTypes::Protoss_Shuttle, 95);
-				TheProducer->produceAlways(1, UnitTypes::Protoss_Shuttle, 3);
+				ThePlanner->add(UnitTypes::Protoss_Shuttle, 1, 95);
 #endif
 			}
 			else
@@ -396,23 +391,21 @@ Zerg openings, in order (in the vector):
 			/// Built templar archives
 			TheProducer->researchTech(TechTypes::Psionic_Storm);
 			TheProducer->researchUpgrade(UpgradeTypes::Khaydarin_Amulet);
-			TheProducer->produce(8, UnitTypes::Protoss_High_Templar, 56, 3);
-			TheProducer->produceAlways(12, UnitTypes::Protoss_High_Templar, 3);
+			ThePlanner->add(UnitTypes::Protoss_High_Templar, 8);
 			if (er == Races::Zerg)
-				TheProducer->produce(2, UnitTypes::Protoss_Archon, 50, 3);
+				ThePlanner->add(UnitTypes::Protoss_Archon, 2);
 		}
 		else if (ut == UnitTypes::Protoss_Observatory)
 		{
-			TheProducer->produce(2, UnitTypes::Protoss_Observer, 60, 2);
+			ThePlanner->add(UnitTypes::Protoss_Observer, 2, 60);
 		}
 		else if (ut == UnitTypes::Protoss_Robotics_Support_Bay)
 		{
-			TheProducer->produce(1, UnitTypes::Protoss_Reaver, 95);
+			ThePlanner->add(UnitTypes::Protoss_Reaver, 1, 95);
 #ifdef __REAVER_FIRST__
 			if (!Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Shuttle))
-				TheProducer->produce(1, UnitTypes::Protoss_Shuttle, 95);
+				ThePlanner->add(UnitTypes::Protoss_Shuttle, 1, 95);
 #endif
-			TheProducer->produceAlways(3, UnitTypes::Protoss_Reaver, 5);
 		}
 		else if (ut == UnitTypes::Protoss_Observer)
 		{
@@ -440,7 +433,7 @@ Zerg openings, in order (in the vector):
 		{
 			if (EUnitsFilter::Instance().getNumbersType(UnitTypes::Zerg_Mutalisk) > 10)
 			{
-				TheProducer->produce(6, UnitTypes::Protoss_Corsair, 80, 2);
+				ThePlanner->add(UnitTypes::Protoss_Corsair, 6, 80);
 				TheProducer->produceAlways(4, UnitTypes::Protoss_Corsair, 2);
 			}
 			if (wontHave(UnitTypes::Protoss_Fleet_Beacon))
@@ -450,12 +443,12 @@ Zerg openings, in order (in the vector):
 		}
 		else if (ut == UnitTypes::Protoss_Fleet_Beacon)
 		{
-			TheProducer->produce(4, UnitTypes::Protoss_Carrier, 80);
+			ThePlanner->add(UnitTypes::Protoss_Carrier, 4, 80);
 			TheProducer->produceAlways(4, UnitTypes::Protoss_Carrier, 5);
 		}
 		else if (ut == UnitTypes::Protoss_Arbiter_Tribunal)
 		{
-			TheProducer->produce(2, UnitTypes::Protoss_Arbiter, 80);
+			TheProducer->produce(UnitTypes::Protoss_Arbiter, 2, 80);
 			TheProducer->produceAlways(1, UnitTypes::Protoss_Arbiter, 5);
 		}
 	}

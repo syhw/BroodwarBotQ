@@ -165,8 +165,7 @@ void Base::update()
 
 void Base::buildCenter()
 {
-	///TheBuilder->addTask(Broodwar->self()->getRace().getCenter(), baseLocation->getTilePosition(), false);
-	TheBuilder->addTask(Broodwar->self()->getRace().getCenter(), baseLocation->getTilePosition(), true);
+	ThePlanner->add(Broodwar->self()->getRace().getCenter(), 1, 99, baseLocation->getTilePosition());
 	centerInConstruction = Broodwar->getFrameCount();
 }
 
@@ -176,7 +175,7 @@ void Base::buildGas()
 		it != baseLocation->getGeysers().end(); ++it)
 	{
 		if (!TheBuilder->willBuild(Broodwar->self()->getRace().getRefinery())) // TODO correct (we can't build 2 Refineries at once)
-			TheBuilder->build(Broodwar->self()->getRace().getRefinery(), (*it)->getTilePosition());
+			ThePlanner->add(Broodwar->self()->getRace().getRefinery(), 1, 99, (*it)->getTilePosition());
 	}
     gasInConstruction = Broodwar->getFrameCount();
 }

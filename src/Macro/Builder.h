@@ -65,7 +65,6 @@ public:
 private:
 	SimCityBuildingPlacer buildingPlacer;
 	std::list<pTask> tasks;
-	std::multimap<int, pTask> boTasks;
 	std::list<BWAPI::Unit*> inConstruction;
 	Builder();
 	~Builder();

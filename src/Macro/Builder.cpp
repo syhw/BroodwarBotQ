@@ -449,22 +449,10 @@ void Builder::addTask(const UnitType& t, const TilePosition& seedPosition, bool 
 
 void Builder::build(const BWAPI::UnitType& t, const BWAPI::TilePosition& seedPosition, bool quick)
 {
-	if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Pylon) >= 42) // magic number :)
-		return; // TODO remove
-	//if (!Macro::Instance().expands  // TODO remove (HACK)
-	//	&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway) + Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Gateway) > 2
-	//	&& Broodwar->self()->minerals() < 500)
-	//	return;
 	if (t == Broodwar->self()->getRace().getCenter())
 		TheBasesManager->expand();
 	else
 		addTask(t, seedPosition, quick);
-}
-
-void Builder::buildOrder(const BWAPI::UnitType& t, int supplyAsTime, const BWAPI::TilePosition& seedPosition)
-{
-	pTask tmp(new Task(NULL, seedPosition, t));
-	boTasks.insert(make_pair<int, pTask>(supplyAsTime, tmp));
 }
 
 /// Attempts to build 2 pylons + 2 cannons around the minerals
@@ -586,26 +574,6 @@ int Builder::additionalSupplyNextFrames(int frames)
 */
 void Builder::update()
 {
-	/// Follow the BO
-	if (!boTasks.empty())
-	{
-		list<int> toRemove;
-		for (multimap<int, pTask>::iterator it = boTasks.begin();
-			it != boTasks.end(); ++it)
-		{
-			if (it->first <= Broodwar->self()->supplyUsed()/2)
-			{
-#ifdef __MACRO_DEBUG__
-				Broodwar->printf("Building %s pop %d", it->second->getName().c_str(), Broodwar->self()->supplyUsed()/2);
-#endif
-				tasks.push_front(it->second);
-				toRemove.push_back(it->first);
-			}
-		}
-		for (list<int>::const_iterator it = toRemove.begin();
-			it != toRemove.end(); ++it)
-			boTasks.erase(*it);
-	}
 	/// Perform tasks
 	double meanTimeToGetToSite = ((double)(6*TILE_SIZE) / UnitTypes::Protoss_Probe.topSpeed()); // TODO work on this
 	int additionalMinerals = (int)(meanTimeToGetToSite * TheResourceRates->getGatherRate().getMinerals()) + 1;

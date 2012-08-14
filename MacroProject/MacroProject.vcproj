@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="MacroProject"
 	ProjectGUID="{F39C7417-770D-4635-8A47-77BD9CDDCD71}"
 	RootNamespace="MacroProject"
@@ -554,6 +554,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\src\Macro\Planner.cpp"
+					>
+				</File>
+				<File
 					RelativePath="..\src\Macro\Producer.cpp"
 					>
 				</File>
@@ -889,6 +893,10 @@
 				</File>
 				<File
 					RelativePath="..\src\Macro\Macro.h"
+					>
+				</File>
+				<File
+					RelativePath="..\src\Macro\Planner.h"
 					>
 				</File>
 				<File
