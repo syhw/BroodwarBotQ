@@ -440,6 +440,14 @@ Builder::~Builder()
 // Use with care outside of here
 void Builder::addTask(const UnitType& t, const TilePosition& seedPosition, bool quick, int lastOrder)
 {
+	/// check if we don't have this task in progress already
+	for each (pTask pt in tasks)
+	{
+		if (pt->getType() == t && pt->getTilePosition() == seedPosition)
+			return;
+	}
+
+	/// add the new task where it should be added (front/back)
 	pTask tmp(new Task(NULL, seedPosition, t, lastOrder));
 	if (quick)
 		tasks.push_front(tmp);
@@ -449,12 +457,6 @@ void Builder::addTask(const UnitType& t, const TilePosition& seedPosition, bool 
 
 void Builder::build(const BWAPI::UnitType& t, const BWAPI::TilePosition& seedPosition, bool quick)
 {
-	if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Pylon) >= 42) // magic number :)
-		return; // TODO remove
-	//if (!Macro::Instance().expands  // TODO remove (HACK)
-	//	&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway) + Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Gateway) > 2
-	//	&& Broodwar->self()->minerals() < 500)
-	//	return;
 	if (t == Broodwar->self()->getRace().getCenter())
 		TheBasesManager->expand();
 	else

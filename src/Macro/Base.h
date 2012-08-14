@@ -23,6 +23,7 @@ public:
 	bool cannoned;
 
 private:
+	void cleanCenter();
 	void buildCenter();
 	void buildGas();
 	BWTA::BaseLocation* baseLocation;

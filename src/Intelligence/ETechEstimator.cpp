@@ -632,7 +632,7 @@ void ETechEstimator::useDistribOpenings(int time)
 		tmpOpProb = getOpeningsProbasIn(time);
 	
 	size_t mostProbable = indMax(tmpOpProb);
-	set<size_t> fearThese = supTo(tmpOpProb, 0.25);
+	set<size_t> fearThese = supTo(tmpOpProb, 0.26);
 #ifdef __BENS_LABELS__
 	int builtCannons = Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Photon_Cannon)
 		+ TheBuilder->willBuild(UnitTypes::Protoss_Photon_Cannon); // ~~
@@ -640,10 +640,10 @@ void ETechEstimator::useDistribOpenings(int time)
 	{
 		if (fearThese.count(2)) // VulturesHarass
 		{
-			TheProducer->produce(2, UnitTypes::Protoss_Observer, (int)(tmpOpProb[2]*100));
+			/*TheProducer->produce(2, UnitTypes::Protoss_Observer, (int)(tmpOpProb[2]*100));
 #ifdef __INTELLIGENCE_DEBUG__
 			Broodwar->printf("Producing observers bc of Vultures");
-#endif
+#endif      */
 		}
 		else if (fearThese.count(3)) // SiegeExpand
 		{
@@ -673,7 +673,7 @@ void ETechEstimator::useDistribOpenings(int time)
 		{
 			TheProducer->produce(2, UnitTypes::Protoss_Zealot, 60, 2);
 		}
-		else if (fearThese.count(1) || tmpOpProb[1] > 0.15) // FastDT
+		else if (fearThese.count(1)) // FastDT
 		{
 			if (!Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Forge)
 				&& !TheBuilder->willBuild(UnitTypes::Protoss_Forge))
@@ -687,19 +687,19 @@ void ETechEstimator::useDistribOpenings(int time)
 				|| Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Forge))
 				&& builtCannons < 3)
 			{
-				if (Broodwar->self()->supplyUsed() < 42)
+				if (Broodwar->self()->supplyUsed() < 44)
 				{
-					TheBuilder->build(UnitTypes::Protoss_Photon_Cannon, TilePositions::None, true);
-					TheBuilder->build(UnitTypes::Protoss_Photon_Cannon, TilePositions::None, true);
+					TheBuilder->buildOrder(UnitTypes::Protoss_Photon_Cannon, 20);
+					TheBuilder->buildOrder(UnitTypes::Protoss_Photon_Cannon, 20);
 				}
 				else
 				{
-					TheBuilder->buildOrder(UnitTypes::Protoss_Photon_Cannon, 19);
-					TheBuilder->buildOrder(UnitTypes::Protoss_Photon_Cannon, 19);
+					TheBuilder->build(UnitTypes::Protoss_Photon_Cannon, TilePositions::None, true);
+					TheBuilder->build(UnitTypes::Protoss_Photon_Cannon, TilePositions::None, true);
 				}
 				builtCannons += 2;
 			}
-			while (builtCannons < 3 + 2*Macro::Instance().expands) 
+			while (builtCannons < 2 + 2*Macro::Instance().expands) 
 			{
 				TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
 				++builtCannons;
@@ -713,7 +713,7 @@ void ETechEstimator::useDistribOpenings(int time)
 		}
 		else if (fearThese.count(3)) // ReaverDrop
 		{
-			while (builtCannons < 3 + 1*Macro::Instance().expands) 
+			while (builtCannons < 2 + 1*Macro::Instance().expands) 
 			{
 				TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
 				++builtCannons;

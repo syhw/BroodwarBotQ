@@ -113,7 +113,7 @@ void Base::update()
 	}
 	if (resourceDepot == NULL && (Broodwar->getFrameCount() - centerInConstruction) > __MAX_TRIES_BUILD_SOMETHING__+250) // it has been canceled
 	{
-		/// TODO can be that there is a burrowed unit or a mine here
+		cleanCenter();
 		buildCenter();
 	}
 	if (refinery == NULL)
@@ -163,9 +163,13 @@ void Base::update()
 	}
 }
 
+void Base::cleanCenter()
+{
+	/// TODO can be that there is a burrowed unit or a mine here
+}
+
 void Base::buildCenter()
 {
-	///TheBuilder->addTask(Broodwar->self()->getRace().getCenter(), baseLocation->getTilePosition(), false);
 	TheBuilder->addTask(Broodwar->self()->getRace().getCenter(), baseLocation->getTilePosition(), true);
 	centerInConstruction = Broodwar->getFrameCount();
 }
