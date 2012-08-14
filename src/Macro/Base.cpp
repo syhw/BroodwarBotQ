@@ -136,19 +136,13 @@ void Base::update()
 	if (activeGas && refinery == NULL && (Broodwar->getFrameCount() - gasInConstruction) > __MAX_TRIES_BUILD_SOMETHING__+250)
 		buildGas();
 	ready = (resourceDepot && resourceDepot->exists() && (resourceDepot->isCompleted() || resourceDepot->getRemainingBuildTime()<300)); // 300 frames before completion
-	if (Broodwar->getFrameCount() > 10*60*24 // after 10 minutes
+	if (Broodwar->getFrameCount() > __MINUTES_CANNONS_MINERALS__*60*24
 		&& !cannoned
 		&& !paused && ready) // active
 	{
 		TheBuilder->buildCannonsMinerals(baseLocation);
 		cannoned = true;
 	}
-	/*if (!cannoned && (Broodwar->enemy()->getRace() == Races::Zerg && (ETechEstimator::Instance().openingsProbas[0] > 0.2 || ETechEstimator::Instance().openingsProbas[1] > 0.2)
-		|| Broodwar->enemy()->getRace() == Races::Protoss && ETechEstimator::Instance().openingsProbas[1] > 0.15
-		|| Broodwar->enemy()->getRace() == Races::Terran && ETechEstimator::Instance().openingsProbas[5] > 0.2)
-		&& Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Can
-		TheBuilder->buildCannonsMinerals(baseLocation);
-		cannoned = true;*/
 
 	/// TODO PURE HACK TO EXPAND WHEN AT SATURATION !!! !!! !!!
 	if (resourceDepot != NULL && !(Broodwar->getFrameCount() % ((resourceDepot->getPosition().x() % 100) + 15)))

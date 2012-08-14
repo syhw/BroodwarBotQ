@@ -102,11 +102,11 @@ void DropGoal::achieve()
 		}
 		else
 		{
-			/*if (reaver != NULL && !(Broodwar->getFrameCount() % 13))
+			if (reaver != NULL && !(Broodwar->getFrameCount() % 13))
 			{
 				reaver->train(UnitTypes::Protoss_Scarab);
 				_dropShipBu->unit->load(reaver);
-			}*/
+			} /// TODO remove (hack)
 			for each (pBayesianUnit pbu in _dropeeBu)
 			{
 				if (pbu->getMode() != MODE_FIGHT_G)

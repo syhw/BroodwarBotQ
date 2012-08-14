@@ -31,6 +31,7 @@
 
 #define __ETECHESTIMATOR_MINUTES__ 2 // 2 minutes further/later
 // set to 0 for old behavior (estimating state instantaneously instead of predicting)
+#define __MINUTES_CANNONS_MINERALS__ 12 // minutes at which to defend bases with cannons
 
 #ifdef __DEBUG__
 //#include <vld.h>

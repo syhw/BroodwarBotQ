@@ -632,7 +632,7 @@ void ETechEstimator::useDistribOpenings(int time)
 		tmpOpProb = getOpeningsProbasIn(time);
 	
 	size_t mostProbable = indMax(tmpOpProb);
-	set<size_t> fearThese = supTo(tmpOpProb, 0.20);
+	set<size_t> fearThese = supTo(tmpOpProb, 0.25);
 #ifdef __BENS_LABELS__
 	int builtCannons = Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Photon_Cannon)
 		+ TheBuilder->willBuild(UnitTypes::Protoss_Photon_Cannon); // ~~
