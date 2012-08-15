@@ -209,7 +209,7 @@ void ETechEstimator::onUnitShow(Unit* u)
 		if (recomputeTime)
 		{
 			computeDistribOpenings(recomputeTime);
-			//useDistribOpenings(__ETECHESTIMATOR_MINUTES__*60);
+			useDistribOpenings(__ETECHESTIMATOR_MINUTES__*60);
 		}
 	}
 }
@@ -640,7 +640,7 @@ void ETechEstimator::useDistribOpenings(int time)
 		tmpOpProb = getOpeningsProbasIn(time);
 	
 	size_t mostProbable = indMax(tmpOpProb);
-	set<size_t> fearThese = supTo(tmpOpProb, 0.26);
+	set<size_t> fearThese = supTo(tmpOpProb, 0.21);
 	int builtCannons = Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Photon_Cannon)
 		+ TheBuilder->willBuild(UnitTypes::Protoss_Photon_Cannon); // ~~
 	if (enemyRace == Races::Terran)
@@ -648,7 +648,7 @@ void ETechEstimator::useDistribOpenings(int time)
 #ifdef __BENS_LABELS__
 		if (fearThese.count(2)) // VulturesHarass
 #else
-		if (featThese.count(42)) // TODO
+		if (fearThese.count(3)) // vultures
 #endif
 		{
 			/*TheProducer->produce(2, UnitTypes::Protoss_Observer, (int)(tmpOpProb[2]*100));
@@ -659,7 +659,7 @@ void ETechEstimator::useDistribOpenings(int time)
 #ifdef __BENS_LABELS__
 		else if (fearThese.count(3)) // SiegeExpand
 #else
-		else if (fearThese.count(42)) // TODO
+		else if (fearThese.count(1)) // rax_fe
 #endif
 		{
 			if (!Macro::Instance().expands && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 4)
@@ -668,7 +668,7 @@ void ETechEstimator::useDistribOpenings(int time)
 #ifdef __BENS_LABELS__
 		else if (fearThese.count(0)) // Bio
 #else
-		else if (fearThese.count(42)) // TODO
+		else if (fearThese.count(0)) // bio
 #endif
 		{
 			if (tmpOpProb[0] > tmpOpProb[1] && tmpOpProb[0] > tmpOpProb[2])
@@ -677,7 +677,7 @@ void ETechEstimator::useDistribOpenings(int time)
 #ifdef __BENS_LABELS__
 		else if (fearThese.count(5)) // FastDropship
 #else
-		else if (fearThese.count(42)) // TODO
+		else if (fearThese.count(4)) // drop
 #endif
 		{
 			while (builtCannons < 3 + 1*Macro::Instance().expands) 
@@ -764,7 +764,11 @@ void ETechEstimator::useDistribOpenings(int time)
 	}
 	else if (enemyRace == Races::Zerg)
 	{
+#ifdef __BENS_LABELS__
 		if (fearThese.count(5)) // Lurker
+#else
+		if (fearThese.count(2)) // lurkers
+#endif
 		{
 			Macro::Instance().reaverFirst = false; // we will need obs
 			if (!Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Robotics_Facility)
@@ -777,7 +781,11 @@ void ETechEstimator::useDistribOpenings(int time)
 			Broodwar->printf("Producing observers bc of Lurkers");
 #endif
 		}
+#ifdef __BENS_LABELS__
 		else if (fearThese.count(0)) // TwoHatchMuta
+#else
+		else if (fearThese.count(0)) // fast_mutas
+#endif
 		{
 			while (builtCannons < 3 + 1*Macro::Instance().expands) 
 			{
@@ -788,7 +796,11 @@ void ETechEstimator::useDistribOpenings(int time)
 			Broodwar->printf("Building cannons bc of 2H Mutas");
 #endif
 		}
+#ifdef __BENS_LABELS__
 		else if (fearThese.count(1)) // ThreeHatchMuta
+#else
+		else if (fearThese.count(1)) // mutas
+#endif
 		{
 			while (builtCannons < 3 + 1*Macro::Instance().expands) 
 			{
@@ -800,7 +812,11 @@ void ETechEstimator::useDistribOpenings(int time)
 #endif
 		}
 
+#ifdef __BENS_LABELS__
 		if (tmpOpProb[0] > tmpOpProb[5] && tmpOpProb[1] > tmpOpProb[5]) // storm against mutas, if Mutas > Lurkers
+#else
+		if (tmpOpProb[0] > tmpOpProb[2] && tmpOpProb[1] > tmpOpProb[2]) // storm against mutas, if Mutas > Lurkers
+#endif
 			Macro::Instance().stormFirst = true;
 	}
 }
