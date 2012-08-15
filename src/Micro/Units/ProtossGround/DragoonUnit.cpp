@@ -98,7 +98,7 @@ void DragoonUnit::micro()
 #ifdef __MICRO_DEBUG__
     if (unit->isStartingAttack())
     {
-        if (Broodwar->getSelectedUnits().count(unit))
+        if (Broodwar->getSelectedUnits().count(unit) && targetEnemy != NULL)
             Broodwar->printf("starting attack at frame: %d, distance to target %f", Broodwar->getFrameCount(), targetEnemy->getDistance(unit));
     }
 #endif

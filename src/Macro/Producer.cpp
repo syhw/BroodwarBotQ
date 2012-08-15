@@ -391,20 +391,20 @@ void Producer::update()
 		/// Organize/order supply to avoid supply block
 		if (TheResourceRates->getGatherRate().getMinerals() > 0.00001) // TODO change
 		{
-		int frames = min(180*24,
-			Broodwar->self()->getRace().getSupplyProvider().buildTime()
-			+ max((int)(Broodwar->self()->getRace().getSupplyProvider().mineralPrice() / TheResourceRates->getGatherRate().getMinerals()) // important only if we perfectly consume our resources
-			, 10*24)); // should be the upper bound on the time to start building a pylon
-		int addSupply = additionalUnitsSupply(frames);
-		if (!TheBuilder->numberInFutureTasks(Broodwar->self()->getRace().getSupplyProvider()) &&
-			Broodwar->self()->supplyTotal() < 400 &&
-			addSupply + Broodwar->self()->supplyUsed() > TheBuilder->additionalSupplyNextFrames(frames) + Broodwar->self()->supplyTotal())
-		{
+			int frames = min(180*24,
+				Broodwar->self()->getRace().getSupplyProvider().buildTime()
+				+ max((int)(Broodwar->self()->getRace().getSupplyProvider().mineralPrice() / TheResourceRates->getGatherRate().getMinerals()) // important only if we perfectly consume our resources
+				, 10*24)); // should be the upper bound on the time to start building a pylon
+			int addSupply = additionalUnitsSupply(frames);
+			if (!TheBuilder->numberInFutureTasks(Broodwar->self()->getRace().getSupplyProvider()) &&
+				Broodwar->self()->supplyTotal() < 400 &&
+				addSupply + Broodwar->self()->supplyUsed() > TheBuilder->additionalSupplyNextFrames(frames) + Broodwar->self()->supplyTotal())
+			{
 #ifdef __MACRO_DEBUG__
-			Broodwar->printf("we need another pylon: prevision supply %d in %d sec", addSupply + Broodwar->self()->supplyUsed(), frames/24);
+				Broodwar->printf("we need another pylon: prevision supply %d in %d sec", addSupply + Broodwar->self()->supplyUsed(), frames/24);
 #endif
-			TheBuilder->build(Broodwar->self()->getRace().getSupplyProvider());
-		}
+				TheBuilder->build(Broodwar->self()->getRace().getSupplyProvider());
+			}
 		}
 
 		/// Research Techs/Upgrades

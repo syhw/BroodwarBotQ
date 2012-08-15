@@ -21,7 +21,7 @@
 #define __MANNER__ // will say gl hf (and in the future TODO leave game)
 #define __CONTROL_BO_UNTIL_SECOND_PYLON__ // no supply management before the second pylon, if you don't place it in the BO, you're locked
 #define __ETECH_ESTIMATOR__ // use the ETechEstimator (or not if undef)
-#define __BENS_LABELS__ // use Ben Weber's openings/strategies labels in the ETechEstimator
+///#define __BENS_LABELS__ // use Ben Weber's openings/strategies labels in the ETechEstimator
 #define __WORKERS_FACTOR__ 1.12 // how much more workers we want on top of the optimal count (nb workers = optimal * __WORKERS_FACTOR__)
 #define __MAX_WORKERS__ 75
 #define __TILES_RADIUS_DEFEND_BASE__ 26
