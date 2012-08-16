@@ -46,9 +46,11 @@ int ZealotUnit::fightMove()
         && setPrio.count(targetEnemy->getType())
         && (targetEnemy->getDistance(_unitPos) > 45.0 || !inRange(targetEnemy)))
     {
-        unit->move(targetEnemy->getPosition());
+		if (unit->getTarget() != targetEnemy)
+	        unit->rightClick(targetEnemy);
         _lastClickFrame = Broodwar->getFrameCount();
         _lastMoveFrame = Broodwar->getFrameCount();
+		_lastAttackFrame = Broodwar->getFrameCount();
         _fightMoving = true;
         return 1;
     }
@@ -57,9 +59,11 @@ int ZealotUnit::fightMove()
     if (oorTargetEnemy != NULL && oorTargetEnemy->exists() && oorTargetEnemy->isVisible() && targetEnemy->isDetected()
         && !inRange(oorTargetEnemy))
     {
-        unit->move(oorTargetEnemy->getPosition());
+		if (unit->getTarget() != oorTargetEnemy)
+	        unit->rightClick(oorTargetEnemy);
         _lastClickFrame = Broodwar->getFrameCount();
         _lastMoveFrame = Broodwar->getFrameCount();
+		_lastAttackFrame = Broodwar->getFrameCount();
         _fightMoving = true;
         return 2;
     }
@@ -181,13 +185,18 @@ void ZealotUnit::micro()
     {
 		if (targetEnemy != NULL && targetEnemy->exists() && targetEnemy->isVisible() && targetEnemy->isDetected()) 
 		{
-			// attack enemy unit
-			unit->rightClick(targetEnemy);
 			_lastClickFrame = Broodwar->getFrameCount();
 			_lastAttackFrame = Broodwar->getFrameCount();
+			if (unit->getTarget() == targetEnemy)
+				return;
+			// attack enemy unit
+			unit->rightClick(targetEnemy);
 		}
 		else
-			unit->attack(_unitsGroup->enemiesCenter);
+		{
+			if (unit->getOrder() != Orders::AttackMove || unit->getOrderTargetPosition().getApproxDistance(_unitsGroup->enemiesCenter) > 3*TILE_SIZE)
+				unit->attack(_unitsGroup->enemiesCenter);
+		}
     }
     else if (unit->getGroundWeaponCooldown() > Broodwar->getLatencyFrames() + 2) // (Broodwar->getLatencyFrames()+1)*2, safety
     {
