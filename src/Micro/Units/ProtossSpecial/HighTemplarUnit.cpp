@@ -38,7 +38,8 @@ void HighTemplarUnit::micro()
         return;
 
 	/// Merge if that's the most interesting thing to do
-    if (((!Broodwar->self()->hasResearched(TechTypes::Psionic_Storm) && unit->getEnergy() < 75) || unit->getEnergy() < 20 /* TODO */ || (unit->getEnergy() < 74 && unit->getHitPoints() < 20) 
+    if (((!Broodwar->self()->hasResearched(TechTypes::Psionic_Storm)) //&& unit->getEnergy() < 75) 
+		|| unit->getEnergy() < 20 /* TODO */ || (unit->getEnergy() < 74 && unit->getHitPoints() < 20) 
         || (unit->getEnergy() < 55 && unit->getShields() < 2)) && elapsed > Broodwar->getLatencyFrames() + getAttackDuration())
     {
         _unitsGroup->signalMerge(unit);
