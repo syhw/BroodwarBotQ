@@ -178,7 +178,11 @@ void Base::cleanCenter()
 		it != tmp.end(); ++it)
 	{
 		if ((*it)->getPlayer() == Broodwar->self() && (*it)->getType() != Broodwar->self()->getRace().getCenter())
-			(*it)->move(Position(Broodwar->self()->getStartLocation())); // TODO change that ugly thing
+		{
+			Position tmpHome = Position(Broodwar->self()->getStartLocation());
+			if ((*it)->getTargetPosition() != tmpHome)
+				(*it)->move(tmpHome); // TODO change that ugly thing
+		}
 	}
 	/// TODO can be that there is a burrowed unit or a mine here
 }
