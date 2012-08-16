@@ -103,7 +103,11 @@ void Base::update()
 #endif
 	if (resourceDepot == NULL)
 	{
-		std::set<Unit*> tmp = Broodwar->getUnitsOnTile(baseLocation->getTilePosition().x(), baseLocation->getTilePosition().y());
+		int bltpx = baseLocation->getPosition().x();
+		int bltpy = baseLocation->getPosition().y();
+		std::set<Unit*> tmp = Broodwar->getUnitsInRectangle(max(0, bltpx - 4*TILE_SIZE), 
+			max(0, bltpy - 4*TILE_SIZE), min(Broodwar->mapWidth()*TILE_SIZE, bltpx + 8*TILE_SIZE),
+			min(Broodwar->mapHeight()*TILE_SIZE, bltpy + 7*TILE_SIZE));
 		for (std::set<Unit*>::const_iterator it = tmp.begin();
 			it != tmp.end(); ++it)
 		{
@@ -165,6 +169,17 @@ void Base::update()
 
 void Base::cleanCenter()
 {
+	int bltpx = baseLocation->getPosition().x();
+	int bltpy = baseLocation->getPosition().y();
+	std::set<Unit*> tmp = Broodwar->getUnitsInRectangle(max(0, bltpx - 1*TILE_SIZE), 
+		max(0, bltpy - 1*TILE_SIZE), min(Broodwar->mapWidth()*TILE_SIZE, bltpx + 5*TILE_SIZE),
+		min(Broodwar->mapHeight()*TILE_SIZE, bltpy + 4*TILE_SIZE));
+	for (std::set<Unit*>::const_iterator it = tmp.begin();
+		it != tmp.end(); ++it)
+	{
+		if ((*it)->getPlayer() == Broodwar->self() && (*it)->getType() != Broodwar->self()->getRace().getCenter())
+			(*it)->move(Position(Broodwar->self()->getStartLocation())); // TODO change that ugly thing
+	}
 	/// TODO can be that there is a burrowed unit or a mine here
 }
 

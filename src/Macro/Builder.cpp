@@ -260,7 +260,13 @@ void Task::buildIt()
 			{
 				BWTA::BaseLocation* b = BWTA::getNearestBaseLocation(tilePosition);
 				if (b != NULL && !b->getMinerals().empty())
-					worker->rightClick(*(b->getMinerals().begin()));
+				{
+					Unit* firstMineral = *(b->getMinerals().begin());
+					if (firstMineral)
+						worker->rightClick(firstMineral);
+					else
+						worker->move(Position(tilePosition));
+				}
 				else
 					worker->move(Position(tilePosition));
 			}
@@ -600,7 +606,8 @@ void Builder::update()
 #ifdef __MACRO_DEBUG__
 				Broodwar->printf("Building %s pop %d", it->second->getName().c_str(), Broodwar->self()->supplyUsed()/2);
 #endif
-				tasks.push_front(it->second);
+				if (!numberInFutureTasks(it->second->getType()))
+					tasks.push_front(it->second);
 				toRemove.push_back(it->first);
 			}
 		}

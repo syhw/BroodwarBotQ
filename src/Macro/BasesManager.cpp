@@ -23,7 +23,7 @@ void BasesManager::destroy()
 
 BasesManager::BasesManager()
 : firstGasPop(12)
-, expanding(false)
+, expanding(0)
 {
 	TheBasesManager = this;
 }
@@ -78,7 +78,7 @@ void BasesManager::update()
 		else
 			readyBases.erase(mb);
 		if (readyBases.size() == allBases.size())
-			expanding = false;
+			expanding = 0;
 	}
 
 	if (Broodwar->self()->minerals() > 1200 // TODO remove
@@ -96,10 +96,10 @@ Base* BasesManager::getBase(BWTA::BaseLocation* location)
 
 bool BasesManager::expand(BWTA::BaseLocation* location)
 {
-	if (expanding)
+	if (expanding > 0) // > 1 ? :)
 		return false;
 	else
-		expanding = true;
+		expanding += 1;
 	if (location == NULL)
 	{
 		// Find closer expand location not taken
@@ -132,7 +132,10 @@ bool BasesManager::expand(BWTA::BaseLocation* location)
 		return true;
 	}
 	else
+	{
+		expanding = 0;
 		return false;
+	}
 }
 
 void BasesManager::setFirstGasPop(int pop)
