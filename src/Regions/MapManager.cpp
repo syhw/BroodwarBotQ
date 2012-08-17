@@ -443,7 +443,7 @@ void MapManager::modifyDamages(int* tab, Position p, int minRadius, int maxRadiu
     assert(higherX > lowerX);
     assert(higherY > lowerY);
     for (int x = lowerX; x <= higherX; x += 32)
-        for (int y = lowerY; y <= higherY; y += 32)
+        for (int y = lowerY; y < higherY; y += 32)
         {
             double dist = p.getDistance(Position(x, y));
             if (dist <= tmpMaxRadius && dist > minRadius)
@@ -464,7 +464,7 @@ void MapManager::updateDamagesGrad(Vec* grad, int* tab, Position p, int minRadiu
     assert(higherX > lowerX);
     assert(higherY > lowerY);
     for (int x = lowerX; x <= higherX; x += 32)
-        for (int y = lowerY; y <= higherY; y += 32)
+        for (int y = lowerY; y < higherY; y += 32)
         {
             double dist = p.getDistance(Position(x, y));
             if (dist <= tmpMaxRadius && dist > tmpMinRadius)
