@@ -135,12 +135,9 @@ void DragoonUnit::micro()
 #ifdef __SIMPLE_FLEE__
             simpleFlee();
 #else
-			//if (unit->isStuck()) /// HACK TODO remove/change (unit->isStuck()?)
-			//	simpleFlee();
-			//else
-				flee();
+			flee();
 #ifdef __MICRO_DEBUG__
-				Broodwar->drawBoxMap(_unitPos.x()-10, _unitPos.y()-10, _unitPos.x()+8, _unitPos.y()+8, Colors::Green, true);
+			Broodwar->drawBoxMap(_unitPos.x()-10, _unitPos.y()-10, _unitPos.x()+8, _unitPos.y()+8, Colors::Green, true);
 #endif
 #endif
         }

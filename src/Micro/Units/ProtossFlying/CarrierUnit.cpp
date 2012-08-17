@@ -39,6 +39,14 @@ CarrierUnit::~CarrierUnit()
 
 void CarrierUnit::micro()
 { 
+	if (unit->getInterceptorCount() < 8)
+	{
+		unit->train(UnitTypes::Protoss_Interceptor);
+#ifndef __MICRO_PROJECT__
+		if (!Broodwar->self()->getUpgradeLevel(UpgradeTypes::Carrier_Capacity))
+			TheProducer->researchUpgrade(UpgradeTypes::Carrier_Capacity);
+#endif
+	}
 	_mode = MODE_FIGHT_A;
 	updateRangeEnemies();
     Vec whereFlee = Vec(0, 0);
@@ -65,15 +73,6 @@ void CarrierUnit::micro()
         return;
     }
 	decideToFlee();
-
-	if (unit->getInterceptorCount() < 8)
-	{
-		unit->train(UnitTypes::Protoss_Interceptor);
-#ifndef __MICRO_PROJECT__
-		if (!Broodwar->self()->getUpgradeLevel(UpgradeTypes::Carrier_Capacity))
-			TheProducer->researchUpgrade(UpgradeTypes::Carrier_Capacity);
-#endif
-	}
 	
 	int currentFrame = Broodwar->getFrameCount();
     if (currentFrame - _lastAttackFrame <= getAttackDuration()) // not interrupting attack
