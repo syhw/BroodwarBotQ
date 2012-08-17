@@ -13,7 +13,26 @@ using namespace std;
 #define __MIN_FRAMES_TO_START_CONSTRUCTION__ 10*24
 
 SimCityBuildingPlacer* Task::buildingPlacer = NULL;
+std::list<std::pair<int, std::pair<int, int> > > Task::reservations;
 
+
+pair<int, int> sumMinGas(list<pair<int, pair<int, int> > >* l, int period)
+{
+	list<pair<int, pair<int, int> > >::iterator it = l->begin();
+	while (it != l->end() && it->first + period*24 < Broodwar->getFrameCount())
+	{
+		l->pop_front();
+		it = l->begin();
+	}
+	pair<int, int> r(0, 0);
+	for (list<pair<int, pair<int, int> > >::const_iterator i = l->begin();
+		i != l->end(); ++i)
+	{
+		r.first += i->second.first;
+		r.second += i->second.second;
+	}
+	return r;
+}
 
 Task::Task(BWAPI::Unit* w, BWAPI::TilePosition tp, BWAPI::UnitType ut, int lo)
 : worker(w)
@@ -25,6 +44,7 @@ Task::Task(BWAPI::Unit* w, BWAPI::TilePosition tp, BWAPI::UnitType ut, int lo)
 , powered(false)
 , reserved(false)
 , finished(false)
+, askedForCoveringPylon(false)
 {
 	if (type == UnitTypes::Protoss_Pylon || type == UnitTypes::Protoss_Assimilator || type == UnitTypes::Protoss_Nexus)
 		powered = true;
@@ -200,7 +220,7 @@ void Task::powerIt()
 				break;
 			}
 		}
-		if (!foundCovering)
+		if (!foundCovering && !askedForCoveringPylon)
 		{
 			/// Seek a covering pylon position
 			TilePosition pylonTP = buildingPlacer->getPylonTilePositionCovering(tilePosition);
@@ -212,6 +232,7 @@ void Task::powerIt()
 					+ UnitTypes::Protoss_Pylon.buildTime()
 					+ __MIN_FRAMES_TO_START_CONSTRUCTION__
 					+ (int)(100.0 /TheResourceRates->getGatherRate().getMinerals()); // delay our construction, assume we have no money
+				askedForCoveringPylon = true;
 			}
 			else
 			{
@@ -311,12 +332,6 @@ void Task::check()
 {	
 	if (Broodwar->getFrameCount() <= lastOrder) // delay hack
 		return;
-	if (!reserved)
-	{
-		Macro::Instance().reservedMinerals += type.mineralPrice();
-		Macro::Instance().reservedGas += type.gasPrice();
-		reserved = true;
-	}
 	lastOrder = max(lastOrder, Task::framesToCompleteRequirements(type)); 
 	//if (tilePosition == TilePositions::None)
 	//	buildingPlacer->getTilePosition(type);
@@ -383,12 +398,7 @@ void Task::update()
 		powerIt();
 		return;
 	}
-	if (!reserved)
-	{
-		Macro::Instance().reservedMinerals += type.mineralPrice();
-		Macro::Instance().reservedGas += type.gasPrice();
-		reserved = true;
-	}
+	reserve();
 
 	// TODO complete distance instead of magic number "6" tiles.
 	double timeToGetToSite = ((double)(6*TILE_SIZE) / UnitTypes::Protoss_Probe.topSpeed());
@@ -399,6 +409,18 @@ void Task::update()
 		askWorker();
 	else
 		buildIt();
+}
+
+void Task::reserve()
+{
+	if (!reserved)
+	{
+		Macro::Instance().reservedMinerals += type.mineralPrice();
+		Macro::Instance().reservedGas += type.gasPrice();
+		Task::reservations.push_back(pair<int, pair<int, int> >(Broodwar->getFrameCount(), 
+			pair<int, int>(type.mineralPrice(), type.gasPrice())));
+		reserved = true;
+	}
 }
 
 const UnitType& Task::getType() const
@@ -630,6 +652,14 @@ void Builder::update()
 	int minerals = Broodwar->self()->minerals() + additionalMinerals;
 	int gas = Broodwar->self()->gas() + additionalGas;
 
+	double newMin = TheResourceRates->getGatherRate().getMinerals()*(24*__BUILDING_PLANNING_LOOKAHEAD__);
+	double newGas = TheResourceRates->getGatherRate().getGas()*(24*__BUILDING_PLANNING_LOOKAHEAD__);
+	double tmpMin = minerals + newMin;
+	double tmpGas = gas + newGas;
+	pair<int, int> sums = sumMinGas(&Task::reservations, __BUILDING_PLANNING_LOOKAHEAD__);
+	double minBudget = __BUILD_BUDGET_FACTOR__*tmpMin - sums.first;
+	double gasBudget = __BUILD_BUDGET_FACTOR__*tmpGas - sums.second;
+
 	for (list<pTask>::iterator it = tasks.begin();
 		it != tasks.end();)
 	{
@@ -639,15 +669,27 @@ void Builder::update()
 		else
 		{
 			(*tmp)->check();
-			/// update as much construction tasks as we can afford
-			if (minerals >= (*tmp)->getType().mineralPrice()
-				&& gas >= (*tmp)->getType().gasPrice()
-				&& (*tmp)->getLastOrder() <= Broodwar->getFrameCount()) // if true, it means we are going to build it right now (or very soon)
+
+			if ((*tmp)->getLastOrder() > Broodwar->getFrameCount())
+				continue;
+
+			/// follow the BO
+			if ((Broodwar->getFrameCount() < 24*60*4
+#ifdef __CONTROL_BO_UNTIL_SECOND_PYLON__
+				|| Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Pylon) < 2)
+#endif
+				&& minerals >= (*tmp)->getType().mineralPrice() && gas >= (*tmp)->getType().gasPrice())
+				(*tmp)->update();
+			/// Reserve resources if we can afford it
+			else if ((*tmp)->getType().mineralPrice() <= minBudget && (*tmp)->getType().gasPrice() <= gasBudget)
 			{
 				(*tmp)->update();
-				minerals -= (*tmp)->getType().mineralPrice();
-				gas -= (*tmp)->getType().gasPrice();
+				pair<int, int> sums = sumMinGas(&Task::reservations, __BUILDING_PLANNING_LOOKAHEAD__);
+				double minBudget = __BUILD_BUDGET_FACTOR__*tmpMin - sums.first;
+				double gasBudget = __BUILD_BUDGET_FACTOR__*tmpGas - sums.second;
 			}
+			else
+				break;
 		}
 	}
 	/// Check buildings in construction

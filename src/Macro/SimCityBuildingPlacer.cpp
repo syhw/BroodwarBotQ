@@ -376,7 +376,7 @@ void SimCityBuildingPlacer::generate(int min_size)
 			if (bc.size >= min_size)
 				break;
 
-			if ((double)(clock() - start)/CLOCKS_PER_SEC > 0.01) // 1 milli second
+			if ((double)(clock() - start)/CLOCKS_PER_SEC > 0.008) // 0.8 milli second
 				goto generate_end; // TODO: remove
 		}
 	}
@@ -387,7 +387,7 @@ void SimCityBuildingPlacer::generate(int min_size)
 	if (Broodwar->getFrameCount() > 100)
 		_canNoLongerGenerateClusters = true;
 	/// Search at other start locations
-	/*if (bc.size < min_size && Broodwar->getFrameCount() > 10*24*60)
+	if (bc.size < min_size && Broodwar->getFrameCount() > 16*24*60)
 	{
 		if (TheInformationManager == NULL)
 			TheInformationManager = InformationManager::create();
@@ -401,10 +401,10 @@ void SimCityBuildingPlacer::generate(int min_size)
 					searchedAtBase(b);
 			}
 
-			if ((double)(clock() - start)/CLOCKS_PER_SEC > 0.01) // 1 milli second
+			if ((double)(clock() - start)/CLOCKS_PER_SEC > 0.008) // 0.8 milli second
 				goto generate_end; // TODO: remove
 		}
-	}*/
+	}
 
 generate_end:
 	if (bc.size >= min_size)

@@ -19,9 +19,11 @@ class Task : public Arbitrator::Controller<BWAPI::Unit*, double>
 	bool powered;
 	bool reserved;
 	bool finished;
+	bool askedForCoveringPylon;
 public:
 	static SimCityBuildingPlacer* buildingPlacer;
 	static int framesToCompleteRequirements(BWAPI::UnitType type);
+	static std::list<std::pair<int, std::pair<int, int> > > reservations; // [(frame, (minerals, gas))]
 	Task(BWAPI::Unit* w, BWAPI::TilePosition tp=BWAPI::TilePositions::None, BWAPI::UnitType ut=BWAPI::UnitTypes::None, int lo=0);
 	inline bool requirements();
 	inline void positionIt();
@@ -31,6 +33,7 @@ public:
 	inline void askWorker();
 	inline void buildIt();
 	inline void powerIt();
+	void reserve();
 	BWAPI::TilePosition getTilePosition() const;
 	virtual std::string getName() const;
 	virtual std::string getShortName() const;

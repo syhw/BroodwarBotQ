@@ -174,9 +174,9 @@ void Base::cleanCenter()
 {
 	int bltpx = baseLocation->getPosition().x();
 	int bltpy = baseLocation->getPosition().y();
-	std::set<Unit*> tmp = Broodwar->getUnitsInRectangle(max(0, bltpx - 1*TILE_SIZE), 
-		max(0, bltpy - 1*TILE_SIZE), min(Broodwar->mapWidth()*TILE_SIZE, bltpx + 5*TILE_SIZE),
-		min(Broodwar->mapHeight()*TILE_SIZE, bltpy + 4*TILE_SIZE));
+	std::set<Unit*> tmp = Broodwar->getUnitsInRectangle(max(0, bltpx - 2*TILE_SIZE), 
+		max(0, bltpy - 2*TILE_SIZE), min(Broodwar->mapWidth()*TILE_SIZE, bltpx + 6*TILE_SIZE),
+		min(Broodwar->mapHeight()*TILE_SIZE, bltpy + 5*TILE_SIZE));
 	for (std::set<Unit*>::const_iterator it = tmp.begin();
 		it != tmp.end(); ++it)
 	{

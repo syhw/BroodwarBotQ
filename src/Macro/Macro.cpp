@@ -129,9 +129,14 @@ void Macro::update()
 		expand();
 	}
 
+	if (Intelligence::Instance().enemyRush)
+		TheWorkerManager->setWorkersPerGas(2);
+	else
+		TheWorkerManager->setWorkersPerGas(3);
+
 	if (!expands)
 	{
-		if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 5
+		if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 6
 			//|| Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway) + Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Gateway) >= 2)
 			&& !Intelligence::Instance().enemyRush)
 		{
@@ -261,7 +266,7 @@ Zerg openings, in order (in the vector):
 			{
 				TheProducer->produce(6, UnitTypes::Protoss_Zealot, 49, 2);
 				TheProducer->produce(16, UnitTypes::Protoss_Dragoon, 50);
-				TheProducer->produceAlways(30, UnitTypes::Protoss_Dragoon);
+				TheProducer->produceAlways(32, UnitTypes::Protoss_Dragoon);
 				TheProducer->produceAlways(6, UnitTypes::Protoss_Zealot, 2);
 			}
 			else if (er == Races::Terran)
@@ -403,7 +408,7 @@ Zerg openings, in order (in the vector):
 			if (!Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Shuttle))
 				TheProducer->produce(1, UnitTypes::Protoss_Shuttle, 95);
 #endif
-			TheProducer->produceAlways(3, UnitTypes::Protoss_Reaver, 5);
+			TheProducer->produceAlways(4, UnitTypes::Protoss_Reaver, 5);
 		}
 		else if (ut == UnitTypes::Protoss_Observer)
 		{
