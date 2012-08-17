@@ -61,7 +61,8 @@ void Intelligence::update()
 	if (Broodwar->enemy()->getRace() == Races::Protoss)
 	{
 		if (Broodwar->getFrameCount() < 24*__GATES_TIME_RUSH__ + 12
-			&& eUnitsFilter->getNumbersType(UnitTypes::Protoss_Gateway) >= 2)
+			&& (eUnitsFilter->getNumbersType(UnitTypes::Protoss_Gateway) >= 2
+			|| eUnitsFilter->getNumbersType(UnitTypes::Protoss_Photon_Cannon) >= 1))
 		{
 			enemyRush = true;
 			TheProducer->produce(1, UnitTypes::Protoss_Zealot, 100);
