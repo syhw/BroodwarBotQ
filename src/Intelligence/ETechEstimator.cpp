@@ -169,9 +169,17 @@ void ETechEstimator::onUnitShow(Unit* u)
 		if (!tableLoaded)
 		{
 			if (u->getType().getRace() == Races::Terran)
+			{
 				st.swap(TvP);
+				size_t nbOpenings = st.openings.size();
+				openingsProbas = vector<long double>(nbOpenings, 1.0 / nbOpenings);
+			}
 			else if (u->getType().getRace() == Races::Zerg)
+			{
 				st.swap(ZvP);
+				size_t nbOpenings = st.openings.size();
+				openingsProbas = vector<long double>(nbOpenings, 1.0 / nbOpenings);
+			}
 			tableLoaded = true;
 		}
 
@@ -630,7 +638,8 @@ bool ETechEstimator::testBuildTreePossible(int indBuildTree, const set<int>& set
 /// (Bullshit talk (c))
 void ETechEstimator::useDistribOpenings(int time)
 {
-	if (time + Broodwar->getFrameCount()/24 >= LEARNED_TIME_LIMIT)
+	if (time + Broodwar->getFrameCount()/24 >= LEARNED_TIME_LIMIT
+		|| Broodwar->self()->supplyUsed() < 42) // hack not to disturb the initial BO
 		return;
 	/// here we should now for sure the enemy's race as we have seen at least a building;
 	Race enemyRace = Intelligence::Instance().enemyRace;
