@@ -28,6 +28,8 @@ Task::Task(BWAPI::Unit* w, BWAPI::TilePosition tp, BWAPI::UnitType ut, int lo)
 {
 	if (type == UnitTypes::Protoss_Pylon || type == UnitTypes::Protoss_Assimilator || type == UnitTypes::Protoss_Nexus)
 		powered = true;
+	if (tp.isValid() && tp != TilePositions::None && type == UnitTypes::Protoss_Nexus)
+		positioned = true;
 }
 
 Task::~Task()
@@ -309,6 +311,12 @@ void Task::check()
 {	
 	if (Broodwar->getFrameCount() <= lastOrder) // delay hack
 		return;
+	if (!reserved)
+	{
+		Macro::Instance().reservedMinerals += type.mineralPrice();
+		Macro::Instance().reservedGas += type.gasPrice();
+		reserved = true;
+	}
 	lastOrder = max(lastOrder, Task::framesToCompleteRequirements(type)); 
 	//if (tilePosition == TilePositions::None)
 	//	buildingPlacer->getTilePosition(type);

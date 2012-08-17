@@ -65,6 +65,13 @@ void BasesManager::update()
 	for each(Base* mb in allBases)
 	{
 		mb->update();
+
+		if (mb->buildTries > 2) // for bases that we can't build (because of a bug or a burrowed unit/mine)
+		{
+			// we just assume that we can take an other expand by setting expanding 1 back
+			expanding -= 1;
+		}
+
 		if (mb->isActive())
 		{
 			activeBases.insert(mb);
@@ -96,7 +103,7 @@ Base* BasesManager::getBase(BWTA::BaseLocation* location)
 
 bool BasesManager::expand(BWTA::BaseLocation* location)
 {
-	if (expanding > 0) // > 1 ? :)
+	if (expanding > 0) // > 1 (for double expanding) ? :)
 		return false;
 	else
 		expanding += 1;
@@ -109,6 +116,8 @@ bool BasesManager::expand(BWTA::BaseLocation* location)
 			i != BWTA::getBaseLocations().end(); i++)
 		{
 			double dist = home->getGroundDistance(*i);
+			if ((*i)->getGeysers().empty())
+				dist += 42*TILE_SIZE; // HACK to un-prioritize "minerals only" expansions
 			if (dist > 0 && getBase(*i) == NULL)
 			{
 				if (minDist < 0 || dist < minDist)

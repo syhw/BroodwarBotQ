@@ -18,6 +18,7 @@ Base::Base(BWTA::BaseLocation* b, Unit* center)
 , centerInConstruction(0)
 , gasInConstruction(0)
 , cannoned(false)
+, buildTries(0)
 {
 }
 
@@ -30,6 +31,7 @@ Base::Base(const Base& b)
 , activeGas(b.activeGas)
 , centerInConstruction(b.centerInConstruction)
 , gasInConstruction(b.gasInConstruction)
+, buildTries(b.buildTries)
 {
 }
 
@@ -117,6 +119,7 @@ void Base::update()
 	}
 	if (resourceDepot == NULL && (Broodwar->getFrameCount() - centerInConstruction) > __MAX_TRIES_BUILD_SOMETHING__+250) // it has been canceled
 	{
+		buildTries += 1;
 		cleanCenter();
 		buildCenter();
 	}

@@ -20,6 +20,7 @@ public:
 	bool isReady() const;
 	bool isActive() const;
 	void update();
+	int buildTries;
 	bool cannoned;
 
 private:

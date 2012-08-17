@@ -131,20 +131,11 @@ void Macro::update()
 
 	if (!expands)
 	{
-		if ((Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 6)
+		if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 5
 			//|| Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway) + Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Gateway) >= 2)
 			&& !Intelligence::Instance().enemyRush)
 		{
-			if (Broodwar->enemy()->getRace() != Races::Protoss || ETechEstimator::Instance().getOpeningsProbas().at(1) > 0.18)
-			{
-				/*if (wontHave(UnitTypes::Protoss_Forge))
-					TheBuilder->build(UnitTypes::Protoss_Forge);
-				while (TheBuilder->willBuild(UnitTypes::Protoss_Photon_Cannon) < 3)
-					TheBuilder->build(UnitTypes::Protoss_Photon_Cannon);
-					*/
-			}
-			else
-				expand();
+			expand();
 		}
 		else if (Broodwar->self()->minerals() > 400)
 			expand();
