@@ -75,7 +75,7 @@ void ExploreGoal::achieve()
 {
 	if (_status != GS_IN_PROGRESS) // defensive
 		return;
-	if (Intelligence::Instance().enemyRush || (_firstRealized && Broodwar->getFrameCount() - _firstRealized > 1200)) // if we are taking more than 50 sec to explore a region, we're doing it wrong
+	if (Intelligence::Instance().enemyRush || (_firstRealized && Broodwar->getFrameCount() - _firstRealized > 1080)) // if we are taking more than 45 sec to explore a region, we're doing it wrong
 	{
 		_status = GS_ACHIEVED;
 		return;

@@ -28,7 +28,7 @@ bool ProbeUnit::decideToFlee()
 
 void ProbeUnit::micro()
 {
-	if (Broodwar->getFrameCount() - _lastClickFrame <= Broodwar->getLatencyFrames() + getAttackDuration())
+	if (Broodwar->getFrameCount() - _lastClickFrame <= Broodwar->getLatencyFrames() + getAttackDuration() + 1)
 		return;
 	if (dodgeStorm() || dragMine() || dragScarab())
 		return;
@@ -63,13 +63,13 @@ void ProbeUnit::micro()
 		}
 		else
 		{
+			_lastAttackFrame = Broodwar->getFrameCount();
 			if (_rangeEnemies.empty())
 				unit->attack(_unitsGroup->center);
 			else
 				unit->attack(_rangeEnemies.begin()->second);
 		}
 		_lastClickFrame = Broodwar->getFrameCount();
-		_lastAttackFrame = Broodwar->getFrameCount();
 	}
 }
 

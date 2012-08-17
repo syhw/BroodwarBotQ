@@ -7,6 +7,25 @@
 using namespace BWAPI;
 using namespace std;
 
+Position interm_position(BWTA::BaseLocation* b)
+{
+	Vec tmp;
+	for each (BWTA::Chokepoint* c in b->getRegion()->getChokepoints())
+		tmp += Vec(c->getCenter().x() - b->getPosition().x(), c->getCenter().y() - b->getPosition().y());
+	tmp = tmp.normalize();
+	tmp *= - 14*TILE_SIZE;
+	Position tmpPos = tmp.translate(Vec(b->getPosition()));
+	if (tmpPos.x() >= Broodwar->mapWidth() * TILE_SIZE)
+		tmpPos = Position((Broodwar->mapWidth()-1) * TILE_SIZE, tmpPos.y());
+	if (tmpPos.y() >= Broodwar->mapHeight() * TILE_SIZE)
+		tmpPos = Position(tmpPos.x(), (Broodwar->mapHeight()-2) * TILE_SIZE);
+	if (tmpPos.x() <= 0)
+		tmpPos = Position(TILE_SIZE, tmpPos.y());
+	if (tmpPos.y() <= 0)
+		tmpPos = Position(tmpPos.x(), TILE_SIZE);
+	return tmpPos;
+}
+
 /// TODO Refactor this: instead of not using the units group, do a
 /// BasicUnitsGroup
 /// DropUnitsGroup : BasicUnitsGroup
@@ -20,6 +39,7 @@ DropGoal::DropGoal(BWTA::BaseLocation* b, const std::map<BWAPI::UnitType, int>& 
 	Micro::Instance().drops += 1;
 	_neededUnits.insert(make_pair<UnitType, int>(UnitTypes::Protoss_Shuttle, 1));
 	_dropPos = b->getPosition();
+	_intermPos = interm_position(b);
 	for each (pair<UnitType, int> pp in _neededUnits)
 		bidOnUnitType(pp.first);
 }
@@ -31,6 +51,7 @@ DropGoal::DropGoal(Position p, const map<UnitType, int>& nU, int priority)
 	Micro::Instance().drops += 1;
 	_neededUnits.insert(make_pair<UnitType, int>(UnitTypes::Protoss_Shuttle, 1));
 	_base = BWTA::getNearestBaseLocation(_dropPos);
+	_intermPos = interm_position(_base);
 	for each (pair<UnitType, int> pp in _neededUnits)
 		bidOnUnitType(pp.first);
 }
@@ -42,6 +63,10 @@ DropGoal::~DropGoal()
 
 void DropGoal::achieve()
 {
+#ifdef __MICRO_DEBUG__
+	Broodwar->drawCircleMap(_dropPos.x(), _dropPos.y(), 40, Colors::Purple, true);
+	Broodwar->drawCircleMap(_intermPos.x(), _intermPos.y(), 40, Colors::Brown, true);
+#endif
 	Unit* reaver = NULL;
 	for each (pBayesianUnit bu in _unitsGroup.units)
 	{
@@ -65,26 +90,30 @@ void DropGoal::achieve()
 		_dropShipBu->unit->unloadAll();
 		return;
 	}
-	if (_unitsGroup.getDistance(_dropPos) > 8*TILE_SIZE)
+	//if (_unitsGroup.getDistance(_dropPos) > 16*TILE_SIZE)
+	if (_dropShipBu->unit->getDistance(_dropPos) > 16*TILE_SIZE)
 	{
 		/// we go there
 		if (_dropShipBu->unit->getLoadedUnits().size() == _unitsGroup.units.size() - 1) // only one dropship
 		{
 			/// gogogo
 			_unitsGroup.nonFlyers = 0;
-			_unitsGroup.groupTargetPosition = _dropPos;
+			_unitsGroup.groupTargetPosition = _intermPos;
+
 			if (_unitsGroup.groupMode != MODE_SCOUT)
 				_unitsGroup.switchMode(MODE_SCOUT);
 			_unitsGroup.update();
+			//_dropShipBu->unit->move(_intermPos);
+
 			if (!(Broodwar->getFrameCount() % 25))
 			{
 				if (_dropShipBu->getPPath().empty())
 				{
-					if (_dropShipBu->_fleeingDmg < 45)
+					if (_dropShipBu->_fleeingDmg < 65)
 					{
 						_dropShipBu->_fleeingDmg += 10;
 					}
-					else
+					/*else
 					{
 						/// Drop elsewhere
 						for each (BWTA::BaseLocation* b in TheInformationManager->getEnemyBases())
@@ -96,17 +125,17 @@ void DropGoal::achieve()
 								return;
 							}
 						}
-					}
+					}*/
 				}
 			}
 		}
-		else
+		else /// load reaver
 		{
 			if (reaver != NULL && !(Broodwar->getFrameCount() % 13))
 			{
 				reaver->train(UnitTypes::Protoss_Scarab);
 				_dropShipBu->unit->load(reaver);
-			} /// TODO remove (hack)
+			} 
 			for each (pBayesianUnit pbu in _dropeeBu)
 			{
 				if (pbu->getMode() != MODE_FIGHT_G)
@@ -119,21 +148,34 @@ void DropGoal::achieve()
 	}
 	else
 	{
-		/// dropship
-		if (_dropShipBu->unit->getLoadedUnits().size())
-			_dropShipBu->unit->unloadAll();
-		else if (reaver != NULL 
-			&& reaver->getGroundWeaponCooldown() > 0 
-			&& !reaver->isStartingAttack())
-			_dropShipBu->unit->load(reaver);
-
-		/// others
-		for each (pBayesianUnit pbu in _dropeeBu)
+		if (_unitsGroup.getDistance(_dropPos) > 6*TILE_SIZE)
 		{
-			if (pbu->getMode() != MODE_FIGHT_G)
+			if (_dropShipBu->unit->getLoadedUnits().count(reaver))
 			{
-				pbu->switchMode(MODE_FIGHT_G);
-				pbu->update();
+				if (!(Broodwar->getFrameCount() % 23))
+					_dropShipBu->move(_dropPos);
+			}
+			else if (reaver != NULL && !(Broodwar->getFrameCount() % 14))
+				_dropShipBu->unit->load(reaver);
+		}
+		else
+		{
+			/// dropship
+			if (_dropShipBu->unit->getLoadedUnits().size())
+				_dropShipBu->unit->unloadAll();
+			else if (reaver != NULL 
+				&& reaver->getGroundWeaponCooldown() > 0 
+				&& !reaver->isStartingAttack())
+				_dropShipBu->unit->load(reaver);
+
+			/// others
+			for each (pBayesianUnit pbu in _dropeeBu)
+			{
+				if (pbu->getMode() != MODE_FIGHT_G)
+				{
+					pbu->switchMode(MODE_FIGHT_G);
+					pbu->update();
+				}
 			}
 		}
 	}

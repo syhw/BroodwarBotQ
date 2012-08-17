@@ -10,6 +10,7 @@ class DropGoal: public Goal
 private:
 	void createMidSubgoal();
 	BWAPI::Position _dropPos;
+	BWAPI::Position _intermPos;
 	BWTA::BaseLocation* _base;
 	pBayesianUnit _dropShipBu;
 	std::list<pBayesianUnit> _dropeeBu;

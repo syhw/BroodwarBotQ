@@ -102,7 +102,12 @@ void DefendGoal::check()
 
 			if (ut.isWorker())
 			{
-				if (u->isAttacking() || u->isConstructing()) //|| u->getTarget()->getPlayer() == Broodwar->self()))
+				if (u->isAttacking() || u->isConstructing() 
+#ifdef __KILL_ENEMY_FIRST_SCOUT__
+					|| Broodwar->getFrameCount() < 5000)
+#else
+					)
+#endif
 				{
 					onlyScouts = false;
 #ifdef __2_PROBES_PER_ENEMY_WORKER_DEFENSE__
@@ -218,8 +223,8 @@ void DefendGoal::bidDefUnits()
 			      < __BAIT_WORKERS_TILES_DISTANCE__*TILE_SIZE 
 			   && _nbWorkers < _eUnits)))
 		{
-			// units at 20 build tiles will be bidded on at 70, really important goals will have a priority > 90
-			int prio = max(_priority, 90 - (int)(u->getDistance(_defPos)/TILE_SIZE)); 
+			// units at 20 build tiles will be bidded on at 88, really important goals will have a priority > 90
+			int prio = max(_priority, 98 - (int)(0.5*u->getDistance(_defPos)/TILE_SIZE)); 
 			TheArbitrator->setBid(this, u, prio);
 			_biddedOn.insert(u);
 		}
