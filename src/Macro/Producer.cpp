@@ -389,7 +389,9 @@ void Producer::update()
 		)
 	{
 		/// Organize/order supply to avoid supply block
-		if (TheResourceRates->getGatherRate().getMinerals() > 0.00001) // TODO change
+		if (TheResourceRates->getGatherRate().getMinerals() > 0.00001
+			&& Broodwar->self()->supplyTotal() < 400
+			&& (Broodwar->self()->supplyTotal() - Broodwar->self()->supplyUsed()) < 42) // TODO change ;)
 		{
 			int frames = min(180*24,
 				Broodwar->self()->getRace().getSupplyProvider().buildTime()
@@ -397,7 +399,6 @@ void Producer::update()
 				, 10*24)); // should be the upper bound on the time to start building a pylon
 			int addSupply = additionalUnitsSupply(frames);
 			if (!TheBuilder->numberInFutureTasks(Broodwar->self()->getRace().getSupplyProvider()) &&
-				Broodwar->self()->supplyTotal() < 400 &&
 				addSupply + Broodwar->self()->supplyUsed() > TheBuilder->additionalSupplyNextFrames(frames) + Broodwar->self()->supplyTotal())
 			{
 #ifdef __MACRO_DEBUG__
