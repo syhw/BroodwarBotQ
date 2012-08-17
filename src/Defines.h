@@ -12,7 +12,7 @@
 #define __ARBITRATOR_DEBUG__
 
 //#define __NON_IMPLEMENTE__
-///#define BW_POS_MOUSE
+#define BW_POS_MOUSE
 //#define __LEARNING_PROB_TABLES__
 
 #define WALK_TILES_SIZE 8
@@ -27,11 +27,14 @@
 #define __TILES_RADIUS_DEFEND_BASE__ 26
 #define __MAX_TRIES_BUILD_SOMETHING__ 1440 // IN FRAMES, 1 minute here
 #define __PYLON_COVERAGE_TILES__ 4 // length/size of the pylon coverage radius in build tiles
-//#define __2_PROBES_PER_ENEMY_WORKER_DEFENSE__ // put 2 probes on one attacking worker in DefendGoal
+#define __2_PROBES_PER_ENEMY_WORKER_DEFENSE__ // put 2 probes on one attacking worker in DefendGoal
 
 #define __ETECHESTIMATOR_MINUTES__ 2 // 2 minutes further/later
 // set to 0 for old behavior (estimating state instantaneously instead of predicting)
 #define __MINUTES_CANNONS_MINERALS__ 12 // minutes at which to defend bases with cannons
+#define __KILL_ENEMY_FIRST_SCOUT__ // what it says, put a worker on the enemy's first scout
+#define __BUILDING_PLANNING_LOOKAHEAD__ 90 // 90 seconds
+#define __BUILD_BUDGET_FACTOR__ 0.42 // maximum (thresholding) fraction of the budget dedicated to building buildings
 
 #ifdef __DEBUG__
 //#include <vld.h>
