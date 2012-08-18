@@ -81,6 +81,8 @@ class ETechEstimator : public CSingleton<ETechEstimator>
 	openings_knowing_player op_prior;
 	serialized_tables TvP; // tmp table to handle random
 	serialized_tables ZvP; // tmp table to handle random
+	openings_knowing_player op_prior_TvP; // tmp table to handle random
+	openings_knowing_player op_prior_ZvP; // tmp table to handle random
 	bool tableLoaded;
 	void loadTable(const char* tname);
 	std::vector<long double> openingsProbas; // see the big fat comment above

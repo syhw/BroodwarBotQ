@@ -112,9 +112,12 @@ void Intelligence::update()
 				break;
 			}
 		}
+		if (enemyHome == NULL)
+			enemyHome = *(TheInformationManager->getEnemyBases().begin());
+
 		for each (BWTA::BaseLocation* b in BWTA::getBaseLocations())
 		{
-			if (enemyHome != NULL && b != enemyHome)
+			if (b != enemyHome)
 			{
 				double dist = MapManager::Instance().distBaseToBase(enemyHome, b);
 				if (dist > 0.0)

@@ -72,10 +72,12 @@ void BasesManager::update()
 			expanding -= 1;
 		}
 
+
 		if (mb->isActive())
 		{
 			activeBases.insert(mb);
-			if (mb != allBases.front()) // for expands, take gas as soon as they are active
+			if (mb != allBases.front() // for expands, take gas as soon as they are active
+				|| Broodwar->getFrameCount() > 6*24*60) // failsafe TODO remove
 				mb->setActiveGas(true);
 		}
 		else

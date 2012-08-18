@@ -65,6 +65,11 @@ struct openings_knowing_player
         : numberGames(nb)
         , tabulated_P_Op_knowing_Time(p_Op)
     {}
+	void swap(openings_knowing_player& op)
+	{
+		tabulated_P_Op_knowing_Time.swap(op.tabulated_P_Op_knowing_Time);
+		numberGames = op.numberGames;
+	}
 };
 
 BOOST_CLASS_TRACKING(openings_knowing_player, boost::serialization::track_never)

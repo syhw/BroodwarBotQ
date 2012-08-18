@@ -131,21 +131,23 @@ void Macro::update()
 	}
 
 	
-	if (Intelligence::Instance().enemyRush)
+	if (Intelligence::Instance().enemyRush && Broodwar->getFrameCount() < 6*24*60)
 		TheWorkerManager->setWorkersPerGas(2);
 	else
 		TheWorkerManager->setWorkersPerGas(3);
 	if (TheWorkerManager->numberWorkers() < 14 || Broodwar->self()->minerals() < 400 && Broodwar->self()->gas() > 800)
-		TheWorkerManager->setWorkersPerGas(0);
+		TheWorkerManager->setWorkersPerGas(1);
+	else
+		TheWorkerManager->setWorkersPerGas(3);
 
 	if (Broodwar->getFrameCount() > 5*24*60) // failsafes post very early rushes
 	{
 		if (!(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Cybernetics_Core))
 			&& !TheBuilder->willBuild(UnitTypes::Protoss_Cybernetics_Core))
-			TheBuilder->build(UnitTypes::Protoss_Cybernetics_Core);
+			TheBuilder->build(UnitTypes::Protoss_Cybernetics_Core, TilePositions::None, true);
 		if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Pylon) < 2
 			&& !TheBuilder->willBuild(UnitTypes::Protoss_Pylon))
-			TheBuilder->build(UnitTypes::Protoss_Pylon);
+			TheBuilder->build(UnitTypes::Protoss_Pylon, TilePositions::None, true);
 	}
 
 
@@ -341,6 +343,22 @@ Zerg openings, in order (in the vector):
 		{
 			if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Nexus) == 2) // it's the first expand then (1 complete + 1 incomplete)
 			{
+				if (!(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Cybernetics_Core))
+					&& !(TheBuilder->willBuild(UnitTypes::Protoss_Cybernetics_Core)))
+				{
+					TheBuilder->build(UnitTypes::Protoss_Cybernetics_Core, TilePositions::None, true);
+				}
+				if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway) < 2
+					&& !(TheBuilder->willBuild(UnitTypes::Protoss_Gateway)))
+				{
+					TheBuilder->build(UnitTypes::Protoss_Gateway, TilePositions::None, true);
+				}
+				if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Pylon) < 3
+					&& !(TheBuilder->willBuild(UnitTypes::Protoss_Pylon)))
+				{
+					TheBuilder->build(UnitTypes::Protoss_Pylon, TilePositions::None, true);
+				}
+					
 				if (!reaverFirst && !stormFirst && wontHave(UnitTypes::Protoss_Observatory))
 				{
 					if (wontHave(UnitTypes::Protoss_Robotics_Facility))

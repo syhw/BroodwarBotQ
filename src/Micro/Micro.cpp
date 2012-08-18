@@ -168,24 +168,29 @@ void Micro::update()
 		&& !TheInformationManager->getEnemyBases().empty())
 		launchFirstDrop();
 
-	/// Look if we can push (again)
-	/*if (needDefense.empty() && _launchedFirstPush 
-		&& (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Observer)
-		|| Broodwar->self()->completedUnitCount(UnitTypes::Protoss_High_Templar)))
+	if (_launchedFirstPush
+		//&& needDefense.empty() 
+		&& goalManager->attackGoals < 1)
 	{
-		double theirForce = 0.0;
-		for (map<Unit*, EViewedUnit>::const_iterator it = EUnitsFilter::Instance().getViewedUnits().begin();
-			it != EUnitsFilter::Instance().getViewedUnits().end(); ++it)
+		if (Broodwar->self()->supplyUsed() > (195*2))
 		{
-			if (!it->second.type.isBuilding()
-				continue
+			for (map<double, BWTA::BaseLocation*>::const_reverse_iterator it = Intelligence::Instance().enemyBasesOrder.rbegin();
+				it != Intelligence::Instance().enemyBasesOrder.rend(); ++it)
+			{
+				if (TheInformationManager->getEnemyBases().count(it->second))
+				{
+					pGoal tmp = pGoal(new AttackGoal(it->second->getPosition()));
+					BWAPI::Unit* cc = EUnitsFilter::Instance().getClosestCenter(it->second);
+					if (cc != NULL)
+					{
+						tmp->addSubgoal(pSubgoal(new KillSubgoal(SL_AND, NULL, cc)));
+						goalManager->addGoal(tmp);
+						break;
+					}
+				}
+			}
 		}
-		if (ourForce > 1.5*theirForce)
-			goalManager->
-	}*/
-	
-	if (_launchedFirstPush && needDefense.empty() && goalManager->attackGoals < 1)
-	{
+		/*
 		int ourMinPrice = 0;
 		int ourGasPrice = 0;
 		int ourSupply = 0;
@@ -224,8 +229,12 @@ void Micro::update()
 		}
 		double theirScore = theirMinPrice + (4/3)*theirGasPrice + 25*theirSupply;
 
-		if (ourScore > theirScore)
-		{
+#ifdef __MICRO__DEBUG__
+		Broodwar->drawTextScreen(62, 62, "our %f, their %f", ourScore, theirScore);
+#endif
+
+		if (ourScore > theirScore || Broodwar->self()->supplyUsed() > (195*2))
+		{*/
 			if (TheInformationManager->getEnemyBases().size() > TheBasesManager->getAllBases().size())
 			{
 				bool found = false;
@@ -237,14 +246,16 @@ void Micro::update()
 						pGoal tmp = pGoal(new AttackGoal(it->second->getPosition()));
 						BWAPI::Unit* cc = EUnitsFilter::Instance().getClosestCenter(it->second);
 						if (cc != NULL)
+						{
 							tmp->addSubgoal(pSubgoal(new KillSubgoal(SL_AND, NULL, cc)));
-						goalManager->addGoal(tmp);
-						found = true;
-						break;
+							goalManager->addGoal(tmp);
+							found = true;
+							break;
+						}
 					}
 				}
 			}
-			else if (!(EUnitsFilter::Instance().getEArmies().empty()))
+			/*else if (!(EUnitsFilter::Instance().getEArmies().empty()))
 			{
 				int prio = 49;
 				for each (pair<int, EArmy> p in EUnitsFilter::Instance().getEArmies())
@@ -254,17 +265,18 @@ void Micro::update()
 					pGoal tmp = pGoal(new AttackGoal(p.second.position, prio--));
 					goalManager->addGoal(tmp);
 				}
-			}
+			}*/
 			else
 			{
-				if (Broodwar->getFrameCount() > 20*24*60) // after 20 minutes hunt every unit
+				if (Broodwar->getFrameCount() > 18*24*60) // after 18 minutes hunt every unit
 				{
-					int prio = 49;
+					int prio = 69;
 					for each (pair<BWAPI::Unit*, EViewedUnit> p in EUnitsFilter::Instance().getViewedUnits())
 					{
 						if (prio < 40)
 							break;
 						pGoal tmp = pGoal(new AttackGoal(p.second.position, prio--));
+						tmp->addSubgoal(pSubgoal(new KillSubgoal(SL_AND, NULL, p.first)));
 						goalManager->addGoal(tmp);
 					}
 				}
@@ -289,7 +301,7 @@ void Micro::update()
 						goalManager->addGoal(pGoal(new AttackGoal(Intelligence::Instance().enemyHome->getPosition())));
 				}
 			}
-		}
+		/*}
 		else if (ourScore > (theirScore/2))
 		{
 			if (TheInformationManager->getEnemyBases().size() > 2 && TheInformationManager->getEnemyBases().size() > TheBasesManager->getAllBases().size())
@@ -303,14 +315,16 @@ void Micro::update()
 						pGoal tmp = pGoal(new AttackGoal(it->second->getPosition()));
 						BWAPI::Unit* cc = EUnitsFilter::Instance().getClosestCenter(it->second);
 						if (cc != NULL)
+						{
 							tmp->addSubgoal(pSubgoal(new KillSubgoal(SL_AND, NULL, cc)));
-						goalManager->addGoal(tmp);
-						found = true;
-						break;
+							goalManager->addGoal(tmp);
+							found = true;
+							break;
+						}
 					}
 				}
 			}
-		}
+		}*/
 	}
 
 	if (Broodwar->getFrameCount() > 24*60*10 && !drops && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Reaver) && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Shuttle))

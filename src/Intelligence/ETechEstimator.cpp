@@ -113,7 +113,18 @@ ETechEstimator::ETechEstimator()
 #endif
 	filename.append(Broodwar->enemy()->getName());
 	filename.append("_");
-	filename.append(Broodwar->enemy()->getRace().c_str());
+	Race r = Broodwar->enemy()->getRace();
+
+	// for rdm
+	string filename_TvP = filename;
+	string filename_ZvP = filename;
+
+	if (Broodwar->enemy()->getRace() != Races::Protoss
+		&& Broodwar->enemy()->getRace() != Races::Terran
+		&& Broodwar->enemy()->getRace() != Races::Zerg) // rdm
+		r = Races::Protoss;
+
+	filename.append(r.c_str());
 	ifstream op_priors(filename.c_str());
 	if (op_priors.good())
 	{
@@ -126,7 +137,45 @@ ETechEstimator::ETechEstimator()
 		op_prior.numberGames = vector<int>(LEARNED_TIME_LIMIT / 60, 1);
 		for (size_t t = 0; t < LEARNED_TIME_LIMIT / 60; ++t)
 			op_prior.tabulated_P_Op_knowing_Time
+			.push_back(vector<long double>(nbOpenings, 1.0 / nbOpenings));
+	}
+
+	if (Broodwar->enemy()->getRace() != Races::Protoss
+		&& Broodwar->enemy()->getRace() != Races::Terran
+		&& Broodwar->enemy()->getRace() != Races::Zerg) // rdm
+	{
+		filename_TvP.append(Races::Terran.c_str());
+		ifstream op_priors_TvP(filename_TvP.c_str());
+		if (op_priors_TvP.good())
+		{
+			boost::archive::text_iarchive op_priors_archive(op_priors_TvP);
+			op_priors_archive >> op_prior_TvP;
+		}
+		else
+		{
+			// we never played against this opponent => uniform prior
+			size_t nbOpenings = TvP.openings.size();
+			op_prior.numberGames = vector<int>(LEARNED_TIME_LIMIT / 60, 1);
+			for (size_t t = 0; t < LEARNED_TIME_LIMIT / 60; ++t)
+				op_prior_TvP.tabulated_P_Op_knowing_Time
 				.push_back(vector<long double>(nbOpenings, 1.0 / nbOpenings));
+		}
+		filename_ZvP.append(Races::Zerg.c_str());
+		ifstream op_priors_ZvP(filename_ZvP.c_str());
+		if (op_priors_ZvP.good())
+		{
+			boost::archive::text_iarchive op_priors_archive(op_priors_ZvP);
+			op_priors_archive >> op_prior_ZvP;
+		}
+		else
+		{
+			// we never played against this opponent => uniform prior
+			size_t nbOpenings = ZvP.openings.size();
+			op_prior.numberGames = vector<int>(LEARNED_TIME_LIMIT / 60, 1);
+			for (size_t t = 0; t < LEARNED_TIME_LIMIT / 60; ++t)
+				op_prior_ZvP.tabulated_P_Op_knowing_Time
+				.push_back(vector<long double>(nbOpenings, 1.0 / nbOpenings));
+		}
 	}
 }
 
@@ -172,12 +221,14 @@ void ETechEstimator::onUnitShow(Unit* u)
 			if (u->getType().getRace() == Races::Terran)
 			{
 				st.swap(TvP);
+				op_prior.swap(op_prior_TvP);
 				size_t nbOpenings = st.openings.size();
 				openingsProbas = vector<long double>(nbOpenings, 1.0 / nbOpenings);
 			}
 			else if (u->getType().getRace() == Races::Zerg)
 			{
 				st.swap(ZvP);
+				op_prior.swap(op_prior_ZvP);
 				size_t nbOpenings = st.openings.size();
 				openingsProbas = vector<long double>(nbOpenings, 1.0 / nbOpenings);
 			}

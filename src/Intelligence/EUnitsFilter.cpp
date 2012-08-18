@@ -172,10 +172,11 @@ void EUnitsFilter::onUnitRenegade(Unit* u)
 
 void EUnitsFilter::updateEArmies()
 {
-    map<Unit*, EViewedUnit> unassigned;
+    map<Unit*, EViewedUnit> unassigned = map<Unit*, EViewedUnit>();
 	unassigned.insert(_eViewedUnits.begin(), _eViewedUnits.end());
 	int i = 0;
-	map<Unit*, int> tmpPairings;
+	list<Unit*> toRem;
+	map<Unit*, int> tmpPairings = map<Unit*, int>();
 	for (map<Unit*, EViewedUnit>::iterator it = unassigned.begin();
 		it != unassigned.end(); ++it)
 	{
@@ -200,9 +201,10 @@ void EUnitsFilter::updateEArmies()
 		}
 		_eArmies[current_ind].position = tmpArmyCenter.toPosition();
 
-		map<Unit*, EViewedUnit>::iterator tmpit = it;
-		unassigned.erase(tmpit);
+		toRem.push_back(it->first);
 	}
+	for each (Unit* u in toRem)
+		unassigned.erase(u);
 }
 
 const std::map<int, EArmy>& EUnitsFilter::getEArmies()

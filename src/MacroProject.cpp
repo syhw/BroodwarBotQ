@@ -26,6 +26,7 @@ void BattleBroodAI::onStart()
 #endif
 	Broodwar->setLatCom(false);
 	Broodwar->setCommandOptimizationLevel(1);
+	Broodwar->setFrameSkip(0);
 
     BWTA::readMap();
     BWTA::analyze();
