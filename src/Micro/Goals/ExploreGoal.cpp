@@ -27,8 +27,16 @@ ExploreGoal::ExploreGoal(BWTA::Region* region, int priority)
 		BWTA::Polygon polygon = region->getPolygon();
 		std::list<Position> to_see;
 		bool insert=true;
-		for(std::vector<Position>::iterator it = polygon.begin(); it != polygon.end(); ++it){
-				to_see.push_back(*it);
+		for(std::vector<Position>::iterator it = polygon.begin(); it != polygon.end(); ++it)
+		{
+			Position tmpCenter = region->getCenter();
+			Vec tmp(tmpCenter.x() - it->x(), tmpCenter.y() - it->y());
+			tmp = tmp.normalize();
+			tmp *= TILE_SIZE;
+			Position tmpPos = tmp.translate(*it);
+			if (!tmpPos.isValid())
+				tmpPos.makeValid();
+			to_see.push_back(tmpPos);
 		}
 		
 		//Add a first position to the subgoals

@@ -357,6 +357,10 @@ double WorkerManager::getGasRate() const
 {
 	return this->gasRate;
 }
+int WorkerManager::numberWorkers() const
+{
+	return workers.size();
+}
 int WorkerManager::getOptimalWorkerCount() const
 {
 	return this->optimalWorkerCount;

@@ -175,7 +175,7 @@ void AttackGoal::abort()
 			}
 		}
 	}
-	GoalManager::Instance().addGoal(pGoal(new AttackGoal(Position(tp), _priority)));
-	//GoalManager::Instance().addGoal(pGoal(new RegroupGoal(Position(tp))));
+	//GoalManager::Instance().addGoal(pGoal(new AttackGoal(Position(tp), _priority)));
+	GoalManager::Instance().addGoal(pGoal(new RegroupGoal(Position(tp))));
 	_status = GS_CANCELED;
 }

@@ -135,10 +135,11 @@ ETechEstimator::~ETechEstimator()
 	/// Write op_priors from what we saw of the opponent
 	{
 #ifdef __BENS_LABELS__
-		string filename("bwapi-data/read/op_prior_"); // TODO CHANGE IN WRITE FOLDER
+		string filename("bwapi-data/write/op_prior_"); // TODO CHANGE IN WRITE FOLDER
 #else
-		string filename("bwapi-data/read/xop_prior_"); // TODO CHANGE IN WRITE FOLDER
+		string filename("bwapi-data/write/xop_prior_"); // TODO CHANGE IN WRITE FOLDER
 #endif
+
 		filename.append(Broodwar->enemy()->getName());
 		filename.append("_");
 		filename.append(Broodwar->enemy()->getRace().c_str());
@@ -649,7 +650,7 @@ void ETechEstimator::useDistribOpenings(int time)
 		tmpOpProb = getOpeningsProbasIn(time);
 	
 	size_t mostProbable = indMax(tmpOpProb);
-	set<size_t> fearThese = supTo(tmpOpProb, 0.21);
+	set<size_t> fearThese = supTo(tmpOpProb, 0.201);
 	int builtCannons = Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Photon_Cannon)
 		+ TheBuilder->willBuild(UnitTypes::Protoss_Photon_Cannon); // ~~
 	if (enemyRace == Races::Terran)

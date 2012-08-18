@@ -46,8 +46,9 @@ void GoalManager::update()
 	int y = 3;
 #endif
 	/// Update all goals
-	for each (pGoal g in _goals)
+	for each (pair<int, pGoal> p in _goals)
 	{
+		pGoal g = p.second;
 		g->update();
 #ifdef __MICRO_DEBUG__
 		if (g->getStatus() == GS_WAIT_PRECONDITION)
@@ -60,19 +61,28 @@ void GoalManager::update()
 #endif
 	}
 	/// Removed finished goals
-	for (list<pGoal>::const_iterator it = _goals.begin();
+	list<multimap<int, pGoal>::const_iterator> toRem;
+	for (multimap<int, pGoal>::const_iterator it = _goals.begin();
 		it != _goals.end();)
 	{
-		if ((*it)->getStatus() == GS_ACHIEVED || (*it)->getStatus() == GS_CANCELED)
+		pGoal g = it->second;
+		if (g->getStatus() == GS_ACHIEVED || g->getStatus() == GS_CANCELED
+#ifdef __PREMPT_GOALS__
+			|| Broodwar->getFrameCount() - it->first > __PREMPT_GOALS__*24*60)
+#else
+			)
+#endif
 		{
 #ifdef __MICRO_DEBUG__
-			Broodwar->printf("\x08 !!! DELETED A %s GOAL !!!", (*it)->getName().c_str());
+			Broodwar->printf("\x08 !!! DELETED A %s GOAL !!!", g->getName().c_str());
 #endif
-			_goals.erase(it++);
+			toRem.push_back(it++);
 		}
 		else
 			++it;
 	}
+	for each (multimap<int, pGoal>::const_iterator it in toRem)
+		_goals.erase(it);
 }
 
 /***
@@ -80,12 +90,12 @@ void GoalManager::update()
  */
 void GoalManager::addGoal(pGoal g)
 {
-	for each (pGoal pg in _goals)
+	for each (pair<int, pGoal> pg in _goals)
 	{
-		if (pg == g)
+		if (pg.second == g)
 			return;
 	}
-	_goals.push_back(g);
+	_goals.insert(pair<int, pGoal>(Broodwar->getFrameCount(), g));
 }
 
 void GoalManager::addGoals(const list<pGoal>& l)
@@ -117,8 +127,8 @@ void GoalManager::onUnitDestroy(Unit* u)
 			_completedUnits.erase(itUnit);
 		_inTrainingUnits.remove(u);
 	}
-	for each (pGoal g in _goals)
-		g->onUnitDestroy(u); // will delete the pBayesianUnit OR will remove enemy units from the bimap
+	for each (pair<int, pGoal> pg in _goals)
+		pg.second->onUnitDestroy(u); // will delete the pBayesianUnit OR will remove enemy units from the bimap
 }
 
 const map<Unit*, pBayesianUnit>& GoalManager::getCompletedUnits() const

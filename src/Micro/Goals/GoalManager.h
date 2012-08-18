@@ -15,7 +15,8 @@ class GoalManager : public CSingleton<GoalManager>
 	friend class CSingleton<GoalManager>;
 private:
 	bool _firstPoke; // hack, remove TODO
-	std::list<pGoal> _goals;
+	//std::list<pGoal> _goals;
+	std::multimap<int, pGoal> _goals;
 	GoalManager();
 	~GoalManager();
 	std::map<BWAPI::Unit*, pBayesianUnit> _completedUnits;

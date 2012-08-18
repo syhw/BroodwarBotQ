@@ -122,6 +122,7 @@ void Macro::update()
 	TheBuilder->update(); // last update which moves an unit that should be done
 
 	TheArbitrator->update();
+
 	
 	/// TODO REMOVE THAT
 	if (!expands && (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 12 || Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway) > 2))
@@ -129,14 +130,28 @@ void Macro::update()
 		expand();
 	}
 
+	
 	if (Intelligence::Instance().enemyRush)
 		TheWorkerManager->setWorkersPerGas(2);
 	else
 		TheWorkerManager->setWorkersPerGas(3);
+	if (TheWorkerManager->numberWorkers() < 14 || Broodwar->self()->minerals() < 400 && Broodwar->self()->gas() > 800)
+		TheWorkerManager->setWorkersPerGas(0);
+
+	if (Broodwar->getFrameCount() > 5*24*60) // failsafes post very early rushes
+	{
+		if (!(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Cybernetics_Core))
+			&& !TheBuilder->willBuild(UnitTypes::Protoss_Cybernetics_Core))
+			TheBuilder->build(UnitTypes::Protoss_Cybernetics_Core);
+		if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Pylon) < 2
+			&& !TheBuilder->willBuild(UnitTypes::Protoss_Pylon))
+			TheBuilder->build(UnitTypes::Protoss_Pylon);
+	}
+
 
 	if (!expands)
 	{
-		if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 6
+		if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Dragoon) > 4
 			//|| Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway) + Broodwar->self()->incompleteUnitCount(UnitTypes::Protoss_Gateway) >= 2)
 			&& !Intelligence::Instance().enemyRush)
 		{
@@ -159,11 +174,13 @@ void Macro::update()
 			)
 		{
 			expand();
-			TheProducer->produceAlways(8, UnitTypes::Protoss_Zealot, 3);
+			TheProducer->produceAlways(10, UnitTypes::Protoss_Zealot, 3);
 		}
 	}
 	else if (expands > 1)
 	{
+		if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Shuttle))
+			TheProducer->researchUpgrade(UpgradeTypes::Gravitic_Drive);
 		if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_High_Templar) > 7)
 		{
 			TheProducer->researchTech(TechTypes::Maelstrom);
@@ -261,23 +278,28 @@ Zerg openings, in order (in the vector):
 		if (ut == UnitTypes::Protoss_Cybernetics_Core && Broodwar->getFrameCount() < 16000)
 		{
 			/// Built the (first) core
-			TheProducer->researchUpgrade(UpgradeTypes::Singularity_Charge);
+			if (!Intelligence::Instance().enemyRush)
+				TheProducer->researchUpgrade(UpgradeTypes::Singularity_Charge);
 			if (er == Races::Zerg)
 			{
-				TheProducer->produce(6, UnitTypes::Protoss_Zealot, 49, 2);
+				TheProducer->produce(5, UnitTypes::Protoss_Zealot, 49, 2);
 				TheProducer->produce(16, UnitTypes::Protoss_Dragoon, 50);
 				TheProducer->produceAlways(32, UnitTypes::Protoss_Dragoon);
-				TheProducer->produceAlways(6, UnitTypes::Protoss_Zealot, 2);
+				TheProducer->produceAlways(8, UnitTypes::Protoss_Zealot, 2);
 			}
 			else if (er == Races::Terran)
 			{
+				TheProducer->produce(2, UnitTypes::Protoss_Zealot, 49, 2);
 				TheProducer->produce(16, UnitTypes::Protoss_Dragoon, 50);
 				TheProducer->produceAlways(32, UnitTypes::Protoss_Dragoon);
+				TheProducer->produceAlways(8, UnitTypes::Protoss_Zealot, 2);
 			}
 			else
 			{
+				TheProducer->produce(2, UnitTypes::Protoss_Zealot, 49, 2);
 				TheProducer->produce(16, UnitTypes::Protoss_Dragoon, 50);
 				TheProducer->produceAlways(32, UnitTypes::Protoss_Dragoon);
+				TheProducer->produceAlways(8, UnitTypes::Protoss_Zealot, 2);
 			}
 		}
 		else if (ut == UnitTypes::Protoss_Gateway)
@@ -286,7 +308,7 @@ Zerg openings, in order (in the vector):
 			if (Broodwar->self()->supplyUsed() < 40)
 			{
 				if (er == Races::Zerg)
-					TheProducer->produce(2, UnitTypes::Protoss_Zealot, 50);
+					TheProducer->produce(3, UnitTypes::Protoss_Zealot, 50);
 			}
 			/// 3rd Gateway and oponent not Terran -> forge (for cannons against mutas and DTs, and for +1 attack against Z)
 			if (er != Races::Terran
@@ -295,6 +317,9 @@ Zerg openings, in order (in the vector):
 			{
 				TheBuilder->build(UnitTypes::Protoss_Forge);
 			}
+			if (Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Gateway) > 3
+				&& !(Broodwar->self()->getUpgradeLevel(UpgradeTypes::Singularity_Charge)))
+				TheProducer->researchUpgrade(UpgradeTypes::Singularity_Charge);
 		}
 
 		/////////////////// T2+ ///////////////////

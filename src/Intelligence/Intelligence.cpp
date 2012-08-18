@@ -65,7 +65,7 @@ void Intelligence::update()
 			|| eUnitsFilter->getNumbersType(UnitTypes::Protoss_Photon_Cannon) >= 1))
 		{
 			enemyRush = true;
-			TheProducer->produce(1, UnitTypes::Protoss_Zealot, 100);
+			TheProducer->produce(2, UnitTypes::Protoss_Zealot, 100);
 		}
 	}
 	else if (Broodwar->enemy()->getRace() == Races::Terran)
@@ -114,7 +114,7 @@ void Intelligence::update()
 		}
 		for each (BWTA::BaseLocation* b in BWTA::getBaseLocations())
 		{
-			if (b != enemyHome)
+			if (enemyHome != NULL && b != enemyHome)
 			{
 				double dist = MapManager::Instance().distBaseToBase(enemyHome, b);
 				if (dist > 0.0)
@@ -173,6 +173,13 @@ void Intelligence::update()
 		_launchedFirstExploreGoal = true;
 	}
 #endif
+	if (Broodwar->getFrameCount() > 20*24*60 && EUnitsFilter::Instance().empty()) // failsafe to explore all
+	{
+		for each (BWTA::Region* r in BWTA::getRegions())
+		{
+			GoalManager::Instance().addGoal(pGoal(new ExploreGoal(r)));
+		}
+	}
 }
 
 void Intelligence::onUnitCreate(Unit* u)

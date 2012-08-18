@@ -116,14 +116,14 @@ void Micro::launchFirstPush()
 		if (p != Positions::None)
 		{
 			pGoal tmp;
-			/*if (Intelligence::Instance().enemyBasesOrder.size() > 1)
+			if (Intelligence::Instance().enemyBasesOrder.size() > 1)
 			{
 				map<double, BWTA::BaseLocation*>::const_iterator it 
 					= Intelligence::Instance().enemyBasesOrder.begin();
 				++it;
 				tmp = pGoal(new AttackGoal(it->second->getPosition(), 30));
 			}
-			else*/
+			else
 			{
 				tmp = pGoal(new AttackGoal(p, 30));
 			}
@@ -183,52 +183,155 @@ void Micro::update()
 		if (ourForce > 1.5*theirForce)
 			goalManager->
 	}*/
-
+	
 	if (_launchedFirstPush && needDefense.empty() && goalManager->attackGoals < 1)
 	{
-		if (TheInformationManager->getEnemyBases().size() > TheBasesManager->getAllBases().size())
+		int ourMinPrice = 0;
+		int ourGasPrice = 0;
+		int ourSupply = 0;
+		for each (Unit* u in Broodwar->self()->getUnits())
 		{
-			bool found = false;
-			for (map<double, BWTA::BaseLocation*>::const_reverse_iterator it = Intelligence::Instance().enemyBasesOrder.rbegin();
-				it != Intelligence::Instance().enemyBasesOrder.rend(); ++it)
+			UnitType ut = u->getType();
+			if (ut.isWorker() || ut.isBuilding() || !(u->isCompleted()))
+				continue;
+			ourMinPrice += ut.mineralPrice();
+			ourGasPrice += ut.gasPrice();
+			ourSupply += ut.supplyRequired();
+		}
+		double ourScore = ourMinPrice + (4/3)*ourGasPrice + 25*ourSupply;
+
+		int theirMinPrice = 0;
+		int theirGasPrice = 0;
+		int theirSupply = 0;
+		//for (map<Unit*, Position>::const_iterator it = EUnitsFilter::Instance().getViewedUnits().begin();
+		//	it != EUnitsFilter::Instance().getViewedUnits.end(); ++it)
+		for each (pair<Unit*, EViewedUnit> it in EUnitsFilter::Instance().getViewedUnits())
+		{
+			UnitType ut = it.second.type;
+			if (ut.isWorker() || ut.isBuilding())
+				continue;
+			if (ut == UnitTypes::Zerg_Overlord)
+				continue;
+			theirMinPrice += ut.mineralPrice();
+			theirGasPrice += ut.gasPrice();
+			theirSupply += ut.supplyRequired();
+			if (ut == UnitTypes::Terran_Siege_Tank_Siege_Mode || ut == UnitTypes::Zerg_Lurker
+				|| ut == UnitTypes::Protoss_Dark_Templar) // a small boost for sieged tanks, lurkers, DT
 			{
-				if (TheInformationManager->getEnemyBases().count(it->second))
-				{
-					pGoal tmp = pGoal(new AttackGoal(it->second->getPosition()));
-					BWAPI::Unit* cc = EUnitsFilter::Instance().getClosestCenter(it->second);
-					if (cc != NULL)
-						tmp->addSubgoal(pSubgoal(new KillSubgoal(SL_AND, NULL, cc)));
-					goalManager->addGoal(tmp);
-					found = true;
-					break;
-				}
+				theirMinPrice += ut.mineralPrice();
+				theirSupply += ut.supplyRequired();
 			}
 		}
-		else
+		double theirScore = theirMinPrice + (4/3)*theirGasPrice + 25*theirSupply;
+
+		if (ourScore > theirScore)
 		{
-			// pushing on his front choke
-			Position toPush = Positions::None;
-			for each (TilePosition tp in MapManager::Instance().getPathFromHomeToSL(Intelligence::Instance().enemyHome))
+			if (TheInformationManager->getEnemyBases().size() > TheBasesManager->getAllBases().size())
 			{
-				for each (BWTA::Chokepoint* cp in TheBorderManager->getEnemyBorder())
+				bool found = false;
+				for (map<double, BWTA::BaseLocation*>::const_reverse_iterator it = Intelligence::Instance().enemyBasesOrder.rbegin();
+					it != Intelligence::Instance().enemyBasesOrder.rend(); ++it)
 				{
-					if (cp->getCenter().getApproxDistance(Position(tp)) <= 7*TILE_SIZE)
+					if (TheInformationManager->getEnemyBases().count(it->second))
 					{
-						toPush = Position(tp);
+						pGoal tmp = pGoal(new AttackGoal(it->second->getPosition()));
+						BWAPI::Unit* cc = EUnitsFilter::Instance().getClosestCenter(it->second);
+						if (cc != NULL)
+							tmp->addSubgoal(pSubgoal(new KillSubgoal(SL_AND, NULL, cc)));
+						goalManager->addGoal(tmp);
+						found = true;
 						break;
 					}
 				}
 			}
-			if (toPush != Positions::None)
-				goalManager->addGoal(pGoal(new AttackGoal(toPush)));
+			else if (!(EUnitsFilter::Instance().getEArmies().empty()))
+			{
+				int prio = 49;
+				for each (pair<int, EArmy> p in EUnitsFilter::Instance().getEArmies())
+				{
+					if (prio < 40)
+						break;
+					pGoal tmp = pGoal(new AttackGoal(p.second.position, prio--));
+					goalManager->addGoal(tmp);
+				}
+			}
 			else
-				goalManager->addGoal(pGoal(new AttackGoal(Intelligence::Instance().enemyHome->getPosition())));
+			{
+				if (Broodwar->getFrameCount() > 20*24*60) // after 20 minutes hunt every unit
+				{
+					int prio = 49;
+					for each (pair<BWAPI::Unit*, EViewedUnit> p in EUnitsFilter::Instance().getViewedUnits())
+					{
+						if (prio < 40)
+							break;
+						pGoal tmp = pGoal(new AttackGoal(p.second.position, prio--));
+						goalManager->addGoal(tmp);
+					}
+				}
+				else
+				{
+					// pushing on his front choke
+					Position toPush = Positions::None;
+					for each (TilePosition tp in MapManager::Instance().getPathFromHomeToSL(Intelligence::Instance().enemyHome))
+					{
+						for each (BWTA::Chokepoint* cp in TheBorderManager->getEnemyBorder())
+						{
+							if (cp->getCenter().getApproxDistance(Position(tp)) <= 7*TILE_SIZE)
+							{
+								toPush = Position(tp);
+								break;
+							}
+						}
+					}
+					if (toPush != Positions::None)
+						goalManager->addGoal(pGoal(new AttackGoal(toPush)));
+					else
+						goalManager->addGoal(pGoal(new AttackGoal(Intelligence::Instance().enemyHome->getPosition())));
+				}
+			}
+		}
+		else if (ourScore > (theirScore/2))
+		{
+			if (TheInformationManager->getEnemyBases().size() > 2 && TheInformationManager->getEnemyBases().size() > TheBasesManager->getAllBases().size())
+			{
+				bool found = false;
+				for (map<double, BWTA::BaseLocation*>::const_reverse_iterator it = Intelligence::Instance().enemyBasesOrder.rbegin();
+					it != Intelligence::Instance().enemyBasesOrder.rend(); ++it)
+				{
+					if (TheInformationManager->getEnemyBases().count(it->second))
+					{
+						pGoal tmp = pGoal(new AttackGoal(it->second->getPosition()));
+						BWAPI::Unit* cc = EUnitsFilter::Instance().getClosestCenter(it->second);
+						if (cc != NULL)
+							tmp->addSubgoal(pSubgoal(new KillSubgoal(SL_AND, NULL, cc)));
+						goalManager->addGoal(tmp);
+						found = true;
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	if (Broodwar->getFrameCount() > 24*60*10 && !drops && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Reaver) && Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Shuttle))
+	{
+		vector<BWTA::BaseLocation*> tmpV;
+		for each (BWTA::BaseLocation* eBase in TheInformationManager->getEnemyBases())
+			tmpV.push_back(eBase);
+		BWTA::BaseLocation* eBase = tmpV[Broodwar->getFrameCount() % TheInformationManager->getEnemyBases().size()];
+		if (eBase != NULL)
+		{
+			map<UnitType, int> tmpNeeded;
+			tmpNeeded.insert(make_pair<UnitType, int>(UnitTypes::Protoss_Reaver, 1));
+			goalManager->addGoal(pGoal(
+				new DropGoal(eBase->getPosition(), tmpNeeded)));
 		}
 	}
 
 	/// Failsafe
 	if (Broodwar->getFrameCount() > 8*24*60)
 		_launchedFirstPush = true;
+
 
 	/// Update all Goals
 	goalManager->update();

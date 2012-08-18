@@ -681,9 +681,15 @@ void Builder::update()
 				&& minerals >= (*tmp)->getType().mineralPrice() && gas >= (*tmp)->getType().gasPrice())
 				(*tmp)->update();
 			/// Reserve resources if we can afford it
-			else if ((*tmp)->getType().mineralPrice() <= minBudget && (*tmp)->getType().gasPrice() <= gasBudget)
+			else if (((*tmp)->getType().mineralPrice() <= minBudget && (*tmp)->getType().gasPrice() <= gasBudget)
+				|| ((*tmp)->getType().mineralPrice() <= minerals && (*tmp)->getType().gasPrice() <= gas))
 			{
 				(*tmp)->update();
+				if ((*tmp)->hasReserved())
+				{
+					minerals -= (*tmp)->getType().mineralPrice();
+					gas -= (*tmp)->getType().gasPrice();
+				}
 				pair<int, int> sums = sumMinGas(&Task::reservations, __BUILDING_PLANNING_LOOKAHEAD__);
 				double minBudget = __BUILD_BUDGET_FACTOR__*tmpMin - sums.first;
 				double gasBudget = __BUILD_BUDGET_FACTOR__*tmpGas - sums.second;
