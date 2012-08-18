@@ -2355,6 +2355,7 @@ ProbTablesData::ProbTablesData(int utID, std::vector<double>damageP,
 
 ProbTables::~ProbTables()
 {
+#ifdef __LEARNING_PROB_TABLES__
 	string filename("bwapi-data/AI/micro_tables/");
 	if (unitTypeID >= 0)
 	{
@@ -2367,7 +2368,6 @@ ProbTables::~ProbTables()
 		filename.append("Flying");
 	else if (unitTypeID == -3)
 		filename.append("Special");
-#ifdef __LEARNING_PROB_TABLES__
 	int tmpScore = 0;
 	set<Unit*> tmpUnits = Broodwar->getAllUnits();
 	for (set<Unit*>::const_iterator it = tmpUnits.begin();
@@ -2386,10 +2386,10 @@ ProbTables::~ProbTables()
 		boost::archive::text_oarchive oa(ofs);
 		oa << probTablesData;
 	}
-#else
+/*#else
     std::ofstream ofs(filename.c_str());
 	boost::archive::text_oarchive oa(ofs);
-	oa << probTablesData;
+	oa << probTablesData;*/
 #endif
 }
     

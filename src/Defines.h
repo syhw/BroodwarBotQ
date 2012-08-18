@@ -47,7 +47,7 @@
 #ifndef __DEBUG__ // Perf
 #undef __ARBITRATOR_DEBUG__
 //#undef __DO_NOT_HARASS_SCOUT__
-#undef _SECURE_SCL
-#define _SECURE_SCL 0 // remove iterator runtime checks
-#define _HAS_ITERATOR_DEBUGGING 0
+//#undef _SECURE_SCL
+//#define _SECURE_SCL 0 // remove iterator runtime checks
+//#define _HAS_ITERATOR_DEBUGGING 0
 #endif
