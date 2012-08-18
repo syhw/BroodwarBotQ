@@ -164,6 +164,10 @@ void Macro::update()
 	}
 	else if (expands == 1)
 	{
+		if (!(Broodwar->self()->completedUnitCount(UnitTypes::Protoss_Cybernetics_Core))
+			&& wontHave(UnitTypes::Protoss_Cybernetics_Core))
+			TheBuilder->build(UnitTypes::Protoss_Cybernetics_Core, TilePositions::None, true);
+
 		if (wontHave(UnitTypes::Protoss_Robotics_Facility))
 			TheBuilder->build(UnitTypes::Protoss_Robotics_Facility);
 
