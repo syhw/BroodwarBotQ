@@ -12,7 +12,8 @@ To run, it requires:
 - MacroProject.dll (the output of the first VCPROJ of the solution)
 - the existence of "bwapi-data\AI\tables\[PvPx|TvPx|ZvPx].table" (found in tables.7z),
   see http://emotion.inrialpes.fr/people/synnaeve/index_files/OpeningPrediction_proceedings.pdf
-- the existence of the "bwapi-data\AI\terrain" folder (so that it can serialize its terrain analysis)
+- the existence of the "bwapi-data\AI\terrain" folder filled with serialized terrain analysis 
+  (*.cdr and *.pfd files) from terrain.7z
 - the "bwapi-data\read" and "bwapi-data\write" folders for online (between games) learning
 
 To compile (MacroProject), it requires:
