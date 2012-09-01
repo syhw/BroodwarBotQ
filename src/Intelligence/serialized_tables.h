@@ -68,7 +68,7 @@ struct openings_knowing_player
 	void swap(openings_knowing_player& op)
 	{
 		tabulated_P_Op_knowing_Time.swap(op.tabulated_P_Op_knowing_Time);
-		numberGames = op.numberGames;
+		numberGames.swap(op.numberGames);
 	}
 };
 

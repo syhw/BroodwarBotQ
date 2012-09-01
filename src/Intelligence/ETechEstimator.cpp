@@ -155,7 +155,7 @@ ETechEstimator::ETechEstimator()
 		{
 			// we never played against this opponent => uniform prior
 			size_t nbOpenings = TvP.openings.size();
-			op_prior.numberGames = vector<int>(LEARNED_TIME_LIMIT / 60, 1);
+			op_prior_TvP.numberGames = vector<int>(LEARNED_TIME_LIMIT / 60, 1);
 			for (size_t t = 0; t < LEARNED_TIME_LIMIT / 60; ++t)
 				op_prior_TvP.tabulated_P_Op_knowing_Time
 				.push_back(vector<long double>(nbOpenings, 1.0 / nbOpenings));
@@ -171,7 +171,7 @@ ETechEstimator::ETechEstimator()
 		{
 			// we never played against this opponent => uniform prior
 			size_t nbOpenings = ZvP.openings.size();
-			op_prior.numberGames = vector<int>(LEARNED_TIME_LIMIT / 60, 1);
+			op_prior_ZvP.numberGames = vector<int>(LEARNED_TIME_LIMIT / 60, 1);
 			for (size_t t = 0; t < LEARNED_TIME_LIMIT / 60; ++t)
 				op_prior_ZvP.tabulated_P_Op_knowing_Time
 				.push_back(vector<long double>(nbOpenings, 1.0 / nbOpenings));
@@ -245,7 +245,7 @@ void ETechEstimator::onUnitShow(Unit* u)
 				if (u->isCompleted())
 					recomputeTime = (Broodwar->getFrameCount() - u->getType().buildTime()) / 24;
 				else
-					recomputeTime = (Broodwar->getFrameCount() - u->getRemainingBuildTime()) / 24;
+					recomputeTime = (Broodwar->getFrameCount() - (u->getType().buildTime() - u->getRemainingBuildTime())) / 24;
 			}
 		} else {
 			/// We infer the buildings needed to produce this unit
@@ -257,11 +257,11 @@ void ETechEstimator::onUnitShow(Unit* u)
 					/// The later he could have built this building
 					int tmpTime = (Broodwar->getFrameCount()
 						- (it->first.buildTime()
-						+ u->getType().buildTime() // minimum build time
+						- u->getType().buildTime() // minimum build time
 						//+ u->getDistance(enemyStart, u->getPosition()) / u->getType().topSpeed() // minimum walking distance done next line (approx.)
-						+ static_cast<int>(((Broodwar->mapWidth() + Broodwar->mapHeight())/2.0 * TILE_SIZE) / u->getType().topSpeed())
+						- static_cast<int>(((Broodwar->mapWidth() + Broodwar->mapHeight())/2.0 * TILE_SIZE) / u->getType().topSpeed())
 						)) / 24;
-					if (!recomputeTime || tmpTime > recomputeTime) // we do only one recompute (the final) instead of many, for each buildings
+					if (!recomputeTime || tmpTime < recomputeTime) // we do only one recompute (the final) instead of many, for each buildings
 						recomputeTime = tmpTime;
 				}
 			}
@@ -653,7 +653,8 @@ void ETechEstimator::computeDistribOpenings(int time)
 	/// time in seconds
 	if (time >= LEARNED_TIME_LIMIT || time <= 0)
 		return;
-	openingsProbas.swap(computeVecDistribOpenings(time));
+	//openingsProbas.swap(computeVecDistribOpenings(time));
+	openingsProbas = computeVecDistribOpenings(time);
 	for (size_t i = 0; i < openingsProbas.size(); ++i)
 	{
 		int t = format_max_time(time);
