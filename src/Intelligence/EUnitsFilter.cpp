@@ -214,7 +214,7 @@ void EUnitsFilter::onUnitRenegade(Unit* u)
 
 void EUnitsFilter::update()
 {
-	updateEArmies();
+	//updateEArmies();
 }
 
 const std::map<BWAPI::Unit*, EViewedUnit>& EUnitsFilter::getViewedUnits()
