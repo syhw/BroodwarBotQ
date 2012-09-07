@@ -21,12 +21,12 @@ class EUnitsFilter : public CSingleton<EUnitsFilter>
     friend class CSingleton<EUnitsFilter>;
     EUnitsFilter();
     ~EUnitsFilter() { }
-	std::map<int, EArmy> _eArmies;
+	//std::map<int, EArmy> _eArmies;
     std::set<BWAPI::UnitType> _interestingTypes;
     std::map<BWAPI::Unit*, EViewedUnit> _eViewedUnits;
     std::map<BWAPI::Unit*, std::pair<BWAPI::UnitType, BWAPI::Position> > _invisibleUnits;
 public:
-	inline void updateEArmies();
+	//inline void updateEArmies();
     void update(BWAPI::Unit* u);
     void filter(BWAPI::Unit* u);
     void onUnitDestroy(BWAPI::Unit* u);
@@ -35,7 +35,7 @@ public:
     void onUnitHide(BWAPI::Unit* u);
     void onUnitRenegade(BWAPI::Unit* u);
 
-	const std::map<int, EArmy>& getEArmies();
+	//const std::map<int, EArmy>& getEArmies();
     const std::map<BWAPI::Unit*, EViewedUnit>& getViewedUnits();
     EViewedUnit getViewedUnit(BWAPI::Unit* u);
     int getNumbersType(BWAPI::UnitType ut);

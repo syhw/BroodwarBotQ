@@ -170,7 +170,7 @@ void EUnitsFilter::onUnitRenegade(Unit* u)
     update(u);
 }
 
-void EUnitsFilter::updateEArmies()
+/*void EUnitsFilter::updateEArmies()
 {
     map<Unit*, EViewedUnit> unassigned = map<Unit*, EViewedUnit>();
 	unassigned.insert(_eViewedUnits.begin(), _eViewedUnits.end());
@@ -205,12 +205,12 @@ void EUnitsFilter::updateEArmies()
 	}
 	for each (Unit* u in toRem)
 		unassigned.erase(u);
-}
+}*/
 
-const std::map<int, EArmy>& EUnitsFilter::getEArmies()
+/*const std::map<int, EArmy>& EUnitsFilter::getEArmies()
 {
 	return _eArmies;
-}
+}*/
 
 void EUnitsFilter::update()
 {
